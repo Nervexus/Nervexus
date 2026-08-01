@@ -4903,10 +4903,11 @@
                   </div>
                 </div>
               </div>
-              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:13px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06); margin-bottom:22px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:13px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06); margin-bottom:8px;">
                 <div><div style="font-size:11px; color:#7c7c84; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">ACTIVE VOICE MODEL</div><div style="font-size:17px; font-weight:700; margin-top:3px;">{{ voiceModelName }}</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">{{ voiceDeviceName }}</div></div>
                 <span onClick="{{ testVoice }}" class="cc-glowbtn" style="padding:10px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">▶ Test voice</span>
               </div>
+              <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#ff8a5b; margin-bottom:14px; padding:0 2px;">⚠ {{ voiceFallbackErr }}</div></sc-if>
               <div class="cc-glowcard" style="border-radius:18px; background:#141416; padding:18px 20px 6px; margin-bottom:22px;">
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">VOICE LIBRARY · ▶ PREVIEW</div>
               <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"><sc-for list="{{ voices }}" as="v" hint-placeholder-count="8"><div onClick="{{ v.pick }}" style="display:flex; align-items:center; gap:6px; flex:1 1 190px; max-width:260px; padding:7px 9px; border:1px solid {{ v.b }}; border-radius:11px; cursor:pointer; background:{{ v.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }"><span onClick="{{ v.preview }}" title="Preview" style="width:20px; height:20px; flex:0 0 20px; border-radius:50%; border:1px solid rgba(255,255,255,0.45); color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:8px; background:rgba(255,255,255,0.1);" style-hover="{ background:'rgba(255,255,255,0.25)' }">▶</span><span style="flex:1; min-width:0; font-size:11.5px; font-weight:600; color:{{ v.c }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ v.name }}</span><sc-if value="{{ v.custom }}" hint-placeholder-val="{{ false }}"><span onClick="{{ v.remove }}" title="Remove" style="width:18px; height:18px; flex:0 0 18px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:#6f6f78; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span></sc-if></div></sc-for></div>
@@ -4919,11 +4920,9 @@
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ volumeChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">READING STYLE</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ readingStyleChips }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.set }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:20px; padding:7px 14px; cursor:pointer; background:{{ c.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ c.l }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">DEFAULT VOICE · BRIEFINGS</div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ briefVoiceChips }}" as="c" hint-placeholder-count="15"><span onClick="{{ c.set }}" style="font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:20px; padding:6px 12px; cursor:pointer; background:{{ c.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ c.name }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">DEFAULT VOICE · CONVERSATIONS</div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ convoVoiceChips }}" as="c" hint-placeholder-count="15"><span onClick="{{ c.set }}" style="font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:20px; padding:6px 12px; cursor:pointer; background:{{ c.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ c.name }}</span></sc-for></div>
+
               <sc-for list="{{ voiceSetToggles }}" as="x" hint-placeholder-count="2"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:13.5px; color:#eef0f2;">{{ x.label }}</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+              <div style="display:flex; gap:8px; margin-top:10px;"><sc-for list="{{ wakeWordChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.set }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:20px; padding:7px 14px; cursor:pointer; background:{{ c.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ c.l }}</span></sc-for></div>
             </sc-if>
 
             <sc-if value="{{ tabNotif }}" hint-placeholder-val="{{ false }}">
@@ -6298,18 +6297,19 @@ class Component extends DCLogic {
   // ElevenLabs is preferred when a key is saved & enabled; falls back to the local VoiceEngine
   // (or plain browser SpeechSynthesis) on any error, missing key, or while offline.
   async _speakEleven(text){
-    if(!this._sbOn()) return false;
+    if(!this._sbOn()){ this.setState({voiceFallbackErr:'Not connected to Supabase — using browser voice'}); return false; }
     const c=this._provCfg('elevenlabs');
-    if(!c.on || !c.saved) return false;
+    if(!c.on || !c.saved){ this.setState({voiceFallbackErr:'ElevenLabs not connected/enabled — using browser voice'}); return false; }
     try{
       const voiceId=(this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
       const res=await window.SB.ttsSpeak('elevenlabs', text, voiceId);
-      if(!res || res.error || !res.audioBase64) return false;
+      if(!res || res.error || !res.audioBase64){ this.setState({voiceFallbackErr:(res&&res.error)||'ElevenLabs call failed — using browser voice'}); return false; }
+      this.setState({voiceFallbackErr:''});
       const audio=new Audio('data:'+(res.mime||'audio/mpeg')+';base64,'+res.audioBase64);
       this._elevenAudio=audio;
       audio.play().catch(()=>{});
       return true;
-    }catch(e){ return false; }
+    }catch(e){ this.setState({voiceFallbackErr:'ElevenLabs error: '+((e&&e.message)||e)}); return false; }
   }
   speak(text){
     this._speakEleven(text).then(ok=>{ if(!ok) this._speakLocal(text); });
@@ -8557,7 +8557,8 @@ class Component extends DCLogic {
       ...this._providerVals(),
       voiceRateChips:[0.75,1,1.25,1.5].map(o=>({l:o+'×', set:()=>this.setPref('voiceRate',o), c:S.prefs.voiceRate===o?'#F4F4F5':'#9a9aa2', b:S.prefs.voiceRate===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.voiceRate===o?'rgba(255,255,255,0.18)':'transparent'})),
       voicePitchChips:[0.8,1,1.2].map(o=>({l:o+'×', set:()=>this.setPref('voicePitch',o), c:S.prefs.voicePitch===o?'#F4F4F5':'#9a9aa2', b:S.prefs.voicePitch===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.voicePitch===o?'rgba(255,255,255,0.18)':'transparent'})),
-      voiceSetToggles:[ this._tog('wake','Wake word','Respond to “Hey Command”'), this._tog('autoListen','Continuous mode','Keep listening after replies') ],
+      voiceSetToggles:[ this._tog('wake','Wake word','Respond to “Hey '+(S.prefs.wakeWordName||'Hannah')+'”'), this._tog('autoListen','Continuous mode','Keep listening after replies') ],
+      wakeWordChips:['Hannah','Lura'].map(n=>({ l:n, set:()=>this.setPref('wakeWordName',n), c:(S.prefs.wakeWordName||'Hannah')===n?'#F4F4F5':'#9a9aa2', b:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.14)':'transparent' })),
       readingStyleChips:['Professional','Friendly','Motivational','Executive','Conversational'].map(o=>({l:o, set:()=>this.setReadingStyle(o), c:(S.prefs.readingStyle||'Professional')===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.14)':'transparent'})),
       volumeChips:[0.5,0.75,1].map(o=>({l:Math.round(o*100)+'%', set:()=>this.setVoiceVolume(o), c:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.14)':'transparent'})),
       briefVoiceChips:((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ name:p.name, set:()=>this.setBriefVoice(p.id), c:(S.prefs.briefingVoice||S.prefs.elevenVoiceId)===p.id?'#F4F4F5':'#b8b8c0', b:(S.prefs.briefingVoice||'concierge')===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.briefingVoice||'concierge')===p.id?'rgba(255,255,255,0.14)':'transparent'})),
@@ -8567,8 +8568,9 @@ class Component extends DCLogic {
       hasReadable:!!((S.readText&&S.readText.trim())||(S.vp&&S.vp.loaded)),
       voiceSources:[{id:'exec',t:'Executive Briefing',d:'Full intelligence report',g:'◆'},{id:'brief',t:'Daily Briefing',d:'Schedule · priorities · markets',g:'▤'},{id:'notif',t:'Notifications',d:'Recent alerts summary',g:'◉'},{id:'schedule',t:'Schedule & Reminders',d:'Today\u2019s events & open tasks',g:'◷'},{id:'fitness',t:'Fitness & Recovery',d:'Readiness · streak · sleep',g:'✚'},{id:'money',t:'Markets & Money',d:'Global financial update',g:'$'},{id:'business',t:'Business Report',d:'Companies & billionaire intel',g:'⬡'}].map(x=>({ title:x.t, desc:x.d, glyph:x.g, read:()=>this.readCoreSource(x.id,x.t) })),
       speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.voiceRate||1)===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.voiceRate||1)===o?'rgba(255,255,255,0.14)':'transparent'})),
-      voiceModelName:(((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).filter(p=>p.id===(S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM')).map(p=>p.name)[0])||'ElevenLabs voice',
+      voiceModelName:(()=>{ const PD=this._pd(); const built=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0].voices)||[]; const custom=S.prefs.customElevenVoices||[]; const cur=S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'; const match=[...built,...custom].find(p=>p.id===cur); return (match&&match.name)||'ElevenLabs voice'; })(),
       voiceDeviceName:this._provCfg('elevenlabs').saved?'ElevenLabs (cloud)':'Browser voice (fallback — connect ElevenLabs above)',
+      voiceFallbackErr:S.voiceFallbackErr||'',
       testVoice:()=>this.previewElevenVoice(S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'),
       adminUsers:S.users.map(u=>({ name:u.name, email:u.email, role:u.role, roleC:u.role==='Owner'?'#ff5563':u.role==='Admin'?'#F4F4F5':'#9a9aa2', status:u.status.toUpperCase(), statusCol:u.status==='active'?'#6cffba':u.status==='pending'?'#ffd66b':'#ff5563', isPending:u.status==='pending', isActive:u.status==='active', isSuspended:u.status==='suspended', isOwner:u.role==='Owner', initials:(u.name.split(/\s+/).map(x=>x[0]).slice(0,2).join('')||'U').toUpperCase(), approve:()=>this.setUserStatus(u.email,'active'), suspend:()=>this.setUserStatus(u.email,'suspended'), reactivate:()=>this.setUserStatus(u.email,'active'), remove:()=>this.delUser(u.email) })),
       pendingCount:S.users.filter(u=>u.status==='pending').length,
