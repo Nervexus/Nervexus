@@ -2,7 +2,7 @@
   "name": "Nervexus",
   "short_name": "Nervexus",
   "description": "Personal AI command center \u2014 learning, fitness, business & world intelligence.",
-  "start_url": "./AI Command Center.dc.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
