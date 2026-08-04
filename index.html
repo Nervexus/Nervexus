@@ -8701,7 +8701,7 @@ class Component extends DCLogic {
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v1.3 — Aug 4, 2026',
+      appVersion:'v1.4 — Aug 4, 2026',
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
       whatsNewOpen:!!S.whatsNewOpen, closeWhatsNew:()=>this.dismissWhatsNew(), openWhatsNewBtn:()=>this.openWhatsNew(),
       latestVersion:(this._changelog()[0]||{}).version||'',
