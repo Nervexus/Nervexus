@@ -1937,7 +1937,11 @@
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
             <div data-orb-mount="voice" style="width:460px; height:460px; margin:4px 0;"></div>
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
-            <div onClick="{{ toggleListen }}" style="display:inline-flex; align-items:center; gap:10px; padding:13px 26px; border-radius:40px; cursor:pointer; border:1px solid {{ listenBdr }}; background:{{ listenBg }}; color:#fff; font-size:14px; font-weight:600;" style-hover="{ transform:'scale(1.03)' }">
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#8a8a92;">VOICE ASSISTANT</span>
+              <div onClick="{{ toggleAssistantEnabled }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ assistantEnabledBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ assistantEnabledPos }}; width:16px; height:16px; border-radius:50%; background:#0a0a0b; transition:left .15s;"></div></div>
+            </div>
+            <div onClick="{{ toggleListen }}" style="display:inline-flex; align-items:center; gap:10px; padding:13px 26px; border-radius:40px; cursor:pointer; border:1px solid {{ listenBdr }}; background:{{ listenBg }}; color:#fff; font-size:14px; font-weight:600; opacity:{{ listenOpacity }}; pointer-events:{{ listenPointerEvents }};" style-hover="{ transform:'scale(1.03)' }">
               <span style="width:10px; height:10px; border-radius:50%; background:{{ listenDot }}; box-shadow:0 0 10px {{ listenDot }};"></span>
               {{ listenLabel }}
             </div>
@@ -4781,7 +4785,10 @@
               </div>
               <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#ff8a5b; margin-bottom:14px; padding:0 2px;">⚠ {{ voiceFallbackErr }}</div></sc-if>
               <div class="cc-glowcard" style="border-radius:18px; background:#141416; padding:18px 20px 6px; margin-bottom:22px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">VOICE LIBRARY · ▶ PREVIEW</div>
+              <div style="display:flex; align-items:center; justify-content:space-between; margin:2px 0 12px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">VOICE LIBRARY · ▶ PREVIEW</span>
+                <div style="display:flex; align-items:center; gap:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce;">READ ALOUD</span><div onClick="{{ toggleReadAloud }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ readAloudBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ readAloudPos }}; width:16px; height:16px; border-radius:50%; background:#0a0a0b; transition:left .15s;"></div></div></div>
+              </div>
               <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"><sc-for list="{{ voices }}" as="v" hint-placeholder-count="8"><div onClick="{{ v.pick }}" style="display:flex; align-items:center; gap:6px; flex:1 1 190px; max-width:260px; padding:7px 9px; border:1px solid {{ v.b }}; border-radius:11px; cursor:pointer; background:{{ v.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }"><span onClick="{{ v.preview }}" title="Preview" style="width:20px; height:20px; flex:0 0 20px; border-radius:50%; border:1px solid rgba(255,255,255,0.45); color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:8px; background:rgba(255,255,255,0.1);" style-hover="{ background:'rgba(255,255,255,0.25)' }">▶</span><span style="flex:1; min-width:0; font-size:11.5px; font-weight:600; color:{{ v.c }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ v.name }}</span><sc-if value="{{ v.custom }}" hint-placeholder-val="{{ false }}"><span onClick="{{ v.remove }}" title="Remove" style="width:18px; height:18px; flex:0 0 18px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:#6f6f78; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span></sc-if></div></sc-for></div>
               </div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">SPEAKING RATE</div>
@@ -6185,7 +6192,13 @@ class Component extends DCLogic {
     this._pauseForSpeech=false; if(this.state.listening) this.startRecog();
     return text;
   }
-  _initVoice(){ if(this._ve) return; if(!window.VoiceEngine){ if(!this._veWait){ this._veWait=setInterval(()=>{ if(window.VoiceEngine){ clearInterval(this._veWait); this._veWait=null; this._initVoice(); } },140); } return; } this._ve=new window.VoiceEngine({ onUpdate:(st)=>{ this.setState({vp:st}); } }); const mig={Aria:'pro_f',Nova:'energ_f',Vera:'calm_f',Luna:'friend_f',Iris:'brit_f',Sable:'exec_f',Elara:'concierge',Mira:'calm_m',Cleo:'ai_future',Wren:'friend_m',Faye:'brit_m',Zara:'energ_m',Isla:'exec_m',Nyra:'pro_m',Thea:'coach'}; if(!this._ve.isValidId(this.state.voice)){ this.setState({voice:mig[this.state.voice]||'pro_f'}); } this._syncVoiceSettings(); }
+  _initVoice(){ if(this._ve) return; if(!window.VoiceEngine){ if(!this._veWait){ this._veWait=setInterval(()=>{ if(window.VoiceEngine){ clearInterval(this._veWait); this._veWait=null; this._initVoice(); } },140); } return; } this._ve=new window.VoiceEngine({ onUpdate:(st)=>{ this.setState({vp:st}); },
+      // Read Aloud (briefings/reports/pasted text) speaks through the same connected
+      // cloud voice as the rest of the app (Settings → Voice Library) when Read Aloud is
+      // enabled, falling back to the browser voice if it's off or nothing's connected.
+      speakChunk:(text)=>this._speakChunkAwait(text),
+      stopChunk:()=>{ if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } },
+    }); const mig={Aria:'pro_f',Nova:'energ_f',Vera:'calm_f',Luna:'friend_f',Iris:'brit_f',Sable:'exec_f',Elara:'concierge',Mira:'calm_m',Cleo:'ai_future',Wren:'friend_m',Faye:'brit_m',Zara:'energ_m',Isla:'exec_m',Nyra:'pro_m',Thea:'coach'}; if(!this._ve.isValidId(this.state.voice)){ this.setState({voice:mig[this.state.voice]||'pro_f'}); } this._syncVoiceSettings(); }
   _syncVoiceSettings(){ if(!this._ve) return; const p=this.state.prefs||{}; this._ve.setSettings({ voice:this._ve.isValidId(this.state.voice)?this.state.voice:'exec_f', speed:p.voiceRate||1, pitch:p.voicePitch||1, volume:p.voiceVolume!=null?p.voiceVolume:1, style:p.readingStyle||'Professional', autoRate:!!p.autoRate }); }
   selectVoice(id){ this.mut(s=>({voice:id})); if(this._ve){ this._ve.setSettings({voice:id}); this._ve.preview(id); } }
   previewVoice(id){ this._ve&&this._ve.preview(id); }
@@ -6215,7 +6228,8 @@ class Component extends DCLogic {
   toggleStarVoice(id){ this.mut(s=>{ const cur=(s.prefs.starredVoices||[]).slice(); const i=cur.indexOf(id); if(i>=0) cur.splice(i,1); else cur.unshift(id); return {prefs:{...s.prefs,starredVoices:cur}}; }); }
   removeVoice(id){ const P=(window.VoiceEngine&&window.VoiceEngine.PROFILES)||[]; const s=this.state; const hid=(s.prefs.hiddenVoices||[]).slice(); if(P.filter(p=>hid.indexOf(p.id)<0).length<=1) return; if(hid.indexOf(id)<0) hid.push(id); const vis=P.filter(p=>hid.indexOf(p.id)<0); const fb=(vis[0]&&vis[0].id)||s.voice; const star=(s.prefs.starredVoices||[]).filter(x=>x!==id); const voice=s.voice===id?fb:s.voice; const prefs={...s.prefs,hiddenVoices:hid,starredVoices:star}; if(prefs.briefingVoice===id) prefs.briefingVoice=fb; if(prefs.convoVoice===id) prefs.convoVoice=fb; this.mut(()=>({prefs,voice})); if(this._ve) this._ve.setSettings({voice}); }
   restoreVoices(){ this.mut(s=>({prefs:{...s.prefs,hiddenVoices:[]}})); }
-  readAloud(text,title,pid){ if(!this._ve||!text||!text.trim()) return; if(this._ve.loadText(text,title||'Document',pid||this.state.voice)) this._ve.play(0); }
+  readAloud(text,title,pid){ if(this.state.prefs.readAloudEnabled===false) return; if(!this._ve||!text||!text.trim()) return; if(this._ve.loadText(text,title||'Document',pid||this.state.voice)) this._ve.play(0); }
+  toggleReadAloud(){ const nowOff=this.state.prefs.readAloudEnabled!==false; this.setPref('readAloudEnabled', !nowOff); if(nowOff && this._ve) this._ve.stop(); }
   pausePlay(){ this._ve&&this._ve.toggle(); }
   stopPlay(){ this._ve&&this._ve.stop(); }
   skipPlay(sec){ this._ve&&this._ve.skip(sec); }
@@ -6297,7 +6311,9 @@ class Component extends DCLogic {
   // (_pauseForSpeech, released when its audio ends) — otherwise every native SR end auto-restarts.
   startRecog(){ try{ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return; this._manualStop=false; const r=this._recog=new SR(); r.lang='en-US'; r.interimResults=false; r.onresult=(e)=>{ const t=e.results[0][0].transcript; this.voiceCommand(t); }; r.onerror=()=>{}; r.onend=()=>{ if(this._manualStop||this._pauseForSpeech) return; if(this.state.listening){ try{r.start();}catch(e){} } }; r.start(); }catch(e){} }
   stopRecog(){ try{ this._recog&&this._recog.stop(); }catch(e){} }
-  toggleListen(){ const on=!this.state.listening; const wasSpeaking=on && this._elevenAudio && !this._elevenAudio.paused;
+  toggleAssistantEnabled(){ const curOn=this.state.prefs.assistantEnabled!==false; const next=!curOn; this.setPref('assistantEnabled',next);
+    if(!next){ this._manualStop=true; this.stopRecog(); this._ttsStreamStop&&this._ttsStreamStop(); if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } speechSynthesis&&speechSynthesis.cancel(); if(this._orbApi) this._orbApi.setForceHover(false); this.setState({listening:false}); } }
+  toggleListen(){ if(this.state.prefs.assistantEnabled===false) return; const on=!this.state.listening; const wasSpeaking=on && this._elevenAudio && !this._elevenAudio.paused;
     this.setState({listening:on}); if(this._orbApi) this._orbApi.setForceHover(on);
     if(on){
       if(wasSpeaking){ try{ this._elevenAudio.pause(); }catch(e){} speechSynthesis&&speechSynthesis.cancel();
@@ -6476,7 +6492,7 @@ class Component extends DCLogic {
   // The orb's own conversation/command backend lives in voice-assistant-engine.js as an
   // independent module — this method is just the bridge: mic transcript in, host callbacks
   // out. All intent parsing and command execution happens in that file, not here.
-  voiceCommand(raw){ const t=(raw||'').trim(); if(!t) return;
+  voiceCommand(raw){ if(this.state.prefs.assistantEnabled===false) return; const t=(raw||'').trim(); if(!t) return;
     this._logConvo('user',t);
     // Barge-in: if the assistant is mid-speech, a new utterance always interrupts first —
     // including a streaming reply still queuing up more sentences to speak.
@@ -7403,6 +7419,10 @@ class Component extends DCLogic {
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v1.5', date:'Aug 4, 2026 · 12:35 BST', notes:[
+      'Added a Voice Assistant on/off switch on the Voice Core screen — turn it off and the mic/typed commands stop responding until switched back on.',
+      '"Read aloud" (briefings, reports, pasted text) now speaks with the exact same voice as the assistant itself, instead of an old separate voice.',
+    ]},
     {version:'v1.4', date:'Aug 4, 2026 · 11:53 BST', notes:[
       'Fixed the voice assistant: with no AI provider connected, plain commands like "open my calendar" wrongly failed — navigation, tasks, memory and reports now always work offline.',
     ]},
@@ -8616,6 +8636,7 @@ class Component extends DCLogic {
           elDraft:(S.provDraft||{}).elevenlabs||'', onElDraft:(e)=>this.setProvDraft('elevenlabs',e), elSave:()=>this.saveProvKey('elevenlabs'), elReplace:()=>this.replaceProvKey('elevenlabs'),
           elTest:()=>this.testProvider('elevenlabs'), elErr:c.err||'',
           elVoiceId:(S.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM', setElVoiceId:(e)=>this.setPref('elevenVoiceId', e.target.value),
+          toggleReadAloud:()=>this.toggleReadAloud(), readAloudBg:(S.prefs.readAloudEnabled!==false)?'#FFFFFF':'rgba(255,255,255,0.14)', readAloudPos:(S.prefs.readAloudEnabled!==false)?'18px':'2px',
           elVoiceOptions:tts.voices||[],
         }; })(),
       tabMemory:S.settingsTab==='Memory',
@@ -8700,7 +8721,7 @@ class Component extends DCLogic {
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v1.4 — Aug 4, 2026',
+      appVersion:'v1.5 — Aug 4, 2026',
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
       whatsNewOpen:!!S.whatsNewOpen, closeWhatsNew:()=>this.dismissWhatsNew(), openWhatsNewBtn:()=>this.openWhatsNew(),
       latestVersion:(this._changelog()[0]||{}).version||'',
@@ -9721,7 +9742,9 @@ class Component extends DCLogic {
       voiceCmds:['Open the finance terminal','Add gym to my checklist','Summarize my day','Read my full briefing','Open the health centre'].map(c=>({label:c, run:()=>this.voiceCommand(c)})),
       toggleListen:()=>this.toggleListen(),
       vInput:S.vInput, setVInput:(e)=>this.setState({vInput:e.target.value}), sendVoice:()=>this.voiceCommand(this.state.vInput), sendVoiceKey:enterKey(()=>this.voiceCommand(this.state.vInput)),
-      listenLabel:S.listening?'Stop listening':'Hold to talk', listenBg:S.listening?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.04)', listenBdr:S.listening?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.14)', listenDot:S.listening?'#FFFFFF':'#7c7c84',
+      toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?'#FFFFFF':'rgba(255,255,255,0.14)', assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
+      listenOpacity:(S.prefs.assistantEnabled!==false)?1:0.4, listenPointerEvents:(S.prefs.assistantEnabled!==false)?'auto':'none',
+      listenLabel:(S.prefs.assistantEnabled===false)?'Assistant is off':(S.listening?'Stop listening':'Hold to talk'), listenBg:S.listening?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.04)', listenBdr:S.listening?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.14)', listenDot:S.listening?'#FFFFFF':'#7c7c84',
       transcript:(S.vtx.length?S.vtx:[{who:'YOU',text:'What is my day and how are markets?'},{who:'AI',text:'You have '+(S.checklist.length-checkDone)+' priorities and a focus block 9 to noon. Markets opened green — portfolio up 2.1%. Say “read my briefing” or “open finance”.'}]).map(m=>({who:m.who, whoC:m.who==='AI'?'#C9C9CE':'#7c7c84', txtC:m.who==='AI'?'#eef0f2':'#b8b8c0', text:m.text})),
     };
   }
