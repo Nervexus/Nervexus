@@ -1,0 +1,14 @@
+{
+  "name": "Nervexus",
+  "short_name": "Nervexus",
+  "description": "Personal AI command center \u2014 learning, fitness, business & world intelligence.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F7F2E9",
+  "theme_color": "#F7F2E9",
+  "icons": [
+    { "src": "./favicon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ]
+}
