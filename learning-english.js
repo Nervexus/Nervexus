@@ -222,7 +222,21 @@
     return { type: 'text', topic: lesson.title, topicKey: key, prompt: ex.q, answer: ex.answer, method: ex.working };
   }
 
-  /* ---- READING ------------------------------------------------------------ */
+  /* ---- READING --------------------------------------------------------------
+     Expanded to genuine GCSE English Language shape: a spread of fiction and
+     non-fiction extracts (narrative, descriptive, persuasive speech, letter,
+     dialogue, article) tagged by level, each carrying a mix of question types
+     across the real GCSE reading skills \u2014 not just literal retrieval:
+       retrieval   \u2014 AO1, find/name something stated directly
+       inference   \u2014 AO1, work out something implied but not stated
+       language    \u2014 AO2, identify a technique (metaphor, rhetorical question,
+                     tricolon, emotive language, pathetic fallacy...) and its
+                     effect on the reader \u2014 the single most-tested GCSE skill
+       structure   \u2014 AO2, how the writer organises the whole text for effect
+       viewpoint   \u2014 AO4, evaluate the writer's perspective/tone
+       compare     \u2014 AO3, only on the two paired top-level texts (45/47),
+                     genuinely testing across two extracts like Paper 2 Q4
+     ---------------------------------------------------------------------- */
   var PASSAGES = [
     {
       level: 3,
@@ -235,13 +249,63 @@
       ]
     },
     {
+      level: 8,
+      title: 'The Old Oak Tree',
+      text: 'Every autumn, Sam climbed the old oak tree at the bottom of the garden, even though his mother told him it was too tall and too old to be safe. The branches creaked under his weight, but he always found the same wide branch near the top, where he could see over the neighbours\u2019 roofs all the way to the hills. This year, when he reached for the branch, it snapped clean away in his hand.',
+      questions: [
+        { q: 'What did Sam\u2019s mother think about the tree?', a: 'that it was too tall and too old to be safe', keywords: ['too tall', 'too old', 'unsafe', 'not safe'] },
+        { q: 'What could Sam see from the top branch?', a: 'over the neighbours\u2019 roofs to the hills', keywords: ['roofs', 'hills'] },
+        { q: 'Using this line \u2014 "it snapped clean away in his hand" \u2014 what do you think happens next? Explain your inference.', a: 'the branch breaking suggests Sam is about to fall', keywords: ['fall', 'falling', 'break', 'broke', 'danger'] }
+      ]
+    },
+    {
+      level: 12,
+      title: 'The Journey of a Paper Cup',
+      text: 'Every year, billions of disposable coffee cups are used once and thrown away. Most people assume paper cups are simple to recycle, but the inside of almost every disposable cup is lined with a thin layer of plastic to stop the liquid soaking through. This lining means the cup cannot go through a standard paper recycling process at all, and most end up in landfill instead \u2014 a detail that surprises most people who use one every morning.',
+      questions: [
+        { q: 'Why can most disposable coffee cups not be recycled normally, according to the passage?', a: 'they have a thin plastic lining inside', keywords: ['plastic', 'lining', 'lined'] },
+        { q: 'What is the effect of the writer ending the passage with "a detail that surprises most people who use one every morning"?', a: 'it highlights how widespread and unnoticed the problem is, making the reader reflect on their own habits', keywords: ['surprise', 'unaware', 'reflect', 'everyday', 'habit'] },
+        { q: 'What is the purpose of this passage?', a: 'to inform the reader and raise awareness of a hidden problem', keywords: ['inform', 'aware', 'educate'] }
+      ]
+    },
+    {
       level: 15,
       title: 'The Power of Renewable Energy',
       text: 'Renewable energy sources, such as wind and solar power, are becoming increasingly important as countries try to reduce their reliance on fossil fuels. Unlike coal or oil, these sources do not run out and produce far fewer harmful emissions. However, critics argue that renewable infrastructure can be expensive to build and that energy storage remains a significant challenge.',
       questions: [
         { q: 'Name two examples of renewable energy given in the passage.', a: 'wind and solar', keywords: ['wind', 'solar'] },
         { q: 'According to critics, what is one drawback of renewable energy?', a: 'expensive to build / storage is a challenge', keywords: ['expensive', 'storage', 'challenge'] },
-        { q: 'Why are countries moving towards renewable energy?', a: 'to reduce reliance on fossil fuels', keywords: ['fossil', 'reduce', 'reliance'] }
+        { q: 'How does the writer show balance in this passage? Refer to specific words.', a: 'the writer presents both sides using "however" to introduce the opposing, critical view after the positive case', keywords: ['however', 'both', 'balance', 'critic'] }
+      ]
+    },
+    {
+      level: 18,
+      title: 'The Abandoned Fairground',
+      text: 'The Ferris wheel stood motionless against the bruised evening sky, its metal frame groaning softly whenever the wind passed through. Weeds had claimed the ticket booth, curling through the broken glass like fingers reaching for something they had lost. Somewhere in the distance, a loose sign clattered against its post, over and over, as though the fairground itself was trying to speak.',
+      questions: [
+        { q: 'Identify one example of personification in this passage and explain its effect.', a: 'the weeds are described "like fingers reaching" and the fairground is described as "trying to speak" \u2014 this makes the abandoned place feel alive and unsettling', keywords: ['personif', 'alive', 'fingers', 'speak', 'human'] },
+        { q: 'What effect does the phrase "bruised evening sky" create?', a: 'it uses colour imagery to create a dark, damaged, unsettling mood before anything else in the scene is described', keywords: ['mood', 'dark', 'colour', 'unsettl', 'atmosphere'] },
+        { q: 'How does the writer use sound in this passage to build atmosphere?', a: 'the groaning wheel and the clattering sign create an eerie, repetitive soundscape that makes the setting feel haunted', keywords: ['sound', 'groan', 'clatter', 'eerie', 'repet'] }
+      ]
+    },
+    {
+      level: 22,
+      title: 'A Speech on Climate Action',
+      text: 'We have been told, again and again, that it is someone else\u2019s problem \u2014 a problem for governments, for corporations, for the next generation. But ask yourselves: if not us, then who? If not now, then when? Every ton of carbon we fail to prevent today becomes a ton our children must somehow undo tomorrow. We do not need more warnings. We need action, and we need it now.',
+      questions: [
+        { q: 'Identify the rhetorical question used in this speech and explain its effect on the audience.', a: '"if not us, then who?" (or "if not now, then when?") \u2014 it challenges the audience directly and makes them feel personally responsible', keywords: ['rhetorical', 'question', 'challenge', 'responsib', 'direct'] },
+        { q: 'The final two sentences are short and direct. What effect does this create?', a: 'the short, blunt sentences create urgency and a forceful, memorable call to action', keywords: ['urgen', 'short', 'forceful', 'impact', 'punchy'] },
+        { q: 'How does the speaker use repetition in this passage? Give an example.', a: 'repeating structures like "if not us, then who? If not now, then when?" builds rhythm and drives the argument home', keywords: ['repeat', 'rhythm', 'structure', 'pattern'] }
+      ]
+    },
+    {
+      level: 25,
+      title: 'The Argument',
+      text: '"You said you\u2019d be here at six." Her voice was flat, controlled \u2014 the kind of calm that came only after real anger had already burned through. Daniel opened his mouth to explain, then closed it again. There was nothing he could say that would make the last two hours disappear. He set his bag down slowly, as if the silence in the room might shatter if he moved too fast.',
+      questions: [
+        { q: 'What can the reader infer about the relationship between the two characters from this extract?', a: 'there is tension and unresolved conflict \u2014 she is controlling her anger and he feels guilty and unable to defend himself', keywords: ['tension', 'anger', 'guilt', 'conflict'] },
+        { q: 'Explain the effect of the simile "as if the silence in the room might shatter if he moved too fast."', a: 'comparing the silence to something fragile like glass shows how tense and delicate the atmosphere is', keywords: ['simile', 'fragile', 'glass', 'tense', 'delicate'] },
+        { q: 'How does the writer use structure in this short extract to build tension?', a: 'starting mid-argument with dialogue, then slowing down into Daniel\u2019s internal hesitation, mirrors his reluctance and stretches out the tense moment', keywords: ['structure', 'dialogue', 'slow', 'pace', 'hesitat'] }
       ]
     },
     {
@@ -250,20 +314,69 @@
       text: 'Ambition is often portrayed as an unambiguous virtue, yet history is littered with examples of its corrosive potential. The same drive that propels an individual toward remarkable achievement can, left unchecked, erode their relationships and integrity. It is not ambition itself that determines its moral value, but rather the means by which it is pursued and the ends to which it is directed.',
       questions: [
         { q: 'What does the writer suggest determines whether ambition is good or bad?', a: 'the means and ends of how it is pursued', keywords: ['means', 'ends', 'pursued'] },
-        { q: 'What word does the writer use to describe ambition\u2019s potential negative effect?', a: 'corrosive', keywords: ['corrosive'] }
+        { q: 'Explain the effect of the word choice in "history is littered with examples" and "corrosive potential."', a: '"littered" suggests something messy and widespread, while "corrosive" compares ambition to a substance that eats away at something \u2014 together they present ambition\u2019s dangers as extensive and destructive', keywords: ['littered', 'corrosive', 'destruct', 'widespread', 'metaphor'] }
       ]
     },
     {
-      level: 42,
+      level: 30,
+      title: 'An Open Letter to Young People',
+      text: 'I will not pretend the world I am leaving you is perfect \u2014 it is not, and pretending otherwise would insult your intelligence. But I have also watched your generation organise, question, and demand better with a clarity mine rarely managed at your age. My hope is not that you inherit a finished world. My hope is that you inherit the will to keep building one.',
+      questions: [
+        { q: 'What tone does the writer adopt towards the young people they are addressing?', a: 'honest, respectful and hopeful \u2014 they admit the world\u2019s flaws rather than being patronising', keywords: ['honest', 'respect', 'hope', 'sincere'] },
+        { q: 'Explain the effect of the repeated structure "My hope is not... My hope is..."', a: 'the repetition and contrast emphasises exactly what the writer values \u2014 not perfection, but the ability to keep improving things', keywords: ['repeat', 'contrast', 'emphas', 'structure'] },
+        { q: 'Why might the writer choose the letter form to communicate this message?', a: 'a letter feels personal and direct, as though speaking one-to-one to the reader, which suits sincere, hopeful advice', keywords: ['personal', 'direct', 'intimate', 'sincer'] }
+      ]
+    },
+    {
+      level: 35,
+      title: 'The Lighthouse Keeper\u2019s Diary',
+      text: 'The light has not failed in thirty years, and I do not intend for it to fail on my watch. Tonight the sea is a black, restless thing, throwing itself against the rocks as though it resents the beam that keeps ships from its jaws. I climb the spiral stairs by memory now, my hand finding the same worn groove in the rail that a hundred keepers before me must have found. I wonder, sometimes, if the light needs me at all \u2014 or if I have simply become another part of its machinery.',
+      questions: [
+        { q: 'What does the extended metaphor of the sea "throwing itself against the rocks" and having "jaws" suggest?', a: 'it presents the sea as a dangerous, almost predatory living creature, emphasising the constant threat it poses to ships', keywords: ['metaphor', 'predator', 'danger', 'threat', 'personif'] },
+        { q: 'What does the final line suggest about the narrator\u2019s sense of identity?', a: 'he questions whether he has any individual purpose left, or has become merged with the mechanical routine of the lighthouse \u2014 suggesting isolation and a loss of self', keywords: ['identity', 'isolat', 'lose', 'purpose', 'machine'] },
+        { q: 'Explain how the writer uses the image of "the same worn groove in the rail" to develop a wider idea in the extract.', a: 'it symbolises tradition and repetition, connecting the narrator to generations of keepers before him and reinforcing the idea of duty passed down through time', keywords: ['symbol', 'tradition', 'repetition', 'duty', 'generation'] }
+      ]
+    },
+    {
+      level: 38,
+      title: 'Are We Losing the Art of Conversation?',
+      text: 'The article opens with a familiar scene: a family seated at dinner, four faces lit not by candlelight but by phone screens. It is tempting to declare this the death of conversation. Yet halfway through researching this piece, I found evidence that complicates that neat narrative \u2014 young people report deeper, more honest conversations happening over text than many ever managed face-to-face. Perhaps we are not losing the art of conversation at all. Perhaps we are simply relearning its shape.',
+      questions: [
+        { q: 'How does the writer structure the opening of this passage to engage the reader?', a: 'opening with a relatable, visual scene (the family at dinner) draws the reader in before the writer introduces a more complex argument', keywords: ['structure', 'open', 'scene', 'relat', 'engage'] },
+        { q: 'Identify the shift in the writer\u2019s argument partway through the passage, and explain how the writer signals it.', a: 'the writer signals a change of direction with "Yet" and "complicates that neat narrative", moving from the expected, pessimistic view to a more balanced, surprising one', keywords: ['shift', 'yet', 'balance', 'surpris', 'complicat'] },
+        { q: 'What is the effect of ending the passage with the short sentence "Perhaps we are simply relearning its shape"?', a: 'it leaves the reader with a hopeful, thought-provoking final idea rather than a firm conclusion, encouraging reflection', keywords: ['hopeful', 'thought-provok', 'reflect', 'end', 'concluding'] }
+      ]
+    },
+    {
+      level: 45,
       title: 'The Ethics of Artificial Intelligence',
       text: 'As artificial intelligence systems become further embedded in decision-making processes \u2014 from loan approvals to medical diagnoses \u2014 questions of accountability grow increasingly urgent. Proponents contend that algorithmic decisions, stripped of human bias, offer a fairer alternative to subjective human judgement. Detractors counter that these systems merely launder existing societal biases through a veneer of mathematical objectivity, rendering discrimination harder to detect and challenge.',
       questions: [
         { q: 'What do proponents of AI decision-making argue?', a: 'it removes human bias and is fairer', keywords: ['bias', 'fair'] },
-        { q: 'What is the detractors\u2019 main criticism?', a: 'AI can hide existing bias behind mathematical objectivity', keywords: ['bias', 'objectivity', 'hide', 'launder'] }
+        { q: 'What is the detractors\u2019 main criticism?', a: 'AI can hide existing bias behind mathematical objectivity', keywords: ['bias', 'objectivity', 'hide', 'launder'] },
+        { q: 'Explain the effect of the metaphor "launder existing societal biases through a veneer of mathematical objectivity."', a: 'comparing bias to something being "laundered" suggests it is being deliberately disguised as legitimate, while "veneer" suggests the fairness is only a thin, false surface \u2014 together this makes AI objectivity sound deceptive', keywords: ['metaphor', 'launder', 'veneer', 'disguis', 'deceptive', 'surface'] }
+      ]
+    },
+    {
+      level: 47,
+      title: 'In Defence of Distraction',
+      text: 'Critics of modern technology speak of "distraction" as though focus were our natural state, corrupted only by the smartphone. History disagrees. Every generation has feared its own tools \u2014 the novel was once blamed for rotting young minds, the television for the death of the family. What we call distraction today may simply be attention finding new shapes to move in. The question is not whether we are distracted, but whether we are asking the right question at all.',
+      questions: [
+        { q: 'What is the writer\u2019s main argument in this passage?', a: 'that fears about technology and distraction are not new, and may be based on a flawed assumption rather than a real decline in focus', keywords: ['not new', 'flawed', 'assumption', 'history', 'repeat'] },
+        { q: 'Explain the effect of the examples "the novel" and "the television" in this passage.', a: 'they show that every new technology has previously been blamed in the same way, undermining the idea that smartphones are uniquely damaging', keywords: ['example', 'history', 'previous', 'undermine', 'pattern'] },
+        { q: 'Compare how this writer and the writer of "The Ethics of Artificial Intelligence" present technology. Refer to both texts in your answer.', a: 'the AI Ethics writer presents technology\u2019s effects as genuinely uncertain and open to serious criticism on both sides, while this writer is more skeptical of the criticism itself, framing anti-technology fears as a repeating historical pattern rather than a real problem \u2014 both use a balanced, questioning tone but reach different emphases', keywords: ['compare', 'both', 'similar', 'differ', 'balance', 'tone'] }
       ]
     }
   ];
-  function passageForLevel(level) { return rr('passages', PASSAGES); }
+  // Previously ignored `level` entirely (pure rotation across every passage), so a
+  // beginner could be served the GCSE Higher comparison text and vice versa. Now picks
+  // from the 5 passages closest in level to what was asked for, same "near" approach
+  // already used for vocabulary (wordsNear), so difficulty actually tracks the request.
+  function passageForLevel(level) {
+    var lvl = level || 1;
+    var near = PASSAGES.slice().sort(function (a, b) { return Math.abs(a.level - lvl) - Math.abs(b.level - lvl); }).slice(0, 5);
+    return rr('passages_' + Math.round(lvl / 5), near);
+  }
   function checkReadingAnswer(input, q) {
     var text = (input || '').toLowerCase();
     return q.keywords.some(function (k) { return text.indexOf(k.toLowerCase()) >= 0; });
@@ -302,6 +415,20 @@
     return 'Beginner';
   }
   function placementLevelFromScore(pct) { return Math.max(1, Math.min(50, Math.round((pct / 100) * 49) + 1)); }
+  // Scaled down from the other subjects' 1-60 grade bands to English's 1-50 level range
+  // (same proportions: grade 9 at the top ~15%, grade 1 below the bottom ~15%).
+  function gradeFromLevel(level) {
+    if (level >= 47) return 9; if (level >= 42) return 8; if (level >= 38) return 7; if (level >= 33) return 6;
+    if (level >= 27) return 5; if (level >= 22) return 4; if (level >= 15) return 3; if (level >= 8) return 2; return 1;
+  }
+  function strongestWeakest(breakdown) {
+    var scored = (breakdown || []).filter(function (b) { return b.total > 0; }).map(function (b) { return { topic: b.topic, acc: b.ok / b.total }; });
+    if (!scored.length) return { strongest: '', weakest: '', focusAreas: [] };
+    scored.sort(function (a, b) { return b.acc - a.acc; });
+    var strongest = scored[0].topic, weakest = scored[scored.length - 1].topic;
+    var focusAreas = scored.slice().sort(function (a, b) { return a.acc - b.acc; }).slice(0, 3).map(function (s) { return s.topic; });
+    return { strongest: strongest, weakest: weakest, focusAreas: focusAreas };
+  }
 
   function checkAnswer(q, input) {
     if (q.type === 'reading') return checkReadingAnswer(input, q);
@@ -486,6 +613,37 @@
     return mix.map(function (k) { return QT_GENERATORS[k](tier); }).concat([QT_GENERATORS.sentencestructure(tier), QT_GENERATORS.pronouns(tier), QT_GENERATORS.writing(tier)]);
   }
 
+  /* ---- GCSE WRITING PROMPTS -----------------------------------------------
+     The AI Writing Coach previously had no real task to respond to — just a
+     placeholder suggesting "100 words about your favourite holiday" (well
+     below GCSE level). These mirror the two GCSE English Language writing
+     papers: creative/descriptive (Paper 1 Q5 style) and transactional —
+     letters, articles, speeches written for a stated purpose/audience/form
+     (Paper 2 Q5 style), which is specifically what AO5/AO6 mark against. ---- */
+  var WRITING_PROMPTS = {
+    creative: [
+      { title: 'A Busy Market', prompt: 'Describe a busy market. Use what you can see, hear and smell to bring the scene to life for the reader.' },
+      { title: 'The Storm', prompt: 'Write a description of a violent storm, focusing on how it affects a small coastal town.' },
+      { title: 'An Old Photograph', prompt: 'Write a story that begins: "The photograph had been in the drawer for years before she finally opened it."' },
+      { title: 'Somewhere You’ll Never Forget', prompt: 'Describe a place you will never forget. It can be real or imagined.' },
+      { title: 'The Empty House', prompt: 'Write a description of an abandoned house, suggested by this idea, as the opening to a story.' },
+      { title: 'A Difficult Decision', prompt: 'Write a story about a character who has to make a decision that will change their life, in which not everything is as it first seems.' },
+      { title: 'Arrival', prompt: 'Write the opening part of a story about someone arriving somewhere completely new.' },
+      { title: 'The Crowd', prompt: 'Describe the atmosphere at a huge sporting event or concert, focusing on the crowd around you.' }
+    ],
+    transactional: [
+      { title: 'Letter to the Council', prompt: 'Write a letter to your local council persuading them to build a new skate park in your area.', form: 'letter', audience: 'local council', purpose: 'persuade' },
+      { title: 'Speech: Should Homework Be Banned?', prompt: 'Write a speech for your school debate club arguing for or against banning homework.', form: 'speech', audience: 'fellow students', purpose: 'argue/persuade' },
+      { title: 'Article: The Rise of Social Media', prompt: 'Write an article for a school magazine giving your views on the impact social media has on young people.', form: 'article', audience: 'general/school readership', purpose: 'inform and give opinion' },
+      { title: 'Letter of Complaint', prompt: 'Write a letter to a company complaining about a product or service you received, and explaining what you want them to do about it.', form: 'letter', audience: 'a company', purpose: 'complain/persuade' },
+      { title: 'Speech: A Cause You Care About', prompt: 'Write a speech to be given at a school assembly persuading students to support a cause you care about.', form: 'speech', audience: 'school assembly', purpose: 'persuade' },
+      { title: 'Article: Is Ambition Overrated?', prompt: 'Write an article for a newspaper giving your point of view on whether ambition is always a good thing.', form: 'article', audience: 'newspaper readers', purpose: 'argue/give opinion' },
+      { title: 'Letter to a Future Student', prompt: 'Write a letter to a student about to join your school, advising and reassuring them about what to expect.', form: 'letter', audience: 'a new student', purpose: 'advise/inform' },
+      { title: 'Article: Are Exams Fair?', prompt: 'Write an article for your school website arguing whether exams are the fairest way to measure a student’s ability.', form: 'article', audience: 'school website readers', purpose: 'argue/give opinion' }
+    ]
+  };
+  function randomWritingPrompt(kind) { var bank = WRITING_PROMPTS[kind] || WRITING_PROMPTS.creative; return pick(bank); }
+
   root.LearningEnglish = {
     WORDS: WORDS, wordForLevel: wordForLevel,
     generateVocabQuestion: generateVocabQuestion,
@@ -495,6 +653,8 @@
     buildQuickTest: buildQuickTest, generateDailyChallenge: generateDailyChallenge, levelToTier: levelToTier,
     generateLevelQuestion: generateLevelQuestion, generateLevelSet: generateLevelSet,
     generatePlacementSet: generatePlacementSet, levelLabel: levelLabel, placementLevelFromScore: placementLevelFromScore,
-    checkAnswer: checkAnswer
+    gradeFromLevel: gradeFromLevel, strongestWeakest: strongestWeakest,
+    checkAnswer: checkAnswer,
+    WRITING_PROMPTS: WRITING_PROMPTS, randomWritingPrompt: randomWritingPrompt
   };
 })(window);
