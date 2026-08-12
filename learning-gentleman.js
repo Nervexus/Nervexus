@@ -1,1 +1,784 @@
+/* ============================================================================
+   learning-gentleman.js — Gentleman's Etiquette engine for the Learning Centre.
+   14 topics covering dress code, accessories, timepieces, drinks, hospitality,
+   service roles, dining, social protocol, grooming, cigars, travel, tailoring
+   and correspondence — the vocabulary and conventions that mark real fluency
+   in refined/formal settings. A 120-level topic-banded ladder, placement test,
+   Quick Test support and a reference glossary. Consumed by the DC logic class
+   via window.LearningGentleman.
+   ============================================================================ */
+(function (root) {
+  'use strict';
+  function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(arr) { return arr[ri(0, arr.length - 1)]; }
+  function shuffle(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = ri(0, i); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 
+  var _rot = {};
+  function rr(key, arr) {
+    var st = _rot[key];
+    if (!st || st.i >= st.order.length || st.order.length !== arr.length) { st = { order: shuffle(arr.map(function (_, i) { return i; })), i: 0 }; _rot[key] = st; }
+    return arr[st.order[st.i++]];
+  }
+
+  var DRESSCODE = [
+    { level: 2, q: 'What is the most formal evening dress code, involving a tailcoat and white bow tie?', a: 'White tie', d: ['White tie', 'Black tie', 'Morning dress', 'Lounge suit'], why: 'White tie is the highest tier of formal Western dress — tailcoat, white waistcoat and white bow tie.' },
+    { level: 5, q: 'What does a "black tie" dress code require?', a: 'A tuxedo (dinner jacket) with a black bow tie', d: ['A tuxedo (dinner jacket) with a black bow tie', 'Any dark suit with a black tie', 'A tailcoat with white tie', 'Smart casual with a blazer'], why: 'Black tie specifically means a tuxedo/dinner jacket with a black bow tie — a business suit is not a substitute.' },
+    { level: 10, q: 'What is "morning dress" traditionally worn for?', a: 'Daytime formal events like weddings or Royal Ascot', d: ['Daytime formal events like weddings or Royal Ascot', 'Evening black-tie dinners', 'Business meetings', 'Funerals only'], why: 'Morning dress — tailcoat, waistcoat and striped trousers — is the daytime equivalent of white tie, despite the name having nothing to do with mornings specifically.' },
+    { level: 16, q: 'What is the difference between a "peak lapel" and a "notch lapel"?', a: 'A peak lapel points upward toward the shoulder; a notch lapel has a horizontal notch where collar meets lapel', d: ['A peak lapel points upward toward the shoulder; a notch lapel has a horizontal notch where collar meets lapel', 'They are two names for the same lapel shape', 'A peak lapel is only found on trousers', 'A notch lapel is more formal than a peak lapel'], why: 'The peak lapel’s upward point reads as more formal and is traditional on tuxedos; the notch lapel is the everyday business-suit standard.' },
+    { level: 24, q: 'What does "black tie optional" on an invitation actually mean?', a: 'You may wear a tuxedo, but a dark formal suit is also acceptable', d: ['You may wear a tuxedo, but a dark formal suit is also acceptable', 'Black tie is strictly mandatory', 'Any casual clothing is fine', 'Only women need to dress formally'], why: '"Optional" signals a tuxedo is welcomed but a dark, well-cut suit is an acceptable alternative — not an invitation to dress down.' },
+    { level: 32, q: 'What is a "lounge suit" in British dress code terminology?', a: 'The standard business suit', d: ['The standard business suit', 'A tuxedo', 'Casual weekend wear', 'A tailcoat'], why: '"Lounge suit" on a British invitation is the equivalent of "business formal" — a standard suit and tie.' },
+    { level: 40, q: 'What is the term for a suit jacket with two rows of buttons?', a: 'Double-breasted', d: ['Double-breasted', 'Single-breasted', 'Cross-buttoned', 'Twin-lapel'], why: 'Double-breasted jackets overlap at the front with two columns of buttons, reading as more formal/traditional than single-breasted.' },
+    { level: 50, q: 'What does "smart casual" typically mean in a dress code context?', a: 'A relaxed but polished look — blazer with no tie, chinos, no trainers or jeans', d: ['A relaxed but polished look — blazer with no tie, chinos, no trainers or jeans', 'Any casual clothing including jeans and trainers', 'A full business suit', 'Gym wear'], why: 'Smart casual sits between business formal and pure casual — put-together, but without a tie or full suit required.' },
+    { level: 60, q: 'What is "black tie creative" or "festive black tie"?', a: 'A modern variation allowing personal flair while keeping black tie’s formal structure', d: ['A modern variation allowing personal flair while keeping black tie’s formal structure', 'A code requiring bright, casual colours only', 'An older, stricter version of black tie', 'A dress code exclusive to women'], why: 'It permits touches like a coloured bow tie or velvet jacket, while the tuxedo’s overall formal structure stays intact.' },
+    { level: 72, q: 'What is the difference between "bespoke" and "made-to-measure" tailoring?', a: 'Bespoke is a fully custom pattern built from scratch; made-to-measure adjusts an existing standard pattern', d: ['Bespoke is a fully custom pattern built from scratch; made-to-measure adjusts an existing standard pattern', 'They are identical processes with different names', 'Made-to-measure is always more expensive than bespoke', 'Bespoke refers only to shoes, never suits'], why: 'Bespoke starts with an individual pattern cut for one person; made-to-measure modifies a block pattern to approximate the same fit at lower cost.' },
+    { level: 85, q: 'What does "cravat" traditionally refer to?', a: 'A formal neckcloth, precursor to the modern necktie', d: ['A formal neckcloth, precursor to the modern necktie', 'A type of formal shoe', 'A style of dinner jacket', 'A pocket square fold'], why: 'The cravat predates the modern tie and survives today in certain formal/ceremonial dress.' },
+    { level: 100, q: 'What is "white tie" more formally sometimes called?', a: 'Full evening dress', d: ['Full evening dress', 'Business formal', 'Black tie optional', 'Morning dress'], why: '"Full evening dress" or simply "tails" are traditional alternate names for white tie.' },
+    { level: 112, q: 'What does "odd jacket" mean in tailoring terminology?', a: 'A jacket not part of a matching suit, worn deliberately with different trousers', d: ['A jacket not part of a matching suit, worn deliberately with different trousers', 'A jacket that has been tailored incorrectly', 'A jacket with mismatched buttons', 'Any jacket over ten years old'], why: 'A blazer worn with flannels, rather than its own matching trousers, is a classic example of an "odd jacket" combination.' }
+  ];
+
+  var ACCESSORIES = [
+    { level: 3, q: 'What is a "pocket square"?', a: 'A decorative cloth folded and placed in a jacket’s breast pocket', d: ['A decorative cloth folded and placed in a jacket’s breast pocket', 'A handkerchief used for blowing your nose', 'A type of tie', 'A wallet insert'], why: 'The pocket square is purely decorative — a separate item from any handkerchief kept in a trouser pocket for practical use.' },
+    { level: 8, q: 'What is the most formal way to fold a pocket square?', a: 'The presidential fold — a flat, crisp square', d: ['The presidential fold — a flat, crisp square', 'The puff fold', 'A star shape', 'Rolled into a ball'], why: 'The presidential (or "TV") fold is flat and understated, making it the most formal option, traditionally paired with black or white tie.' },
+    { level: 14, q: 'What is the purpose of a "tie bar" (tie clip)?', a: 'To keep a necktie in place against the shirt', d: ['To keep a necktie in place against the shirt', 'To lengthen a tie that is too short', 'To decorate a bow tie', 'To hold a pocket square in place'], why: 'A tie bar is traditionally positioned between the third and fourth shirt buttons, keeping the tie neat without pinning it too high.' },
+    { level: 20, q: 'What are "cufflinks" used for?', a: 'Fastening French cuffs, which have no buttons', d: ['Fastening French cuffs, which have no buttons', 'Decorating a regular buttoned shirt cuff', 'Holding a tie in place', 'Attaching a pocket square'], why: 'French cuffs are designed with holes rather than buttons specifically to be joined with cufflinks.' },
+    { level: 28, q: 'What was a "signet ring" traditionally used for?', a: 'Sealing documents with wax using an engraved crest', d: ['Sealing documents with wax using an engraved crest', 'Marking ownership of shoes', 'Indicating marital status only', 'Holding a pocket watch chain'], why: 'Historically functional for sealing wax, the signet ring survives today mainly as a traditional accessory, often worn on the pinky.' },
+    { level: 36, q: 'Why are formal trousers traditionally paired with braces rather than a belt?', a: 'Many formal trousers are cut without belt loops, designed for braces instead', d: ['Many formal trousers are cut without belt loops, designed for braces instead', 'Belts are considered more formal than braces', 'Braces are only worn with jeans', 'There is no traditional distinction'], why: 'Formal trouser cuts often include buttons for braces rather than belt loops, since braces sit the trouser more cleanly under a jacket.' },
+    { level: 46, q: 'What distinguishes an "oxford" shoe from a "derby"?', a: 'An oxford has a closed lacing system stitched under the vamp; a derby’s laces are stitched on top', d: ['An oxford has a closed lacing system stitched under the vamp; a derby’s laces are stitched on top', 'Oxfords always have no laces at all', 'A derby is always made of suede', 'They are two names for an identical shoe'], why: 'The closed lacing of an oxford is considered more formal than the open lacing of a derby.' },
+    { level: 56, q: 'What is a "brogue"?', a: 'A shoe decorated with perforated patterns along the seams', d: ['A shoe decorated with perforated patterns along the seams', 'A shoe with no laces', 'A style of sandal', 'A type of formal sock'], why: 'Broguing refers to the decorative perforated pattern, which can appear on either an oxford or a derby style shoe.' },
+    { level: 66, q: 'What does "monk strap" refer to in footwear?', a: 'A shoe fastened with a buckle and strap instead of laces', d: ['A shoe fastened with a buckle and strap instead of laces', 'A shoe worn only with monastic robes', 'A lace-up boot', 'A slip-on loafer'], why: 'Monk straps sit stylistically between the formality of an oxford and the ease of a loafer.' },
+    { level: 78, q: 'What is "patina" in the context of leather shoes?', a: 'The subtle colour and sheen variation leather develops through wear and polishing over time', d: ['The subtle colour and sheen variation leather develops through wear and polishing over time', 'A factory-applied waterproof coating', 'A defect caused by poor storage', 'The stitching pattern on the sole'], why: 'A rich patina is prized in high-end shoe care and develops naturally with years of wear and conditioning.' },
+    { level: 90, q: 'What is a "boutonnière"?', a: 'A small flower worn in a jacket’s lapel buttonhole', d: ['A small flower worn in a jacket’s lapel buttonhole', 'A type of cufflink', 'A folded pocket square style', 'A tie knot'], why: 'Traditionally worn for formal and ceremonial occasions such as weddings.' },
+    { level: 104, q: 'What is the traditional rule for how much shirt cuff should show beneath a jacket sleeve?', a: 'About half an inch (roughly 1.25cm)', d: ['About half an inch (roughly 1.25cm)', 'None at all — the cuff should be fully hidden', 'At least two inches', 'It should match the pocket square exactly'], why: 'A small visible band of shirt cuff is the traditional mark of a well-fitted jacket sleeve.' }
+  ];
+
+  var TIMEPIECES = [
+    { level: 5, q: 'What is the difference between an "automatic" and a "quartz" watch movement?', a: 'Automatic is mechanical, wound by wrist motion; quartz is battery-powered and electronic', d: ['Automatic is mechanical, wound by wrist motion; quartz is battery-powered and electronic', 'They are the same mechanism with different names', 'Quartz watches are always more expensive', 'Automatic watches require a battery'], why: 'An automatic movement winds itself via a rotor that spins with the wearer’s natural wrist movement.' },
+    { level: 12, q: 'What does "chronograph" mean on a watch?', a: 'A watch with a built-in stopwatch function', d: ['A watch with a built-in stopwatch function', 'A watch that shows the date only', 'A watch with no hands', 'A waterproof watch'], why: 'Chronograph watches add sub-dials and pushers to time elapsed intervals, separate from telling the current time.' },
+    { level: 22, q: 'What is a "complication" in watchmaking?', a: 'Any function beyond simply telling the time', d: ['Any function beyond simply telling the time', 'A manufacturing defect', 'The watch’s price tag', 'The type of strap used'], why: 'Date displays, moonphases and chronographs are all examples of "complications" — added mechanical functions.' },
+    { level: 34, q: 'What does a "tourbillon" do?', a: 'Counteracts the effects of gravity on watch accuracy', d: ['Counteracts the effects of gravity on watch accuracy', 'Winds the watch automatically', 'Displays a second time zone', 'Waterproofs the movement'], why: 'The rotating tourbillon cage is considered a hallmark of high-end mechanical watchmaking.' },
+    { level: 44, q: 'What is the difference between a "manual" and "automatic" movement?', a: 'Manual must be wound by hand via the crown; automatic winds itself from wrist movement', d: ['Manual must be wound by hand via the crown; automatic winds itself from wrist movement', 'Manual watches never need winding', 'Automatic watches use a battery', 'There is no meaningful difference'], why: 'A manual (hand-wound) movement will stop if not periodically wound by turning the crown.' },
+    { level: 55, q: 'What does a "100m water resistance" rating actually mean in practice?', a: 'Suitable for swimming/showering, but not deep diving', d: ['Suitable for swimming/showering, but not deep diving', 'Safe for scuba diving to 100 metres', 'The watch is fully waterproof indefinitely', 'The rating only applies when the watch is new'], why: 'Water resistance ratings reflect controlled lab conditions, not real-world diving depth — deep diving needs a specifically rated dive watch.' },
+    { level: 68, q: 'What is a "dress watch" expected to look like?', a: 'Thin, minimal dial, leather strap, understated', d: ['Thin, minimal dial, leather strap, understated', 'Large, bulky, with a metal sport bracelet', 'Digital with multiple complications', 'Waterproof to at least 300 metres'], why: 'A dress watch is designed to sit discreetly under a shirt cuff, appropriate for formal occasions.' },
+    { level: 80, q: 'What does an "in-house movement" mean?', a: 'The movement was designed and manufactured by the watch brand itself', d: ['The movement was designed and manufactured by the watch brand itself', 'The movement was assembled at home by a hobbyist', 'The watch has no moving parts', 'The movement was sourced from a third-party supplier'], why: 'In-house movements are often seen as a mark of horological prestige compared to widely-used third-party movements.' },
+    { level: 94, q: 'What does a "power reserve" indicator show?', a: 'How much stored energy remains before a mechanical watch needs winding again', d: ['How much stored energy remains before a mechanical watch needs winding again', 'The current battery percentage', 'How many complications the watch has', 'The watch’s water resistance level'], why: 'Useful for mechanical watches, which will stop entirely once their stored energy runs out.' },
+    { level: 108, q: 'What is the traditional etiquette around wearing a watch with a tuxedo?', a: 'A slim, minimal dress watch on a leather strap, or none at all', d: ['A slim, minimal dress watch on a leather strap, or none at all', 'A large sport watch with a metal bracelet', 'A smartwatch with a bright display', 'Any watch is equally appropriate'], why: 'A bulky sport watch is traditionally considered a mismatch with the understated formality of black or white tie.' }
+  ];
+
+  var SPIRITS = [
+    { level: 2, q: 'What does ordering a drink "neat" mean?', a: 'Poured straight, with no ice, water or mixer', d: ['Poured straight, with no ice, water or mixer', 'Served over ice', 'Mixed with soda water', 'Served in a chilled glass with no liquor'], why: '"Neat" is the simplest pour — the spirit alone, at room temperature.' },
+    { level: 6, q: 'What does "on the rocks" mean?', a: 'Served over ice', d: ['Served over ice', 'Served neat', 'Blended with fruit', 'Served warm'], why: 'A straightforward request for the drink poured over ice cubes.' },
+    { level: 10, q: 'What is the difference between a martini served "up" versus "on the rocks"?', a: '"Up" is chilled and strained into a stemmed glass with no ice; "on the rocks" is served over ice', d: ['"Up" is chilled and strained into a stemmed glass with no ice; "on the rocks" is served over ice', 'They are identical requests', '"Up" means extra strong', '"On the rocks" means non-alcoholic'], why: 'Both are chilled, but "up" is strained clear of ice into the glass, while "on the rocks" keeps ice in the glass.' },
+    { level: 18, q: 'What is the difference between a "dry" and "wet" martini?', a: 'A dry martini uses very little vermouth; a wet martini uses more vermouth', d: ['A dry martini uses very little vermouth; a wet martini uses more vermouth', 'A dry martini has no gin', 'A wet martini is always served on the rocks', 'They differ only in glass shape'], why: 'The dryness refers specifically to the vermouth ratio, not the overall strength or moisture of the drink.' },
+    { level: 26, q: 'What does asking for a "twist" instead of an "olive" refer to?', a: 'The garnish — a twist is a strip of citrus peel', d: ['The garnish — a twist is a strip of citrus peel', 'The type of glass used', 'How many times the drink is stirred', 'The brand of gin used'], why: 'A twist adds citrus oil aroma, while an olive adds a classic savoury note — purely a garnish choice.' },
+    { level: 36, q: 'What is the difference between "whisky" and "whiskey" spelling?', a: 'Whisky (no e) is Scottish/Canadian/Japanese; whiskey (with e) is Irish/American', d: ['Whisky (no e) is Scottish/Canadian/Japanese; whiskey (with e) is Irish/American', 'They refer to entirely different ingredients', 'Whiskey is always stronger than whisky', 'The spelling depends only on the drinker’s nationality'], why: 'The spelling follows the country of origin’s tradition, not the drink’s strength or ingredients.' },
+    { level: 48, q: 'What does "single malt" mean on a Scotch label?', a: 'Made from malted barley at a single distillery', d: ['Made from malted barley at a single distillery', 'Made from a single grain type blended across many distilleries', 'Bottled only once per year', 'Aged for a single year'], why: '"Single" refers to the one distillery of origin, not a single batch or barrel.' },
+    { level: 58, q: 'What is a "highball"?', a: 'A spirit with a larger amount of a non-alcoholic mixer, served in a tall glass over ice', d: ['A spirit with a larger amount of a non-alcoholic mixer, served in a tall glass over ice', 'A shot served with no mixer', 'A layered dessert cocktail', 'A drink served without ice'], why: 'Whisky and soda, or gin and tonic, are classic examples of the highball format.' },
+    { level: 70, q: 'What does asking for whisky "with a splash" mean, versus neat?', a: 'A small amount of water is added, often to open up the aromas', d: ['A small amount of water is added, often to open up the aromas', 'The drink is served with no whisky at all', 'It is served flaming', 'It refers to the size of the pour, not any addition'], why: 'A splash of water can subtly release aroma compounds in whisky that a neat pour keeps locked in.' },
+    { level: 82, q: 'What does understanding a spirit’s "ABV" help you judge?', a: 'Its strength and how it is typically meant to be served', d: ['Its strength and how it is typically meant to be served', 'Its exact production year', 'The distillery’s location', 'Whether it is a blend or single malt'], why: 'ABV (alcohol by volume) is the standard measure of a drink’s potency.' },
+    { level: 96, q: 'What does it mean to "muddle" an ingredient in cocktail making?', a: 'Gently crush it to release its flavour and oils before mixing', d: ['Gently crush it to release its flavour and oils before mixing', 'Freeze it solid before serving', 'Strain it out entirely', 'Add it last as a garnish only'], why: 'Muddling mint or fruit at the bottom of a glass is a common step before building a cocktail like a mojito.' },
+    { level: 110, q: 'What is the polite, discreet way to signal to a bartender that you’d like to close your tab?', a: 'Ask quietly for "the check" or "to close out"', d: ['Ask quietly for "the check" or "to close out"', 'Wave your hand loudly across the bar', 'Leave without saying anything', 'Tap your empty glass repeatedly'], why: 'A calm, direct verbal request is the standard, unobtrusive way to close out at a bar.' }
+  ];
+
+  var WINE = [
+    { level: 4, q: 'What does it mean when a wine is "corked"?', a: 'It has been spoiled by a compound from a faulty cork, giving a musty smell', d: ['It has been spoiled by a compound from a faulty cork, giving a musty smell', 'It still has pieces of cork floating in it', 'It has been aged too long', 'It was never sealed with a cork at all'], why: 'TCA taint from a faulty cork gives wine a distinctive wet-cardboard smell and is grounds to send a bottle back.' },
+    { level: 10, q: 'What is the role of a "sommelier"?', a: 'A trained wine professional who curates a restaurant’s wine list and advises guests', d: ['A trained wine professional who curates a restaurant’s wine list and advises guests', 'The chef in charge of desserts', 'A waiter who only serves water', 'The restaurant’s cashier'], why: 'Sommeliers undergo extensive training in wine knowledge and food pairing.' },
+    { level: 16, q: 'What does "decanting" a wine involve, and why is it done?', a: 'Pouring it into a separate vessel to let it breathe and/or separate it from sediment', d: ['Pouring it into a separate vessel to let it breathe and/or separate it from sediment', 'Chilling the wine rapidly before serving', 'Removing the alcohol content', 'Filtering out all colour'], why: 'Decanting aerates young, tannic wines and separates older wines from natural sediment.' },
+    { level: 24, q: 'What is "terroir"?', a: 'The complete natural environment that gives wine from a specific place its distinct character', d: ['The complete natural environment that gives wine from a specific place its distinct character', 'The name of the winemaker', 'The type of barrel used for aging', 'A legal classification for expensive wines only'], why: 'Soil, climate and terrain together shape the distinct character wine experts attribute to terroir.' },
+    { level: 34, q: 'What is the difference between "Champagne" and "sparkling wine"?', a: 'Champagne must come from the Champagne region of France under strict rules; other sparkling wine can be made anywhere', d: ['Champagne must come from the Champagne region of France under strict rules; other sparkling wine can be made anywhere', 'They are identical, just different marketing names', 'Sparkling wine is always non-alcoholic', 'Champagne is always more sugary'], why: 'Only sparkling wine from the legally defined Champagne region, made to its rules, may be called Champagne.' },
+    { level: 44, q: 'What does "vintage" mean on a wine label?', a: 'The single year the grapes were harvested', d: ['The single year the grapes were harvested', 'How many years the wine has been aged in total', 'The winery’s founding year', 'The bottle’s serial number'], why: 'A vintage label reflects harvest year, not necessarily the wine’s current age.' },
+    { level: 54, q: 'How should a wine glass be held to avoid warming the wine?', a: 'By the stem or base, not cupping the bowl', d: ['By the stem or base, not cupping the bowl', 'By the rim only', 'Cupped fully in both hands', 'It makes no difference to temperature'], why: 'Holding the bowl transfers body heat, gradually warming the wine above its intended serving temperature.' },
+    { level: 64, q: 'What does "tannin" refer to in describing a red wine?', a: 'A naturally occurring compound creating a dry, mouth-puckering sensation', d: ['A naturally occurring compound creating a dry, mouth-puckering sensation', 'The wine’s sugar content', 'An artificial preservative', 'The wine’s alcohol percentage'], why: 'Tannins come from grape skins, seeds and oak, and are especially pronounced in young red wines.' },
+    { level: 74, q: 'What is a "digestif"?', a: 'An after-dinner drink traditionally taken to aid digestion', d: ['An after-dinner drink traditionally taken to aid digestion', 'A drink served before the meal to stimulate appetite', 'A non-alcoholic palate cleanser', 'A wine served only with dessert courses'], why: 'Cognac, port and amaro are all classic digestifs, distinct from a pre-meal apéritif.' },
+    { level: 86, q: 'What is the difference between "Old World" and "New World" wine?', a: 'Old World refers to traditional European regions; New World refers to newer regions like the US, Australia and Chile', d: ['Old World refers to traditional European regions; New World refers to newer regions like the US, Australia and Chile', 'Old World wines are always red', 'New World wines are always cheaper', 'The terms refer to bottle shape'], why: 'The distinction is about region and winemaking tradition, not quality or price.' },
+    { level: 98, q: 'What does it mean to "let a wine breathe"?', a: 'Exposing it to air to soften tannins and open up its aromas', d: ['Exposing it to air to soften tannins and open up its aromas', 'Leaving it unopened in a cool room', 'Shaking the bottle vigorously', 'Storing it upright rather than on its side'], why: 'Contact with air can noticeably change a young wine’s taste and aroma for the better over a short period.' },
+    { level: 106, q: 'When a sommelier presents the cork after opening a bottle, what is the real purpose of that moment?', a: 'You may briefly inspect it, but the small tasting pour is what actually confirms the wine isn’t faulty', d: ['You may briefly inspect it, but the small tasting pour is what actually confirms the wine isn’t faulty', 'You are expected to smell the cork and approve or reject the wine based on that alone', 'The cork ritual has no real purpose today', 'You are meant to keep the cork as a souvenir immediately'], why: 'The cork gives minor information, but tasting the pour is the meaningful check for genuine faults like corking.' }
+  ];
+
+  var HOTELS = [
+    { level: 3, q: 'What is the difference between a "junior suite" and a full "suite"?', a: 'A junior suite is one larger room with a separated sitting area; a full suite has physically separate rooms', d: ['A junior suite is one larger room with a separated sitting area; a full suite has physically separate rooms', 'They are identical room types with different names', 'A junior suite is only for children', 'A full suite has no bathroom'], why: 'A full suite has a genuinely separate bedroom and living room; a junior suite fakes the separation within one room.' },
+    { level: 9, q: 'What does "concierge" service typically include?', a: 'Arranging reservations, transport, tickets and local recommendations', d: ['Arranging reservations, transport, tickets and local recommendations', 'Cleaning guest rooms', 'Cooking meals for guests', 'Only handling lost luggage'], why: 'The concierge is a guest’s point of contact for arranging experiences outside the hotel itself.' },
+    { level: 18, q: 'What is the traditional role of a "porter" or "bellhop"?', a: 'Assisting guests with luggage to and from their room', d: ['Assisting guests with luggage to and from their room', 'Managing the hotel’s finances', 'Serving as the head chef', 'Driving the hotel shuttle exclusively'], why: 'Porters/bellhops specifically handle luggage and room escort duties.' },
+    { level: 28, q: 'What does a hotel "turn-down service" involve?', a: 'Staff visiting the room in the evening to prepare the bed and tidy for the night', d: ['Staff visiting the room in the evening to prepare the bed and tidy for the night', 'Refusing a guest’s reservation', 'Lowering the room rate for a longer stay', 'Cleaning the room in the morning only'], why: 'Turn-down service is an evening amenity — folding back bedding, closing curtains, sometimes leaving a small treat.' },
+    { level: 38, q: 'What is the polite way to request an early check-in?', a: 'Call ahead and ask, rather than assume it will be available', d: ['Call ahead and ask, rather than assume it will be available', 'Arrive early and demand immediate access', 'Simply wait in the lobby without asking', 'Book two rooms to guarantee early access'], why: 'Early check-in depends on room availability, so a courteous advance request is the correct approach.' },
+    { level: 50, q: 'What is customary regarding tipping for room service delivery?', a: 'A small additional tip beyond any included service charge, given directly to the person delivering', d: ['A small additional tip beyond any included service charge, given directly to the person delivering', 'No tip is ever expected for room service', 'Tipping should only be given at checkout', 'A tip is only appropriate for breakfast deliveries'], why: 'Even when a service charge is included, a modest additional tip for the individual delivering is customary in many countries.' },
+    { level: 62, q: 'What distinguishes a "boutique hotel" from a large chain hotel?', a: 'A boutique hotel is typically smaller, independently or locally styled, with a distinct character', d: ['A boutique hotel is typically smaller, independently or locally styled, with a distinct character', 'A boutique hotel is always cheaper', 'Chain hotels are always more luxurious', 'There is no meaningful distinction'], why: 'Boutique hotels emphasise individual character over the standardised brand experience of large chains.' },
+    { level: 74, q: 'What does "presidential suite" typically signify?', a: 'A hotel’s top-tier, most luxurious and expansive suite', d: ['A hotel’s top-tier, most luxurious and expansive suite', 'A suite reserved exclusively for heads of state by law', 'The cheapest available room category', 'A suite with no bedroom'], why: 'While often associated with VIPs, any guest able to book it may typically stay in a presidential suite.' },
+    { level: 88, q: 'What is the etiquette for tipping housekeeping?', a: 'Leaving a modest cash tip daily, since different staff may service the room each day', d: ['Leaving a modest cash tip daily, since different staff may service the room each day', 'Tipping only once at the very end of the stay', 'Housekeeping should never be tipped', 'Leaving the tip in the hotel safe'], why: 'Since housekeeping staff can rotate, a daily tip better ensures the person who actually cleaned the room is rewarded.' },
+    { level: 100, q: 'Why does it matter to ask about a hotel’s "amenity fee" upfront?', a: 'It’s an additional charge beyond the room rate for facilities like pools or wifi, and asking avoids a surprise bill', d: ['It’s an additional charge beyond the room rate for facilities like pools or wifi, and asking avoids a surprise bill', 'It is always included and never worth asking about', 'It refers to the hotel’s star rating', 'It only applies to hotels without a pool'], why: 'Amenity fees can add a meaningful amount to a bill and are worth confirming before booking or checkout.' }
+  ];
+
+  var SERVICE = [
+    { level: 2, q: 'What is the primary job of a "valet"?', a: 'Parking and retrieving a guest’s car', d: ['Parking and retrieving a guest’s car', 'Cooking meals', 'Managing a household’s finances', 'Driving guests on scheduled routes only'], why: 'Valet parking is a dedicated service specifically for handling guests’ vehicles.' },
+    { level: 7, q: 'What does a "chauffeur" do, as distinct from a rideshare driver?', a: 'Provides dedicated, professional private driving service, often in a luxury vehicle', d: ['Provides dedicated, professional private driving service, often in a luxury vehicle', 'Only drives commercial buses', 'Works exclusively as a valet', 'Delivers packages professionally'], why: 'A chauffeur’s service is typically dedicated and personalised, distinct from an on-demand rideshare trip.' },
+    { level: 14, q: 'What is the traditional role of a "butler"?', a: 'Overseeing household staff and running day-to-day operations of a private household', d: ['Overseeing household staff and running day-to-day operations of a private household', 'Cooking exclusively', 'Driving the family car only', 'Managing hotel reservations'], why: 'The butler is traditionally the senior staff member coordinating an entire household’s operations.' },
+    { level: 22, q: 'What does a "maître d’" do in a restaurant?', a: 'Manages the front-of-house — greeting guests, seating and overseeing waitstaff', d: ['Manages the front-of-house — greeting guests, seating and overseeing waitstaff', 'Cooks all the main courses', 'Manages the wine cellar exclusively', 'Handles the restaurant’s accounting'], why: 'The maître d’hôtel oversees the guest-facing dining room experience, distinct from the kitchen or sommelier’s roles.' },
+    { level: 32, q: 'What is a "doorman" primarily responsible for?', a: 'Greeting and assisting guests or residents at an entrance', d: ['Greeting and assisting guests or residents at an entrance', 'Managing building finances', 'Cleaning common areas', 'Handling mail delivery exclusively'], why: 'Doormen also often assist with hailing transport and general entrance security/welcome duties.' },
+    { level: 42, q: 'What is the correct way to address a butler or valet generally?', a: 'By their surname, or their first name if they’ve introduced themselves that way', d: ['By their surname, or their first name if they’ve introduced themselves that way', 'By shouting "hey you"', 'Only by a generic title like "staff"', 'It is impolite to address them at all'], why: 'Basic courtesy applies — address service staff the way any professional would expect to be addressed.' },
+    { level: 54, q: 'What is the difference between a "personal assistant" and a "concierge"?', a: 'A personal assistant works for one individual across many areas of life; a concierge serves guests within a specific venue', d: ['A personal assistant works for one individual across many areas of life; a concierge serves guests within a specific venue', 'They are identical roles with different titles', 'A concierge always earns more', 'A personal assistant only works in hotels'], why: 'Scope is the key difference — one person versus a role tied to a location serving many different guests.' },
+    { level: 66, q: 'What is the polite way to summon a valet when leaving a venue?', a: 'Present your ticket/claim check and wait calmly at the stand', d: ['Present your ticket/claim check and wait calmly at the stand', 'Shout across the car park', 'Walk into the parking area yourself to find your car', 'Wave a large tip in the air to get attention'], why: 'The claim ticket system exists precisely so guests don’t need to shout or search for their own vehicle.' },
+    { level: 78, q: 'What does a "personal shopper" typically do?', a: 'Advises and selects clothing/items on a client’s behalf, often with store or brand access', d: ['Advises and selects clothing/items on a client’s behalf, often with store or brand access', 'Only wraps gifts at a store counter', 'Delivers groceries', 'Manages a client’s calendar'], why: 'Personal shoppers combine style expertise with retail access to save clients time and improve outcomes.' },
+    { level: 92, q: 'What is the standard etiquette for tipping a valet?', a: 'A modest cash tip when the car is returned, regardless of whether parking itself was free', d: ['A modest cash tip when the car is returned, regardless of whether parking itself was free', 'No tip is ever expected', 'Tipping should happen when the car is dropped off, not returned', 'A large tip is mandatory by law'], why: 'A small cash tip on return is customary even when the parking service itself carries no separate fee.' },
+    { level: 104, q: 'What distinguishes a "private chauffeur" from a "chauffeur service" booking?', a: 'A private chauffeur is dedicated to one employer/family; a service assigns a driver per booking', d: ['A private chauffeur is dedicated to one employer/family; a service assigns a driver per booking', 'They are the exact same arrangement', 'A chauffeur service never uses luxury vehicles', 'A private chauffeur only works part-time by definition'], why: 'Dedication versus per-occasion booking is the key structural difference between the two arrangements.' }
+  ];
+
+  var DINING = [
+    { level: 3, q: 'In the "continental" style of eating, which hand holds the fork throughout the meal?', a: 'The left hand', d: ['The left hand', 'The right hand', 'Either hand, switched constantly', 'Neither — only the knife is used'], why: 'In continental style the fork stays in the left hand (tines down) and the knife in the right, without switching.' },
+    { level: 9, q: 'In the "American" style of eating, what happens after cutting food?', a: 'The knife is set down and the fork is switched to the right hand to eat', d: ['The knife is set down and the fork is switched to the right hand to eat', 'The fork stays in the left hand at all times', 'Both utensils are set down between every bite', 'The knife is used to eat directly'], why: 'This "zig-zag" switching is distinct from the continental style, where the fork never changes hands.' },
+    { level: 16, q: 'What does placing your knife and fork together, parallel, in the centre of the plate signal?', a: 'You have finished the course and it can be cleared', d: ['You have finished the course and it can be cleared', 'You would like more food', 'You did not enjoy the meal', 'You are only pausing briefly'], why: 'This is a widely recognised signal to waitstaff that a course is complete.' },
+    { level: 24, q: 'What is the correct use of a napkin at the start of a meal?', a: 'Unfold it and place it on your lap', d: ['Unfold it and place it on your lap', 'Tuck it into your collar', 'Leave it folded on the table', 'Use it to wipe the cutlery first'], why: 'Tucking a napkin into a collar is considered informal and outdated in refined dining settings.' },
+    { level: 34, q: 'What does "amuse-bouche" mean on a fine-dining menu?', a: 'A small, complimentary bite served before the meal, at the chef’s choosing', d: ['A small, complimentary bite served before the meal, at the chef’s choosing', 'The final dessert course', 'An extra course you must pay for separately', 'A palate cleanser served between wines'], why: 'Literally "amuses the mouth" — a single bite introducing the chef’s style before the ordered courses begin.' },
+    { level: 44, q: 'What is the general "left to right" rule for a formal table setting?', a: 'Bread plate to your left, drink glasses to your right', d: ['Bread plate to your left, drink glasses to your right', 'Bread plate to your right, drink glasses to your left', 'Both are always centred', 'It varies with no consistent convention'], why: 'A simple mnemonic, "BMW" (Bread, Meal, Water), helps recall that bread sits left and drinks sit right of your place setting.' },
+    { level: 56, q: 'What is the correct etiquette if you need to leave the table briefly during a meal?', a: 'Place your napkin on your chair and offer a brief excuse', d: ['Place your napkin on your chair and offer a brief excuse', 'Leave the napkin on the table', 'Leave without any explanation', 'Take the napkin with you'], why: 'Leaving the napkin on the chair (not the table) signals you intend to return and the meal isn’t finished.' },
+    { level: 68, q: 'What does it mean to "work from the outside in" with cutlery at a formal setting?', a: 'Use the outermost utensils first, working inward with each course', d: ['Use the outermost utensils first, working inward with each course', 'Use the utensils closest to the plate first', 'Use whichever utensil is easiest to reach', 'Cutlery order does not matter'], why: 'Formal place settings are laid out in the order courses will be served, from outside toward the plate.' },
+    { level: 80, q: 'What is the polite way to signal you’ve had enough wine, without making a scene?', a: 'Simply leave your glass unfinished, or give a small verbal decline', d: ['Simply leave your glass unfinished, or give a small verbal decline', 'Turn your glass upside down dramatically', 'Cover the glass with your whole hand loudly', 'Announce it to the whole table'], why: 'A quiet, understated signal is preferred over any dramatic gesture at a refined table.' },
+    { level: 94, q: 'At a business dinner, what does being the "host" typically involve regarding ordering and paying?', a: 'Signalling the meal’s tone (e.g. ordering first) and handling payment discreetly, often pre-arranged', d: ['Signalling the meal’s tone (e.g. ordering first) and handling payment discreetly, often pre-arranged', 'Insisting every guest split the bill evenly at the table', 'Letting the most senior guest pay regardless of who invited whom', 'Announcing the total bill amount to the table'], why: 'A host typically arranges payment discreetly in advance, avoiding an awkward moment at the table.' }
+  ];
+
+  var ADDRESS = [
+    { level: 4, q: 'What is the correct way to introduce two people of different seniority professionally?', a: 'Say the more senior person’s name first', d: ['Say the more senior person’s name first', 'Say whichever name comes to mind first', 'Always introduce the younger person first', 'Introduce by job title only, never by name'], why: 'Naming the senior person first is a traditional mark of respect in formal introductions.' },
+    { level: 11, q: 'What does "RSVP" stand for, and what does it obligate you to do?', a: '"Répondez s’il vous plaît" — it obligates a reply confirming attendance or not', d: ['"Répondez s’il vous plaît" — it obligates a reply confirming attendance or not', 'It only applies if you plan to attend', 'It is simply the event’s start time', 'It means the invitation is optional to read'], why: 'French for "please respond" — a reply is expected regardless of whether you plan to attend.' },
+    { level: 20, q: 'What is traditional handshake etiquette on first meeting someone?', a: 'Firm but not crushing, brief eye contact, released after a couple of seconds', d: ['Firm but not crushing, brief eye contact, released after a couple of seconds', 'As long and tight a grip as possible', 'Avoiding eye contact entirely', 'Holding the handshake for as long as conversation continues'], why: 'A confident, brief handshake with eye contact is the traditional Western standard for a first meeting.' },
+    { level: 30, q: 'What does addressing someone as "Esquire" traditionally signify in written correspondence?', a: 'Historically a mark of gentlemanly status, still used after a lawyer’s name in the US', d: ['Historically a mark of gentlemanly status, still used after a lawyer’s name in the US', 'It is a job title meaning "assistant"', 'It applies only to members of royalty', 'It is used exclusively in spoken address, never written'], why: 'In modern US usage, "Esq." after a name most commonly denotes a practising attorney in formal written address.' },
+    { level: 40, q: 'What is the polite way to correct someone who has mispronounced your name?', a: 'A brief, light correction in passing, without making it an awkward moment', d: ['A brief, light correction in passing, without making it an awkward moment', 'Ignoring it every time to avoid conflict', 'Correcting them loudly in front of others', 'Refusing to respond until they get it right'], why: 'A light, quick correction keeps the interaction comfortable for both people.' },
+    { level: 52, q: 'What is the etiquette around exchanging business cards?', a: 'Offer and receive with care, and look at a card received before putting it away', d: ['Offer and receive with care, and look at a card received before putting it away', 'Pocket the card immediately without looking at it', 'Only exchange cards if specifically asked', 'Hand the card face-down'], why: 'Briefly acknowledging a received card shows respect, rather than treating it as disposable.' },
+    { level: 64, q: 'If an invitation doesn’t specify a "plus-one," what is the polite assumption?', a: 'Assume you should attend alone unless you ask the host directly', d: ['Assume you should attend alone unless you ask the host directly', 'Always bring a guest regardless', 'Bring as many guests as you like', 'Assume the invitation is cancelled'], why: 'Absence of a plus-one on the invitation is a strong signal, and it’s courteous to ask rather than assume.' },
+    { level: 76, q: 'What is the polite way to decline an invitation you cannot attend?', a: 'Respond promptly with a brief, gracious decline', d: ['Respond promptly with a brief, gracious decline', 'Simply not responding at all', 'Waiting until the last possible moment to reply', 'Sending a lengthy list of excuses'], why: 'A prompt, gracious decline respects the host’s need to plan, unlike silence or a delayed response.' },
+    { level: 88, q: 'What is the default etiquette on using someone’s first name versus title and surname on first meeting?', a: 'Default to title and surname until invited to use their first name', d: ['Default to title and surname until invited to use their first name', 'Always use first names immediately', 'Always use only last names, with no titles', 'It depends entirely on the person’s age'], why: 'Waiting to be invited to use a first name is the more formal, traditionally respectful default.' },
+    { level: 100, q: 'What is the traditional window for sending a thank-you note after being hosted?', a: 'Within about a week of the occasion', d: ['Within about a week of the occasion', 'Exactly one year later', 'There is no traditional expectation at all', 'Only if a gift was received'], why: 'A prompt thank-you note, sent within roughly a week, is the traditional standard of good manners.' }
+  ];
+
+  var GROOMING = [
+    { level: 6, q: 'What is the difference between "Eau de Toilette" and "Eau de Parfum"?', a: 'Eau de Parfum has a higher concentration of fragrance oil and lasts longer', d: ['Eau de Parfum has a higher concentration of fragrance oil and lasts longer', 'They are identical products with different names', 'Eau de Toilette is always more expensive', 'Eau de Parfum is only for evening wear'], why: 'Concentration determines both intensity and how long a fragrance lasts on skin.' },
+    { level: 14, q: 'What are the "top, heart and base notes" of a fragrance?', a: 'The layered scent stages smelled over time, from fastest-fading to longest-lasting', d: ['The layered scent stages smelled over time, from fastest-fading to longest-lasting', 'Three separate fragrances mixed together', 'The three ingredients listed first on the label', 'A rating system for fragrance quality'], why: 'Top notes appear first and fade quickly; base notes emerge last and linger the longest.' },
+    { level: 24, q: 'What is a "wet shave," as distinct from an electric shave?', a: 'Shaving with a razor, cream/soap and water, traditionally with a brush', d: ['Shaving with a razor, cream/soap and water, traditionally with a brush', 'Shaving in the shower with no product at all', 'Using an electric razor under running water', 'A shave performed only by a barber, never at home'], why: 'The wet shave method uses lather and a blade rather than a dry electric shaver.' },
+    { level: 34, q: 'What is a "fade" haircut?', a: 'A haircut that gradually shortens from longer on top to very short at the sides and back', d: ['A haircut that gradually shortens from longer on top to very short at the sides and back', 'A haircut with no variation in length anywhere', 'A style exclusive to long hair', 'A haircut requiring no scissors at all'], why: 'The gradual blend from long to short is the defining feature of a fade.' },
+    { level: 46, q: 'By traditional etiquette, how much fragrance should be applied?', a: 'Enough to be noticed only at close distance, like a handshake or hug', d: ['Enough to be noticed only at close distance, like a handshake or hug', 'Enough to be smelled across a large room', 'As much as possible for maximum impact', 'None at all in professional settings'], why: 'Overapplication is considered a common grooming mistake — subtlety is the traditional standard.' },
+    { level: 58, q: 'Where is fragrance traditionally applied for the best longevity?', a: 'Pulse points, such as wrists and neck', d: ['Pulse points, such as wrists and neck', 'Directly onto clothing only', 'The soles of the feet', 'Hair only, never skin'], why: 'The warmth at pulse points helps diffuse and sustain a fragrance’s scent throughout the day.' },
+    { level: 70, q: 'What is the difference between a barber taking hair "off the top" and "just a trim"?', a: '"Off the top" noticeably shortens the length; "a trim" only tidies the existing length', d: ['"Off the top" noticeably shortens the length; "a trim" only tidies the existing length', 'They mean exactly the same thing', '"A trim" always means shaving the head', '"Off the top" refers only to sideburns'], why: 'Being precise with this distinction avoids a much shorter cut than intended.' },
+    { level: 84, q: 'What is "witch hazel" commonly used for after a wet shave?', a: 'As an aftershave astringent/toner to soothe and disinfect the skin', d: ['As an aftershave astringent/toner to soothe and disinfect the skin', 'As a pre-shave oil only', 'As a substitute for shaving cream', 'As a cologne base note'], why: 'Its mild astringent properties help calm freshly shaved skin.' },
+    { level: 96, q: 'What does "layering" a fragrance mean?', a: 'Using a scented shower gel/lotion from the same fragrance family beneath a cologne', d: ['Using a scented shower gel/lotion from the same fragrance family beneath a cologne', 'Applying three different colognes at once', 'Spraying fragrance directly onto a jacket', 'Mixing perfume with aftershave in the same bottle'], why: 'Layering complementary scented products can make a fragrance last longer and feel more complex.' }
+  ];
+
+  var CIGARS = [
+    { level: 5, q: 'What is a "robusto" in cigar sizing?', a: 'A shorter, thicker cigar shape, among the most popular formats', d: ['A shorter, thicker cigar shape, among the most popular formats', 'The largest cigar size made', 'A cigar with no wrapper leaf', 'A flavoured cigar variety'], why: 'Roughly 5 inches with a 50 ring gauge, the robusto is one of the most widely smoked formats.' },
+    { level: 13, q: 'What does "ring gauge" measure on a cigar?', a: 'The cigar’s diameter, in 64ths of an inch', d: ['The cigar’s diameter, in 64ths of an inch', 'The cigar’s total weight', 'How many wrapper leaves were used', 'The cigar’s burn time in minutes'], why: 'A higher ring gauge number means a thicker cigar.' },
+    { level: 22, q: 'What is the correct way to cut a cigar before smoking?', a: 'A straight or V-cut at the cap end, removing just enough for a smooth draw', d: ['A straight or V-cut at the cap end, removing just enough for a smooth draw', 'Cutting straight through the middle of the cigar', 'Biting off the end', 'Cutting the foot (lighting end) instead of the cap'], why: 'Cutting the cap opens the draw without unraveling the wrapper or over-opening the cigar.' },
+    { level: 32, q: 'What does it mean to "toast the foot" of a cigar before lighting?', a: 'Gently warming the tobacco end before drawing, for an even light', d: ['Gently warming the tobacco end before drawing, for an even light', 'Cutting off the foot entirely', 'Dipping the foot in alcohol first', 'Lighting the cap end instead'], why: 'Toasting helps the cigar catch evenly rather than burning unevenly down one side.' },
+    { level: 44, q: 'What is a "torpedo" shaped cigar?', a: 'A cigar with a tapered, pointed head rather than a flat or rounded cap', d: ['A cigar with a tapered, pointed head rather than a flat or rounded cap', 'A cigar with no wrapper leaf at all', 'The shortest cigar format made', 'A cigar rolled without any filler'], why: 'The pointed head is the torpedo’s distinctive visual feature.' },
+    { level: 56, q: 'What is the etiquette around smoking a cigar near others?', a: 'Always ask first, and only smoke in designated or ventilated areas', d: ['Always ask first, and only smoke in designated or ventilated areas', 'It is always acceptable without asking', 'Only ask if smoking indoors', 'Cigars require no special consideration, unlike cigarettes'], why: 'Cigar smoke is notably strong and lingering, so courtesy toward others nearby matters.' },
+    { level: 68, q: 'What do "wrapper, binder, and filler" refer to in a cigar’s construction?', a: 'The outer leaf, the leaf holding the filler together, and the blended tobacco inside', d: ['The outer leaf, the leaf holding the filler together, and the blended tobacco inside', 'Three different brands blended into one cigar', 'The three stages of aging', 'Three sizes of the same cigar'], why: 'Each of the three components affects flavour, burn and appearance differently.' },
+    { level: 80, q: 'What distinguishes a "Churchill" from a "Corona" cigar size?', a: 'A Churchill is longer and thicker; a Corona is a classic medium size', d: ['A Churchill is longer and thicker; a Corona is a classic medium size', 'They are the same size with different names', 'A Corona is always flavoured', 'A Churchill has no wrapper leaf'], why: 'Roughly 7 inches for a Churchill versus about 5.5 inches for a Corona.' },
+    { level: 92, q: 'What is the polite way to relight a cigar that has gone out?', a: 'Gently toast the foot again before drawing, within a reasonable time', d: ['Gently toast the foot again before drawing, within a reasonable time', 'Relighting is never acceptable once a cigar goes out', 'Cut off the unburnt portion and start a new cigar', 'Relight from the cap end instead'], why: 'Relighting is generally acceptable if done reasonably soon after the cigar goes out.' }
+  ];
+
+  var TRAVEL = [
+    { level: 8, q: 'What is the difference between "first class" and "business class" on a commercial flight?', a: 'First class offers the highest tier of space, service and privacy; business class is a step below', d: ['First class offers the highest tier of space, service and privacy; business class is a step below', 'They are identical on all airlines', 'Business class is always more expensive than first', 'First class only exists on private jets'], why: 'On many routes business class is now the top tier offered, with first class reserved for select long-haul flights.' },
+    { level: 18, q: 'What does "FBO" stand for in private aviation?', a: 'Fixed-Base Operator', d: ['Fixed-Base Operator', 'Flight Booking Office', 'First-Boarding Option', 'Federal Boarding Order'], why: 'An FBO is a private terminal facility used for private and chartered aircraft, separate from the main commercial terminal.' },
+    { level: 28, q: 'What is a "tail number" on a private aircraft?', a: 'The aircraft’s unique registration identifier, painted on the tail', d: ['The aircraft’s unique registration identifier, painted on the tail', 'The number of passengers it can carry', 'The pilot’s licence number', 'The aircraft’s manufacturing year'], why: 'The tail number uniquely identifies that specific aircraft, similar to a car’s licence plate.' },
+    { level: 40, q: 'What is the difference between chartering a plane and using a private jet card?', a: 'Chartering books a whole aircraft for your own trip; a jet card is pre-paid membership access to available aircraft', d: ['Chartering books a whole aircraft for your own trip; a jet card is pre-paid membership access to available aircraft', 'They are identical arrangements', 'A jet card always includes a dedicated aircraft owned by you', 'Chartering requires annual membership fees'], why: 'A charter is a one-off booking; a jet card provides flexible, on-demand access without owning or fully booking a plane each time.' },
+    { level: 52, q: 'What does "Pullman" traditionally refer to in rail travel?', a: 'A luxury railway sleeping/dining carriage associated with first-class rail travel', d: ['A luxury railway sleeping/dining carriage associated with first-class rail travel', 'A type of train ticket discount', 'The name for any high-speed train', 'A rail company that no longer exists in any form'], why: 'Historically operated by the Pullman Company, the name became synonymous with luxury rail travel.' },
+    { level: 64, q: 'What is a marina "berth"?', a: 'A designated docking space for a boat or yacht', d: ['A designated docking space for a boat or yacht', 'The captain’s cabin', 'A type of anchor', 'A marina’s fuel dock'], why: 'A berth is the specific, often numbered, space assigned for a vessel to dock.' },
+    { level: 76, q: 'What do "port" and "starboard" mean on a boat?', a: 'Port is the left side facing forward; starboard is the right side facing forward', d: ['Port is the left side facing forward; starboard is the right side facing forward', 'Port is the front; starboard is the back', 'They refer to the top and bottom decks', 'Port means "stop"; starboard means "go"'], why: 'These terms are fixed relative to facing the bow (front), regardless of which way you personally happen to be facing.' },
+    { level: 88, q: 'What is the etiquette for tipping a chauffeur or private driver on a multi-day trip?', a: 'A tip is customary at the end of the full engagement, reflecting the whole trip', d: ['A tip is customary at the end of the full engagement, reflecting the whole trip', 'Tipping should happen before the trip begins', 'No tip is expected on multi-day engagements', 'A separate tip must be given after every single stop'], why: 'One considered tip at the conclusion is the more typical approach than repeated small tips throughout.' },
+    { level: 100, q: 'What does "wheels up" mean in private aviation terminology?', a: 'The moment the aircraft’s wheels leave the ground', d: ['The moment the aircraft’s wheels leave the ground', 'The moment passengers board the aircraft', 'The scheduled departure time on paper', 'The moment the aircraft lands'], why: 'Commonly used to mean the flight has genuinely and physically departed.' },
+    { level: 110, q: 'What is the difference between a "layover" and a "connection" in common travel usage?', a: 'Both are stops between flights, but "layover" often implies a longer stop, sometimes overnight', d: ['Both are stops between flights, but "layover" often implies a longer stop, sometimes overnight', 'A connection always requires changing airlines', 'A layover always means missing your original flight', 'They refer to two entirely unrelated concepts'], why: 'The terms overlap in casual use, though "layover" typically suggests a longer gap than a quick "connection."' }
+  ];
+
+  var TAILORING = [
+    { level: 10, q: 'What does a "Super 120s" (or Super 150s) label on wool fabric refer to?', a: 'A measure of the fineness of the wool fibre', d: ['A measure of the fineness of the wool fibre', 'The fabric’s weight in ounces', 'The number of stitches per inch', 'The wool’s country of origin'], why: 'Higher Super numbers indicate finer, softer fibres — though not necessarily more durable ones.' },
+    { level: 20, q: 'What is the difference between "full canvas" and "fused" suit construction?', a: 'Full canvas uses a hand-stitched internal layer for better drape and longevity; fused uses glued interfacing', d: ['Full canvas uses a hand-stitched internal layer for better drape and longevity; fused uses glued interfacing', 'They are identical construction methods', 'Fused construction is always more expensive', 'Full canvas refers to the outer fabric colour'], why: 'Fused construction is cheaper but can bubble or separate over time; full canvas ages far better.' },
+    { level: 32, q: 'What is "worsted wool"?', a: 'Wool spun from long, combed fibres into a smooth, tightly woven fabric', d: ['Wool spun from long, combed fibres into a smooth, tightly woven fabric', 'A synthetic wool substitute', 'Wool blended with cotton', 'Unprocessed raw wool'], why: 'Worsted wool is the standard fabric type for classic, crisp business suiting.' },
+    { level: 44, q: 'What is "flannel" as a suiting fabric?', a: 'A soft, slightly brushed wool fabric with a matte finish, favoured for autumn/winter', d: ['A soft, slightly brushed wool fabric with a matte finish, favoured for autumn/winter', 'A lightweight cotton used only in summer', 'A synthetic waterproof fabric', 'The lining fabric used inside a jacket'], why: 'Flannel’s soft texture and warmth make it a seasonal favourite for cooler-weather suits.' },
+    { level: 56, q: 'What does "tweed" refer to as a fabric?', a: 'A rough, textured woolen fabric associated with country/outdoor formal wear', d: ['A rough, textured woolen fabric associated with country/outdoor formal wear', 'A smooth silk used for evening wear', 'A waterproof technical fabric', 'A type of lining material only'], why: 'Tweed’s rugged texture ties it traditionally to countryside and outdoor pursuits.' },
+    { level: 68, q: 'What is the purpose of a "basted" fitting in bespoke tailoring?', a: 'A temporary, loosely-stitched garment used to check fit before final construction', d: ['A temporary, loosely-stitched garment used to check fit before final construction', 'The final, permanently stitched suit', 'A type of fabric pattern', 'A step used only for shirts, never suits'], why: 'The baste fitting lets the tailor adjust proportions before committing to permanent stitching.' },
+    { level: 80, q: 'What does "half-canvas" construction mean?', a: 'Canvas is used in the chest/lapel area, while fused construction is used elsewhere for cost efficiency', d: ['Canvas is used in the chest/lapel area, while fused construction is used elsewhere for cost efficiency', 'The jacket is only half-lined', 'The suit uses two different fabric colours', 'It refers to a suit missing its trousers'], why: 'Half-canvas is a practical middle ground between the durability of full canvas and the lower cost of fused construction.' },
+    { level: 92, q: 'What is a suit’s "drape"?', a: 'How the fabric hangs and moves on the body', d: ['How the fabric hangs and moves on the body', 'The suit’s exact colour shade', 'The type of lining fabric used', 'The number of buttons on the cuff'], why: 'Good drape means the fabric skims the body cleanly without pulling or excess bunching.' },
+    { level: 104, q: 'What does "bespoke last" mean in relation to shoes?', a: 'A wooden mould custom-shaped to an individual’s foot', d: ['A wooden mould custom-shaped to an individual’s foot', 'The final stage of the shoemaking process only', 'A type of leather grade', 'The shoe’s standard factory size'], why: 'The last is the foundation shape used to construct made-to-measure or bespoke footwear.' },
+    { level: 116, q: 'What is the significance of a "house check" pattern in British tailoring?', a: 'A distinctive check pattern historically associated with a specific tailoring house or estate', d: ['A distinctive check pattern historically associated with a specific tailoring house or estate', 'A random pattern with no historical meaning', 'A pattern used exclusively for formal black tie', 'A modern marketing term with no tailoring roots'], why: 'Historically, estate staff or tenants could be identified by their estate’s distinctive house check.' }
+  ];
+
+  var CORRESPONDENCE = [
+    { level: 12, q: 'What is the correct traditional salutation for a formal letter when you don’t know the recipient’s name?', a: '"Dear Sir or Madam"', d: ['"Dear Sir or Madam"', '"To whom it may involve"', '"Hey there"', '"Dear Occupant"'], why: 'This remains the standard formal opening when the specific recipient is unknown.' },
+    { level: 22, q: 'What does "black tie" printed on a wedding invitation actually obligate the male guest to wear?', a: 'A tuxedo/dinner jacket', d: ['A tuxedo/dinner jacket', 'Any suit, in any colour', 'A morning coat', 'Smart casual attire'], why: 'A business suit does not fulfil a black tie requirement, regardless of how formal it looks.' },
+    { level: 35, q: 'What is the polite window for sending a wedding gift relative to the ceremony?', a: 'Traditionally any time up to about a year after the wedding', d: ['Traditionally any time up to about a year after the wedding', 'Only on the exact day of the wedding', 'Strictly before the wedding only', 'Gifts are never expected'], why: 'Though sending before or shortly after has become more common, the traditional window is quite generous.' },
+    { level: 47, q: 'What does "regrets only" mean on an invitation?', a: 'You only need to respond if you cannot attend', d: ['You only need to respond if you cannot attend', 'The event has been cancelled', 'You must always respond, even to confirm attendance', 'Only negative feedback is welcome'], why: 'Silence under "regrets only" is taken to mean you are attending.' },
+    { level: 59, q: 'What is the traditional etiquette for how soon to reply to a formal invitation?', a: 'As promptly as possible, and always by any stated RSVP date', d: ['As promptly as possible, and always by any stated RSVP date', 'Exactly on the RSVP deadline, never before', 'Only after the event has already happened', 'Whenever convenient, with no real urgency'], why: 'Prompt replies help hosts plan — waiting until the last moment is considered poor form.' },
+    { level: 71, q: 'What is a "save the date" card, and how does it differ from a formal invitation?', a: 'An early notice of an upcoming event’s date, sent before the full formal invitation', d: ['An early notice of an upcoming event’s date, sent before the full formal invitation', 'A replacement for a formal invitation entirely', 'A card sent only after the event has occurred', 'A legally binding confirmation of attendance'], why: 'It gives guests advance notice to plan, with full details following in a separate formal invitation.' },
+    { level: 83, q: 'What is the traditional way to address a formal envelope to a married couple?', a: '"Mr. and Mrs. [Surname]," or increasingly both full names', d: ['"Mr. and Mrs. [Surname]," or increasingly both full names', 'Using only the husband’s first name', 'Using only "The Family [Surname]"', 'Addressing it to "Occupants"'], why: 'Modern etiquette increasingly favours listing both individuals’ names where preferred.' },
+    { level: 95, q: 'What is the etiquette around bringing a gift when invited to someone’s home for dinner?', a: 'A modest gift like wine or flowers is customary, though checking preferences first is wise', d: ['A modest gift like wine or flowers is customary, though checking preferences first is wise', 'Gifts are never appropriate for a private dinner', 'A gift is only expected if the host is a stranger', 'Only expensive gifts are considered acceptable'], why: 'Checking dietary or alcohol preferences avoids an awkward or unusable gift.' },
+    { level: 107, q: 'What is the traditional close of a very formal letter to a dignitary?', a: '"Yours faithfully" (name unknown) or "Yours sincerely" (name known), in UK usage', d: ['"Yours faithfully" (name unknown) or "Yours sincerely" (name known), in UK usage', '"Best," in every formal context', 'There is no traditional distinction in closings', '"Cheers," regardless of formality'], why: 'UK formal correspondence traditionally distinguishes these closings based on whether the recipient’s name was known.' },
+    { level: 119, q: 'What does "black tie invited" sometimes signal on an American invitation, as opposed to "black tie" alone?', a: 'Black tie is encouraged and appropriate, but not strictly mandatory', d: ['Black tie is encouraged and appropriate, but not strictly mandatory', 'It is a stricter requirement than plain "black tie"', 'It means the event has been cancelled', 'It applies only to female guests'], why: 'This phrasing gives guests some latitude while still signalling a formal expectation.' }
+  ];
+
+  var BANKS = { dresscode: DRESSCODE, accessories: ACCESSORIES, timepieces: TIMEPIECES, spirits: SPIRITS, wine: WINE, hotels: HOTELS, service: SERVICE, dining: DINING, address: ADDRESS, grooming: GROOMING, cigars: CIGARS, travel: TRAVEL, tailoring: TAILORING, correspondence: CORRESPONDENCE };
+  var TOPIC_LABELS = { dresscode: 'Dress Code & Formality', accessories: 'Accessories & Details', timepieces: 'Watches & Timepieces', spirits: 'Spirits & Cocktails', wine: 'Wine & Champagne', hotels: 'Hotels & Hospitality', service: 'Service Roles & Staff', dining: 'Dining Etiquette', address: 'Forms of Address & Protocol', grooming: 'Grooming & Fragrance', cigars: 'Cigars & Tobacco', travel: 'Travel & Transport', tailoring: 'Tailoring & Fabric', correspondence: 'Correspondence & Occasions' };
+  function mcFromEntry(topicLabel, e) { return { type: 'mc', topic: topicLabel, level: e.level, prompt: e.q, options: shuffle(e.d), answer: e.a, method: e.why }; }
+  function nearestByLevel(bank, level) { return bank.slice().sort(function (a, b) { return Math.abs(a.level - level) - Math.abs(b.level - level); }); }
+  function generateFromBank(poolKey, level, topicLabel) { var near = nearestByLevel(BANKS[poolKey], level || 1); return mcFromEntry(topicLabel, rr(poolKey, near)); }
+  function generate(topicKey, level) { return generateFromBank(topicKey, level, TOPIC_LABELS[topicKey]); }
+
+  var POOL_KEYS = ['dresscode', 'accessories', 'timepieces', 'spirits', 'wine', 'hotels', 'service', 'dining', 'address', 'grooming', 'cigars', 'travel', 'tailoring', 'correspondence'];
+  // 120-level ladder (double the usual 60) for maximum progression depth. Bands widen
+  // topic variety as level rises, with every topic eligible in the top "mastery" band.
+  var LEVEL_BANDS = [
+    { min: 1, max: 20, pools: ['dresscode', 'address', 'dining', 'service'] },
+    { min: 21, max: 40, pools: ['accessories', 'hotels', 'spirits'] },
+    { min: 41, max: 60, pools: ['wine', 'grooming', 'dining', 'address'] },
+    { min: 61, max: 80, pools: ['timepieces', 'cigars', 'travel'] },
+    { min: 81, max: 100, pools: ['tailoring', 'correspondence', 'wine', 'spirits'] },
+    { min: 101, max: 120, pools: POOL_KEYS }
+  ];
+  function bandFor(level) { for (var i = 0; i < LEVEL_BANDS.length; i++) { var b = LEVEL_BANDS[i]; if (level >= b.min && level <= b.max) return b; } return LEVEL_BANDS[LEVEL_BANDS.length - 1]; }
+  function tierForLevel(level) { level = level || 1; if (level <= 20) return 1; if (level <= 40) return 2; if (level <= 60) return 3; if (level <= 80) return 4; if (level <= 100) return 5; return 6; }
+  function generateForLevel(level) { level = Math.max(1, Math.min(120, level || 1)); return generate(pick(bandFor(level).pools), level); }
+  function generateLevelSet(n, level) { var out = []; for (var i = 0; i < n; i++) out.push(generateForLevel(level)); return out; }
+  function levelLabel(level) {
+    if (level >= 110) return 'Consummate Gentleman'; if (level >= 95) return 'Distinguished'; if (level >= 80) return 'Refined';
+    if (level >= 60) return 'Polished'; if (level >= 40) return 'Well-Versed'; if (level >= 20) return 'Developing'; return 'Novice';
+  }
+  // No academic grade concept here — gradeFromLevel returns the same rank name as levelLabel,
+  // so the shared dashboard pattern (which expects a "grade" value) shows a rank instead.
+  function gradeFromLevel(level) { return levelLabel(level); }
+  function generatePlacementSet(n) { n = n || 16; var out = []; for (var i = 0; i < n; i++) { var level = Math.round(1 + (i / (n - 1)) * 119); out.push(generateForLevel(level)); } return out; }
+  function levelFromScore(pct) { return Math.max(1, Math.min(120, Math.round((pct / 100) * 119) + 1)); }
+  function strongestWeakest(breakdown) {
+    var scored = (breakdown || []).filter(function (b) { return b.total > 0; }).map(function (b) { return { topic: b.topic, acc: b.ok / b.total }; });
+    if (!scored.length) return { strongest: '', weakest: '', focusAreas: [] };
+    scored.sort(function (a, b) { return b.acc - a.acc; });
+    var strongest = scored[0].topic, weakest = scored[scored.length - 1].topic;
+    var focusAreas = scored.slice().sort(function (a, b) { return a.acc - b.acc; }).slice(0, 3).map(function (s) { return s.topic; });
+    return { strongest: strongest, weakest: weakest, focusAreas: focusAreas };
+  }
+
+  var QT_TYPES = POOL_KEYS.map(function (k) { return { key: k, label: TOPIC_LABELS[k] }; }).concat([{ key: 'mixed', label: 'Mixed Etiquette Test' }]);
+  var QT_DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced', 'Expert', 'Elite', 'Master'];
+  var QT_LENGTHS = [5, 10, 20, 50];
+  function qtDifficultyToTier(diff) { return { Beginner: 1, Intermediate: 2, Advanced: 3, Expert: 4, Elite: 5, Master: 6 }[diff] || 2; }
+  function qtLevelToTier(level) { return tierForLevel(level); }
+  function qtTierToLevel(tier) { return { 1: 10, 2: 30, 3: 50, 4: 70, 5: 90, 6: 110 }[tier] || 30; }
+  function qtQuestionForType(typeKey, tier) { var level = qtTierToLevel(tier); var key = typeKey === 'mixed' ? pick(POOL_KEYS) : typeKey; return generate(key, level); }
+  function buildQuickTest(typeKey, difficulty, length, userLevel) {
+    var tier = difficulty === 'Auto' ? qtLevelToTier(userLevel || 1) : qtDifficultyToTier(difficulty);
+    var out = []; for (var i = 0; i < (length || 10); i++) out.push(qtQuestionForType(typeKey, tier));
+    return out;
+  }
+  function generateDailyChallenge(userLevel) {
+    var tier = qtLevelToTier(userLevel || 1);
+    var mix = POOL_KEYS.slice();
+    var out = []; for (var i = 0; i < 8; i++) out.push(qtQuestionForType(mix[i % mix.length], tier));
+    return out;
+  }
+  function checkAnswer(q, input) {
+    var norm = function (s) { return (s || '').toLowerCase().trim().replace(/[^a-z0-9 ]/g, ''); };
+    return norm(input) === norm(q.answer);
+  }
+
+  var LESSONS = {
+    dresscode: {
+      title: 'Dress Code & Formality',
+      intro: 'Dress codes are a compressed language — a single phrase like "black tie" or "lounge suit" carries an exact, agreed-upon meaning, and getting it right (or wrong) is instantly visible to everyone in the room.',
+      origin: 'Modern Western formal dress codes descend largely from 19th-century British upper-class convention, when tailcoats and white tie were simply what one wore in the evening. The tuxedo (black tie) emerged in the 1880s as a deliberately less formal alternative for private, informal evenings — it only became the new formal standard once white tie faded from everyday use through the 20th century. Understanding this history explains why black tie still reads as "one notch below" true formality, even though it is now the most formal code most people will ever actually encounter.',
+      sections: [
+        { heading: 'The Formality Ladder', body: 'Dress codes exist on a strict hierarchy: white tie, morning dress (daytime formal), black tie, lounge suit/business formal, smart casual, and casual. Each step down removes specific elements — white tie’s tailcoat and white waistcoat give way to black tie’s dinner jacket, which gives way to the lounge suit’s ordinary jacket and tie. Knowing the ladder means you can correctly interpret any code you haven’t seen written out before by its position relative to ones you know.' },
+        { heading: 'Why "Optional" and "Creative" Codes Cause Confusion', body: 'Modifiers like "black tie optional" or "black tie creative" exist precisely because hosts want formality with some flexibility — but they are frequently misread. "Optional" means a tuxedo is preferred but a dark, well-cut suit is acceptable; it does not mean casual dress is fine. "Creative" invites personal flair (colour, texture) while keeping the black tie’s underlying formal structure intact, not abandoning it.' },
+        { heading: 'Construction Details That Signal Formality', body: 'Details like a peak lapel (more formal, evening-associated) versus a notch lapel (everyday business), or a single- versus double-breasted cut, aren’t just style preferences — they carry formality signals a trained eye reads instantly. A double-breasted peak-lapel jacket reads more formal than a single-breasted notch-lapel one, even in an identical colour.' },
+        { heading: 'Bespoke, Made-to-Measure and Off-the-Rack', body: 'These three terms describe genuinely different processes, not just price tiers. Bespoke builds an entirely individual pattern from scratch, refined over multiple fittings. Made-to-measure starts from an existing block pattern and adjusts it to the individual. Off-the-rack is a fixed standard size with no individual pattern at all. Each has its place, but conflating them (calling made-to-measure "bespoke," for instance) is a common and noticeable mistake.' }
+      ],
+      misconceptions: [
+        { myth: '"Black tie" means any suit and any tie, as long as it’s dark.', reality: 'Black tie specifically means a tuxedo/dinner jacket with a black bow tie — a standard suit does not fulfil it, however dark or formal it looks.' },
+        { myth: 'A dress code with "optional" in it means casual dress is acceptable.', reality: '"Optional" softens which formal option is required (tuxedo vs dark suit), not whether formality is required at all.' },
+        { myth: 'Made-to-measure and bespoke are just two names for the same custom tailoring process.', reality: 'Bespoke is an individual pattern built from nothing; made-to-measure adjusts an existing standard pattern — a real, meaningful difference in process and result.' }
+      ],
+      expertNotes: [
+        'When a dress code is genuinely unclear, the safest approach is to ask the host directly rather than guess.',
+        'Fabric and season matter as much as the formal code itself — a heavy winter suit at a summer garden party misses the mark even if the formality level is technically correct.',
+        'Well-dressed people often deliberately under-rather-than-overdress by exactly one notch when a code is ambiguous, since being slightly underdressed reads better than looking like you tried too hard.'
+      ],
+      examples: [{ q: 'An invitation says "black tie." What must a male guest wear?', working: 'The literal, specific meaning of the code, not a loose interpretation', answer: 'A tuxedo with a black bow tie' }, { q: 'What is the daytime equivalent of white tie formality?', working: 'Same tier of formality, different time-of-day convention', answer: 'Morning dress' }]
+    },
+    accessories: {
+      title: 'Accessories & Details',
+      intro: 'Accessories are where genuine attention to detail becomes visible — the correct pocket square fold, the right lacing style on a shoe, or knowing what a signet ring is actually for, all signal a level of knowledge that can’t be faked with money alone.',
+      origin: 'Most classic men’s accessories began as purely functional items that formality later turned decorative. Cufflinks emerged because French-cuff shirts (with no buttons) needed a fastening method; the pocket square began as a genuinely used handkerchief before becoming a purely ornamental addition; the signet ring was a functional wax-sealing tool for centuries before survival as tradition. Knowing this functional history is often the difference between using an accessory correctly and merely wearing it.',
+      sections: [
+        { heading: 'Formality Signals in Footwear', body: 'The oxford’s closed lacing (stitched under the vamp) reads as more formal than the derby’s open lacing (stitched on top), a distinction that traces back to the oxford’s more minimal, streamlined silhouette. Brogueing (the decorative perforated pattern) can appear on either style but traditionally signals a slightly less formal register than a plain-toe oxford — useful to know when a dress code specifically calls for a particular level of shoe formality.' },
+        { heading: 'Why Braces Exist Alongside Belts', body: 'Formal trousers are often cut without belt loops specifically because braces (suspenders) were the intended fastening — they distribute the trouser’s weight from the shoulders rather than cinching it at the waist, giving a cleaner line under a jacket. Wearing a belt with trousers designed for braces (or vice versa) is a small but noticeable mismatch to a trained eye.' },
+        { heading: 'The Pocket Square’s Fold Hierarchy', body: 'Fold choice signals intended formality: the flat presidential (or "TV") fold is the most understated and correct choice for the most formal occasions, while puffed or multi-point folds read as more casual or playful, appropriate for less formal settings. Matching the fold to the occasion is as important as choosing the right square itself.' },
+        { heading: 'Patina and the Value of Visible Wear', body: 'Unlike most consumer goods, a leather shoe’s patina — the subtle colour variation built up through wear and conditioning — is prized rather than seen as damage. It signals genuine, long-term ownership and care, which is precisely why patina cannot be faked or bought new; it has to be earned through time.' }
+      ],
+      misconceptions: [
+        { myth: 'A pocket square should match the tie exactly.', reality: 'Traditional guidance favours complementing, not matching, the tie — an exact match is often considered a beginner’s mistake.' },
+        { myth: 'Cufflinks work with any dress shirt.', reality: 'Cufflinks require a French cuff (no buttons); a standard buttoned cuff shirt cannot take them at all.' },
+        { myth: 'Brogueing (the perforated pattern) makes a shoe automatically less formal than a plain oxford.', reality: 'It shifts formality slightly, but a well-made brogued oxford can still be entirely appropriate for business and many semi-formal settings.' }
+      ],
+      expertNotes: [
+        'Watch straps, belts and shoes are traditionally expected to broadly match in leather colour and tone in a well put-together outfit.',
+        'A tie bar is traditionally positioned between the third and fourth shirt button, keeping the tie secure without appearing to float too high.',
+        'Genuine patina develops unevenly and organically — an artificially "distressed" shoe rarely convinces someone who knows what real wear looks like.'
+      ],
+      examples: [{ q: 'Which shoe style has a closed lacing system, stitched under the vamp?', working: 'The defining structural feature of this shoe type', answer: 'Oxford' }, { q: 'What accessory is specifically required to fasten a French cuff shirt?', working: 'French cuffs have no buttons of their own', answer: 'Cufflinks' }]
+    },
+    timepieces: {
+      title: 'Watches & Timepieces',
+      intro: 'A watch is one of the few accessories that combines genuine mechanical craftsmanship with social signalling — understanding movements and complications lets you appreciate (and discuss) what you’re actually wearing, not just its brand name.',
+      origin: 'Mechanical watchmaking developed over centuries, but the modern divide between mechanical and quartz watches dates to the 1969 introduction of quartz movement technology — the so-called "quartz crisis" that nearly destroyed the traditional Swiss mechanical watch industry, since quartz was far cheaper and more accurate. Mechanical watches survived not on accuracy but by repositioning as craftsmanship and heritage objects, which is why complications like tourbillons remain prized today despite offering no practical timekeeping advantage over a basic quartz movement.',
+      sections: [
+        { heading: 'Automatic vs Manual vs Quartz', body: 'An automatic movement winds itself via a rotor that spins with natural wrist motion; a manual (hand-wound) movement must be wound periodically via the crown; a quartz movement uses a battery and electronic oscillator. None is objectively "better" — automatic and manual are prized for mechanical craftsmanship, while quartz is prized for accuracy and low maintenance.' },
+        { heading: 'What "Complications" Actually Add', body: 'Any watch function beyond telling the time is a complication — a date window, a chronograph (stopwatch), a moonphase display, or a tourbillon. More complications generally mean more mechanical complexity and cost, and serious watch enthusiasts often value the engineering challenge of a complication more than its practical usefulness.' },
+        { heading: 'Water Resistance Ratings Are Lab Conditions, Not Real-World Guarantees', body: 'A "100m" rating does not mean the watch is safe for diving to 100 metres — it reflects controlled static pressure testing, and real-world factors like water pressure changes during movement, temperature and aging gaskets all reduce practical resistance. A watch intended for actual diving carries a specific ISO dive rating, not just a water resistance number.' },
+        { heading: 'Matching the Watch to the Occasion', body: 'A slim, minimal dress watch on a leather strap is the traditional choice for formal occasions, since it sits discreetly under a cuff; a larger sport watch, however impressive, reads as a mismatch with black or white tie. This mirrors the broader etiquette principle that formal accessories should be understated, not attention-seeking.' }
+      ],
+      misconceptions: [
+        { myth: 'An expensive watch is always mechanically more accurate than a cheap one.', reality: 'Quartz movements — including inexpensive ones — are almost always more accurate than mechanical movements, regardless of price; mechanical value lies in craftsmanship, not precision.' },
+        { myth: 'A high water resistance rating means the watch is safe to dive with.', reality: 'True dive-readiness requires a specific ISO dive certification, not just a stated metre rating.' },
+        { myth: 'More complications always mean a better watch.', reality: 'Complications add cost and complexity but not necessarily better timekeeping — a simple, well-made watch can be superior in reliability to an overly complicated one.' }
+      ],
+      expertNotes: [
+        'Collectors distinguish "in-house" movements (made by the brand itself) from third-party movements, treating the former as generally more prestigious.',
+        'A watch’s power reserve indicator is especially useful for manual and automatic watches, which will stop entirely once fully unwound.',
+        'Serious watch etiquette holds that a watch should never be the loudest thing in the room — subtlety, not size, signals real knowledge.'
+      ],
+      examples: [{ q: 'What powers an automatic watch movement?', working: 'A rotor that spins with the wearer’s natural wrist motion', answer: 'Wrist motion (a self-winding rotor)' }, { q: 'What is a watch’s "power reserve" indicator showing?', working: 'How much stored mechanical energy remains', answer: 'Remaining time before the watch needs winding' }]
+    },
+    spirits: {
+      title: 'Spirits & Cocktails',
+      intro: 'Ordering a drink correctly — knowing what "neat," "up," and "dry" actually mean — instantly signals real familiarity, while getting them confused (or over-explaining) does the opposite.',
+      origin: 'Much of today’s precise cocktail vocabulary crystallised during and after America’s Prohibition era (1920-1933), when skilled bartenders fled to Europe and refined cocktail culture abroad, later returning as Prohibition ended. The martini’s dry/wet distinction, the classic highball format, and formal bar service terminology all trace largely to this golden age of bartending, which deliberately built a precise shared language for communicating exact preferences quickly and unambiguously.',
+      sections: [
+        { heading: 'The Core Ordering Vocabulary', body: '"Neat" means poured straight with nothing added; "on the rocks" means served over ice; "up" means chilled (often shaken or stirred with ice) then strained into a stemmed glass with no ice at all. These three terms cover the vast majority of how a spirit can be requested, and mixing them up (asking for something "neat on the rocks," for instance) signals unfamiliarity rather than precision.' },
+        { heading: 'Why Vermouth Ratio Defines "Dry" and "Wet"', body: 'In a martini specifically, "dry" and "wet" refer only to the proportion of vermouth used, not the drink’s overall style or strength — a dry martini uses very little vermouth, a wet martini uses more. This is a common point of confusion, since "dry" elsewhere often implies less sweetness generally, not a specific ingredient ratio.' },
+        { heading: 'Whisky Spelling Reflects Origin, Not Quality', body: 'Whisky (no "e") is the spelling used by Scotland, Canada and Japan; whiskey (with "e") is used by Ireland and the United States. Neither spelling indicates anything about quality or style — it simply follows the producing country’s convention, and using the correct spelling for a specific bottle is a small but real marker of attention to detail.' },
+        { heading: 'Reading a Cocktail Beyond the Recipe', body: 'Understanding technique terms like "muddling" (crushing ingredients to release oils/flavour) or a spirit’s ABV (alcohol by volume, indicating strength) lets you follow — and intelligently discuss — what a bartender is actually doing, rather than simply consuming the result.' }
+      ],
+      misconceptions: [
+        { myth: '"Dry" in a martini means less alcohol overall.', reality: 'It refers specifically to a lower vermouth ratio, not the drink’s overall strength — a dry martini can be just as strong, or stronger, than a wet one.' },
+        { myth: 'Whisky and whiskey are different types of drink.', reality: 'They’re the same category of spirit; the spelling simply reflects the producing country’s traditional convention.' },
+        { myth: '"Single malt" means the whisky comes from a single barrel or batch.', reality: 'It means the whisky comes from a single distillery, made entirely from malted barley — batches can still be blended across multiple casks within that one distillery.' }
+      ],
+      expertNotes: [
+        'Experienced bartenders read specificity ("Negroni, stirred, orange twist") as a sign of a knowledgeable guest, versus a vague request that requires clarifying questions.',
+        'A small splash of water added to whisky can genuinely open up its aroma — this is a technique, not a dilution mistake.',
+        'Closing a bar tab is handled with a quiet, direct verbal request, never a loud gesture across the room.'
+      ],
+      examples: [{ q: 'What does ordering a drink "neat" specifically mean?', working: 'The simplest possible pour, with nothing added', answer: 'Poured straight, with no ice, water or mixer' }, { q: 'What is the actual difference between a dry and wet martini?', working: 'It is about one specific ingredient’s ratio', answer: 'The proportion of vermouth used' }]
+    },
+    wine: {
+      title: 'Wine & Champagne',
+      intro: 'Wine carries perhaps the densest specialist vocabulary of any social context — terroir, tannin, decanting, vintage — and fluency here reliably separates genuine knowledge from simply ordering "the red."',
+      origin: 'Formal wine service developed heavily in France, where the sommelier profession became institutionalised through certification systems still respected globally today. The strict legal definition of "Champagne" — protected to mean only sparkling wine from that specific French region, made under specific rules — dates to French appellation law in the early 20th century, established precisely to prevent producers elsewhere from borrowing the name’s prestige without following its production standards.',
+      sections: [
+        { heading: 'Champagne Is a Place, Not Just a Style', body: 'Legally, only sparkling wine produced in the Champagne region of France, using its specific grape varieties and traditional method, may be labelled Champagne — everything else, however similar in style, is simply "sparkling wine" (or a region-specific name like Cava or Prosecco). This distinction is a matter of protected legal geography, not a marketing preference.' },
+        { heading: 'Why Decanting Matters — and When It Doesn’t', body: 'Decanting serves two different purposes depending on the wine: aerating a young, tannic red to soften and open it up, or separating an older wine from natural sediment that has settled in the bottle. Not every wine benefits from decanting — delicate older whites, for instance, can lose character from excess air exposure, so knowing when to decant is as important as knowing how.' },
+        { heading: 'Tannin, Terroir, and What They Actually Describe', body: 'Tannin is a specific chemical compound from grape skins, seeds and oak that creates a dry, mouth-puckering sensation, especially pronounced in young reds. Terroir is a broader concept — the total natural environment (soil, climate, terrain) that shapes a wine’s character in ways specific to where its grapes were grown. Confusing the two (or using "terroir" loosely to just mean "flavour") is a common giveaway of surface-level knowledge.' },
+        { heading: 'The Sommelier’s Cork Ritual, Properly Understood', body: 'When a sommelier presents a cork after opening a bottle, the cork itself offers only minor information (moisture, condition); the real check happens with the small tasting pour offered next, which reveals whether the wine is genuinely faulty (such as being corked). Treating the cork alone as the meaningful moment misses the actual purpose of the ritual.' }
+      ],
+      misconceptions: [
+        { myth: 'Any high-quality sparkling wine can correctly be called "Champagne."', reality: 'Only sparkling wine from the Champagne region of France, made under its specific legal rules, may use the name — this is a protected geographic term, not a general quality descriptor.' },
+        { myth: 'Decanting is always beneficial for any wine.', reality: 'It particularly helps young, tannic reds and sediment-heavy older wines, but can actually diminish delicate wines through over-exposure to air.' },
+        { myth: '"Corked" means physical bits of cork are floating in the wine.', reality: 'It refers specifically to spoilage from a chemical compound (TCA) contaminating the cork, giving a musty, wet-cardboard aroma — unrelated to cork fragments.' }
+      ],
+      expertNotes: [
+        'Sommeliers train extensively in blind tasting and food pairing, and a good one will happily guide a guest’s choice rather than expect them to already know the list.',
+        'Holding a wine glass by the stem or base, not the bowl, keeps body heat from warming the wine above its intended serving temperature.',
+        'Vintage refers only to the single harvest year — it says nothing on its own about how long the wine has actually been aged before release or drinking.'
+      ],
+      examples: [{ q: 'Can a sparkling wine made in California legally be labelled "Champagne"?', working: 'Champagne is a legally protected regional name', answer: 'No — only sparkling wine from the Champagne region of France may use that name' }, { q: 'What does "letting a wine breathe" actually do to it?', working: 'Exposure to air changes the wine’s character', answer: 'Softens tannins and opens up its aromas' }]
+    },
+    hotels: {
+      title: 'Hotels & Hospitality',
+      intro: 'Knowing the correct terms for hotel services and staff roles — and the tipping conventions attached to each — turns a hotel stay from a transactional booking into a fluent, comfortable experience for both guest and staff.',
+      origin: 'The modern luxury hotel, with its layered staff roles (concierge, porter, housekeeping, turn-down service) and clearly defined service standards, largely traces to the grand European and American hotels of the late 19th and early 20th centuries — establishments like the Ritz in Paris and the Savoy in London, which set the template for what "five-star" hospitality means, including the precise division of labour between staff roles still used today.',
+      sections: [
+        { heading: 'Suite Terminology Is More Precise Than It Sounds', body: 'A "junior suite" is a single larger room with a visually separated sitting area, still technically one room; a full "suite" has genuinely separate rooms — a distinct bedroom and living area. Hotels sometimes stretch this terminology for marketing purposes, so understanding the real distinction helps set accurate expectations when booking.' },
+        { heading: 'What Each Staff Role Actually Covers', body: 'The concierge arranges reservations, transport, tickets and local recommendations — essentially anything outside the hotel itself. The porter/bellhop specifically handles luggage. Housekeeping maintains the room, sometimes including a separate evening "turn-down service." Knowing which role handles which request avoids asking the wrong person and getting an unhelpful answer.' },
+        { heading: 'Tipping Conventions Vary by Role and Timing', body: 'Room service typically warrants a small tip on delivery even when a service charge is included on the bill. Housekeeping is best tipped daily in cash, since different staff may service the room on different days — tipping only at checkout risks rewarding no one who actually did the work. These conventions vary somewhat by country, so it’s worth knowing local norms when travelling.' },
+        { heading: 'Reading the Fine Print: Amenity Fees and Early Check-In', body: 'An amenity fee is a charge beyond the quoted room rate, often covering pool, gym or wifi access — asking about it before booking avoids a surprise on the final bill. Early check-in is never guaranteed; the polite approach is to call ahead and request it, rather than arrive and expect immediate access before the stated time.' }
+      ],
+      misconceptions: [
+        { myth: 'Any hotel room described as a "suite" has physically separate rooms.', reality: 'A "junior suite" is still one room with a separated sitting area — only a full suite has genuinely distinct rooms.' },
+        { myth: 'Housekeeping only needs to be tipped once, at the end of a stay.', reality: 'Since staff often rotate day to day, a daily tip better ensures the person who actually did the work is rewarded.' },
+        { myth: 'The concierge and the front desk handle the same requests.', reality: 'The front desk manages check-in/out and room logistics; the concierge specifically arranges outside experiences like reservations and transport.' }
+      ],
+      expertNotes: [
+        'Frequent luxury travellers often build a direct relationship with a hotel’s concierge over repeat stays, since a known guest tends to receive more attentive, tailored service.',
+        'A boutique hotel’s appeal is usually its distinct character and personalised service, as distinct from a chain hotel’s consistent, standardised experience.',
+        'Confirming amenity fees and any resort charges before booking is one of the most commonly overlooked steps in avoiding an unexpectedly high final bill.'
+      ],
+      examples: [{ q: 'What is the key structural difference between a junior suite and a full suite?', working: 'One room with a divided area, versus genuinely separate rooms', answer: 'A full suite has physically separate rooms; a junior suite does not' }, { q: 'Who should you ask to arrange restaurant reservations and local recommendations at a hotel?', working: 'This falls specifically outside the hotel’s own operations', answer: 'The concierge' }]
+    },
+    service: {
+      title: 'Service Roles & Staff',
+      intro: 'Valet, chauffeur, butler, maître d’, doorman — each role has a specific, distinct function, and knowing exactly what each one does (and how to properly request something from them) is one of the clearest markers of real social fluency.',
+      origin: 'Most formal household and hospitality service roles descend from the large staffed estates of 18th- and 19th-century Britain, where households employed dozens of specialised roles under a strict hierarchy, typically headed by the butler. As private staffing shrank through the 20th century, these roles migrated largely into hotels, restaurants and dedicated service industries — which is why a modern maître d’ or hotel butler still carries the formal conventions of that original household hierarchy.',
+      sections: [
+        { heading: 'Distinguishing the Core Roles', body: 'A valet parks and retrieves vehicles. A chauffeur provides dedicated, professional private driving. A butler oversees an entire household’s staff and operations. A maître d’ manages a restaurant’s front-of-house. A doorman greets and assists at an entrance. Each role is genuinely distinct, and using the wrong term (calling a doorman a "valet," for instance) signals unfamiliarity.' },
+        { heading: 'Why Correct Address Matters', body: 'Service staff are addressed the same way any professional would expect — by surname, or first name if they’ve introduced themselves that way. Treating service staff dismissively (shouting, snapping fingers, generic terms) is both poor etiquette and, practically, tends to produce worse service in return.' },
+        { heading: 'The Personal Assistant vs Concierge Distinction', body: 'A personal assistant works dedicated to one individual across many areas of their life; a concierge serves whichever guests are present within a specific venue at a given time. The distinction is about scope and dedication, not seniority or skill.' },
+        { heading: 'Tipping as a Signal of Genuine Fluency', body: 'Tipping conventions differ meaningfully by role: a valet is tipped in cash on return of the vehicle regardless of any parking fee; a private chauffeur on a multi-day engagement is typically tipped once at the end, reflecting the whole trip, rather than repeatedly per journey. Getting these conventions right (or visibly not knowing them) is immediately noticeable to service professionals.' }
+      ],
+      misconceptions: [
+        { myth: 'A butler and a valet perform essentially the same job.', reality: 'A butler oversees an entire household’s operations and staff; a valet’s role (in the parking sense) is narrowly focused on vehicles.' },
+        { myth: 'Service staff should be tipped only once, at the very end of an engagement.', reality: 'It depends on the role — a valet is tipped per return, while a multi-day chauffeur engagement is typically tipped once at the end.' },
+        { myth: 'It’s acceptable to get service staff’s attention however is fastest, including shouting or snapping.', reality: 'Correct etiquette treats service staff the same as any other professional — calm, direct, respectful address.' }
+      ],
+      expertNotes: [
+        'A hotel concierge’s value grows dramatically with familiarity — regular guests who build rapport typically receive noticeably better recommendations and access.',
+        'Restaurant regulars who learn and use a maître d’’s name consistently tend to receive better tables and more attentive service over time.',
+        'Understanding a role’s actual scope prevents both under- and over-tipping — knowing what a service genuinely involves is the basis for judging a fair tip.'
+      ],
+      examples: [{ q: 'Who manages a restaurant’s front-of-house, seating and reservations?', working: 'The role specifically responsible for the guest-facing dining room', answer: 'The maître d’' }, { q: 'What is the key difference between a private chauffeur and a chauffeur service booking?', working: 'One is dedicated to a single employer; the other assigns drivers per booking', answer: 'A private chauffeur is dedicated to one employer/family, not booked per-occasion' }]
+    },
+    dining: {
+      title: 'Dining Etiquette',
+      intro: 'Correct cutlery use, napkin protocol and course terminology all exist to make a shared meal run smoothly and predictably — once you know the signals, you can read (and be read) at any formal table without a word being spoken.',
+      origin: 'Formal Western table manners largely crystallised in French and British aristocratic courts from the 17th century onward, where an increasingly elaborate multi-course dining format required a shared, unambiguous system of signals — which utensil to use when, how to indicate a course was finished, and so on. The American style of eating (switching the fork to the right hand after cutting) actually descends from an older European convention that continental Europe itself later abandoned in favour of the current continental style, which is why the two traditions differ today.',
+      sections: [
+        { heading: 'Continental vs American Cutlery Style', body: 'In continental style, the fork stays in the left hand throughout the meal (tines down), with the knife remaining in the right — no switching. In American style, food is cut, the knife is set down, and the fork switches to the right hand to eat. Neither is more "correct" globally, but consistency within whichever style you use matters — switching haphazardly between the two looks uncertain rather than deliberate.' },
+        { heading: 'Cutlery Placement as Silent Communication', body: 'Working "from the outside in" — using the outermost utensils first at a formal setting — follows the order courses will actually be served. Placing your knife and fork together, parallel, in the plate’s centre when finished silently signals to waitstaff that the course can be cleared, without needing to say anything.' },
+        { heading: 'Napkin Protocol Beyond the Obvious', body: 'A napkin is unfolded and placed on the lap at the start of a meal, never tucked into a collar. If you need to leave the table briefly, placing the napkin on your chair (not the table) signals you intend to return and the meal isn’t over — a small detail that avoids confusing waitstaff into clearing your setting prematurely.' },
+        { heading: 'Reading the Host’s Role at a Business Dinner', body: 'At a business dinner, the host typically signals the meal’s tone (sometimes by ordering first or suggesting courses) and arranges payment discreetly, often pre-settled before the meal even begins to avoid any awkward moment at the table. Understanding this convention helps a guest avoid accidentally overstepping, such as reaching for the bill.' }
+      ],
+      misconceptions: [
+        { myth: 'Tucking a napkin into your collar is acceptable at any formal meal.', reality: 'It’s considered informal and outdated — the napkin belongs unfolded on the lap.' },
+        { myth: 'The American and continental eating styles are simply "correct" and "incorrect" versions of the same thing.', reality: 'They are two distinct, legitimate traditions — the key is consistency, not which one you choose.' },
+        { myth: 'You should always finish every drop of wine poured for you.', reality: 'Leaving a glass unfinished is itself an accepted, understated way to signal you’ve had enough.' }
+      ],
+      expertNotes: [
+        'Fine dining waitstaff are trained to watch cutlery position specifically as a wordless cue for pacing a meal’s courses.',
+        'A confidently held, unhurried pace at the table — rather than rushing through cutlery mechanics — is itself read as a mark of ease and familiarity.',
+        'Business hosts often arrange payment with the restaurant in advance specifically to avoid any bill-related moment disrupting the meal’s flow.'
+      ],
+      examples: [{ q: 'What does placing your knife and fork together, parallel, in the plate’s centre signal?', working: 'A wordless cue understood by trained waitstaff', answer: 'The course is finished and can be cleared' }, { q: 'Where should a napkin go if you need to briefly leave the table?', working: 'Signals you intend to return, unlike leaving it elsewhere', answer: 'On your chair, not the table' }]
+    },
+    address: {
+      title: 'Forms of Address & Protocol',
+      intro: 'How you introduce people, respond to invitations, and handle a handshake or business card all communicate social fluency faster than almost anything else — often within the first few seconds of an interaction.',
+      origin: 'Formal introduction and correspondence protocol developed heavily through European court etiquette, where precise rules governed exactly how individuals of different rank addressed and were introduced to one another — mistakes carried real social (and sometimes political) consequences. Much of this protocol softened over the 20th century, but the core structure — deferring to seniority in introductions, prompt and gracious responses to invitations — survives intact in professional and formal social settings today.',
+      sections: [
+        { heading: 'The Logic Behind Introduction Order', body: 'Saying the more senior person’s name first when introducing two people ("Mr. Smith, may I introduce...") is a small but deliberate mark of respect — it’s not arbitrary, and getting it backward is a subtle but real misstep in formal or professional settings.' },
+        { heading: 'RSVP Is an Obligation, Not a Suggestion', body: '"Répondez s’il vous plaît" literally means "please respond" — and it genuinely obligates a reply, whether you plan to attend or not, ideally by any stated deadline. Silence is not a neutral non-answer; it is read as poor etiquette and leaves a host unable to plan properly.' },
+        { heading: 'Business Cards as a Small Ritual', body: 'Offering and receiving a business card with visible care — taking a moment to look at what you’ve been handed before putting it away — signals respect for the exchange itself, not just the information on the card. Pocketing a card immediately without acknowledgment is a small but noticeable breach.' },
+        { heading: 'Defaulting to Formality Until Invited Otherwise', body: 'Using a title and surname until specifically invited to use someone’s first name is the traditionally correct default on first meeting, particularly across a seniority or age gap. This isn’t about coldness — it’s a low-risk starting point that lets the other person set the tone.' }
+      ],
+      misconceptions: [
+        { myth: '"RSVP" only requires a response if you plan to attend.', reality: 'It obligates a reply either way — declining is just as much a response as accepting.' },
+        { myth: 'It’s fine to not respond to an invitation if you’re unsure whether you can attend.', reality: 'Etiquette favours a prompt reply, even a tentative one, over leaving a host without any answer at all.' },
+        { myth: 'Using someone’s first name immediately is always the friendlier, better choice.', reality: 'Defaulting to title and surname until invited otherwise is the traditionally correct and safer starting point, especially in formal or unfamiliar settings.' }
+      ],
+      expertNotes: [
+        'Experienced hosts and event planners treat a non-response to an invitation as functionally equivalent to a "no," since they can’t plan around an unknown.',
+        'A firm, brief handshake with genuine eye contact remains the standard, culturally near-universal mark of a confident first impression in Western business contexts.',
+        'Sending a thank-you note within roughly a week of being hosted is considered the traditional outer boundary of promptness, not merely a suggestion.'
+      ],
+      examples: [{ q: 'When introducing two people of different seniority, whose name is said first?', working: 'A deliberate mark of respect, not arbitrary ordering', answer: 'The more senior person’s name' }, { q: 'Does "RSVP" obligate a response only if you’re attending?', working: 'The literal French phrase means simply "please respond"', answer: 'No — a reply is expected either way' }]
+    },
+    grooming: {
+      title: 'Grooming & Fragrance',
+      intro: 'Grooming vocabulary — fragrance concentration, note structure, haircut terminology — lets you communicate precisely with a barber or when choosing a scent, instead of vaguely gesturing and hoping for the best.',
+      origin: 'The modern fragrance industry’s concentration tiers (Eau de Toilette, Eau de Parfum, and beyond) formalised through 20th-century French perfumery, which developed a standardised vocabulary for describing oil concentration so that scents could be reliably compared and marketed across a rapidly growing industry. Barbering terminology like the "fade" has a more recent, distinctly 20th-century military and pop-culture history, evolving into today’s wide vocabulary of precise, namable cut styles.',
+      sections: [
+        { heading: 'What Fragrance Concentration Actually Changes', body: 'Eau de Parfum contains a higher concentration of fragrance oil than Eau de Toilette, which translates directly into both intensity and how long the scent lasts on skin. Neither is inherently "better" — the right choice depends on desired strength and occasion, not price or prestige alone.' },
+        { heading: 'Reading a Fragrance’s Note Structure', body: 'A fragrance unfolds over time in layers: top notes are smelled first and fade quickest, heart (middle) notes emerge next, and base notes appear last and linger longest. Understanding this structure explains why a fragrance can smell noticeably different an hour after application than it did on first spray — this is expected, not a flaw.' },
+        { heading: 'The Wet Shave as a Distinct Method', body: 'A wet shave uses a razor with cream or soap and water, traditionally applied with a brush, as distinct from a dry electric shave. Each method has genuine trade-offs in closeness, skin sensitivity and time — knowing the terminology lets you specify exactly what you want rather than describing it vaguely.' },
+        { heading: 'Precision With a Barber Saves a Bad Haircut', body: 'Terms like "fade" (gradual shortening from top to sides), "off the top" (noticeably shortening length) versus "just a trim" (only tidying existing length) exist specifically to avoid miscommunication — a vague request is the single most common cause of an unwanted haircut result.' }
+      ],
+      misconceptions: [
+        { myth: 'Eau de Parfum and Eau de Toilette are just two brand names for identical products.', reality: 'They differ in actual fragrance oil concentration, which meaningfully affects intensity and longevity.' },
+        { myth: 'More fragrance applied is always better.', reality: 'Traditional etiquette favours restraint — noticeable only at close distance, not filling an entire room.' },
+        { myth: '"A trim" and "off the top" mean the same thing to a barber.', reality: 'They specify genuinely different amounts of hair removed, and confusing them is a common cause of an unexpectedly short haircut.' }
+      ],
+      expertNotes: [
+        'Fragrance is best applied to pulse points (wrists, neck), where body warmth helps diffuse and sustain the scent through the day.',
+        '"Layering" — using a scented shower gel or lotion from the same fragrance family beneath a cologne — is a genuine technique for extending a scent’s longevity.',
+        'A good barber will always ask clarifying questions about desired length and style rather than assume — the same precision is worth bringing as the client.'
+      ],
+      examples: [{ q: 'Which lasts longer on skin: Eau de Toilette or Eau de Parfum?', working: 'Determined directly by fragrance oil concentration', answer: 'Eau de Parfum' }, { q: 'What are the three layered stages of a fragrance’s scent called?', working: 'They unfold over time, from fastest-fading to longest-lasting', answer: 'Top, heart (middle) and base notes' }]
+    },
+    cigars: {
+      title: 'Cigars & Tobacco',
+      intro: 'Cigar vocabulary — ring gauge, wrapper, toasting the foot — reflects a genuinely technical craft, and knowing it lets you select, cut and light a cigar correctly instead of guessing your way through what’s actually a fairly precise ritual.',
+      origin: 'Modern cigar culture and its standardised size/shape naming largely developed in Cuba from the 19th century onward, as the cigar industry professionalised production and needed consistent terminology to describe an expanding range of shapes and sizes across manufacturers. Many size names in use today (robusto, corona, Churchill — the latter named after Winston Churchill’s well-known preference) still trace directly to this Cuban naming tradition, even for cigars produced elsewhere.',
+      sections: [
+        { heading: 'Reading Cigar Dimensions', body: 'A cigar’s size is described by length and ring gauge (diameter, measured in 64ths of an inch) — a robusto (roughly 5 inches, 50 ring gauge) is shorter and thicker than a Churchill (roughly 7 inches, 47 ring gauge), and different sizes genuinely smoke differently, affecting both flavour concentration and smoking time.' },
+        { heading: 'The Anatomy of a Cigar', body: 'The wrapper (outer leaf) most strongly affects flavour and appearance; the binder holds the filler tobacco together; the filler is the blended tobacco inside. This three-part construction is standard across nearly all premium cigars, and understanding it explains why wrapper choice alone can dramatically change a cigar’s character.' },
+        { heading: 'Cutting and Lighting Properly', body: 'A straight or V-cut at the cap (head) end opens a smooth draw without unraveling the wrapper; toasting the foot (gently warming the tobacco end before drawing) helps ensure an even light rather than a lopsided burn. Both steps exist to solve real, practical problems in how a cigar burns.' },
+        { heading: 'Cigar Etiquette Around Others', body: 'Given how strong and lingering cigar smoke is, always asking before lighting up near others — and smoking only in designated or well-ventilated spaces — is basic courtesy, distinct from the more casual norms sometimes applied to cigarettes.' }
+      ],
+      misconceptions: [
+        { myth: 'A bigger ring gauge cigar is always a stronger smoke.', reality: 'Size affects burn time and flavour concentration, but strength depends more on the tobacco blend itself than on diameter alone.' },
+        { myth: 'Cigars should be lit the same way as a cigarette, straight to the tip.', reality: 'Toasting the foot first — gently warming the tobacco before drawing — produces a more even burn than lighting directly.' },
+        { myth: 'Once a cigar goes out, it can never be relit.', reality: 'Relighting is generally acceptable within a reasonable time, by gently toasting the foot again before drawing.' }
+      ],
+      expertNotes: [
+        'Aficionados often judge a cigar’s quality partly by the evenness of its burn line, which reflects both construction quality and how well it was lit.',
+        'The wrapper leaf, despite being a small proportion of the cigar’s total tobacco, is often considered the single biggest influence on perceived flavour.',
+        'Cigar and spirit pairings (a robust cigar with a peated Scotch, for instance) are approached with the same deliberate care as wine and food pairing.'
+      ],
+      examples: [{ q: 'What does a cigar’s "ring gauge" measure?', working: 'A precise diameter measurement, in 64ths of an inch', answer: 'Its diameter' }, { q: 'What is the purpose of "toasting the foot" before lighting a cigar?', working: 'Solves a specific practical burning problem', answer: 'Ensures an even light rather than an uneven burn' }]
+    },
+    travel: {
+      title: 'Travel & Transport',
+      intro: 'From private aviation terms like "FBO" and "tail number" to nautical basics like "port" and "starboard," this vocabulary lets you navigate — and discuss — higher-end travel confidently instead of nodding along.',
+      origin: 'Private aviation terminology largely formalised through 20th-century commercial and business aviation growth, borrowing heavily from military aviation’s existing precise vocabulary. Nautical terms like "port" and "starboard" are far older, dating to a time before rudders were centrally mounted, when ships were steered by a "steering board" mounted on the right side of the vessel — which is the actual origin of "starboard," while "port" emerged later since the left side was the one placed against the port (dock) to avoid damaging the steering mechanism.',
+      sections: [
+        { heading: 'Commercial Cabin Classes, Correctly Understood', body: 'First class represents the highest tier of space, service and privacy on an aircraft, but on many modern long-haul routes, business class has effectively become the top tier actually offered — first class survives mainly on select flagship routes. Knowing this avoids assuming first class is universally available.' },
+        { heading: 'Private Aviation’s Own Vocabulary', body: 'An FBO (Fixed-Base Operator) is the private terminal facility used for chartered and private aircraft, distinct from a commercial terminal. A tail number is an aircraft’s unique registration identifier. A charter books a specific aircraft for one trip, while a jet card is a pre-paid membership giving flexible, on-demand access to available aircraft without owning or fully booking one each time.' },
+        { heading: 'Nautical Orientation Terms', body: 'Port always means the left side facing forward (toward the bow), and starboard always means the right — these are fixed relative to the vessel’s own orientation, not whichever way a person happens to be facing, which is precisely why sailors rely on them instead of "left" and "right."' },
+        { heading: 'Tipping Conventions on Extended Trips', body: 'For a multi-day chauffeur or private travel engagement, a single considered tip at the conclusion — reflecting the whole trip — is more typical than repeated small tips after each individual journey, a convention that mirrors similar norms in extended hospitality service.' }
+      ],
+      misconceptions: [
+        { myth: 'First class is always available and always the top tier on any commercial flight.', reality: 'Business class is now the highest tier offered on many routes, with true first class reserved for select flagship long-haul flights.' },
+        { myth: '"Port" and "starboard" change depending on which way you’re facing on the boat.', reality: 'They are fixed relative to the vessel’s own bow (front), regardless of the observer’s own orientation.' },
+        { myth: 'A jet card means you own a share of a specific private aircraft.', reality: 'It’s a pre-paid membership for flexible access to available aircraft, not ownership of any particular plane.' }
+      ],
+      expertNotes: [
+        '"Wheels up" specifically marks the physical moment a flight departs, and is commonly used loosely to mean a flight has genuinely begun.',
+        'FBOs typically offer a far more private, streamlined experience than commercial terminals, which is a large part of private aviation’s appeal beyond the flight itself.',
+        'Understanding a marina "berth" as a specific, often numbered docking space helps when discussing or arranging boat travel and storage.'
+      ],
+      examples: [{ q: 'What is an FBO in private aviation?', working: 'A private terminal facility distinct from commercial ones', answer: 'A Fixed-Base Operator' }, { q: 'Which side of a boat is "starboard"?', working: 'Fixed relative to facing the bow, not the observer', answer: 'The right side, facing forward' }]
+    },
+    tailoring: {
+      title: 'Tailoring & Fabric Knowledge',
+      intro: 'Understanding fabric and construction terms — Super numbers, canvassing, drape — lets you evaluate a suit’s actual quality and longevity, rather than judging purely by price tag or brand name.',
+      origin: 'Savile Row in London became the historical centre of formalised bespoke tailoring standards from the early 19th century onward, developing much of the construction vocabulary (canvassing, basting, drape) still used globally today. The "Super" wool numbering system is a more recent 20th-century industry development, created to give a standardised, comparable measure of fibre fineness across different mills and countries.',
+      sections: [
+        { heading: 'What "Super Numbers" Actually Measure', body: 'A "Super 120s" or "Super 150s" label measures the fineness of the wool fibre used — higher numbers mean finer, softer fabric. This is often mistaken for a general quality indicator, but finer fibres are not necessarily more durable; a very high Super number fabric can actually wear out faster than a slightly coarser, well-chosen one.' },
+        { heading: 'Canvas Construction Determines a Suit’s Lifespan', body: 'Full canvas construction uses a natural internal layer hand-stitched between the outer fabric and lining, giving superior drape and a much longer useful life. Fused construction glues interfacing in place instead — cheaper to produce, but prone to bubbling or separating from the outer fabric over time. Half-canvas construction is a practical middle ground, canvassing only the chest and lapel area.' },
+        { heading: 'Fabric Choice Reflects Season and Purpose', body: 'Worsted wool — smooth, tightly woven from combed long fibres — is the standard for classic business suiting. Flannel, softer and slightly brushed, suits cooler autumn/winter wear. Tweed, rougher and more textured, ties traditionally to country and outdoor formal wear. Choosing the wrong fabric for the season or occasion is a subtle but real mismatch.' },
+        { heading: 'From Basted Fitting to Bespoke Last', body: 'In bespoke tailoring, a "basted" fitting — a temporary, loosely stitched garment — lets adjustments happen before final construction. In bespoke shoemaking, a "last" is a wooden mould custom-shaped to an individual’s foot, the foundation for a shoe built specifically for that person. Both reflect the same underlying principle: get the individual fit exactly right before committing to permanent construction.' }
+      ],
+      misconceptions: [
+        { myth: 'A higher Super number always means a higher-quality, more durable fabric.', reality: 'It measures fibre fineness, not durability — very fine, high Super number fabrics can actually be more delicate and wear faster.' },
+        { myth: 'Fused and full canvas construction look and perform identically at first, so the difference doesn’t matter.', reality: 'They may look similar new, but fused construction is far more prone to bubbling and separating from the fabric over years of wear.' },
+        { myth: '"Bespoke" is just a fancier marketing word for any custom-fitted clothing.', reality: 'It specifically means an individual pattern built from scratch — a real, distinct process from made-to-measure adjustment of an existing pattern.' }
+      ],
+      expertNotes: [
+        'Experienced tailors often recommend a mid-range Super number (100s-120s) for everyday suiting, reserving very high Super numbers for special-occasion pieces given their delicacy.',
+        'A suit’s drape — how cleanly the fabric hangs and moves on the body — is considered a more reliable quality indicator during fitting than fabric name or price alone.',
+        'A "house check" pattern historically identified staff or tenants of a specific British estate, a small but genuine piece of social history still referenced in traditional tailoring today.'
+      ],
+      examples: [{ q: 'What does a "Super 150s" label on a wool fabric indicate?', working: 'A specific, standardised fibre measurement', answer: 'The fineness of the wool fibre' }, { q: 'Which suit construction method is generally more durable over years of wear: full canvas or fused?', working: 'One uses hand-stitched natural layers; the other uses glued interfacing', answer: 'Full canvas' }]
+    },
+    correspondence: {
+      title: 'Correspondence & Occasions Protocol',
+      intro: 'From how quickly to RSVP to the correct way to close a formal letter, written and event etiquette exists to remove ambiguity — everyone involved knows exactly what’s expected, without having to ask.',
+      origin: 'Formal correspondence conventions — salutations, closings, envelope addressing — developed through centuries of European aristocratic and diplomatic letter-writing, where precise wording carried real social weight and mistakes could genuinely cause offence. Many of these conventions (such as the UK’s distinction between "yours faithfully" and "yours sincerely") persist today largely unchanged, even as most everyday correspondence has moved to far less formal channels.',
+      sections: [
+        { heading: 'Salutations and Closings Follow Specific Rules', body: 'In UK convention, a letter opened "Dear Sir or Madam" (recipient unknown) traditionally closes "Yours faithfully," while a letter opened with a named recipient ("Dear Mr. Smith") closes "Yours sincerely." This paired logic — matching the closing to whether the opening used a name — is a small but precise rule that’s easy to get backward.' },
+        { heading: 'What an Invitation’s Fine Print Actually Means', body: '"Regrets only" means you need only respond if you cannot attend — silence is read as a yes. A "save the date" card is an early notice preceding the full formal invitation, not a replacement for it. "Black tie invited" (versus plain "black tie") signals formality is encouraged but not strictly mandatory. Each phrase carries a specific, different obligation.' },
+        { heading: 'Timing Conventions for Gifts and Thanks', body: 'A wedding gift is traditionally acceptable any time up to about a year after the ceremony, though sending before or shortly after has become more common practice. A thank-you note after being hosted, by contrast, is expected far more promptly — traditionally within about a week — reflecting the different social weight of the two gestures.' },
+        { heading: 'Addressing Envelopes and Managing Plus-Ones', body: 'A married couple’s envelope traditionally reads "Mr. and Mrs. [Surname]," though modern etiquette increasingly favours listing both individuals by name where preferred. When an invitation doesn’t specify a plus-one, the polite assumption is to attend alone unless you ask the host directly — assuming otherwise risks an awkward, uninvited extra guest.' }
+      ],
+      misconceptions: [
+        { myth: '"Regrets only" means you must always send a response either way.', reality: 'It specifically means you only need to respond if you cannot attend — no reply is read as a confirmed yes.' },
+        { myth: 'A "save the date" card can substitute for a full formal invitation.', reality: 'It’s an early notice only; complete details still follow in a separate, formal invitation.' },
+        { myth: '"Yours faithfully" and "Yours sincerely" are interchangeable in formal UK correspondence.', reality: 'Traditional convention pairs each closing to whether the recipient was named in the opening salutation.' }
+      ],
+      expertNotes: [
+        'Event planners treat RSVP deadlines as genuinely load-bearing for catering and seating logistics, not as a soft suggestion guests can ignore.',
+        'A handwritten thank-you note, even a brief one, is still widely regarded as carrying more weight than a digital message, particularly after a significant occasion.',
+        'When genuinely uncertain about an invitation’s expectations (plus-ones, gift etiquette, dress code), the correct move is always to ask the host directly rather than guess.'
+      ],
+      examples: [{ q: 'Under UK convention, what closing pairs with a letter opened "Dear Sir or Madam"?', working: 'The recipient is unnamed, which determines the correct closing', answer: 'Yours faithfully' }, { q: 'What does "regrets only" on an invitation require you to do if you plan to attend?', working: 'A specific, narrower obligation than a standard RSVP', answer: 'Nothing — only respond if you cannot attend' }]
+    }
+  };
+
+  /* ---- REFERENCE GLOSSARY --------------------------------------------------
+     Reuses the other subjects' FORMULAS shape ({topic,name,formula,when,example,tip})
+     as a quick-lookup reference card — "formula" holds the correct term/definition. */
+  var FORMULAS = [
+    { topic: 'Dress Code', name: 'The formality ladder', formula: 'White tie > Morning dress > Black tie > Lounge suit > Smart casual > Casual', when: 'Working out how to interpret an unfamiliar dress code from its position on the ladder.', example: '"Black tie optional" sits at the black tie tier, softened toward a dark formal suit — not smart casual.', tip: 'When genuinely unsure, ask the host directly rather than guess.' },
+    { topic: 'Accessories', name: 'Oxford vs derby', formula: 'Oxford = closed lacing (more formal) · Derby = open lacing (less formal)', when: 'Choosing footwear formality to match an outfit or dress code.', example: 'A plain-toe oxford is the safest formal choice for black tie.', tip: 'Brogueing (perforated detail) can appear on either style and slightly softens formality.' },
+    { topic: 'Timepieces', name: 'Movement types', formula: 'Automatic (self-winding) · Manual (hand-wound) · Quartz (battery)', when: 'Understanding or discussing how a watch actually works.', example: 'An automatic watch winds itself from the natural motion of your wrist.', tip: 'Water resistance ratings are lab conditions, not a diving guarantee.' },
+    { topic: 'Spirits', name: 'Core ordering terms', formula: 'Neat = no ice/mixer · On the rocks = over ice · Up = chilled, strained, no ice', when: 'Ordering a spirit exactly the way you want it.', example: '"Whisky, neat" — poured straight, nothing added.', tip: '"Dry" vs "wet" in a martini refers only to the vermouth ratio, not overall strength.' },
+    { topic: 'Wine', name: 'Champagne vs sparkling wine', formula: 'Champagne = legally must be from the Champagne region, France, under strict rules', when: 'Correctly naming a sparkling wine.', example: 'A California sparkling wine is "sparkling wine," never "Champagne."', tip: 'Terroir refers to the whole growing environment; tannin is one specific compound from skins/seeds/oak.' },
+    { topic: 'Hotels', name: 'Suite hierarchy', formula: 'Standard room < Junior suite (one room, divided area) < Full suite (separate rooms)', when: 'Booking or evaluating a hotel room category.', example: 'A "junior suite" is still technically one room, despite the name.', tip: 'Ask about amenity fees before booking to avoid a surprise on the final bill.' },
+    { topic: 'Service Roles', name: 'Who does what', formula: 'Valet = parks cars · Chauffeur = private driving · Butler = runs household staff · Maître d’ = restaurant front-of-house', when: 'Knowing exactly who to ask for a given request.', example: 'Ask the concierge (not the front desk) to arrange a restaurant reservation.', tip: 'Address service staff by name/surname, the same as any other professional.' },
+    { topic: 'Dining', name: 'Cutlery order', formula: 'Work from the outside in — outermost utensils first, moving inward with each course', when: 'Navigating a formal, multi-course place setting.', example: 'The soup spoon furthest from the plate is used for the first course.', tip: 'Knife and fork together, parallel, centre of plate = signal you’re finished.' },
+    { topic: 'Address', name: 'Reply etiquette', formula: 'RSVP = a reply is required either way, by any stated deadline', when: 'Responding to any formal invitation.', example: '"Regrets only" narrows this — reply only if you cannot attend.', tip: 'Default to title + surname until invited to use a first name.' },
+    { topic: 'Grooming', name: 'Fragrance concentration', formula: 'Eau de Parfum (higher concentration, longer-lasting) > Eau de Toilette (lighter, more diluted)', when: 'Choosing or discussing a fragrance.', example: 'An EDP applied at 9am may still be noticeable by evening; an EDT usually won’t.', tip: 'Apply to pulse points (wrists, neck) for the best diffusion and longevity.' },
+    { topic: 'Cigars', name: 'Sizing basics', formula: 'Ring gauge = diameter in 64ths of an inch · Length measured separately', when: 'Choosing or discussing a cigar format.', example: 'A robusto (~5", 50 ring gauge) is shorter and thicker than a Churchill (~7", 47 ring gauge).', tip: 'Cut the cap, not the foot — and always toast the foot before drawing.' },
+    { topic: 'Travel', name: 'Port and starboard', formula: 'Port = left facing forward · Starboard = right facing forward (fixed to the vessel, not the observer)', when: 'Navigating or discussing boat/nautical directions.', example: 'Calling out "starboard" means the same side regardless of which way you’re facing.', tip: 'An FBO is the private terminal used for chartered/private aircraft, separate from commercial terminals.' },
+    { topic: 'Tailoring', name: 'Canvas construction quality', formula: 'Full canvas (best drape/longevity) > Half-canvas (mixed) > Fused (cheapest, least durable)', when: 'Evaluating a suit’s real long-term quality, not just its price tag.', example: 'Fused construction can bubble or separate from the fabric after a few years of wear.', tip: 'A higher "Super number" means finer wool, not necessarily more durable wool.' },
+    { topic: 'Correspondence', name: 'UK letter closings', formula: 'Recipient unnamed → "Yours faithfully" · Recipient named → "Yours sincerely"', when: 'Closing a formal UK letter correctly.', example: '"Dear Sir or Madam... Yours faithfully" — the pairing is deliberate, not interchangeable.', tip: 'A thank-you note is expected within about a week of being hosted.' }
+  ];
+
+  var TOPICS = [
+    { key: 'dresscode', label: 'Dress Code & Formality', desc: 'White tie to smart casual, and how to read any code correctly' },
+    { key: 'accessories', label: 'Accessories & Details', desc: 'Pocket squares, cufflinks, shoes and the terms behind them' },
+    { key: 'timepieces', label: 'Watches & Timepieces', desc: 'Movements, complications and dress-watch etiquette' },
+    { key: 'spirits', label: 'Spirits & Cocktails', desc: 'Neat, up, dry — ordering with real precision' },
+    { key: 'wine', label: 'Wine & Champagne', desc: 'Decanting, terroir, tannin and what "Champagne" really means' },
+    { key: 'hotels', label: 'Hotels & Hospitality', desc: 'Suite types, concierge vs porter, and correct tipping' },
+    { key: 'service', label: 'Service Roles & Staff', desc: 'Valet, chauffeur, butler, maître d’ — who does what' },
+    { key: 'dining', label: 'Dining Etiquette', desc: 'Cutlery, napkins, courses and reading the table' },
+    { key: 'address', label: 'Forms of Address & Protocol', desc: 'Introductions, RSVPs, handshakes and correspondence basics' },
+    { key: 'grooming', label: 'Grooming & Fragrance', desc: 'Concentration, notes, and precise barber terminology' },
+    { key: 'cigars', label: 'Cigars & Tobacco', desc: 'Sizing, construction, cutting and lighting correctly' },
+    { key: 'travel', label: 'Travel & Transport', desc: 'Private aviation, rail and nautical terminology' },
+    { key: 'tailoring', label: 'Tailoring & Fabric', desc: 'Canvas construction, wool grades and what actually lasts' },
+    { key: 'correspondence', label: 'Correspondence & Occasions', desc: 'Invitations, gift timing and formal letter conventions' }
+  ];
+
+  /* ---- SCENARIO SIMULATOR ---------------------------------------------
+     Real "what would you do" situations, distinct from the trivia banks above —
+     each has 3 choices ranked best/good/poor with an outcome explaining WHY,
+     teaching judgment in ambiguous real situations rather than a single fact. */
+  var SCENARIOS = [
+    { id: 'sc1', topic: 'Dress Code & Formality', setup: 'A wedding invitation says "black tie optional." You only own a well-cut dark navy suit, no tuxedo.',
+      choices: [
+        { text: 'Wear the dark navy suit with a black tie', quality: 'best', outcome: 'Correct read — "optional" means a tuxedo is preferred but a dark, well-cut suit is entirely acceptable. You are dressed appropriately.' },
+        { text: 'Rent a tuxedo just to be completely safe', quality: 'good', outcome: 'Not wrong, but unnecessary — "optional" exists specifically so a dark suit is acceptable without needing to rent formalwear.' },
+        { text: 'Wear a light-coloured suit since "optional" means anything goes', quality: 'poor', outcome: '"Optional" softens WHICH formal option is required, not whether formality is required at all — a light suit reads as underdressed here.' }
+      ] },
+    { id: 'sc2', topic: 'Dining Etiquette', setup: 'Partway through a formal dinner, you need to step away from the table briefly to take an urgent call.',
+      choices: [
+        { text: 'Place your napkin on your chair and quietly excuse yourself', quality: 'best', outcome: 'Correct — the napkin on the chair (not the table) signals you intend to return, so waitstaff won’t clear your setting.' },
+        { text: 'Leave the napkin on the table and step away', quality: 'poor', outcome: 'A napkin left on the table signals the meal is finished — your setting may get cleared while you’re gone.' },
+        { text: 'Take the napkin with you', quality: 'poor', outcome: 'Unusual and unnecessary — the napkin stays at the table; its position on the chair is the actual signal that matters.' }
+      ] },
+    { id: 'sc3', topic: 'Spirits & Cocktails', setup: 'At a bar, you want whisky with nothing added, at room temperature, no ice.',
+      choices: [
+        { text: 'Order it "neat"', quality: 'best', outcome: 'Exactly right — "neat" means poured straight, with no ice, water or mixer.' },
+        { text: 'Order it "up"', quality: 'poor', outcome: '"Up" means chilled and strained into a glass with no ice — not the same as a room-temperature neat pour.' },
+        { text: 'Order it "on the rocks"', quality: 'poor', outcome: '"On the rocks" specifically means served over ice — the opposite of what you wanted.' }
+      ] },
+    { id: 'sc4', topic: 'Forms of Address & Protocol', setup: 'You’re introducing your new business partner (a senior director) to a junior colleague.',
+      choices: [
+        { text: 'Say the senior director’s name first: "Ms. Chen, may I introduce..."', quality: 'best', outcome: 'Correct — naming the more senior person first is the traditional mark of respect in formal introductions.' },
+        { text: 'Introduce whoever is standing closest to you first', quality: 'poor', outcome: 'Introduction order isn’t arbitrary — seniority determines who is named first in a formal setting.' },
+        { text: 'Introduce them both at the same time with no particular order', quality: 'good', outcome: 'Not incorrect socially, but it misses the small, deliberate signal of respect that naming seniority first conveys.' }
+      ] },
+    { id: 'sc5', topic: 'Hotels & Hospitality', setup: 'Housekeeping cleans your hotel room every day of a five-night stay. You want to tip fairly.',
+      choices: [
+        { text: 'Leave a modest cash tip in the room each day', quality: 'best', outcome: 'Correct — since different staff can service the room on different days, a daily tip better ensures whoever actually cleaned it is rewarded.' },
+        { text: 'Leave one larger tip on the final morning', quality: 'good', outcome: 'Well-intentioned, but risks rewarding only whoever cleans the room that last day, not everyone who worked on it.' },
+        { text: 'Skip tipping since it isn’t required by law', quality: 'poor', outcome: 'Tipping housekeeping is a strong customary expectation in many countries, even though it isn’t legally mandatory.' }
+      ] },
+    { id: 'sc6', topic: 'Wine & Champagne', setup: 'At a restaurant, the sommelier presents the cork after opening your bottle.',
+      choices: [
+        { text: 'Glance at the cork, then focus on tasting the small pour offered next', quality: 'best', outcome: 'Correct — the cork gives only minor information; the tasting pour is the real, meaningful check for a faulty bottle.' },
+        { text: 'Smell the cork carefully and decide whether to approve the wine from that alone', quality: 'poor', outcome: 'The cork ritual is often over-interpreted — the tasting pour, not the cork, is what actually reveals a fault like corking.' },
+        { text: 'Pocket the cork as a keepsake immediately', quality: 'poor', outcome: 'This skips the actual purpose of the moment — briefly acknowledging the cork, then tasting, before it’s set aside.' }
+      ] },
+    { id: 'sc7', topic: 'Service Roles & Staff', setup: 'You need to get a valet’s attention to retrieve your car after an event.',
+      choices: [
+        { text: 'Present your claim ticket at the stand and wait calmly', quality: 'best', outcome: 'Correct — the ticket system exists precisely so guests don’t need to shout or search for their own vehicle.' },
+        { text: 'Walk into the parking area and look for your car yourself', quality: 'poor', outcome: 'This bypasses the system valets rely on and can actually slow things down or create a safety issue.' },
+        { text: 'Wave a large tip in the air to get faster service', quality: 'poor', outcome: 'Unnecessary and can come across poorly — the claim ticket, not a visible tip, is what gets your car retrieved.' }
+      ] },
+    { id: 'sc8', topic: 'Correspondence & Occasions', setup: 'You receive a wedding invitation marked "regrets only" and you plan to attend.',
+      choices: [
+        { text: 'Do nothing — silence is read as a confirmed yes', quality: 'best', outcome: 'Correct — "regrets only" specifically means you need only respond if you CANNOT attend.' },
+        { text: 'Call to confirm you’re coming, just to be safe', quality: 'good', outcome: 'Not wrong, but unnecessary — it can even create extra work for a host managing a "regrets only" list.' },
+        { text: 'Assume you need to formally RSVP either way', quality: 'poor', outcome: '"Regrets only" is a narrower obligation than a standard RSVP — a reply is expected only if you’re declining.' }
+      ] },
+    { id: 'sc9', topic: 'Cigars & Tobacco', setup: 'You’re about to light a cigar at an outdoor gathering with a friend standing nearby.',
+      choices: [
+        { text: 'Ask if they mind before lighting up', quality: 'best', outcome: 'Correct — cigar smoke is notably strong and lingering, so asking first is basic courtesy, even outdoors.' },
+        { text: 'Light it without asking since you’re outside', quality: 'poor', outcome: 'Being outdoors doesn’t remove the courtesy of asking — cigar smoke still lingers and can bother people nearby.' },
+        { text: 'Move a few steps away without saying anything and light it', quality: 'good', outcome: 'A reasonable instinct, but a quick, direct ask is still the more genuinely polite move.' }
+      ] },
+    { id: 'sc10', topic: 'Accessories & Details', setup: 'You’re choosing a pocket square to go with a tie for a formal event.',
+      choices: [
+        { text: 'Pick a square that complements the tie without matching it exactly', quality: 'best', outcome: 'Correct — traditional guidance favours complementing, not matching; an exact match reads as a beginner’s mistake.' },
+        { text: 'Buy a pocket square made from the exact same fabric as the tie', quality: 'poor', outcome: 'An exact match is a common giveaway of inexperience — the two should relate, not be identical.' },
+        { text: 'Skip the pocket square entirely to avoid getting it wrong', quality: 'good', outcome: 'Safe, but a well-chosen complementary square is a genuine opportunity to show attention to detail.' }
+      ] },
+    { id: 'sc11', topic: 'Travel & Transport', setup: 'You’re booking a private chauffeur for a multi-day business trip and want to handle tipping correctly.',
+      choices: [
+        { text: 'Give one considered tip at the end, reflecting the whole trip', quality: 'best', outcome: 'Correct — this is the more typical convention for a multi-day private engagement, rather than tipping after each journey.' },
+        { text: 'Tip a small amount after every single journey', quality: 'good', outcome: 'Not wrong exactly, but it doesn’t match the more typical convention for an extended engagement.' },
+        { text: 'Tip only at the very start, before the trip begins', quality: 'poor', outcome: 'Tipping is customarily given at the end, once the full service has actually been delivered.' }
+      ] },
+    { id: 'sc12', topic: 'Grooming & Fragrance', setup: 'You’re getting ready for an important evening event and deciding how much fragrance to apply.',
+      choices: [
+        { text: 'Apply a light amount to pulse points, noticeable only up close', quality: 'best', outcome: 'Correct — traditional etiquette favours restraint, noticeable at close distance like a handshake, not filling a room.' },
+        { text: 'Apply a heavy amount so it’s noticeable across the room', quality: 'poor', outcome: 'Overapplication is one of the most common grooming missteps — subtlety is the traditional standard.' },
+        { text: 'Skip fragrance entirely to be safe', quality: 'good', outcome: 'Not wrong, but a light, well-chosen application is generally seen as a positive, deliberate touch.' }
+      ] }
+  ];
+  function generateScenarioSet(n) {
+    var shuffled = shuffle(SCENARIOS);
+    return shuffled.slice(0, Math.min(n || SCENARIOS.length, shuffled.length));
+  }
+
+  /* ---- PLACE SETTING DRILL ---------------------------------------------
+     A visual "tap the correct position" exercise instead of text trivia —
+     items are positioned (left/top, percentages of the diagram container)
+     but unlabelled on screen; the prompt names an item and the student must
+     know where convention puts it. */
+  var PLACESETTING_ITEMS = [
+    { id: 'dinner_plate', label: 'Dinner Plate', left: '50%', top: '46%' },
+    { id: 'dinner_fork', label: 'Dinner Fork', left: '37%', top: '46%' },
+    { id: 'salad_fork', label: 'Salad Fork', left: '28%', top: '46%' },
+    { id: 'dinner_knife', label: 'Dinner Knife', left: '63%', top: '46%' },
+    { id: 'soup_spoon', label: 'Soup Spoon', left: '72%', top: '46%' },
+    { id: 'dessert_spoon_fork', label: 'Dessert Spoon & Fork', left: '50%', top: '20%' },
+    { id: 'bread_plate', label: 'Bread Plate', left: '22%', top: '18%' },
+    { id: 'butter_knife', label: 'Butter Knife', left: '22%', top: '27%' },
+    { id: 'water_glass', label: 'Water Glass', left: '67%', top: '18%' },
+    { id: 'red_wine_glass', label: 'Red Wine Glass', left: '76%', top: '20%' },
+    { id: 'white_wine_glass', label: 'White Wine Glass', left: '84%', top: '22%' },
+    { id: 'napkin', label: 'Napkin', left: '44%', top: '62%' }
+  ];
+  var PLACESETTING_PROMPTS = [
+    { q: 'Tap the salad fork.', correct: 'salad_fork', why: 'The salad fork sits outermost on the left — worked "outside in," it’s used before the dinner fork.' },
+    { q: 'Following the "outside in" rule, tap the utensil used first for a soup course.', correct: 'soup_spoon', why: 'The soup spoon sits outermost on the right, since soup is typically the first course served.' },
+    { q: 'Tap the bread plate.', correct: 'bread_plate', why: 'The bread plate sits to the upper left of the setting — remember "BMW": Bread, Meal, Water, left to right.' },
+    { q: 'Tap the water glass.', correct: 'water_glass', why: 'The water glass sits closest among the glassware, directly above the knife.' },
+    { q: 'Tap the utensil used to butter your bread.', correct: 'butter_knife', why: 'The small butter knife rests on or beside the bread plate, on the left.' },
+    { q: 'Tap where the dessert utensils are placed.', correct: 'dessert_spoon_fork', why: 'Dessert spoon and fork are traditionally placed above the plate, brought down only for that course.' },
+    { q: 'Tap the red wine glass.', correct: 'red_wine_glass', why: 'Red wine glass sits among the glassware cluster to the upper right, further out than the water glass.' },
+    { q: 'Tap where your napkin belongs before you start eating.', correct: 'napkin', why: 'The napkin is unfolded and placed on the lap — its resting position on the table is just left of or on the plate.' },
+    { q: 'Tap the dinner fork (the one closest to the plate on the left).', correct: 'dinner_fork', why: 'Working outside in, the dinner fork sits closer to the plate than the salad fork, used for the main course.' }
+  ];
+  function generatePlaceSettingSet(n) {
+    var shuffled = shuffle(PLACESETTING_PROMPTS);
+    return shuffled.slice(0, Math.min(n || PLACESETTING_PROMPTS.length, shuffled.length));
+  }
+
+  /* ---- DAILY REAL-WORLD CHALLENGE ---------------------------------------
+     One bite-size real-life action per day (date-seeded, same for everyone,
+     resets at local midnight) — nudges actual behaviour, not just trivia. */
+  var REALWORLD_CHALLENGES = [
+    'Practice a firm handshake with genuine eye contact the next time you meet someone.',
+    'Order a drink tonight using precise language — "neat", "on the rocks" or "up".',
+    'Write and send a proper thank-you note to someone who did something kind for you recently.',
+    'Fold a pocket square using the presidential fold before your next formal occasion.',
+    'Introduce two people today using the correct seniority-first order.',
+    'Notice which hand you hold your fork in tonight — try the continental style for one meal.',
+    'Check the fit of your watch strap — a dress watch should sit close, not loose.',
+    'RSVP promptly to an invitation you’ve been putting off.',
+    'Practice placing your napkin on your lap the moment you sit down at your next meal.',
+    'Look up the correct term for a suit detail you’ve never known the name of (lapel style, cuff, vent).',
+    'Address an email today with a proper formal salutation and matching closing.',
+    'Ask before lighting up, playing music, or anything else that affects people nearby.',
+    'Practice the "outside in" cutlery rule at your next multi-course meal.',
+    'Offer your business card (or LinkedIn) with a small moment of genuine attention, not a rush.',
+    'Check one grooming detail before you leave the house today — collar, cuffs, or shoe polish.',
+    'Tip with a touch more thought today — consider who actually did the work.',
+    'Practice a graceful decline the next time you can’t attend something, instead of silence.',
+    'Notice a dress code today (a restaurant, an event) and consciously place it on the formality ladder.',
+    'Hold a wine glass by the stem, not the bowl, the next time you’re drinking one.',
+    'Look up one hotel or travel term you’ve heard but never confirmed (FBO, berth, junior suite).'
+  ];
+  function dailyRealWorldChallenge(dateStr) {
+    var s = dateStr || '';
+    var idx = 0;
+    for (var i = 0; i < s.length; i++) idx += s.charCodeAt(i);
+    return REALWORLD_CHALLENGES[idx % REALWORLD_CHALLENGES.length];
+  }
+
+  root.LearningGentleman = {
+    generate: generate, generateForLevel: generateForLevel, generateLevelSet: generateLevelSet, generatePlacementSet: generatePlacementSet,
+    levelLabel: levelLabel, gradeFromLevel: gradeFromLevel, levelFromScore: levelFromScore, strongestWeakest: strongestWeakest,
+    QT_TYPES: QT_TYPES, QT_DIFFICULTIES: QT_DIFFICULTIES, QT_LENGTHS: QT_LENGTHS,
+    buildQuickTest: buildQuickTest, generateDailyChallenge: generateDailyChallenge, levelToTier: qtLevelToTier,
+    checkAnswer: checkAnswer, LESSONS: LESSONS, FORMULAS: FORMULAS, TOPICS: TOPICS, TOPIC_LABELS: TOPIC_LABELS,
+    SCENARIOS: SCENARIOS, generateScenarioSet: generateScenarioSet,
+    PLACESETTING_ITEMS: PLACESETTING_ITEMS, PLACESETTING_PROMPTS: PLACESETTING_PROMPTS, generatePlaceSettingSet: generatePlaceSettingSet,
+    dailyRealWorldChallenge: dailyRealWorldChallenge
+  };
+})(window);
