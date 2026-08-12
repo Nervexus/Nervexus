@@ -157,20 +157,25 @@
     { re: /^remind me to\s+(.+)/i, run: function (m, host) { return toolByName('add_task').run({ label: m[1].trim().replace(/[.!?]+$/, '') }, host); } }
   ];
 
-  async function fallback(text, host) {
+  async function matchFastIntent(text, host) {
     for (var i = 0; i < FALLBACK_INTENTS.length; i++) {
       var m = text.match(FALLBACK_INTENTS[i].re);
       if (m) return await FALLBACK_INTENTS[i].run(m, host);
     }
-    return host.hasGeneralProvider()
-      ? null // let caller try live/general ask instead of a dead end
-      : 'I need an AI provider connected to help with that — add one in Settings \u2192 AI Providers.';
+    return null;
   }
 
   // ---- entry point -----------------------------------------------------------
+  // Fast path first: a handful of common phrasings (remember X, what's the time,
+  // hello, add a task, remind me to...) are answered instantly from a local regex
+  // match \u2014 zero network round-trip \u2014 before ever touching the LLM planner.
+  // This is what keeps the assistant feeling snappy instead of making every single
+  // utterance wait on a full plan-then-answer round trip.
   async function handle(raw, host) {
     var t = (raw || '').trim();
     if (!t) return;
+    var fast = await matchFastIntent(t, host);
+    if (fast) { host.speak(fast); return; }
     if (host.hasGeneralProvider()) {
       var plan = await planWithLLM(t, host);
       if (plan) {
@@ -179,13 +184,13 @@
         if (out) host.speak(out);
         return;
       }
+      // planning failed to parse \u2014 treat directly as a live/general question
+      var isLive = /^(what|who|when|where|why|how|which|is|are|does|do|can)\b/i.test(t) || /\?\s*$/.test(t) || /\b(news|latest|today.?s|current|price of|weather|happening|score)\b/i.test(t);
+      var out2 = await (isLive ? toolByName('live_question') : toolByName('chat')).run(isLive ? { query: t } : { query: t, reply: '' }, host);
+      if (out2) host.speak(out2);
+      return;
     }
-    var out2 = await fallback(t, host);
-    if (out2) { host.speak(out2); return; }
-    // no local match and a provider exists — treat as a live/general question
-    var isLive = /^(what|who|when|where|why|how|which|is|are|does|do|can)\b/i.test(t) || /\?\s*$/.test(t) || /\b(news|latest|today.?s|current|price of|weather|happening|score)\b/i.test(t);
-    out2 = await (isLive ? toolByName('live_question') : toolByName('chat')).run(isLive ? { query: t } : { query: t, reply: '' }, host);
-    if (out2) host.speak(out2);
+    host.speak('I need an AI provider connected to help with that \u2014 add one in Settings \u2192 AI Providers.');
   }
 
   root.VoiceAssistant = { handle: handle, TOOLS: TOOLS };
