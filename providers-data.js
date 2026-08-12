@@ -23,37 +23,19 @@
 (function (root) {
   'use strict';
 
+  // Simplified down to two supported providers per product decision — Claude for everything
+  // (chat, tutors, briefings, voice assistant) and Gemini specifically for live search (real-time
+  // travel data, safety checks) since it's the only one with a genuine free tier. No routing/
+  // failover/backup complexity. The other 8 adapters (OpenAI, xAI, Mistral, DeepSeek, OpenRouter,
+  // Together, Perplexity, Cohere) stay removed from this list for now, not deleted from the
+  // codebase — re-add an entry here to bring one back.
   var AI_PROVIDERS = [
-    { id:'openai', name:'OpenAI', mark:'OA', color:'#10a37f', endpoint:'https://api.openai.com/v1',
-      auth:'apikey', keyRe:'^sk-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-…', docs:'platform.openai.com',
-      usage:true, models:['gpt-5.5','gpt-5','gpt-4.1','gpt-4o','o4-mini'], defaultModel:'gpt-5.5' },
     { id:'anthropic', name:'Anthropic (Claude)', mark:'AN', color:'#d97757', endpoint:'https://api.anthropic.com/v1',
       auth:'apikey', keyRe:'^sk-ant-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-ant-…', docs:'docs.anthropic.com',
       usage:true, models:['claude-opus-4.5','claude-sonnet-4.5','claude-haiku-4.5'], defaultModel:'claude-sonnet-4.5' },
     { id:'google', name:'Google Gemini', mark:'GE', color:'#4285f4', endpoint:'https://generativelanguage.googleapis.com/v1',
       auth:'apikey', keyRe:'^AIza[A-Za-z0-9_\\-]{30,}$', keyHint:'AIza…', docs:'ai.google.dev',
-      usage:true, live:true, freeTier:true, models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' },
-    { id:'xai', name:'xAI (Grok)', mark:'XA', color:'#111114', endpoint:'https://api.x.ai/v1',
-      auth:'apikey', keyRe:'^xai-[A-Za-z0-9_\\-]{20,}$', keyHint:'xai-…', docs:'docs.x.ai',
-      usage:true, models:['grok-4','grok-4-mini','grok-3'], defaultModel:'grok-4' },
-    { id:'mistral', name:'Mistral AI', mark:'MI', color:'#fa5010', endpoint:'https://api.mistral.ai/v1',
-      auth:'apikey', keyRe:'^[A-Za-z0-9]{32,}$', keyHint:'32+ chars', docs:'docs.mistral.ai',
-      usage:true, models:['mistral-large-2','mistral-medium-3','codestral-2','ministral-8b'], defaultModel:'mistral-large-2' },
-    { id:'deepseek', name:'DeepSeek', mark:'DS', color:'#4d6bfe', endpoint:'https://api.deepseek.com/v1',
-      auth:'apikey', keyRe:'^sk-[A-Za-z0-9]{20,}$', keyHint:'sk-…', docs:'platform.deepseek.com',
-      usage:true, models:['deepseek-v3.2','deepseek-r1','deepseek-coder-v2'], defaultModel:'deepseek-v3.2' },
-    { id:'openrouter', name:'OpenRouter', mark:'OR', color:'#6467f2', endpoint:'https://openrouter.ai/api/v1',
-      auth:'apikey', keyRe:'^sk-or-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-or-…', docs:'openrouter.ai/docs',
-      usage:true, models:['auto','anthropic/claude-sonnet-4.5','openai/gpt-5.5','google/gemini-2.5-pro','meta/llama-4'], defaultModel:'auto' },
-    { id:'together', name:'Together AI', mark:'TO', color:'#0f6fff', endpoint:'https://api.together.xyz/v1',
-      auth:'apikey', keyRe:'^[A-Za-z0-9]{40,}$', keyHint:'40+ chars', docs:'docs.together.ai',
-      usage:true, models:['llama-4-maverick','qwen-3-72b','deepseek-v3','mixtral-8x22b'], defaultModel:'llama-4-maverick' },
-    { id:'perplexity', name:'Perplexity AI', mark:'PP', color:'#20b8cd', endpoint:'https://api.perplexity.ai',
-      auth:'apikey', keyRe:'^pplx-[A-Za-z0-9]{20,}$', keyHint:'pplx-…', docs:'docs.perplexity.ai',
-      usage:true, models:['sonar-pro','sonar-reasoning-pro','sonar'], defaultModel:'sonar-pro' },
-    { id:'cohere', name:'Cohere', mark:'CO', color:'#39594d', endpoint:'https://api.cohere.ai/v1',
-      auth:'apikey', keyRe:'^[A-Za-z0-9]{40,}$', keyHint:'40+ chars', docs:'docs.cohere.com',
-      usage:true, models:['command-a','command-r-plus','command-r'], defaultModel:'command-a' }
+      usage:true, live:true, freeTier:true, models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }
   ];
 
   // category: News | Markets | Economic | Crypto | Government | Business | Tech
@@ -198,9 +180,10 @@
   ];
 
   // Recommended default routing (by provider id) — used to seed config.
+  // Every feature routes to Claude now that it's the only supported provider.
   var DEFAULT_ROUTING = {
-    voice:'anthropic', briefings:'openai', business:'openai', writing:'anthropic',
-    workout:'google', image:'google', coding:'anthropic', market:'openai'
+    voice:'anthropic', briefings:'anthropic', business:'anthropic', writing:'anthropic',
+    workout:'anthropic', image:'anthropic', coding:'anthropic', market:'anthropic'
   };
 
   var BRIEFING_CATEGORIES = ['Global Money','Billionaire News','Major Company Movements','Global Economy',
