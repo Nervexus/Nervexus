@@ -134,7 +134,8 @@
   .theme-ultra .cc-side.cc-side, .theme-ultra .cc-top.cc-top{ background:var(--u-bg) !important; }
   .theme-ultra .cc-home-hero{ background:var(--u-card) !important; }
   .theme-ultra .cc-home-neural{ display:none !important; }
-  .theme-ultra.theme-noir .cc-home-hero{ background:#0a0806 !important; }
+  .theme-ultra.theme-noir .cc-home-hero{ background:linear-gradient(160deg, #18140f 0%, #0a0806 100%) !important; }
+  .theme-noir .cc-home-hero h1.cc-home-greeting{ color:#f5f1ea !important; }
   .theme-ultra .cc-grain-overlay{ display:block !important; }
   [style*="background: rgb(27, 29, 33)"],[style*="background: rgb(22, 24, 28)"],[style*="background: rgb(23, 25, 29)"],[style*="background: rgb(20, 20, 22)"],[style*="background: rgb(16, 16, 18)"],[style*="background:rgb(27, 29, 33)"],[style*="background:rgb(22, 24, 28)"],[style*="background:rgb(23, 25, 29)"],[style*="background:rgb(20, 20, 22)"],[style*="background:rgb(16, 16, 18)"],[style*="#1b1d21"],[style*="#16181c"],[style*="#17191d"],[style*="#141416"],[style*="#101012"]{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
   .cc-power-solid .cc-glowcard{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border:none; }
@@ -873,17 +874,17 @@
         </div>
         <div style="position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; padding:20px 0;">
           <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
-            <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(201,162,74,0.5); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(201,162,74,0.15), inset 0 0 16px rgba(201,162,74,0.08);">
+            <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(201,162,74,0.55); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(201,162,74,0.18), inset 0 0 16px rgba(201,162,74,0.1);">
               <img src="favicon.png" alt="" style="width:28px; height:28px; object-fit:contain; opacity:0.9;">
             </div>
-            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#e7c98a; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#f5f1ea; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:2px;">
               <div style="width:44px; height:1px; background:linear-gradient(90deg, transparent, #c9a24a);"></div>
               <span style="color:#c9a24a; font-size:11px;">✦</span>
               <div style="width:44px; height:1px; background:linear-gradient(90deg, #c9a24a, transparent);"></div>
             </div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#8a7a5f; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(201,162,74,0.5); color:#e0b568; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(201,162,74,0.08)', borderColor:'#c9a24a' }">{{ powerOnLabel }}</span>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#b3a47f; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(201,162,74,0.5); color:#e7c98a; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(201,162,74,0.1)', borderColor:'#c9a24a' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
@@ -8730,7 +8731,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.14-16 · v11.16 ultra-noir-style-dropdown';
+const NOTIF_BUILD_VERSION = '2026.08.14-17 · v11.17 noir-contrast-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12010,6 +12011,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.17', date:'Aug 14, 2026 · 21:50', major:true, notes:[
+      'Fixed a contrast bug on the Ultra Noir Home screen — a shared Ultra-theme style rule was silently forcing the greeting text to near-black, making it unreadable against the dark hero. Greeting is now bright off-white, the meta line is a lighter warm tone, and the hero background is a soft black-to-charcoal gradient instead of flat black — a cleaner black / white / gold / charcoal palette.',
+    ]},
     {version:'v11.16', date:'Aug 14, 2026 · 21:20', major:true, notes:[
       'Ultra and Spline are separate background modes again — Neural and Black Hole have been retired as selectable options, leaving Spline as the one non-Ultra background.',
       'The black/gold luxury look from the last update is no longer forced onto the default theme — it’s now a "Noir" style you pick from a dropdown that appears under Settings → Appearance once Ultra is selected (Ultra: Light / Noir). Ultra defaults to its original light look; switch to Noir for the black/gold Home screen.',
@@ -14764,7 +14768,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.16 — Aug 14, 2026',
+      appVersion:'v11.17 — Aug 14, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
