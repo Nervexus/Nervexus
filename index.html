@@ -858,9 +858,6 @@
       <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
       <div style="position:relative; min-height:calc(100vh - 160px); border-radius:24px; overflow:hidden; background:{{ homeHeroBg }}; display:flex; flex-direction:column; padding:36px 40px; animation:rise .5s ease both;" class="cc-home-hero">
         <canvas data-chart="homeNeural" class="cc-home-neural" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
-        <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
-          <img src="statue-ultra.jpg" alt="" style="position:absolute; right:0; bottom:0; height:50%; width:auto; max-width:40%; object-fit:contain; object-position:bottom right; z-index:0; pointer-events:none; mix-blend-mode:multiply; opacity:0.92;">
-        </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
             <sc-if value="{{ showChrome }}" hint-placeholder-val="{{ true }}">
@@ -8707,7 +8704,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.14-13 · v11.13 home-ultra-statue-art';
+const NOTIF_BUILD_VERSION = '2026.08.14-14 · v11.14 remove-home-statue-art';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11987,6 +11984,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.14', date:'Aug 14, 2026 · 20:15', major:true, notes:[
+      'Removed the marble-statue art from the Home hero — reverted back to the plain card.',
+    ]},
     {version:'v11.13', date:'Aug 14, 2026 · 20:00', major:true, notes:[
       'Home screen (Ultra theme only) gained a marble-statue art piece on the right side of the main hero card, rising about halfway up it — purely decorative, matches the cream card background.',
     ]},
@@ -14729,7 +14729,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.13 — Aug 14, 2026',
+      appVersion:'v11.14 — Aug 14, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
