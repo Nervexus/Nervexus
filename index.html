@@ -78,6 +78,7 @@
 
   /* ===== ULTRA THEME (AURA-inspired: ivory/stone, thin serif italic headings, glass panels, grain) ===== */
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
+  .theme-ultra.theme-noir{ --u-bg:#0a0806; --u-card:rgba(28,23,18,0.82); --u-ink:#f0ece3; --u-muted:#b8ac8f; --u-line:rgba(201,162,74,0.22); --u-accent:#d4af6a; }
   .theme-ultra, .theme-ultra .cc-scene, .theme-ultra .cc-top, .theme-ultra .cc-side{ background:var(--u-bg) !important; color:var(--u-ink) !important; font-family:'Cormorant Garamond',serif !important; }
   .theme-ultra h1, .theme-ultra h2, .theme-ultra h3{ font-family:'Cormorant Garamond',serif !important; font-weight:300 !important; font-style:italic !important; color:var(--u-accent) !important; letter-spacing:.5px !important; }
   .theme-ultra .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:blur(14px) !important; -webkit-backdrop-filter:blur(14px) !important; }
@@ -8731,7 +8732,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.14-18 · v11.18 noir-command-center';
+const NOTIF_BUILD_VERSION = '2026.08.14-19 · v11.19 noir-app-wide-dark';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12011,6 +12012,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.19', date:'Aug 14, 2026 · 22:45', major:true, notes:[
+      'Ultra Noir now recolors the whole app, not just Home — the shared background/card/text/accent variables the Light look was built on now flip to black, charcoal glass panels, off-white text and gold accents wherever Noir is active, so the Command Center (and every other screen) actually goes dark instead of staying on the cream Light palette.',
+    ]},
     {version:'v11.18', date:'Aug 14, 2026 · 22:20', major:true, notes:[
       'Extended Ultra Noir to the Command Center: the AI Daily Brief buttons, the Focus/Move/Goals progress rings, the productivity chart line, and the stat-card sparklines now render in gold instead of the Light theme\'s maroon.',
       'Added a double white line frame around the inside of the Home hero card for Ultra Noir.',
@@ -14777,7 +14781,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.18 — Aug 14, 2026',
+      appVersion:'v11.19 — Aug 14, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
