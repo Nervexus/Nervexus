@@ -134,6 +134,7 @@
   .theme-ultra .cc-side.cc-side, .theme-ultra .cc-top.cc-top{ background:var(--u-bg) !important; }
   .theme-ultra .cc-home-hero{ background:var(--u-card) !important; }
   .theme-ultra .cc-home-neural{ display:none !important; }
+  .theme-ultra.theme-noir .cc-home-hero{ background:#0a0806 !important; }
   .theme-ultra .cc-grain-overlay{ display:block !important; }
   [style*="background: rgb(27, 29, 33)"],[style*="background: rgb(22, 24, 28)"],[style*="background: rgb(23, 25, 29)"],[style*="background: rgb(20, 20, 22)"],[style*="background: rgb(16, 16, 18)"],[style*="background:rgb(27, 29, 33)"],[style*="background:rgb(22, 24, 28)"],[style*="background:rgb(23, 25, 29)"],[style*="background:rgb(20, 20, 22)"],[style*="background:rgb(16, 16, 18)"],[style*="#1b1d21"],[style*="#16181c"],[style*="#17191d"],[style*="#141416"],[style*="#101012"]{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
   .cc-power-solid .cc-glowcard{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border:none; }
@@ -871,13 +872,7 @@
           </div>
         </div>
         <div style="position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; padding:20px 0;">
-          <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
-            <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
-            <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
-          </sc-if>
-          <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
             <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(201,162,74,0.5); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(201,162,74,0.15), inset 0 0 16px rgba(201,162,74,0.08);">
               <img src="favicon.png" alt="" style="width:28px; height:28px; object-fit:contain; opacity:0.9;">
             </div>
@@ -889,6 +884,18 @@
             </div>
             <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#8a7a5f; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(201,162,74,0.5); color:#e0b568; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(201,162,74,0.08)', borderColor:'#c9a24a' }">{{ powerOnLabel }}</span>
+          </sc-if>
+          <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
+            <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+            <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
+          </sc-if>
+          <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
+            <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+            <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
         </div>
       </div>
@@ -7954,6 +7961,10 @@
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ homeBgChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; padding:8px 14px; border-radius:9px; cursor:pointer; color:{{ c.c }}; border:1px solid {{ c.b }};">{{ c.l }}</span></sc-for></div>
               </sc-if>
               <sc-if value="{{ bgPickerMobileNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#8a8a92; margin-bottom:14px;">{{ bgPickerMobileNote }}</div></sc-if>
+              <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">ULTRA STYLE</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ ultraStyleChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
+              </sc-if>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">THEME</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ themeChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">DENSITY</div>
@@ -8719,7 +8730,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.14-15 · v11.15 home-black-gold-theme-start';
+const NOTIF_BUILD_VERSION = '2026.08.14-16 · v11.16 ultra-noir-style-dropdown';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9844,7 +9855,7 @@ activities: this._mergeShipLog(s.activities),
       if(this._getTwoFA(r.email)){ this.setState({loginStage:'twofa', pendingAuthEmail:r.email, loginErr:'', login2FAInput:''}); }
       else { this._persistLock(0,0); this._completeLogin(r.email); }
     } else { this._registerFail(r.err); } }
-  _defaultPrefs(){ return { theme:'Lime', homeBg:'Neural', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, provOpenAI:true, provClaude:true, provPerplexity:false, aiPrimary:'OpenAI', notifsEnabled:true, quotesEnabled:false,
+  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Light', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, provOpenAI:true, provClaude:true, provPerplexity:false, aiPrimary:'OpenAI', notifsEnabled:true, quotesEnabled:false,
     coaching:{finance:true,fitness:true,checkins:true,spendingAlerts:true,motivational:true,silent:false,vacation:false,frequency:'Normal',workStart:'',workEnd:''}, mutedTopics:[], coachLog:{},
     // ===== Notification & Reminder System settings (notification-engine.js) =====
     notifFrequency:'hourly', notifFrequencyCustomMin:60, notifSound:true, notifVibration:true,
@@ -11999,6 +12010,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.16', date:'Aug 14, 2026 · 21:20', major:true, notes:[
+      'Ultra and Spline are separate background modes again — Neural and Black Hole have been retired as selectable options, leaving Spline as the one non-Ultra background.',
+      'The black/gold luxury look from the last update is no longer forced onto the default theme — it’s now a "Noir" style you pick from a dropdown that appears under Settings → Appearance once Ultra is selected (Ultra: Light / Noir). Ultra defaults to its original light look; switch to Noir for the black/gold Home screen.',
+    ]},
     {version:'v11.15', date:'Aug 14, 2026 · 20:45', major:true, notes:[
       'First step of a black/gold luxury theme for the default (non-Ultra) look — starting with the Home screen: a gold crest ring, an italic serif greeting in gold instead of bold white, and a gold ornamental divider, replacing the plain sans-serif treatment. More screens to follow in later updates rather than all at once.',
     ]},
@@ -14679,6 +14694,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       appearToggles:[ this._tog('animations','Animations','Cinematic transitions & motion'), this._tog('particles','Particle effects','AI orb & ambient particles'), this._tog('glass','Glassmorphism','Panel blur & transparency'), this._tog('reduceMotion','Reduce motion','Minimize non-essential movement') ],
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
+      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir',
+      ultraStyleChips:this._chips('ultraStyle',['Light','Noir']),
       // Reusable Ultra-only "terminal card" wrapper for active learning screens (Practice,
       // Test, Quick Fire, ...) — same crest + inset maroon border language as the hub and
       // dashboard headers. Base themes get an inert wrapper (just position:relative, so the
@@ -14688,7 +14705,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ultraWrapInner: S.prefs.theme==='Ultra' ? "border:1px solid rgba(91,26,26,0.35); border-radius:2px; padding:26px 24px 30px; font-family:'Cormorant Garamond',Georgia,serif; color:#3A2A20;" : '',
       mobilePreviewOpen:!!S.mobilePreviewOpen, mobilePreviewUrl:window.location.href,
       openMobilePreview:()=>this.setState({mobilePreviewOpen:true}), closeMobilePreview:()=>this.setState({mobilePreviewOpen:false}),
-      homeBgChips:(typeof window!=='undefined' && window.innerWidth<=900)?[]:[...this._chips('homeBg',['Neural','Spline','Black Hole']).map(c=>({...c, set:()=>{ this.setPref('homeBg', c.l); if(S.prefs.theme==='Ultra') this.setPref('theme','Lime'); }, c:(S.prefs.theme!=='Ultra'&&S.prefs.homeBg===c.l)?'#F4F4F5':'#9a9aa2', b:(S.prefs.theme!=='Ultra'&&S.prefs.homeBg===c.l)?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)'})), {l:this._hasUltraAccess()?'Ultra':'Ultra 🔒', set:()=>{ if(this._hasUltraAccess()) this.setPref('theme','Ultra'); else this.showToast('system','Ultra access required','Ask the owner to grant Ultra access to your account.'); }, c:S.prefs.theme==='Ultra'?'#F4F4F5':'#9a9aa2', b:S.prefs.theme==='Ultra'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.theme==='Ultra'?'rgba(255,255,255,0.18)':'transparent'}],
+      homeBgChips:(typeof window!=='undefined' && window.innerWidth<=900)?[]:[...this._chips('homeBg',['Spline']).map(c=>({...c, set:()=>{ this.setPref('homeBg', c.l); if(S.prefs.theme==='Ultra') this.setPref('theme','Lime'); }, c:(S.prefs.theme!=='Ultra'&&S.prefs.homeBg===c.l)?'#F4F4F5':'#9a9aa2', b:(S.prefs.theme!=='Ultra'&&S.prefs.homeBg===c.l)?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)'})), {l:this._hasUltraAccess()?'Ultra':'Ultra 🔒', set:()=>{ if(this._hasUltraAccess()) this.setPref('theme','Ultra'); else this.showToast('system','Ultra access required','Ask the owner to grant Ultra access to your account.'); }, c:S.prefs.theme==='Ultra'?'#F4F4F5':'#9a9aa2', b:S.prefs.theme==='Ultra'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.theme==='Ultra'?'rgba(255,255,255,0.18)':'transparent'}],
       showBgPicker:!(typeof window!=='undefined' && window.innerWidth<=900),
       bgPickerMobileNote:(typeof window!=='undefined' && window.innerWidth<=900)?'Mobile always uses the Spline background for best performance.':'',
       isMobileViewport:(typeof window!=='undefined' && window.innerWidth<=900),
@@ -14747,7 +14764,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.15 — Aug 14, 2026',
+      appVersion:'v11.16 — Aug 14, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -14812,7 +14829,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ]; })(),
       shellDisplay: S.loggedIn?'grid':'block', asideDisplay:this._isPrivatePageOpen()?'none':(typeof window!=='undefined' && window.innerWidth<=900)?'none':'flex', shellCols: (typeof window!=='undefined' && window.innerWidth<=900)?'1fr':((S.focusMode||this._isPrivatePageOpen())?'0px 1fr':'84px 1fr'),
       themeFilter:(()=>{ const t=S.prefs.theme; return t==='Ember'?'hue-rotate(83deg) saturate(1.1) brightness(0.95)':t==='Onyx'?'saturate(0) brightness(1.08)':t==='Ghost'?'saturate(0) contrast(1.08)':t==='Snow'?'hue-rotate(218deg) saturate(1.05)':'none'; })(),
-      themeClass: S.prefs.theme==='Ultra'?'theme-ultra':'', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
+      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':'')):'', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
       showBanGate: S.loggedIn && !!(S.perfStatus && S.perfStatus.banned),
       showSuspendedGate: S.loggedIn && !!(S.profile && S.profile.account_status==='suspended' && S.profile.role!=='owner'),
       notifOpen:S.notifOpen, sidebarX:S.notifOpen?'0':'110%',
