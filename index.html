@@ -134,7 +134,7 @@
   .theme-ultra .cc-side.cc-side, .theme-ultra .cc-top.cc-top{ background:var(--u-bg) !important; }
   .theme-ultra .cc-home-hero{ background:var(--u-card) !important; }
   .theme-ultra .cc-home-neural{ display:none !important; }
-  .theme-ultra.theme-noir .cc-home-hero{ background:linear-gradient(160deg, #18140f 0%, #0a0806 100%) !important; }
+  .theme-ultra.theme-noir .cc-home-hero{ background:linear-gradient(160deg, #18140f 0%, #0a0806 100%) !important; border:5px double rgba(245,241,234,0.4) !important; }
   .theme-noir .cc-home-hero h1.cc-home-greeting{ color:#f5f1ea !important; }
   .theme-ultra .cc-grain-overlay{ display:block !important; }
   [style*="background: rgb(27, 29, 33)"],[style*="background: rgb(22, 24, 28)"],[style*="background: rgb(23, 25, 29)"],[style*="background: rgb(20, 20, 22)"],[style*="background: rgb(16, 16, 18)"],[style*="background:rgb(27, 29, 33)"],[style*="background:rgb(22, 24, 28)"],[style*="background:rgb(23, 25, 29)"],[style*="background:rgb(20, 20, 22)"],[style*="background:rgb(16, 16, 18)"],[style*="#1b1d21"],[style*="#16181c"],[style*="#17191d"],[style*="#141416"],[style*="#101012"]{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
@@ -1028,9 +1028,9 @@
             </div>
             <p style="font-size:15.5px; line-height:1.6; color:#d6d6da; max-width:620px;">{{ homeBriefText }}</p>
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
-              <span onClick="{{ genBriefing }}" style="font-size:12px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.35); border-radius:10px; padding:7px 13px; background:rgba(255,255,255,0.1); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.2)' }">{{ homeBriefBtnLabel }}</span>
-              <span onClick="{{ goVoice }}" style="font-size:12px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:7px 13px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">▶ Play voice brief</span>
-              <span onClick="{{ goBrief }}" style="font-size:12px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:7px 13px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">Open full briefing</span>
+              <span onClick="{{ genBriefing }}" style="font-size:12px; color:{{ ultraBriefBtnColor }}; border:1px solid {{ ultraBriefBtnBorder }}; border-radius:10px; padding:7px 13px; background:{{ ultraBriefBtnBg }}; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.2)' }">{{ homeBriefBtnLabel }}</span>
+              <span onClick="{{ goVoice }}" style="font-size:12px; color:{{ ultraSecBtnColor }}; border:1px solid {{ ultraSecBtnBorder }}; border-radius:10px; padding:7px 13px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">▶ Play voice brief</span>
+              <span onClick="{{ goBrief }}" style="font-size:12px; color:{{ ultraSecBtnColor }}; border:1px solid {{ ultraSecBtnBorder }}; border-radius:10px; padding:7px 13px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">Open full briefing</span>
             </div>
             <sc-if value="{{ aiBriefErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-top:10px;">⚠ {{ aiBriefErr }}</div></sc-if>
             <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
@@ -8731,7 +8731,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.14-17 · v11.17 noir-contrast-fix';
+const NOTIF_BUILD_VERSION = '2026.08.14-18 · v11.18 noir-command-center';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11597,10 +11597,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     });
   }
 
-  startRingSet(cv,vals,cols,lw,gap){ const isU=this.state.prefs.theme==='Ultra'; const uPal=['#5B1A1A','#7A2626','#9C6B3E']; if(isU) cols=cols.map((c,i)=>vals.length>1?uPal[i%uPal.length]:this._ultraRingColor(c)); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2;
+  startRingSet(cv,vals,cols,lw,gap){ const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const uPal=isNoir?['#E0C583','#C9A24A','#9C6B3E']:['#5B1A1A','#7A2626','#9C6B3E']; if(isU) cols=cols.map((c,i)=>vals.length>1?uPal[i%uPal.length]:this._ultraRingColor(c)); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2;
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const grow=0.4+0.6*Math.min(1,ts*0.0007);
       vals.forEach((v,i)=>{ const r=(w/2-lw/2-2)-i*(lw+gap); const prog=Math.min(1,v)*grow;
-        ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isU?'rgba(41,37,36,0.1)':'rgba(255,255,255,0.06)'; ctx.lineWidth=lw; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isNoir?'rgba(201,162,74,0.1)':isU?'rgba(41,37,36,0.1)':'rgba(255,255,255,0.06)'; ctx.lineWidth=lw; ctx.stroke();
         ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=cols[i]; ctx.lineWidth=lw; ctx.lineCap='round'; ctx.shadowColor=cols[i]; ctx.shadowBlur=14; ctx.stroke(); ctx.shadowBlur=0; });
     });
   }
@@ -11615,8 +11615,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.loop((ts)=>{ const ph=ts*0.0009; ctx.clearRect(0,0,w,h);
       ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; for(let gy=0;gy<4;gy++){ const y=(gy/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
       const pts=base.map((v,i)=>({x:(i/(n-1))*w, y:h-(Math.min(0.95,v+0.05*Math.sin(i*0.5+ph)))*h}));
-      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const isU=this.state.prefs.theme==='Ultra'; const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0, isU?'rgba(122,38,38,0.22)':'rgba(255,255,255,0.32)'); g.addColorStop(1, isU?'rgba(122,38,38,0)':'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fill();
-      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=isU?'#292524':'#FFFFFF'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=isU?'rgba(122,38,38,0.5)':'rgba(255,255,255,0.7)'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0, isNoir?'rgba(201,162,74,0.24)':isU?'rgba(122,38,38,0.22)':'rgba(255,255,255,0.32)'); g.addColorStop(1, isNoir?'rgba(201,162,74,0)':isU?'rgba(122,38,38,0)':'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fill();
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=isNoir?'#C9A24A':isU?'#292524':'#FFFFFF'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=isNoir?'rgba(201,162,74,0.6)':isU?'rgba(122,38,38,0.5)':'rgba(255,255,255,0.7)'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
       const last=pts[pts.length-1]; ctx.fillStyle=isU?'#7A2626':'#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); });
   }
 
@@ -11952,7 +11952,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const activeTab=this.root.querySelector('[data-tab-active="true"]');
     if(activeTab) activeTab.scrollIntoView({ block:'nearest', inline:'center' });
     if(!(this.state.learningTab==='Maths' && this.state.mtMode==='hub')) return; const hist=(((this.state.learning&&this.state.learning.mathsHistory)||[]).filter(h=>h.mode==='GCSE Test').slice(0,10).reverse()); if(hist.length<2) return; const cv=this.root.querySelector('[data-chart="mtProgress"]'); if(cv) this.startTrend(cv, hist.map(h=>h.pct), '#4ADE80'); }
-  init_dashboard(){ const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?'#5B1A1A':(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
+  init_dashboard(){ const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
   init_finance(){ const m=this.root.querySelector('[data-chart="finMain"]'); if(m) this.startCandle(m); const d=this.root.querySelector('[data-chart="finDonut"]'); if(d) this.startDonut(d,[42,26,18,14],['#FFFFFF','#e8e8ec','#7a7a82','#55631C']); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load'){ const up=c.dataset.spark.indexOf('d')%2===0; this.startSpark(c,up?'#e8e8ec':'#ff3b4a'); } }); }
   init_fitness(){ const today=this.todayMin(); const move=Math.min(1,(today*8)/700); const r=this.root.querySelector('[data-chart="fitRings"]'); if(r) this.startRingSet(r,[move, Math.min(1,today/45), 0.9],['#FFFFFF','#eef0f2','#7a7a82'],15,7); const st=this.root.querySelector('[data-chart="strength"]'); if(st) this.startTrend(st, this.strengthSeries(), '#FFFFFF'); }
   init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
@@ -12011,6 +12011,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.18', date:'Aug 14, 2026 · 22:20', major:true, notes:[
+      'Extended Ultra Noir to the Command Center: the AI Daily Brief buttons, the Focus/Move/Goals progress rings, the productivity chart line, and the stat-card sparklines now render in gold instead of the Light theme\'s maroon.',
+      'Added a double white line frame around the inside of the Home hero card for Ultra Noir.',
+    ]},
     {version:'v11.17', date:'Aug 14, 2026 · 21:50', major:true, notes:[
       'Fixed a contrast bug on the Ultra Noir Home screen — a shared Ultra-theme style rule was silently forcing the greeting text to near-black, making it unreadable against the dark hero. Greeting is now bright off-white, the meta line is a lighter warm tone, and the hero background is a soft black-to-charcoal gradient instead of flat black — a cleaner black / white / gold / charcoal palette.',
     ]},
@@ -14700,6 +14704,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
       isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir',
       ultraStyleChips:this._chips('ultraStyle',['Light','Noir']),
+      ultraBriefBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#e7c98a':'#F4F4F5',
+      ultraBriefBtnBg:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(201,162,74,0.12)':'rgba(255,255,255,0.1)',
+      ultraBriefBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(201,162,74,0.5)':'rgba(255,255,255,0.35)',
+      ultraSecBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#d9c08a':'#cfcfd4',
+      ultraSecBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(201,162,74,0.35)':'rgba(255,255,255,0.14)',
       // Reusable Ultra-only "terminal card" wrapper for active learning screens (Practice,
       // Test, Quick Fire, ...) — same crest + inset maroon border language as the hub and
       // dashboard headers. Base themes get an inert wrapper (just position:relative, so the
@@ -14768,7 +14777,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.17 — Aug 14, 2026',
+      appVersion:'v11.18 — Aug 14, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
