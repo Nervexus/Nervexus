@@ -2574,6 +2574,282 @@
       </div>
       </sc-if>
 
+      <!-- ===== DARK PSYCHOLOGY (private, full-screen) ===== -->
+              <sc-if value="{{ isDarkPsychScene }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                  <span onClick="{{ goPhyHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back to Psychology</span>
+                  <span onClick="{{ phyExitDark }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#ff8a92; cursor:pointer; border:1px solid rgba(255,138,146,0.35); border-radius:8px; padding:6px 12px;" style-hover="{ background:'rgba(255,138,146,0.1)' }">✕ Exit</span>
+                </div>
+                <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F5F1E8; border-radius:2px; padding:14px; margin:16px 0 20px; box-shadow:0 20px 50px rgba(58,42,32,0.18);">
+                <div style="border:1px solid rgba(91,26,26,0.35); border-radius:2px; padding:28px 26px 30px; font-family:'Cormorant Garamond',Georgia,serif; color:#3A2A20; text-align:center;">
+                  <img src="favicon.png" alt="" style="display:block; width:36px; height:36px; object-fit:contain; margin:0 auto 10px; opacity:0.9;">
+                  <div style="font-size:10.5px; letter-spacing:3px; color:#8a6a5a;">◆ HUMAN PSYCHOLOGY · 18+</div>
+                  <h1 style="font-style:italic; font-weight:500; font-size:27px; color:#3A2A20; margin:10px 0 10px;">Dark Psychology</h1>
+                  <div style="font-size:14px; color:#6b5a4e; line-height:1.65; max-width:520px; margin:0 auto;">Manipulation, coercive control &amp; cult tactics — helping you <b style="color:#3A2A20;">recognise and defend against</b> real tactics used by abusive partners, controlling groups, con artists and coercive bosses. Not, and will not become, a manual for using them on someone else.</div>
+                  <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin:18px auto 0;">
+                    <div style="width:40px; height:1px; background:#5B1A1A;"></div>
+                    <span style="color:#5B1A1A; font-size:11px;">❦</span>
+                    <div style="width:40px; height:1px; background:#5B1A1A;"></div>
+                  </div>
+                </div>
+                </div>
+                </sc-if>
+                <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
+                <div class="cc-vault-card cc-phydark-hero" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.35); --vault-bg:#1b1416; --vault-bg2:#050506; margin-top:16px; padding:22px 20px; max-width:760px; box-sizing:border-box; overflow-wrap:break-word;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><span class="cc-vault-pt" style="--vault-accent:#8c1414;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#ff8a92;">DARK PSYCHOLOGY · 18+ · PRIVATE</span></div>
+                  <div class="cc-phydark-title" style="font-size:22px; font-weight:700; margin-bottom:12px; letter-spacing:-.3px; line-height:1.25;">Manipulation, coercive control &amp; cult tactics</div>
+                  <p style="font-size:13.5px; color:#c9b8ba; line-height:1.65; margin-bottom:0;">This section exists to help you <b style="color:#eef0f2;">recognise and defend against</b> real manipulation tactics — the ones used by abusive partners, controlling groups, con artists and coercive bosses. It covers how these tactics work, why they're effective, and how to spot and counter them. It is not, and will not become, a manual for using them on someone else.</p>
+                </div>
+                </sc-if>
+
+                <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:20px; font-family:'Cormorant Garamond',Georgia,serif;">
+                    <div onClick="{{ phyDarkLearn }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
+                      <div style="font-size:24px; margin-bottom:8px;">📖</div>
+                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">Learn</div>
+                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">The deep-dive lesson</div>
+                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">Start Reading</div>
+                    </div>
+                    <div onClick="{{ phyDarkPractice }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
+                      <div style="font-size:24px; margin-bottom:8px;">✎</div>
+                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">Practice</div>
+                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">Untimed, no pressure</div>
+                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">Start Practising</div>
+                    </div>
+                    <div onClick="{{ phyStartDarkTest }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
+                      <div style="font-size:24px; margin-bottom:8px;">🧪</div>
+                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">Test</div>
+                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">16 questions, timed</div>
+                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">Start Test</div>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; gap:12px; flex-wrap:wrap; margin:16px 0 28px;">
+                  <div onClick="{{ phyDarkLearn }}" class="cc-glowbtn" style="padding:14px 22px; border-radius:3px 12px 12px 12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:14px; text-align:center;" style-hover="{ transform:'translateY(-1px)' }">📖 Learn the deep dive</div>
+                  <div onClick="{{ phyDarkPractice }}" style="padding:14px 22px; border-radius:3px 12px 12px 12px; cursor:pointer; border:1px solid rgba(255,138,146,0.4); color:#ff8a92; font-weight:700; font-size:14px; text-align:center;" style-hover="{ background:'rgba(255,138,146,0.08)' }">✎ Practice questions</div>
+                  <div onClick="{{ phyStartDarkTest }}" style="padding:14px 22px; border-radius:3px 12px 12px 12px; cursor:pointer; border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-weight:700; font-size:14px; text-align:center;" style-hover="{ background:'rgba(255,255,255,0.06)' }">🧪 Take the test</div>
+                </div>
+                </sc-if>
+
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:24px 0 12px;">WHAT'S COVERED</div>
+                <div class="cc-phydark-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; max-width:760px; margin-bottom:24px;">
+                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Dark Triad &amp; gaslighting</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Narcissism, Machiavellianism, psychopathy — and how reality gets rewritten.</div></div>
+                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Love bombing &amp; DARVO</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Fast-tracked intimacy as a hook, and the deny-attack-reverse playbook.</div></div>
+                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Coercive control</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Evan Stark's framework for sustained domination in relationships.</div></div>
+                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Cults &amp; thought reform</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Lifton's milieu control and how high-control groups isolate members.</div></div>
+                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Sexual &amp; reproductive coercion</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Recognising pressure, sabotage and consent erosion as forms of control.</div></div>
+                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Propaganda &amp; influence</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Bernays-era mass persuasion and how it still shows up today.</div></div>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;"><span class="cc-vault-pt" style="--vault-accent:#8c1414;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">PRIVATE SAFETY JOURNAL</span></div>
+                <p style="font-size:12px; color:#75757d; line-height:1.5; max-width:600px; margin-bottom:14px;">A dated, private log — synced to your account only, never shared. Therapists working with coercive control recommend this: patterns are often far clearer written down over weeks than in any single moment.</p>
+                <div class="cc-vault-card" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.25); --vault-bg:#141416; --vault-bg2:#050506; padding:16px; max-width:600px; box-sizing:border-box; margin-bottom:14px;">
+                  <textarea value="{{ phyJournalInputVal }}" onInput="{{ setPhyJournalInput }}" placeholder="What happened, and when — write it as plainly as you can…" style="width:100%; min-height:64px; padding:11px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; font-family:inherit; box-sizing:border-box; margin-bottom:10px;"></textarea>
+                  <div onClick="{{ phyAddJournalEntry }}" class="cc-glowbtn" style="display:inline-block; padding:10px 18px; border-radius:3px 10px 10px 10px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:12.5px;" style-hover="{ transform:'translateY(-1px)' }">+ Add dated entry</div>
+                </div>
+                <sc-if value="{{ hasPhyJournalEntries }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; flex-direction:column; gap:10px; max-width:600px;">
+                    <sc-for list="{{ phyJournalEntries }}" as="j" hint-placeholder-count="2">
+                      <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#141416; padding:14px 16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+                          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d;">{{ j.stamp }}</div>
+                          <span onClick="{{ j.remove }}" style="cursor:pointer; color:#7c7c84; font-size:12px; flex:0 0 auto;" style-hover="{ color:'#ff6b76' }">✕</span>
+                        </div>
+                        <div style="font-size:13px; color:#dcdce0; line-height:1.55; margin-top:6px; overflow-wrap:break-word;">{{ j.body }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </sc-if>
+
+      <!-- ===== THE BLACK BOOK (private, full-screen) ===== -->
+              <sc-if value="{{ isBlackBookScene }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back to Gentleman's Etiquette</span>
+                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#c9a24a; cursor:pointer; border:1px solid rgba(201,162,74,0.35); border-radius:8px; padding:6px 12px;" style-hover="{ background:'rgba(201,162,74,0.1)' }">✕ Exit</span>
+                </div>
+                <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F5F1E8; border-radius:2px; padding:14px; margin:16px 0 20px; box-shadow:0 20px 50px rgba(58,42,32,0.18);">
+                <div style="border:1px solid rgba(91,26,26,0.35); border-radius:2px; padding:28px 26px 30px; font-family:'Cormorant Garamond',Georgia,serif; color:#3A2A20; text-align:center;">
+                  <img src="favicon.png" alt="" style="display:block; width:36px; height:36px; object-fit:contain; margin:0 auto 10px; opacity:0.9;">
+                  <div style="font-size:10.5px; letter-spacing:3px; color:#8a6a5a;">◆ GENTLEMAN'S ETIQUETTE</div>
+                  <h1 style="font-style:italic; font-weight:500; font-size:27px; color:#3A2A20; margin:10px 0 10px;">The Black Book</h1>
+                  <div style="font-size:14px; color:#6b5a4e; line-height:1.65; max-width:520px; margin:0 auto;">Insider brands &amp; a worldwide guide — curated editorial guidance, not live availability, pricing or booking data. The names and places people already deep in a category tend to know, chosen deliberately over the obvious, billboard-famous ones.</div>
+                  <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin:18px auto 0;">
+                    <div style="width:40px; height:1px; background:#5B1A1A;"></div>
+                    <span style="color:#5B1A1A; font-size:11px;">❦</span>
+                    <div style="width:40px; height:1px; background:#5B1A1A;"></div>
+                  </div>
+                </div>
+                </div>
+                </sc-if>
+                <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
+                <div class="cc-vault-card" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.35); --vault-bg:#1b1d21; --vault-bg2:#050506; margin-top:16px; padding:22px 20px; max-width:760px; box-sizing:border-box;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><span class="cc-vault-pt"></span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#c9a24a;">THE BLACK BOOK · PRIVATE</span></div>
+                  <div style="font-size:22px; font-weight:700; margin-bottom:10px; letter-spacing:-.3px;">Insider brands &amp; a worldwide guide</div>
+                  <p style="font-size:13px; color:#a4a4ac; line-height:1.6; margin-bottom:0;">Curated editorial guidance, not live availability, pricing or booking data — the names and places people already deep in a category tend to know, chosen deliberately over the obvious, billboard-famous ones. Treat specifics as a starting point to verify, not a guarantee.</p>
+                </div>
+                </sc-if>
+
+                <div style="display:flex; gap:8px; margin:20px 0; flex-wrap:wrap;">
+                  <span onClick="{{ setBBBrands }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabBrandsBg }}; color:{{ bbTabBrandsC }};">Brands</span>
+                  <span onClick="{{ setBBLocations }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabLocationsBg }}; color:{{ bbTabLocationsC }};">Locations</span>
+                  <span onClick="{{ setBBSaved }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabSavedBg }}; color:{{ bbTabSavedC }};">☆ My Black Book</span>
+                </div>
+
+                <sc-if value="{{ isBBBrands }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+                    <sc-for list="{{ bbCatChips }}" as="c" hint-placeholder-count="5">
+                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
+                    <sc-for list="{{ bbBrandCards }}" as="b" hint-placeholder-count="5">
+                      <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box; overflow-wrap:break-word;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:15px; font-weight:700; color:#eef0f2;">{{ b.name }}</div>
+                          <span onClick="{{ b.save }}" title="Save to My Black Book" style="cursor:pointer; color:#c9a24a; font-size:15px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#c9a24a; margin-top:4px;">{{ b.origin }}</div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:10px;">{{ b.blurb }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ isBBLocations }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+                    <sc-for list="{{ bbCityChips }}" as="c" hint-placeholder-count="10">
+                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:16px;">{{ bbCityRegion }}</div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#7cb0ff; margin-bottom:8px;">HOTELS</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbHotelCards }}" as="h" hint-placeholder-count="3">
+                      <div class="cc-vault-tile" style="--vault-accent:#7cb0ff; --vault-line:rgba(124,176,255,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ h.name }}</div>
+                          <span onClick="{{ h.save }}" title="Save to My Black Book" style="cursor:pointer; color:#7cb0ff; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ h.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#ff8a92; margin-bottom:8px;">RESTAURANTS</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbRestaurantCards }}" as="r" hint-placeholder-count="3">
+                      <div class="cc-vault-tile" style="--vault-accent:#ff8a92; --vault-line:rgba(255,138,146,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ r.name }}</div>
+                          <span onClick="{{ r.save }}" title="Save to My Black Book" style="cursor:pointer; color:#ff8a92; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ r.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#C4FF3D; margin-bottom:8px;">EVENTS</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbEventCards }}" as="e" hint-placeholder-count="3">
+                      <div class="cc-vault-tile" style="--vault-accent:#C4FF3D; --vault-line:rgba(196,255,61,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ e.name }}</div>
+                          <span onClick="{{ e.save }}" title="Save to My Black Book" style="cursor:pointer; color:#C4FF3D; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ e.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#6de0c9; margin-bottom:8px;">SPAS &amp; WELLNESS</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbSpaCards }}" as="sp" hint-placeholder-count="2">
+                      <div class="cc-vault-tile" style="--vault-accent:#6de0c9; --vault-line:rgba(109,224,201,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ sp.name }}</div>
+                          <span onClick="{{ sp.save }}" title="Save to My Black Book" style="cursor:pointer; color:#6de0c9; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ sp.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#ffb86b; margin-bottom:8px;">MOTORING</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbMotoringCards }}" as="mo" hint-placeholder-count="2">
+                      <div class="cc-vault-tile" style="--vault-accent:#ffb86b; --vault-line:rgba(255,184,107,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ mo.name }}</div>
+                          <span onClick="{{ mo.save }}" title="Save to My Black Book" style="cursor:pointer; color:#ffb86b; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ mo.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#c9a24a; margin-bottom:8px;">PRIVATE CINEMA</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbCinemaCards }}" as="ci" hint-placeholder-count="2">
+                      <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ ci.name }}</div>
+                          <span onClick="{{ ci.save }}" title="Save to My Black Book" style="cursor:pointer; color:#c9a24a; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ ci.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#d8d8e0; margin-bottom:8px;">LUXURY CLOTHING</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
+                    <sc-for list="{{ bbShoppingCards }}" as="sh" hint-placeholder-count="2">
+                      <div class="cc-vault-tile" style="--vault-accent:#d8d8e0; --vault-line:rgba(216,216,224,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ sh.name }}</div>
+                          <span onClick="{{ sh.save }}" title="Save to My Black Book" style="cursor:pointer; color:#d8d8e0; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ sh.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#d69bff; margin-bottom:8px;">HOLIDAY IDEA</div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px;">
+                    <div class="cc-vault-tile" style="--vault-accent:#d69bff; --vault-line:rgba(214,155,255,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
+                      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                        <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ bbHolidayName }}</div>
+                        <span onClick="{{ saveBBHoliday }}" title="Save to My Black Book" style="cursor:pointer; color:#d69bff; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                      </div>
+                      <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ bbHolidayNote }}</div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ isBBSaved }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ hasBBSaved }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                      <sc-for list="{{ bbSavedList }}" as="s" hint-placeholder-count="3">
+                        <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                          <div style="min-width:0;">
+                            <div style="font-size:13.5px; color:#eef0f2; overflow-wrap:break-word;">{{ s.body }}</div>
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; margin-top:4px;">SAVED {{ s.stamp }}</div>
+                          </div>
+                          <span onClick="{{ s.remove }}" style="cursor:pointer; color:#7c7c84; font-size:12px; flex:0 0 auto;" style-hover="{ color:'#ff6b76' }">✕</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ !hasBBSaved }}" hint-placeholder-val="{{ true }}">
+                    <div style="border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:32px 20px; text-align:center; color:#75757d; font-size:12.5px; max-width:420px;">Nothing saved yet — tap the ☆ on any brand or place to keep it here, synced to your account.</div>
+                  </sc-if>
+                </sc-if>
+              </sc-if>
+
       <!-- ===== MUSIC ===== -->
       <sc-if value="{{ isMusic }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Music" style="animation:rise .5s ease both;">
@@ -6108,54 +6384,6 @@
                 </div>
               </sc-if>
 
-              <sc-if value="{{ isPhyDark }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                  <span onClick="{{ goPhyHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back to Psychology</span>
-                  <span onClick="{{ phyExitDark }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#ff8a92; cursor:pointer; border:1px solid rgba(255,138,146,0.35); border-radius:8px; padding:6px 12px;" style-hover="{ background:'rgba(255,138,146,0.1)' }">✕ Exit</span>
-                </div>
-                <div class="cc-vault-card cc-phydark-hero" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.35); --vault-bg:#1b1416; --vault-bg2:#050506; margin-top:16px; padding:22px 20px; max-width:760px; box-sizing:border-box; overflow-wrap:break-word;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><span class="cc-vault-pt" style="--vault-accent:#8c1414;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#ff8a92;">DARK PSYCHOLOGY · 18+ · PRIVATE</span></div>
-                  <div class="cc-phydark-title" style="font-size:22px; font-weight:700; margin-bottom:12px; letter-spacing:-.3px; line-height:1.25;">Manipulation, coercive control &amp; cult tactics</div>
-                  <p style="font-size:13.5px; color:#c9b8ba; line-height:1.65; margin-bottom:0;">This section exists to help you <b style="color:#eef0f2;">recognise and defend against</b> real manipulation tactics — the ones used by abusive partners, controlling groups, con artists and coercive bosses. It covers how these tactics work, why they're effective, and how to spot and counter them. It is not, and will not become, a manual for using them on someone else.</p>
-                </div>
-
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:24px 0 12px;">WHAT'S COVERED</div>
-                <div class="cc-phydark-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; max-width:760px; margin-bottom:24px;">
-                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Dark Triad &amp; gaslighting</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Narcissism, Machiavellianism, psychopathy — and how reality gets rewritten.</div></div>
-                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Love bombing &amp; DARVO</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Fast-tracked intimacy as a hook, and the deny-attack-reverse playbook.</div></div>
-                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Coercive control</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Evan Stark's framework for sustained domination in relationships.</div></div>
-                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Cults &amp; thought reform</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Lifton's milieu control and how high-control groups isolate members.</div></div>
-                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Sexual &amp; reproductive coercion</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Recognising pressure, sabotage and consent erosion as forms of control.</div></div>
-                  <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; overflow-wrap:break-word;"><div style="font-size:13.5px; font-weight:700; color:#eef0f2; margin-bottom:5px;">Propaganda &amp; influence</div><div style="font-size:12px; color:#8a8a92; line-height:1.5;">Bernays-era mass persuasion and how it still shows up today.</div></div>
-                </div>
-
-                <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px;">
-                  <div onClick="{{ phyDarkLearn }}" class="cc-glowbtn" style="padding:14px 22px; border-radius:3px 12px 12px 12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:14px; text-align:center;" style-hover="{ transform:'translateY(-1px)' }">📖 Learn the deep dive</div>
-                  <div onClick="{{ phyDarkPractice }}" style="padding:14px 22px; border-radius:3px 12px 12px 12px; cursor:pointer; border:1px solid rgba(255,138,146,0.4); color:#ff8a92; font-weight:700; font-size:14px; text-align:center;" style-hover="{ background:'rgba(255,138,146,0.08)' }">✎ Practice questions</div>
-                  <div onClick="{{ phyStartDarkTest }}" style="padding:14px 22px; border-radius:3px 12px 12px 12px; cursor:pointer; border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-weight:700; font-size:14px; text-align:center;" style-hover="{ background:'rgba(255,255,255,0.06)' }">🧪 Take the test</div>
-                </div>
-
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;"><span class="cc-vault-pt" style="--vault-accent:#8c1414;"></span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">PRIVATE SAFETY JOURNAL</span></div>
-                <p style="font-size:12px; color:#75757d; line-height:1.5; max-width:600px; margin-bottom:14px;">A dated, private log — synced to your account only, never shared. Therapists working with coercive control recommend this: patterns are often far clearer written down over weeks than in any single moment.</p>
-                <div class="cc-vault-card" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.25); --vault-bg:#141416; --vault-bg2:#050506; padding:16px; max-width:600px; box-sizing:border-box; margin-bottom:14px;">
-                  <textarea value="{{ phyJournalInputVal }}" onInput="{{ setPhyJournalInput }}" placeholder="What happened, and when — write it as plainly as you can…" style="width:100%; min-height:64px; padding:11px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; font-family:inherit; box-sizing:border-box; margin-bottom:10px;"></textarea>
-                  <div onClick="{{ phyAddJournalEntry }}" class="cc-glowbtn" style="display:inline-block; padding:10px 18px; border-radius:3px 10px 10px 10px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:12.5px;" style-hover="{ transform:'translateY(-1px)' }">+ Add dated entry</div>
-                </div>
-                <sc-if value="{{ hasPhyJournalEntries }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex; flex-direction:column; gap:10px; max-width:600px;">
-                    <sc-for list="{{ phyJournalEntries }}" as="j" hint-placeholder-count="2">
-                      <div class="cc-vault-tile" style="--vault-accent:#8c1414; --vault-line:rgba(140,20,20,0.2); --vault-bg:#141416; padding:14px 16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
-                          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d;">{{ j.stamp }}</div>
-                          <span onClick="{{ j.remove }}" style="cursor:pointer; color:#7c7c84; font-size:12px; flex:0 0 auto;" style-hover="{ color:'#ff6b76' }">✕</span>
-                        </div>
-                        <div style="font-size:13px; color:#dcdce0; line-height:1.55; margin-top:6px; overflow-wrap:break-word;">{{ j.body }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-              </sc-if>
-
               <sc-if value="{{ isPhyLearn }}" hint-placeholder-val="{{ false }}">
                 <span onClick="{{ goPhyHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ phyLesson }}" hint-placeholder-val="{{ true }}">
@@ -7351,106 +7579,6 @@
                 </div>
               </sc-if>
 
-              <sc-if value="{{ isGentBlackBook }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back to Gentleman's Etiquette</span>
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#c9a24a; cursor:pointer; border:1px solid rgba(201,162,74,0.35); border-radius:8px; padding:6px 12px;" style-hover="{ background:'rgba(201,162,74,0.1)' }">✕ Exit</span>
-                </div>
-                <div class="cc-vault-card" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.35); --vault-bg:#1b1d21; --vault-bg2:#050506; margin-top:16px; padding:22px 20px; max-width:760px; box-sizing:border-box;">
-                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;"><span class="cc-vault-pt"></span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#c9a24a;">THE BLACK BOOK · PRIVATE</span></div>
-                  <div style="font-size:22px; font-weight:700; margin-bottom:10px; letter-spacing:-.3px;">Insider brands &amp; a worldwide guide</div>
-                  <p style="font-size:13px; color:#a4a4ac; line-height:1.6; margin-bottom:0;">Curated editorial guidance, not live availability, pricing or booking data — the names and places people already deep in a category tend to know, chosen deliberately over the obvious, billboard-famous ones. Treat specifics as a starting point to verify, not a guarantee.</p>
-                </div>
-
-                <div style="display:flex; gap:8px; margin:20px 0; flex-wrap:wrap;">
-                  <span onClick="{{ setBBBrands }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabBrandsBg }}; color:{{ bbTabBrandsC }};">Brands</span>
-                  <span onClick="{{ setBBLocations }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabLocationsBg }}; color:{{ bbTabLocationsC }};">Locations</span>
-                  <span onClick="{{ setBBSaved }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabSavedBg }}; color:{{ bbTabSavedC }};">☆ My Black Book</span>
-                </div>
-
-                <sc-if value="{{ isBBBrands }}" hint-placeholder-val="{{ true }}">
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
-                    <sc-for list="{{ bbCatChips }}" as="c" hint-placeholder-count="5">
-                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
-                    </sc-for>
-                  </div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
-                    <sc-for list="{{ bbBrandCards }}" as="b" hint-placeholder-count="5">
-                      <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box; overflow-wrap:break-word;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:15px; font-weight:700; color:#eef0f2;">{{ b.name }}</div>
-                          <span onClick="{{ b.save }}" title="Save to My Black Book" style="cursor:pointer; color:#c9a24a; font-size:15px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#c9a24a; margin-top:4px;">{{ b.origin }}</div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:10px;">{{ b.blurb }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-
-                <sc-if value="{{ isBBLocations }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
-                    <sc-for list="{{ bbCityChips }}" as="c" hint-placeholder-count="10">
-                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
-                    </sc-for>
-                  </div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:12px;">{{ bbCityRegion }}</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
-                    <div class="cc-vault-tile" style="--vault-accent:#7cb0ff; --vault-line:rgba(124,176,255,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
-                      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#7cb0ff;">HOTEL</div>
-                        <span onClick="{{ saveBBHotel }}" title="Save to My Black Book" style="cursor:pointer; color:#7cb0ff; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                      </div>
-                      <div style="font-size:14px; font-weight:700; color:#eef0f2; margin-top:6px;">{{ bbHotelName }}</div>
-                      <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ bbHotelNote }}</div>
-                    </div>
-                    <div class="cc-vault-tile" style="--vault-accent:#ff8a92; --vault-line:rgba(255,138,146,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
-                      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#ff8a92;">RESTAURANT</div>
-                        <span onClick="{{ saveBBRestaurant }}" title="Save to My Black Book" style="cursor:pointer; color:#ff8a92; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                      </div>
-                      <div style="font-size:14px; font-weight:700; color:#eef0f2; margin-top:6px;">{{ bbRestaurantName }}</div>
-                      <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ bbRestaurantNote }}</div>
-                    </div>
-                    <div class="cc-vault-tile" style="--vault-accent:#C4FF3D; --vault-line:rgba(196,255,61,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
-                      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#C4FF3D;">EVENT</div>
-                        <span onClick="{{ saveBBEvent }}" title="Save to My Black Book" style="cursor:pointer; color:#C4FF3D; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                      </div>
-                      <div style="font-size:14px; font-weight:700; color:#eef0f2; margin-top:6px;">{{ bbEventName }}</div>
-                      <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ bbEventNote }}</div>
-                    </div>
-                    <div class="cc-vault-tile" style="--vault-accent:#d69bff; --vault-line:rgba(214,155,255,0.2); --vault-bg:#1b1d21; padding:16px; box-sizing:border-box;">
-                      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#d69bff;">HOLIDAY</div>
-                        <span onClick="{{ saveBBHoliday }}" title="Save to My Black Book" style="cursor:pointer; color:#d69bff; font-size:14px; flex:0 0 auto;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                      </div>
-                      <div style="font-size:14px; font-weight:700; color:#eef0f2; margin-top:6px;">{{ bbHolidayName }}</div>
-                      <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ bbHolidayNote }}</div>
-                    </div>
-                  </div>
-                </sc-if>
-
-                <sc-if value="{{ isBBSaved }}" hint-placeholder-val="{{ false }}">
-                  <sc-if value="{{ hasBBSaved }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-                      <sc-for list="{{ bbSavedList }}" as="s" hint-placeholder-count="3">
-                        <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#1b1d21; padding:14px 16px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                          <div style="min-width:0;">
-                            <div style="font-size:13.5px; color:#eef0f2; overflow-wrap:break-word;">{{ s.body }}</div>
-                            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; margin-top:4px;">SAVED {{ s.stamp }}</div>
-                          </div>
-                          <span onClick="{{ s.remove }}" style="cursor:pointer; color:#7c7c84; font-size:12px; flex:0 0 auto;" style-hover="{ color:'#ff6b76' }">✕</span>
-                        </div>
-                      </sc-for>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{ !hasBBSaved }}" hint-placeholder-val="{{ true }}">
-                    <div style="border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:32px 20px; text-align:center; color:#75757d; font-size:12.5px; max-width:420px;">Nothing saved yet — tap the ☆ on any brand or place to keep it here, synced to your account.</div>
-                  </sc-if>
-                </sc-if>
-              </sc-if>
-
               <sc-if value="{{ isGentDashboard }}" hint-placeholder-val="{{ false }}">
                 <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
@@ -7904,7 +8032,7 @@
                     <div style="font-size:13px; font-weight:700; color:#eef0f2;">Email template</div>
                     <sc-if value="{{ emailTemplateCustomized }}" hint-placeholder-val="{{ false }}"><span onClick="{{ resetEmailTemplate }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:5px 10px; cursor:pointer;">Reset to default</span></sc-if>
                   </div>
-                  <div style="font-size:11px; color:#8a8a92; margin-bottom:10px; line-height:1.5;">Customize how reminder emails are formatted. Use <code style="color:#c8c8ce;">{{ tplTitleHint }}</code> and <code style="color:#c8c8ce;">{{ tplMessageHint }}</code> as placeholders — they're filled in with the real reminder each time. Leave blank to use the plain default.</div>
+                  <div style="font-size:11px; color:#8a8a92; margin-bottom:10px; line-height:1.5;">Customize how reminder emails are formatted. Use <code style="color:#c8c8ce;">{{ tplTitleHint }}</code>, <code style="color:#c8c8ce;">{{ tplMessageHint }}</code> and <code style="color:#c8c8ce;">{{ tplCountHint }}</code> as placeholders — they're filled in with the real reminder each time (<code style="color:#c8c8ce;">{{ tplCountHint }}</code> is the item/day count where one applies — e.g. tasks left, or the miss streak number — and comes through blank for reminders that don't have one, like version updates). Leave blank to use the plain default.</div>
                   <div style="font-size:10px; color:#6f6f78; margin-bottom:4px; letter-spacing:1px;">SUBJECT</div>
                   <input value="{{ emailTemplateSubjectVal }}" onInput="{{ setEmailTemplateSubject }}" placeholder="{{ tplTitleHint }}" style="width:100%; max-width:420px; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; margin-bottom:12px; box-sizing:border-box;">
                   <div style="font-size:10px; color:#6f6f78; margin-bottom:4px; letter-spacing:1px;">BODY</div>
@@ -8535,7 +8663,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.11-26 · v10.3 cloud-code-backup';
+const NOTIF_BUILD_VERSION = '2026.08.13-35 · v11.2 blackbook-locations-restructure';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10801,8 +10929,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // that haven't been pushed yet, deletes ones removed locally since the last sync.
   _syncActivities(acts){
     if(!this._sbOn()) return;
+    // The initial Supabase pull seeds _syncedActivityIds with every row already on the
+    // server (see _sbPullCore). If this runs before that pull lands — easy to hit, since
+    // componentDidUpdate starts firing the instant login completes, using whatever
+    // locally-cached `activities` state already exists — every already-synced row looks
+    // "new" here and gets re-INSERTed, which the DB rejects as a duplicate id (409) for
+    // each one. Bail until the pull has actually seeded the known-ids set.
+    if(!this._syncedActivityIds) return;
     const uid=this.state.authUserId;
-    const known=this._syncedActivityIds||new Set();
+    const known=this._syncedActivityIds;
     const curIds=new Set();
     (acts||[]).forEach(a=>{
       if(!a.id) return;
@@ -10818,8 +10953,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // whatever hasn't been pushed yet — unlike _syncActivities there's no delete side to diff.
   _syncLoginXP(log){
     if(!this._sbOn()) return;
+    // Same race as _syncActivities above — wait for the initial pull to seed known ids
+    // before diffing, or every already-synced row gets re-INSERTed and rejected (409).
+    if(!this._syncedLoginXPIds) return;
     const uid=this.state.authUserId;
-    const known=this._syncedLoginXPIds||new Set();
+    const known=this._syncedLoginXPIds;
     const curIds=new Set();
     (log||[]).forEach(l=>{
       if(!l.id) return;
@@ -11805,6 +11943,33 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.2', date:'Aug 13, 2026 · 23:45', major:true, notes:[
+      'The Black Book → Brands lost the four categories added last update — Spas & Wellness, Motoring, Private Cinema and Luxury Clothing moved into Locations instead, so they now sit alongside Hotels, Restaurants and Events as per-city picks rather than one flat global list. Every city also gained a fourth hotel, screened to genuine 4.5–5★ tier, with more variety throughout — famous landmark names sitting next to quieter, less social-media-obvious picks.',
+    ]},
+    {version:'v11.1', date:'Aug 13, 2026 · 23:10', major:true, notes:[
+      'The Black Book → Brands gained four new categories: Spas & Wellness, Motoring, Private Cinema and Luxury Clothing — 6 curated names each, same insider-editorial voice as the existing 12 categories (watches, tailoring, shoes, etc.). 16 categories total now.',
+    ]},
+    {version:'v11.0', date:'Aug 13, 2026 · 22:45', major:true, notes:[
+      'The Black Book → Locations expanded: every one of the 26 cities went from a single hotel/restaurant/event pick to three of each — a mix of the true landmark, very-high-end names alongside the original insider picks — so each city now reads as an actual shortlist rather than one default. Holiday stays as one idea per city. Each entry still saves individually to My Black Book.',
+    ]},
+    {version:'v10.9', date:'Aug 13, 2026 · 22:00', major:true, notes:[
+      'Dark Psychology and The Black Book were the only two lessons in the Learning Centre that never got the Ultra-theme treatment every other subject hub already has — crest mark, cream parchment card, serif type, ornamental divider. Both now match: a proper hero card in Ultra theme, and their Learn/Practice/Test (Dark Psychology) and action buttons upgraded to the same icon-card style as Maths, English and the rest.',
+    ]},
+    {version:'v10.8', date:'Aug 13, 2026 · 21:15', notes:[
+      'Email template (Settings → Notifications) gained a third placeholder, {{count}} — the item/day count for whichever reminder is firing (tasks left, missions left, the Performance Terminal miss streak, days since you were last seen). Comes through blank for reminders that don\'t have a natural count, like version updates.',
+    ]},
+    {version:'v10.7', date:'Aug 13, 2026 · 20:40', major:true, notes:[
+      'Dark Psychology and The Black Book no longer take over the full screen — they now render as normal lessons within the Learning Centre, sidebar and header visible, same as every other subject. The full-screen private takeover was the source of a run of rendering bugs that kept resurfacing across several attempted fixes, and wasn\'t worth the fragility for what it added. All the content stays exactly as built: the Dark Psychology deep-dive, Practice, Test, and Safety Journal; The Black Book\'s Brands, Locations and My Black Book tabs, saving still works.',
+    ]},
+    {version:'v10.6', date:'Aug 13, 2026 · 20:05', major:true, notes:[
+      'Rebuilt Dark Psychology and The Black Book as fully independent top-level screens — the same pattern the Notification Testing Panel already uses — instead of nesting them three levels deep inside the Learning tab\'s internal state. The previous nesting meant three separate conditions (which scene, which subject tab, which internal mode) all had to agree at once for the page to render, which was fragile; the new version depends on one flag, matching a pattern already proven reliable elsewhere in the app. Behaviour is unchanged — same design, same content, same Exit/Back buttons — this only changes how reliably it renders.',
+    ]},
+    {version:'v10.5', date:'Aug 13, 2026 · 19:20', notes:[
+      'Fixed Dark Psychology and The Black Book showing up blank on desktop web until DevTools was opened. Both pages hide the sidebar and header the instant they open (a same-frame layout change), and on some browsers that left the new content painted-but-invisible until something forced a fresh layout pass — which is exactly what opening DevTools does by resizing the viewport. Now triggers that same recompute automatically on open and close, so nothing needs nudging by hand.',
+    ]},
+    {version:'v10.4', date:'Aug 13, 2026 · 18:45', notes:[
+      'Fixed a bug that could make pages feel stuck or blank right after logging in (most noticeable on Dark Psychology and The Black Book, since those hide everything else while open): the Productivity work log and login-streak sync could start diffing against the server before the initial data pull had finished, mistaking already-saved entries for new ones and firing a burst of rejected duplicate-save requests. It now waits for that pull to land before syncing, so nothing gets retried that’s already there.',
+    ]},
     {version:'v10.3', date:'Aug 11, 2026 · 08:35', major:true, notes:[
       'Added a "☁ BACKUP CODE" button next to WHAT’S NEW in Settings → Account (owner only) — uploads the app’s current source files to a private Supabase Storage bucket. This is a stopgap safety net while GitHub write access is unavailable, not a replacement for real version control: it overwrites in place rather than keeping history.',
     ]},
@@ -13452,20 +13617,23 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const now=Date.now(); this.setState({phyNow:now});
     if(now>=this.state.phyTimerEnd){ this.phyFinishTest(); }
   }, 250); }
-  phyGoHub(){ this._phyStopTicker(); this.setState({phyMode:'hub', phyQ:null, phyFeedback:null, phyInput:'', phyDarkTest:false}); }
-  phyStartLearn(topicKey){ if(topicKey==='dark'){ if(this.state.prefs.isMinor){ this.setState({phyMode:'agelock'}); return; } if(!this.state.prefs.psychDarkUnlocked){ this.setState({phyMode:'darkgate', phyPendingMode:'learn'}); return; } } this.setState({phyMode:'learn', phyTopic:topicKey}); }
+  phyGoHub(){ this._phyStopTicker(); this.setState({phyMode:'hub', phyQ:null, phyFeedback:null, phyInput:'', phyDarkTest:false, scene:'learning'}); }
+  phyStartLearn(topicKey){ if(topicKey==='dark'){ if(this.state.prefs.isMinor){ this.setState({phyMode:'agelock'}); return; } if(!this.state.prefs.psychDarkUnlocked){ this.setState({phyMode:'darkgate', phyPendingMode:'learn'}); return; } } this.setState({phyMode:'learn', phyTopic:topicKey, scene:'learning'}); }
   phyStartPractice(topicKey){ if(topicKey==='dark'){ if(this.state.prefs.isMinor){ this.setState({phyMode:'agelock'}); return; } if(!this.state.prefs.psychDarkUnlocked){ this.setState({phyMode:'darkgate', phyPendingMode:'practice'}); return; } }
     const PH=window.LearningPhysiology; if(!PH) return; const lvl=(this.state.learning&&this.state.learning.physiologyLevel)||1;
-    this.setState({ phyMode:'practice', phyTopic:topicKey, phyQ:PH.generate(topicKey, lvl), phyInput:'', phyFeedback:null, phyShowMethod:false, phyScore:0, phyTotal:0, phyHint:'', phyHintErr:'' }); }
+    this.setState({ phyMode:'practice', phyTopic:topicKey, phyQ:PH.generate(topicKey, lvl), phyInput:'', phyFeedback:null, phyShowMethod:false, phyScore:0, phyTotal:0, phyHint:'', phyHintErr:'', scene:'learning' }); }
   phyCancelDarkGate(){ this.setState({phyMode:'hub', phyPendingMode:''}); }
-  phyExitDark(){ this.setState({phyMode:'hub', scene:'home'}); }
+  phyExitDark(){ this.setState({phyMode:'hub', scene:'home'}); this._forceReflowNextFrame(); }
   // Private, dated Safety Journal — same synced notes vault as the rest of the app, tagged
   // so it lists separately here. Matches the lesson's own advice to keep a dated log.
   phyAddJournalEntry(){ const b=(this.state.phyJournalInput||'').trim(); if(!b) return; const id=this._uuid(); const title='⟡ Safety Journal'; this.mut(s=>({notes:[{id,title,body:b,ts:Date.now()},...s.notes], phyJournalInput:''})); if(this._sbOn()) window.SB.insert('notes',{id,user_id:this.state.authUserId,title,body:b}); }
   phyRemoveJournalEntry(id){ this.mut(s=>({notes:s.notes.filter(n=>n.id!==id)})); if(this._sbOn()) window.SB.remove('notes',id); }
-  phyOpenDark(){ if(this.state.prefs.isMinor){ this.setState({phyMode:'agelock'}); return; } if(!this.state.prefs.psychDarkUnlocked){ this.setState({phyMode:'darkgate', phyPendingMode:'dark'}); return; } this.setState({phyMode:'dark'}); }
+  // Dark Psychology is its own top-level scene (not nested under scene==='learning'), same
+  // pattern as the Notification Testing Panel — a page this private shouldn't depend on
+  // three simultaneous conditions (scene + tab + mode) all agreeing to render correctly.
+  phyOpenDark(){ if(this.state.prefs.isMinor){ this.setState({phyMode:'agelock'}); return; } if(!this.state.prefs.psychDarkUnlocked){ this.setState({phyMode:'darkgate', phyPendingMode:'dark'}); return; } this.setState({phyMode:'dark', scene:'darkpsych'}); this._forceReflowNextFrame(); }
   phyConfirmDarkUnlock(){ const pending=this.state.phyPendingMode||'dark'; this.setPref('psychDarkUnlocked', true);
-    if(pending==='practice') this.phyStartPractice('dark'); else if(pending==='learn') this.phyStartLearn('dark'); else this.setState({phyMode:'dark'}); }
+    if(pending==='practice') this.phyStartPractice('dark'); else if(pending==='learn') this.phyStartLearn('dark'); else { this.setState({phyMode:'dark', scene:'darkpsych'}); this._forceReflowNextFrame(); } }
   setPhyInput(e){ this.setState({phyInput:e.target.value}); }
   phyPick(opt){ this.setState({phyInput:opt}); }
   togglePhyMethod(){ this.setState(s=>({phyShowMethod:!s.phyShowMethod})); }
@@ -13487,7 +13655,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({ phyMode:'test', phyPlacement:true, phyDarkTest:false, phyLevel:0, phyQueue:PH.generatePlacementSet(n), phyIdx:0, phyQ:null, phyAnswers:[], phyInput:'', phyFeedback:null, phyScore:0, phyTotal:n, phyTimerEnd:now+dur, phyNow:now, phyDuration:dur, phyStartedAt:now },()=>{ this.setState({phyQ:this.state.phyQueue[0]}); }); this._phyStartTicker(); }
   phyStartDarkTest(){ if(this.state.prefs.isMinor) return; const PH=window.LearningPhysiology; if(!PH || !this.state.prefs.psychDarkUnlocked) return; this._phyBusy=false;
     const queue=PH.generateDarkSet(); const n=queue.length, dur=10*60000, now=Date.now();
-    this.setState({ phyMode:'test', phyPlacement:false, phyDarkTest:true, phyLevel:0, phyQueue:queue, phyIdx:0, phyQ:null, phyAnswers:[], phyInput:'', phyFeedback:null, phyScore:0, phyTotal:n, phyTimerEnd:now+dur, phyNow:now, phyDuration:dur, phyStartedAt:now },()=>{ this.setState({phyQ:this.state.phyQueue[0]}); }); this._phyStartTicker(); }
+    this.setState({ phyMode:'test', phyPlacement:false, phyDarkTest:true, phyLevel:0, phyQueue:queue, phyIdx:0, phyQ:null, phyAnswers:[], phyInput:'', phyFeedback:null, phyScore:0, phyTotal:n, phyTimerEnd:now+dur, phyNow:now, phyDuration:dur, phyStartedAt:now, scene:'learning' },()=>{ this.setState({phyQ:this.state.phyQueue[0]}); }); this._phyStartTicker(); }
   phyStartLevelTest(){ const PH=window.LearningPhysiology; if(!PH) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.physiologyLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=8*60000, now=Date.now();
     const focusAreas=(this.state.learning&&this.state.learning.physiologyFocusAreas)||[];
     const keyFor=(label)=>Object.keys(PH.TOPIC_LABELS||{}).find(k=>PH.TOPIC_LABELS[k]===label);
@@ -13513,7 +13681,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const answers=[...S.phyAnswers, {topic:S.phyQ.topic, ok:false, idk:true}]; const nextIdx=S.phyIdx+1;
     if(nextIdx>=S.phyQueue.length){ this.setState({phyAnswers:answers},()=>{ this.phyFinishTest(); this._phyBusy=false; }); }
     else { this.setState({ phyAnswers:answers, phyIdx:nextIdx, phyQ:S.phyQueue[nextIdx], phyInput:'' },()=>{ this._phyBusy=false; }); } }
-  phyEndTest(){ if(!this.state.phyAnswers.length){ if(this.state.phyDarkTest){ this.setState({phyMode:'dark', phyDarkTest:false}); return; } this.phyGoHub(); return; } this.phyFinishTest(); }
+  phyEndTest(){ if(!this.state.phyAnswers.length){ if(this.state.phyDarkTest){ this.setState({phyMode:'dark', phyDarkTest:false, scene:'darkpsych'}); this._forceReflowNextFrame(); return; } this.phyGoHub(); return; } this.phyFinishTest(); }
   phyFinishTest(){ if(this.state.phyMode==='results') return; this._phyStopTicker(); const PH=window.LearningPhysiology; const S=this.state; const pct=S.phyTotal?Math.round(S.phyScore/S.phyTotal*100):0;
     const byTopic={}; S.phyAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
@@ -13701,7 +13869,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const now=Date.now(); this.setState({gentNow:now});
     if(now>=this.state.gentTimerEnd){ this.gentFinishTest(); }
   }, 250); }
-  gentGoHub(){ this._gentStopTicker(); this.setState({gentMode:'hub', gentQ:null, gentFeedback:null, gentInput:''}); }
+  gentGoHub(){ const wasBlackBook=this.state.scene==='blackbook'; this._gentStopTicker(); this.setState({gentMode:'hub', gentQ:null, gentFeedback:null, gentInput:'', scene:'learning'}); if(wasBlackBook) this._forceReflowNextFrame(); }
   gentStartLearn(topicKey){ this.setState({gentMode:'learn', gentTopic:topicKey}); }
   gentStartPractice(topicKey){ const LG=window.LearningGentleman; if(!LG) return; const lvl=(this.state.learning&&this.state.learning.gentLevel)||1;
     this.setState({ gentMode:'practice', gentTopic:topicKey, gentQ:LG.generate(topicKey), gentInput:'', gentFeedback:null, gentShowMethod:false, gentScore:0, gentTotal:0, gentHint:'', gentHintErr:'' }); }
@@ -13781,11 +13949,25 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   gentOpenDashboard(){ this._gentStopTicker(); this.setState({gentMode:'dashboard'}); }
   setGentFormulaSearch(e){ this.setState({gentFormulaSearch:e.target.value}); }
   // ===== The Black Book — insider brands + worldwide locations reference =====
-  gentOpenBlackBook(){ if(this.state.prefs.isMinor){ this.setState({gentMode:'agelock'}); return; } this._gentStopTicker(); this.setState({gentMode:'blackbook'}); }
+  // The Black Book is its own top-level scene (not nested under scene==='learning'), same
+  // pattern as the Notification Testing Panel — a page this private shouldn't depend on
+  // three simultaneous conditions (scene + tab + mode) all agreeing to render correctly.
+  gentOpenBlackBook(){ if(this.state.prefs.isMinor){ this.setState({gentMode:'agelock'}); return; } this._gentStopTicker(); this.setState({gentMode:'blackbook', scene:'blackbook'}); this._forceReflowNextFrame(); }
   // Dark Psychology and The Black Book are private, sensitive pages — while either is open
   // the sidebar and top bar hide entirely (same collapse Focus Mode uses) so nothing about
   // them is visible around the edges of the screen.
-  _isPrivatePageOpen(){ const S=this.state; return (S.scene==='learning' && S.learningTab==='Human Physiology' && S.phyMode==='dark') || (S.scene==='learning' && S.learningTab==='Gentleman’s Etiquette' && S.gentMode==='blackbook'); }
+  // No longer hides the sidebar/header — Dark Psychology and The Black Book render as
+  // normal Learning Centre screens now (same chrome as every other lesson), per request
+  // to drop the full-screen private takeover. Kept as a stub (always false) rather than
+  // deleted outright, since the 3 call sites below still reference it.
+  _isPrivatePageOpen(){ return false; }
+  // The private-page collapse (shellCols going 84px 1fr -> 0px 1fr, sidebar/header
+  // disappearing) is a same-frame CSS Grid + overflow:hidden change on .cc-shell, and on
+  // some browsers that combination leaves the new content painted-but-invisible until
+  // something forces a fresh layout pass (which is exactly what opening DevTools does,
+  // by resizing the viewport — that's why it "fixes itself" the moment it's opened).
+  // Nudging a resize event on the next frame forces that same recompute without DevTools.
+  _forceReflowNextFrame(){ requestAnimationFrame(()=>{ try{ window.dispatchEvent(new Event('resize')); }catch(e){} }); }
   setGentBBTab(t){ this.setState({gentBBTab:t}); }
   setGentBBCat(k){ this.setState({gentBBCat:k}); }
   setGentBBCity(k){ this.setState({gentBBCity:k}); }
@@ -14418,7 +14600,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v10.3 — Aug 11, 2026',
+      appVersion:'v11.2 — Aug 13, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -14533,10 +14715,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       emailTemplatePreview:(()=>{
         const subj=((S.emailTemplateSubjectDraft!=null?S.emailTemplateSubjectDraft:S.prefs.emailTemplateSubject)||'').trim()||'{{title}}';
         const bod=((S.emailTemplateBodyDraft!=null?S.emailTemplateBodyDraft:S.prefs.emailTemplateBody)||'').trim()||'{{message}}';
-        const fill=(t)=>t.replace(/\{\{\s*title\s*\}\}/g,'Daily Sales').replace(/\{\{\s*message\s*\}\}/g,'Only one task left on Daily Sales today.').replace(/\{\{\s*body\s*\}\}/g,'Only one task left on Daily Sales today.');
+        const fill=(t)=>t.replace(/\{\{\s*title\s*\}\}/g,'Daily Sales').replace(/\{\{\s*message\s*\}\}/g,'Only one task left on Daily Sales today.').replace(/\{\{\s*body\s*\}\}/g,'Only one task left on Daily Sales today.').replace(/\{\{\s*count\s*\}\}/g,'1');
         return { subject:fill(subj)||'Daily Sales', text:fill(bod)||'Only one task left on Daily Sales today.' };
       })(),
-      tplTitleHint:'{{title}}', tplMessageHint:'{{message}}',
+      tplTitleHint:'{{title}}', tplMessageHint:'{{message}}', tplCountHint:'{{count}}',
       ...this._safe(()=>{
         const FREQ=[['15min','15 min'],['30min','30 min'],['hourly','Hourly (default)'],['2hour','2 hours'],['4hour','4 hours'],['daily','Daily'],['custom','Custom']];
         const CATS=window.NotificationManager?window.NotificationManager.CATEGORIES:{};
@@ -14648,7 +14830,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
       goHealthDiet:()=>this.setState({scene:'health', healthSub:'diet'}),
-      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isFinance:scene==='finance', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health', isBiz:scene==='business', isProd:scene==='productivity', isChecklists:scene==='checklists', isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice',
+      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isFinance:scene==='finance', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health', isBiz:scene==='business', isProd:scene==='productivity', isChecklists:scene==='checklists', isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
       ...this._safe(()=>{
         const CL=S.userChecklists||[];
         const activeCL=CL.find(c=>c.id===S.activeChecklistId)||CL[0]||null;
@@ -15445,7 +15627,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           phySkipTest:()=>this.phySkipTest(), phyIDKTest:()=>this.phyIDKTest(), phyEndTest:()=>this.phyEndTest(), phySubmitTest:()=>this.phySubmitTest(), phySubmitTestKey:enterKey(()=>this.phySubmitTest()),
           phyResultIsPlacement: !!(r4&&r4.mode==='Placement Test'), phyResultIsLevel: !!(r4&&r4.level && r4.mode!=='Placement Test'),
           phyResultIsDark: !!(r4&&r4.mode==='Dark Psychology Test'),
-          phyResultBackFn: (r4&&r4.mode==='Dark Psychology Test')?(()=>this.setState({phyMode:'dark', phyDarkTest:false})):(()=>this.phyGoHub()),
+          phyResultBackFn: (r4&&r4.mode==='Dark Psychology Test')?(()=>{ this.setState({phyMode:'dark', phyDarkTest:false, scene:'darkpsych'}); this._forceReflowNextFrame(); }):(()=>this.phyGoHub()),
           phyResultBackLabel: (r4&&r4.mode==='Dark Psychology Test')?'‹ Back to Dark Psychology':'Back to Human Psychology hub',
           phyResultScore: r4?(r4.score+' / '+r4.total):'', phyResultPct: r4&&r4.pct!=null?(r4.pct+'%'):'',
           phyResultLevel: r4?r4.level:0, phyResultGrade: r4&&r4.grade?('Grade '+r4.grade):'',
@@ -15581,9 +15763,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bbBrandCards:(bbCat?bbCat.brands:[]).map(b=>({ ...b, save:()=>this.gentSaveBBItem(bbCat.label,b.name,b.blurb) })),
           bbCityChips:(BB?BB.CITIES:[]).map(c=>({ label:c.label, go:()=>this.setGentBBCity(c.key), bg:(S.gentBBCity||'london')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCity||'london')===c.key?'#0a0a0b':'#c5c5ca' })),
           bbCityRegion:bbCity?(bbCity.label+' · '+bbCity.region).toUpperCase():'',
-          bbHotelName:bbCity?bbCity.hotel.name:'', bbHotelNote:bbCity?bbCity.hotel.note:'', saveBBHotel:()=>bbCity&&this.gentSaveBBItem('Hotel',bbCity.hotel.name,bbCity.hotel.note),
-          bbRestaurantName:bbCity?bbCity.restaurant.name:'', bbRestaurantNote:bbCity?bbCity.restaurant.note:'', saveBBRestaurant:()=>bbCity&&this.gentSaveBBItem('Restaurant',bbCity.restaurant.name,bbCity.restaurant.note),
-          bbEventName:bbCity?bbCity.event.name:'', bbEventNote:bbCity?bbCity.event.note:'', saveBBEvent:()=>bbCity&&this.gentSaveBBItem('Event',bbCity.event.name,bbCity.event.note),
+          bbHotelCards:(bbCity&&bbCity.hotels?bbCity.hotels:[]).map(h=>({...h, save:()=>this.gentSaveBBItem('Hotel',h.name,h.note)})),
+          bbRestaurantCards:(bbCity&&bbCity.restaurants?bbCity.restaurants:[]).map(r=>({...r, save:()=>this.gentSaveBBItem('Restaurant',r.name,r.note)})),
+          bbEventCards:(bbCity&&bbCity.events?bbCity.events:[]).map(e=>({...e, save:()=>this.gentSaveBBItem('Event',e.name,e.note)})),
+          bbSpaCards:(bbCity&&bbCity.spas?bbCity.spas:[]).map(sp=>({...sp, save:()=>this.gentSaveBBItem('Spa',sp.name,sp.note)})),
+          bbMotoringCards:(bbCity&&bbCity.motoring?bbCity.motoring:[]).map(mo=>({...mo, save:()=>this.gentSaveBBItem('Motoring',mo.name,mo.note)})),
+          bbCinemaCards:(bbCity&&bbCity.cinema?bbCity.cinema:[]).map(ci=>({...ci, save:()=>this.gentSaveBBItem('Private Cinema',ci.name,ci.note)})),
+          bbShoppingCards:(bbCity&&bbCity.shopping?bbCity.shopping:[]).map(sh=>({...sh, save:()=>this.gentSaveBBItem('Luxury Clothing',sh.name,sh.note)})),
           bbHolidayName:bbCity?bbCity.holiday.name:'', bbHolidayNote:bbCity?bbCity.holiday.note:'', saveBBHoliday:()=>bbCity&&this.gentSaveBBItem('Holiday',bbCity.holiday.name,bbCity.holiday.note),
           isBBSaved:S.gentBBTab==='saved',
           setBBSaved:()=>this.setGentBBTab('saved'),
