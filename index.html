@@ -42,6 +42,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Pinyon+Script&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=gambarino@400&amp;display=swap">
 <style>
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; background:#050506; }
@@ -78,8 +79,33 @@
 
   /* ===== ULTRA THEME (AURA-inspired: ivory/stone, thin serif italic headings, glass panels, grain) ===== */
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
-  .theme-ultra.theme-noir{ --u-bg:#141110; --u-card:rgba(30,25,22,0.82); --u-ink:#F5F1E8; --u-muted:#cfc7ba; --u-line:rgba(201,162,74,0.22); --u-accent:#F5F1E8; }
+  .theme-ultra.theme-noir{ --u-bg:#121212; --u-card:rgba(30,30,30,0.86); --u-ink:#C4BDB0; --u-muted:#968F82; --u-line:rgba(150,143,130,0.28); --u-accent:#C4BDB0; }
   .theme-ultra, .theme-ultra .cc-scene, .theme-ultra .cc-top, .theme-ultra .cc-side{ background:var(--u-bg) !important; color:var(--u-ink) !important; font-family:'Cormorant Garamond',serif !important; }
+  .theme-ultra.theme-noir .cc-glowcard.cc-glowcard{ background:#1E1E1E !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
+  .theme-ultra.theme-noir .cc-home-hero{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
+  .theme-ultra.theme-noir .cc-glowcard[style*="box-shadow"], .theme-ultra.theme-noir .cc-home-hero[style*="box-shadow"]{ box-shadow:none !important; }
+  .theme-ultra.theme-noir [style*="linear-gradient(180deg"]{ background:#1E1E1E !important; }
+  .theme-ultra.theme-noir [style*="background:#F5F1E8"], .theme-ultra.theme-noir [style*="background: rgb(245, 241, 232)"]{ background:#1E1E1E !important; }
+  .theme-ultra.theme-noir [style*="color:#F5F1E8"], .theme-ultra.theme-noir [style*="color: rgb(245, 241, 232)"]{ color:#C4BDB0 !important; }
+  .theme-ultra.theme-noir [style*="color:#3A2A20"], .theme-ultra.theme-noir [style*="color: rgb(58, 42, 32)"]{ color:#C4BDB0 !important; }
+  .theme-ultra.theme-noir [style*="color:#8a6a5a"], .theme-ultra.theme-noir [style*="color: rgb(138, 106, 90)"]{ color:#968F82 !important; }
+  .theme-ultra.theme-noir [style*="color:#6b5a4e"], .theme-ultra.theme-noir [style*="color: rgb(107, 90, 78)"], .theme-ultra.theme-noir [style*="color:#5A473C"], .theme-ultra.theme-noir [style*="color: rgb(90, 71, 60)"], .theme-ultra.theme-noir [style*="color:#6E5B4E"], .theme-ultra.theme-noir [style*="color: rgb(110, 91, 78)"]{ color:#B7AFA2 !important; }
+  .theme-ultra.theme-noir [style*="color:#8a3030"], .theme-ultra.theme-noir [style*="color: rgb(138, 48, 48)"]{ color:#968F82 !important; }
+  .theme-ultra.theme-noir [style*="background:#5B1A1A"], .theme-ultra.theme-noir [style*="background: rgb(91, 26, 26)"]{ background:#625B50 !important; }
+  .theme-ultra.theme-noir [style*="color:#5B1A1A"], .theme-ultra.theme-noir [style*="color: rgb(91, 26, 26)"], .theme-ultra.theme-noir [style*="border:1px solid #5B1A1A"]{ color:#968F82 !important; }
+  .theme-ultra.theme-noir [style*="background:#FAF7F0"], .theme-ultra.theme-noir [style*="background: rgb(250, 247, 240)"]{ background:#181818 !important; }
+  .theme-ultra.theme-noir [style*="background:#F8F4EC"], .theme-ultra.theme-noir [style*="background: rgb(248, 244, 236)"]{ background:#181818 !important; }
+  .theme-ultra.theme-noir, .theme-ultra.theme-noir *:not([style*="JetBrains Mono"]):not(canvas){ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-noir [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
+  .theme-ultra.theme-noir [style*="Cormorant Garamond"]{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-noir h1, .theme-ultra.theme-noir h2, .theme-ultra.theme-noir h3{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-noir svg [stroke="#5B1A1A"]{ stroke:#968F82 !important; }
+  .theme-ultra.theme-noir svg [fill="#5B1A1A"]{ fill:#968F82 !important; }
+  .theme-ultra.theme-noir [style*="background:#FEFCF8"], .theme-ultra.theme-noir [style*="background: rgb(254, 252, 248)"]{ background:#272626 !important; }
+  .theme-ultra.theme-noir [style*="background: rgba(91,26,26"], .theme-ultra.theme-noir [style*="background:rgba(91,26,26"], .theme-ultra.theme-noir [style*="background: rgba(91, 26, 26"]{ background:rgba(150,143,130,0.15) !important; }
+  .theme-ultra.theme-noir [style*="rgba(91,26,26"], .theme-ultra.theme-noir [style*="rgba(91, 26, 26"]{ border-color:rgba(150,143,130,0.35) !important; }
+  .theme-ultra.theme-noir [style*="rgba(58,42,32"], .theme-ultra.theme-noir [style*="rgba(58, 42, 32"]{ border-color:rgba(150,143,130,0.3) !important; }
+  .theme-ultra.theme-noir [style*="box-shadow:0 20px 50px rgba(58,42,32"], .theme-ultra.theme-noir [style*="box-shadow:0 16px 40px rgba(58,42,32"], .theme-ultra.theme-noir [style*="box-shadow:0 50px 100px rgba(58,42,32"], .theme-ultra.theme-noir [style*="rgba(58, 42, 32, 0.18) 0px 20px 50px"], .theme-ultra.theme-noir [style*="rgba(58, 42, 32, 0.16) 0px 16px 40px"], .theme-ultra.theme-noir [style*="rgba(58, 42, 32, 0.28) 0px 50px 100px"]{ box-shadow:none !important; }
   .theme-ultra.theme-noir, .theme-ultra.theme-noir .cc-scene, .theme-ultra.theme-noir .cc-top, .theme-ultra.theme-noir .cc-side{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E") !important; background-blend-mode:overlay !important; background-color:var(--u-bg) !important; }
   .theme-ultra h1, .theme-ultra h2, .theme-ultra h3{ font-family:'Cormorant Garamond',serif !important; font-weight:300 !important; font-style:italic !important; color:var(--u-accent) !important; letter-spacing:.5px !important; }
   .theme-ultra .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:blur(14px) !important; -webkit-backdrop-filter:blur(14px) !important; }
@@ -136,8 +162,14 @@
   .theme-ultra .cc-side.cc-side, .theme-ultra .cc-top.cc-top{ background:var(--u-bg) !important; }
   .theme-ultra .cc-home-hero{ background:var(--u-card) !important; }
   .theme-ultra .cc-home-neural{ display:none !important; }
-  .theme-ultra.theme-noir .cc-home-hero{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E"), linear-gradient(160deg, #201a16 0%, #141110 100%) !important; background-blend-mode:overlay !important; border:5px double rgba(245,241,234,0.4) !important; }
-  .theme-noir .cc-home-hero h1.cc-home-greeting{ color:#f5f1ea !important; }
+  .theme-ultra.theme-noir .cc-home-hero, .theme-ultra.theme-noir .cc-power-hero.cc-power-hero, .theme-ultra.theme-noir .cc-cal-hero.cc-cal-hero{ background:
+      radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 55%),
+      repeating-linear-gradient(96deg, rgba(255,255,255,0.022) 0px, rgba(255,255,255,0.022) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 4px),
+      repeating-linear-gradient(84deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 7px),
+      repeating-linear-gradient(12deg, rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 2px, rgba(0,0,0,0) 2px, rgba(0,0,0,0) 11px),
+      repeating-linear-gradient(170deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 3px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 17px),
+      linear-gradient(168deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.16) 100%),
+      #1E1E1E !important; }
   .theme-ultra .cc-grain-overlay{ display:block !important; }
   [style*="background: rgb(27, 29, 33)"],[style*="background: rgb(22, 24, 28)"],[style*="background: rgb(23, 25, 29)"],[style*="background: rgb(20, 20, 22)"],[style*="background: rgb(16, 16, 18)"],[style*="background:rgb(27, 29, 33)"],[style*="background:rgb(22, 24, 28)"],[style*="background:rgb(23, 25, 29)"],[style*="background:rgb(20, 20, 22)"],[style*="background:rgb(16, 16, 18)"],[style*="#1b1d21"],[style*="#16181c"],[style*="#17191d"],[style*="#141416"],[style*="#101012"]{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
   .cc-power-solid .cc-glowcard{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border:none; }
@@ -862,6 +894,9 @@
       <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
       <div style="position:relative; min-height:calc(100vh - 160px); border-radius:24px; overflow:hidden; background:{{ homeHeroBg }}; display:flex; flex-direction:column; padding:36px 40px; animation:rise .5s ease both;" class="cc-home-hero">
         <canvas data-chart="homeNeural" class="cc-home-neural" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
+        <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:18px; border:3px solid rgba(196,189,176,0.4); outline:3px solid rgba(196,189,176,0.4); outline-offset:6px; border-radius:14px; pointer-events:none; z-index:1;"></div>
+        </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
             <sc-if value="{{ showChrome }}" hint-placeholder-val="{{ true }}">
@@ -876,17 +911,33 @@
         </div>
         <div style="position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; padding:20px 0;">
           <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
-            <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(201,162,74,0.55); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(201,162,74,0.18), inset 0 0 16px rgba(201,162,74,0.1);">
+            <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(196,189,176,0.5); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(150,143,130,0.16), inset 0 0 16px rgba(150,143,130,0.1);">
               <img src="favicon.png" alt="" style="width:28px; height:28px; object-fit:contain; opacity:0.9;">
             </div>
-            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#f5f1ea; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
-            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:2px;">
-              <div style="width:44px; height:1px; background:linear-gradient(90deg, transparent, #c9a24a);"></div>
-              <span style="color:#c9a24a; font-size:11px;">✦</span>
-              <div style="width:44px; height:1px; background:linear-gradient(90deg, #c9a24a, transparent);"></div>
+            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#C4BDB0; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+            <div style="margin:56px 0 12px;">
+              <svg width="360" height="26" viewBox="0 0 600 28" style="display:block;">
+                <g fill="none" stroke="#C4BDB0" stroke-width="1.5" stroke-linecap="round">
+                  <line x1="10" y1="14" x2="235" y2="14"/>
+                  <line x1="365" y1="14" x2="590" y2="14"/>
+                </g>
+                <g fill="#C4BDB0">
+                  <circle cx="10" cy="14" r="2.2"/>
+                  <circle cx="590" cy="14" r="2.2"/>
+                  <circle cx="248" cy="14" r="1.6"/>
+                  <circle cx="258" cy="14" r="1.6"/>
+                  <circle cx="342" cy="14" r="1.6"/>
+                  <circle cx="352" cy="14" r="1.6"/>
+                </g>
+                <g fill="none" stroke="#C4BDB0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M270,14 C280,4 292,4 296,10 C300,16 292,20 286,16 C282,13 284,9 288,9"/>
+                  <path d="M330,14 C320,4 308,4 304,10 C300,16 308,20 314,16 C318,13 316,9 312,9"/>
+                </g>
+                <rect x="296" y="2" width="8" height="8" fill="#C4BDB0" transform="rotate(45 300 6)"/>
+              </svg>
             </div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#cfc7ba; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(201,162,74,0.5); color:#e7c98a; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(201,162,74,0.1)', borderColor:'#c9a24a' }">{{ powerOnLabel }}</span>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#968F82; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
@@ -1115,7 +1166,7 @@
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ POWER LEVEL</div>
           <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Life Performance Index</h1>
         </div>
-        <div class="cc-glowcard" style="position:relative; border-radius:24px; background:#101012; padding:36px 32px; display:flex; flex-direction:column; align-items:center; overflow:hidden; margin-bottom:18px;">
+        <div class="cc-glowcard cc-power-hero" style="position:relative; border-radius:24px; background:#101012; padding:36px 32px; display:flex; flex-direction:column; align-items:center; overflow:hidden; margin-bottom:18px;">
           <canvas data-chart="powerHills" style="position:absolute; inset:0; width:100%; height:100%;"></canvas>
           <div style="position:relative; width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
             <canvas data-chart="powerRing" style="position:absolute; inset:0; width:150px; height:150px;"></canvas>
@@ -3100,7 +3151,7 @@
           </div>
         </div>
         <div class="cc-grid-cal" style="display:grid; grid-template-columns:1fr 340px; gap:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; display:flex; flex-direction:column;">
+          <div class="cc-glowcard cc-cal-hero" style="border-radius:20px; background:#16181c; padding:20px; display:flex; flex-direction:column;">
             <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:8px; flex:0 0 auto;">
               <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7"><div style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; letter-spacing:1px;">{{ d }}</div></sc-for>
             </div>
@@ -8733,7 +8784,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.14-20 · v11.20 noir-texture-white-text';
+const NOTIF_BUILD_VERSION = '2026.08.15-21 · v11.21 noir-design-refinements';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9858,7 +9909,7 @@ activities: this._mergeShipLog(s.activities),
       if(this._getTwoFA(r.email)){ this.setState({loginStage:'twofa', pendingAuthEmail:r.email, loginErr:'', login2FAInput:''}); }
       else { this._persistLock(0,0); this._completeLogin(r.email); }
     } else { this._registerFail(r.err); } }
-  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Light', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, provOpenAI:true, provClaude:true, provPerplexity:false, aiPrimary:'OpenAI', notifsEnabled:true, quotesEnabled:false,
+  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Ultra X', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, provOpenAI:true, provClaude:true, provPerplexity:false, aiPrimary:'OpenAI', notifsEnabled:true, quotesEnabled:false,
     coaching:{finance:true,fitness:true,checkins:true,spendingAlerts:true,motivational:true,silent:false,vacation:false,frequency:'Normal',workStart:'',workEnd:''}, mutedTopics:[], coachLog:{},
     // ===== Notification & Reminder System settings (notification-engine.js) =====
     notifFrequency:'hourly', notifFrequencyCustomMin:60, notifSound:true, notifVibration:true,
@@ -11602,23 +11653,23 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   startRingSet(cv,vals,cols,lw,gap){ const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const uPal=isNoir?['#E0C583','#C9A24A','#9C6B3E']:['#5B1A1A','#7A2626','#9C6B3E']; if(isU) cols=cols.map((c,i)=>vals.length>1?uPal[i%uPal.length]:this._ultraRingColor(c)); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2;
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const grow=0.4+0.6*Math.min(1,ts*0.0007);
       vals.forEach((v,i)=>{ const r=(w/2-lw/2-2)-i*(lw+gap); const prog=Math.min(1,v)*grow;
-        ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isNoir?'rgba(201,162,74,0.1)':isU?'rgba(41,37,36,0.1)':'rgba(255,255,255,0.06)'; ctx.lineWidth=lw; ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isNoir?'rgba(150,143,130,0.1)':isU?'rgba(41,37,36,0.1)':'rgba(255,255,255,0.06)'; ctx.lineWidth=lw; ctx.stroke();
         ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=cols[i]; ctx.lineWidth=lw; ctx.lineCap='round'; ctx.shadowColor=cols[i]; ctx.shadowBlur=14; ctx.stroke(); ctx.shadowBlur=0; });
     });
   }
-  startProgRing(cv,val,color){ if(this.state.prefs.theme==='Ultra') color=this._ultraRingColor(color); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-8; const isU=this.state.prefs.theme==='Ultra';
+  startProgRing(cv,val,color){ if(this.state.prefs.theme==='Ultra') color=this._ultraRingColor(color); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-8; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008));
-      ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isU?'rgba(41,37,36,0.12)':'rgba(255,255,255,0.07)'; ctx.lineWidth=7; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isNoir?'rgba(196,189,176,0.14)':isU?'rgba(41,37,36,0.12)':'rgba(255,255,255,0.07)'; ctx.lineWidth=7; ctx.stroke();
       ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=7; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
-      ctx.fillStyle=isU?'#292524':'#eef0f2'; ctx.font='600 15px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(Math.round(val*100)+'%',cx,cy); });
+      ctx.fillStyle=isNoir?'#C4BDB0':isU?'#292524':'#eef0f2'; ctx.font='600 15px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(Math.round(val*100)+'%',cx,cy); });
   }
 
   startArea(cv){ const {ctx,w,h}=this.prep(cv); const n=46; const base=[]; for(let i=0;i<n;i++){ base.push(0.45+0.30*Math.sin(i*0.32)+0.12*Math.sin(i*0.9)+(i/n)*0.18); }
     this.loop((ts)=>{ const ph=ts*0.0009; ctx.clearRect(0,0,w,h);
       ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; for(let gy=0;gy<4;gy++){ const y=(gy/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
       const pts=base.map((v,i)=>({x:(i/(n-1))*w, y:h-(Math.min(0.95,v+0.05*Math.sin(i*0.5+ph)))*h}));
-      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0, isNoir?'rgba(201,162,74,0.24)':isU?'rgba(122,38,38,0.22)':'rgba(255,255,255,0.32)'); g.addColorStop(1, isNoir?'rgba(201,162,74,0)':isU?'rgba(122,38,38,0)':'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fill();
-      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=isNoir?'#C9A24A':isU?'#292524':'#FFFFFF'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=isNoir?'rgba(201,162,74,0.6)':isU?'rgba(122,38,38,0.5)':'rgba(255,255,255,0.7)'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0, isNoir?'rgba(150,143,130,0.24)':isU?'rgba(122,38,38,0.22)':'rgba(255,255,255,0.32)'); g.addColorStop(1, isNoir?'rgba(150,143,130,0)':isU?'rgba(122,38,38,0)':'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fill();
+      ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=isNoir?'#C9A24A':isU?'#292524':'#FFFFFF'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=isNoir?'rgba(150,143,130,0.6)':isU?'rgba(122,38,38,0.5)':'rgba(255,255,255,0.7)'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
       const last=pts[pts.length-1]; ctx.fillStyle=isU?'#7A2626':'#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); });
   }
 
@@ -11646,12 +11697,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     });
   }
 
-  startBiz(cv,inc,exp){ const {ctx,w,h}=this.prep(cv); const n=12; const mx=Math.max(...inc,...exp,1); const gp=w/n*0.4; const bw=(w/n-gp)/2; const isU=this.state.prefs.theme==='Ultra';
+  startBiz(cv,inc,exp){ const {ctx,w,h}=this.prep(cv); const n=12; const mx=Math.max(...inc,...exp,1); const gp=w/n*0.4; const bw=(w/n-gp)/2; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
     this.loop((ts)=>{ const prog=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h);
       ctx.strokeStyle='rgba(255,255,255,0.04)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-12)+2; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
       for(let i=0;i<n;i++){ const bx=i*(w/n)+gp/2;
-        const ih=(inc[i]/mx)*(h-16)*prog; const g1=ctx.createLinearGradient(0,h-ih,0,h); g1.addColorStop(0, isU?'#292524':'#FFFFFF'); g1.addColorStop(1, isU?'rgba(41,37,36,0.35)':'rgba(255,255,255,0.25)'); ctx.fillStyle=g1; ctx.fillRect(bx, h-ih, bw, ih);
-        const eh=(exp[i]/mx)*(h-16)*prog; const g2=ctx.createLinearGradient(0,h-eh,0,h); g2.addColorStop(0,'#7A2626'); g2.addColorStop(1,'rgba(122,38,38,0.25)'); ctx.fillStyle=g2; ctx.fillRect(bx+bw+2, h-eh, bw, eh);
+        const ih=(inc[i]/mx)*(h-16)*prog; const g1=ctx.createLinearGradient(0,h-ih,0,h); g1.addColorStop(0, isNoir?'#C4BDB0':isU?'#292524':'#FFFFFF'); g1.addColorStop(1, isNoir?'rgba(196,189,176,0.3)':isU?'rgba(41,37,36,0.35)':'rgba(255,255,255,0.25)'); ctx.fillStyle=g1; ctx.fillRect(bx, h-ih, bw, ih);
+        const eh=(exp[i]/mx)*(h-16)*prog; const g2=ctx.createLinearGradient(0,h-eh,0,h); g2.addColorStop(0,isNoir?'#968F82':'#7A2626'); g2.addColorStop(1,isNoir?'rgba(150,143,130,0.25)':'rgba(122,38,38,0.25)'); ctx.fillStyle=g2; ctx.fillRect(bx+bw+2, h-eh, bw, eh);
       }
     });
   }
@@ -12013,6 +12064,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.21', date:'Aug 15, 2026 · 00:20', major:true, notes:[
+      'Folded in the Ultra Noir design work from Claude Design: refined black/taupe palette (matching the Dark Graphite #1E1E1E used on Learning Centre cards), a proper inset double-line picture-frame border on Home (floating in from the card edge instead of flush against it), a new ornamental flourish divider replacing the plain line-and-dot, and Noir now extends further — the Power and Calendar hero cards, the What\'s New modal, calendar day cells, and the Business chart all pick up the Noir palette too.',
+      'Fixed several places where the new Noir styling would have leaked into Ultra Light or every other theme — a stray default-preference change that would have made Noir the default for new accounts, an inset frame that would have shown in Light mode too, and several colour changes to Dark Psychology/Black Book that weren\'t actually theme-gated. All reverted to stay Noir-only.',
+      'Renamed Ultra\'s "Light" style to "Ultra X" — Settings → Appearance → Ultra Style now reads Ultra X / Noir.',
+    ]},
     {version:'v11.20', date:'Aug 14, 2026 · 23:10', major:true, notes:[
       'Ultra Noir refined to match the reference art more closely — the background is a warmer near-black (was a flatter near-pure-black), and a subtle paper-grain texture now overlays it app-wide plus the Home hero, instead of a flat solid colour.',
       'Headings and secondary/meta text now render in white/cream across the whole app under Noir, instead of gold — gold is reserved for the ornamental accents (crest ring, dividers, buttons, progress rings, chart lines) rather than body text.',
@@ -12853,7 +12909,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   init_business(){ const b=this.root.querySelector('[data-chart="bizChart"]'); if(b){ const {inc,exp}=this.monthly(); this.startBiz(b,inc,exp); } }
   startHGauge(cv,val,color,center){ const isU=this.state.prefs.theme==='Ultra'; if(isU) color=this._ultraRingColor(color); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0009)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isU?'rgba(41,37,36,0.12)':'rgba(255,255,255,0.07)'; ctx.lineWidth=8; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=8; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=13; ctx.stroke(); ctx.shadowBlur=0; ctx.fillStyle=isU?'#292524':'#eef0f2'; ctx.font='600 21px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(center,cx,cy); }); }
-  _ultraRingColor(color){ const c=(color||'').toLowerCase();
+  _ultraRingColor(color){ const c=(color||'').toLowerCase(); const isNoir=this.state.prefs.ultraStyle==='Noir';
+    if(isNoir){
+      if(c==='#ff5563'||c==='#ff4d5e'||c==='#f43f5e') return '#B7AFA2';
+      if(c==='#4ade80'||c==='#34d399'||c==='#22c55e') return '#968F82';
+      if(c==='#5aa0dc'||c==='#7cb0ff') return '#625B50';
+      if(c==='#e8b45a'||c==='#f0c060') return '#C4BDB0';
+      return '#968F82';
+    }
     if(c==='#ff5563'||c==='#ff4d5e'||c==='#f43f5e') return '#B3261E';
     if(c==='#4ade80'||c==='#34d399'||c==='#22c55e') return '#5B1A1A';
     if(c==='#5aa0dc'||c==='#7cb0ff') return '#7A2626';
@@ -14404,7 +14467,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const y=S.calY, m=S.calM; const monthLabel=new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'});
     const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const daysIn=new Date(y,m+1,0).getDate(); const _tz=(S.account&&S.account.timezone)||'auto'; let todayStr; try{ todayStr=new Date().toLocaleDateString('en-CA',_tz==='auto'?{}:{timeZone:_tz}); }catch(e){ todayStr=new Date().toLocaleDateString('en-CA'); }
     const calCells=[]; for(let i=0;i<startDow;i++) calCells.push({d:'',dots:[],bg:'transparent',border:'transparent',numColor:'transparent',cursor:'default',select:()=>{}});
-    for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const bg=today?(isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.16):(isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isU?'#5B1A1A':'#FFFFFF'):(hl?this.hexA(hl,0.55):(isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?'#ff5563':(hl?hl:(isU?'#52525b':'#b8b8c0')); const ring=sel?(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset'):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(()=>1), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
+    for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const isNoir=isU && S.prefs.ultraStyle==='Noir'; const bg=today?(isNoir?'rgba(196,189,176,0.18)':isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.16):(isNoir?'rgba(150,143,130,0.05)':isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isNoir?'#C4BDB0':isU?'#5B1A1A':'#FFFFFF'):(hl?this.hexA(hl,0.55):(isNoir?'rgba(150,143,130,0.18)':isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?(isNoir?'#C4BDB0':'#ff5563'):(hl?hl:(isNoir?'#968F82':isU?'#52525b':'#b8b8c0')); const ring=sel?(isNoir?'0 0 0 3px #FFFFFF inset':(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset')):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(()=>1), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
     const _hlDefs=[['Amber','#ffb020'],['Green','#2fce86'],['Cyan','#38bdf8'],['Blue','#4f7bff'],['Purple','#a855f7'],['Pink','#ff5fa2']]; const _curHl=(S.dayColors||{})[S.calSel]; const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], ring:_curHl===c[1]?'#ffffff':'rgba(255,255,255,0.15)', glow:_curHl===c[1]?'0 0 10px '+this.hexA(c[1],0.7):'none', pick:()=>{ const day=S.calSel, color=c[1]; this.mut(st=>{ const dc={...(st.dayColors||{})}; dc[day]=color; return {dayColors:dc}; }); if(this._sbOn()) window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } })); const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
     const dayEvents=S.events.filter(e=>this._eventOccursOn(e,S.calSel)).sort((a,b)=>a.time.localeCompare(b.time)).map(e=>{ const idx=S.events.indexOf(e); const rl=this._repeatLabel(e.repeat); return {title:e.title,time:e.time,repeatLabel:rl,removeTitle:rl?'Remove this repeating series':'Remove event',remove:()=>{ this.mut(s=>({events:s.events.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('events',e.id); }}; });
     const evRepeatDays=S.evRepeatDays||[]; const _dowAll=['MON','TUE','WED','THU','FRI','SAT','SUN']; const evDowChips=_dowAll.map(code=>{ const on=evRepeatDays.indexOf(code)!==-1; return { l:code[0], c:on?'#0a0a0b':'#9a9aa2', bg:on?'#FFFFFF':'rgba(255,255,255,0.05)', bd:on?'#FFFFFF':'rgba(255,255,255,0.14)', toggle:()=>this.setState({evRepeatDays:on?evRepeatDays.filter(c=>c!==code):[...evRepeatDays,code]}) }; });
@@ -14712,10 +14775,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
       isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir',
-      ultraStyleChips:this._chips('ultraStyle',['Light','Noir']),
+      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir']),
       ultraBriefBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#e7c98a':'#F4F4F5',
-      ultraBriefBtnBg:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(201,162,74,0.12)':'rgba(255,255,255,0.1)',
-      ultraBriefBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(201,162,74,0.5)':'rgba(255,255,255,0.35)',
+      ultraBriefBtnBg:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.12)':'rgba(255,255,255,0.1)',
+      ultraBriefBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.5)':'rgba(255,255,255,0.35)',
       ultraSecBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#d9c08a':'#cfcfd4',
       ultraSecBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(201,162,74,0.35)':'rgba(255,255,255,0.14)',
       // Reusable Ultra-only "terminal card" wrapper for active learning screens (Practice,
@@ -14786,7 +14849,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.20 — Aug 14, 2026',
+      appVersion:'v11.21 — Aug 15, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -14803,8 +14866,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
-      wnBackdrop:S.prefs.theme==='Ultra'?'rgba(58,42,32,0.35)':'rgba(0,0,0,0.7)',
-      wnModalBg:S.prefs.theme==='Ultra'?'#F5F1E8':'#101012',
+      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
+      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':'#F5F1E8'):'#101012',
       toggleWhatsNewSigned:()=>this.setState(s=>({whatsNewSigned:!s.whatsNewSigned})),
       whatsNewCheckBd:S.whatsNewSigned?'#FFFFFF':'rgba(255,255,255,0.3)', whatsNewCheckBg:S.whatsNewSigned?'#FFFFFF':'transparent', whatsNewCheckMark:S.whatsNewSigned?'\u2713':'',
       whatsNewBtnCursor:S.whatsNewSigned?'pointer':'not-allowed', whatsNewBtnOpacity:S.whatsNewSigned?1:0.4, whatsNewBtnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)',
