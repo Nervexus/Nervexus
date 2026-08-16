@@ -907,7 +907,7 @@
           <div style="position:absolute; inset:18px; border:3px solid rgba(196,189,176,0.4); outline:3px solid rgba(196,189,176,0.4); outline-offset:6px; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute; inset:18px; border:3px solid rgba(91,26,26,0.55); border-radius:14px; pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -8822,7 +8822,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.16-28 · v11.28 missions-mobile-gender-fixes';
+const NOTIF_BUILD_VERSION = '2026.08.16-29 · v11.29 ultra-x-frame-color-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12108,6 +12108,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.29', date:'Aug 16, 2026 · 13:05', major:true, notes:[
+      'Fixed Ultra X\'s Home frame — it was using the same maroon at 55% opacity, which washed it out to a lighter pink-red instead of matching the solid #5B1A1A used everywhere else in Ultra X (buttons, dividers). Now solid, matching exactly.',
+    ]},
     {version:'v11.28', date:'Aug 16, 2026 · 12:15', major:true, notes:[
       'Request Account: removed the "Other" gender option, leaving Male/Female.',
       'Mobile: the Progress Overview stat strip on every Learning Centre subject (accuracy, XP, streak, questions, hours, tests) was crammed into one unreadable row on narrow screens — now wraps into proper rows instead.',
@@ -14938,7 +14941,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.28 — Aug 16, 2026',
+      appVersion:'v11.29 — Aug 16, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
