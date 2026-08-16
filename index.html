@@ -8787,7 +8787,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.16-26 · v11.26 ultra-x-inset-border';
+const NOTIF_BUILD_VERSION = '2026.08.16-27 · v11.27 account-request-rls-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11246,7 +11246,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const {data,error}=await window.SB.signIn(email,pass);
     if(error){
       this.setState({authBusy:false});
-      const {data:reqs}=await window.SB.list('account_requests',{match:{email}});
+      const {data:reqs}=await window.SB.checkAccountRequestStatus(email);
       const approved=(reqs||[]).some(r=>r.status==='approved');
       if(approved){ this.setState({loginStage:'setpw', pendingAuthEmail:email, loginErr:'', signupErr:''}); return; }
       this._registerFail(error.message||'Incorrect email or password.'); return;
@@ -11262,7 +11262,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(pass!==pass2){ this.setState({signupErr:'Passwords do not match.'}); return; }
     this.setState({signupErr:'', authBusy:true});
     let isMinor=false;
-    try{ const {data:reqs}=await window.SB.list('account_requests',{match:{email}});
+    try{ const {data:reqs}=await window.SB.checkAccountRequestStatus(email);
       const req=(reqs||[]).find(r=>r.status==='approved')||(reqs||[])[0];
       const age=req&&req.age!=null?Number(req.age):null;
       isMinor=(age!=null && !isNaN(age) && age<18);
@@ -12067,6 +12067,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.27', date:'Aug 16, 2026 · 11:00', major:true, notes:[
+      'Fixed "Request Account" failing with a row-level-security error for everyone trying to sign up — the account_requests table had no policy permitting the anonymous insert the request form needs. Requires a one-time SQL migration (sent separately) alongside this app update.',
+      'The two places that check a pending request\'s status/age before login now go through a narrow server-side lookup instead of reading the table directly, so tightening read access to the owner only doesn\'t expose every requester\'s name/income/purpose to anyone with the app\'s public key.',
+    ]},
     {version:'v11.26', date:'Aug 16, 2026 · 10:25', major:true, notes:[
       'Ultra X\'s Home border was sitting flush on the card edge — pulled it inward into a proper inset frame (18px in from the edge, same technique as Noir\'s frame) instead of a literal CSS border on the card boundary.',
     ]},
@@ -14867,7 +14871,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.26 — Aug 16, 2026',
+      appVersion:'v11.27 — Aug 16, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),

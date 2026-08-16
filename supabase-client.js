@@ -41,6 +41,12 @@ window.SB = {
   async remove(table, id){ return window.sb.from(table).delete().eq('id', id); },
   async upsert(table, row, conflict){ return window.sb.from(table).upsert(row, conflict?{onConflict:conflict}:undefined).select(); },
 
+  // Pre-login lookup for the requester's own account_requests status/age — the
+  // table itself is locked to owner-only SELECT via RLS, so this goes through a
+  // SECURITY DEFINER RPC that only ever returns {status, age}, never the other
+  // request fields (name, income, purpose, etc).
+  async checkAccountRequestStatus(email){ return window.sb.rpc('check_account_request_status', { p_email: email }); },
+
   subscribe(table, userId, onChange){
     return window.sb.channel('rt:'+table+':'+userId)
       .on('postgres_changes', { event:'*', schema:'public', table, filter:'user_id=eq.'+userId }, onChange)
