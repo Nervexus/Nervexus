@@ -8785,7 +8785,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.16-24 · v11.24 ultra-x-home-border';
+const NOTIF_BUILD_VERSION = '2026.08.16-25 · v11.25 add-maison-elysee-style';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12065,6 +12065,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.25', date:'Aug 16, 2026 · 10:05', major:true, notes:[
+      'Added a third Ultra style — "Maison Élysée" — to Settings → Appearance → Ultra Style. It currently renders identically to Ultra X (its own look is coming in a later update); the dropdown and preference plumbing are in place so it can be styled independently going forward.',
+    ]},
     {version:'v11.24', date:'Aug 16, 2026 · 09:35', major:true, notes:[
       'Ultra X\'s Home card was missing its maroon border — added a solid 4px #5B1A1A border around the hero card, matching the reference (Noir\'s card keeps its own separate frame treatment; this is Ultra X only).',
     ]},
@@ -14784,8 +14787,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       appearToggles:[ this._tog('animations','Animations','Cinematic transitions & motion'), this._tog('particles','Particle effects','AI orb & ambient particles'), this._tog('glass','Glassmorphism','Panel blur & transparency'), this._tog('reduceMotion','Reduce motion','Minimize non-essential movement') ],
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
-      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir',
-      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir']),
+      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir',
+      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée']),
       ultraBriefBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#e7c98a':'#F4F4F5',
       ultraBriefBtnBg:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.12)':'rgba(255,255,255,0.1)',
       ultraBriefBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.5)':'rgba(255,255,255,0.35)',
@@ -14859,7 +14862,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.24 — Aug 16, 2026',
+      appVersion:'v11.25 — Aug 16, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -14924,7 +14927,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ]; })(),
       shellDisplay: S.loggedIn?'grid':'block', asideDisplay:this._isPrivatePageOpen()?'none':(typeof window!=='undefined' && window.innerWidth<=900)?'none':'flex', shellCols: (typeof window!=='undefined' && window.innerWidth<=900)?'1fr':((S.focusMode||this._isPrivatePageOpen())?'0px 1fr':'84px 1fr'),
       themeFilter:(()=>{ const t=S.prefs.theme; return t==='Ember'?'hue-rotate(83deg) saturate(1.1) brightness(0.95)':t==='Onyx'?'saturate(0) brightness(1.08)':t==='Ghost'?'saturate(0) contrast(1.08)':t==='Snow'?'hue-rotate(218deg) saturate(1.05)':'none'; })(),
-      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':'')):'', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
+      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':'')):'', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
       showBanGate: S.loggedIn && !!(S.perfStatus && S.perfStatus.banned),
       showSuspendedGate: S.loggedIn && !!(S.profile && S.profile.account_status==='suspended' && S.profile.role!=='owner'),
       notifOpen:S.notifOpen, sidebarX:S.notifOpen?'0':'110%',
