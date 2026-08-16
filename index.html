@@ -940,10 +940,33 @@
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
-            <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
-            <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
+            <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(91,26,26,0.4); background:rgba(91,26,26,0.03); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(91,26,26,0.12), inset 0 0 16px rgba(91,26,26,0.08);">
+              <img src="favicon.png" alt="" style="width:28px; height:28px; object-fit:contain; opacity:0.9;">
+            </div>
+            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#5B1A1A; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+            <div style="margin:56px 0 12px;">
+              <svg width="360" height="26" viewBox="0 0 600 28" style="display:block;">
+                <g fill="none" stroke="#5B1A1A" stroke-width="1.5" stroke-linecap="round">
+                  <line x1="10" y1="14" x2="235" y2="14"/>
+                  <line x1="365" y1="14" x2="590" y2="14"/>
+                </g>
+                <g fill="#5B1A1A">
+                  <circle cx="10" cy="14" r="2.2"/>
+                  <circle cx="590" cy="14" r="2.2"/>
+                  <circle cx="248" cy="14" r="1.6"/>
+                  <circle cx="258" cy="14" r="1.6"/>
+                  <circle cx="342" cy="14" r="1.6"/>
+                  <circle cx="352" cy="14" r="1.6"/>
+                </g>
+                <g fill="none" stroke="#5B1A1A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M270,14 C280,4 292,4 296,10 C300,16 292,20 286,16 C282,13 284,9 288,9"/>
+                  <path d="M330,14 C320,4 308,4 304,10 C300,16 308,20 314,16 C318,13 316,9 312,9"/>
+                </g>
+                <rect x="296" y="2" width="8" height="8" fill="#5B1A1A" transform="rotate(45 300 6)"/>
+              </svg>
+            </div>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#8a6a5a; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(91,26,26,0.4); color:#5B1A1A; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(91,26,26,0.08)', borderColor:'#5B1A1A' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:96vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
@@ -8784,7 +8807,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.15-21 · v11.21 noir-design-refinements';
+const NOTIF_BUILD_VERSION = '2026.08.15-22 · v11.22 ultra-x-home-parity';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12064,6 +12087,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.22', date:'Aug 15, 2026 · 01:10', major:true, notes:[
+      'Ultra X\'s (formerly "Light") Home screen was still on the plain pre-redesign treatment — just a heading, a thin line and a button — while Noir had already gained a crest ring and an ornamental flourish divider. Brought Ultra X up to the same level of polish, in its own established maroon accent, so both Ultra styles now match in level of detail.',
+    ]},
     {version:'v11.21', date:'Aug 15, 2026 · 00:20', major:true, notes:[
       'Folded in the Ultra Noir design work from Claude Design: refined black/taupe palette (matching the Dark Graphite #1E1E1E used on Learning Centre cards), a proper inset double-line picture-frame border on Home (floating in from the card edge instead of flush against it), a new ornamental flourish divider replacing the plain line-and-dot, and Noir now extends further — the Power and Calendar hero cards, the What\'s New modal, calendar day cells, and the Business chart all pick up the Noir palette too.',
       'Fixed several places where the new Noir styling would have leaked into Ultra Light or every other theme — a stray default-preference change that would have made Noir the default for new accounts, an inset frame that would have shown in Light mode too, and several colour changes to Dark Psychology/Black Book that weren\'t actually theme-gated. All reverted to stay Noir-only.',
@@ -14849,7 +14875,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.21 — Aug 15, 2026',
+      appVersion:'v11.22 — Aug 15, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
