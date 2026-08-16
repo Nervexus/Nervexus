@@ -161,7 +161,6 @@
   .theme-ultra .cc-side, .theme-ultra .cc-top{ border-color:var(--u-line) !important; }
   .theme-ultra .cc-side.cc-side, .theme-ultra .cc-top.cc-top{ background:var(--u-bg) !important; }
   .theme-ultra .cc-home-hero{ background:var(--u-card) !important; }
-  .theme-ultra:not(.theme-noir) .cc-home-hero{ border:4px solid #5B1A1A !important; }
   .theme-ultra .cc-home-neural{ display:none !important; }
   .theme-ultra.theme-noir .cc-home-hero, .theme-ultra.theme-noir .cc-power-hero.cc-power-hero, .theme-ultra.theme-noir .cc-cal-hero.cc-cal-hero{ background:
       radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 55%),
@@ -897,6 +896,9 @@
         <canvas data-chart="homeNeural" class="cc-home-neural" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
         <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute; inset:18px; border:3px solid rgba(196,189,176,0.4); outline:3px solid rgba(196,189,176,0.4); outline-offset:6px; border-radius:14px; pointer-events:none; z-index:1;"></div>
+        </sc-if>
+        <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:18px; border:3px solid rgba(91,26,26,0.55); border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -8785,7 +8787,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.16-25 · v11.25 add-maison-elysee-style';
+const NOTIF_BUILD_VERSION = '2026.08.16-26 · v11.26 ultra-x-inset-border';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12065,6 +12067,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.26', date:'Aug 16, 2026 · 10:25', major:true, notes:[
+      'Ultra X\'s Home border was sitting flush on the card edge — pulled it inward into a proper inset frame (18px in from the edge, same technique as Noir\'s frame) instead of a literal CSS border on the card boundary.',
+    ]},
     {version:'v11.25', date:'Aug 16, 2026 · 10:05', major:true, notes:[
       'Added a third Ultra style — "Maison Élysée" — to Settings → Appearance → Ultra Style. It currently renders identically to Ultra X (its own look is coming in a later update); the dropdown and preference plumbing are in place so it can be styled independently going forward.',
     ]},
@@ -14862,7 +14867,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.25 — Aug 16, 2026',
+      appVersion:'v11.26 — Aug 16, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
