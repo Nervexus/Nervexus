@@ -243,6 +243,15 @@
      answer options that get crushed into an unreadable narrow strip. Single column on
      mobile always, regardless of answer length; desktop keeps its multi-column layout. */
   .cc-mc-grid { grid-template-columns: 1fr !important; }
+  /* Every subject's Learning Centre hub has a Progress Overview stat strip
+     (accuracy, XP today, streak, questions, hours, 7d/30d tests) laid out as a
+     single flex row of 6-7 equal-width segments with 1px divider bars between
+     them — fine on desktop, but on a phone it crams every stat and its label
+     into a sliver, overlapping and unreadable. Wrap it into rows of ~3 and drop
+     the now-mid-row dividers instead. */
+  [style*="padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;"]{ flex-wrap:wrap !important; gap:12px 6px !important; padding:14px 10px !important; }
+  [style*="padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;"] > div[style*="flex:1; text-align:center;"]{ flex:1 1 28% !important; min-width:78px !important; }
+  [style*="padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;"] > div[style*="width:1px; height:30px"]{ display:none !important; }
   .cc-subtabs-row{ flex-direction:column !important; }
   .cc-subtabs-side{ flex:none !important; width:100% !important; flex-direction:row !important; overflow-x:auto !important; gap:8px !important; padding:8px !important; scroll-snap-type:x proximity !important; scroll-padding-inline:8px !important; }
   .cc-subtabs-side > div{ white-space:nowrap; flex:0 0 auto; scroll-snap-align:start; }
@@ -1031,6 +1040,32 @@
               <input value="{{ missionInput }}" onInput="{{ setMissionInput }}" onKeyDown="{{ addMissionKey }}" placeholder="Add a mission and press Enter…" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
               <span onClick="{{ toggleMissionRecurring }}" title="Toggle mission type" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ missionTypeC }}; border:1px solid {{ missionTypeBd }}; background:{{ missionTypeBg }}; border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;">{{ missionTypeLabel }}</span>
             </div>
+            <div style="margin-top:10px;">
+              <span onClick="{{ toggleMissionGen }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">✨ Suggest tasks</span>
+            </div>
+            <sc-if value="{{ missGenOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); padding:14px;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#7c7c84; margin-bottom:10px;">WHAT KIND OF TASKS?</div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <sc-for list="{{ missGenCats }}" as="c" hint-placeholder-count="5">
+                    <span onClick="{{ c.pick }}" style="font-size:12px; padding:8px 13px; border-radius:9px; cursor:pointer; color:{{ c.c }}; border:1px solid {{ c.bd }}; background:{{ c.bg }};">{{ c.label }}</span>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ missGenLoading }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#8a8a92; margin-top:12px;">Thinking…</div></sc-if>
+                <sc-if value="{{ missGenErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff6b76; margin-top:12px;">⚠ {{ missGenErr }}</div></sc-if>
+                <sc-if value="{{ missGenHasResult }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                    <sc-for list="{{ missGenResultList }}" as="r" hint-placeholder-count="4">
+                      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 11px; border-radius:9px; background:rgba(255,255,255,0.04);">
+                        <span style="font-size:13px; color:#eef0f2; flex:1;">{{ r.label }}</span>
+                        <span onClick="{{ r.add }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; cursor:pointer; white-space:nowrap;">+ Add</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <span onClick="{{ addAllMissionGen }}" style="display:inline-block; margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#9a9aa2; cursor:pointer;" style-hover="{ color:'#F4F4F5' }">Add all</span>
+                </sc-if>
+              </div>
+            </sc-if>
             </sc-if>
 
             <sc-if value="{{ missViewHistory }}" hint-placeholder-val="{{ false }}">
@@ -8787,7 +8822,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.16-27 · v11.27 account-request-rls-fix';
+const NOTIF_BUILD_VERSION = '2026.08.16-28 · v11.28 missions-mobile-gender-fixes';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -8850,6 +8885,7 @@ class Component extends DCLogic {
       perfHolStart:'', perfHolEnd:'', perfHolErr:'', perfAppealDraft:'',
       perfTeamProfiles:[], perfTeamStatusRaw:[], perfTeamLogsRaw:[],
       missionNotes:{}, missionInput:'', missionRecurring:false, missionView:'active', xpFx:[],
+      missGenOpen:false, missGenCat:null, missGenLoading:false, missGenErr:'', missGenResult:null,
       move: s.move || { streak:13, last:yestC, longest:21 },
       lastRollover: s.lastRollover || todayC,
       workouts: s.workouts || [
@@ -9915,7 +9951,7 @@ activities: this._mergeShipLog(s.activities),
   _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Ultra X', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, provOpenAI:true, provClaude:true, provPerplexity:false, aiPrimary:'OpenAI', notifsEnabled:true, quotesEnabled:false,
     coaching:{finance:true,fitness:true,checkins:true,spendingAlerts:true,motivational:true,silent:false,vacation:false,frequency:'Normal',workStart:'',workEnd:''}, mutedTopics:[], coachLog:{},
     // ===== Notification & Reminder System settings (notification-engine.js) =====
-    notifFrequency:'hourly', notifFrequencyCustomMin:60, notifSound:true, notifVibration:true,
+    notifFrequency:'150min', notifFrequencyCustomMin:60, notifSound:true, notifVibration:true,
     notifCriticalBypassSilent:true, notifWeekendBehavior:'normal',
     notifTimezone:(()=>{ try{ return Intl.DateTimeFormat().resolvedOptions().timeZone; }catch(e){ return 'UTC'; } })(),
     notifQuietHours:{enabled:false, start:22, end:7},
@@ -11489,22 +11525,27 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(this._sbOn()){
       try{ const {data}=await window.SB.list('missions',{match:{user_id:this.state.authUserId, day_key:today}}); existingDailies=(data||[]).filter(r=>!r.recurring); }catch(e){ existingDailies=null; }
     }
+    let staleIds=[];
     this.setState(s=>{
       let missions=(s.missions||[]).map(m=>resetIds.includes(m.id)?{...m,streak:0}:m);
+      const stale=missions.filter(m=>!m.recurring && m.dayKey!==today);
+      staleIds=stale.map(m=>m.id);
       missions=missions.filter(m=>m.recurring || m.dayKey===today);
-      if(!missions.some(m=>!m.recurring && m.dayKey===today)){
-        if(existingDailies && existingDailies.length){
-          missions=missions.concat(existingDailies.map(r=>({id:r.id,name:r.name,recurring:false,dayKey:r.day_key||today,streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||''})));
-        } else {
-          const fresh=this.generateDailies(today);
-          missions=missions.concat(fresh);
-          if(this._sbOn()) fresh.forEach(m=>window.SB.insert('missions',{id:m.id,user_id:this.state.authUserId,name:m.name,recurring:false,day_key:today,streak:0,longest_streak:0,total_completions:0}).catch(()=>{}));
-        }
+      if(!missions.some(m=>!m.recurring && m.dayKey===today) && existingDailies && existingDailies.length){
+        missions=missions.concat(existingDailies.map(r=>({id:r.id,name:r.name,recurring:false,dayKey:r.day_key||today,streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||''})));
       }
       const health=s.health?{...s.health, diet:(s.health.diet||[]).map(d=>d.locked?d:{...d,checked:false})}:s.health;
       return { missions, lastRollover:today, health };
     }, ()=>this.save());
-    if(this._sbOn()) resetIds.forEach(id=>window.SB.update('missions',id,{streak:0}).catch(()=>{}));
+    if(this._sbOn()){
+      resetIds.forEach(id=>window.SB.update('missions',id,{streak:0}).catch(()=>{}));
+      // Older versions auto-generated 4 fresh daily missions every day and never
+      // cleaned up the prior day's rows once they aged out — they just piled up in
+      // the missions table indefinitely (inflating server-side counts, e.g. the
+      // reminder email's task total). Auto-generation is gone; this clears out
+      // whatever already accumulated so existing accounts self-heal on next load.
+      staleIds.forEach(id=>window.SB.remove('missions',id).catch(()=>{}));
+    }
   }
   completeMission(id){ const today=this._todayStr(), yest=this._yestStr(), time=this._nowTime(); const m=(this.state.missions||[]).find(x=>x.id===id); if(!m || m.lastCompleted===today) return; const rate=this._xpRate(); const newStreak=(m.lastCompleted===yest)?(m.streak||0)+1:1; const newLongest=Math.max(m.longest||0,newStreak); const newTotal=(m.total||0)+1; const note=((this.state.missionNotes||{})[id]||'').trim(); const histId=this._uuid();
     this.mut(s=>{ const missions=s.missions.map(x=>x.id===id?{...x,lastCompleted:today,streak:newStreak,longest:newLongest,total:newTotal}:x); const hist=[{id:histId,missionId:id,name:m.name,date:today,time,notes:note,xp:rate,streak:newStreak,recurring:!!m.recurring}, ...(s.missionHistory||[])].slice(0,200); const notes={...(s.missionNotes||{})}; delete notes[id]; return { missions, missionHistory:hist, missionXP:(s.missionXP||0)+rate, missionNotes:notes }; });
@@ -12067,6 +12108,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.28', date:'Aug 16, 2026 · 12:15', major:true, notes:[
+      'Request Account: removed the "Other" gender option, leaving Male/Female.',
+      'Mobile: the Progress Overview stat strip on every Learning Centre subject (accuracy, XP, streak, questions, hours, tests) was crammed into one unreadable row on narrow screens — now wraps into proper rows instead.',
+      'Daily Missions no longer silently auto-generates 4 generic tasks every day — that ran quietly in the background and, since old days\' tasks were never cleaned up server-side, is why the reminder email could say "36 tasks left" while the app itself only showed 4. That cleanup now runs automatically going forward. In its place: a "✨ Suggest tasks" button that asks which area you want help with (Health / Knowledge / House / Financial / Mentality improvement) and generates real suggestions you choose to add — nothing gets added without you tapping it.',
+      'Added a 2.5-hour option to the notification frequency picker (Settings → Notifications). Existing accounts keep whatever frequency they\'d already picked — open Settings and select "2.5 hours" to switch.',
+    ]},
     {version:'v11.27', date:'Aug 16, 2026 · 11:00', major:true, notes:[
       'Fixed "Request Account" failing with a row-level-security error for everyone trying to sign up — the account_requests table had no policy permitting the anonymous insert the request form needs. Requires a one-time SQL migration (sent separately) alongside this app update.',
       'The two places that check a pending request\'s status/age before login now go through a narrow server-side lookup instead of reading the table directly, so tightening read access to the owner only doesn\'t expose every requester\'s name/income/purpose to anyone with the app\'s public key.',
@@ -13341,6 +13388,26 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // Shared by both the rule-based fallback and the real AI suggestions below, so accepting
   // either kind of suggestion creates an identical, real, synced mission.
   _addMissionFromRec(label){ const today=this._todayStr(); const id=this._uuid(); this.mut(s=>({missions:[...(s.missions||[]),{id,name:label,recurring:false,dayKey:today,streak:0,longest:0,total:0,lastCompleted:''}]})); this.showToast('system','Mission added',label); if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name:label,recurring:false,day_key:today,streak:0,longest_streak:0,total_completions:0}); }
+  // User-initiated task suggestions, replacing the old silent daily auto-add.
+  // Asks which of 5 areas to focus on, then generates real, specific suggestions
+  // for that one category via AI — nothing gets added until the user taps it.
+  toggleMissionGen(){ this.setState(s=>({missGenOpen:!s.missGenOpen, missGenCat:null, missGenErr:'', missGenResult:null})); }
+  pickMissionGenCat(cat){ this.setState({missGenCat:cat}); this.generateMissionSuggestions(cat); }
+  async generateMissionSuggestions(cat){
+    if(!window.claude){ this.setState({missGenLoading:false, missGenErr:'AI unavailable in this environment'}); return; }
+    this.setState({missGenLoading:true, missGenErr:'', missGenResult:null});
+    const sys='You suggest small, concrete, achievable daily tasks for someone’s personal to-do list, in the one category they picked. Return ONLY valid minified JSON, no markdown fences, no prose: an array of exactly 4 short task strings, e.g. ["Task one","Task two","Task three","Task four"]. Each under 60 characters, specific and actionable — never vague like "be healthier" or "improve finances".';
+    const prompt='Category: '+cat+'. Suggest 4 daily tasks for this category.';
+    try{
+      const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:300});
+      const arr=this._extractJSONArray(raw);
+      const clean=(arr||[]).filter(x=>x&&typeof x==='string').map(x=>x.trim().slice(0,80)).filter(Boolean).slice(0,4);
+      if(!clean.length){ this.setState({missGenLoading:false, missGenErr:'Could not parse suggestions — try again.'}); return; }
+      this.setState({missGenLoading:false, missGenErr:'', missGenResult:clean});
+    }catch(e){ this.setState({missGenLoading:false, missGenErr:(e&&e.message)||'Could not generate suggestions'}); }
+  }
+  addGeneratedMission(idx){ const label=(this.state.missGenResult||[])[idx]; if(!label) return; this._addMissionFromRec(label); this.setState(s=>({missGenResult:(s.missGenResult||[]).filter((_,i)=>i!==idx)})); }
+  addAllGeneratedMissions(){ (this.state.missGenResult||[]).forEach(label=>this._addMissionFromRec(label)); this.setState({missGenOpen:false, missGenResult:null, missGenCat:null}); }
   // Rule-based fallback -- used before the user asks for real AI suggestions, and if the AI
   // call fails or isn't available. Deliberately simple/fixed, unlike generateAiTasks() below.
   recommend(){ const c=Date.now()-7*86400000; const cats={}; this.state.activities.forEach(a=>{ if(a.ts>=c) cats[a.cat]=(cats[a.cat]||0)+1; });
@@ -14871,7 +14938,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.27 — Aug 16, 2026',
+      appVersion:'v11.28 — Aug 16, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -14991,7 +15058,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       })(),
       tplTitleHint:'{{title}}', tplMessageHint:'{{message}}', tplCountHint:'{{count}}',
       ...this._safe(()=>{
-        const FREQ=[['15min','15 min'],['30min','30 min'],['hourly','Hourly (default)'],['2hour','2 hours'],['4hour','4 hours'],['daily','Daily'],['custom','Custom']];
+        const FREQ=[['15min','15 min'],['30min','30 min'],['hourly','Hourly'],['150min','2.5 hours'],['2hour','2 hours'],['4hour','4 hours'],['daily','Daily'],['custom','Custom']];
         const CATS=window.NotificationManager?window.NotificationManager.CATEGORIES:{};
         const catKeys=Object.keys(CATS).length?Object.keys(CATS):['mission','finance','fitness','health','checklist','calendar','weather','travel','news','ai_assistant','security','system'];
         const nc=S.prefs.notifCategories||{};
@@ -16244,7 +16311,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       reqName:S.reqName, reqEmail:S.reqEmail, reqPass:S.reqPass, reqAge:S.reqAge, reqNat:S.reqNat, reqIncome:S.reqIncome, reqPurpose:S.reqPurpose, reqGender:S.reqGender, reqErr:S.reqErr,
       setReqName:(e)=>this.setState({reqName:e.target.value,reqErr:''}), setReqEmail:(e)=>this.setState({reqEmail:e.target.value,reqErr:''}), setReqPass:(e)=>this.setState({reqPass:e.target.value,reqErr:''}),
       setReqAge:(e)=>this.setState({reqAge:e.target.value}), setReqNat:(e)=>this.setState({reqNat:e.target.value}), setReqIncome:(e)=>this.setState({reqIncome:e.target.value}), setReqPurpose:(e)=>this.setState({reqPurpose:e.target.value}),
-      reqGenderChips:['Male','Female','Other'].map(g=>({ label:g, set:()=>this.setState({reqGender:g}), c:S.reqGender===g?'#0c0c0d':'#9a9aa2', bg:S.reqGender===g?'rgba(255,255,255,0.7)':'rgba(255,255,255,0.04)', bd:S.reqGender===g?'rgba(255,255,255,0.9)':'rgba(255,255,255,0.12)' })),
+      reqGenderChips:['Male','Female'].map(g=>({ label:g, set:()=>this.setState({reqGender:g}), c:S.reqGender===g?'#0c0c0d':'#9a9aa2', bg:S.reqGender===g?'rgba(255,255,255,0.7)':'rgba(255,255,255,0.04)', bd:S.reqGender===g?'rgba(255,255,255,0.9)':'rgba(255,255,255,0.12)' })),
       submitRequest:()=>this.submitRequest(),
       sessName:(()=>{ if(this._isOwner()) return S.account.name; const u=(S.users||[]).find(x=>(x.email||'').toLowerCase()===this._currentEmail()); return u?u.name:S.account.name; })(),
       sessRole:(this._role()||'Owner').toUpperCase(),
@@ -16288,6 +16355,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       missHistoryC:S.missionView==='history'?'#F4F4F5':'#8a8a92', missHistoryBg:S.missionView==='history'?'rgba(255,255,255,0.16)':'transparent', missHistoryBd:S.missionView==='history'?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)',
       noHistory:(S.missionHistory||[]).length===0,
       missionInput:S.missionInput, setMissionInput:(e)=>this.setState({missionInput:e.target.value}),
+      missGenOpen:!!S.missGenOpen, toggleMissionGen:()=>this.toggleMissionGen(),
+      missGenCats:['Health improvement','Knowledge improvement','House improvement','Financial improvement','Mentality improvement'].map(c=>({ label:c, pick:()=>this.pickMissionGenCat(c), c:S.missGenCat===c?'#0c0c0d':'#c8c8ce', bg:S.missGenCat===c?'#F4F4F5':'transparent', bd:S.missGenCat===c?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.14)' })),
+      missGenLoading:!!S.missGenLoading, missGenErr:S.missGenErr||'',
+      missGenHasResult:!!(S.missGenResult && S.missGenResult.length),
+      missGenResultList:(S.missGenResult||[]).map((r,i)=>({label:r, add:()=>this.addGeneratedMission(i)})),
+      addAllMissionGen:()=>this.addAllGeneratedMissions(),
       addMission:()=>this.addMission(), addMissionKey:enterKey(()=>this.addMission()),
       missionRecurring:S.missionRecurring, toggleMissionRecurring:()=>this.setState(s=>({missionRecurring:!s.missionRecurring})),
       missionTypeLabel:S.missionRecurring?'Recurring':'One-time', missionTypeC:S.missionRecurring?'#F4F4F5':'#9a9aa2', missionTypeBg:S.missionRecurring?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', missionTypeBd:S.missionRecurring?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.12)',
