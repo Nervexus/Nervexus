@@ -403,27 +403,27 @@
           <h1 style="font-style:italic; font-weight:500; font-size:30px; color:{{ perfUInk }}; text-align:center; margin:0 0 6px;">Performance Terminal</h1>
           <div style="font-size:13px; color:{{ perfUMuted }}; text-align:center; letter-spacing:0.5px; margin-bottom:24px;">{{ perfTodayLabel }}</div>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What was completed today?</div>
-          <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Summarise today…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
+          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What's the one thing today that actually mattered?</div>
+          <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">How long did it take?</div>
-          <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 3 hours" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; text-align:center; box-sizing:border-box;">
+          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">Focused hours logged today</div>
+          <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; text-align:center; box-sizing:border-box;">
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What was the benefit of this task?</div>
-          <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Why it mattered…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
+          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What did you avoid, delay, or half-ass today?</div>
+          <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest — this is the one that matters…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What have you learned from this?</div>
-          <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="A lesson or takeaway…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
+          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">{{ perfYesterdayLabel }}</div>
+          <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
 
           <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:18px;">
             <span style="font-size:15px; color:{{ perfUAccent }}; font-style:italic;">Trained today</span>
             <div onClick="{{ togglePerfTrained }}" style="width:40px; height:22px; border-radius:12px; background:{{ perfTrainedBgU }}; position:relative; cursor:pointer;"><div style="width:18px; height:18px; border-radius:50%; background:#FBF8F1; position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
           </div>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What will you improve tomorrow?</div>
-          <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="One or two things to do better…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
+          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">Tomorrow's one priority</div>
+          <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:10px; font-style:italic;">Rate today</div>
+          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:10px; font-style:italic;">Discipline today</div>
           <div style="display:flex; gap:8px; justify-content:center; margin-bottom:20px;">
             <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:24px; color:{{ st.cU }};">★</span></sc-for>
           </div>
@@ -445,27 +445,27 @@
         <h1 style="font-size:20px; font-weight:700; margin-bottom:4px;">Performance Terminal</h1>
         <div style="font-size:11px; color:#6f6f78; margin-bottom:16px;">{{ perfTodayLabel }} · today’s check-in is required</div>
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What was completed today?</div>
-        <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Summarise today…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
+        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What's the one thing today that actually mattered?</div>
+        <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">How long did it take?</div>
-        <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 3 hours" style="width:100%; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; margin-bottom:12px; box-sizing:border-box;">
+        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Focused hours logged today</div>
+        <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="width:100%; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; margin-bottom:12px; box-sizing:border-box;">
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What was the benefit of this task?</div>
-        <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Why it mattered…" style="width:100%; min-height:44px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
+        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What did you avoid, delay, or half-ass today?</div>
+        <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest — this is the one that matters…" style="width:100%; min-height:44px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What have you learned from this?</div>
-        <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="A lesson or takeaway…" style="width:100%; min-height:44px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
+        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">{{ perfYesterdayLabel }}</div>
+        <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="width:100%; min-height:44px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
 
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
           <div onClick="{{ togglePerfTrained }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ perfTrainedBg }}; position:relative; cursor:pointer;"><div style="width:17px; height:17px; border-radius:50%; background:#fff; position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
           <span style="font-size:12.5px; color:#c8c8ce;">Trained / exercised today</span>
         </div>
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What will you improve tomorrow?</div>
-        <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="One or two things to do better…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
+        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Tomorrow's one priority</div>
+        <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Rate today</div>
+        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Discipline today</div>
         <div style="display:flex; gap:6px; margin-bottom:14px;">
           <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:24px; color:{{ st.c }};">★</span></sc-for>
         </div>
@@ -8621,26 +8621,26 @@
 
               <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:18px 20px; margin-bottom:22px;">
                 <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:14px;">Today’s check-in — {{ perfTodayLabel }}</div>
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What was completed today?</div>
-                <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Summarise today…" style="width:100%; min-height:64px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What's the one thing today that actually mattered?</div>
+                <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="width:100%; min-height:64px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">How long did it take?</div>
-                <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 3 hours" style="width:100%; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; margin-bottom:14px; box-sizing:border-box;">
+                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Focused hours logged today</div>
+                <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="width:100%; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; margin-bottom:14px; box-sizing:border-box;">
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What was the benefit of this task?</div>
-                <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Why it mattered…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What did you avoid, delay, or half-ass today?</div>
+                <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest — this is the one that matters…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What have you learned from this?</div>
-                <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="A lesson or takeaway…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">{{ perfYesterdayLabel }}</div>
+                <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                   <div onClick="{{ togglePerfTrained }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ perfTrainedBg }}; position:relative; cursor:pointer;"><div style="width:17px; height:17px; border-radius:50%; background:#fff; position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
                   <span style="font-size:12.5px; color:#c8c8ce;">Trained / exercised today</span>
                 </div>
-                <div style="font-size:11.5px; color:#8b8b93; margin:14px 0 6px;">What will you improve tomorrow?</div>
-                <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="One or two things to do better…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:#8b8b93; margin:14px 0 6px;">Tomorrow's one priority</div>
+                <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Rate today</div>
+                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Discipline today</div>
                 <div style="display:flex; gap:6px; margin-bottom:16px;">
                   <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:26px; color:{{ st.c }};">★</span></sc-for>
                 </div>
@@ -8671,8 +8671,8 @@
                   </sc-if>
                   <div style="font-size:12.5px; color:#b8b8c0; line-height:1.5; margin-bottom:6px;">{{ p.whatDone }}</div>
                   <div style="font-size:11px; color:#6f6f78; margin-bottom:6px;">⏱ {{ p.duration }}</div>
-                  <div style="font-size:11.5px; color:#8b8b93; margin-bottom:4px;">Benefit: {{ p.benefit }}</div>
-                  <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Learned: {{ p.learned }}</div>
+                  <div style="font-size:11.5px; color:#8b8b93; margin-bottom:4px;">Avoided: {{ p.benefit }}</div>
+                  <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Follow-through: {{ p.learned }}</div>
                   <div style="font-size:11px; color:#6f6f78; margin-bottom:4px;">{{ p.trainLabel }}</div>
                   <div style="font-size:11.5px; color:#8b8b93;">Tomorrow: {{ p.improvement }}</div>
                   <sc-if value="{{ p.hasOwnerRating }}" hint-placeholder-val="{{ false }}"><div style="margin-top:8px; font-size:11px; color:#9a9aa2;">Owner rating: {{ p.ownerStarsLabel }}</div></sc-if>
@@ -8918,7 +8918,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-31 · v11.31 perf-terminal-ultra-fix';
+const NOTIF_BUILD_VERSION = '2026.08.17-32 · v11.32 perf-terminal-rebuild+missions-blank';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -8927,11 +8927,6 @@ class Component extends DCLogic {
     const D=86400000, now=Date.now();
     const _ld=(off)=>{ const dd=new Date(now+off*D); try{ return dd.toLocaleDateString('en-CA'); }catch(_){ return dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0'); } };
     const todayC=_ld(0), yestC=_ld(-1);
-    const seedMissions=[
-      {id:'r_gym',name:'Go to the Gym',recurring:true,dayKey:'',streak:6,longest:12,total:32,lastCompleted:yestC},
-      {id:'r_walk',name:'Morning Walk',recurring:true,dayKey:'',streak:3,longest:9,total:18,lastCompleted:yestC},
-      {id:'r_med',name:'Meditation',recurring:true,dayKey:'',streak:0,longest:5,total:11,lastCompleted:''}
-    ].concat(this.generateDailies(todayC));
     this.state={
       loggedIn: !!s.loggedIn, scene:'home', listening:false, vLiveTranscript:'', voice:s.voice||'exec_f',
       loginEmail:'', loginPass:'', loginErr:'',
@@ -8969,11 +8964,8 @@ class Component extends DCLogic {
       newChecklistTitle:'', newChecklistCategory:'checklist', newChecklistPriority:'normal', newChecklistDue:'', newChecklistRepeat:'none',
       activeChecklistId: s.activeChecklistId || '', newChecklistItemDraft:'',
       newFitChecklistTitle:'', activeFitChecklistId: s.activeFitChecklistId || '', newFitChecklistItemDraft:'',
-      missions: s.missions || seedMissions,
-      missionHistory: s.missionHistory || [
-        {missionId:'r_gym',name:'Go to the Gym',date:yestC,time:'07:40',notes:'Chest, shoulders & triceps. Bench +5kg.',xp:40,streak:6,recurring:true},
-        {missionId:'r_walk',name:'Morning Walk',date:yestC,time:'06:55',notes:'3.2km loop before work.',xp:40,streak:3,recurring:true}
-      ],
+      missions: s.missions || [],
+      missionHistory: s.missionHistory || [],
       missionXP: s.missionXP!=null ? s.missionXP : 80,
       loginStreak: s.loginStreak||0, lastLoginDate: s.lastLoginDate||'', loginXPLog: s.loginXPLog||[],
       perfLogs: s.perfLogs||[], perfHolidays: s.perfHolidays||[], perfStatus: s.perfStatus||{missStreak:0,banned:false,bannedAt:null,warnedAt:null,appealStatus:'none',appealText:'',appealAt:null},
@@ -11501,7 +11493,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   setPerfRating(n){ this.setState({perfDraftRating:n}); }
   submitPerfLog(){
     const s=this.state; const what=(s.perfDraftWhat||'').trim(), duration=(s.perfDraftDuration||'').trim(), benefit=(s.perfDraftBenefit||'').trim(), learned=(s.perfDraftLearned||'').trim(), improve=(s.perfDraftImprovement||'').trim();
-    if(!what || !duration || !benefit || !learned || !improve || !s.perfDraftRating){ this.setState({perfSubmitErr:'Fill in every field and a star rating.'}); return false; }
+    if(!what || !duration || !benefit || !learned || !improve || !s.perfDraftRating){ this.setState({perfSubmitErr:'Fill in every field and rate your discipline.'}); return false; }
     const today=this._todayStr();
     const suspicious=this._perfEntrySuspicious(what,benefit,learned,improve);
     const entry={ id:this._uuid(), date:today, whatDone:what, duration, benefit, learned, trained:!!s.perfDraftTrained, improvement:improve, selfRating:s.perfDraftRating, ownerRating:null, ownerNote:'', ts:Date.now(), flagged:suspicious, flagReason:suspicious?'Looks auto-generated or very low-effort':'' };
@@ -11600,12 +11592,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(this._sbOn()) window.SB.upsert('performance_status', {user_id:userId, banned, banned_at:banned?new Date().toISOString():null}, 'user_id').catch(()=>{});
   }
   _xpRate(){ const r=(this._role()||'').toLowerCase(); return (r==='owner'||r==='admin'||r==='superadmin')?40:10; }
-  _dailyPool(){ return ['Review finances','Read 20 pages','Drink 2 litres of water','Learn AI for 30 minutes','Organise workspace','Meditate 10 minutes','Plan tomorrow\u2019s top 3','Take a 30-minute walk','Clear your inbox','Journal one page','Deep-work sprint (90m)','No sugar today']; }
-  _dayHash(str){ let h=0; for(let i=0;i<str.length;i++){ h=(h*31+str.charCodeAt(i))>>>0; } return h; }
-  // Real UUIDs (not the old deterministic 'd_'+today+'_'+k string) so these rows can
-  // actually be written to missions.id, which is a uuid column — the old id format was
-  // never valid there, which is part of why rollover never persisted to Supabase at all.
-  generateDailies(today){ const pool=this._dailyPool(); const h=this._dayHash(today); const picks=[]; const used={}; let i=0; while(picks.length<4 && Object.keys(used).length<pool.length){ const idx=(h+i*7)%pool.length; i++; if(used[idx]) continue; used[idx]=1; picks.push(pool[idx]); } return picks.map((name)=>({ id:this._uuid(), name, recurring:false, dayKey:today, streak:0, longest:0, total:0, lastCompleted:'' })); }
   maybeRollover(){ if(!this.state.loggedIn) return; const today=this._todayStr(); const hasToday=(this.state.missions||[]).some(m=>!m.recurring && m.dayKey===today); if(this.state.lastRollover!==today || !hasToday) this.rolloverMissions(); }
   // The daily reset used to be entirely local (setState + localStorage save, no Supabase
   // write) — a missed-day streak reset or a fresh day's set of daily missions on one
@@ -12204,6 +12190,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.32', date:'Aug 17, 2026 · 11:00', major:true, notes:[
+      'Performance Terminal check-in rebuilt from six generic questions to a real accountability loop: "what did you complete" is now "what\'s the one thing today that actually mattered"; "benefit of this task" is now "what did you avoid, delay, or half-ass today"; "how long did it take" is now a focused-hours number; and "what will you improve tomorrow" is sharpened to one single priority. The big change: whatever you write as tomorrow\'s priority gets pulled back in as tomorrow\'s first question — "yesterday you said X, did you follow through?" — so it can\'t just be forgotten. Star rating relabelled "Discipline today" to match.',
+      'Daily Missions no longer ships with fake starter tasks (the "Go to the Gym / Morning Walk / Meditation" demo entries with pre-filled streaks, plus whatever generic dailies got auto-picked). New accounts and fresh devices now start completely blank — nothing shows up until you add it yourself, and it syncs the same as everything else you add.',
+    ]},
     {version:'v11.31', date:'Aug 17, 2026 · 09:10', major:true, notes:[
       'Fixed the Performance Terminal check-in popup for Ultra: it was hardcoded to Ultra X\'s maroon-on-cream look no matter which Ultra style was active, so Noir showed dark brown text on its dark card (barely readable) and Maison Élysée showed off-brand maroon instead of its blue. Every colour in the popup — heading, labels, field borders, the star rating, the "Trained today" switch, and the submit button — now follows the active Ultra style.',
       'Fixed the same popup\'s ornamental corner scrollwork overlapping the submit button and top content — the decorations were sized to reach past the card\'s padding into the readable area. Shrunk and pulled them back so they stay in the frame\'s margin.',
@@ -14905,13 +14895,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const year=new Date().getFullYear(); const used=this._perfDaysUsed(year); const cap=this._perfCap();
         const perfHolidayList=(S.perfHolidays||[]).slice().sort((a,b)=>a.start.localeCompare(b.start)).map(h=>({ label:this._niceDate(h.start)+' – '+this._niceDate(h.end), days:h.days, cancel:()=>this.cancelHoliday(h.id) }));
         const seenHistDates=new Set();
-        const hist=(S.perfLogs||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)||(b.ts-a.ts)).filter(p=>{ if(seenHistDates.has(p.date)) return false; seenHistDates.add(p.date); return true; }).map(p=>({
+        const sortedLogs=(S.perfLogs||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)||(b.ts-a.ts)).filter(p=>{ if(seenHistDates.has(p.date)) return false; seenHistDates.add(p.date); return true; });
+        const hist=sortedLogs.map(p=>({
           dateLabel:this._niceDate(p.date), starsLabel:'★'.repeat(p.selfRating)+'☆'.repeat(5-p.selfRating),
           whatDone:p.whatDone, duration:p.duration||'—', benefit:p.benefit||'', learned:p.learned||'', improvement:p.improvement||'—',
           trainLabel:p.trained?'Trained today':'Did not train',
           hasOwnerRating:p.ownerRating!=null, ownerStarsLabel:p.ownerRating!=null?('★'.repeat(p.ownerRating)+'☆'.repeat(5-p.ownerRating)):'',
           flagged:!!p.flagged, flagReason:p.flagReason||'',
         }));
+        // Loop-closer: pull the most recent PRIOR day's stated priority back in as today's
+        // first prompt, so "tomorrow's priority" actually gets checked instead of evaporating.
+        const perfPrevLog=sortedLogs.find(p=>p.date!==this._todayStr());
+        const perfYesterdayLabel=(perfPrevLog && (perfPrevLog.improvement||'').trim())
+          ? 'Yesterday you said: “'+perfPrevLog.improvement.trim()+'”. Did you follow through?'
+          : 'Did you follow through on what you set out to do?';
         const teamRaw=(S.perfTeamProfiles||[]).filter(pr=>pr.id!==S.authUserId);
         const statusByUser={}; (S.perfTeamStatusRaw||[]).forEach(s=>{ statusByUser[s.user_id]=s; });
         const logsByUser={}; (S.perfTeamLogsRaw||[]).forEach(l=>{ if(!logsByUser[l.user_id]) logsByUser[l.user_id]=l; });
@@ -14935,7 +14932,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           perfAppealPending:appealStatus==='pending', perfAppealOpen:!(appealStatus==='pending'||appealStatus==='approved'),
           perfAppealDraftVal:S.perfAppealDraft||'', setPerfAppealDraft:(e)=>this.setPerfAppealDraft(e), submitPerfAppeal:()=>this.submitPerfAppeal(),
           resetOwnStreak:()=>this.resetOwnStreak(),
-          perfHasLoggedToday:this._perfHasLoggedToday(), perfTodayLabel:todayLbl,
+          perfHasLoggedToday:this._perfHasLoggedToday(), perfTodayLabel:todayLbl, perfYesterdayLabel,
           perfDraftWhatVal:S.perfDraftWhat||'', setPerfDraftWhat:(e)=>this.setPerfDraftWhat(e),
           perfDraftDurationVal:S.perfDraftDuration||'', setPerfDraftDuration:(e)=>this.setPerfDraftDuration(e),
           perfDraftBenefitVal:S.perfDraftBenefit||'', setPerfDraftBenefit:(e)=>this.setPerfDraftBenefit(e),
@@ -15046,7 +15043,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.31 — Aug 17, 2026',
+      appVersion:'v11.32 — Aug 17, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
