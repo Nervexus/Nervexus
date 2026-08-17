@@ -8918,7 +8918,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-32 · v11.32 perf-terminal-rebuild+missions-blank';
+const NOTIF_BUILD_VERSION = '2026.08.17-33 · v11.33 power-card-per-ultra-style';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12190,6 +12190,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.33', date:'Aug 17, 2026 · 12:30', major:true, notes:[
+      'The Power/ID card (profile popup → Power Level) only ever had two looks — cream-and-maroon for any Ultra style, or dark-and-white for the base theme — so Noir and Maison Élysée were both silently wearing Ultra X\'s card. Each now has its own: Noir is black and charcoal with a gold chip, gold accents and cream text; Maison Élysée is cream with its own blue accent and navy text; Ultra X unchanged.',
+    ]},
     {version:'v11.32', date:'Aug 17, 2026 · 11:00', major:true, notes:[
       'Performance Terminal check-in rebuilt from six generic questions to a real accountability loop: "what did you complete" is now "what\'s the one thing today that actually mattered"; "benefit of this task" is now "what did you avoid, delay, or half-ass today"; "how long did it take" is now a focused-hours number; and "what will you improve tomorrow" is sharpened to one single priority. The big change: whatever you write as tomorrow\'s priority gets pulled back in as tomorrow\'s first question — "yesterday you said X, did you follow through?" — so it can\'t just be forgotten. Star rating relabelled "Discipline today" to match.',
       'Daily Missions no longer ships with fake starter tasks (the "Go to the Gym / Morning Walk / Meditation" demo entries with pre-filled streaks, plus whatever generic dailies got auto-picked). New accounts and fresh devices now start completely blank — nothing shows up until you add it yourself, and it syncs the same as everything else you add.',
@@ -14777,17 +14780,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%', profileXpIn:P.xpInLevel, profileXpNext:P.xpForNext,
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
-      profCardBg: S.prefs.theme==='Ultra' ? 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)' : 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)',
-      profCardBorder: S.prefs.theme==='Ultra' ? 'rgba(58,42,32,0.18)' : 'rgba(255,255,255,0.15)',
-      profCardShadow: S.prefs.theme==='Ultra' ? '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)' : '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)',
-      profCardGlow: S.prefs.theme==='Ultra' ? 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)',
-      profChipBg: S.prefs.theme==='Ultra' ? 'linear-gradient(135deg,#5B1A1A,#7A2626)' : 'linear-gradient(135deg,#8a8a92,#c8c8ce)',
-      profMuted: S.prefs.theme==='Ultra' ? '#6E5B4E' : '#7c7c84',
-      profAccent: S.prefs.theme==='Ultra' ? '#5B1A1A' : '#FFFFFF',
-      profTrack: S.prefs.theme==='Ultra' ? 'rgba(58,42,32,0.1)' : 'rgba(255,255,255,0.08)',
-      profInk: S.prefs.theme==='Ultra' ? '#3A2A20' : '#eef0f2',
-      profMonoRing: S.prefs.theme==='Ultra' ? 'rgba(91,26,26,0.28)' : 'rgba(255,255,255,0.18)',
-      profDivider: S.prefs.theme==='Ultra' ? 'rgba(91,26,26,0.25)' : 'rgba(255,255,255,0.14)',
+      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
+      profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
+      profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+      profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
+      profChipBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#8a8a92,#c8c8ce)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#C9A24A,#8a6a2a)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#4E6E96,#6E86A8)' : 'linear-gradient(135deg,#5B1A1A,#7A2626)',
+      profMuted: S.prefs.theme!=='Ultra' ? '#7c7c84' : S.prefs.ultraStyle==='Noir' ? '#968F82' : S.prefs.ultraStyle==='Maison Élysée' ? '#6E82A0' : '#6E5B4E',
+      profAccent: S.prefs.theme!=='Ultra' ? '#FFFFFF' : S.prefs.ultraStyle==='Noir' ? '#C9A24A' : S.prefs.ultraStyle==='Maison Élysée' ? '#4E6E96' : '#5B1A1A',
+      profTrack: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.14)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.1)' : 'rgba(58,42,32,0.1)',
+      profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
+      profMonoRing: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.18)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.3)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.28)' : 'rgba(91,26,26,0.28)',
+      profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
       profMonogram: ((()=>{ if(this._isOwner()) return S.account.name; const u=(S.users||[]).find(x=>(x.email||'').toLowerCase()===this._currentEmail()); return u?u.name:S.account.name; })()||'N').trim().charAt(0).toUpperCase()||'N',
       powerLevel:P.level, rankName:P.rank.n, rankDesc:P.rank.d, powerPct:P.pct+'%', xpIn:P.xpInLevel, xpNext:P.xpForNext, nextRankName:P.next?P.next.n:'MAX RANK', nextRankLevel:P.next?P.next.min:'—',
       powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'#ff5563'},{label:'WEEKLY XP',value:'+'+P.week,c:'#eef0f2'},{label:'TOTAL XP',value:P.totalXP,c:'#eef0f2'},{label:'DAY STREAK',value:P.streak+'d',c:'#ff5563'}],
@@ -15043,7 +15046,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.32 — Aug 17, 2026',
+      appVersion:'v11.33 — Aug 17, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
