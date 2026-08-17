@@ -8918,7 +8918,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-34 · v11.34 move-min-fix+intel-desk-pins';
+const NOTIF_BUILD_VERSION = '2026.08.17-35 · v11.35 pin-double-click-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11939,7 +11939,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _wiRedrawPins(){ const map=this._mlMap; if(!map) return; (this._wiPinMarkers||[]).forEach(m=>m.remove()); this._wiPinMarkers=[];
     (this.state.wiSavedPins||[]).forEach(p=>{ const m=new maplibregl.Marker({color:'#7cb0ff'}).setLngLat([p.lng,p.lat]).addTo(map);
       const el=m.getElement(); el.style.cursor='pointer'; el.title='Double-click to remove';
-      el.addEventListener('dblclick',(e)=>{ e.stopPropagation(); this.removeSavedPin(p.id); });
+      // Native 'dblclick' on a marker isn't reliable here — the map's own globe-projection
+      // double-click-zoom handler can still see the gesture bubble past the marker, and the
+      // map's plain 'click' (add-a-pin) listener fires on both taps of the double-click before
+      // it resolves. Track the two clicks ourselves and swallow every stage explicitly so
+      // double-clicking a pin only ever removes it, never zooms or drops a second pin underneath.
+      let lastClickAt=0;
+      const swallow=(e)=>{ e.stopPropagation(); e.preventDefault(); };
+      el.addEventListener('click',(e)=>{ swallow(e); const now=Date.now(); if(now-lastClickAt<450){ lastClickAt=0; this.removeSavedPin(p.id); } else { lastClickAt=now; } });
+      el.addEventListener('dblclick',swallow);
       this._wiPinMarkers.push(m);
     });
   }
@@ -12194,6 +12202,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.35', date:'Aug 17, 2026 · 14:40', major:true, notes:[
+      'Fixed pin double-click on Intelligence Desk\'s map for real this time — the previous attempt relied on the browser\'s native double-click event, but the map\'s own single-click (which drops a new pin) still fired on both taps before the double-click resolved, so trying to remove a pin dropped extra ones on top of it instead. Now tracks the two clicks directly and blocks the map\'s add-pin handler the moment a click lands on an existing pin, so double-clicking one only ever removes it.',
+    ]},
     {version:'v11.34', date:'Aug 17, 2026 · 14:00', major:true, notes:[
       'Fixed Move/Train Today/Week Total reading 0 even after logging training: Log Training lets you log a set by weight × sets × reps alone (minutes is optional, by design — Muscle Training Split moved to volume, not time), but Move/Train/Week Total only ever summed the minutes field, so a weight-only session never counted. They now estimate ~2.5 minutes per set when no explicit duration was given, so logging sets without minutes still shows up. Checked every other Fitness HQ stat against this same bug — Coach Summary\'s "trained for Xm" line pulls from the same fixed function, so that\'s corrected too. Muscle Training Split\'s kg chart was already volume-based and unaffected.',
       'World Intelligence HQ renamed to "Intelligence Desk" (was "Global Situation Room").',
@@ -15061,7 +15072,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.34 — Aug 17, 2026',
+      appVersion:'v11.35 — Aug 17, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
