@@ -1450,7 +1450,7 @@
         <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
           <div>
             <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ WORLD INTELLIGENCE HQ</div>
-            <h1 style="font-size:26px; font-weight:700; letter-spacing:-.5px;">Global Situation Room</h1>
+            <h1 style="font-size:26px; font-weight:700; letter-spacing:-.5px;">Intelligence Desk</h1>
             <p style="color:#8b8b93; font-size:13px; margin-top:5px;">Real-time geopolitical monitoring &amp; intelligence analysis.</p>
           </div>
           <div style="display:flex; align-items:center; gap:9px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); min-width:230px;">
@@ -8918,7 +8918,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-33 · v11.33 power-card-per-ultra-style';
+const NOTIF_BUILD_VERSION = '2026.08.17-34 · v11.34 move-min-fix+intel-desk-pins';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11937,7 +11937,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     map.getSource('wiPts').setData({type:'FeatureCollection', features:pts});
   }
   _wiRedrawPins(){ const map=this._mlMap; if(!map) return; (this._wiPinMarkers||[]).forEach(m=>m.remove()); this._wiPinMarkers=[];
-    (this.state.wiSavedPins||[]).forEach(p=>{ const m=new maplibregl.Marker({color:'#7cb0ff'}).setLngLat([p.lng,p.lat]).addTo(map); this._wiPinMarkers.push(m); });
+    (this.state.wiSavedPins||[]).forEach(p=>{ const m=new maplibregl.Marker({color:'#7cb0ff'}).setLngLat([p.lng,p.lat]).addTo(map);
+      const el=m.getElement(); el.style.cursor='pointer'; el.title='Double-click to remove';
+      el.addEventListener('dblclick',(e)=>{ e.stopPropagation(); this.removeSavedPin(p.id); });
+      this._wiPinMarkers.push(m);
+    });
   }
   addRoute(){ const S=this.state; const from=S.routeFrom, to=S.routeTo; if(!from||!to||from===to) return; const exists=(S.wiRoutes||[]).some(r=>r.from===from&&r.to===to); if(exists) return;
     this.mut(s=>({ wiRoutes:[...(s.wiRoutes||[]), {from,to}] })); this.save(); this._wiRedrawRoutes(); }
@@ -12190,6 +12194,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.34', date:'Aug 17, 2026 · 14:00', major:true, notes:[
+      'Fixed Move/Train Today/Week Total reading 0 even after logging training: Log Training lets you log a set by weight × sets × reps alone (minutes is optional, by design — Muscle Training Split moved to volume, not time), but Move/Train/Week Total only ever summed the minutes field, so a weight-only session never counted. They now estimate ~2.5 minutes per set when no explicit duration was given, so logging sets without minutes still shows up. Checked every other Fitness HQ stat against this same bug — Coach Summary\'s "trained for Xm" line pulls from the same fixed function, so that\'s corrected too. Muscle Training Split\'s kg chart was already volume-based and unaffected.',
+      'World Intelligence HQ renamed to "Intelligence Desk" (was "Global Situation Room").',
+      'Saved map pins: double-click a pin to remove it, instead of only being able to remove it from the list below the map.',
+    ]},
     {version:'v11.33', date:'Aug 17, 2026 · 12:30', major:true, notes:[
       'The Power/ID card (profile popup → Power Level) only ever had two looks — cream-and-maroon for any Ultra style, or dark-and-white for the base theme — so Noir and Maison Élysée were both silently wearing Ultra X\'s card. Each now has its own: Noir is black and charcoal with a gold chip, gold accents and cream text; Maison Élysée is cream with its own blue accent and navy text; Ultra X unchanged.',
     ]},
@@ -13231,7 +13240,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const slpWeekAvg=(K.avg(wk7)||0).toFixed(1), slpMonthAvg=(K.avg(wk30)||0).toFixed(1);
       const lastNight=K.bySorted(H.sleepLog).slice(-1)[0];
       const slpTodayLabel= lastNight ? (lastNight.hours+'h '+lastNight.minutes+'m') : 'Not logged';
-      const workoutMinToday=(S.workouts||[]).filter(w=>{ try{ return w.ts && new Date(w.ts).toLocaleDateString('en-CA')===todayD; }catch(e){ return false; } }).reduce((a,w)=>a+(+w.min||0),0) || (H.todayExtra&&H.todayExtra.workoutMin) || 0;
+      const workoutMinToday=(S.workouts||[]).filter(w=>{ try{ return w.ts && new Date(w.ts).toLocaleDateString('en-CA')===todayD; }catch(e){ return false; } }).reduce((a,w)=>a+this._woEstMin(w),0) || (H.todayExtra&&H.todayExtra.workoutMin) || 0;
       const TE=H.todayExtra||{};
       const kcalTotal2=(H.meals||[]).reduce((a,m)=>a+(+m.kcal||0),0), proteinTotal2=(H.meals||[]).reduce((a,m)=>a+(+m.protein||0),0);
       const statVal={ calories:kcalTotal2, protein:proteinTotal2, carbs:TE.carbs||0, fat:TE.fat||0, fibre:TE.fibre||0, sugar:TE.sugar||0, water:K.fmtVol(todayMl,vu), steps:(TE.steps||0).toLocaleString(), activeKcal:TE.activeKcal||0, workoutMin:workoutMinToday };
@@ -13399,9 +13408,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   init_voice(){ const wv=this.root.querySelector('[data-chart="wave"]'); if(wv) this.startWave(wv); }
 
   // ===== derived data =====
-  todayMin(){ const s=new Date(); s.setHours(0,0,0,0); return this.state.workouts.filter(w=>w.ts>=s.getTime()).reduce((a,w)=>a+(+w.min||0),0); }
-  weekMin(){ const c=Date.now()-7*86400000; return this.state.workouts.filter(w=>w.ts>=c).reduce((a,w)=>a+(+w.min||0),0); }
-  partMinutes(){ const c=Date.now()-7*86400000; const m={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0}; this.state.workouts.forEach(w=>{ if(w.ts>=c&&m[w.part]!=null) m[w.part]+=(+w.min||0); }); return m; }
+  // Log Training accepts a set logged by weight/sets/reps alone (min is optional, defaults
+  // to 0 — that's the whole point of the volume-not-time redesign below). But Move/Train
+  // Today/Week Total still need a duration to show anything at all, so when no explicit
+  // minutes were given, estimate from set count (~2.5m/set, covering the set plus rest)
+  // instead of silently reading as zero training just because minutes went unfilled.
+  _woEstMin(w){ const explicit=+w.min||0; if(explicit>0) return explicit; if(w.part==='Cardio') return 0; const sets=+w.sets||0; return sets>0 ? sets*2.5 : 0; }
+  todayMin(){ const s=new Date(); s.setHours(0,0,0,0); return this.state.workouts.filter(w=>w.ts>=s.getTime()).reduce((a,w)=>a+this._woEstMin(w),0); }
+  weekMin(){ const c=Date.now()-7*86400000; return this.state.workouts.filter(w=>w.ts>=c).reduce((a,w)=>a+this._woEstMin(w),0); }
+  partMinutes(){ const c=Date.now()-7*86400000; const m={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0}; this.state.workouts.forEach(w=>{ if(w.ts>=c&&m[w.part]!=null) m[w.part]+=this._woEstMin(w); }); return m; }
   // Training volume (kg lifted = weight x sets x reps) per muscle group, last 7 days — used by
   // the Muscle Training Split chart. Cardio has no weight/reps, so it stays minutes-based there.
   partVolume(){ const c=Date.now()-7*86400000; const v={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0};
@@ -15046,7 +15061,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.33 — Aug 17, 2026',
+      appVersion:'v11.34 — Aug 17, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
