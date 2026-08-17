@@ -2901,8 +2901,33 @@
                 <div style="display:flex; gap:8px; margin:20px 0; flex-wrap:wrap;">
                   <span onClick="{{ setBBBrands }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabBrandsBg }}; color:{{ bbTabBrandsC }};">Brands</span>
                   <span onClick="{{ setBBLocations }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabLocationsBg }}; color:{{ bbTabLocationsC }};">Locations</span>
+                  <span onClick="{{ setBBHotels }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabHotelsBg }}; color:{{ bbTabHotelsC }};">Hotels</span>
                   <span onClick="{{ setBBSaved }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabSavedBg }}; color:{{ bbTabSavedC }};">☆ My Black Book</span>
                 </div>
+
+                <sc-if value="{{ isBBHotels }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:Georgia,serif; font-style:italic; font-size:12.5px; color:#a4a4ac; line-height:1.6; max-width:560px; margin-bottom:16px;">Every hotel pick from across The Black Book's 26 cities, in one list — 4.5–5★ tier only, landmark names alongside quieter private ones.</div>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
+                    <sc-for list="{{ bbHotelRegionChips }}" as="c" hint-placeholder-count="7">
+                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px;">
+                    <sc-for list="{{ bbAllHotelCards }}" as="h" hint-placeholder-count="8">
+                      <div class="cc-vault-tile" style="--vault-accent:#7cb0ff; --vault-line:rgba(124,176,255,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
+                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ h.name }}</div>
+                          <div style="display:flex; gap:8px; flex:0 0 auto;">
+                          <span onClick="{{ h.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ h.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
+                          <span onClick="{{ h.save }}" title="Save to My Black Book" style="cursor:pointer; color:#7cb0ff; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
+                        </div>
+                        </div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7cb0ff; margin-top:4px;">{{ h.cityLine }}</div>
+                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ h.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
 
                 <sc-if value="{{ isBBBrands }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
@@ -8736,6 +8761,32 @@
               </sc-if>
             </sc-if>
 
+            <sc-if value="{{ tabTrouble }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">DIAGNOSTICS</div>
+              <h1 style="font-size:18px; font-weight:700; margin-bottom:6px;">Troubleshooting</h1>
+              <p style="font-size:12.5px; color:#8b8b93; margin-bottom:18px; max-width:520px;">A live read of what the app can see about your own setup, plus fixes for the issues that come up most.</p>
+
+              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 20px; margin-bottom:14px;">
+                <sc-for list="{{ diagRows }}" as="d" hint-placeholder-count="7">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <span style="font-size:12.5px; color:#8b8b93;">{{ d.k }}</span>
+                    <span style="font-size:12.5px; font-weight:600; color:{{ d.c }}; text-align:right;">{{ d.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:26px;">
+                <div onClick="{{ startRefresh }}" style="display:inline-block; padding:10px 16px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12px; font-weight:600;">↻ {{ tsRefreshLabel }}</div>
+              </div>
+
+              <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:12px;">Common issues</div>
+              <sc-for list="{{ troubleFaq }}" as="f" hint-placeholder-count="8">
+                <div class="cc-glowcard" style="border-radius:14px; background:#16181c; padding:15px 18px; margin-bottom:10px;">
+                  <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:6px;">{{ f.q }}</div>
+                  <div style="font-size:12.5px; color:#a8a8b0; line-height:1.6;">{{ f.a }}</div>
+                </div>
+              </sc-for>
+            </sc-if>
+
             <sc-if value="{{ tabAdmin }}" hint-placeholder-val="{{ false }}">
               <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;" class="cc-stat4">
                 <sc-for list="{{ adminStats }}" as="s" hint-placeholder-count="4"><div style="border-radius:13px; padding:13px; background:rgba(23,25,29,0.92);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:22px; color:#eef0f2; margin-top:3px;">{{ s.v }}</div></div></sc-for>
@@ -8918,7 +8969,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-36 · v11.36 intel-desk-card-spacing';
+const NOTIF_BUILD_VERSION = '2026.08.17-37 · v11.37 troubleshooting-page+bb-hotels';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9059,7 +9110,7 @@ activities: this._mergeShipLog(s.activities),
       gentScenQueue:[], gentScenIdx:0, gentScenChoice:null, gentScenPicks:[], gentScenStartedAt:0,
       gentOccasionSel:'', gentOccasionResult:null, gentOccasionLoading:false, gentOccasionErr:'',
       gentPSQueue:[], gentPSIdx:0, gentPSPicked:'', gentPSScore:0, gentPSStartedAt:0,
-      gentBBTab:'brands', gentBBCat:'watches', gentBBCity:'london',
+      gentBBTab:'brands', gentBBCat:'watches', gentBBCity:'london', gentBBHotelRegion:'All',
       phyTutorMessages:[], phyTutorInput:'', phyTutorLoading:false, phyTutorErr:'', phyTutorVoiceId:'pro_f', phyTutorListening:false,
       tutorOpen:false, tutorSubject:'maths', tutorMessages:{}, tutorInput:'', tutorLoading:false, tutorErr:'', tutorVoiceId:'pro_f', tutorListening:false,
       qtMode:'closed', qtSubject:'english', qtType:'grammar', qtDifficulty:'Intermediate', qtLength:10, qtQueue:[], qtIdx:0, qtQ:null, qtInput:'', qtAnswers:[], qtStartedAt:0, qtIsDaily:false, qtLastResult:null,
@@ -12202,6 +12253,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.37', date:'Aug 17, 2026 · 16:00', major:true, notes:[
+      'New: Settings → Troubleshooting. A live diagnostics readout (app version, account sync, connection, notification permission, AI provider status, who you\'re signed in as, cached data size) plus a force-refresh button and a common-issues list covering the recurring ones — sync not appearing on another device, missing notifications, Performance Terminal bans, AI features not responding, theme not updating, mic permission for the voice assistant, stale cached builds, and password/2FA recovery.',
+      'The Black Book gained a "Hotels" tab: every hotel pick from all 26 cities in one browsable list, filterable by region, instead of only visible one city at a time under Locations. Same save-to-My-Black-Book and private-note controls as everywhere else in The Black Book.',
+    ]},
     {version:'v11.36', date:'Aug 17, 2026 · 15:10', major:true, notes:[
       'Intelligence Desk: the Location Safety Check and AI Briefing cards had no gap between them and sat flush against each other. Added proper spacing, matching the Routes card above it.',
     ]},
@@ -14400,6 +14455,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   setGentBBTab(t){ this.setState({gentBBTab:t}); }
   setGentBBCat(k){ this.setState({gentBBCat:k}); }
   setGentBBCity(k){ this.setState({gentBBCity:k}); }
+  setGentBBHotelRegion(r){ this.setState({gentBBHotelRegion:r}); }
   // "My Black Book" — saved brands/places, synced through the same private notes vault
   // (tagged so they list separately) rather than a new table, since that vault already
   // syncs to Supabase per-account.
@@ -14898,7 +14954,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       muscleChartBars:(()=>{ const pv=this.partVolume(); const pc={Chest:'#FFFFFF',Back:'#E4E4E7',Shoulders:'#e8e8ec',Arms:'#FFFFFF',Legs:'#FFFFFF',Core:'#e8e8ec',Cardio:'#ff5563'}; const labels={Shoulders:'Delts'}; const order=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio']; const max=Math.max(1,...order.map(k=>pv[k]||0)); return order.map(k=>{ const v=pv[k]||0; return { label:labels[k]||k, minLabel:v>0?(k==='Cardio'?v+'m':v.toLocaleString()+'kg'):'—', h:Math.max(4,Math.round((v/max)*100)), barBg:v>0?pc[k]:'rgba(255,255,255,0.08)', valColor:v>0?'#c3d2e6':'#5c5c64' }; }); })(),
       trainedMuscles:(()=>{ const pv=this.partVolume(); return Object.keys(pv).filter(k=>pv[k]>0).map(k=>({name:k, val:(k==='Cardio'?pv[k]+'m':pv[k].toLocaleString()+'kg')})); })(),
       noTrained:(()=>{ const pv=this.partVolume(); return Object.keys(pv).filter(k=>pv[k]>0).length===0; })(),
-      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','AI Providers','Performance Terminal','Update Terminal',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'#F4F4F5':'#9a9aa2', bg:n===S.settingsTab?'rgba(255,255,255,0.14)':'transparent', bd:n===S.settingsTab?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.08)', soon:''})),
+      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','AI Providers','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'#F4F4F5':'#9a9aa2', bg:n===S.settingsTab?'rgba(255,255,255,0.14)':'transparent', bd:n===S.settingsTab?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.08)', soon:''})),
       settingsTab:S.settingsTab,
       ...(()=>{ const c=this._provCfg('elevenlabs'); const PD=this._pd(); const tts=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0])||{voices:[]};
         const st=c.status||'idle';
@@ -14917,7 +14973,35 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       memDraft:S.memDraft||'', setMemDraft:(e)=>this.setState({memDraft:e.target.value}),
       addMemBtn:()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } },
       addMemKey:enterKey(()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } }),
-      tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security', tabAI:S.settingsTab==='AI Providers', tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
+      tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security', tabAI:S.settingsTab==='AI Providers', tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabTrouble:S.settingsTab==='Troubleshooting', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
+      ...this._safe(()=>{
+        const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
+        const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
+        const aiOk=aiConnected && anthCfg.status!=='error';
+        const notifPerm=S.notifPermission||(typeof Notification!=='undefined'?Notification.permission:'unsupported');
+        const online=typeof navigator==='undefined'||navigator.onLine!==false;
+        let storageKB=0; try{ storageKB=Math.round((JSON.stringify(localStorage.getItem('cc_v2')||'').length)/1024); }catch(e){}
+        const diagRows=[
+          { k:'App version', v:S.appVersion||'—', c:'#eef0f2' },
+          { k:'Account sync', v:S.sbReady?'Connected':'Local only — not signed in to sync', c:S.sbReady?'#2fce86':'#ffb020' },
+          { k:'Connection', v:online?'Online':'Offline', c:online?'#2fce86':'#ff5563' },
+          { k:'Notifications', v:notifPerm==='granted'?'Allowed':notifPerm==='denied'?'Blocked in browser settings':notifPerm==='unsupported'?'Not supported on this browser':'Not yet asked', c:notifPerm==='granted'?'#2fce86':notifPerm==='denied'?'#ff5563':'#ffb020' },
+          { k:'AI (Claude)', v:aiStatusLabel, c:aiOk?'#2fce86':(aiConnected?'#ff5563':'#ffb020') },
+          { k:'Signed in as', v:(S.account&&S.account.email)?(S.account.email+' · '+this._role()):'Not signed in', c:'#eef0f2' },
+          { k:'Local data cached', v:storageKB+' KB', c:'#eef0f2' },
+        ];
+        const troubleFaq=[
+          { q:'My data isn’t showing up on another device', a:'Sync only runs while signed in with a working connection — check "Account sync" above reads Connected on both devices. If either shows Local only, sign out and back in there; it’ll pull everything fresh from your account.' },
+          { q:'I’m not getting notifications', a:'Check "Notifications" above first — most misses come down to the browser permission being Blocked or never asked. Some browsers (iOS Safari outside "Add to Home Screen", most in-app browsers) don’t support push at all. Settings → Notifications has a "Send test reminder now" button to confirm delivery once permission is granted.' },
+          { q:'Performance Terminal banned my account', a:'7 consecutive missed daily check-ins triggers an automatic ban. Submit an appeal from Settings → Performance Terminal — the owner reviews it from their own Admin tab. Holidays logged in advance are exempt, up to the yearly cap shown there.' },
+          { q:'AI features (chat, briefings, suggestions) aren’t responding', a:'Check "AI (Claude)" above — it needs a saved, connected key. Settings → AI Providers lets you paste and test one; ERROR usually means the key was revoked or the account’s out of credit, not a bug in the app.' },
+          { q:'My theme (Ultra / Noir / Maison Élysée) didn’t change', a:'Settings → Appearance → Theme applies immediately, but a stale cached build can hold the old look. Tap the refresh icon top-right (or Settings → Update Terminal) to force the latest version, then re-check.' },
+          { q:'The voice assistant isn’t responding to the mic', a:'The browser needs microphone permission for this site — if it was denied once, it won’t ask again automatically. Check the site permissions in your browser’s address-bar icon and allow microphone access, then reload.' },
+          { q:'A feature I was told about seems to be missing', a:'Tap the refresh icon top-right to force-pull the latest build, then compare the app version above against the newest entry in Settings → Update Terminal — if they don’t match you’re still on a cached older version.' },
+          { q:'I forgot my password, or I’m locked out of 2FA', a:'Password reset is available from the login screen via email. 2FA has no recovery path by design — if you’re locked out, use "Owner recovery" on the 2FA prompt, or ask the owner to review it from their side.' },
+        ];
+        return { diagRows, troubleFaq, tsRefreshLabel:'Force refresh now' };
+      }),
       ...this._safe(()=>{
         const P=S.perfStatus||{}; const missStreak=P.missStreak||0; const banned=!!P.banned; const appealStatus=P.appealStatus||'none';
         const todayLbl=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
@@ -15075,7 +15159,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.36 — Aug 17, 2026',
+      appVersion:'v11.37 — Aug 17, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -16258,15 +16342,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           isGentHub:S.gentMode==='hub' && S.qtMode==='closed', isGentLearn:S.gentMode==='learn', isGentPractice:S.gentMode==='practice', isGentTest:S.gentMode==='test', isGentResults:S.gentMode==='results',
           isGentFormulas:S.gentMode==='formulas', isGentDashboard:S.gentMode==='dashboard', isGentBlackBook:S.gentMode==='blackbook', isGentAgeLock:S.gentMode==='agelock',
           goGentBlackBook:()=>this.gentOpenBlackBook(),
-          isBBBrands:(S.gentBBTab||'brands')==='brands', isBBLocations:(S.gentBBTab||'brands')==='locations',
-          setBBBrands:()=>this.setGentBBTab('brands'), setBBLocations:()=>this.setGentBBTab('locations'),
+          isBBBrands:(S.gentBBTab||'brands')==='brands', isBBLocations:(S.gentBBTab||'brands')==='locations', isBBHotels:(S.gentBBTab||'brands')==='hotels',
+          setBBBrands:()=>this.setGentBBTab('brands'), setBBLocations:()=>this.setGentBBTab('locations'), setBBHotels:()=>this.setGentBBTab('hotels'),
           bbTabBrandsBg:(S.gentBBTab||'brands')==='brands'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabBrandsC:(S.gentBBTab||'brands')==='brands'?'#0a0a0b':'#c5c5ca',
           bbTabLocationsBg:S.gentBBTab==='locations'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabLocationsC:S.gentBBTab==='locations'?'#0a0a0b':'#c5c5ca',
+          bbTabHotelsBg:S.gentBBTab==='hotels'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabHotelsC:S.gentBBTab==='hotels'?'#0a0a0b':'#c5c5ca',
           bbCatChips:(BB?BB.BRAND_CATEGORIES:[]).map(c=>({ label:c.label, go:()=>this.setGentBBCat(c.key), bg:(S.gentBBCat||'watches')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCat||'watches')===c.key?'#0a0a0b':'#c5c5ca' })),
           bbBrandCards:(bbCat?bbCat.brands:[]).map(b=>({ ...b, save:()=>this.gentSaveBBItem(bbCat.label,b.name,b.blurb), ...bbNoteMeta('brand:'+(bbCat?bbCat.key:'')+':'+b.name, b.name) })),
           bbCityChips:(BB?BB.CITIES:[]).map(c=>({ label:c.label, go:()=>this.setGentBBCity(c.key), bg:(S.gentBBCity||'london')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCity||'london')===c.key?'#0a0a0b':'#c5c5ca' })),
           bbCityRegion:bbCity?(bbCity.label+' · '+bbCity.region).toUpperCase():'',
           bbHotelCards:(bbCity&&bbCity.hotels?bbCity.hotels:[]).map(h=>({...h, save:()=>this.gentSaveBBItem('Hotel',h.name,h.note), ...bbNoteMeta('hotel:'+(bbCity?bbCity.key:'')+':'+h.name, h.name) })),
+          bbHotelRegionChips:(()=>{ const regions=[]; (BB?BB.CITIES:[]).forEach(c=>{ if(!regions.includes(c.region)) regions.push(c.region); }); return ['All'].concat(regions).map(r=>({ label:r, go:()=>this.setGentBBHotelRegion(r), bg:(S.gentBBHotelRegion||'All')===r?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBHotelRegion||'All')===r?'#0a0a0b':'#c5c5ca' })); })(),
+          bbAllHotelCards:(()=>{ const region=S.gentBBHotelRegion||'All'; const out=[]; (BB?BB.CITIES:[]).forEach(c=>{ if(region!=='All'&&c.region!==region) return; (c.hotels||[]).forEach(h=>{ out.push({ ...h, cityLine:(c.label+' · '+c.region).toUpperCase(), save:()=>this.gentSaveBBItem('Hotel',h.name,h.note), ...bbNoteMeta('hotel:'+c.key+':'+h.name, h.name) }); }); }); out.sort((a,b)=>a.cityLine.localeCompare(b.cityLine)); return out; })(),
           bbRestaurantCards:(bbCity&&bbCity.restaurants?bbCity.restaurants:[]).map(r=>({...r, save:()=>this.gentSaveBBItem('Restaurant',r.name,r.note), ...bbNoteMeta('restaurant:'+(bbCity?bbCity.key:'')+':'+r.name, r.name) })),
           bbEventCards:(bbCity&&bbCity.events?bbCity.events:[]).map(e=>({...e, save:()=>this.gentSaveBBItem('Event',e.name,e.note), ...bbNoteMeta('event:'+(bbCity?bbCity.key:'')+':'+e.name, e.name) })),
           bbSpaCards:(bbCity&&bbCity.spas?bbCity.spas:[]).map(sp=>({...sp, save:()=>this.gentSaveBBItem('Spa',sp.name,sp.note), ...bbNoteMeta('spa:'+(bbCity?bbCity.key:'')+':'+sp.name, sp.name) })),
