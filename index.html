@@ -2960,6 +2960,13 @@
                 </sc-if>
 
                 <sc-if value="{{ isBBLocations }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; align-items:center; gap:9px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); max-width:340px; margin-bottom:14px;">
+                    <span style="color:#C9C9CE; font-size:12px;">⌕</span>
+                    <input value="{{ bbLocationQueryVal }}" onInput="{{ setBBLocationQuery }}" placeholder="Search a city or region…" style="flex:1; background:transparent; border:none; outline:none; color:#eef0f2; font-size:12.5px;">
+                  </div>
+                  <sc-if value="{{ bbLocationNoResults }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:12.5px; color:#6f6f78; padding:8px 0 18px;">No cities match that search.</div>
+                  </sc-if>
                   <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
                     <sc-for list="{{ bbCityChips }}" as="c" hint-placeholder-count="10">
                       <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
@@ -8976,7 +8983,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-38 · v11.38 bb-hotels-search';
+const NOTIF_BUILD_VERSION = '2026.08.17-39 · v11.39 bb-locations-search';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9117,7 +9124,7 @@ activities: this._mergeShipLog(s.activities),
       gentScenQueue:[], gentScenIdx:0, gentScenChoice:null, gentScenPicks:[], gentScenStartedAt:0,
       gentOccasionSel:'', gentOccasionResult:null, gentOccasionLoading:false, gentOccasionErr:'',
       gentPSQueue:[], gentPSIdx:0, gentPSPicked:'', gentPSScore:0, gentPSStartedAt:0,
-      gentBBTab:'brands', gentBBCat:'watches', gentBBCity:'london', gentBBHotelRegion:'All', gentBBHotelQuery:'',
+      gentBBTab:'brands', gentBBCat:'watches', gentBBCity:'london', gentBBHotelRegion:'All', gentBBHotelQuery:'', gentBBLocationQuery:'',
       phyTutorMessages:[], phyTutorInput:'', phyTutorLoading:false, phyTutorErr:'', phyTutorVoiceId:'pro_f', phyTutorListening:false,
       tutorOpen:false, tutorSubject:'maths', tutorMessages:{}, tutorInput:'', tutorLoading:false, tutorErr:'', tutorVoiceId:'pro_f', tutorListening:false,
       qtMode:'closed', qtSubject:'english', qtType:'grammar', qtDifficulty:'Intermediate', qtLength:10, qtQueue:[], qtIdx:0, qtQ:null, qtInput:'', qtAnswers:[], qtStartedAt:0, qtIsDaily:false, qtLastResult:null,
@@ -12260,6 +12267,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.39', date:'Aug 17, 2026 · 16:35', major:true, notes:[
+      'Black Book → Locations gained the same search bar as Hotels — matches a city by name or region, narrowing the city chips instead of scrolling through all 26.',
+    ]},
     {version:'v11.38', date:'Aug 17, 2026 · 16:20', major:true, notes:[
       'Black Book → Hotels gained a search bar — matches by city, region or hotel name, on top of the existing region chips.',
     ]},
@@ -14467,6 +14477,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   setGentBBCity(k){ this.setState({gentBBCity:k}); }
   setGentBBHotelRegion(r){ this.setState({gentBBHotelRegion:r}); }
   setGentBBHotelQuery(e){ this.setState({gentBBHotelQuery:e.target.value}); }
+  setGentBBLocationQuery(e){ this.setState({gentBBLocationQuery:e.target.value}); }
   // "My Black Book" — saved brands/places, synced through the same private notes vault
   // (tagged so they list separately) rather than a new table, since that vault already
   // syncs to Supabase per-account.
@@ -15170,7 +15181,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.38 — Aug 17, 2026',
+      appVersion:'v11.39 — Aug 17, 2026',
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -16360,7 +16371,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bbTabHotelsBg:S.gentBBTab==='hotels'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabHotelsC:S.gentBBTab==='hotels'?'#0a0a0b':'#c5c5ca',
           bbCatChips:(BB?BB.BRAND_CATEGORIES:[]).map(c=>({ label:c.label, go:()=>this.setGentBBCat(c.key), bg:(S.gentBBCat||'watches')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCat||'watches')===c.key?'#0a0a0b':'#c5c5ca' })),
           bbBrandCards:(bbCat?bbCat.brands:[]).map(b=>({ ...b, save:()=>this.gentSaveBBItem(bbCat.label,b.name,b.blurb), ...bbNoteMeta('brand:'+(bbCat?bbCat.key:'')+':'+b.name, b.name) })),
-          bbCityChips:(BB?BB.CITIES:[]).map(c=>({ label:c.label, go:()=>this.setGentBBCity(c.key), bg:(S.gentBBCity||'london')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCity||'london')===c.key?'#0a0a0b':'#c5c5ca' })),
+          bbLocationQueryVal:S.gentBBLocationQuery||'', setBBLocationQuery:(e)=>this.setGentBBLocationQuery(e),
+          bbCityChips:(()=>{ const q=(S.gentBBLocationQuery||'').trim().toLowerCase(); return (BB?BB.CITIES:[]).filter(c=>!q||c.label.toLowerCase().includes(q)||c.region.toLowerCase().includes(q)).map(c=>({ label:c.label, go:()=>this.setGentBBCity(c.key), bg:(S.gentBBCity||'london')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCity||'london')===c.key?'#0a0a0b':'#c5c5ca' })); })(),
+          bbLocationNoResults:(()=>{ const q=(S.gentBBLocationQuery||'').trim().toLowerCase(); if(!q) return false; return !(BB?BB.CITIES:[]).some(c=>c.label.toLowerCase().includes(q)||c.region.toLowerCase().includes(q)); })(),
           bbCityRegion:bbCity?(bbCity.label+' · '+bbCity.region).toUpperCase():'',
           bbHotelCards:(bbCity&&bbCity.hotels?bbCity.hotels:[]).map(h=>({...h, save:()=>this.gentSaveBBItem('Hotel',h.name,h.note), ...bbNoteMeta('hotel:'+(bbCity?bbCity.key:'')+':'+h.name, h.name) })),
           bbHotelRegionChips:(()=>{ const regions=[]; (BB?BB.CITIES:[]).forEach(c=>{ if(!regions.includes(c.region)) regions.push(c.region); }); return ['All'].concat(regions).map(r=>({ label:r, go:()=>this.setGentBBHotelRegion(r), bg:(S.gentBBHotelRegion||'All')===r?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBHotelRegion||'All')===r?'#0a0a0b':'#c5c5ca' })); })(),
