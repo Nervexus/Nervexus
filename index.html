@@ -3396,22 +3396,22 @@
 
       <!-- ===== VOICE ===== -->
       <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
-      <div style="position:fixed; inset:0; z-index:3; background:#000; pointer-events:none;"></div>
+      <div style="position:fixed; inset:0; z-index:3; background:{{ vOverlay }}; pointer-events:none;"></div>
 
       <sc-if value="{{ convoHistoryOpen }}" hint-placeholder-val="{{ false }}">
         <div onClick="{{ closeConvoHistory }}" style="position:fixed; inset:0; z-index:40; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
-          <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:80vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:22px;">
+          <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:80vh; overflow-y:auto; border-radius:20px; background:{{ vCard }}; border:1px solid {{ vLine2 }}; padding:22px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-              <span style="font-size:15px; font-weight:700;">Conversation History</span>
-              <span onClick="{{ closeConvoHistory }}" style="cursor:pointer; color:#8a8a92; font-size:18px; line-height:1;">×</span>
+              <span style="font-size:15px; font-weight:700; color:{{ vInk }};">Conversation History</span>
+              <span onClick="{{ closeConvoHistory }}" style="cursor:pointer; color:{{ vMuted }}; font-size:18px; line-height:1;">×</span>
             </div>
-            <sc-if value="{{ convoHistoryLoading }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:#8a8a92;">Loading…</div></sc-if>
+            <sc-if value="{{ convoHistoryLoading }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:{{ vMuted }};">Loading…</div></sc-if>
             <sc-if value="{{ convoHistoryErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:#ff8a5b;">{{ convoHistoryErr }}</div></sc-if>
-            <sc-if value="{{ convoHistoryEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:#6f6f78;">No past conversations yet.</div></sc-if>
+            <sc-if value="{{ convoHistoryEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:{{ vMuted3 }};">No past conversations yet.</div></sc-if>
             <sc-for list="{{ convoHistoryList }}" as="c" hint-placeholder-count="6">
               <div style="display:flex; flex-direction:column; gap:3px; margin-bottom:12px;">
                 <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ c.whoC }};">{{ c.who }} · {{ c.time }}</span>
-                <span style="font-size:13px; line-height:1.5; color:#dbdbe0; background:#1e2024; border-radius:11px; padding:9px 12px; display:inline-block;">{{ c.text }}</span>
+                <span style="font-size:13px; line-height:1.5; color:{{ vInk2 }}; background:{{ vBubbleAI }}; border-radius:11px; padding:9px 12px; display:inline-block;">{{ c.text }}</span>
               </div>
             </sc-for>
           </div>
@@ -3420,76 +3420,76 @@
       <div style="animation:rise .5s ease both; display:flex; flex-direction:column; align-items:center; position:relative; z-index:4;">
         <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="width:100%; max-width:720px; font-size:12px; color:#ff8a5b; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(255,138,91,0.1); border:1px solid rgba(255,138,91,0.25);">⚠ {{ voiceFallbackErr }}</div></sc-if>
         <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center; padding:36px 0 26px; margin-bottom:18px;">
-          <div style="position:absolute; inset:-40px 0; z-index:0; background:radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%);"></div>
+          <div style="position:absolute; inset:-40px 0; z-index:0; background:{{ vGlow }};"></div>
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
             <div data-orb-mount="voice" style="width:460px; height:460px; margin:4px 0;"></div>
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#8a8a92;">VOICE ASSISTANT</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:{{ vMuted }};">VOICE ASSISTANT</span>
               <div onClick="{{ toggleAssistantEnabled }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ assistantEnabledBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ assistantEnabledPos }}; width:16px; height:16px; border-radius:50%; background:#0a0a0b; transition:left .15s;"></div></div>
             </div>
-            <div onClick="{{ toggleListen }}" style="display:inline-flex; align-items:center; gap:10px; padding:13px 26px; border-radius:40px; cursor:pointer; border:1px solid {{ listenBdr }}; background:{{ listenBg }}; color:#fff; font-size:14px; font-weight:600; opacity:{{ listenOpacity }}; pointer-events:{{ listenPointerEvents }};" style-hover="{ transform:'scale(1.03)' }">
+            <div onClick="{{ toggleListen }}" style="display:inline-flex; align-items:center; gap:10px; padding:13px 26px; border-radius:40px; cursor:pointer; border:1px solid {{ listenBdr }}; background:{{ listenBg }}; color:{{ vInk }}; font-size:14px; font-weight:600; opacity:{{ listenOpacity }}; pointer-events:{{ listenPointerEvents }};" style-hover="{ transform:'scale(1.03)' }">
               <span style="width:10px; height:10px; border-radius:50%; background:{{ listenDot }}; box-shadow:0 0 10px {{ listenDot }};"></span>
               {{ listenLabel }}
             </div>
-            <sc-if value="{{ hasLiveTranscript }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#8a8a92; letter-spacing:.3px; max-width:520px; text-align:center;">“{{ vLiveTranscript }}”</div></sc-if>
+            <sc-if value="{{ hasLiveTranscript }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ vMuted }}; letter-spacing:.3px; max-width:520px; text-align:center;">“{{ vLiveTranscript }}”</div></sc-if>
           </div>
         </div>
-        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:#141416; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">LIVE TRANSCRIPT</span><span onClick="{{ openConvoHistory }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#9a9aa2; cursor:pointer; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:5px 10px;" style-hover="{ color:'#FFFFFF', borderColor:'rgba(255,255,255,0.4)' }">HISTORY</span></div>
+        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ vMuted2 }};">LIVE TRANSCRIPT</span><span onClick="{{ openConvoHistory }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ vMuted }}; cursor:pointer; border:1px solid {{ vLine2 }}; border-radius:8px; padding:5px 10px;" style-hover="{ color:'{{ vAccent }}' }">HISTORY</span></div>
           <sc-for list="{{ transcript }}" as="m" hint-placeholder-count="3">
             <div style="display:flex; flex-direction:column; gap:4px; margin-bottom:14px; max-width:90%;">
               <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ m.whoC }};">{{ m.who }}</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.5; color:{{ m.txtC }}; background:#1e2024; border-radius:13px; padding:10px 14px; display:inline-block;">{{ m.text }}</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:13.5px; line-height:1.5; color:{{ m.txtC }}; background:{{ m.bg }}; border-radius:13px; padding:10px 14px; display:inline-block;">{{ m.text }}</span>
             </div>
           </sc-for>
-          <div style="display:flex; gap:9px; margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:14px;">
-            <input value="{{ vInput }}" onInput="{{ setVInput }}" onKeyDown="{{ sendVoiceKey }}" placeholder="Type a command… e.g. open finance, add gym to my checklist" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-            <span onClick="{{ sendVoice }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">Send</span>
+          <div style="display:flex; gap:9px; margin-top:8px; border-top:1px solid {{ vLine3 }}; padding-top:14px;">
+            <input value="{{ vInput }}" onInput="{{ setVInput }}" onKeyDown="{{ sendVoiceKey }}" placeholder="Type a command… e.g. open finance, add gym to my checklist" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid {{ vLine }}; background:{{ vInputBg }}; color:{{ vInk }}; font-size:13px; outline:none;">
+            <span onClick="{{ sendVoice }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:{{ vBtnBg }}; box-shadow:{{ vBtnShadow }}; color:{{ vBtnText }}; font-size:13px; font-weight:700; cursor:pointer;">Send</span>
           </div>
         </div>
-        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:#141416; padding:20px; margin-bottom:18px;">
+        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
             <div onClick="{{ toggleAutoBriefing }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ autoBriefBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ autoBriefPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-            <span style="font-size:12.5px; color:#c8c8ce;">Speak my daily briefing automatically at</span>
-            <input type="time" value="{{ autoBriefTime }}" onInput="{{ setAutoBriefTime }}" style="padding:7px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px;">
+            <span style="font-size:12.5px; color:{{ vInk2 }};">Speak my daily briefing automatically at</span>
+            <input type="time" value="{{ autoBriefTime }}" onInput="{{ setAutoBriefTime }}" style="padding:7px 10px; border-radius:9px; border:1px solid {{ vLine }}; background:{{ vInputBg }}; color:{{ vInk }}; font-size:12px;">
           </div>
-          <div style="font-size:11px; color:#6f6f78;">Manage remembered facts in Settings → Memory.</div>
+          <div style="font-size:11px; color:{{ vMuted3 }};">Manage remembered facts in Settings → Memory.</div>
         </div>
-        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:#141416; padding:20px; margin-bottom:18px;">
+        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">READ ALOUD · IMPORT OR PASTE</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#6f6f78;">TXT · MD · PDF · DOCX</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ vMuted2 }};">READ ALOUD · IMPORT OR PASTE</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ vMuted3 }};">TXT · MD · PDF · DOCX</span>
           </div>
           <label onDrop="{{ onDropRead }}" onDragOver="{{ onDragOverRead }}" onDragLeave="{{ onDragLeaveRead }}" style="display:flex; align-items:center; justify-content:center; gap:10px; padding:16px; border:1px dashed {{ dragBd }}; border-radius:13px; background:{{ dragBg }}; cursor:pointer; text-align:center; transition:background .2s;">
-            <span style="font-size:16px; color:#FFFFFF;">⤒</span>
-            <span style="font-size:12.5px; color:#c8c8ce;">Drop a file here or <span style="color:#F4F4F5; text-decoration:underline;">browse</span> — TXT, Markdown, PDF or Word</span>
+            <span style="font-size:16px; color:{{ vAccent }};">⤒</span>
+            <span style="font-size:12.5px; color:{{ vInk2 }};">Drop a file here or <span style="color:{{ vAccent }}; text-decoration:underline;">browse</span> — TXT, Markdown, PDF or Word</span>
             <input type="file" accept=".txt,.md,.markdown,.pdf,.docx,text/plain" onChange="{{ importReadFile }}" style="display:none;">
           </label>
-          <sc-if value="{{ importing }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#FFFFFF; margin-top:8px;">◷ Reading file…</div></sc-if>
+          <sc-if value="{{ importing }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ vAccent }}; margin-top:8px;">◷ Reading file…</div></sc-if>
           <sc-if value="{{ importErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#ff3b4a; margin-top:8px;">⚠ {{ importErr }}</div></sc-if>
-          <textarea value="{{ readText }}" onInput="{{ setReadText }}" placeholder="…or paste text here for the assistant to read aloud." style="width:100%; margin-top:12px; min-height:96px; resize:vertical; padding:13px 15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; line-height:1.5; outline:none; font-family:inherit; box-sizing:border-box;"></textarea>
+          <textarea value="{{ readText }}" onInput="{{ setReadText }}" placeholder="…or paste text here for the assistant to read aloud." style="width:100%; margin-top:12px; min-height:96px; resize:vertical; padding:13px 15px; border-radius:12px; border:1px solid {{ vLine }}; background:{{ vInputBg }}; color:{{ vInk }}; font-size:13px; line-height:1.5; outline:none; font-family:inherit; box-sizing:border-box;"></textarea>
           <div style="display:flex; gap:9px; margin-top:12px;">
-            <span onClick="{{ readPasted }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700;" style-hover="{ transform:'translateY(-1px)' }">▶ Read aloud</span>
-            <span onClick="{{ stopPlay }}" style="padding:12px 18px; border-radius:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.14); color:#c8c8ce; font-size:13px; font-weight:600;" style-hover="{ color:'#FFFFFF', borderColor:'rgba(255,255,255,0.4)' }">Stop</span>
+            <span onClick="{{ readPasted }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:12px; cursor:pointer; background:{{ vBtnBg }}; box-shadow:{{ vBtnShadow }}; color:{{ vBtnText }}; font-size:13px; font-weight:700;" style-hover="{ transform:'translateY(-1px)' }">▶ Read aloud</span>
+            <span onClick="{{ stopPlay }}" style="padding:12px 18px; border-radius:12px; cursor:pointer; border:1px solid {{ vLine2 }}; color:{{ vInk2 }}; font-size:13px; font-weight:600;" style-hover="{ color:'{{ vAccent }}' }">Stop</span>
           </div>
           <sc-if value="{{ vp.loaded }}" hint-placeholder-val="{{ false }}">
-            <div style="margin-top:16px; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;">
+            <div style="margin-top:16px; border-top:1px solid {{ vLine2 }}; padding-top:14px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <span style="font-size:12.5px; font-weight:600; color:#eef0f2; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ vp.title }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92; white-space:nowrap;">{{ vp.timeLabel }} / {{ vp.totalLabel }}</span>
+                <span style="font-size:12.5px; font-weight:600; color:{{ vInk }}; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ vp.title }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ vMuted }}; white-space:nowrap;">{{ vp.timeLabel }} / {{ vp.totalLabel }}</span>
               </div>
-              <div style="height:6px; border-radius:4px; background:rgba(255,255,255,0.08); overflow:hidden;"><div style="height:100%; width:{{ vp.pct }}%; background:#FFFFFF; transition:width .25s;"></div></div>
-              <div style="display:flex; justify-content:space-between; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78;">{{ vp.remainLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78;">SEG {{ vpSeg }}</span></div>
+              <div style="height:6px; border-radius:4px; background:{{ vTrack }}; overflow:hidden;"><div style="height:100%; width:{{ vp.pct }}%; background:{{ vAccent }}; transition:width .25s;"></div></div>
+              <div style="display:flex; justify-content:space-between; margin-top:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:{{ vMuted3 }};">{{ vp.remainLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:{{ vMuted3 }};">SEG {{ vpSeg }}</span></div>
               <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px;">
-                <span onClick="{{ restartPlay }}" title="Restart" style="width:38px; height:38px; border-radius:50%; border:1px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#c8c8ce; font-size:13px;" style-hover="{ borderColor:'rgba(255,255,255,0.5)', color:'#fff' }">⏮</span>
-                <span onClick="{{ skipBack }}" title="Back 15 seconds" style="width:44px; height:38px; border-radius:19px; border:1px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#c8c8ce; font-family:'JetBrains Mono',monospace; font-size:10px;" style-hover="{ borderColor:'rgba(255,255,255,0.5)', color:'#fff' }">«15</span>
-                <span onClick="{{ pausePlay }}" style="width:52px; height:52px; border-radius:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#0c0c0d; font-size:18px; box-shadow:0 4px 12px rgba(0,0,0,0.4);" style-hover="{ transform:'scale(1.05)' }">{{ playIcon }}</span>
-                <span onClick="{{ skipFwd }}" title="Forward 15 seconds" style="width:44px; height:38px; border-radius:19px; border:1px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#c8c8ce; font-family:'JetBrains Mono',monospace; font-size:10px;" style-hover="{ borderColor:'rgba(255,255,255,0.5)', color:'#fff' }">15»</span>
-                <span onClick="{{ stopPlay }}" title="Stop" style="width:38px; height:38px; border-radius:50%; border:1px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#c8c8ce; font-size:11px;" style-hover="{ borderColor:'rgba(255,255,255,0.5)', color:'#FFFFFF' }">■</span>
+                <span onClick="{{ restartPlay }}" title="Restart" style="width:38px; height:38px; border-radius:50%; border:1px solid {{ vLine2 }}; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ vInk2 }}; font-size:13px;" style-hover="{ borderColor:'{{ vAccent }}', color:'{{ vAccent }}' }">⏮</span>
+                <span onClick="{{ skipBack }}" title="Back 15 seconds" style="width:44px; height:38px; border-radius:19px; border:1px solid {{ vLine2 }}; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ vInk2 }}; font-family:'JetBrains Mono',monospace; font-size:10px;" style-hover="{ borderColor:'{{ vAccent }}', color:'{{ vAccent }}' }">«15</span>
+                <span onClick="{{ pausePlay }}" style="width:52px; height:52px; border-radius:50%; background:{{ vAccent }}; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ vBtnText }}; font-size:18px; box-shadow:0 4px 12px rgba(0,0,0,0.25);" style-hover="{ transform:'scale(1.05)' }">{{ playIcon }}</span>
+                <span onClick="{{ skipFwd }}" title="Forward 15 seconds" style="width:44px; height:38px; border-radius:19px; border:1px solid {{ vLine2 }}; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ vInk2 }}; font-family:'JetBrains Mono',monospace; font-size:10px;" style-hover="{ borderColor:'{{ vAccent }}', color:'{{ vAccent }}' }">15»</span>
+                <span onClick="{{ stopPlay }}" title="Stop" style="width:38px; height:38px; border-radius:50%; border:1px solid {{ vLine2 }}; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ vInk2 }}; font-size:11px;" style-hover="{ borderColor:'{{ vAccent }}', color:'{{ vAccent }}' }">■</span>
               </div>
               <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-top:14px; align-items:center;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-right:2px;">SPEED</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ vMuted2 }}; margin-right:2px;">SPEED</span>
                 <sc-for list="{{ speedChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:8px; padding:5px 10px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
               </div>
             </div>
@@ -8983,7 +8983,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-39 · v11.39 bb-locations-search';
+const NOTIF_BUILD_VERSION = '2026.08.17-40 · v11.40 voice-assistant-per-theme';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11394,6 +11394,35 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _currentEmail(){ if(this.state.profile) return (this.state.profile.email||'').trim().toLowerCase(); return (((this.state.currentEmail||'')||((this.state.account&&this.state.account.email)||'')).trim().toLowerCase()); }
   _isOwner(){ if(this.state.profile) return this.state.profile.role==='owner'; const owner=((this.state.account&&this.state.account.email)||'').trim().toLowerCase(); const cur=(this.state.currentEmail||'').trim().toLowerCase(); return cur===''||cur===owner; }
   _role(){ if(this.state.profile) return this._isOwner()?'Owner':'Standard'; if(this._isOwner()) return 'Owner'; const em=this._currentEmail(); const u=(this.state.users||[]).find(x=>((x.email)||'').trim().toLowerCase()===em); return u?u.role:'Standard'; }
+  // Voice Assistant screen's per-theme palette. dark=true keeps the original black look
+  // (base theme + Spline background, and Noir); Ultra X and Maison Élysée get their own
+  // light card/ink/accent set instead of inheriting a black screen that doesn't match them.
+  _voiceTokens(){
+    const P=this.state.prefs||{}; const isUltra=P.theme==='Ultra'; const isMaison=P.ultraStyle==='Maison Élysée';
+    const dark=!isUltra||P.ultraStyle==='Noir'; const accent=dark?'#FFFFFF':(isMaison?'#4E6E96':'#5B1A1A');
+    return {
+      vDark:dark,
+      vOverlay:dark?'#000':'transparent',
+      vGlow:dark?'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)':('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
+      vCard:dark?'#141416':(isMaison?'#FBF7EF':'#F5F1E8'),
+      vInk:dark?'#eef0f2':(isMaison?'#2E4560':'#3A2A20'),
+      vInk2:dark?'#c8c8ce':(isMaison?'#3C5A7D':'#5A473C'),
+      vMuted:dark?'#8a8a92':(isMaison?'#6E82A0':'#8a6a5a'),
+      vMuted2:dark?'#7c7c84':(isMaison?'#7f93AE':'#9c8674'),
+      vMuted3:dark?'#6f6f78':(isMaison?'#8fa2ba':'#a8927e'),
+      vAccent:accent,
+      vLine:dark?'rgba(255,255,255,0.1)':(isMaison?'rgba(60,90,125,0.18)':'rgba(91,26,26,0.18)'),
+      vLine2:dark?'rgba(255,255,255,0.14)':(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
+      vLine3:dark?'rgba(255,255,255,0.06)':(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
+      vInputBg:dark?'rgba(255,255,255,0.03)':(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
+      vBubbleAI:dark?'#1e2024':(isMaison?'#F2ECE0':'#EFE7DA'),
+      vBubbleYou:dark?'rgba(255,255,255,0.05)':(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
+      vTrack:dark?'rgba(255,255,255,0.08)':(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
+      vBtnBg:dark?'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)':accent,
+      vBtnText:dark?'#0a0a0b':(isMaison?'#F6F0E4':'#F5F1E8'),
+      vBtnShadow:dark?'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)':'none',
+    };
+  }
   _sbBoot(){
     if(!(window.SB && window.SB.ready())) return;
     this.setState({sbReady:true});
@@ -12267,6 +12296,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.40', date:'Aug 17, 2026 · 17:15', major:true, notes:[
+      'Voice Assistant screen now follows the active Ultra style instead of always being black — Ultra X gets its cream-and-maroon palette, Maison Élysée gets cream-and-blue, both matching the rest of their theme (cards, buttons, transcript bubbles, the listen button, playback controls, all of it). Base theme with the Spline background, and Noir, keep the original black look.',
+      'Fixed: Settings → Troubleshooting\'s "App version" diagnostic row has shown "—" since it shipped in v11.37 — it read a state field that never existed. Shows the real version now.',
+    ]},
     {version:'v11.39', date:'Aug 17, 2026 · 16:35', major:true, notes:[
       'Black Book → Locations gained the same search bar as Hotels — matches a city by name or region, narrowing the city chips instead of scrolling through all 26.',
     ]},
@@ -14690,6 +14723,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
   renderVals(){
     const scene=this.state.scene, S=this.state;
+    const vTok=this._voiceTokens();
+    const appVer='v11.40 — Aug 17, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
     const navActive=(id)=> id===scene || (id==='business' && scene==='finance') || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
@@ -15004,7 +15039,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const online=typeof navigator==='undefined'||navigator.onLine!==false;
         let storageKB=0; try{ storageKB=Math.round((JSON.stringify(localStorage.getItem('cc_v2')||'').length)/1024); }catch(e){}
         const diagRows=[
-          { k:'App version', v:S.appVersion||'—', c:'#eef0f2' },
+          { k:'App version', v:appVer, c:'#eef0f2' },
           { k:'Account sync', v:S.sbReady?'Connected':'Local only — not signed in to sync', c:S.sbReady?'#2fce86':'#ffb020' },
           { k:'Connection', v:online?'Online':'Offline', c:online?'#2fce86':'#ff5563' },
           { k:'Notifications', v:notifPerm==='granted'?'Allowed':notifPerm==='denied'?'Blocked in browser settings':notifPerm==='unsupported'?'Not supported on this browser':'Not yet asked', c:notifPerm==='granted'?'#2fce86':notifPerm==='denied'?'#ff5563':'#ffb020' },
@@ -15163,6 +15198,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       freqChips:this._chips('nFreq',['Real-time','Hourly','Daily digest']),
       privacyToggles:[ this._tog('twoFA','Two-factor authentication','Require a second factor at login'), this._tog('aiMemory','AI memory','Let assistants remember context'), this._tog('analytics','Usage analytics','Anonymous product analytics'), this._tog('telemetry','Crash telemetry','Send diagnostics on errors') ],
       ...this._providerVals(),
+      // Voice Assistant screen — was pure black regardless of theme (fine for Spline/Noir,
+      // wrong for Ultra X's cream/maroon and Maison Élysée's cream/blue). vTok.vDark stays
+      // true for the base theme and Noir; Ultra X and Maison Élysée get their own light
+      // palette. See _voiceTokens() for the actual per-theme values.
+      ...vTok,
       voiceRateChips:[0.75,1,1.25,1.5].map(o=>({l:o+'×', set:()=>this.setPref('voiceRate',o), c:S.prefs.voiceRate===o?'#F4F4F5':'#9a9aa2', b:S.prefs.voiceRate===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.voiceRate===o?'rgba(255,255,255,0.18)':'transparent'})),
       voicePitchChips:[0.8,1,1.2].map(o=>({l:o+'×', set:()=>this.setPref('voicePitch',o), c:S.prefs.voicePitch===o?'#F4F4F5':'#9a9aa2', b:S.prefs.voicePitch===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.voicePitch===o?'rgba(255,255,255,0.18)':'transparent'})),
       voiceSetToggles:[ this._tog('wake','Wake word','Respond to “Hey '+(S.prefs.wakeWordName||'Hannah')+'”'), this._tog('autoListen','Continuous mode','Keep listening after replies') ],
@@ -15171,7 +15211,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       volumeChips:[0.5,0.75,1].map(o=>({l:Math.round(o*100)+'%', set:()=>this.setVoiceVolume(o), c:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.14)':'transparent'})),
       briefVoiceChips:((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ name:p.name, set:()=>this.setBriefVoice(p.id), c:(S.prefs.briefingVoice||S.prefs.elevenVoiceId)===p.id?'#F4F4F5':'#b8b8c0', b:(S.prefs.briefingVoice||'concierge')===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.briefingVoice||'concierge')===p.id?'rgba(255,255,255,0.14)':'transparent'})),
       convoVoiceChips:((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ name:p.name, set:()=>this.setConvoVoice(p.id), c:(S.prefs.convoVoice||S.prefs.elevenVoiceId)===p.id?'#F4F4F5':'#b8b8c0', b:(S.prefs.convoVoice||'friend_f')===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.convoVoice||'friend_f')===p.id?'rgba(255,255,255,0.14)':'transparent'})),
-      readText:S.readText, setReadText:(e)=>this.setReadText(e), readPasted:()=>this.readPasted(), importReadFile:(e)=>this.importReadFile(e), onDropRead:(e)=>this.onDropRead(e), onDragOverRead:(e)=>{ try{e.preventDefault();}catch(_){} if(!this.state.dragOver) this.setState({dragOver:true}); }, onDragLeaveRead:()=>{ if(this.state.dragOver) this.setState({dragOver:false}); }, importing:S.importing, importErr:S.importErr, dragBg:S.dragOver?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.02)', dragBd:S.dragOver?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.14)',
+      readText:S.readText, setReadText:(e)=>this.setReadText(e), readPasted:()=>this.readPasted(), importReadFile:(e)=>this.importReadFile(e), onDropRead:(e)=>this.onDropRead(e), onDragOverRead:(e)=>{ try{e.preventDefault();}catch(_){} if(!this.state.dragOver) this.setState({dragOver:true}); }, onDragLeaveRead:()=>{ if(this.state.dragOver) this.setState({dragOver:false}); }, importing:S.importing, importErr:S.importErr, dragBg:S.dragOver?(vTok.vDark?'rgba(255,255,255,0.1)':vTok.vInputBg):(vTok.vDark?'rgba(255,255,255,0.02)':vTok.vLine3), dragBd:S.dragOver?vTok.vAccent:vTok.vLine,
       readerTitle:(S.vp&&S.vp.title)||S.readText&&'Ready'||'', vp:S.vp||{}, playIcon:(S.vp&&S.vp.playing&&!S.vp.paused)?'⏸':'▶', speakBriefing:()=>this.speakBriefing(), pausePlay:()=>this.pausePlay(), stopPlay:()=>this.stopPlay(), restartPlay:()=>this.restartPlay(), skipBack:()=>this.skipPlay(-15), skipFwd:()=>this.skipPlay(15), vpSeg:((S.vp&&S.vp.count)?((S.vp.idx+1)+' / '+S.vp.count):'—'),
       hasReadable:!!((S.readText&&S.readText.trim())||(S.vp&&S.vp.loaded)),
       convoHistoryOpen:!!S.convoHistoryOpen,
@@ -15179,9 +15219,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       closeConvoHistory:()=>this.setState({convoHistoryOpen:false}),
       convoHistoryLoading:!!S.convoHistoryLoading, convoHistoryErr:S.convoHistoryErr||'', convoHistoryErrShow:!!S.convoHistoryErr,
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
-      convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?'#7c7c84':'#c9c9ce', text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
+      convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?vTok.vMuted2:vTok.vAccent, text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
       showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
-      appVersion:'v11.39 — Aug 17, 2026',
+      appVersion:appVer,
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
       whatsNewList:this._changelog().map(c=>({version:c.version, date:c.date, notes:c.notes})),
@@ -15235,11 +15275,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       dashboardWidgets:[['missions','Missions & Diet Checklist'],['brief','AI Daily Brief'],['stats','Stat Cards'],['intel','Intelligence Feed']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
       emailProvider:S.prefs.emailProvider||'resend', setEmailProvider:(e)=>this.setPref('emailProvider',e.target.value),
-      autoBriefBg:S.prefs.autoBriefingEnabled?'#FFFFFF':'rgba(255,255,255,0.14)', autoBriefPos:S.prefs.autoBriefingEnabled?'20px':'2px',
+      autoBriefBg:S.prefs.autoBriefingEnabled?vTok.vAccent:vTok.vLine2, autoBriefPos:S.prefs.autoBriefingEnabled?'20px':'2px',
       toggleAutoBriefing:()=>this.setPref('autoBriefingEnabled',!S.prefs.autoBriefingEnabled),
       autoBriefTime:S.prefs.autoBriefingTime||'08:00', setAutoBriefTime:(e)=>this.setPref('autoBriefingTime',e.target.value),
       voiceSources:[{id:'exec',t:'Executive Briefing',d:'Full intelligence report',g:'◆'},{id:'brief',t:'Daily Briefing',d:'Schedule · priorities · markets',g:'▤'},{id:'notif',t:'Notifications',d:'Recent alerts summary',g:'◉'},{id:'schedule',t:'Schedule & Reminders',d:'Today\u2019s events & open tasks',g:'◷'},{id:'fitness',t:'Fitness & Recovery',d:'Readiness · streak · sleep',g:'✚'},{id:'money',t:'Markets & Money',d:'Global financial update',g:'$'},{id:'business',t:'Business Report',d:'Companies & billionaire intel',g:'⬡'}].map(x=>({ title:x.t, desc:x.d, glyph:x.g, read:()=>this.readCoreSource(x.id,x.t) })),
-      speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.voiceRate||1)===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.voiceRate||1)===o?'rgba(255,255,255,0.14)':'transparent'})),
+      speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?vTok.vInk:vTok.vMuted2, b:(S.prefs.voiceRate||1)===o?vTok.vAccent:vTok.vLine, bg:(S.prefs.voiceRate||1)===o?vTok.vLine2:'transparent'})),
       voiceModelName:(()=>{ const PD=this._pd(); const built=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0].voices)||[]; const custom=S.prefs.customElevenVoices||[]; const cur=S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'; const match=[...built,...custom].find(p=>p.id===cur); return (match&&match.name)||'ElevenLabs voice'; })(),
       voiceDeviceName:this._provCfg('elevenlabs').saved?'ElevenLabs (cloud)':'Browser voice (fallback — connect ElevenLabs above)',
       voiceFallbackErr:S.voiceFallbackErr||'',
@@ -16780,11 +16820,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       voiceCmds:['Open the finance terminal','Add gym to my checklist','Summarize my day','Read my full briefing','Open the health centre'].map(c=>({label:c, run:()=>this.voiceCommand(c)})),
       toggleListen:()=>this.toggleListen(),
       vInput:S.vInput, setVInput:(e)=>this.setState({vInput:e.target.value}), sendVoice:()=>this.voiceCommand(this.state.vInput), sendVoiceKey:enterKey(()=>this.voiceCommand(this.state.vInput)),
-      toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?'#FFFFFF':'rgba(255,255,255,0.14)', assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
+      toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?vTok.vAccent:vTok.vLine2, assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
       listenOpacity:(S.prefs.assistantEnabled!==false)?1:0.4, listenPointerEvents:(S.prefs.assistantEnabled!==false)?'auto':'none',
-      listenLabel:(S.prefs.assistantEnabled===false)?'Assistant is off':(S.listening?'Stop listening':'Hold to talk'), listenBg:S.listening?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.04)', listenBdr:S.listening?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.14)', listenDot:S.listening?'#FFFFFF':'#7c7c84',
+      listenLabel:(S.prefs.assistantEnabled===false)?'Assistant is off':(S.listening?'Stop listening':'Hold to talk'), listenBg:S.listening?(vTok.vDark?'rgba(255,255,255,0.22)':vTok.vLine2):vTok.vInputBg, listenBdr:S.listening?vTok.vAccent:vTok.vLine, listenDot:S.listening?vTok.vAccent:vTok.vMuted2,
       vLiveTranscript:S.vLiveTranscript||'', hasLiveTranscript:!!(S.listening&&S.vLiveTranscript),
-      transcript:(S.vtx.length?S.vtx:[{who:'YOU',text:'What is my day and how are markets?'},{who:'AI',text:'You have '+(S.checklist.length-checkDone)+' priorities and a focus block 9 to noon. Markets opened green — portfolio up 2.1%. Say “read my briefing” or “open finance”.'}]).map(m=>({who:m.who, whoC:m.who==='AI'?'#C9C9CE':'#7c7c84', txtC:m.who==='AI'?'#eef0f2':'#b8b8c0', text:m.text})),
+      transcript:(S.vtx.length?S.vtx:[{who:'YOU',text:'What is my day and how are markets?'},{who:'AI',text:'You have '+(S.checklist.length-checkDone)+' priorities and a focus block 9 to noon. Markets opened green — portfolio up 2.1%. Say “read my briefing” or “open finance”.'}]).map(m=>({who:m.who, whoC:m.who==='AI'?vTok.vAccent:vTok.vMuted2, txtC:m.who==='AI'?vTok.vInk:vTok.vInk2, bg:m.who==='AI'?vTok.vBubbleAI:vTok.vBubbleYou, text:m.text})),
     };
   }
 }
