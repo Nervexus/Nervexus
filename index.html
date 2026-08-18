@@ -3403,14 +3403,12 @@
 
       <!-- ===== VOICE ===== -->
       <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
-      <sc-if value="{{ vDark }}" hint-placeholder-val="{{ true }}">
-        <div style="position:fixed; inset:0; z-index:3; background:#000; pointer-events:none; overflow:hidden;">
-          <div data-us-project="tCcBHRpF4pd3u3hQXCm5" style="position:absolute; inset:0; width:100%; height:100%;"></div>
-        </div>
-      </sc-if>
-      <sc-if value="{{ vLight }}" hint-placeholder-val="{{ false }}">
-        <div style="position:fixed; inset:0; z-index:3; background:{{ vOverlay }}; pointer-events:none;"></div>
-      </sc-if>
+      <div style="position:fixed; inset:0; z-index:3; background:#000; pointer-events:none; overflow:hidden;">
+        <div data-us-project="tCcBHRpF4pd3u3hQXCm5" style="position:absolute; inset:0; width:100%; height:100%;"></div>
+        <sc-if value="{{ vLight }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:0; background:{{ vBgTint }};"></div>
+        </sc-if>
+      </div>
 
       <sc-if value="{{ convoHistoryOpen }}" hint-placeholder-val="{{ false }}">
         <div onClick="{{ closeConvoHistory }}" style="position:fixed; inset:0; z-index:40; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
@@ -3434,10 +3432,8 @@
       <div style="animation:rise .5s ease both; display:flex; flex-direction:column; align-items:center; position:relative; z-index:4;">
         <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="width:100%; max-width:720px; font-size:12px; color:#ff8a5b; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(255,138,91,0.1); border:1px solid rgba(255,138,91,0.25);">⚠ {{ voiceFallbackErr }}</div></sc-if>
         <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center; padding:36px 0 26px; margin-bottom:18px;">
-          <div style="position:absolute; inset:-40px 0; z-index:0; background:{{ vGlow }};"></div>
-          <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
-            <div data-orb-mount="voice" style="width:460px; height:460px; margin:4px 0;"></div>
-            <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
+          <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; width:100%;">
+            <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:36px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
               <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:{{ vMuted }};">VOICE ASSISTANT</span>
               <div onClick="{{ toggleAssistantEnabled }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ assistantEnabledBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ assistantEnabledPos }}; width:16px; height:16px; border-radius:50%; background:#0a0a0b; transition:left .15s;"></div></div>
@@ -8997,7 +8993,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-42 · v11.42 orb-per-theme-color';
+const NOTIF_BUILD_VERSION = '2026.08.17-43 · v11.43 voice-drop-orb-fix-lag';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11408,17 +11404,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _currentEmail(){ if(this.state.profile) return (this.state.profile.email||'').trim().toLowerCase(); return (((this.state.currentEmail||'')||((this.state.account&&this.state.account.email)||'')).trim().toLowerCase()); }
   _isOwner(){ if(this.state.profile) return this.state.profile.role==='owner'; const owner=((this.state.account&&this.state.account.email)||'').trim().toLowerCase(); const cur=(this.state.currentEmail||'').trim().toLowerCase(); return cur===''||cur===owner; }
   _role(){ if(this.state.profile) return this._isOwner()?'Owner':'Standard'; if(this._isOwner()) return 'Owner'; const em=this._currentEmail(); const u=(this.state.users||[]).find(x=>((x.email)||'').trim().toLowerCase()===em); return u?u.role:'Standard'; }
-  // Voice Assistant screen's per-theme palette. dark=true keeps the original black look
-  // (base theme + Spline background, and Noir); Ultra X and Maison Élysée get their own
-  // light card/ink/accent set instead of inheriting a black screen that doesn't match them.
+  // Voice Assistant screen's per-theme palette. The Unicorn Studio animated background
+  // now runs for all four themes (base/Spline, Noir, Ultra X, Maison Élysée) — it used to
+  // be paired with a separate WebGL orb for base+Noir, but running two WebGL animations
+  // on one screen was the real cause of the reported lag, so the orb was dropped in favour
+  // of Unicorn Studio alone everywhere. dark=true (base theme + Noir) leaves the scene as
+  // its native black; light themes layer vBgTint on top so it reads as their own palette
+  // instead of raw black, since the scene itself is hosted externally and can't be recoloured.
   _voiceTokens(){
     const P=this.state.prefs||{}; const isUltra=P.theme==='Ultra'; const isMaison=P.ultraStyle==='Maison Élysée';
     const dark=!isUltra||P.ultraStyle==='Noir'; const accent=dark?'#FFFFFF':(isMaison?'#4E6E96':'#5B1A1A');
     return {
       vDark:dark,
       vLight:!dark,
-      vOverlay:dark?'#000':'transparent',
-      vGlow:dark?'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)':('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
+      vBgTint:isMaison?'rgba(251,247,239,0.82)':'rgba(245,241,232,0.82)',
       vCard:dark?'#141416':(isMaison?'#FBF7EF':'#F5F1E8'),
       vInk:dark?'#eef0f2':(isMaison?'#2E4560':'#3A2A20'),
       vInk2:dark?'#c8c8ce':(isMaison?'#3C5A7D':'#5A473C'),
@@ -12311,6 +12310,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.43', date:'Aug 17, 2026 · 18:35', major:true, notes:[
+      'Fixed Voice Assistant lag: the screen was running two separate WebGL animations at once — the big pulsing orb and the new Unicorn Studio background behind it. Dropped the orb (the pulse-when-listening visual is gone) so Unicorn Studio is the only animation running there, for all four themes now including Ultra X and Maison Élysée. Since that scene is hosted externally and can\'t be recoloured directly, Ultra X and Maison Élysée layer a translucent cream wash over it so it reads as their own palette instead of raw black.',
+    ]},
     {version:'v11.42', date:'Aug 17, 2026 · 18:10', major:true, notes:[
       'Fixed the glowing orbs — the sidebar logo (top-left) and the floating voice button (bottom-right on most screens) were hardcoded to Ultra X\'s red/maroon no matter what theme was active, so base theme and Noir both showed the same red orb. Now follows the active theme: neutral silver for base theme, gold for Noir, blue for Maison Élysée, red/maroon stays for Ultra X. Same fix applied to the large orb on the Voice Assistant screen itself.',
     ]},
@@ -14760,7 +14762,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   renderVals(){
     const scene=this.state.scene, S=this.state;
     const vTok=this._voiceTokens();
-    const appVer='v11.42 — Aug 17, 2026';
+    const appVer='v11.43 — Aug 17, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
     const navActive=(id)=> id===scene || (id==='business' && scene==='finance') || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
