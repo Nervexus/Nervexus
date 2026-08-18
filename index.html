@@ -892,7 +892,7 @@
   <!-- ================= SIDEBAR ================= -->
   <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
   <aside class="cc-side" style="position:relative; z-index:5; border-right:1px solid rgba(255,255,255,0.06); background:#0a0a0b; flex-direction:column; align-items:center; padding:20px 0 16px; overflow-y:auto; overflow-x:hidden; gap:16px; display:{{ asideDisplay }};">
-    <div data-orb-mount="mini" title="Nervexus" style="width:32px; height:32px; border-radius:50%; overflow:hidden; flex:0 0 32px;"></div>
+    <img src="favicon.png" alt="Nervexus" title="Nervexus" style="width:32px; height:32px; border-radius:50%; object-fit:contain; flex:0 0 32px;">
     <nav style="display:flex; flex-direction:column; gap:8px; align-items:center;">
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="9">
         <div onClick="{{ item.go }}" title="{{ item.label }}" style="position:relative; width:44px; height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:center; border-radius:13px; cursor:pointer; background:{{ item.bg }};" style-hover="{ background:'rgba(255,255,255,0.1)' }">
@@ -8993,7 +8993,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-43 · v11.43 voice-drop-orb-fix-lag';
+const NOTIF_BUILD_VERSION = '2026.08.17-44 · v11.44 sidebar-orb-removed';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12310,6 +12310,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.44', date:'Aug 17, 2026 · 19:00', major:true, notes:[
+      'Removed the sidebar\'s top-left logo orb — replaced with the plain static Nervexus mark. It only ever showed Ultra X\'s red regardless of theme, and unlike the voice-screen orb it wasn\'t worth keeping as an animated WebGL element just for a 32px badge.',
+    ]},
     {version:'v11.43', date:'Aug 17, 2026 · 18:35', major:true, notes:[
       'Fixed Voice Assistant lag: the screen was running two separate WebGL animations at once — the big pulsing orb and the new Unicorn Studio background behind it. Dropped the orb (the pulse-when-listening visual is gone) so Unicorn Studio is the only animation running there, for all four themes now including Ultra X and Maison Élysée. Since that scene is hosted externally and can\'t be recoloured directly, Ultra X and Maison Élysée layer a translucent cream wash over it so it reads as their own palette instead of raw black.',
     ]},
@@ -14762,7 +14765,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   renderVals(){
     const scene=this.state.scene, S=this.state;
     const vTok=this._voiceTokens();
-    const appVer='v11.43 — Aug 17, 2026';
+    const appVer='v11.44 — Aug 17, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
     const navActive=(id)=> id===scene || (id==='business' && scene==='finance') || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
