@@ -77,6 +77,11 @@
   .spline-active .cc-top{ background:rgba(10,10,11,0.3) !important; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
   .cc-glowcard.cc-glowcard{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border:none; }
 
+  /* ===== SOVEREIGN (base theme, light Ultra-inspired touch — additive only, no inline overrides) ===== */
+  .sovereign-lite .cc-home-greeting{ font-family:'Cormorant Garamond',Georgia,serif !important; font-style:italic !important; font-weight:500 !important; letter-spacing:0 !important; }
+  .sovereign-lite .cc-glowcard{ position:relative; }
+  .sovereign-lite .cc-glowcard::before{ content:''; position:absolute; top:-1px; left:-1px; width:9px; height:9px; background:rgba(196,255,61,0.45); transform:rotate(45deg); border-radius:1px; pointer-events:none; }
+
   /* ===== ULTRA THEME (AURA-inspired: ivory/stone, thin serif italic headings, glass panels, grain) ===== */
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
   .theme-ultra.theme-noir{ --u-bg:#121212; --u-card:rgba(30,30,30,0.86); --u-ink:#C4BDB0; --u-muted:#968F82; --u-line:rgba(150,143,130,0.28); --u-accent:#C4BDB0; }
@@ -8192,7 +8197,7 @@
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">ULTRA STYLE</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ ultraStyleChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               </sc-if>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">THEME</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">SOVEREIGN</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ themeChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">DENSITY</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ densityChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
@@ -8983,7 +8988,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.17-45 · v11.45 revert-unicornstudio';
+const NOTIF_BUILD_VERSION = '2026.08.19-46 · v11.46 sovereign-theme';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12297,6 +12302,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.46', date:'Aug 19, 2026', major:true, notes:[
+      'The base theme is now branded Sovereign — Settings → Appearance now labels the Lime/Onyx/Ember/Ghost/Snow group "SOVEREIGN" instead of the generic "THEME", matching how the Ultra sub-styles are labelled.',
+      'Sovereign gets a light touch of the Ultra look: the home greeting now uses the same Cormorant Garamond serif italic treatment, and every card gets a small corner accent mark. Colors, layout, buttons, and the five accent filters are unchanged — this is additive CSS only, applied via a single new class, nothing else touched.',
+    ]},
     {version:'v11.45', date:'Aug 17, 2026 · 19:20', major:true, notes:[
       'Removed the Unicorn Studio background from Voice Assistant entirely — the external script, the animated scene, and the light-theme tint overlay are all gone. Back to the per-theme orb + flat background from v11.40 (Ultra X maroon, Maison Élysée blue, base theme + Noir black), with the pulse-when-listening visual restored. No more external dependency on that screen.',
     ]},
@@ -14753,7 +14762,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   renderVals(){
     const scene=this.state.scene, S=this.state;
     const vTok=this._voiceTokens();
-    const appVer='v11.45 — Aug 17, 2026';
+    const appVer='v11.46 — Aug 19, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
     const navActive=(id)=> id===scene || (id==='business' && scene==='finance') || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
@@ -15328,7 +15337,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ]; })(),
       shellDisplay: S.loggedIn?'grid':'block', asideDisplay:this._isPrivatePageOpen()?'none':(typeof window!=='undefined' && window.innerWidth<=900)?'none':'flex', shellCols: (typeof window!=='undefined' && window.innerWidth<=900)?'1fr':((S.focusMode||this._isPrivatePageOpen())?'0px 1fr':'84px 1fr'),
       themeFilter:(()=>{ const t=S.prefs.theme; return t==='Ember'?'hue-rotate(83deg) saturate(1.1) brightness(0.95)':t==='Onyx'?'saturate(0) brightness(1.08)':t==='Ghost'?'saturate(0) contrast(1.08)':t==='Snow'?'hue-rotate(218deg) saturate(1.05)':'none'; })(),
-      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':'')):'', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
+      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
       showBanGate: S.loggedIn && !!(S.perfStatus && S.perfStatus.banned),
       showSuspendedGate: S.loggedIn && !!(S.profile && S.profile.account_status==='suspended' && S.profile.role!=='owner'),
       notifOpen:S.notifOpen, sidebarX:S.notifOpen?'0':'110%',
