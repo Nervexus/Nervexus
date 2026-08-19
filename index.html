@@ -8988,7 +8988,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.19-46 · v11.46 sovereign-theme';
+const NOTIF_BUILD_VERSION = '2026.08.19-47 · v11.47 mixed-training-log';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12302,6 +12302,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.47', date:'Aug 19, 2026', major:true, notes:[
+      'Added Mixed as a Log Training category — for a session that combines exercises from different muscle groups in one entry (e.g. squats + shoulder press together), pick Mixed instead of forcing it into a single group. Works in the manual Log Training form and syncs like any other entry.',
+    ]},
     {version:'v11.46', date:'Aug 19, 2026', major:true, notes:[
       'The base theme is now branded Sovereign — Settings → Appearance now labels the Lime/Onyx/Ember/Ghost/Snow group "SOVEREIGN" instead of the generic "THEME", matching how the Ultra sub-styles are labelled.',
       'Sovereign gets a light touch of the Ultra look: the home greeting now uses the same Cormorant Garamond serif italic treatment, and every card gets a small corner accent mark. Colors, layout, buttons, and the five accent filters are unchanged — this is additive CSS only, applied via a single new class, nothing else touched.',
@@ -13622,7 +13625,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     try{
       const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:2000});
       const arr=this._extractJSONArray(raw);
-      const parts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio'];
+      const parts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
       if(arr && arr.length){
         const rows=arr.map(r=>({ exercise:(r.exercise||'Exercise').toString().slice(0,60), part:parts.includes(r.part)?r.part:'Full', weight:(+r.weight||0)||'', sets:(+r.sets||0)||'', reps:(+r.reps||0)||'', minutes:(+r.minutes||0)||'' }));
         this.setState({woImportRows:rows, woImportLoading:false});
@@ -13630,7 +13633,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     }catch(e){ this.setState({woImportLoading:false, woImportErr:(e&&e.message)||'Parsing failed — try again.'}); }
   }
   setWoImportRowField(idx,field,value){ this.mut(s=>{ const rows=[...s.woImportRows]; rows[idx]={...rows[idx],[field]:value}; return {woImportRows:rows}; }); }
-  cycleWoImportRowPart(idx){ const order=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio']; this.mut(s=>{ const rows=[...s.woImportRows]; const cur=rows[idx].part; const next=order[(order.indexOf(cur)+1)%order.length]; rows[idx]={...rows[idx],part:next}; return {woImportRows:rows}; }); }
+  cycleWoImportRowPart(idx){ const order=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed']; this.mut(s=>{ const rows=[...s.woImportRows]; const cur=rows[idx].part; const next=order[(order.indexOf(cur)+1)%order.length]; rows[idx]={...rows[idx],part:next}; return {woImportRows:rows}; }); }
   removeWoImportRow(idx){ this.mut(s=>({woImportRows:s.woImportRows.filter((_,i)=>i!==idx)})); }
   confirmWoImport(){
     const rows=(this.state.woImportRows||[]).filter(r=>(r.exercise||'').trim()); if(!rows.length) return;
@@ -14762,7 +14765,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   renderVals(){
     const scene=this.state.scene, S=this.state;
     const vTok=this._voiceTokens();
-    const appVer='v11.46 — Aug 19, 2026';
+    const appVer='v11.47 — Aug 19, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
     const navActive=(id)=> id===scene || (id==='business' && scene==='finance') || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
@@ -14799,8 +14802,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // fitness derived
     const pm=this.partMinutes();
     const heat=(m)=> m<=0?'#17171b': m<20?'rgba(255,255,255,0.4)': m<45?'rgba(255,255,255,0.68)':'#FFFFFF';
-    const partColor={Chest:'#FFFFFF',Back:'#E4E4E7',Shoulders:'#e8e8ec',Arms:'#FFFFFF',Legs:'#FFFFFF',Core:'#e8e8ec',Cardio:'#ff5563'};
-    const woParts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Full'].map(p=>({name:p, pick:()=>this.setState({woPart:p}), c:S.woPart===p?'#F4F4F5':'#b8b8c0', b:S.woPart===p?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.woPart===p?'rgba(255,255,255,0.14)':'transparent'}));
+    const partColor={Chest:'#FFFFFF',Back:'#E4E4E7',Shoulders:'#e8e8ec',Arms:'#FFFFFF',Legs:'#FFFFFF',Core:'#e8e8ec',Cardio:'#ff5563',Mixed:'#d6b8ff'};
+    const woParts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed','Full'].map(p=>({name:p, pick:()=>this.setState({woPart:p}), c:S.woPart===p?'#F4F4F5':'#b8b8c0', b:S.woPart===p?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.woPart===p?'rgba(255,255,255,0.14)':'transparent'}));
     const woRanges=['Day','Week','Month'].map(r=>({name:r, pick:()=>this.setState({woRange:r}), c:(S.woRange||'Week')===r?'#F4F4F5':'#b8b8c0', b:(S.woRange||'Week')===r?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.woRange||'Week')===r?'rgba(255,255,255,0.14)':'transparent'}));
     const woRangeStart=this._rangeStartTs(S.woRange||'Week');
     const woCanLog=S.woPart!=='Full';
