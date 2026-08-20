@@ -8306,6 +8306,32 @@
                 <span style="font-size:12px; color:#c8c8ce;">Send one of these randomly (push + in-app) every few hours</span>
               </div>
 
+              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Custom Quotes</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">A random quote from your list, shown every 5 minutes while the app is open. Add your own, or let the AI generate more in the same voice.</div></div>
+              <textarea value="{{ quoteDraftVal }}" onInput="{{ setQuoteDraft }}" onKeyDown="{{ addQuoteKey }}" placeholder="Type or paste a quote, press Enter to add…" style="width:100%; max-width:560px; min-height:60px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; margin-bottom:10px;"></textarea>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+                <span onClick="{{ addQuote }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:600;">+ Add quote</span>
+                <sc-if value="{{ hasQuotes }}" hint-placeholder-val="{{ false }}">
+                  <span onClick="{{ genMoreQuotes }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#c9c9d0; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:9px 16px; cursor:pointer;">{{ quoteGenBtnLabel }}</span>
+                  <span onClick="{{ sendTestQuote }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:6px 11px; cursor:pointer;">Send test</span>
+                </sc-if>
+                <sc-if value="{{ quoteGenErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px; color:#ff8a5b;">{{ quoteGenErr }}</span></sc-if>
+              </div>
+              <sc-if value="{{ hasQuotes }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">{{ quoteCountLabel }}</div>
+                <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:16px;">
+                  <sc-for list="{{ quoteList }}" as="q" hint-placeholder-count="6">
+                    <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:rgba(255,255,255,0.03);">
+                      <span onClick="{{ q.open }}" style="flex:1; min-width:0; font-size:12.5px; color:#c8c8ce; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;" style-hover="{ color:'#fff' }">{{ q.text }}</span>
+                      <span onClick="{{ q.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#fff' }">×</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                <div onClick="{{ toggleQuotesEnabled }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ quotesEnabledBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ quotesEnabledPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                <span style="font-size:12px; color:#c8c8ce;">A random quote from your list every 5 minutes while the app is open</span>
+              </div>
+
               <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Reminders</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">Calendar events send an in-app + push notification (and optionally an email) shortly before they start. Your checklist can also nudge you on a schedule while items are still open.</div></div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
                 <div onClick="{{ toggleReminderPush }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ reminderPushBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ reminderPushPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
@@ -8996,7 +9022,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.20-51 · v11.51 dead-code-cleanup';
+const NOTIF_BUILD_VERSION = '2026.08.20-52 · v11.52 custom-quotes-wired-up';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9153,7 +9179,7 @@ activities: this._mergeShipLog(s.activities),
       musicLibrary: s.musicLibrary || [], musicQueue: s.musicQueue || [], musicIdx: s.musicIdx || 0,
       musicPlaying:false, musicInputUrl:'', musicAddErr:'', musicAddLoading:false, musicVolume: s.musicVolume!=null?s.musicVolume:80, musicReady:false, musicProgressPct:0,
       customQuotes: s.customQuotes || [],
-      quoteDraft: '', quotesSubOpen:false, openQuoteId:null,
+      quoteDraft: '', openQuoteId:null,
       prefs: {...this._defaultPrefs(), ...(s.prefs||{})},
       users: s.users || [ {name:'Maddox Harvey',email:'maddoxsharvey@icloud.com',role:'Owner',status:'active'} ],
     };
@@ -12176,6 +12202,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.52', date:'Aug 20, 2026', major:true, notes:[
+      'Custom Quotes is now actually usable — Settings → Notifications has a new "Custom Quotes" panel where you can add your own quotes one at a time, generate 20 more in the same voice with AI, send a test, and turn the whole feature on or off. Tap a saved quote to read it full-screen with a read-aloud button. This backend was already built in an earlier update but never had a way to reach it — it does now.',
+    ]},
     {version:'v11.51', date:'Aug 20, 2026', major:false, notes:[
       'Removed dead code found in a full audit: an old land-mask/world-map subsystem superseded by the real globe, a duplicate black-hole shader canvas no longer used (the live one is an iframe), a half-built mute-topic voice command that was never wired up, an old voice-picker replaced by the current one, and roughly 45 leftover settings/UI bindings from earlier iterations of Notifications, Push, Account Requests, and a few other screens. No visible change — this only removes code nothing in the app was calling.',
     ]},
@@ -15093,15 +15122,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       splineClass:S.prefs.theme==='Ultra'?'':(typeof window!=='undefined' && window.innerWidth<=900)?'spline-active':(S.prefs.homeBg==='Spline')?'spline-active':(S.prefs.homeBg==='Black Hole')?'blackhole-active':'',
       homeHeroBg:(S.prefs.theme==='Ultra')?'transparent':((typeof window!=='undefined' && window.innerWidth<=900) || S.prefs.homeBg==='Spline'||S.prefs.homeBg==='Black Hole')?'transparent':'#000',
       densityChips:this._chips('density',['Compact','Comfortable','Spacious']),
-      quotesEnabledTog:this._tog('quotesEnabled','Custom Quotes','A random quote from your list every 5 minutes while the app is open'),
+      quotesEnabledBg:S.prefs.quotesEnabled?'#FFFFFF':'rgba(255,255,255,0.14)', quotesEnabledPos:S.prefs.quotesEnabled?'22px':'2px', toggleQuotesEnabled:()=>this.setPref('quotesEnabled',!S.prefs.quotesEnabled),
       quoteDraftVal:S.quoteDraft||'', setQuoteDraft:(e)=>this.setQuoteDraft(e), addQuote:()=>this.addQuote(), addQuoteKey:(e)=>this.addQuoteKey(e), sendTestQuote:()=>this.sendTestQuote(),
       hasQuotes:(S.customQuotes||[]).length>0, quoteCount:(S.customQuotes||[]).length,
       quoteCountLabel:(S.customQuotes||[]).length+' saved · '+(S.prefs.quotesEnabled?'on':'off'),
-      quoteList:(S.customQuotes||[]).map(q=>({ id:q.id, text:q.text, long:q.text.length>140, remove:()=>this.removeQuote(q.id), open:()=>this.openQuoteFull(q.id), read:()=>this.readQuote(q.text) })),
+      quoteList:(S.customQuotes||[]).map(q=>({ id:q.id, text:q.text, remove:()=>this.removeQuote(q.id), open:()=>this.openQuoteFull(q.id) })),
       ...this._safe(()=>{ const q=(S.customQuotes||[]).find(x=>x.id===S.openQuoteId); return { hasOpenQuote:!!q, openQuoteText:q?q.text:'', readOpenQuote:()=>q&&this.readQuote(q.text) }; }, {}),
       closeQuoteFull:()=>this.closeQuoteFull(),
       genMoreQuotes:()=>this.genMoreQuotes(), quoteGenLoading:!!S.quoteGenLoading, quoteGenErr:S.quoteGenErr||'',
-      notifMainView:!S.quotesSubOpen, notifQuotesView:!!S.quotesSubOpen,
+      quoteGenBtnLabel:S.quoteGenLoading?'Generating…':'+ Generate 20 more',
       pwaInstalled:!!S.pwaDisplayStandalone,
       installBtnLabel: S.pwaDisplayStandalone?'✓ Installed':(S.pwaInstallAvailable?'Install app':'Install app'),
       installApp:()=>this.installApp(),
@@ -15114,7 +15143,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       notifPermGranted:!!S.prefs.pushEnabled,
       notifPermBtnLabel: S.pushLoading?'Enabling…':(S.prefs.pushEnabled?'✓ Enabled':(S.notifPermission==='denied'?'Blocked — check browser settings':'Enable notifications')),
       requestNotifPermission:()=>this.requestNotifPermission(),
-      openQuotesSub:()=>this.setState({quotesSubOpen:true}), closeQuotesSub:()=>this.setState({quotesSubOpen:false}),
       privacyToggles:[ this._tog('twoFA','Two-factor authentication','Require a second factor at login'), this._tog('aiMemory','AI memory','Let assistants remember context'), this._tog('analytics','Usage analytics','Anonymous product analytics'), this._tog('telemetry','Crash telemetry','Send diagnostics on errors') ],
       ...this._providerVals(),
       // Voice Assistant screen — was pure black regardless of theme (fine for Spline/Noir,
