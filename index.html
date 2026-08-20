@@ -8194,6 +8194,7 @@
               </sc-if>
               <sc-if value="{{ bgPickerMobileNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#8a8a92; margin-bottom:14px;">{{ bgPickerMobileNote }}</div></sc-if>
               <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
+              <div style="height:1px; background:rgba(255,255,255,0.08); margin:6px 0 22px;"></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">ULTRA STYLE</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ ultraStyleChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               </sc-if>
@@ -8988,7 +8989,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.20-48 · v11.48 supabase-egress-fix';
+const NOTIF_BUILD_VERSION = '2026.08.20-49 · v11.49 maison-everpine-chip';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12302,6 +12303,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.49', date:'Aug 20, 2026', major:true, notes:[
+      'Added a fourth Ultra style — "Maison Éverpine" — to Settings → Appearance → Ultra Style. Like Maison Élysée at launch, it currently renders identically to Ultra X (its own look is coming in a later update); the chip and preference plumbing are in place so it can be styled independently going forward.',
+      'Settings → Appearance now has a clear divider between the Background (Spline and friends) section and the Ultra Style picker, so the two are visually separated instead of running straight into each other.',
+    ]},
     {version:'v11.48', date:'Aug 20, 2026', major:false, notes:[
       'Reduced Supabase bandwidth usage on login/refresh — the bulk data pull for logs (workouts, meals, sleep, hydration, body metrics, income, expenses, notes, memories, music library) now fetches only the columns each screen actually uses instead of every column on every row. No visible change, just a lighter pull.',
     ]},
@@ -15186,7 +15191,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
       isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée',
-      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée']),
+      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Maison Éverpine']),
       ultraBriefBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#e7c98a':'#F4F4F5',
       ultraBriefBtnBg:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.12)':'rgba(255,255,255,0.1)',
       ultraBriefBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.5)':'rgba(255,255,255,0.35)',
