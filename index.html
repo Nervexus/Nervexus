@@ -8988,7 +8988,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.19-47 · v11.47 mixed-training-log';
+const NOTIF_BUILD_VERSION = '2026.08.20-48 · v11.48 supabase-egress-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11312,26 +11312,26 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     try{
       const [tasks,notes,missions,missionHistory,events,income,expenses,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes]=await Promise.all([
         window.SB.list('tasks',{match:{user_id:uid},order:{column:'position',ascending:true}}),
-        window.SB.list('notes',{match:{user_id:uid},order:{column:'created_at',ascending:false}}),
+        window.SB.list('notes',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,deleted_at,title,body,created_at'}),
         window.SB.list('missions',{match:{user_id:uid}}),
         window.SB.list('mission_history',{match:{user_id:uid},order:{column:'completed_date',ascending:false},limit:200}),
         window.SB.list('events',{match:{user_id:uid}}),
-        window.SB.list('income',{match:{user_id:uid},order:{column:'occurred_at',ascending:false}}),
-        window.SB.list('expenses',{match:{user_id:uid},order:{column:'occurred_at',ascending:false}}),
-        window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false}}),
-        window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false}}),
-        window.SB.list('sleep_logs',{match:{user_id:uid},order:{column:'log_date',ascending:true}}),
-        window.SB.list('hydration_logs',{match:{user_id:uid},order:{column:'logged_at',ascending:true}}),
-        window.SB.list('body_metrics',{match:{user_id:uid},order:{column:'log_date',ascending:true}}),
+        window.SB.list('income',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,amount,occurred_at'}),
+        window.SB.list('expenses',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,amount,occurred_at'}),
+        window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,sets,reps,occurred_at'}),
+        window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,name,kcal,protein'}),
+        window.SB.list('sleep_logs',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,hours,bed_time,wake_time,quality,energy,notes'}),
+        window.SB.list('hydration_logs',{match:{user_id:uid},order:{column:'logged_at',ascending:true},columns:'id,log_date,amount,logged_at'}),
+        window.SB.list('body_metrics',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,extra,weight,body_fat,muscle_mass,waist'}),
         window.SB.list('notifications',{match:{user_id:uid},order:{column:'created_at',ascending:false},limit:40}),
-        window.SB.list('progress_photos',{match:{user_id:uid},order:{column:'taken_date',ascending:true}}),
+        window.SB.list('progress_photos',{match:{user_id:uid},order:{column:'taken_date',ascending:true},columns:'id,deleted_at,storage_path,view,taken_date'}),
         window.SB.list('goals',{match:{user_id:uid}}),
         window.SB.list('world_intel_prefs',{match:{user_id:uid}}),
         window.SB.list('day_colors',{match:{user_id:uid}}),
         window.SB.list('note_vault_settings',{match:{user_id:uid}}),
         window.SB.list('learning_progress',{match:{user_id:uid}}),
-        window.SB.list('memories',{match:{user_id:uid},order:{column:'created_at',ascending:false}}),
-        window.SB.list('music_library',{match:{user_id:uid},order:{column:'created_at',ascending:false}}),
+        window.SB.list('memories',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,fact,category,source,created_at'}),
+        window.SB.list('music_library',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'video_id,title,thumb,created_at'}),
         window.SB.list('activities',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},limit:500}),
         window.SB.list('login_xp_log',{match:{user_id:uid},order:{column:'created_at',ascending:false},limit:400}),
         window.SB.list('world_intel_pins',{match:{user_id:uid}}),
@@ -12302,6 +12302,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.48', date:'Aug 20, 2026', major:false, notes:[
+      'Reduced Supabase bandwidth usage on login/refresh — the bulk data pull for logs (workouts, meals, sleep, hydration, body metrics, income, expenses, notes, memories, music library) now fetches only the columns each screen actually uses instead of every column on every row. No visible change, just a lighter pull.',
+    ]},
     {version:'v11.47', date:'Aug 19, 2026', major:true, notes:[
       'Added Mixed as a Log Training category — for a session that combines exercises from different muscle groups in one entry (e.g. squats + shoulder press together), pick Mixed instead of forcing it into a single group. Works in the manual Log Training form and syncs like any other entry.',
     ]},

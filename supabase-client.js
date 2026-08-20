@@ -29,8 +29,8 @@ window.SB = {
   async resetPasswordForEmail(email, redirectTo){ return window.sb.auth.resetPasswordForEmail(email, redirectTo?{redirectTo}:undefined); },
   async updatePassword(newPassword){ return window.sb.auth.updateUser({ password:newPassword }); },
 
-  async list(table, { match={}, order=null, limit=null } = {}){
-    let q = window.sb.from(table).select('*');
+  async list(table, { match={}, order=null, limit=null, columns=null } = {}){
+    let q = window.sb.from(table).select(columns || '*');
     Object.entries(match).forEach(([k,v])=>{ q = q.eq(k, v); });
     if (order) q = q.order(order.column, { ascending: !!order.ascending });
     if (limit) q = q.limit(limit);
