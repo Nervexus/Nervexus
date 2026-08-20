@@ -957,6 +957,13 @@
         <span class="cc-kbd" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#75757d; border:1px solid rgba(255,255,255,0.12); border-radius:6px; padding:2px 7px; flex:0 0 auto;">⌘K</span>
       </div>
       <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+        <sc-if value="{{ showRaimentSwitcher }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:3px; padding:4px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); flex:0 0 auto;">
+          <sc-for list="{{ raimentIcons }}" as="r" hint-placeholder-count="4">
+            <span onClick="{{ r.set }}" title="{{ r.name }}" style="width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:15px; cursor:pointer; color:{{ r.c }}; background:{{ r.bg }};" style-hover="{ background:'rgba(255,255,255,0.1)' }">{{ r.g }}</span>
+          </sc-for>
+        </div>
+        </sc-if>
         <div class="cc-nw" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; text-align:right; line-height:1.3; flex:0 0 auto;">
           <div data-clock="" style="color:#dcdce0;">--:--:--</div>
           <div data-date="" style="font-size:9px; color:#C9C9CE; letter-spacing:1.5px;">--</div>
@@ -8989,7 +8996,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.20-49 · v11.49 maison-everpine-chip';
+const NOTIF_BUILD_VERSION = '2026.08.20-50 · v11.50 raiment-switcher';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10054,6 +10061,13 @@ activities: this._mergeShipLog(s.activities),
   setFinanceBudget(cat,v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeBudgets:{...(s.prefs.financeBudgets||{}), [cat]:n}}, financeBudgetDraft:{...(s.financeBudgetDraft||{}), [cat]:undefined}})); }
   _tog(key,label,desc){ const on=this.state.prefs[key]; return { label, desc, bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setPref(key,!this.state.prefs[key]) }; }
   _chips(key,opts){ const cur=this.state.prefs[key]; return opts.map(o=>({ l:o, set:()=>this.setPref(key,o), c:cur===o?'#F4F4F5':'#9a9aa2', b:cur===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:cur===o?'rgba(255,255,255,0.18)':'transparent' })); }
+  // Global raiment switcher (header icon row) — jumps straight into Ultra + the chosen
+  // style from anywhere, using the same glyphs as the marketing site's raiment cards.
+  _raimentIcons(){
+    const P=this.state.prefs||{}; const cur=P.theme==='Ultra'?P.ultraStyle:null;
+    const defs=[{k:'Ultra X',g:'◆'},{k:'Noir',g:'☾'},{k:'Maison Élysée',g:'❦'},{k:'Maison Éverpine',g:'❖'}];
+    return defs.map(d=>{ const on=cur===d.k; return { g:d.g, name:d.k, c:on?'#F4F4F5':'#75757d', bg:on?'rgba(255,255,255,0.14)':'transparent', set:()=>{ this.setPref('theme','Ultra'); this.setPref('ultraStyle',d.k); } }; });
+  }
   _testTierOrder(){ return ['Easy','Mid','High','Max','Ultra']; }
   _testTierFromCount(n){ if(n>=30) return 'Ultra'; if(n>=16) return 'Max'; if(n>=8) return 'High'; if(n>=3) return 'Mid'; return 'Easy'; }
   _totalQtTestsDone(){ const subs=['maths','english','science','grammar','history','physiology','speaking','money','gentleman']; return subs.reduce((sum,s)=>sum+(((this._qtState(s).history)||[]).length),0); }
@@ -12303,6 +12317,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.50', date:'Aug 20, 2026', major:true, notes:[
+      'Added a raiment switcher to the top bar, on every screen except Settings — four small glyphs (◆ Ultra X, ☾ Noir, ❦ Maison Élysée, ❖ Maison Éverpine) let you jump straight into any Ultra style from anywhere, no need to go into Settings → Appearance first. The active one is highlighted; clicking any of them switches your theme to Ultra with that style immediately.',
+    ]},
     {version:'v11.49', date:'Aug 20, 2026', major:true, notes:[
       'Added a fourth Ultra style — "Maison Éverpine" — to Settings → Appearance → Ultra Style. Like Maison Élysée at launch, it currently renders identically to Ultra X (its own look is coming in a later update); the chip and preference plumbing are in place so it can be styled independently going forward.',
       'Settings → Appearance now has a clear divider between the Background (Spline and friends) section and the Ultra Style picker, so the two are visually separated instead of running straight into each other.',
@@ -15192,6 +15209,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
       isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée',
       ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Maison Éverpine']),
+      raimentIcons:this._raimentIcons(), showRaimentSwitcher:S.scene!=='settings',
       ultraBriefBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#e7c98a':'#F4F4F5',
       ultraBriefBtnBg:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.12)':'rgba(255,255,255,0.1)',
       ultraBriefBtnBorder:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'rgba(150,143,130,0.5)':'rgba(255,255,255,0.35)',
