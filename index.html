@@ -8996,7 +8996,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.20-50 · v11.50 raiment-switcher';
+const NOTIF_BUILD_VERSION = '2026.08.20-51 · v11.51 dead-code-cleanup';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9014,7 +9014,7 @@ class Component extends DCLogic {
       focusMode:false,
       pwVisible:false, twoFAVisible:false, reqPwVisible:false,
       authMode:'login', currentEmail: s.currentEmail || '',
-      reqName:'', reqEmail:'', reqPass:'', reqAge:'', reqGender:'', reqNat:'', reqIncome:'', reqPurpose:'', reqErr:'', reqDone:false,
+      reqName:'', reqEmail:'', reqAge:'', reqGender:'', reqNat:'', reqIncome:'', reqPurpose:'', reqErr:'', reqDone:false,
       requests: s.requests || [],
       account: s.account ? { timezone:'auto', twoFA:'', ...s.account } : { name:'Maddox Harvey', email:'maddoxsharvey@icloud.com', password:'Jude_Harvey22', twoFA:'', avatar:'', greeting:'', timezone:'auto' },
       acctDraft: s.account ? { timezone:'auto', twoFA:'', ...s.account } : { name:'Maddox Harvey', email:'maddoxsharvey@icloud.com', password:'Jude_Harvey22', twoFA:'', avatar:'', greeting:'', timezone:'auto' },
@@ -9514,108 +9514,6 @@ activities: this._mergeShipLog(s.activities),
   }
   _resolveAsset(resId, fallbackPath){ return (window.__resources && window.__resources[resId]) || fallbackPath; }
   _musicFallbackThumb(title){ const c=encodeURIComponent('#1e1e21'); const ch=((title||'?').trim()[0]||'?').toUpperCase(); return 'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="56" height="38"><rect width="56" height="38" fill="#1e1e21"/><text x="28" y="24" font-family="monospace" font-size="14" fill="#6f6f78" text-anchor="middle">'+ch+'</text></svg>'); }
-  // Physically-inspired raymarched black hole (gravitational lensing + Doppler-brightened
-  // accretion disk), adapted from a Shadertoy-style relativistic raymarcher into normalized
-  // units (c=1, Schwarzschild radius=1) so it runs stably in single-precision GLSL. Camera fixed.
-  startTon618BG(cv){ if(this._ton618Started) return; this._ton618Started=true;
-    const gl=cv.getContext('webgl',{antialias:true,alpha:false,preserveDrawingBuffer:true}) || cv.getContext('experimental-webgl',{preserveDrawingBuffer:true});
-    if(!gl){ return; }
-    const dpr=Math.min(1.5,window.devicePixelRatio||1);
-    const resize=()=>{ const r=cv.parentElement.getBoundingClientRect(); cv.width=r.width*dpr; cv.height=r.height*dpr; gl.viewport(0,0,cv.width,cv.height); };
-    resize(); window.addEventListener('resize', resize);
-    const vs=`attribute vec2 p; void main(){ gl_Position=vec4(p,0.,1.); }`;
-    const fs=`precision highp float; uniform vec2 res; uniform float t; uniform vec2 rota;
-      float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
-      float noise(vec2 p){ vec2 i=floor(p), f=fract(p); float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1)); vec2 u=f*f*(3.-2.*f); return mix(mix(a,b,u.x),mix(c,d,u.x),u.y); }
-      float fbm(vec2 p){ float v=0., a=0.5; for(int i=0;i<4;i++){ v+=a*noise(p); p*=2.1; a*=0.5; } return v; }
-      #define ITER 56
-      void main(){
-        vec2 uv=(gl_FragCoord.xy-0.5*res)/min(res.x,res.y);
-        // orbit camera: user-draggable azimuth/elevation around the black hole, fixed distance
-        float az=rota.x, el=clamp(rota.y,-1.3,1.3);
-        float camDist=14.0;
-        vec3 camPos=vec3(sin(az)*cos(el)*camDist, sin(el)*camDist, -cos(az)*cos(el)*camDist);
-        vec3 fwd=normalize(-camPos);
-        vec3 right=normalize(cross(fwd,vec3(0.0,1.0,0.0)));
-        vec3 up=cross(right,fwd);
-        vec3 rd=normalize(fwd + uv.x*right*1.6 + uv.y*up*1.6);
-        vec3 ro=camPos;
-        // starfield from initial ray direction (fixed, tiny twinkle only)
-        vec3 col=vec3(0.0);
-        vec2 sp=rd.xy*4.0+rd.z*2.0;
-        float sh=hash(floor(sp*160.0));
-        if(sh>0.9975){ float tw=0.92+0.08*sin(t*0.5+sh*30.0); col+=vec3(tw); }
-        const float rs=1.0;
-        const float dpl=2.0*22.0/float(ITER);
-        const float dt=(sqrt(1.0+4.0*dpl)-1.0)*0.5;
-        float alpha=0.0;
-        for(int i=0;i<ITER;i++){
-          float l=length(ro);
-          if(l<=rs){ alpha=1.0; break; }
-          vec3 a=-ro/(l*l*l);
-          vec3 v=rd + a*dt;
-          rd=normalize(v);
-          vec3 dp=rd*dt;
-          // accretion disk: thin plane through origin, tilted slightly
-          float prevY=ro.y, nextY=ro.y+dp.y;
-          if(prevY*nextY<=0.0){
-            vec3 hitP=ro + dp*(abs(prevY)/(abs(prevY)+abs(nextY)+1e-5));
-            float rl=length(hitP.xz);
-            if(rl>rs*1.5 && rl<rs*7.0){
-              float v2=rs/rl; float vv=sqrt(v2);
-              vec2 vd=normalize(vec2(hitP.z,-hitP.x));
-              float dopp=sqrt(1.0-v2)/max(0.15,1.0-vv*dot(vd,rd.xz));
-              float ang=atan(hitP.z,hitP.x);
-              float flow=t*0.12/max(0.2,vv); // faster orbit closer to the hole, like real disk rotation
-              float streak=fbm(vec2(ang*2.0 - vv*2.5 - flow, rl*0.9 - t*0.04))*0.25+0.85;
-              float front=clamp(1.0-(rl-rs*1.5)/(rs*5.5),0.0,1.0);
-              // sharp bright photon ring right at the inner edge, fading to deep amber outward
-              float ringBoost=smoothstep(rs*3.0,rs*1.5,rl);
-              vec3 hot=mix(vec3(1.0,0.42,0.12),vec3(1.0,0.97,0.88),front);
-              float glowPulse=1.0+0.03*sin(t*0.35+ang*0.5);
-              col += hot*dopp*streak*(0.55+ringBoost*0.9)*glowPulse;
-            }
-          }
-          ro+=dp;
-        }
-        col = col/(1.0+col);
-        col = pow(col, vec3(0.4545));
-        col = mix(col, vec3(0.0), alpha);
-        gl_FragColor=vec4(col,1.0);
-      }`;
-    const compile=(src,type)=>{ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); return s; };
-    const prog=gl.createProgram();
-    gl.attachShader(prog, compile(vs, gl.VERTEX_SHADER));
-    gl.attachShader(prog, compile(fs, gl.FRAGMENT_SHADER));
-    gl.linkProgram(prog);
-    if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){ console.warn('[ton618]', gl.getProgramInfoLog(prog)); return; }
-    gl.useProgram(prog);
-    const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-    const pLoc=gl.getAttribLocation(prog,'p'); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc,2,gl.FLOAT,false,0,0);
-    const resLoc=gl.getUniformLocation(prog,'res'), tLoc=gl.getUniformLocation(prog,'t'), rotaLoc=gl.getUniformLocation(prog,'rota');
-    const start=performance.now();
-    const rota={az:0.35,el:0.12};
-    let dragging=false, lastX=0, lastY=0;
-    const onDown=(e)=>{ dragging=true; const p=e.touches?e.touches[0]:e; lastX=p.clientX; lastY=p.clientY; };
-    const onMove=(e)=>{ if(!dragging) return; const p=e.touches?e.touches[0]:e; const dx=p.clientX-lastX, dy=p.clientY-lastY; lastX=p.clientX; lastY=p.clientY; rota.az+=dx*0.005; rota.el+=dy*0.005; };
-    const onUp=()=>{ dragging=false; };
-    cv.style.pointerEvents='auto'; cv.style.cursor='grab';
-    cv.addEventListener('mousedown', onDown); window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp);
-    cv.addEventListener('touchstart', onDown, {passive:true}); cv.addEventListener('touchmove', onMove, {passive:true}); cv.addEventListener('touchend', onUp);
-    const tick=()=>{
-      if(!this._ton618Started) return;
-      if(!document.hidden){
-        gl.uniform2f(resLoc, cv.width, cv.height);
-        gl.uniform1f(tLoc, (performance.now()-start)*0.001);
-        gl.uniform2f(rotaLoc, rota.az, rota.el);
-        gl.drawArrays(gl.TRIANGLES,0,3);
-      }
-      this._ton618Raf=requestAnimationFrame(tick);
-    };
-    tick();
-  }
-  stopTon618BG(){ this._ton618Started=false; if(this._ton618Raf) cancelAnimationFrame(this._ton618Raf); }
   // White twinkling stars + occasional shooting stars, overlaid (screen blend) on the tinted
   // black hole scene so stars read white even though the disk/nebula underneath is warm-tinted.
   startBHStars(cv){ if(this._bhStarsStarted) return; this._bhStarsStarted=true;
@@ -9643,7 +9541,6 @@ activities: this._mergeShipLog(s.activities),
   componentDidUpdate(prevProps){ this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs();
     if(this.state.prefs.theme==='Ultra' && !this._hasUltraAccess() && !this._ultraRevoking){ this._ultraRevoking=true; this.setPref('theme','Lime'); this.showToast('system','Ultra access revoked','Your Ultra access was removed — reverted to the default theme.'); setTimeout(()=>{ this._ultraRevoking=false; },500); }
     if(typeof window!=='undefined' && window.innerWidth<=900 && ['power','requests'].includes(this.state.scene)) this.setState({scene:'home'});
-    if(this._ton618Started){ this.stopTon618BG(); }
     if(this.state.prefs.homeBg==='Black Hole'){ const cv=this.root && this.root.querySelector('[data-chart="bhStars"]'); if(cv && !this._bhStarsStarted) this.startBHStars(cv); }
     if(this.state.loggedIn && this.state.scene==='settings' && this.state.settingsTab==='Notifications' && !this._pvSeeded && window.NotifEngine){ this._pvSeeded=true; this.genPreview(); }
     if(this.state.loggedIn && this._isOwner() && this.state.scene==='settings' && this.state.settingsTab==='Performance Terminal' && !this._perfTeamReseeded && this._sbOn()){ this._perfTeamReseeded=true; this._sbPullPerfTeam(); }
@@ -10538,8 +10435,6 @@ activities: this._mergeShipLog(s.activities),
       stopChunk:()=>{ if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } },
     }); const mig={Aria:'pro_f',Nova:'energ_f',Vera:'calm_f',Luna:'friend_f',Iris:'brit_f',Sable:'exec_f',Elara:'concierge',Mira:'calm_m',Cleo:'ai_future',Wren:'friend_m',Faye:'brit_m',Zara:'energ_m',Isla:'exec_m',Nyra:'pro_m',Thea:'coach'}; if(!this._ve.isValidId(this.state.voice)){ this.setState({voice:mig[this.state.voice]||'pro_f'}); } this._syncVoiceSettings(); }
   _syncVoiceSettings(){ if(!this._ve) return; const p=this.state.prefs||{}; this._ve.setSettings({ voice:this._ve.isValidId(this.state.voice)?this.state.voice:'exec_f', speed:p.voiceRate||1, pitch:p.voicePitch||1, volume:p.voiceVolume!=null?p.voiceVolume:1, style:p.readingStyle||'Professional', autoRate:!!p.autoRate }); }
-  selectVoice(id){ this.mut(s=>({voice:id})); if(this._ve){ this._ve.setSettings({voice:id}); this._ve.preview(id); } }
-  previewVoice(id){ this._ve&&this._ve.preview(id); }
   addCustomElevenVoice(){
     const id=(this.state.customVoiceIdDraft||'').trim(); const name=(this.state.customVoiceNameDraft||'').trim()||'Custom voice';
     if(!id) return;
@@ -10563,9 +10458,6 @@ activities: this._mergeShipLog(s.activities),
       audio.play().catch(e=>this._setProv('elevenlabs',{err:'Playback blocked: '+e.message}));
     }catch(e){ this._setProv('elevenlabs',{err:'Preview failed: '+((e&&e.message)||e),status:'error'}); }
   }
-  toggleStarVoice(id){ this.mut(s=>{ const cur=(s.prefs.starredVoices||[]).slice(); const i=cur.indexOf(id); if(i>=0) cur.splice(i,1); else cur.unshift(id); return {prefs:{...s.prefs,starredVoices:cur}}; }); }
-  removeVoice(id){ const P=(window.VoiceEngine&&window.VoiceEngine.PROFILES)||[]; const s=this.state; const hid=(s.prefs.hiddenVoices||[]).slice(); if(P.filter(p=>hid.indexOf(p.id)<0).length<=1) return; if(hid.indexOf(id)<0) hid.push(id); const vis=P.filter(p=>hid.indexOf(p.id)<0); const fb=(vis[0]&&vis[0].id)||s.voice; const star=(s.prefs.starredVoices||[]).filter(x=>x!==id); const voice=s.voice===id?fb:s.voice; const prefs={...s.prefs,hiddenVoices:hid,starredVoices:star}; if(prefs.briefingVoice===id) prefs.briefingVoice=fb; if(prefs.convoVoice===id) prefs.convoVoice=fb; this.mut(()=>({prefs,voice})); if(this._ve) this._ve.setSettings({voice}); }
-  restoreVoices(){ this.mut(s=>({prefs:{...s.prefs,hiddenVoices:[]}})); }
   readAloud(text,title,pid){ if(this.state.prefs.readAloudEnabled===false) return; if(!this._ve||!text||!text.trim()) return; if(this._ve.loadText(text,title||'Document',pid||this.state.voice)) this._ve.play(0); }
   toggleReadAloud(){ const nowOff=this.state.prefs.readAloudEnabled!==false; this.setPref('readAloudEnabled', !nowOff); if(nowOff && this._ve) this._ve.stop(); }
   pausePlay(){ this._ve&&this._ve.toggle(); }
@@ -10578,8 +10470,6 @@ activities: this._mergeShipLog(s.activities),
   importReadFile(e){ const f=e.target&&e.target.files&&e.target.files[0]; if(f) this._ingestFile(f); if(e.target) e.target.value=''; }
   onDropRead(e){ try{ e.preventDefault(); }catch(_){} const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0]; if(f) this._ingestFile(f); this.setState({dragOver:false}); }
   _ingestFile(f){ if(!this._ve) return; this.setState({importing:true,importErr:''}); this._ve.importFile(f).then(r=>{ this.setState({readText:r.text||'',readTitle:r.title||'Document',importing:false}); this._ve.loadText(r.text||'',r.title||'Document',this.state.voice); }).catch(err=>{ this.setState({importing:false,importErr:(err&&err.message)||'Could not read that file.'}); }); }
-  setBriefVoice(id){ this.setPref('briefingVoice',id); }
-  setConvoVoice(id){ this.setPref('convoVoice',id); }
   setReadingStyle(v){ if(this._ve) this._ve.setSettings({style:v}); this.setPref('readingStyle',v); }
   setVoiceVolume(v){ if(this._ve) this._ve.setSettings({volume:v}); this.setPref('voiceVolume',v); }
   speakBriefing(){ const exec=this.state.scene==='briefing'&&this.state.briefTab==='exec'; const txt=exec?this._execBriefingText():this._briefingText(); this.readAloud(txt, exec?'Executive Intelligence Briefing':'Daily Briefing', (this.state.prefs&&this.state.prefs.briefingVoice)||this.state.voice); }
@@ -10678,18 +10568,7 @@ activities: this._mergeShipLog(s.activities),
   // ===== PROACTIVE COACHING =====
   _coachCfg(){ return this.state.prefs.coaching||{}; }
   _isMuted(topic){ return (this.state.prefs.mutedTopics||[]).includes(topic); }
-  muteTopic(topic){ this.mut(s=>({prefs:{...s.prefs, mutedTopics:[...new Set([...(s.prefs.mutedTopics||[]),topic])]}})); }
   unmuteTopic(topic){ this.mut(s=>({prefs:{...s.prefs, mutedTopics:(s.prefs.mutedTopics||[]).filter(x=>x!==topic)}})); }
-  _detectMuteCommand(t){
-    const low=t.toLowerCase();
-    const wantsMute=/stop (reminding|telling|mentioning|giving|nagging)|don.?t (ask|mention|remind|tell) me|leave (this|it|that) (topic |alone)?alone|stop (bringing|raising)/.test(low);
-    if(!wantsMute) return null;
-    if(/spend|financ|money|budget|subscription/.test(low)) return 'finance';
-    if(/workout|fitness|gym|train|exercise/.test(low)) return 'fitness';
-    if(/sleep/.test(low)) return 'sleep';
-    if(/check.?in|wellbeing|how i.?m doing/.test(low)) return 'checkins';
-    return this._lastCoachTopic||'general';
-  }
   _cooldownMs(){ const f=this._coachCfg().frequency||'Normal'; return f==='Low'?48*3600000:f==='High'?6*3600000:20*3600000; }
   _withinWorkingHours(){ const c=this._coachCfg(); if(!c.workStart||!c.workEnd) return true; const now=new Date(); const cur=now.getHours()*60+now.getMinutes(); const [sh,sm]=c.workStart.split(':').map(Number); const [eh,em]=c.workEnd.split(':').map(Number); const s=sh*60+sm, e=eh*60+em; return cur>=s && cur<=e; }
   _generateCoachingCandidates(){
@@ -11958,24 +11837,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
 
   // ===== WORLD INTEL =====
-  get wiPolys(){ if(this._wp) return this._wp; this._wp=[
-    [[-168,66],[-164,71],[-156,71],[-140,70],[-126,70],[-110,69],[-96,69],[-84,67],[-79,63],[-71,61],[-64,60],[-57,53],[-53,47],[-59,46],[-67,44],[-70,42],[-74,40],[-75,35],[-81,31],[-80,25],[-82,28],[-85,30],[-90,29],[-94,29],[-97,26],[-97,21],[-91,18],[-87,15],[-83,9],[-77,8],[-82,8],[-87,13],[-92,16],[-97,16],[-106,21],[-113,27],[-117,32],[-122,37],[-124,43],[-125,48],[-130,54],[-138,59],[-148,60],[-157,57],[-163,61],[-168,66]],
-    [[-46,60],[-40,64],[-38,68],[-28,68],[-20,70],[-17,75],[-25,79],[-40,83],[-56,82],[-53,76],[-49,70],[-47,64],[-46,60]],
-    [[-77,8],[-71,11],[-63,10],[-60,5],[-51,4],[-50,0],[-44,-2],[-39,-6],[-35,-8],[-39,-13],[-41,-22],[-48,-26],[-54,-34],[-58,-38],[-63,-41],[-66,-45],[-69,-52],[-75,-53],[-72,-46],[-73,-40],[-73,-33],[-71,-25],[-70,-18],[-75,-15],[-80,-6],[-81,-2],[-79,2],[-77,6],[-77,8]],
-    [[-6,36],[1,37],[11,37],[11,33],[19,32],[25,32],[33,31],[36,28],[38,22],[43,12],[48,12],[51,10],[44,2],[41,-4],[40,-11],[35,-18],[32,-26],[25,-34],[19,-35],[15,-28],[13,-22],[12,-15],[9,-1],[5,4],[-4,5],[-9,4],[-13,9],[-17,15],[-17,21],[-14,26],[-11,32],[-6,36]],
-    [[-9,43],[-9,37],[-6,36],[-2,36],[3,42],[5,43],[8,44],[10,44],[12,46],[14,42],[18,40],[16,38],[13,41],[13,45],[19,42],[23,40],[26,40],[30,37],[36,36],[35,33],[34,31],[35,28],[39,21],[43,13],[48,13],[52,12],[57,22],[56,25],[50,29],[48,30],[56,26],[61,25],[67,24],[72,21],[73,15],[77,8],[80,13],[84,19],[87,21],[89,22],[92,21],[94,18],[98,12],[100,3],[104,1],[106,10],[108,16],[110,21],[113,22],[117,23],[121,31],[122,37],[126,38],[129,35],[129,40],[133,43],[135,47],[141,52],[148,59],[155,60],[157,51],[162,56],[164,61],[172,66],[180,69],[170,71],[150,73],[140,74],[113,74],[100,77],[85,77],[73,73],[60,70],[50,69],[40,68],[33,70],[28,71],[20,70],[15,68],[12,64],[6,62],[5,59],[8,58],[8,54],[4,52],[0,49],[-4,48],[-9,43]],
-    [[113,-22],[114,-27],[115,-32],[118,-35],[123,-34],[129,-32],[131,-31],[134,-33],[138,-35],[141,-38],[147,-38],[150,-37],[153,-31],[153,-26],[151,-24],[146,-19],[142,-11],[136,-12],[130,-13],[126,-14],[122,-18],[117,-21],[113,-22]],
-    [[-5,50],[-1,50],[1,51],[0,53],[-1,54],[-3,55],[-5,58],[-6,57],[-5,55],[-3,54],[-4,53],[-5,52],[-5,50]],
-    [[-10,52],[-6,52],[-6,54],[-8,55],[-10,54],[-10,52]],
-    [[130,31],[132,33],[135,34],[137,35],[140,36],[141,39],[142,41],[141,43],[144,44],[141,45],[139,42],[138,37],[135,34],[132,33],[130,31]],
-    [[49,-16],[50,-19],[47,-25],[45,-24],[44,-20],[46,-16],[49,-16]],
-    [[173,-35],[176,-38],[178,-38],[177,-40],[174,-41],[173,-38],[173,-35]],
-    [[168,-44],[171,-42],[174,-42],[171,-46],[167,-46],[166,-45],[168,-44]],
-    [[-24,65],[-19,64],[-14,65],[-17,66],[-22,66],[-24,65]],
-    [[95,5],[99,3],[104,-2],[106,-6],[102,-5],[97,1],[95,5]],
-    [[109,2],[114,3],[117,1],[118,-3],[114,-4],[110,-2],[109,2]],
-    [[120,18],[124,17],[126,9],[125,6],[122,7],[120,13],[120,18]]
-  ]; return this._wp; }
   get countries(){ if(this._cts && this._cts.length>50) return this._cts; const raw=(typeof window!=='undefined'&&window.__COUNTRIES)||null; const detail=this._detailMap(); if(!raw){ return Object.keys(detail).map(k=>detail[k]); }
     const REG={ Europe:{pol:76,dis:22,threat:'LOW'}, NAmerica:{pol:72,dis:32,threat:'LOW'}, Oceania:{pol:79,dis:40,threat:'LOW'}, SAmerica:{pol:60,dis:42,threat:'GUARDED'}, Asia:{pol:58,dis:46,threat:'GUARDED'}, Africa:{pol:50,dis:52,threat:'GUARDED'} };
     const OVR={ 'Ukraine':'SEVERE','Russia':'HIGH','Syria':'SEVERE','Yemen':'SEVERE','Afghanistan':'HIGH','Iraq':'HIGH','Somalia':'HIGH','Sudan':'HIGH','South Sudan':'HIGH','Mali':'ELEVATED','Niger':'ELEVATED','Burkina Faso':'ELEVATED','North Korea':'HIGH','Israel':'HIGH','Palestine':'SEVERE','Iran':'ELEVATED','Myanmar':'HIGH','Libya':'HIGH','Congo (DRC)':'HIGH','Central African Republic':'HIGH','Lebanon':'ELEVATED','Venezuela':'ELEVATED','Haiti':'HIGH','China':'ELEVATED','Pakistan':'ELEVATED','Nigeria':'ELEVATED','Ethiopia':'ELEVATED' };
@@ -11991,8 +11852,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     }); return this._cts;
   }
   _flag(iso){ if(!iso||iso.length!==2) return '🏳'; try{ return String.fromCodePoint(...[...iso.toUpperCase()].map(c=>0x1F1E6+c.charCodeAt(0)-65)); }catch(e){ return '🏳'; } }
-  _pip(x,y,poly){ let inside=false; for(let i=0,j=poly.length-1;i<poly.length;j=i++){ const xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1]; if(((yi>y)!==(yj>y)) && (x<(xj-xi)*(y-yi)/((yj-yi)||1e-9)+xi)) inside=!inside; } return inside; }
-  _landMask(){ if(this._mask) return this._mask; const W=720,H=360,d=new Uint8Array(W*H),P=this.wiPolys; for(let row=0;row<H;row++){ const lat=90-(row+0.5)*0.5; for(let col=0;col<W;col++){ const lon=(col+0.5)*0.5-180; for(let k=0;k<P.length;k++){ if(this._pip(lon,lat,P[k])){ d[row*W+col]=1; break; } } } } this._mask=d; return d; }
   _detailMap(){ return {
     'United States':{name:'United States',flag:'🇺🇸',lat:39,lon:-98,region:'NAmerica',threat:'GUARDED',pol:82,mil:96,eco:88,cyber:78,dis:34,ai:97,strategic:'CRITICAL',summary:'Equities firm as inflation cools. Large federal defense and AI-infrastructure procurement underway. Cyber posture elevated.'},
     'United Kingdom':{name:'United Kingdom',flag:'🇬🇧',lat:54,lon:-2,region:'Europe',threat:'LOW',pol:78,mil:70,eco:74,cyber:72,dis:18,ai:90,strategic:'HIGH',summary:'Stable governance; financial-services reform advancing. Intelligence cooperation strong across allied networks.'},
@@ -12317,6 +12176,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.51', date:'Aug 20, 2026', major:false, notes:[
+      'Removed dead code found in a full audit: an old land-mask/world-map subsystem superseded by the real globe, a duplicate black-hole shader canvas no longer used (the live one is an iframe), a half-built mute-topic voice command that was never wired up, an old voice-picker replaced by the current one, and roughly 45 leftover settings/UI bindings from earlier iterations of Notifications, Push, Account Requests, and a few other screens. No visible change — this only removes code nothing in the app was calling.',
+    ]},
     {version:'v11.50', date:'Aug 20, 2026', major:true, notes:[
       'Added a raiment switcher to the top bar, on every screen except Settings — four small glyphs (◆ Ultra X, ☾ Noir, ❦ Maison Élysée, ❖ Maison Éverpine) let you jump straight into any Ultra style from anywhere, no need to go into Settings → Appearance first. The active one is highlighted; clicking any of them switches your theme to Ultra with that style immediately.',
     ]},
@@ -14980,13 +14842,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
     return {
       rootRef:(el)=>{ this.root=el; },
-      refreshing:S.refreshing, refreshPct:rp, refreshSteps, refreshStatusLine, refreshTitle:'We are rebuilding your command center, '+((S.account&&S.account.name||'there').trim().split(/\s+/)[0])+'.',
+      refreshing:S.refreshing, refreshPct:rp, refreshSteps, refreshStatusLine,
       refreshBarFillC:S.prefs.theme==='Ultra'?'#5B1A1A':'#eef0f2', startRefresh:()=>this.startRefresh(),
       refreshBtnCursor:S.refreshing?'default':'pointer', refreshBtnBg:S.refreshing?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.03)', refreshBtnBd:S.refreshing?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)', refreshIconStroke:S.refreshing?'#FFFFFF':'#cfcfd4', refreshIconAnim:S.refreshing?'spin 1s linear infinite':'none',
       notifBtnBd:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.3)':'rgba(255,255,255,0.1)', notifBtnBg:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.06)':'rgba(255,255,255,0.03)', notifIconStroke:S.prefs.theme==='Ultra'?'#5B1A1A':'#cfcfd4',
       isPower:scene==='power',
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
-      profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%', profileXpIn:P.xpInLevel, profileXpNext:P.xpForNext,
+      profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
       profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
       profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
@@ -14997,9 +14859,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profAccent: S.prefs.theme!=='Ultra' ? '#FFFFFF' : S.prefs.ultraStyle==='Noir' ? '#C9A24A' : S.prefs.ultraStyle==='Maison Élysée' ? '#4E6E96' : '#5B1A1A',
       profTrack: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.14)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.1)' : 'rgba(58,42,32,0.1)',
       profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
-      profMonoRing: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.18)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.3)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.28)' : 'rgba(91,26,26,0.28)',
       profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
-      profMonogram: ((()=>{ if(this._isOwner()) return S.account.name; const u=(S.users||[]).find(x=>(x.email||'').toLowerCase()===this._currentEmail()); return u?u.name:S.account.name; })()||'N').trim().charAt(0).toUpperCase()||'N',
       powerLevel:P.level, rankName:P.rank.n, rankDesc:P.rank.d, powerPct:P.pct+'%', xpIn:P.xpInLevel, xpNext:P.xpForNext, nextRankName:P.next?P.next.n:'MAX RANK', nextRankLevel:P.next?P.next.min:'—',
       powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'#ff5563'},{label:'WEEKLY XP',value:'+'+P.week,c:'#eef0f2'},{label:'TOTAL XP',value:P.totalXP,c:'#eef0f2'},{label:'DAY STREAK',value:P.streak+'d',c:'#ff5563'}],
       powerCats:P.categories.map(c=>({name:c.name,level:c.level,pct:c.pct+'%'})),
@@ -15047,7 +14907,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       notesPwCurrent:S.notesPw, notesPwBtnLabel:S.notesPwSaved?'Updated ✓':'Update',
       notesPwBtnBg:S.notesPwSaved?'#FFFFFF':((S.notesPwDraft&&S.notesPwDraft.length>=3)?'#FFFFFF':'rgba(255,255,255,0.06)'),
       saveNotesPw:()=>{ const v=(this.state.notesPwDraft||'').trim(); if(v.length>=3){ this.mut(s=>({notesPw:v, notesPwDraft:'', notesUnlocked:false, notesPwSaved:true})); if(this._sbOn()) window.SB.upsert('note_vault_settings',{user_id:this.state.authUserId,pw_hash:v},'user_id'); if(this._npv) clearTimeout(this._npv); this._npv=setTimeout(()=>this.setState({notesPwSaved:false}),1700); } },
-      dashGreeting: (S.account.greeting && S.account.greeting.trim()) ? S.account.greeting : ('Good morning, '+((S.account.name||'there').trim().split(' ')[0])+'.'),
       acctName:S.acctDraft.name, acctEmail:S.acctDraft.email, acctPass:S.acctDraft.password, acctTwoFA:S.acctDraft.twoFA, acctGreeting:S.acctDraft.greeting,
       setAcctName:(e)=>{ const v=e.target.value; this.setState(st=>({acctDraft:{...st.acctDraft,name:v}})); },
       setAcctEmail:(e)=>{ const v=e.target.value; this.setState(st=>({acctDraft:{...st.acctDraft,email:v}})); },
@@ -15060,7 +14919,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       onAvatar:(e)=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>this.setState(st=>({acctDraft:{...st.acctDraft,avatar:rd.result}})); rd.readAsDataURL(f); },
       removeAvatar:()=>this.setState(st=>({acctDraft:{...st.acctDraft,avatar:''}})),
       saveAccount:()=>this.saveAccount(),
-      acctDirty:JSON.stringify(S.acctDraft)!==JSON.stringify(S.account),
       saveBtnLabel:S.acctSaved?'Saved ✓':'Save changes',
       saveBtnBg:S.acctSaved?'#5B1A1A':(JSON.stringify(S.acctDraft)!==JSON.stringify(S.account)?'#5B1A1A':'rgba(255,255,255,0.06)'),
       saveBtnC:(S.acctSaved || JSON.stringify(S.acctDraft)!==JSON.stringify(S.account))?'#F5F1E8':'#9a9aa2',
@@ -15069,7 +14927,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       acctChipTxt:(JSON.stringify(S.acctDraft)!==JSON.stringify(S.account))?'● UNSAVED':'● SAVED',
       acctChipColor:(JSON.stringify(S.acctDraft)!==JSON.stringify(S.account))?'#ffd66b':'#6cffba',
       testTierChips:(()=>{ const cur=this._effectiveTestTier(); return this._testTierOrder().map(t=>({ l:t, set:()=>this.setTestDifficulty(t), c:cur===t?'#F4F4F5':'#9a9aa2', b:cur===t?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:cur===t?'rgba(255,255,255,0.18)':'transparent' })); })(),
-      testTierIsAuto:S.prefs.testDifficultyAuto!==false,
       testTierIsManual:S.prefs.testDifficultyAuto===false,
       testTierAutoLabel:(S.prefs.testDifficultyAuto!==false)?('Auto — based on '+this._totalQtTestsDone()+' Quick Test'+(this._totalQtTestsDone()===1?'':'s')+' completed'):'Manual override active',
       resetTestTierAuto:()=>this.resetTestDifficultyAuto(),
@@ -15227,7 +15084,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       homeBgChips:(typeof window!=='undefined' && window.innerWidth<=900)?[]:[...this._chips('homeBg',['Spline']).map(c=>({...c, set:()=>{ this.setPref('homeBg', c.l); if(S.prefs.theme==='Ultra') this.setPref('theme','Lime'); }, c:(S.prefs.theme!=='Ultra'&&S.prefs.homeBg===c.l)?'#F4F4F5':'#9a9aa2', b:(S.prefs.theme!=='Ultra'&&S.prefs.homeBg===c.l)?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)'})), {l:this._hasUltraAccess()?'Ultra':'Ultra 🔒', set:()=>{ if(this._hasUltraAccess()) this.setPref('theme','Ultra'); else this.showToast('system','Ultra access required','Ask the owner to grant Ultra access to your account.'); }, c:S.prefs.theme==='Ultra'?'#F4F4F5':'#9a9aa2', b:S.prefs.theme==='Ultra'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.theme==='Ultra'?'rgba(255,255,255,0.18)':'transparent'}],
       showBgPicker:!(typeof window!=='undefined' && window.innerWidth<=900),
       bgPickerMobileNote:(typeof window!=='undefined' && window.innerWidth<=900)?'Mobile always uses the Spline background for best performance.':'',
-      isMobileViewport:(typeof window!=='undefined' && window.innerWidth<=900),
       appBgSpline:S.prefs.theme!=='Ultra' && ((typeof window!=='undefined' && window.innerWidth<=900) || (S.prefs.homeBg||'Neural')==='Spline'),
       appBgBlackhole:S.prefs.theme!=='Ultra' && S.prefs.homeBg==='Black Hole' && !(typeof window!=='undefined' && window.innerWidth<=900), isBlackholeBg:S.prefs.homeBg==='Black Hole',
       blackholeIframeRef:this._bhIframeRef||(this._bhIframeRef=(el)=>{ this._bhIframeEl=el; }),
@@ -15237,8 +15093,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       splineClass:S.prefs.theme==='Ultra'?'':(typeof window!=='undefined' && window.innerWidth<=900)?'spline-active':(S.prefs.homeBg==='Spline')?'spline-active':(S.prefs.homeBg==='Black Hole')?'blackhole-active':'',
       homeHeroBg:(S.prefs.theme==='Ultra')?'transparent':((typeof window!=='undefined' && window.innerWidth<=900) || S.prefs.homeBg==='Spline'||S.prefs.homeBg==='Black Hole')?'transparent':'#000',
       densityChips:this._chips('density',['Compact','Comfortable','Spacious']),
-      focusModeGlyph:S.focusMode?'✕':'◎', focusModeBg:S.focusMode?'#FFFFFF':'rgba(255,255,255,0.14)', focusModePos:S.focusMode?'22px':'2px', focusModeBd:S.focusMode?'rgba(255,255,255,0.35)':'transparent',
-      notifsEnabledTog:this._tog('notifsEnabled','Standard Notifications','Reminders, news, finance, fitness, briefings & security'),
       quotesEnabledTog:this._tog('quotesEnabled','Custom Quotes','A random quote from your list every 5 minutes while the app is open'),
       quoteDraftVal:S.quoteDraft||'', setQuoteDraft:(e)=>this.setQuoteDraft(e), addQuote:()=>this.addQuote(), addQuoteKey:(e)=>this.addQuoteKey(e), sendTestQuote:()=>this.sendTestQuote(),
       hasQuotes:(S.customQuotes||[]).length>0, quoteCount:(S.customQuotes||[]).length,
@@ -15257,12 +15111,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       pwaInAppWarn: (S.pwaCtx&&S.pwaCtx.isInApp) ? ('You’re viewing this inside '+(S.pwaCtx.inAppName||'another app')+'. Install and notifications can’t work inside in-app browsers — open nervexus.vercel.app in Safari or Chrome directly.') : '',
       iosStandaloneNeededShow: !!(S.pwaCtx&&S.pwaCtx.isIOS && !S.pwaCtx.isStandalone && !S.pwaCtx.isInApp),
       notifPermission:S.notifPermission||'default',
-      notifPermGranted:!!S.prefs.pushEnabled, notifPermDenied:S.notifPermission==='denied', notifPermUnsupported:S.notifPermission==='unsupported',
+      notifPermGranted:!!S.prefs.pushEnabled,
       notifPermBtnLabel: S.pushLoading?'Enabling…':(S.prefs.pushEnabled?'✓ Enabled':(S.notifPermission==='denied'?'Blocked — check browser settings':'Enable notifications')),
       requestNotifPermission:()=>this.requestNotifPermission(),
       openQuotesSub:()=>this.setState({quotesSubOpen:true}), closeQuotesSub:()=>this.setState({quotesSubOpen:false}),
-      notifToggles:[ this._tog('nFitness','Coaching & training','Discipline, streaks, recovery & PBs'), this._tog('nReminders','Schedule & directives','Events & open missions'), this._tog('nFinance','Markets & capital','Crypto, sales & money movement'), this._tog('nNews','World intel','Government & conflict watch'), this._tog('nSecurity','Security watch','Location & threat advisories'), this._tog('nBrief','Briefings','Daily briefing ready'), this._tog('nSound','Notification sound','Play a chime'), this._tog('nDesktop','Desktop push','System notifications') ],
-      freqChips:this._chips('nFreq',['Real-time','Hourly','Daily digest']),
       privacyToggles:[ this._tog('twoFA','Two-factor authentication','Require a second factor at login'), this._tog('aiMemory','AI memory','Let assistants remember context'), this._tog('analytics','Usage analytics','Anonymous product analytics'), this._tog('telemetry','Crash telemetry','Send diagnostics on errors') ],
       ...this._providerVals(),
       // Voice Assistant screen — was pure black regardless of theme (fine for Spline/Noir,
@@ -15276,11 +15128,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       wakeWordChips:['Hannah','Lura'].map(n=>({ l:n, set:()=>this.setPref('wakeWordName',n), c:(S.prefs.wakeWordName||'Hannah')===n?'#F4F4F5':'#9a9aa2', b:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.14)':'transparent' })),
       readingStyleChips:['Professional','Friendly','Motivational','Executive','Conversational'].map(o=>({l:o, set:()=>this.setReadingStyle(o), c:(S.prefs.readingStyle||'Professional')===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.14)':'transparent'})),
       volumeChips:[0.5,0.75,1].map(o=>({l:Math.round(o*100)+'%', set:()=>this.setVoiceVolume(o), c:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.14)':'transparent'})),
-      briefVoiceChips:((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ name:p.name, set:()=>this.setBriefVoice(p.id), c:(S.prefs.briefingVoice||S.prefs.elevenVoiceId)===p.id?'#F4F4F5':'#b8b8c0', b:(S.prefs.briefingVoice||'concierge')===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.briefingVoice||'concierge')===p.id?'rgba(255,255,255,0.14)':'transparent'})),
-      convoVoiceChips:((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ name:p.name, set:()=>this.setConvoVoice(p.id), c:(S.prefs.convoVoice||S.prefs.elevenVoiceId)===p.id?'#F4F4F5':'#b8b8c0', b:(S.prefs.convoVoice||'friend_f')===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.convoVoice||'friend_f')===p.id?'rgba(255,255,255,0.14)':'transparent'})),
       readText:S.readText, setReadText:(e)=>this.setReadText(e), readPasted:()=>this.readPasted(), importReadFile:(e)=>this.importReadFile(e), onDropRead:(e)=>this.onDropRead(e), onDragOverRead:(e)=>{ try{e.preventDefault();}catch(_){} if(!this.state.dragOver) this.setState({dragOver:true}); }, onDragLeaveRead:()=>{ if(this.state.dragOver) this.setState({dragOver:false}); }, importing:S.importing, importErr:S.importErr, dragBg:S.dragOver?(vTok.vDark?'rgba(255,255,255,0.1)':vTok.vInputBg):(vTok.vDark?'rgba(255,255,255,0.02)':vTok.vLine3), dragBd:S.dragOver?vTok.vAccent:vTok.vLine,
-      readerTitle:(S.vp&&S.vp.title)||S.readText&&'Ready'||'', vp:S.vp||{}, playIcon:(S.vp&&S.vp.playing&&!S.vp.paused)?'⏸':'▶', speakBriefing:()=>this.speakBriefing(), pausePlay:()=>this.pausePlay(), stopPlay:()=>this.stopPlay(), restartPlay:()=>this.restartPlay(), skipBack:()=>this.skipPlay(-15), skipFwd:()=>this.skipPlay(15), vpSeg:((S.vp&&S.vp.count)?((S.vp.idx+1)+' / '+S.vp.count):'—'),
-      hasReadable:!!((S.readText&&S.readText.trim())||(S.vp&&S.vp.loaded)),
+      vp:S.vp||{}, playIcon:(S.vp&&S.vp.playing&&!S.vp.paused)?'⏸':'▶', speakBriefing:()=>this.speakBriefing(), pausePlay:()=>this.pausePlay(), stopPlay:()=>this.stopPlay(), restartPlay:()=>this.restartPlay(), skipBack:()=>this.skipPlay(-15), skipFwd:()=>this.skipPlay(15), vpSeg:((S.vp&&S.vp.count)?((S.vp.idx+1)+' / '+S.vp.count):'—'),
       convoHistoryOpen:!!S.convoHistoryOpen,
       openConvoHistory:()=>{ this.setState({convoHistoryOpen:true}); this.loadConvoHistory(); },
       closeConvoHistory:()=>this.setState({convoHistoryOpen:false}),
@@ -15334,10 +15183,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       latestVersion:(this._changelog()[0]||{}).version||'',
       latestDate:(this._changelog()[0]||{}).date||'',
       latestNotes:(this._changelog()[0]||{}).notes||[],
-      pushLoading:!!S.pushLoading, pushErr:S.pushErr||'', pushErrShow:!!S.pushErr, pushEnabledShow:!!S.prefs.pushEnabled,
-      pushToggleLabel:S.pushLoading?'…':(S.prefs.pushEnabled?'DISABLE':'ENABLE'),
-      pushToggleAction:S.pushLoading?()=>{}:(S.prefs.pushEnabled?()=>this.disablePushNotifications():()=>this.enablePushNotifications()),
-      sendTestPush:()=>this.sendTestPush(), pushTestLabel:S.pushTestLoading?'Sending…':'Send test push',
+      pushLoading:!!S.pushLoading, pushErr:S.pushErr||'', pushErrShow:!!S.pushErr,
       clearAllNotifs:()=>this.clearAllNotifs(),
       dashboardWidgets:[['missions','Missions & Diet Checklist'],['brief','AI Daily Brief'],['stats','Stat Cards'],['intel','Intelligence Feed']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
@@ -15345,7 +15191,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       autoBriefBg:S.prefs.autoBriefingEnabled?vTok.vAccent:vTok.vLine2, autoBriefPos:S.prefs.autoBriefingEnabled?'20px':'2px',
       toggleAutoBriefing:()=>this.setPref('autoBriefingEnabled',!S.prefs.autoBriefingEnabled),
       autoBriefTime:S.prefs.autoBriefingTime||'08:00', setAutoBriefTime:(e)=>this.setPref('autoBriefingTime',e.target.value),
-      voiceSources:[{id:'exec',t:'Executive Briefing',d:'Full intelligence report',g:'◆'},{id:'brief',t:'Daily Briefing',d:'Schedule · priorities · markets',g:'▤'},{id:'notif',t:'Notifications',d:'Recent alerts summary',g:'◉'},{id:'schedule',t:'Schedule & Reminders',d:'Today\u2019s events & open tasks',g:'◷'},{id:'fitness',t:'Fitness & Recovery',d:'Readiness · streak · sleep',g:'✚'},{id:'money',t:'Markets & Money',d:'Global financial update',g:'$'},{id:'business',t:'Business Report',d:'Companies & billionaire intel',g:'⬡'}].map(x=>({ title:x.t, desc:x.d, glyph:x.g, read:()=>this.readCoreSource(x.id,x.t) })),
       speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?vTok.vInk:vTok.vMuted2, b:(S.prefs.voiceRate||1)===o?vTok.vAccent:vTok.vLine, bg:(S.prefs.voiceRate||1)===o?vTok.vLine2:'transparent'})),
       voiceModelName:(()=>{ const PD=this._pd(); const built=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0].voices)||[]; const custom=S.prefs.customElevenVoices||[]; const cur=S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'; const match=[...built,...custom].find(p=>p.id===cur); return (match&&match.name)||'ElevenLabs voice'; })(),
       voiceDeviceName:this._provCfg('elevenlabs').saved?'ElevenLabs (cloud)':'Browser voice (fallback — connect ElevenLabs above)',
@@ -15461,7 +15306,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             if(a.action!=='open') this.mut(s=>({notifs:s.notifs.map(x=>x.id===n.id?{...x,read:true}:x)}));
           } })),
         }; }),
-      notifIsUltra:S.prefs.theme==='Ultra',
       notifPanelBg:S.prefs.theme==='Ultra'?'linear-gradient(180deg,#F5F1E8,#EDE6D9)':'linear-gradient(180deg,rgba(14,14,17,0.98),rgba(9,9,12,0.97))',
       notifPanelBorder:S.prefs.theme==='Ultra'?'1px solid rgba(91,26,26,0.35)':'1px solid rgba(255,255,255,0.2)',
       notifHeaderBorder:S.prefs.theme==='Ultra'?'1px solid rgba(58,42,32,0.15)':'1px solid rgba(255,255,255,0.08)',
@@ -15527,7 +15371,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       isFinPlanner:scene==='financeplanner',
       bizTabs:[['Finance','business'],['Operations HQ','finance'],['Finance Planner','financeplanner']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       fitTabs:[['Fitness HQ','fitness'],['Health','health'],['Productivity','productivity'],['Checklists','checklists'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
-      dbTabs:[['Daily Briefing','briefing'],['Voice Core','voice']].map(t=>({ name:t[0], icon:t[1], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', bd:scene===t[1]?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
       goHealthDiet:()=>this.setState({scene:'health', healthSub:'diet'}),
@@ -16678,13 +16521,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       reqTabC:S.authMode==='request'?(S.prefs.theme==='Ultra'?'#F5F1E8':'#0c0c0d'):(S.prefs.theme==='Ultra'?'#8a6a5a':'#8a8a92'), reqTabBg:S.authMode==='request'?(S.prefs.theme==='Ultra'?'#5B1A1A':'#FFFFFF'):'transparent',
       loginPassType:S.pwVisible?'text':'password', loginPassEyeLabel:S.pwVisible?'HIDE':'SHOW', toggleLoginPwVis:()=>this.setState(s=>({pwVisible:!s.pwVisible})),
       login2FAType:S.twoFAVisible?'text':'password', login2FAEyeLabel:S.twoFAVisible?'HIDE':'SHOW', toggleTwoFAVis:()=>this.setState(s=>({twoFAVisible:!s.twoFAVisible})),
-      reqPassType:S.reqPwVisible?'text':'password', reqPassEyeLabel:S.reqPwVisible?'HIDE':'SHOW', toggleReqPwVis:()=>this.setState(s=>({reqPwVisible:!s.reqPwVisible})),
       logout:()=>this.logout(),
-      isLoginMode:S.authMode!=='request', isRequestMode:S.authMode==='request', reqSuccessShow:S.authMode==='request' && S.reqDone, showReqForm:S.authMode==='request' && !S.reqDone,
+      isLoginMode:S.authMode!=='request', reqSuccessShow:S.authMode==='request' && S.reqDone, showReqForm:S.authMode==='request' && !S.reqDone,
       showLogin:()=>this.setState({authMode:'login', loginErr:'', reqErr:''}),
       showRequest:()=>this.setState({authMode:'request', reqDone:false, reqErr:'', loginErr:''}),
-      reqName:S.reqName, reqEmail:S.reqEmail, reqPass:S.reqPass, reqAge:S.reqAge, reqNat:S.reqNat, reqIncome:S.reqIncome, reqPurpose:S.reqPurpose, reqGender:S.reqGender, reqErr:S.reqErr,
-      setReqName:(e)=>this.setState({reqName:e.target.value,reqErr:''}), setReqEmail:(e)=>this.setState({reqEmail:e.target.value,reqErr:''}), setReqPass:(e)=>this.setState({reqPass:e.target.value,reqErr:''}),
+      reqName:S.reqName, reqEmail:S.reqEmail, reqAge:S.reqAge, reqNat:S.reqNat, reqIncome:S.reqIncome, reqPurpose:S.reqPurpose, reqGender:S.reqGender, reqErr:S.reqErr,
+      setReqName:(e)=>this.setState({reqName:e.target.value,reqErr:''}), setReqEmail:(e)=>this.setState({reqEmail:e.target.value,reqErr:''}),
       setReqAge:(e)=>this.setState({reqAge:e.target.value}), setReqNat:(e)=>this.setState({reqNat:e.target.value}), setReqIncome:(e)=>this.setState({reqIncome:e.target.value}), setReqPurpose:(e)=>this.setState({reqPurpose:e.target.value}),
       reqGenderChips:['Male','Female'].map(g=>({ label:g, set:()=>this.setState({reqGender:g}), c:S.reqGender===g?'#0c0c0d':'#9a9aa2', bg:S.reqGender===g?'rgba(255,255,255,0.7)':'rgba(255,255,255,0.04)', bd:S.reqGender===g?'rgba(255,255,255,0.9)':'rgba(255,255,255,0.12)' })),
       submitRequest:()=>this.submitRequest(),
@@ -16701,9 +16543,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       reviewedReqs:(S.requests||[]).filter(r=>r.status!=='pending').map(r=>({ name:r.name, email:r.email, purpose:(r.purpose||'—'), statusLabel:r.status.toUpperCase(), statusC:r.status==='accepted'?'#6cffba':'#FFFFFF', statusBg:r.status==='accepted'?'rgba(108,255,186,0.12)':'rgba(255,107,118,0.12)', ago:this.ago(r.reviewedTs||r.ts) })),
 
       // dashboard
-      checkDone, checkTotal:S.checklist.length, checkRemain:missRemainToday, checklist, newTask:S.newTask,
-      setNewTask:(e)=>this.setState({newTask:e.target.value}),
-      addTaskKey:enterKey(()=>{ const v=S.newTask.trim(); if(v){ const id=this._uuid(); const pos=S.checklist.length; this.mut(s=>({checklist:[...s.checklist,{id,label:v,tag:'TASK',done:false}],newTask:''})); if(this._sbOn()) window.SB.insert('tasks',{id,user_id:this.state.authUserId,label:v,tag:'TASK',done:false,position:pos}); } }),
+      checkDone, checkRemain:missRemainToday, checklist,
       nextActions:nextActionsList, noNextActions:!nextActionsList.length,
       nextActionsBtnLabel: S.aiNextActionsLoading?'⏂ Thinking…':'✨ AI suggest',
       nextActionsSourceLabel: nextActionsIsAI?'AI-GENERATED · FROM YOUR DAY':'FROM YOUR MISSIONS & CALENDAR',
@@ -16759,7 +16599,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ...this.wiData(),
 
       // fitness
-      chestFill:heat(pm.Chest), shoFill:heat(pm.Shoulders), armFill:heat(pm.Arms), backFill:heat(pm.Back), coreFill:heat(pm.Core), legFill:heat(pm.Legs), cardioFill: pm.Cardio>0?this.hexA('#FFFFFF',Math.min(0.5,pm.Cardio/60*0.5)):'rgba(0,0,0,0)',
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
       addWorkout:()=>{ const ex=S.woEx.trim(), mn=parseInt(S.woMin)||0, wt=parseFloat(S.woWeight)||0, st=parseInt(S.woSets)||0, rp=parseInt(S.woReps)||0; if(ex&&(mn>0||wt>0||rp>0)){ const id=this._uuid(), part=S.woPart, ts=Date.now(); this.mut(s=>({workouts:[...s.workouts,{id,part,exercise:ex,min:mn,weight:wt,sets:st,reps:rp,ts}],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''})); if(this._sbOn()) window.SB.insert('workouts',{id,user_id:this.state.authUserId,body_part:part,exercise:ex,minutes:mn,weight:wt,sets:st,reps:rp,occurred_at:new Date(ts).toISOString()}); } },
@@ -16859,7 +16698,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       noNotes:S.notes.length===0,
       noteReadOpen:!!S.noteRead, noteReadTitle:(S.noteRead&&S.noteRead.title)||'', noteReadStamp:(S.noteRead&&S.noteRead.stamp)||'', noteReadBody:(S.noteRead&&S.noteRead.body)||'',
       closeNoteRead:()=>this.setState({noteRead:null}),
-      heatmap:Array.from({length:70},(_,i)=>{ const r=(Math.sin(i*1.3)+Math.sin(i*0.7)+1.4)/3; const lvl=r<0.15?0:r<0.4?1:r<0.7?2:3; return {bg:['rgba(255,255,255,0.05)','rgba(255,255,255,0.3)','rgba(255,255,255,0.6)','rgba(255,255,255,1)'][lvl]}; }),
 
       // calendar
       dows:['MON','TUE','WED','THU','FRI','SAT','SUN'], monthLabel, calCells, hlColors, clearHighlight, prevMonth:()=>this.setState(s=>{ let mm=s.calM-1,yy=s.calY; if(mm<0){mm=11;yy--;} return {calM:mm,calY:yy}; }), nextMonth:()=>this.setState(s=>{ let mm=s.calM+1,yy=s.calY; if(mm>11){mm=0;yy++;} return {calM:mm,calY:yy}; }),
@@ -16882,9 +16720,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         return all.map(v=>({ id:v.id, name:v.name, custom:!!v.custom, pick:()=>this.setPref('elevenVoiceId',v.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(v.id); },
           bg:cur===v.id?'rgba(255,255,255,0.14)':'transparent', b:cur===v.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', c:cur===v.id?'#F4F4F5':'#c8c8ce',
           starColor:'transparent', starIcon:'', star:()=>{}, remove:custom.find(cv=>cv.id===v.id)?()=>this.removeCustomElevenVoice(v.id):()=>{} })); })(),
-      _voicesOld_unused:(()=>{ const P=(window.VoiceEngine&&window.VoiceEngine.PROFILES)||[]; const st=S.prefs.starredVoices||[]; const hid=S.prefs.hiddenVoices||[]; const vis=P.filter(p=>hid.indexOf(p.id)<0); const sorted=vis.slice().sort((a,b)=>((st.indexOf(a.id)<0?1:0)-(st.indexOf(b.id)<0?1:0))); return sorted.map(p=>{ const starred=st.indexOf(p.id)>=0; return { id:p.id, name:p.name, desc:p.desc, deviceName:(this._ve?this._ve.deviceVoiceName(p.id):''), pick:()=>this.selectVoice(p.id), preview:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.previewVoice(p.id); }, star:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.toggleStarVoice(p.id); }, remove:(e)=>{ if(e&&e.stopPropagation)e.stopPropagation(); this.removeVoice(p.id); }, starred, starIcon:starred?'★':'☆', starColor:starred?'#e8b45a':'#6f6f78', sel:p.id===S.voice, c:p.id===S.voice?'#F4F4F5':'#b8b8c0', b:p.id===S.voice?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:p.id===S.voice?'rgba(255,255,255,0.14)':'transparent' }; }); })(),
-      hiddenVoiceCount:(S.prefs.hiddenVoices||[]).length, restoreVoices:()=>this.restoreVoices(),
-      voiceCmds:['Open the finance terminal','Add gym to my checklist','Summarize my day','Read my full briefing','Open the health centre'].map(c=>({label:c, run:()=>this.voiceCommand(c)})),
       toggleListen:()=>this.toggleListen(),
       vInput:S.vInput, setVInput:(e)=>this.setState({vInput:e.target.value}), sendVoice:()=>this.voiceCommand(this.state.vInput), sendVoiceKey:enterKey(()=>this.voiceCommand(this.state.vInput)),
       toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?vTok.vAccent:vTok.vLine2, assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
