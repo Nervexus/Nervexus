@@ -964,6 +964,13 @@
           </sc-for>
         </div>
         </sc-if>
+        <div onClick="{{ openWebApp }}" title="Open web app in browser" style="width:40px; height:40px; flex:0 0 40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
+          <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="#dcdce0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7.5 3H3.75A0.75 0.75 0 0 0 3 3.75v10.5c0 0.414 0.336 0.75 0.75 0.75h10.5a0.75 0.75 0 0 0 0.75-0.75V10.5"></path>
+            <path d="M10.5 3H15v4.5"></path>
+            <path d="M7.5 10.5L15 3"></path>
+          </svg>
+        </div>
         <div class="cc-nw" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; text-align:right; line-height:1.3; flex:0 0 auto;">
           <div data-clock="" style="color:#dcdce0;">--:--:--</div>
           <div data-date="" style="font-size:9px; color:#C9C9CE; letter-spacing:1.5px;">--</div>
@@ -8991,7 +8998,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-64 · v11.64 voice-assistant-rebuild';
+const NOTIF_BUILD_VERSION = '2026.08.21-65 · v11.65 open-web-app-button';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11162,6 +11169,7 @@ activities: this._mergeShipLog(s.activities),
     return results.filter(Boolean).join('\n\n');
   }
   mut(u){ this.setState(u, ()=>this.save()); }
+  openWebApp(){ window.open('https://nervexus.vercel.app', '_blank', 'noopener'); }
   startRefresh(){
     if(this.state.refreshing) return;
     clearInterval(this._refreshTimer);
@@ -12221,6 +12229,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.65', date:'Aug 21, 2026', major:false, notes:[
+      'Added an \u201copen web app\u201d button to the top bar, next to the raiment switcher \u2014 opens https://nervexus.vercel.app in a new browser tab.',
+    ]},
     {version:'v11.64', date:'Aug 21, 2026', major:true, notes:[
       'Voice assistant reliability: \u201clog my workout\u201d, \u201clog my weight\u201d, \u201clog this meal\u201d and \u201cadd a note\u201d previously threw silently and never saved anything, while the assistant still said \u201cLogged.\u201d \u2014 the same class of bug already fixed once for income/expense logging, now fixed for these four too (plus the underlying weight-log path, which was writing into a disconnected array with no sync at all \u2014 it now saves through the real Body Metrics history). Also added a safety net in the voice dispatcher itself: if a tool ever fails now, you hear an honest \u201cthat didn\u2019t go through\u201d instead of a false success or dead air.',
       'Daily Briefing rebuilt to be entirely real. It previously included a hardcoded \u201cMarkets. Equities are firm, crypto is bid\u2026\u201d line that never changed and wasn\u2019t connected to anything, plus a \u201cRecovery is at X percent\u201d line pulled from a number that\u2019s frozen at account creation and never updates. Both removed \u2014 the briefing now covers today\u2019s schedule, open tasks and missions, real sleep/hydration, and this month\u2019s income and expenses. \u201cGive me my daily briefing\u201d is now its own clear voice command instead of being buried in a generic \u201cread source\u201d list.',
@@ -14963,6 +14974,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       rootRef:(el)=>{ this.root=el; },
       refreshing:S.refreshing, refreshPct:rp, refreshSteps, refreshStatusLine,
       refreshBarFillC:S.prefs.theme==='Ultra'?'#5B1A1A':'#eef0f2', startRefresh:()=>this.startRefresh(),
+      openWebApp:()=>this.openWebApp(),
       refreshBtnCursor:S.refreshing?'default':'pointer', refreshBtnBg:S.refreshing?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.03)', refreshBtnBd:S.refreshing?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)', refreshIconStroke:S.refreshing?'#FFFFFF':'#cfcfd4', refreshIconAnim:S.refreshing?'spin 1s linear infinite':'none',
       notifBtnBd:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.3)':'rgba(255,255,255,0.1)', notifBtnBg:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.06)':'rgba(255,255,255,0.03)', notifIconStroke:S.prefs.theme==='Ultra'?'#5B1A1A':'#cfcfd4',
       isPower:scene==='power',
