@@ -8500,11 +8500,12 @@
                       <div style="display:flex; align-items:center; gap:11px;">
                         <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
                         <div style="flex:1; min-width:0;">
-                          <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><sc-if value="{{ p.live }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#2fce86; border:1px solid rgba(47,206,134,0.4); border-radius:5px; padding:1px 5px;">LIVE</span></sc-if><sc-if value="{{ p.freeTier }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.4); border-radius:5px; padding:1px 5px;">FREE</span></sc-if></div>
+                          <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><sc-if value="{{ p.live }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#2fce86; border:1px solid rgba(47,206,134,0.4); border-radius:5px; padding:1px 5px;">LIVE SEARCH</span></sc-if><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.freePaidC }}; background:{{ p.freePaidBg }}; border-radius:5px; padding:1px 5px;">{{ p.freePaid }}</span></div>
                           <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.statusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.statusColor }};">{{ p.statusLabel }}</span></div>
                         </div>
                         <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
                       </div>
+                      <div style="font-size:10.5px; line-height:1.4; color:#75757d; margin-top:8px;">{{ p.freePaidNote }}</div>
                       <div onClick="{{ p.toggleExpand }}" style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9a9aa2;"><span>{{ p.expandIcon }} CONFIGURE</span><span style="color:#6f6f78;">{{ p.sync }}</span></div>
                       <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
                         <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
@@ -8524,17 +8525,15 @@
                           </div>
                           <sc-if value="{{ p.showUsage }}" hint-placeholder-val="{{ false }}">
                             <div>
-                              <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">USAGE &middot; LAST 24H</div>
-                              <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
-                                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">REQUESTS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uReqs }}</div></div>
-                                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">TOKENS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uTokens }}</div></div>
-                                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">EST. COST</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#7fe6b0; margin-top:2px;">{{ p.uCost }}</div></div>
-                              </div>
-                              <div style="display:flex; align-items:center; gap:9px; margin-top:8px;">
-                                <span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#75757d; white-space:nowrap;">RATE LIMIT</span>
-                                <div style="flex:1; height:5px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden;"><div style="height:100%; width:{{ p.uRatePct }}; background:{{ p.uRateColor }}; border-radius:3px;"></div></div>
-                                <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ p.uRateColor }}; white-space:nowrap;">{{ p.uRate }} RPM</span>
-                              </div>
+                              <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">USAGE &middot; LAST 24H <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ true }}"><span style="color:#4a4a52;">&middot; from your real logged calls</span></sc-if></div>
+                              <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ true }}">
+                                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
+                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">REQUESTS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uReqs }}</div></div>
+                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">TOKENS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uTokens }}</div></div>
+                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">EST. COST</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#7fe6b0; margin-top:2px;">{{ p.uCost }}</div></div>
+                                </div>
+                              </sc-if>
+                              <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#5a5a62;">No calls to this provider in the last 24 hours.</div></sc-if>
                             </div>
                           </sc-if>
                         </div>
@@ -8581,7 +8580,7 @@
 
               <sc-if value="{{ isProvIntel }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ intelCatChips }}" as="c" hint-placeholder-count="8"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.cc }}; border:1px solid {{ c.cb }}; background:{{ c.cbg }}; border-radius:8px; padding:6px 11px; cursor:pointer;">{{ c.label }}</span></sc-for></div>
-              <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">Curated intelligence &amp; data sources by category — News, Markets, Economic, Crypto, Government, Business, Tech. Every entry here is a reviewed, established provider; toggle one on to feed it into your Executive Briefing.</div>
+              <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">A reference directory by category — News, Markets, Economic, Crypto, Government, Business, Tech. This is not a live connection to any of these (most require enterprise licensing this app can't offer); toggling a source on just tells your AI Briefing to lean into that category. For a real, live-fetched connection, use News Source APIs below.</div>
               <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <sc-for list="{{ intelCards }}" as="p" hint-placeholder-count="6">
                   <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px;">
@@ -8589,28 +8588,10 @@
                       <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:{{ p.markText }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
                       <div style="flex:1; min-width:0;">
                         <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.trustColor }}; border:1px solid {{ p.trustColor }}; border-radius:5px; padding:1px 5px; opacity:0.85;">{{ p.trustLabel }}</span></div>
-                        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.statusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.statusColor }};">{{ p.statusLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#54545c;">&middot; {{ p.category }} &middot; {{ p.region }}</span></div>
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.enabledColor }};">{{ p.enabledLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#54545c;">&middot; {{ p.category }} &middot; {{ p.region }}</span></div>
                       </div>
                       <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
                     </div>
-                    <div onClick="{{ p.toggleExpand }}" style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9a9aa2;"><span>{{ p.expandIcon }} CONFIGURE</span><span style="color:#6f6f78;">{{ p.auth }}</span></div>
-                    <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
-                      <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
-                        <sc-if value="{{ p.needsKey }}" hint-placeholder-val="{{ false }}">
-                          <sc-if value="{{ p.saved }}" hint-placeholder-val="{{ false }}">
-                            <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.masked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.replace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer;">REPLACE</span></div>
-                          </sc-if>
-                          <sc-if value="{{ p.notSaved }}" hint-placeholder-val="{{ true }}">
-                            <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.draft }}" onInput="{{ p.onDraft }}" placeholder="Paste API key" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">SAVE</span></div>
-                          </sc-if>
-                        </sc-if>
-                        <sc-if value="{{ p.err }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ p.err }}</div></sc-if>
-                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                          <span onClick="{{ p.test }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 12px; cursor:pointer;">&#9889; TEST CONNECTION</span>
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78;">Last sync: {{ p.sync }}</span>
-                        </div>
-                      </div>
-                    </sc-if>
                   </div>
                 </sc-for>
               </div>
@@ -8999,7 +8980,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-69 · v11.69 fix-gemini-key-format';
+const NOTIF_BUILD_VERSION = '2026.08.21-70 · v11.70 ai-providers-rebuild';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9077,6 +9058,7 @@ class Component extends DCLogic {
         {label:'Paid ads',amt:9800,cat:'Growth',ts:now-4*D},
       ],
       savings: s.savings || [],
+      usageLog: s.usageLog || [],
       incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false, incSaveAmt:'', savingsAddAmt:'', newExpenseCat:'',
       expLabel:'', expAmt:'', expCat:'Food', expRecurring:false,
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
@@ -9766,7 +9748,7 @@ activities: this._mergeShipLog(s.activities),
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
-    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus };
+    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
     localStorage.setItem('cc_v2', JSON.stringify({ loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
   // ===== AI & INTELLIGENCE PROVIDER MANAGER =====
@@ -9834,7 +9816,22 @@ activities: this._mergeShipLog(s.activities),
   _setIntel(id,patch){ this.mut(s=>({prefs:{...s.prefs, intel:{...(s.prefs.intel||{}), [id]:{...((s.prefs.intel||{})[id]||{}), ...patch}}}})); }
   _maskKey(v){ if(!v) return ''; const s=String(v).trim(); const dash=s.indexOf('-'); const head=s.slice(0, dash>=0&&dash<8?dash+1:3); return head+'\u2022\u2022\u2022\u2022\u2022\u2022'+s.slice(-4); }
   _validKey(id,v){ const P=this._pd().byId(id); v=(v||'').trim(); if(!P||!P.keyRe) return v.length>=16; try{ return new RegExp(P.keyRe).test(v); }catch(e){ return v.length>=16; } }
-  _usage(id){ let h=0; for(let i=0;i<id.length;i++){ h=(h*31+id.charCodeAt(i))>>>0; } const nx=(n)=>{ h=(h*1103515245+12345)>>>0; return (h%100000)/100000*n; }; const reqs=Math.floor(80+nx(560)); const tokM=0.3+nx(4.4); const price={openai:5,anthropic:3,google:1.25,xai:5,mistral:2,deepseek:0.28,openrouter:4,together:0.9,perplexity:3,cohere:2.5}[id]||2; const rpmMax={openai:10000,anthropic:4000,google:2000,xai:6000,perplexity:2000}[id]||5000; const rpmUsed=Math.floor(rpmMax*(0.08+nx(0.62))); return { reqs:reqs.toLocaleString(), tokens:tokM.toFixed(1)+'M', cost:'$'+(tokM*price).toFixed(2), rate:(rpmUsed/1000).toFixed(1)+'k/'+(rpmMax/1000)+'k', ratePct:Math.round(rpmUsed/rpmMax*100) }; }
+  // Real usage, computed from ai_usage_log rows the edge function writes on every actual
+  // AI call (token counts read straight from each provider's own response — never
+  // estimated). Previously this was a seeded pseudo-random generator that fabricated
+  // identical-looking "usage" for a provider regardless of whether it had ever been
+  // called — replaced entirely, not just relabeled.
+  _usage(id){
+    const dayAgo=Date.now()-86400000;
+    const rows=(this.state.usageLog||[]).filter(r=>r.provider===id && r.ts>=dayAgo);
+    const reqs=rows.length;
+    const inTok=rows.reduce((a,r)=>a+r.inTok,0), outTok=rows.reduce((a,r)=>a+r.outTok,0), totalTok=inTok+outTok;
+    // Approximate public per-million-token USD pricing — for an at-a-glance estimate only,
+    // not a substitute for the provider's own billing dashboard.
+    const PRICE={'claude-opus-5':[15,75],'claude-sonnet-5':[3,15],'claude-haiku-4-5-20251001':[1,5],'gemini-2.5-pro':[1.25,10],'gemini-2.5-flash':[0.3,2.5],'gemini-2.0-flash':[0.1,0.4]};
+    const cost=rows.reduce((a,r)=>{ const p=PRICE[r.model]||[2,6]; return a+(r.inTok/1e6*p[0])+(r.outTok/1e6*p[1]); },0);
+    return { hasData:reqs>0, reqs:reqs.toLocaleString(), tokens:totalTok>=1000?(totalTok/1000).toFixed(1)+'K':String(totalTok), cost:'~$'+cost.toFixed(2) };
+  }
   setProvDraft(id,e){ const v=e.target.value; this.setState(s=>({provDraft:{...s.provDraft,[id]:v}})); }
   // One-step connect: paste key -> Connect. Saves AND validates in a single click —
   // no separate manual "test" step required to get a provider working.
@@ -9864,10 +9861,6 @@ activities: this._mergeShipLog(s.activities),
   setRouting(f,id){ this.mut(s=>({prefs:{...s.prefs, routing:{...(s.prefs.routing||{}), [f]:id}}})); }
   toggleFailover(){ this.setPref('failover',!this.state.prefs.failover); }
   toggleIntel(id){ this._setIntel(id,{on:!this._intelCfg(id).on}); }
-  async testIntel(id){ this._setIntel(id,{status:'testing'}); await new Promise(r=>setTimeout(r,700+Math.random()*700)); const S=this._pd().sourceById(id); const ok=S&&(S.auth==='open'||S.auth==='rss'||this._intelCfg(id).saved); this._setIntel(id, ok?{status:'ok',sync:Date.now()}:{status:'error'}); }
-  setIntelDraft(id,e){ const v=e.target.value; this.setState(s=>({intelDraft:{...(s.intelDraft||{}),[id]:v}})); }
-  saveIntelKey(id){ const v=((this.state.intelDraft||{})[id]||'').trim(); if(!v){ this._setIntel(id,{status:'error',err:'Enter an API key'}); return; } this._setIntel(id,{saved:true,on:true,masked:this._maskKey(v),status:'idle',err:''}); this.setState(s=>({intelDraft:{...(s.intelDraft||{}),[id]:''}})); this.testIntel(id); }
-  replaceIntelKey(id){ this._setIntel(id,{saved:false,status:'idle',err:''}); }
   setProvView(v){ this.setState({provView:v}); }
   setProvSearch(e){ this.setState({provSearch:e.target.value}); }
   setIntelCat(c){ this.setState({intelCat:c}); }
@@ -9888,16 +9881,22 @@ activities: this._mergeShipLog(s.activities),
       isDefault:S.prefs.aiDefault===p.id, isBackup:S.prefs.aiBackup===p.id, setDefault:()=>this.setDefaultAI(p.id), setBackup:()=>this.setBackupAI(p.id),
       defC:S.prefs.aiDefault===p.id?'#F4F4F5':'#8a8a92', defBd:S.prefs.aiDefault===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', defBg:S.prefs.aiDefault===p.id?'rgba(255,255,255,0.16)':'transparent',
       bkC:S.prefs.aiBackup===p.id?'#e8b45a':'#8a8a92', bkBd:S.prefs.aiBackup===p.id?'rgba(232,180,90,0.5)':'rgba(255,255,255,0.12)', bkBg:S.prefs.aiBackup===p.id?'rgba(232,180,90,0.14)':'transparent',
-      sync:c.sync?this.ago(c.sync):'never', showUsage:!!(c.saved&&p.usage), uReqs:u.reqs, uTokens:u.tokens, uCost:u.cost, uRate:u.rate, uRatePct:u.ratePct+'%', uRateColor:u.ratePct>85?'#ff5563':u.ratePct>60?'#e8b45a':'#2fce86', expanded:exp, expandIcon:exp?'\u25be':'\u25b8', toggleExpand:()=>this.setState(s=>({provExpanded:{...(s.provExpanded||{}),[p.id]:!(s.provExpanded||{})[p.id]}}))
+      sync:c.sync?this.ago(c.sync):'never', showUsage:!!(c.saved&&p.usage), uHasData:u.hasData, uReqs:u.reqs, uTokens:u.tokens, uCost:u.cost, expanded:exp, expandIcon:exp?'\u25be':'\u25b8', toggleExpand:()=>this.setState(s=>({provExpanded:{...(s.provExpanded||{}),[p.id]:!(s.provExpanded||{})[p.id]}})),
+      freePaid:p.freeTier?'FREE TIER':'PAID', freePaidC:p.freeTier?'#2fce86':'#e8b45a', freePaidBg:p.freeTier?'rgba(47,206,134,0.12)':'rgba(232,180,90,0.12)', freePaidNote:p.freeTierNote||(p.freeTier?'Free within provider limits \u2014 a card may be required, no charge inside them.':'No ongoing free tier \u2014 billed per token from the first call.')
     }; });
     const curIntelCat=S.intelCat||'All';
-    const intelCards=PD.INTEL_SOURCES.filter(s=>(curIntelCat==='All'||s.category===curIntelCat)&&(!q||s.name.toLowerCase().indexOf(q)>=0)).map(s=>{ const c=this._intelCfg(s.id); const st=c.status||'idle'; const needsKey=(s.auth==='apikey'||s.auth==='licensed'); const ek='intel_'+s.id; return {
+    // Intel Sources is a browse-only reference directory (per its own data-file comment:
+    // "no source here makes a real API call") — it previously still showed a paste-a-key +
+    // TEST CONNECTION + CONNECTED flow that accepted literally any text as a valid key and
+    // always reported success, which is exactly the "looks live, isn't" pattern this app is
+    // being audited for. Stripped that fake flow entirely: this is now honestly a reference
+    // list you can enable/disable per source to flavor the AI Briefing, nothing more — for a
+    // real live connection, use News Source APIs below instead.
+    const intelCards=PD.INTEL_SOURCES.filter(s=>(curIntelCat==='All'||s.category===curIntelCat)&&(!q||s.name.toLowerCase().indexOf(q)>=0)).map(s=>{ const c=this._intelCfg(s.id); return {
       id:s.id, name:s.name, mark:s.mark, color:s.color, markText:s.dark?'#111':'#fff', category:s.category, auth:PD.AUTH_LABEL[s.auth]||s.auth, region:s.region||'Global', licensed:s.auth==='licensed',
       trustLabel:s.tier===1?'VETTED · TIER 1':'ESTABLISHED · TIER 2', trustColor:s.tier===1?'#2fce86':'#e8b45a',
       on:!!c.on, toggleBg:c.on?'#FFFFFF':'rgba(255,255,255,0.14)', togglePos:c.on?'20px':'2px', toggle:()=>this.toggleIntel(s.id),
-      status:st, statusColor:stColor(st), statusLabel:stLabel(st,c.saved), testing:st==='testing', test:()=>this.testIntel(s.id), sync:c.sync?this.ago(c.sync):'—',
-      needsKey, saved:!!c.saved, notSaved:!c.saved, masked:c.masked||'', draft:(S.intelDraft||{})[s.id]||'', onDraft:(e)=>this.setIntelDraft(s.id,e), save:()=>this.saveIntelKey(s.id), replace:()=>this.replaceIntelKey(s.id), err:c.err||'',
-      expanded:!!(S.provExpanded||{})[ek], expandIcon:(S.provExpanded||{})[ek]?'▾':'▸', toggleExpand:()=>this.setState(st2=>({provExpanded:{...(st2.provExpanded||{}),[ek]:!(st2.provExpanded||{})[ek]}}))
+      enabledLabel:c.on?'ENABLED · INCLUDED IN BRIEFINGS':'DISABLED', enabledColor:c.on?'#2fce86':'#6f6f78',
     }; });
     const intelCatChips=(PD.INTEL_CATEGORIES||[]).map(c=>({ id:c.id, label:c.label, set:()=>this.setIntelCat(c.id), cc:curIntelCat===c.id?'#111114':'#c8c8ce', cb:curIntelCat===c.id?'#FFFFFF':'rgba(255,255,255,0.14)', cbg:curIntelCat===c.id?'#FFFFFF':'rgba(255,255,255,0.03)' }));
     const provsOn=PD.AI_PROVIDERS.filter(p=>this._provCfg(p.id).on);
@@ -9935,14 +9934,17 @@ activities: this._mergeShipLog(s.activities),
           status:st, statusColor:stColor(st), statusLabel:stLabel(st,c.saved), err:c.err||'', testing:st==='testing', test:()=>this.testProvider(p.id),
           expanded:exp, expandIcon:exp?'\u25be':'\u25b8', toggleExpand:()=>this.setState(s=>({provExpanded:{...(s.provExpanded||{}),[p.id]:!(s.provExpanded||{})[p.id]}}))
         }; }),
+      // Intel Sources deliberately excluded here — it's a reference directory, not a real
+      // connection (see the comment on intelCards above), so it never belonged in a count
+      // called "active connections." Counting it made "9 connected" appear from sources
+      // nobody had ever actually entered a key for.
       activeConnections:(()=>{ const out=[];
         PD.AI_PROVIDERS.forEach(p=>{ const c=this._provCfg(p.id); if(c.on&&c.saved) out.push({name:p.name,kind:'AI',dotColor:c.status==='error'?'#ff5563':'#2fce86'}); });
         (PD.NEWS_SOURCES||[]).forEach(p=>{ const c=this._provCfg(p.id); if(c.on&&c.saved) out.push({name:p.name,kind:'NEWS',dotColor:c.status==='error'?'#ff5563':'#2fce86'}); });
-        (PD.INTEL_SOURCES||[]).forEach(p=>{ const c=this._intelCfg(p.id); if(c.on) out.push({name:p.name,kind:'INTEL',dotColor:c.status==='error'?'#ff5563':'#2fce86'}); });
         (PD.TTS_PROVIDERS||[]).forEach(p=>{ const c=this._provCfg(p.id); if(c.on&&c.saved) out.push({name:p.name,kind:'VOICE',dotColor:c.status==='error'?'#ff5563':'#2fce86'}); });
         return out; })(),
-      connCountLabel:(()=>{ const ai=PD.AI_PROVIDERS.filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const nw=(PD.NEWS_SOURCES||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const it=(PD.INTEL_SOURCES||[]).filter(p=>this._intelCfg(p.id).on).length; const tt=(PD.TTS_PROVIDERS||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; return ai+nw+it+tt+' connected'; })(),
-      noConnections:(()=>{ const ai=PD.AI_PROVIDERS.filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const nw=(PD.NEWS_SOURCES||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const it=(PD.INTEL_SOURCES||[]).filter(p=>this._intelCfg(p.id).on).length; const tt=(PD.TTS_PROVIDERS||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; return (ai+nw+it+tt)===0; })(),
+      connCountLabel:(()=>{ const ai=PD.AI_PROVIDERS.filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const nw=(PD.NEWS_SOURCES||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const tt=(PD.TTS_PROVIDERS||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; return ai+nw+tt+' connected'; })(),
+      noConnections:(()=>{ const ai=PD.AI_PROVIDERS.filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const nw=(PD.NEWS_SOURCES||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; const tt=(PD.TTS_PROVIDERS||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length; return (ai+nw+tt)===0; })(),
       provStats:[{k:'AI PROVIDERS',v:nAI+'/'+PD.AI_PROVIDERS.length},{k:'NEWS SOURCES',v:nNews+'/'+(PD.NEWS_SOURCES||[]).length},{k:'ROUTED FEATURES',v:String(PD.AI_FEATURES.length)},{k:'FAILOVER',v:S.prefs.failover?'ARMED':'OFF'}],
       genBriefing:()=>this.generateBriefingAI(), aiBriefLoading:!!S.aiBriefLoading, aiBriefErr:S.aiBriefErr||'', hasAIBrief:!!S.aiBrief, clearAIBrief:()=>this.clearAIBrief(),
       aiBriefProvider:S.aiBriefProvider||'', aiBriefStamp:S.aiBriefStamp||'', synthLabel:S.aiBriefLoading?'SYNTHESIZING…':(S.aiBrief?'RE-SYNTHESIZE LIVE':'SYNTHESIZE LIVE'), briefProviderName:((PD.byId((S.prefs.routing&&S.prefs.routing.briefings)||S.prefs.aiDefault||'anthropic')||{}).name||'AI')
@@ -10051,7 +10053,7 @@ activities: this._mergeShipLog(s.activities),
       if(this._getTwoFA(r.email)){ this.setState({loginStage:'twofa', pendingAuthEmail:r.email, loginErr:'', login2FAInput:''}); }
       else { this._persistLock(0,0); this._completeLogin(r.email); }
     } else { this._registerFail(r.err); } }
-  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Ultra X', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, provOpenAI:true, provClaude:true, provPerplexity:false, aiPrimary:'OpenAI', notifsEnabled:true, quotesEnabled:false,
+  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Ultra X', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, notifsEnabled:true, quotesEnabled:false,
     coaching:{finance:true,fitness:true,checkins:true,spendingAlerts:true,motivational:true,silent:false,vacation:false,frequency:'Normal',workStart:'',workEnd:''}, mutedTopics:[], coachLog:{},
     // ===== Notification & Reminder System settings (notification-engine.js) =====
     notifFrequency:'150min', notifFrequencyCustomMin:60, notifSound:true, notifVibration:true,
@@ -10080,7 +10082,7 @@ activities: this._mergeShipLog(s.activities),
   _completeLogin(email){ const em=(email||'').trim().toLowerCase(); const acc0=(this.state.accounts||{})[em];
     const acc=acc0?{...acc0, prefs:{...this._defaultPrefs(), ...(acc0.prefs||{})}}:acc0;
     const user=(this.state.users||[]).find(u=>(u.email||'').trim().toLowerCase()===em);
-    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], savings:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
+    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], savings:[], usageLog:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
     this.setState(Object.assign({loggedIn:true,currentEmail:email,loginErr:'',loginPass:'',login2FAInput:'',loginStage:'creds',loginFailCount:0,scene:'home'}, acc||blank),()=>{ this._checkDailyLogin(); this.save(); this._notifInit=false; this.initNotifs(); }); }
   doLogin2FA(){ const now=Date.now(); if(this.state.loginLockUntil && now<this.state.loginLockUntil){ this.setState({loginErr:this._lockMsg()}); return; }
     if(window.SB && window.SB.ready()){
@@ -11268,7 +11270,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!this._sbOn()) return;
     const uid=this.state.authUserId;
     try{
-      const [tasks,notes,missions,missionHistory,events,income,expenses,savings,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes]=await Promise.all([
+      const [tasks,notes,missions,missionHistory,events,income,expenses,savings,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes,usageLogRes]=await Promise.all([
         window.SB.list('tasks',{match:{user_id:uid},order:{column:'position',ascending:true}}),
         window.SB.list('notes',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,deleted_at,title,body,created_at'}),
         window.SB.list('missions',{match:{user_id:uid}}),
@@ -11295,6 +11297,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         window.SB.list('login_xp_log',{match:{user_id:uid},order:{column:'created_at',ascending:false},limit:400}),
         window.SB.list('world_intel_pins',{match:{user_id:uid}}),
         window.SB.list('world_intel_routes',{match:{user_id:uid}}),
+        window.SB.list('ai_usage_log',{match:{user_id:uid},order:{column:'created_at',ascending:false},limit:300}),
       ]);
       const patch={};
       if(tasks && tasks.data) patch.checklist=tasks.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,label:r.label,tag:r.tag||'TASK',done:!!r.done,xpAwarded:!!r.done}));
@@ -11309,6 +11312,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(notifs && notifs.data){ const fromDb=notifs.data.map(r=>({id:r.id,cat:r.category||'system',title:r.title,body:r.body,read:!!r.read,ts:new Date(r.created_at).getTime()})); const localIds=new Set(this.state.notifs.map(x=>x.id)); patch.notifs=[...this.state.notifs, ...fromDb.filter(x=>!localIds.has(x.id))].sort((a,b)=>b.ts-a.ts).slice(0,40); }
       if(goalsRes && goalsRes.data && goalsRes.data.length){ const g={}; goalsRes.data.forEach(r=>{ if(r.target!=null) g[r.label]=+r.target; }); patch._pendingGoals=g; }
       if(worldIntel && worldIntel.data && worldIntel.data[0]){ const w=worldIntel.data[0]; if(w.selected_country) patch.selCountry=w.selected_country; if(w.layer) patch.wiLayer=w.layer; if(w.time_range) patch.wiTime=w.time_range; if(w.last_query) patch.wiQuery=w.last_query; }
+      if(usageLogRes && usageLogRes.data) patch.usageLog=usageLogRes.data.map(r=>({provider:r.provider,model:r.model||'',inTok:+r.input_tokens||0,outTok:+r.output_tokens||0,ts:new Date(r.created_at).getTime()}));
       if(dayColorsRes && dayColorsRes.data && dayColorsRes.data.length){ const dc={}; dayColorsRes.data.forEach(r=>{ dc[r.day]=r.color; }); patch.dayColors=dc; }
       if(noteVault && noteVault.data && noteVault.data[0] && noteVault.data[0].pw_hash){ patch.notesPw=noteVault.data[0].pw_hash; }
       if(learningRes && learningRes.data && learningRes.data[0] && learningRes.data[0].data){ patch.learning={...this.state.learning, ...learningRes.data[0].data}; }
@@ -12230,6 +12234,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.70', date:'Aug 21, 2026', major:true, notes:[
+      'Rebuilt AI Providers. The \u201cUSAGE \u00b7 LAST 24H\u201d panel was seeded pseudo-random data that showed activity even for a key you\u2019d never used \u2014 replaced with real tracking: the edge function now logs every actual AI call with token counts read straight from each provider\u2019s own response, and the panel shows your real request count, real tokens, and an estimated cost from that \u2014 or an honest \u201cno calls in the last 24 hours\u201d when there aren\u2019t any. The fake rate-limit bar is gone rather than faked further.',
+      'Fixed \u201c9 connected\u201d / \u201c10 connected\u201d showing up in AI Providers with nothing ever actually connected \u2014 Intel Sources (Reuters, Alpha Vantage, FRED, and the rest) had a \u201cpaste a key \u2192 Connect\u201d flow that accepted literally any text as valid and always reported success, because the sources themselves make no real API call (most are licensed/enterprise feeds this app was never going to integrate). Stripped that fake flow entirely \u2014 Intel Sources is now honestly a browse-only reference directory with a simple enable/disable toggle, and the connection count only counts genuinely connected AI/News/Voice providers.',
+      'Added a clear FREE / PAID badge and a one-line explanation to each AI provider \u2014 Anthropic has no ongoing free tier (billed per token from the first call), Google Gemini is free within its daily rate limits and is also the only one with live web search built in.',
+    ]},
     {version:'v11.69', date:'Aug 21, 2026', major:true, notes:[
       'Fixed Google Gemini keys being rejected with \u201cInvalid key format for this provider\u201d \u2014 the check only accepted the old \u201cAIza\u2026\u201d key format, but Google is now also issuing keys starting \u201cAQ.\u2026\u201d (seen live from AI Studio), which got rejected client-side before ever reaching Google to actually be checked. The format check is now permissive about the prefix; the real validation is still the live call to Google\u2019s API when you hit Connect.',
     ]},

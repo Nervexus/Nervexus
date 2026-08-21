@@ -34,14 +34,16 @@
       auth:'apikey', keyRe:'^sk-ant-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-ant-…', docs:'docs.anthropic.com',
       // Real, currently-live Anthropic model IDs (not the old placeholder-style "4.5" names
       // with dots, which aren't valid API model slugs and would 404 if ever actually sent).
-      usage:true, models:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5-20251001'], defaultModel:'claude-sonnet-5' },
+      usage:true, models:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5-20251001'], defaultModel:'claude-sonnet-5',
+      freeTier:false, freeTierNote:'No free tier — billed per token from your first request. A new key gets a small one-time trial credit, then it’s pay-as-you-go.' },
     { id:'google', name:'Google Gemini', mark:'GE', color:'#4285f4', endpoint:'https://generativelanguage.googleapis.com/v1',
       // Google now issues two live key formats — the older "AIza..." keys and newer ones
       // starting "AQ." (seen from AI Studio in Aug 2026) — so this only sanity-checks length
       // and character set instead of pinning to one prefix. The real check happens
       // server-side against Google's own API when you hit Connect.
       auth:'apikey', keyRe:'^[A-Za-z0-9_.\\-]{20,}$', keyHint:'AIza… or AQ….', docs:'ai.google.dev',
-      usage:true, live:true, freeTier:true, models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }
+      usage:true, live:true, freeTier:true, freeTierNote:'Free within Google’s generous daily rate limits — no card required to start. Also the only provider here with live web search built in.',
+      models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }
   ];
 
   // category: News | Markets | Economic | Crypto | Government | Business | Tech

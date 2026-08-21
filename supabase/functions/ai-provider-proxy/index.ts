@@ -40,6 +40,16 @@ function resolveModel(provider: string, requested?: string): string {
   return fallback;
 }
 
+// Real usage logging, replacing what used to be a client-side seeded-random "USAGE · LAST 24H"
+// panel that fabricated request/token/cost numbers regardless of actual use. Best-effort: a
+// logging failure never fails the underlying AI call, and unreported tokens are logged as 0
+// rather than guessed — an honest 0 beats a plausible-looking fake number.
+async function logUsage(admin: any, uid: string, provider: string, model: string | undefined, inputTokens: number, outputTokens: number) {
+  try {
+    await admin.from('ai_usage_log').insert({ user_id: uid, provider, model: model || null, input_tokens: inputTokens || 0, output_tokens: outputTokens || 0 });
+  } catch (_e) { /* best-effort only */ }
+}
+
 // Every response — success, error, and the OPTIONS preflight — must carry these or the
 // browser's fetch() rejects the whole call before JS ever sees a status code or body
 // (this was previously missing entirely, silently breaking every action from the client).
@@ -194,14 +204,16 @@ function sseFrame(obj: unknown): string { return 'data: ' + JSON.stringify(obj) 
 // provider's own stream and normalizing each provider's delta shape into {delta:string}.
 // Ends with {done:true, citations?} or {error:string}. Added so the voice assistant can
 // start speaking a finished sentence before the full reply finishes generating.
-function streamCall(provider: string, apiKey: string, prompt: string, model?: string): Response {
+function streamCall(provider: string, apiKey: string, prompt: string, model: string | undefined, admin: any, uid: string): Response {
   const stream = new ReadableStream({
     async start(controller) {
       const enc = new TextEncoder();
       const send = (obj: unknown) => { try { controller.enqueue(enc.encode(sseFrame(obj))); } catch { /* client closed */ } };
+      let usageIn = 0, usageOut = 0;
       try {
         let url = '', headers: Record<string, string> = {}, reqBody: unknown;
         let extractDelta: (obj: any) => string = () => '';
+        let extractUsage: (obj: any) => void = () => {};
         let citations: string[] | undefined;
 
         if (provider === 'openai') {
@@ -214,6 +226,10 @@ function streamCall(provider: string, apiKey: string, prompt: string, model?: st
           headers = { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' };
           reqBody = { model: resolveModel('anthropic', model), max_tokens: 1024, stream: true, messages: [{ role: 'user', content: prompt }] };
           extractDelta = (obj) => (obj.type === 'content_block_delta' && obj.delta?.type === 'text_delta') ? (obj.delta.text || '') : '';
+          extractUsage = (obj) => {
+            if (obj.type === 'message_start' && obj.message?.usage) usageIn = obj.message.usage.input_tokens || usageIn;
+            if (obj.type === 'message_delta' && obj.usage) usageOut = obj.usage.output_tokens || usageOut;
+          };
         } else if (provider === 'perplexity') {
           url = 'https://api.perplexity.ai/chat/completions';
           headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
@@ -236,6 +252,9 @@ function streamCall(provider: string, apiKey: string, prompt: string, model?: st
             const chunks = cand?.groundingMetadata?.groundingChunks;
             if (chunks) citations = chunks.map((c: any) => c.web?.title || c.web?.uri).filter(Boolean);
             return (cand?.content?.parts || []).map((p: any) => p.text || '').join('');
+          };
+          extractUsage = (obj) => {
+            if (obj.usageMetadata) { usageIn = obj.usageMetadata.promptTokenCount || usageIn; usageOut = obj.usageMetadata.candidatesTokenCount || usageOut; }
           };
         }
 
@@ -263,12 +282,14 @@ function streamCall(provider: string, apiKey: string, prompt: string, model?: st
             try { obj = JSON.parse(line); } catch { continue; }
             const delta = extractDelta(obj);
             if (delta) send({ delta });
+            extractUsage(obj);
           }
         }
         send({ done: true, citations });
       } catch (e) {
         send({ error: (e as Error)?.message || 'Stream failed' });
       } finally {
+        if (usageIn || usageOut) await logUsage(admin, uid, provider, model, usageIn, usageOut);
         controller.close();
       }
     },
@@ -490,7 +511,7 @@ Deno.serve(async (req) => {
     // providers 'call' already supports below; falls through to the non-streamed
     // path for everything else (unchanged).
     if (body.stream && ['openai', 'anthropic', 'perplexity', 'xai', 'google'].includes(provider)) {
-      return streamCall(provider, apiKey, prompt, model);
+      return streamCall(provider, apiKey, prompt, model, admin, uid);
     }
 
     let result = '';
@@ -502,14 +523,17 @@ Deno.serve(async (req) => {
       });
       const j = await r.json();
       result = j.choices?.[0]?.message?.content || '';
+      if (j.usage) await logUsage(admin, uid, provider, 'gpt-4o-mini', j.usage.prompt_tokens, j.usage.completion_tokens);
     } else if (provider === 'anthropic') {
+      const usedModel = resolveModel('anthropic', model);
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: resolveModel('anthropic', model), max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: usedModel, max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
       });
       const j = await r.json();
       result = j.content?.[0]?.text || '';
+      if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.input_tokens, j.usage.output_tokens);
     } else if (provider === 'perplexity') {
       // Perplexity's sonar models do a real live web search per request — this is the
       // only provider here that can answer "what's happening today" style questions.
@@ -528,6 +552,7 @@ Deno.serve(async (req) => {
       if (!r.ok) return json({ error: j.error?.message || 'Perplexity request failed (' + r.status + ')' }, 400);
       result = j.choices?.[0]?.message?.content || '';
       const citations = j.citations || [];
+      if (j.usage) await logUsage(admin, uid, provider, 'sonar-pro', j.usage.prompt_tokens, j.usage.completion_tokens);
       return json({ result, citations });
     } else if (provider === 'xai') {
       // Grok (live search enabled) — also genuinely current, OpenAI-compatible shape.
@@ -539,10 +564,12 @@ Deno.serve(async (req) => {
       const j = await r.json();
       if (!r.ok) return json({ error: j.error?.message || 'xAI request failed (' + r.status + ')' }, 400);
       result = j.choices?.[0]?.message?.content || '';
+      if (j.usage) await logUsage(admin, uid, provider, 'grok-4', j.usage.prompt_tokens, j.usage.completion_tokens);
     } else if (provider === 'google') {
       // Gemini + "Grounding with Google Search" — genuinely current, and free within Google's
       // monthly grounded-query allowance, so this is the free backup live-search option.
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${resolveModel('google', model)}:generateContent?key=${apiKey}`, {
+      const usedModel = resolveModel('google', model);
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${usedModel}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
@@ -553,6 +580,7 @@ Deno.serve(async (req) => {
       result = cand?.content?.parts?.map((p: any) => p.text).join('') || '';
       const chunks = cand?.groundingMetadata?.groundingChunks || [];
       const citations = chunks.map((c: any) => c.web?.title || c.web?.uri).filter(Boolean);
+      if (j.usageMetadata) await logUsage(admin, uid, provider, usedModel, j.usageMetadata.promptTokenCount, j.usageMetadata.candidatesTokenCount);
       return json({ result, citations });
     } else {
       return json({ error: 'Provider not implemented yet' }, 400);
