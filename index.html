@@ -8980,7 +8980,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-71 · v11.71 fix-gemini-3-models';
+const NOTIF_BUILD_VERSION = '2026.08.21-72 · v11.72 fix-provider-sync-on-reload';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11350,7 +11350,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!this._sbOn()) return;
     try{
       const res=await window.SB.providerStatus();
-      if(res && res.providers){ this.mut(s=>({prefs:{...s.prefs, prov:{...(s.prefs.prov||{}), ...res.providers}}})); }
+      // The server reports a saved key as {saved, masked, enabled} — never `on`, which is
+      // the field every "is this provider usable" check in this file actually reads
+      // (_pickAutoProvider, the executive-brief/news-pull provider picks, the connection
+      // counts). On a fresh page load that left `on` undefined, so a genuinely-saved,
+      // genuinely-enabled key was silently invisible to the voice assistant and everything
+      // else that calls _pickAutoProvider — it would only start working again once you
+      // manually flipped the toggle off and back on in that browser tab. Mapping enabled
+      // straight onto `on` here fixes every one of those checks at the single point they
+      // all trace back to, instead of patching each call site.
+      if(res && res.providers){
+        const mapped={}; Object.entries(res.providers).forEach(([id,p])=>{ mapped[id]={...p, on:p.enabled!==false}; });
+        this.mut(s=>({prefs:{...s.prefs, prov:{...(s.prefs.prov||{}), ...mapped}}}));
+      }
       else if(res && res.error){ console.warn('[sb] provider status failed:', res.error); }
     }catch(e){ console.warn('[sb] provider status failed:', (e&&e.message)||e); }
   }
@@ -12234,6 +12246,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.72', date:'Aug 21, 2026', major:true, notes:[
+      'Fixed a real \u201cAPI key doesn\u2019t sync\u201d bug: a genuinely saved, genuinely connected AI provider key could still get \u201cI need an AI provider connected\u201d from the voice assistant on a fresh page load or a new tab. Root cause \u2014 the server reports a saved key as {saved, masked, enabled}, but every actual \u201cis this provider usable\u201d check in the app (the voice assistant, briefings, news pulling, connection counts) reads a differently-named field, `on`, which the status pull never set. It only ever got set locally when you flipped the toggle switch in that browser tab. Fixed at the one place all of those checks trace back to, so a saved key now works immediately after any reload, not just in the tab you originally connected it in.',
+    ]},
     {version:'v11.71', date:'Aug 21, 2026', major:true, notes:[
       'Fixed Gemini calls failing with \u201cmodels/gemini-2.5-flash is no longer available to new users.\u201d Google retired the 2.5 line for newly-issued API keys \u2014 moved the default and the model picker to the current Gemini 3 stable Flash tier (gemini-3.6-flash by default, plus 3.7-flash and 3.5-flash-lite as options). Left Pro out of the picker on purpose: gemini-3.1-pro is preview-only and requires a paid Google Cloud plan, which would break the exact same way for anyone on the free tier this provider exists for.',
     ]},
