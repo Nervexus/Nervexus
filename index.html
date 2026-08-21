@@ -8997,7 +8997,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-75 · v11.75 smart-workout-parser';
+const NOTIF_BUILD_VERSION = '2026.08.21-76 · v11.76 bw-volume-label';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12290,6 +12290,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.76', date:'Aug 21, 2026', major:true, notes:[
+      'Fixed the trained-muscles chips and volume legend on Fitness HQ labelling bodyweight-only training as "kg" — a body part trained purely with bodyweight sets (no external weight logged) now reads "BW" instead of a made-up kilogram figure. A part with real weighted sets still shows kg as normal.',
+    ]},
     {version:'v11.75', date:'Aug 21, 2026', major:true, notes:[
       'Bulk Import Workout no longer needs an AI provider for common formats — the local parser now reads single-line entries like "Squats & Shoulder Press 30kg x10reps" directly (the exact format that was hitting a Gemini quota error and failing to import at all). Combined names ("&", "+", "and", "x") are split into their real individual exercises, each classified into its own muscle group — so logging "squats x push ups" now shows up under Legs AND Chest instead of one vague "Mixed" bucket. Same splitting now applies to manual/voice logging too. Added a BW (bodyweight) toggle next to the kg field — in the log form, in bulk-import rows, and picked up automatically for reps-only lines with no weight — since not all training uses external weight; bodyweight sets now count toward your volume charts instead of showing as zero.',
     ]},
@@ -13714,11 +13717,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   partMinutes(){ const c=Date.now()-7*86400000; const m={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0}; this.state.workouts.forEach(w=>{ if(w.ts>=c&&m[w.part]!=null) m[w.part]+=this._woEstMin(w); }); return m; }
   // Training volume (kg lifted = weight x sets x reps) per muscle group, last 7 days — used by
   // the Muscle Training Split chart. Cardio has no weight/reps, so it stays minutes-based there.
-  partVolume(){ const c=Date.now()-7*86400000; const v={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0};
+  // weighted[part] tracks whether any real kg was lifted for that part this week — a part
+  // trained purely with bodyweight sets gets its pseudo-volume labelled BW downstream instead
+  // of a made-up "kg" figure that never happened.
+  partVolume(){ const c=Date.now()-7*86400000; const v={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0}; const weighted={Chest:false,Back:false,Shoulders:false,Arms:false,Legs:false,Core:false,Cardio:false};
     this.state.workouts.forEach(w=>{ if(w.ts<c||v[w.part]==null) return;
       if(w.part==='Cardio') v.Cardio+=(+w.min||0);
-      else v[w.part]+=this._workoutVol(w);
-    }); return v; }
+      else { v[w.part]+=this._workoutVol(w); if((+w.weight||0)>0) weighted[w.part]=true; }
+    }); return {vol:v, weighted}; }
   // ===== Bulk workout import — paste a whole session, AI splits it into rows and
   // classifies each exercise's muscle group, reviewed before anything is actually logged. =====
   openWoImport(){ this.setState({woImportOpen:true, woImportText:'', woImportErr:'', woImportRows:[], woImportDayOffset:0}); }
@@ -14954,9 +14960,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const workoutList=[...S.workouts].filter(w=>(S.woPart==='Full'||w.part===S.woPart) && w.ts>=woRangeStart).sort((a,b)=>b.ts-a.ts).map((w)=>{ const idx=S.workouts.indexOf(w); const isBW=w.unit==='BW'; const det=isBW ? ('BW'+(w.weight?'+'+w.weight+'kg':'')+'·'+(w.sets||1)+'×'+(w.reps||0)) : (w.weight? (w.weight+'kg·'+(w.sets||1)+'×'+(w.reps||0)) : ((w.min||0)+'m')); return {exercise:w.exercise,part:w.part,min:w.min,detail:det,ago:this.ago(w.ts),color:partColor[w.part]||'#FFFFFF', remove:()=>{ this.mut(s=>({workouts:s.workouts.filter((_,j)=>j!==idx)})); if(this._sbOn() && w.id) window.SB.remove('workouts',w.id); }}; });
     const trainedList=Object.keys(pm).filter(k=>pm[k]>0);
     const coachMsg = trainedList.length===0 ? 'No sessions logged this week. Start with a full-body session to build momentum.' : `This week you trained ${trainedList.join(', ')} for ${this.weekMin()} min. ${pm.Back===0?'Your back is untrained — add a pull session.':(pm.Legs===0?'Legs are untrained — add a lower-body day.':'Balanced split — prioritise recovery and progressive overload.')}`;
-    const pv=this.partVolume();
-    const volLabel=(p,v)=>v<=0?'—':(p==='Cardio'?v+'m':v.toLocaleString()+'kg');
-    const bodyLegend=['Chest','Shoulders','Arms','Back','Core','Legs','Cardio'].map(p=>({name:p, min:volLabel(p,pv[p]), c:pv[p]>0?'#cfcfd4':'#6f6f78', dot:pv[p]>0?(partColor[p]||'#FFFFFF'):'#2a2a30'}));
+    const {vol:pv, weighted:pw}=this.partVolume();
+    const volLabel=(p,v,w)=>v<=0?'—':(p==='Cardio'?v+'m':v.toLocaleString()+(w?'kg':' BW'));
+    const bodyLegend=['Chest','Shoulders','Arms','Back','Core','Legs','Cardio'].map(p=>({name:p, min:volLabel(p,pv[p],pw[p]), c:pv[p]>0?'#cfcfd4':'#6f6f78', dot:pv[p]>0?(partColor[p]||'#FFFFFF'):'#2a2a30'}));
 
     // business derived
     const totalInc=S.income.reduce((a,i)=>a+(+i.amt||0),0), totalExp=S.expenses.reduce((a,e)=>a+(+e.amt||0),0); const net=totalInc-totalExp; const margin=totalInc>0?Math.round(net/totalInc*100):0;
@@ -15187,8 +15193,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       resetTestTierAuto:()=>this.resetTestDifficultyAuto(),
 
       muscleChartBars:(()=>{ const pv=this.partVolume(); const pc={Chest:'#FFFFFF',Back:'#E4E4E7',Shoulders:'#e8e8ec',Arms:'#FFFFFF',Legs:'#FFFFFF',Core:'#e8e8ec',Cardio:'#ff5563'}; const labels={Shoulders:'Delts'}; const order=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio']; const max=Math.max(1,...order.map(k=>pv[k]||0)); return order.map(k=>{ const v=pv[k]||0; return { label:labels[k]||k, minLabel:v>0?(k==='Cardio'?v+'m':v.toLocaleString()+'kg'):'—', h:Math.max(4,Math.round((v/max)*100)), barBg:v>0?pc[k]:'rgba(255,255,255,0.08)', valColor:v>0?'#c3d2e6':'#5c5c64' }; }); })(),
-      trainedMuscles:(()=>{ const pv=this.partVolume(); return Object.keys(pv).filter(k=>pv[k]>0).map(k=>({name:k, val:(k==='Cardio'?pv[k]+'m':pv[k].toLocaleString()+'kg')})); })(),
-      noTrained:(()=>{ const pv=this.partVolume(); return Object.keys(pv).filter(k=>pv[k]>0).length===0; })(),
+      trainedMuscles:(()=>{ const {vol:pv, weighted:pw}=this.partVolume(); return Object.keys(pv).filter(k=>pv[k]>0).map(k=>({name:k, val:(k==='Cardio'?pv[k]+'m':pv[k].toLocaleString()+(pw[k]?'kg':' BW'))})); })(),
+      noTrained:(()=>{ const pv=this.partVolume().vol; return Object.keys(pv).filter(k=>pv[k]>0).length===0; })(),
       settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','AI Providers','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'#F4F4F5':'#9a9aa2', bg:n===S.settingsTab?'rgba(255,255,255,0.14)':'transparent', bd:n===S.settingsTab?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.08)', soon:''})),
       settingsTab:S.settingsTab,
       ...(()=>{ const c=this._provCfg('elevenlabs'); const PD=this._pd(); const tts=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0])||{voices:[]};
