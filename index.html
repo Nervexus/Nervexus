@@ -2277,17 +2277,10 @@
               <sc-if value="{{ noMoneySelDayEntries }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78; padding:8px 0;">Nothing logged this day.</div></sc-if>
             </div>
           </div>
-        </div>
-        <div class="cc-grid-biz" style="display:grid; grid-template-columns:1.55fr 1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:15px; font-weight:700;">Income vs Expenses · 2026</span>
-              <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:10px;"><span style="color:#8a8a92;"><span style="color:#FFFFFF;">■</span> Income</span><span style="color:#8a8a92;"><span style="color:#ff5563;">■</span> Expenses</span></div>
-            </div>
-            <canvas data-chart="bizChart" style="width:100%; height:250px; display:block; margin-top:10px;"></canvas>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:16px;">
+          <div style="height:1px; background:rgba(255,255,255,0.08); margin:22px 0 18px;"></div>
+          <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
             <!-- income log -->
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
+            <div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span style="font-size:13px; font-weight:600;">Log Income</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFFFFF;">{{ incTotal }}</span></div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:9px;">
                 <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
@@ -2315,7 +2308,7 @@
               </div>
             </div>
             <!-- expense log -->
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
+            <div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span style="font-size:13px; font-weight:600;">Log Expense</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#e8e8ec;">{{ expTotal }}</span></div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:9px;">
                 <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
@@ -2343,6 +2336,12 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-bottom:18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:15px; font-weight:700;">Income vs Expenses · 2026</span>
+            <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:10px;"><span style="color:#8a8a92;"><span style="color:#FFFFFF;">■</span> Income</span><span style="color:#8a8a92;"><span style="color:#ff5563;">■</span> Expenses</span></div>
+          </div>
+          <canvas data-chart="bizChart" style="width:100%; height:250px; display:block; margin-top:10px;"></canvas>
         </div>
 
         <div style="margin:26px 0 14px;">
@@ -8990,7 +8989,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-56 · v11.56 voice-income-fix';
+const NOTIF_BUILD_VERSION = '2026.08.21-57 · v11.57 unified-cashflow-block';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12155,6 +12154,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.57', date:'Aug 21, 2026', major:false, notes:[
+      'Cash Flow Calendar, Log Income, and Log Expense are now one unified block on Finance Terminal instead of three separate cards — calendar + day detail on top, Log Income and Log Expense side by side below a divider. Income vs Expenses chart moved into its own card below.',
+    ]},
     {version:'v11.56', date:'Aug 21, 2026', major:false, notes:[
       'Fixed a bug found while QA-checking the new income/expense rebuild: the voice assistant’s "log income" / "log expense" commands called this.addIncome()/this.addExpense(), but those only existed as button-click bindings, not real methods — so voice-triggered logging silently failed. addIncome/addExpense are now real methods the UI button, Enter key, and voice assistant all share.',
     ]},
