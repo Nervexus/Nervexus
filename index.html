@@ -1380,82 +1380,6 @@
 
 
       <!-- ===== FINANCE ===== -->
-      <sc-if value="{{ isFinance }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <sc-for list="{{ bizTabs }}" as="t" hint-placeholder-count="2"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
-        </div>
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:20px;">
-          <div>
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:7px; flex-wrap:wrap;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE;">◆ FINANCE HQ · FINANCE</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#75757d; border:1px solid rgba(255,255,255,0.16); border-radius:20px; padding:2px 9px;">SIMULATED DEMO — NOT CONNECTED TO A REAL BROKERAGE</span>
-            </div>
-            <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Markets &amp; Portfolio</h1>
-          </div>
-          <div style="display:flex; gap:22px; font-family:'JetBrains Mono',monospace;">
-            <div><div style="font-size:10px; color:#7c7c84; letter-spacing:1px;">NET WORTH</div><div style="font-size:21px; color:#eef0f2;">$1.42M</div></div>
-            <div><div style="font-size:10px; color:#7c7c84; letter-spacing:1px;">DAY P/L</div><div style="font-size:21px; color:#eef0f2;">+$8,240</div></div>
-            <div><div style="font-size:10px; color:#7c7c84; letter-spacing:1px;">CASH</div><div style="font-size:21px; color:#eef0f2;">$96K</div></div>
-          </div>
-        </div>
-        <div class="cc-glowcard" style="overflow:hidden; border-radius:12px; background:#16181c; margin-bottom:18px; height:40px; display:flex; align-items:center;">
-          <div style="display:flex; gap:34px; white-space:nowrap; animation:ticker 38s linear infinite; padding-left:20px; font-family:'JetBrains Mono',monospace; font-size:12.5px;">
-            <sc-for list="{{ tickers }}" as="t" hint-placeholder-count="12">
-              <span style="display:inline-flex; gap:8px; align-items:center;"><b style="color:#d6d6da;">{{ t.sym }}</b><span style="color:#9a9aa2;">{{ t.px }}</span><span style="color:{{ t.col }};">{{ t.chg }}</span></span>
-            </sc-for>
-          </div>
-        </div>
-        <div class="cc-grid-fin" style="display:grid; grid-template-columns:1.6fr 1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:8px;">
-              <div style="display:flex; align-items:baseline; gap:12px;"><span style="font-size:17px; font-weight:700;">PORTFOLIO</span><span style="font-family:'JetBrains Mono',monospace; font-size:22px; color:#eef0f2;">$1,418,902</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#FFFFFF;">▲ 2.1% · +$29,402</span></div>
-              <div style="display:flex; gap:6px;">
-                <sc-for list="{{ ranges }}" as="r" hint-placeholder-count="5"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ r.bg }};">{{ r.l }}</span></sc-for>
-              </div>
-            </div>
-            <canvas data-chart="finMain" style="width:100%; height:280px; display:block; margin-top:10px;"></canvas>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:20px;">
-              <canvas data-chart="finDonut" style="width:130px; height:130px; flex:0 0 130px;"></canvas>
-              <div style="flex:1; display:flex; flex-direction:column; gap:9px;">
-                <sc-for list="{{ alloc }}" as="a" hint-placeholder-count="4">
-                  <div style="display:flex; align-items:center; gap:9px; font-size:12.5px;"><span style="width:9px; height:9px; border-radius:3px; background:{{ a.c }};"></span><span style="color:#cfcfd4; flex:1;">{{ a.label }}</span><span style="font-family:'JetBrains Mono',monospace; color:#9a9aa2;">{{ a.pct }}</span></div>
-                </sc-for>
-              </div>
-            </div>
-            <div class="cc-glowcard" style="flex:1; border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:10px;">◆ SAMPLE SUMMARY</div>
-              <p style="font-size:13.5px; line-height:1.6; color:#d6d6da;">Portfolio outperformed the S&amp;P by <b style="color:#fff;">0.8%</b> today, led by tech. Concentration risk is rising — top 3 holdings are <b style="color:#FFFFFF;">41%</b> of equity. Consider trimming on strength.</p>
-              <div style="margin-top:12px; font-size:10px; color:#75757d; border-top:1px solid rgba(255,255,255,0.08); padding-top:10px;">Illustrative example text, not generated from any real position · not financial advice · figures simulated</div>
-            </div>
-          </div>
-        </div>
-        <div class="cc-grid-fin" style="display:grid; grid-template-columns:1.3fr 1fr; gap:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; margin-bottom:14px;">Sector Heatmap</div>
-            <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;">
-              <sc-for list="{{ heat }}" as="h" hint-placeholder-count="24">
-                <div style="aspect-ratio:1.5; border-radius:8px; background:{{ h.bg }}; display:flex; flex-direction:column; justify-content:center; align-items:center; border:1px solid {{ h.bd }};"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#eef0f2;">{{ h.sym }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ h.tc }};">{{ h.chg }}</span></div>
-              </sc-for>
-            </div>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><span style="font-size:13px; font-weight:600;">Watchlist</span><span style="font-size:9px; color:#75757d; border:1px solid rgba(255,255,255,0.16); border-radius:20px; padding:2px 8px;">SIMULATED</span></div>
-            <sc-for list="{{ watch }}" as="w" hint-placeholder-count="6">
-              <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                <div style="width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.22); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#FFFFFF;">{{ w.ic }}</div>
-                <div style="flex:1;"><div style="font-size:13px; color:#dbdbe0; font-weight:600;">{{ w.sym }}</div><div style="font-size:10px; color:#75757d;">{{ w.name }}</div></div>
-                <canvas data-spark="{{ w.spark }}" style="width:62px; height:26px;"></canvas>
-                <div style="text-align:right; font-family:'JetBrains Mono',monospace;"><div style="font-size:12px; color:#eef0f2;">{{ w.px }}</div><div style="font-size:10px; color:{{ w.col }};">{{ w.chg }}</div></div>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-      </div>
-      </sc-if>
-
       <!-- ===== WORLD INTELLIGENCE HQ ===== -->
       <sc-if value="{{ isGlobe }}" hint-placeholder-val="{{ false }}">
       <div class="cc-globe-glass" style="animation:rise .5s ease both;">
@@ -2278,71 +2202,12 @@
       </sc-if>
 
       <!-- ===== FINANCE PLANNER ===== -->
-      <sc-if value="{{ isFinPlanner }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <sc-for list="{{ bizTabs }}" as="t" hint-placeholder-count="3"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
-        </div>
-        <div style="margin-bottom:20px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ FINANCE HQ · PLANNER</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Finance Planner</h1>
-        </div>
-        <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:18px;">
-          <sc-for list="{{ finPlannerRings }}" as="t" hint-placeholder-count="4">
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; border:1px solid rgba(255,255,255,0.1); padding:18px; display:flex; flex-direction:column; align-items:center; text-align:center;">
-              <canvas data-ring="{{ t.val }}" data-ringc="{{ t.color }}" style="width:82px; height:82px;"></canvas>
-              <div style="font-size:12.5px; color:#dbdbe0; margin-top:10px; font-weight:600;">{{ t.name }}</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; margin-top:3px;">{{ t.sub }}</div>
-            </div>
-          </sc-for>
-        </div>
-        <sc-if value="{{ noFinPlannerRings }}" hint-placeholder-val="{{ false }}"><div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px; margin-bottom:18px; font-size:12px; color:#8a8a92;">Log an expense in the Finance tab to see budget rings here.</div></sc-if>
-        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;"><span style="font-size:13px; font-weight:600;">Budget vs Actual</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ plannerTotalColor }};">{{ plannerTotalLabel }}</span></div>
-          <div style="font-size:11.5px; color:#8a8a92; margin-bottom:14px;">Tracked live against your logged expenses in the Finance tab.</div>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <sc-for list="{{ plannerRows }}" as="p" hint-placeholder-count="3">
-              <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:12px; color:#c3c3ca; width:100px; flex:0 0 100px;">{{ p.cat }}</span>
-                <div style="flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden;"><div style="height:100%; width:{{ p.pct }}; background:{{ p.barColor }}; border-radius:4px;"></div></div>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ p.spentColor }}; width:70px; flex:0 0 70px; text-align:right;">{{ p.spentLabel }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6f6f78;">/</span>
-                <input value="{{ p.budgetInput }}" onInput="{{ p.setBudget }}" onKeyDown="{{ p.saveKey }}" onBlur="{{ p.save }}" placeholder="budget" style="width:74px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none;">
-              </div>
-            </sc-for>
-          </div>
-          <sc-if value="{{ noPlannerRows }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">Log an expense in the Finance tab to start planning a budget.</span></sc-if>
-        </div>
-        <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ RECOMMENDATIONS</span>
-            <span onClick="{{ generateFinRecsAI }}" style="font-size:10px; color:#F4F4F5; cursor:pointer; font-family:'JetBrains Mono',monospace; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ finRecsBtnLabel }}</span>
-          </div>
-          <div style="font-size:9px; color:#8a8a92; font-family:'JetBrains Mono',monospace; margin-bottom:10px;">{{ finRecsSourceLabel }}</div>
-          <sc-if value="{{ finRecsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:8px; line-height:1.4;">⚠ {{ finRecsErr }}</div></sc-if>
-          <sc-for list="{{ finPlannerRecs }}" as="r" hint-placeholder-count="2">
-            <div style="display:flex; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-              <span style="color:#C9C9CE; font-size:13px;">▸</span>
-              <span style="font-size:12.5px; line-height:1.5; color:#d6d6da; flex:1;">{{ r }}</span>
-            </div>
-          </sc-for>
-        </div>
-      </div>
-      </sc-if>
-
-      <!-- ===== FINANCE HQ ===== -->
+      <!-- ===== FINANCE TERMINAL ===== -->
       <sc-if value="{{ isBiz }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <sc-for list="{{ bizTabs }}" as="t" hint-placeholder-count="2"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
-        </div>
-        <div onClick="{{ openFinanceTutor }}" class="cc-glowbtn" style="border-radius:14px; background:#1b1d21; padding:14px 18px; margin-bottom:18px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;" style-hover="{ background:'#202226' }">
-          <div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#d69bff;">AI ASSISTANT</div><div style="font-size:14px; font-weight:700; margin-top:2px;">Ask the Finance Assistant</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">Budgeting, spending, investing &amp; understanding your money</div></div>
-          <span style="font-size:12px; color:#8a8a92;">Text or voice →</span>
-        </div>
         <div style="margin-bottom:20px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ FINANCE HQ</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Revenue &amp; Operations</h1>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ FINANCE TERMINAL</div>
+          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Finance Terminal</h1>
         </div>
         <div class="cc-stat4 cc-fin-kpi-wrap" style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:18px;">
           <sc-for list="{{ bizKpis }}" as="k" hint-placeholder-count="4">
@@ -2354,17 +2219,17 @@
           </sc-for>
         </div>
         <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ AI BUSINESS SPECIALIST</span><span style="font-size:9px; color:#8a8a92;">reads your logged numbers</span></div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ MONEY ASSISTANT</span><span style="font-size:9px; color:#8a8a92;">reads your logged numbers</span></div>
           <div style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
             <sc-for list="{{ bizMsgs }}" as="m" hint-placeholder-count="1">
               <div style="align-self:{{ m.align }}; max-width:76%; padding:10px 14px; border-radius:13px; background:{{ m.bg }}; border:1px solid rgba(255,255,255,0.06);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ m.whoC }}; margin-bottom:3px;">{{ m.who }}</div><div style="font-size:13px; color:{{ m.txtC }}; line-height:1.5;">{{ m.text }}</div></div>
             </sc-for>
             <sc-if value="{{ bizLoading }}" hint-placeholder-val="{{ false }}">
-              <div style="align-self:flex-start; max-width:76%; padding:10px 14px; border-radius:13px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#C9C9CE; margin-bottom:3px;">SPECIALIST</div><div style="font-size:13px; color:#8a8a92;">Thinking…</div></div>
+              <div style="align-self:flex-start; max-width:76%; padding:10px 14px; border-radius:13px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#C9C9CE; margin-bottom:3px;">MONEY ASSISTANT</div><div style="font-size:13px; color:#8a8a92;">Thinking…</div></div>
             </sc-if>
           </div>
           <div style="display:flex; gap:9px;">
-            <input value="{{ bizInput }}" onInput="{{ setBizInput }}" onKeyDown="{{ bizSendKey }}" placeholder="Ask about cash flow, marketing, competitors, a purchase decision…" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+            <input value="{{ bizInput }}" onInput="{{ setBizInput }}" onKeyDown="{{ bizSendKey }}" placeholder="Ask about budgeting, spending, saving, or a money decision…" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
             <span onClick="{{ bizSend }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; opacity:{{ bizSendOpacity }};">{{ bizSendLabel }}</span>
           </div>
         </div>
@@ -2415,6 +2280,52 @@
             </div>
           </div>
         </div>
+
+        <div style="margin:26px 0 14px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:4px;">◆ BUDGET PLANNER</div>
+          <div style="font-size:12px; color:#8a8a92;">Set a monthly budget per category and track it against what you log above.</div>
+        </div>
+        <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:18px;">
+          <sc-for list="{{ finPlannerRings }}" as="t" hint-placeholder-count="4">
+            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; border:1px solid rgba(255,255,255,0.1); padding:18px; display:flex; flex-direction:column; align-items:center; text-align:center;">
+              <canvas data-ring="{{ t.val }}" data-ringc="{{ t.color }}" style="width:82px; height:82px;"></canvas>
+              <div style="font-size:12.5px; color:#dbdbe0; margin-top:10px; font-weight:600;">{{ t.name }}</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; margin-top:3px;">{{ t.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ noFinPlannerRings }}" hint-placeholder-val="{{ false }}"><div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px; margin-bottom:18px; font-size:12px; color:#8a8a92;">Log an expense above to see budget rings here.</div></sc-if>
+        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;"><span style="font-size:13px; font-weight:600;">Budget vs Actual</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ plannerTotalColor }};">{{ plannerTotalLabel }}</span></div>
+          <div style="font-size:11.5px; color:#8a8a92; margin-bottom:14px;">Tracked live against the expenses you log above.</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <sc-for list="{{ plannerRows }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:12px; color:#c3c3ca; width:100px; flex:0 0 100px;">{{ p.cat }}</span>
+                <div style="flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden;"><div style="height:100%; width:{{ p.pct }}; background:{{ p.barColor }}; border-radius:4px;"></div></div>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ p.spentColor }}; width:70px; flex:0 0 70px; text-align:right;">{{ p.spentLabel }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6f6f78;">/</span>
+                <input value="{{ p.budgetInput }}" onInput="{{ p.setBudget }}" onKeyDown="{{ p.saveKey }}" onBlur="{{ p.save }}" placeholder="budget" style="width:74px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none;">
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ noPlannerRows }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">Log an expense above to start planning a budget.</span></sc-if>
+        </div>
+        <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ BUDGET RECOMMENDATIONS</span>
+            <span onClick="{{ generateFinRecsAI }}" style="font-size:10px; color:#F4F4F5; cursor:pointer; font-family:'JetBrains Mono',monospace; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ finRecsBtnLabel }}</span>
+          </div>
+          <div style="font-size:9px; color:#8a8a92; font-family:'JetBrains Mono',monospace; margin-bottom:10px;">{{ finRecsSourceLabel }}</div>
+          <sc-if value="{{ finRecsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:8px; line-height:1.4;">⚠ {{ finRecsErr }}</div></sc-if>
+          <sc-for list="{{ finPlannerRecs }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+              <span style="color:#C9C9CE; font-size:13px;">▸</span>
+              <span style="font-size:12.5px; line-height:1.5; color:#d6d6da; flex:1;">{{ r }}</span>
+            </div>
+          </sc-for>
+        </div>
+
         <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
           <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; padding:20px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
@@ -9022,7 +8933,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.20-52 · v11.52 custom-quotes-wired-up';
+const NOTIF_BUILD_VERSION = '2026.08.21-53 · v11.53 finance-terminal-merge';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9188,7 +9099,7 @@ activities: this._mergeShipLog(s.activities),
 
   navDefs=[
     {id:'home',label:'Home'},
-    {id:'dashboard',label:'Command'},{id:'learning',label:'Learning'},{id:'business',label:'Business HQ'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
+    {id:'dashboard',label:'Command'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
     {id:'globe',label:'World Intel'},
     {id:'fitness',label:'Fitness'},
     {id:'calendar',label:'Calendar'},
@@ -11819,23 +11730,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const last=pts[pts.length-1]; ctx.fillStyle=isU?'#7A2626':'#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); });
   }
 
-  startCandle(cv){ const {ctx,w,h}=this.prep(cv); const n=60; let price=100; const candles=[];
-    for(let i=0;i<n;i++){ const o=price; const ch=(Math.sin(i*0.4)+Math.sin(i*0.13))*1.4+(Math.random()-0.45)*2.2; price=Math.max(60,o+ch); const c=price; const hi=Math.max(o,c)+Math.random()*1.8; const lo=Math.min(o,c)-Math.random()*1.8; candles.push({o,c,hi,lo}); }
-    let min=Math.min(...candles.map(c=>c.lo)), max=Math.max(...candles.map(c=>c.hi)); const pad=(max-min)*0.12; min-=pad; max+=pad; const Y=v=>h-((v-min)/(max-min))*(h-20)-10; const cw=w/n;
-    this.loop((ts)=>{ const prog=Math.min(1,ts*0.0007); ctx.clearRect(0,0,w,h);
-      ctx.strokeStyle='rgba(255,255,255,0.04)'; for(let g=0;g<5;g++){ const y=(g/4)*(h-20)+10; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-      ctx.beginPath(); candles.forEach((c,i)=>{ const x=i*cw+cw/2; const y=Y(c.c); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,'rgba(255,255,255,0.14)'); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fill();
-      const shown=Math.floor(n*prog);
-      for(let i=0;i<shown;i++){ const c=candles[i]; const x=i*cw+cw/2; const up=c.c>=c.o; const col=up?'#e8e8ec':'#ff3b4a'; ctx.strokeStyle=col; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(x,Y(c.hi)); ctx.lineTo(x,Y(c.lo)); ctx.stroke(); ctx.fillStyle=col; const yo=Y(c.o),yc=Y(c.c); ctx.fillRect(x-cw*0.28, Math.min(yo,yc), cw*0.56, Math.max(2,Math.abs(yc-yo))); }
-      ctx.beginPath(); for(let i=0;i<shown;i++){ const x=i*cw+cw/2; const y=Y(candles[i].c); i?ctx.lineTo(x,y):ctx.moveTo(x,y); } ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.4; ctx.stroke(); });
-  }
-
-  startDonut(cv,vals,cols){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,R=w/2-6,r=R*0.6; const tot=vals.reduce((a,b)=>a+b,0);
-    this.loop((ts)=>{ const prog=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); let a=-Math.PI/2;
-      vals.forEach((v,i)=>{ const seg=(v/tot)*Math.PI*2*prog; ctx.beginPath(); ctx.arc(cx,cy,(R+r)/2,a,a+seg); ctx.strokeStyle=cols[i]; ctx.lineWidth=R-r; ctx.stroke(); a+=seg; });
-      ctx.fillStyle='#eef0f2'; ctx.font='600 17px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$1.4M',cx,cy-6); ctx.fillStyle='#7c7c84'; ctx.font='9px JetBrains Mono'; ctx.fillText('EQUITY',cx,cy+12); });
-  }
-
   startBars(cv,vals,accent){ const {ctx,w,h}=this.prep(cv); const n=vals.length; const gap=w/n*0.32; const bw=w/n-gap; const mx=Math.max(...vals,1);
     this.loop((ts)=>{ const prog=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h);
       ctx.strokeStyle='rgba(255,255,255,0.04)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-10)+2; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
@@ -12144,7 +12038,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(activeTab) activeTab.scrollIntoView({ block:'nearest', inline:'center' });
     if(!(this.state.learningTab==='Maths' && this.state.mtMode==='hub')) return; const hist=(((this.state.learning&&this.state.learning.mathsHistory)||[]).filter(h=>h.mode==='GCSE Test').slice(0,10).reverse()); if(hist.length<2) return; const cv=this.root.querySelector('[data-chart="mtProgress"]'); if(cv) this.startTrend(cv, hist.map(h=>h.pct), '#4ADE80'); }
   init_dashboard(){ const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
-  init_finance(){ const m=this.root.querySelector('[data-chart="finMain"]'); if(m) this.startCandle(m); const d=this.root.querySelector('[data-chart="finDonut"]'); if(d) this.startDonut(d,[42,26,18,14],['#FFFFFF','#e8e8ec','#7a7a82','#55631C']); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load'){ const up=c.dataset.spark.indexOf('d')%2===0; this.startSpark(c,up?'#e8e8ec':'#ff3b4a'); } }); }
   init_fitness(){ const today=this.todayMin(); const move=Math.min(1,(today*8)/700); const r=this.root.querySelector('[data-chart="fitRings"]'); if(r) this.startRingSet(r,[move, Math.min(1,today/45), 0.9],['#FFFFFF','#eef0f2','#7a7a82'],15,7); const st=this.root.querySelector('[data-chart="strength"]'); if(st) this.startTrend(st, this.strengthSeries(), '#FFFFFF'); }
   init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
   startPowerHills(cv){ const {ctx,w,h}=this.prep(cv); const rows=10;
@@ -12202,6 +12095,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.53', date:'Aug 21, 2026', major:true, notes:[
+      'Merged the three separate Finance pages (Finance, Operations HQ, Finance Planner) into one "Finance Terminal" — one scrolling page instead of three tabs. Deleted the "Markets & Portfolio" stock-market simulation entirely (it was 100% hardcoded fake tickers/prices, not connected to any real data). The two AI chats ("Ask the Finance Assistant" and "AI Business Specialist") are now one Money Assistant focused on budgeting, spending and saving instead of generic business topics. Budget Planner (rings + Budget vs Actual + recommendations) now lives on the same page as income/expense logging, right below it.',
+    ]},
     {version:'v11.52', date:'Aug 20, 2026', major:true, notes:[
       'Custom Quotes is now actually usable — Settings → Notifications has a new "Custom Quotes" panel where you can add your own quotes one at a time, generate 20 more in the same voice with AI, send a test, and turn the whole feature on or off. Tap a saved quote to read it full-screen with a read-aloud button. This backend was already built in an earlier update but never had a way to reach it — it does now.',
     ]},
@@ -13111,19 +13007,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(/1rm|max|strength/.test(t)) return 'I estimate 1RM via Epley: weight × (1 + reps/30). Add weight, sets and reps when logging and the strength trend updates automatically.';
     return 'This week you trained '+(trained.length?trained.join(', '):'nothing yet')+' for '+wk+' min. '+(untr.length?('Next, hit '+untr[0]+'.'):'Keep progressive overload going.')+' Ask me for a plan, weak points, recovery, or nutrition.'; }
   bizReply(text){ const t=text.toLowerCase(); const s=this.state; const inc=s.income.reduce((a,i)=>a+(+i.amt||0),0), exp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0), net=inc-exp, margin=inc>0?Math.round(net/inc*100):0;
-    if(/cash|flow|profit|margin|money/.test(t)) return 'Income '+this.fmtK(inc)+', expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'% margin). '+(net<0?'You are burning — cut discretionary spend or accelerate collections.':'Healthy — route a fixed % of profit to reserves and growth.');
-    if(/market|sell|sales|grow|acqui|customer/.test(t)) return 'Double down on your highest-converting channel. At '+margin+'% margin you can reinvest in paid acquisition if CAC payback is under 6 months. Test one channel at a time.';
-    if(/invest|risk|purchase|buy|spend/.test(t)) return 'For a risky purchase: size it under 10% of cash reserves, define a payback threshold, and pre-commit an exit. Want me to model the downside from your logged numbers?';
-    if(/compet|rival/.test(t)) return 'Track competitors on pricing, launches and hiring. Differentiate on the one thing customers repeat back to you, then double down.';
+    if(/cash|flow|profit|margin|money/.test(t)) return 'Income '+this.fmtK(inc)+', expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'% margin). '+(net<0?'You are spending more than you bring in — cut discretionary spend or find another income source.':'Healthy — route a fixed % of what is left to savings or debt payoff.');
+    if(/save|saving|goal|reserve/.test(t)) return 'A simple rule: pay yourself first. Move a fixed % of income to savings the moment it lands, before it can be spent. At '+margin+'% margin you have '+(margin>0?'room to increase that %.':'no margin yet — trim spend before automating savings.');
+    if(/invest|risk|purchase|buy|spend/.test(t)) return 'For a big purchase: size it against your cash on hand, not your income. Ask what it costs you if income drops next month before committing.';
+    if(/budget|categ|overspend|over budget/.test(t)) return 'Check the Budget Planner below — it shows exactly which categories are over for the month, live against what you have logged.';
     if(/code|debug|automat|bug|script/.test(t)) return 'Describe the workflow or paste the error. In a live deployment I would run a coding agent; here I can outline the fix, the steps, and the automation logic for you to implement.';
-    return 'Snapshot — income '+this.fmtK(inc)+', expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'%). Ask me about cash flow, marketing, competitors, or a purchase decision.'; }
+    return 'Snapshot — income '+this.fmtK(inc)+', expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'%). Ask me about budgeting, spending, saving, or a money decision.'; }
   async bizAskAI(v){ const s=this.state;
     this.setState(st=>({bizChat:[...st.bizChat,{who:'you',text:v}], bizInput:'', bizLoading:true}));
     if(!window.claude){ this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:this.bizReply(v)}], bizLoading:false})); return; }
     const inc=s.income.reduce((a,i)=>a+(+i.amt||0),0), exp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0), net=inc-exp, margin=inc>0?Math.round(net/inc*100):0;
     const topInc=[...s.income].sort((a,b)=>(+b.amt||0)-(+a.amt||0)).slice(0,5).map(i=>i.label+': '+this.fmtK(+i.amt||0)).join(', ')||'none logged';
     const topExp=[...s.expenses].sort((a,b)=>(+b.amt||0)-(+a.amt||0)).slice(0,5).map(e=>e.label+': '+this.fmtK(+e.amt||0)).join(', ')||'none logged';
-    const sys='You are an AI business specialist embedded in a command-center app. Be concise (2-4 sentences), direct, and practical — no filler, no disclaimers. Ground answers in these real logged numbers when relevant: total income '+this.fmtK(inc)+', total expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'% margin). Top income sources: '+topInc+'. Top expenses: '+topExp+'.';
+    const sys='You are an AI money management assistant embedded in a command-center app. Be concise (2-4 sentences), direct, and practical — no filler, no disclaimers. Help with budgeting, spending, saving and everyday financial decisions. Ground answers in these real logged numbers when relevant: total income '+this.fmtK(inc)+', total expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'% margin). Top income sources: '+topInc+'. Top expenses: '+topExp+'.';
     const history=(s.bizChat||[]).slice(-10).map(m=>({role:m.who==='you'?'user':'assistant', content:m.text}));
     try{ const text=await window.claude.complete({system:sys, messages:[...history,{role:'user',content:v}], max_tokens:400});
       this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:(text||'').trim()||this.bizReply(v)}], bizLoading:false}));
@@ -13150,7 +13046,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       this.showToast('system','Calendar imported', clean.length+' event'+(clean.length>1?'s':'')+' added');
     }catch(e){ this.setState({calImportLoading:false, calImportErr:'Could not read that image'}); }
   }
-  init_business(){ const b=this.root.querySelector('[data-chart="bizChart"]'); if(b){ const {inc,exp}=this.monthly(); this.startBiz(b,inc,exp); } }
+  init_business(){ const b=this.root.querySelector('[data-chart="bizChart"]'); if(b){ const {inc,exp}=this.monthly(); this.startBiz(b,inc,exp); } this.root.querySelectorAll('[data-ring]').forEach(c=>this.startProgRing(c, parseFloat(c.dataset.ring), c.dataset.ringc||'#FFFFFF')); }
   startHGauge(cv,val,color,center){ const isU=this.state.prefs.theme==='Ultra'; if(isU) color=this._ultraRingColor(color); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0009)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isU?'rgba(41,37,36,0.12)':'rgba(255,255,255,0.07)'; ctx.lineWidth=8; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=8; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=13; ctx.stroke(); ctx.shadowBlur=0; ctx.fillStyle=isU?'#292524':'#eef0f2'; ctx.font='600 21px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(center,cx,cy); }); }
   _ultraRingColor(color){ const c=(color||'').toLowerCase(); const isNoir=this.state.prefs.ultraStyle==='Noir';
     if(isNoir){
@@ -13453,7 +13349,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       };
     }catch(err){ return {}; }
   }
-  init_financeplanner(){ this.root.querySelectorAll('[data-ring]').forEach(c=>this.startProgRing(c, parseFloat(c.dataset.ring), c.dataset.ringc||'#FFFFFF')); }
   init_productivity(){ this.root.querySelectorAll('[data-ring]').forEach(c=>this.startProgRing(c, parseFloat(c.dataset.ring), c.dataset.ringc||'#FFFFFF')); const p=this.root.querySelector('[data-chart="catPie"]'); if(p) this.startCatPie(p); }
   fmtHrs(m){ if(m>=60){ const h=m/60; return (h>=10?Math.round(h):h.toFixed(1))+'h'; } return Math.round(m)+'m'; }
   _dayStart(offsetDays){ const d=new Date(); d.setHours(0,0,0,0); if(offsetDays) d.setDate(d.getDate()-offsetDays); return d.getTime(); }
@@ -14684,7 +14579,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const appVer='v11.47 — Aug 19, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
-    const navActive=(id)=> id===scene || (id==='business' && scene==='finance') || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
+    const navActive=(id)=> id===scene || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
     const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='requests'?(S.requests||[]).filter(r=>r.status==='pending').length:0), hasBadge:(n.id==='requests'&&(S.requests||[]).some(r=>r.status==='pending')), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
     // Mobile-first set: Home, Tasks (Command dashboard — missions/checklist/notes-adjacent),
     // Calendar, Fitness (also reaches Health/Productivity-Notes/Music via its own sub-tabs),
@@ -14901,7 +14796,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       fitSend:()=>{ const v=S.fitInput.trim(); if(v&&!S.fitLoading) this.fitAskAI(v); },
       fitSendKey:enterKey(()=>{ const v=S.fitInput.trim(); if(v&&!S.fitLoading) this.fitAskAI(v); }),
       fitLoading:!!S.fitLoading, fitSendLabel:S.fitLoading?'…':'Send', fitSendOpacity:S.fitLoading?'0.5':'1',
-      bizMsgs:mkMsgs(S.bizChat,'I am your business specialist. Ask about cash flow, marketing, competitors, or a purchase decision — I read your logged numbers.','SPECIALIST'), bizInput:S.bizInput, setBizInput:(e)=>this.setState({bizInput:e.target.value}),
+      bizMsgs:mkMsgs(S.bizChat,'I am your money assistant. Ask about budgeting, spending, saving, or a money decision — I read your logged numbers.','MONEY ASSISTANT'), bizInput:S.bizInput, setBizInput:(e)=>this.setState({bizInput:e.target.value}),
       bizSend:()=>{ const v=S.bizInput.trim(); if(v&&!S.bizLoading) this.bizAskAI(v); },
       bizSendKey:enterKey(()=>{ const v=S.bizInput.trim(); if(v&&!S.bizLoading) this.bizAskAI(v); }),
       bizLoading:!!S.bizLoading, bizSendLabel:S.bizLoading?'…':'Send', bizSendOpacity:S.bizLoading?'0.5':'1',
@@ -15396,13 +15291,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           finRecsSourceLabel: (S.finRecsResult&&S.finRecsResult.length)?'AI-GENERATED · FROM YOUR SPENDING':'FROM YOUR BUDGETS',
           finRecsErr: S.finRecsErr||'', generateFinRecsAI:()=>this.generateFinRecsAI() };
       })(),
-      isFinPlanner:scene==='financeplanner',
-      bizTabs:[['Finance','business'],['Operations HQ','finance'],['Finance Planner','financeplanner']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       fitTabs:[['Fitness HQ','fitness'],['Health','health'],['Productivity','productivity'],['Checklists','checklists'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
       goHealthDiet:()=>this.setState({scene:'health', healthSub:'diet'}),
-      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isFinance:scene==='finance', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health', isBiz:scene==='business', isProd:scene==='productivity', isChecklists:scene==='checklists', isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
+      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health', isBiz:scene==='business', isProd:scene==='productivity', isChecklists:scene==='checklists', isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
       noteEditorOpen: !!S.noteEditor, noteEditorLabel: S.noteEditor?S.noteEditor.label:'', noteEditorDraft: S.noteEditor?S.noteEditor.draft:'',
       setNoteEditorDraft:(e)=>this.setEntryNoteDraft(e), saveNoteEditor:()=>this.saveEntryNote(), closeNoteEditor:()=>this.closeEntryNote(), clearNoteEditor:()=>this.clearEntryNote(),
       ...this._safe(()=>{
@@ -16484,7 +16377,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         return {
           isTutorOpen:!!S.tutorOpen, tutorTitle:this._tutorTitle(subj), closeTutor:()=>this.closeTutor(),
           openMathsTutor:()=>this.openTutor('maths'), openEnglishTutor:()=>this.openTutor('english'), openScienceTutor:()=>this.openTutor('science'),
-          openGrammarTutor:()=>this.openTutor('grammar'), openHistoryTutor:()=>this.openTutor('history'), openSpeakingTutor:()=>this.openTutor('speaking'), openFinanceTutor:()=>this.openTutor('finance'),
+          openGrammarTutor:()=>this.openTutor('grammar'), openHistoryTutor:()=>this.openTutor('history'), openSpeakingTutor:()=>this.openTutor('speaking'),
           tutorMsgs:msgs, hasTutorMsgs:msgs.length>0,
           tutorInput:S.tutorInput||'', setTutorInput:(e)=>this.setTutorInput(e), tutorAsk:()=>this.tutorAsk(), tutorAskKey:enterKey(()=>this.tutorAsk()),
           tutorLoading:!!S.tutorLoading, tutorErr:S.tutorErr||'',
@@ -16616,13 +16509,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       goBriefBack:()=>this.setState({scene:'home'}),
       execGreeting:execView.greeting, execOutlook:execView.outlook, execSentiment:execView.sentiment, execSentColor:execView.sentColor,
       execSummaryRows:execView.summaryRows, execSections:execView.sections, execTakeaways:execView.takeaways,
-
-      // finance
-      tickers:(()=>{ const base=[['AAPL','228.41','+1.2%',1],['NVDA','1284.0','+3.4%',1],['MSFT','472.8','+0.8%',1],['TSLA','248.6','-1.1%',0],['BTC','72,140','+2.9%',1],['ETH','3,910','+1.7%',1],['SPX','5,648','+0.6%',1],['GOOGL','188.2','-0.3%',0],['META','611.4','+1.9%',1],['AMZN','201.7','+0.5%',1],['GOLD','2,418','+0.2%',1],['OIL','71.4','-0.9%',0]]; const mk=base.map(b=>({sym:b[0],px:b[1],chg:b[2],col:b[3]?'#e8e8ec':'#ff3b4a'})); return mk.concat(mk); })(),
-      ranges:['1D','1W','1M','1Y','ALL'].map((l,i)=>({l,c:i===2?'#F4F4F5':'#7c7c84',b:i===2?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.12)',bg:i===2?'rgba(255,255,255,0.14)':'transparent'})),
-      alloc:[{label:'Equities',pct:'42%',c:'#FFFFFF'},{label:'Crypto',pct:'26%',c:'#e8e8ec'},{label:'Real Estate',pct:'18%',c:'#7a7a82'},{label:'Cash & Bonds',pct:'14%',c:'#55631C'}],
-      heat:(()=>{ const syms=['AAPL','NVDA','MSFT','GOOG','META','AMZN','TSLA','AMD','NFLX','JPM','V','MA','XOM','CVX','PFE','UNH','HD','WMT','DIS','BA','INTC','CRM','ORCL','ADBE']; return syms.map((sy,i)=>{ const ch=(Math.sin(i*1.7)+Math.sin(i*0.6))*1.8; const up=ch>=0; const mag=Math.min(1,Math.abs(ch)/3.5); return {sym:sy,chg:(up?'+':'')+ch.toFixed(1)+'%',bg:up?`rgba(255,255,255,${0.06+mag*0.18})`:`rgba(255,255,255,${0.12+mag*0.5})`,bd:up?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.28)',tc:up?'#e8e8ec':'#ffb3ba'}; }); })(),
-      watch:[{sym:'NVDA',name:'NVIDIA Corp',ic:'NV',px:'1284.0',chg:'+3.4%',col:'#e8e8ec',spark:'wd0'},{sym:'AAPL',name:'Apple Inc',ic:'AA',px:'228.41',chg:'+1.2%',col:'#e8e8ec',spark:'wd1'},{sym:'TSLA',name:'Tesla Inc',ic:'TS',px:'248.60',chg:'-1.1%',col:'#ff3b4a',spark:'wu2'},{sym:'BTC',name:'Bitcoin',ic:'₿',px:'72,140',chg:'+2.9%',col:'#e8e8ec',spark:'wd3'},{sym:'ETH',name:'Ethereum',ic:'Ξ',px:'3,910',chg:'+1.7%',col:'#e8e8ec',spark:'wd4'},{sym:'SPY',name:'S&P 500 ETF',ic:'SP',px:'564.8',chg:'-0.2%',col:'#ff3b4a',spark:'wu5'}],
 
       ...this.wiData(),
 
