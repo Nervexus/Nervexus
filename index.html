@@ -2287,6 +2287,10 @@
                 <input value="{{ incLabel }}" onInput="{{ setIncLabel }}" onKeyDown="{{ addIncKey }}" placeholder="Source" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
                 <input value="{{ incAmt }}" onInput="{{ setIncAmt }}" onKeyDown="{{ addIncKey }}" type="number" placeholder="$" style="width:64px; padding:8px 8px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
               </div>
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                <span style="font-size:10px; color:#6f6f78; white-space:nowrap;">Save $</span>
+                <input value="{{ incSaveAmt }}" onInput="{{ setIncSaveAmt }}" onKeyDown="{{ addIncKey }}" type="number" placeholder="optional" style="flex:1; min-width:0; padding:7px 9px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11.5px; outline:none;">
+              </div>
               <div style="display:flex; align-items:center; gap:6px; margin-bottom:14px;">
                 <span onClick="{{ toggleIncRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10px; color:{{ incRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:11px; height:11px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ incRecurringBg }}; display:inline-block;"></span>Recurring</span>
                 <span onClick="{{ addIncome }}" style="flex:1; text-align:center; padding:8px; border-radius:9px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); color:#F4F4F5; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
@@ -2331,7 +2335,6 @@
             </div>
           </sc-for>
         </div>
-        <sc-if value="{{ noFinPlannerRings }}" hint-placeholder-val="{{ false }}"><div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px; margin-bottom:18px; font-size:12px; color:#8a8a92;">Set a budget below to see rings here.</div></sc-if>
         <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;"><span style="font-size:13px; font-weight:600;">Budget vs Actual</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ plannerTotalColor }};">{{ plannerTotalLabel }}</span></div>
           <div style="font-size:11.5px; color:#8a8a92; margin-bottom:14px;">All categories, tracked live against the expenses you log above.</div>
@@ -2360,6 +2363,27 @@
               <span style="font-size:12.5px; line-height:1.5; color:#d6d6da; flex:1;">{{ r }}</span>
             </div>
           </sc-for>
+        </div>
+
+        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:4px;">◆ SAVINGS</div>
+          <sc-if value="{{ showSpendWarning }}" hint-placeholder-val="{{ false }}"><div style="border-radius:12px; background:rgba(255,85,99,0.1); border:1px solid rgba(255,85,99,0.3); padding:10px 12px; margin:10px 0; font-size:12px; color:#ff9099; line-height:1.5;">⚠ {{ spendWarningText }}</div></sc-if>
+          <sc-if value="{{ spendablePctLabel }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ spendablePctColor }}; margin:10px 0 14px;">{{ spendablePctLabel }}</div></sc-if>
+          <div style="display:flex; gap:20px; align-items:center; margin-bottom:16px;">
+            <canvas data-ring="{{ savingsPctForRing }}" data-ringc="{{ savingsRingColor }}" style="width:82px; height:82px; flex:0 0 82px;"></canvas>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:22px; color:#eef0f2;">{{ savingsTotalLabel }}</div>
+              <div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">{{ savingsGoalLabel }}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+            <span style="font-size:11.5px; color:#8a8a92; white-space:nowrap;">Goal $</span>
+            <input value="{{ savingsGoalInput }}" onInput="{{ setSavingsGoalDraft }}" onKeyDown="{{ saveSavingsGoalKey }}" onBlur="{{ saveSavingsGoal }}" type="number" placeholder="e.g. 10000" style="flex:1; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input value="{{ savingsAddAmt }}" onInput="{{ setSavingsAddAmt }}" onKeyDown="{{ addSavingsQuickKey }}" type="number" placeholder="Add to savings $" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+            <span onClick="{{ addSavingsQuick }}" style="padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); color:#F4F4F5; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center;">+ Add</span>
+          </div>
         </div>
 
         <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
@@ -8962,7 +8986,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-60 · v11.60 real-monthly-chart-budget';
+const NOTIF_BUILD_VERSION = '2026.08.21-61 · v11.61 savings-system';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9039,7 +9063,8 @@ class Component extends DCLogic {
         {label:'Cloud infra',amt:14500,cat:'Ops',ts:now-3*D},
         {label:'Paid ads',amt:9800,cat:'Growth',ts:now-4*D},
       ],
-      incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false,
+      savings: s.savings || [],
+      incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false, incSaveAmt:'', savingsAddAmt:'',
       expLabel:'', expAmt:'', expCat:'Food', expRecurring:false,
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
 activities: this._mergeShipLog(s.activities),
@@ -9728,9 +9753,9 @@ activities: this._mergeShipLog(s.activities),
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
-    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus };
+    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
-    localStorage.setItem('cc_v2', JSON.stringify({ loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
+    localStorage.setItem('cc_v2', JSON.stringify({ loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
   // ===== AI & INTELLIGENCE PROVIDER MANAGER =====
   _pd(){ return window.PROVIDERS_DATA; }
   // Genuine empty state — every provider/source starts off and unsaved. Nothing is
@@ -9921,14 +9946,25 @@ activities: this._mergeShipLog(s.activities),
   _moneyLogDay(){ const S=this.state; const today=new Date().toLocaleDateString('en-CA'); return S.moneySel||today; }
   addIncome(){ const S=this.state; const l=(S.incLabel||'').trim(), a=parseFloat(S.incAmt)||0; if(!l||!(a>0)) return;
     const id=this._uuid(), cat=S.incCat||'Salary', recurring=!!S.incRecurring, ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
-    this.mut(s=>({income:[...s.income,{id,label:l,amt:a,cat,recurring,ts}],incLabel:'',incAmt:'',incRecurring:false}));
+    this.mut(s=>({income:[...s.income,{id,label:l,amt:a,cat,recurring,ts}],incLabel:'',incAmt:'',incRecurring:false,incSaveAmt:''}));
     if(this._sbOn()) window.SB.insert('income',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
+    const saveAmt=Math.min(parseFloat(S.incSaveAmt)||0, a);
+    if(saveAmt>0) this.addSavings(saveAmt, 'From income: '+l, ts);
   }
   addExpense(){ const S=this.state; const l=(S.expLabel||'').trim(), a=parseFloat(S.expAmt)||0; if(!l||!(a>0)) return;
     const id=this._uuid(), cat=S.expCat||'Food', recurring=!!S.expRecurring, ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
     this.mut(s=>({expenses:[...s.expenses,{id,label:l,amt:a,cat,recurring,ts}],expLabel:'',expAmt:'',expRecurring:false}));
     if(this._sbOn()) window.SB.insert('expenses',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
   }
+  // Savings is a protected pool: it only grows via an explicit contribution (either set aside
+  // when logging income, or a standalone top-up) and is never reduced by logging an expense —
+  // the "safe to spend" check in renderVals warns instead of ever touching this balance.
+  addSavings(amt, label, ts){ const a=+amt||0; if(!(a>0)) return;
+    const id=this._uuid(), t=ts||new Date(this._moneyLogDay()+'T12:00:00').getTime(), l=label||'Savings';
+    this.mut(s=>({savings:[...s.savings,{id,label:l,amt:a,ts:t}]}));
+    if(this._sbOn()) window.SB.insert('savings',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,occurred_at:new Date(t).toISOString()});
+  }
+  setSavingsGoal(v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeSavingsGoal:n}, savingsGoalDraft:undefined})); }
   _tog(key,label,desc){ const on=this.state.prefs[key]; return { label, desc, bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setPref(key,!this.state.prefs[key]) }; }
   _chips(key,opts){ const cur=this.state.prefs[key]; return opts.map(o=>({ l:o, set:()=>this.setPref(key,o), c:cur===o?'#F4F4F5':'#9a9aa2', b:cur===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:cur===o?'rgba(255,255,255,0.18)':'transparent' })); }
   // Global raiment switcher (header icon row) — jumps straight into Ultra + the chosen
@@ -10020,7 +10056,7 @@ activities: this._mergeShipLog(s.activities),
   _completeLogin(email){ const em=(email||'').trim().toLowerCase(); const acc0=(this.state.accounts||{})[em];
     const acc=acc0?{...acc0, prefs:{...this._defaultPrefs(), ...(acc0.prefs||{})}}:acc0;
     const user=(this.state.users||[]).find(u=>(u.email||'').trim().toLowerCase()===em);
-    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
+    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], savings:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
     this.setState(Object.assign({loggedIn:true,currentEmail:email,loginErr:'',loginPass:'',login2FAInput:'',loginStage:'creds',loginFailCount:0,scene:'home'}, acc||blank),()=>{ this._checkDailyLogin(); this.save(); this._notifInit=false; this.initNotifs(); }); }
   doLogin2FA(){ const now=Date.now(); if(this.state.loginLockUntil && now<this.state.loginLockUntil){ this.setState({loginErr:this._lockMsg()}); return; }
     if(window.SB && window.SB.ready()){
@@ -11177,14 +11213,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!this._sbOn()) return;
     const uid=this.state.authUserId;
     try{
-      const [tasks,notes,missions,missionHistory,events,income,expenses,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes]=await Promise.all([
+      const [tasks,notes,missions,missionHistory,events,income,expenses,savings,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes]=await Promise.all([
         window.SB.list('tasks',{match:{user_id:uid},order:{column:'position',ascending:true}}),
         window.SB.list('notes',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,deleted_at,title,body,created_at'}),
         window.SB.list('missions',{match:{user_id:uid}}),
         window.SB.list('mission_history',{match:{user_id:uid},order:{column:'completed_date',ascending:false},limit:200}),
         window.SB.list('events',{match:{user_id:uid}}),
-        window.SB.list('income',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,amount,occurred_at'}),
-        window.SB.list('expenses',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,amount,occurred_at'}),
+        window.SB.list('income',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,recurring,amount,occurred_at'}),
+        window.SB.list('expenses',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,recurring,amount,occurred_at'}),
+        window.SB.list('savings',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,amount,occurred_at'}),
         window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,sets,reps,occurred_at'}),
         window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,name,kcal,protein'}),
         window.SB.list('sleep_logs',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,hours,bed_time,wake_time,quality,energy,notes'}),
@@ -11210,8 +11247,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(missions && missions.data) patch.missions=missions.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,name:r.name,recurring:!!r.recurring,dayKey:r.day_key||'',streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||''}));
       if(missionHistory && missionHistory.data) patch.missionHistory=missionHistory.data.map(r=>({missionId:r.mission_id,name:r.name,date:r.completed_date,time:r.completed_time||'',notes:r.notes||'',xp:r.xp||0,streak:r.streak||0,recurring:!!r.recurring}));
       if(events && events.data) patch.events=events.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,title:r.title,date:r.event_date,time:r.event_time||'09:00',repeat:r.repeat_days||[]}));
-      if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,amt:+r.amount||0,month:6,ts:new Date(r.occurred_at).getTime()}));
-      if(expenses && expenses.data) patch.expenses=expenses.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Ops',amt:+r.amount||0,month:6,ts:new Date(r.occurred_at).getTime()}));
+      if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
+      if(expenses && expenses.data) patch.expenses=expenses.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
+      if(savings && savings.data) patch.savings=savings.data.map(r=>({id:r.id,label:r.label,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,sets:r.sets||0,reps:r.reps||0,ts:new Date(r.occurred_at).getTime()}));
       if(notifs && notifs.data){ const fromDb=notifs.data.map(r=>({id:r.id,cat:r.category||'system',title:r.title,body:r.body,read:!!r.read,ts:new Date(r.created_at).getTime()})); const localIds=new Set(this.state.notifs.map(x=>x.id)); patch.notifs=[...this.state.notifs, ...fromDb.filter(x=>!localIds.has(x.id))].sort((a,b)=>b.ts-a.ts).slice(0,40); }
       if(goalsRes && goalsRes.data && goalsRes.data.length){ const g={}; goalsRes.data.forEach(r=>{ if(r.target!=null) g[r.label]=+r.target; }); patch._pendingGoals=g; }
@@ -11618,7 +11656,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
   startClock(){ const upd=()=>{ if(!this.root) return; const tz=(this.state.account&&this.state.account.timezone)||'auto'; const o=tz==='auto'?{}:{timeZone:tz}; const d=new Date(); const cl=this.root.querySelector('[data-clock]'); if(cl){ try{ cl.textContent=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit',...o}); }catch(e){ cl.textContent=d.toLocaleTimeString('en-GB'); } } const de=this.root.querySelector('[data-date]'); if(de){ try{ const wd=d.toLocaleDateString('en-GB',{weekday:'short',...o}).toUpperCase(); const dm=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',...o}).toUpperCase(); de.textContent=wd+' · '+dm; }catch(e){} } }; upd(); this._clk=setInterval(upd,1000); }
 
-  dataSig(){ const s=this.state; const H=s.health||{}; return [s.checklist,s.workouts,s.income,s.expenses,s.activities,s.events].map(a=>a.length).join(',')+'|'+s.checklist.filter(c=>c.done).length+'|h'+(H.meals?H.meals.length:0)+','+H.water+','+(H.weights?H.weights.length:0)+','+(H.meals?H.meals.reduce((a,m)=>a+(+m.kcal||0),0):0)+'|m'+(s.missions?s.missions.length:0)+','+(s.missionHistory?s.missionHistory.length:0)+','+(s.missionXP||0)+',mv'+((s.move&&s.move.last)||'')+','+((s.move&&s.move.streak)||0)+','+(s.missions?s.missions.filter(m=>m.lastCompleted===this._todayStr()).length:0)+'|hk'+(H.sleepLog?H.sleepLog.length:0)+','+(H.hydrationLog?H.hydrationLog.length:0)+','+(H.bodyLog?H.bodyLog.length:0)+','+(H.photos?H.photos.length:0)+','+(H.statsPrefs?H.statsPrefs.join(''):'')+','+(H.goals?Object.keys(H.goals).length:0)+'|lm'+((s.learning&&s.learning.mathsHistory)?s.learning.mathsHistory.length:0); }
+  dataSig(){ const s=this.state; const H=s.health||{}; return [s.checklist,s.workouts,s.income,s.expenses,s.savings,s.activities,s.events].map(a=>a.length).join(',')+'|'+s.checklist.filter(c=>c.done).length+'|h'+(H.meals?H.meals.length:0)+','+H.water+','+(H.weights?H.weights.length:0)+','+(H.meals?H.meals.reduce((a,m)=>a+(+m.kcal||0),0):0)+'|m'+(s.missions?s.missions.length:0)+','+(s.missionHistory?s.missionHistory.length:0)+','+(s.missionXP||0)+',mv'+((s.move&&s.move.last)||'')+','+((s.move&&s.move.streak)||0)+','+(s.missions?s.missions.filter(m=>m.lastCompleted===this._todayStr()).length:0)+'|hk'+(H.sleepLog?H.sleepLog.length:0)+','+(H.hydrationLog?H.hydrationLog.length:0)+','+(H.bodyLog?H.bodyLog.length:0)+','+(H.photos?H.photos.length:0)+','+(H.statsPrefs?H.statsPrefs.join(''):'')+','+(H.goals?Object.keys(H.goals).length:0)+'|lm'+((s.learning&&s.learning.mathsHistory)?s.learning.mathsHistory.length:0); }
   sync(){
     if(!this.root) return;
     this._pruneOrbLoops();
@@ -12137,6 +12175,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.61', date:'Aug 21, 2026', major:true, notes:[
+      'Added a real Savings system to Finance Terminal. Savings is a protected pool \u2014 it only grows when you explicitly set money aside (a new optional \u201cSave $\u201d field when logging income, or a standalone \u201cAdd to savings\u201d action), and expenses never touch it. Set a savings goal and track progress with a ring. New \u201csafe to spend\u201d check, scoped to whichever month you\u2019re browsing: income minus savings set aside minus expenses \u2014 if that drops under 35% of that month\u2019s income, you get a warning to bring in more income or slow spending.\n\nAlso fixed a real bug found while building this: reloading the app (or logging back in) never re-fetched the category or recurring flag for income/expenses from Supabase \u2014 both silently reverted to their defaults on every fresh load even though the real values were safely stored in the cloud. Fixed the fetch to pull them back correctly, and also fixed the Savings ring never refreshing after adding a contribution (it wasn\u2019t in the cache signature that decides when to redraw).\n\nRemoved the \u201cSet a budget below to see rings here\u201d placeholder \u2014 the rings row just stays empty when nothing\u2019s budgeted yet.',
+    ]},
     {version:'v11.60', date:'Aug 21, 2026', major:true, notes:[
       'Income vs Expenses is now a real monthly chart \u2014 added Jan\u2013Dec labels and a scale reference so you can actually read it, instead of unlabeled bars. It also now correctly separates by year (previously months from different years could get merged into the same bar).\n\nBudget Planner rebuilt into an actual system: it now follows whichever month you\u2019re browsing in the Cash Flow Calendar above (so paging the calendar also updates your budget view), shows all expense categories so you can set a budget before you\u2019ve spent anything in it (previously a budgeted category with $0 spent this month just vanished from the list), and adds a pacing indicator \u2014 how far through the month you are vs. how much of your budget is used \u2014 so it flags when you\u2019re burning through a budget faster than the days are passing.',
     ]},
@@ -15338,7 +15379,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           plannerTotalColor: totalBudget && totalSpent>totalBudget ? '#ff5563' : '#eef0f2',
           finPlannerRings: ringCats.map(c=>{ const spent=spentByCat(c); const budget=+(budgets[c])||0; const val=budget?Math.min(1,spent/budget):0;
             return { name:c, sub:budget?('$'+spent.toLocaleString()+' / $'+budget.toLocaleString()):('$'+spent.toLocaleString()+' spent'), val, color:(budget&&spent>budget)?'#ff5563':'#FFFFFF' }; }),
-          noFinPlannerRings: !ringCats.length,
           finPlannerRecs: (S.finRecsResult&&S.finRecsResult.length) ? S.finRecsResult : (()=>{ const over=budgetedCats.filter(c=>spentByCat(c)>(+(budgets[c])||0));
             const r=[]; if(!budgetedCats.length) r.push('Set a monthly budget per category below to start tracking against it.');
             else if(over.length) r.push(over.join(', ')+(over.length>1?' are':' is')+' over budget this month \u2014 review before new spend.');
@@ -15348,6 +15388,35 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           finRecsBtnLabel: S.finRecsLoading?'\u23c2 Thinking\u2026':'\u2728 AI suggest',
           finRecsSourceLabel: (S.finRecsResult&&S.finRecsResult.length)?'AI-GENERATED · FROM YOUR SPENDING':'FROM YOUR BUDGETS',
           finRecsErr: S.finRecsErr||'', generateFinRecsAI:()=>this.generateFinRecsAI() };
+      })(),
+      ...(()=>{ const sav=S.savings||[]; const goal=+(S.prefs.financeSavingsGoal)||0;
+        const savingsTotal=sav.reduce((a,x)=>a+(+x.amt||0),0);
+        const savingsPct=goal?Math.min(1,savingsTotal/goal):0;
+        const y=S.moneyCalY, m=S.moneyCalM;
+        const inMonth=(ts)=>{ const d=new Date(ts); return d.getFullYear()===y && d.getMonth()===m; };
+        const monthIncome=(S.income||[]).filter(i=>inMonth(i.ts)).reduce((a,i)=>a+(+i.amt||0),0);
+        const monthSaved=sav.filter(x=>inMonth(x.ts)).reduce((a,x)=>a+(+x.amt||0),0);
+        const monthExpenses=(S.expenses||[]).filter(e=>inMonth(e.ts)).reduce((a,e)=>a+(+e.amt||0),0);
+        const spendable=monthIncome-monthSaved-monthExpenses;
+        const spendablePct=monthIncome>0?Math.round(spendable/monthIncome*100):null;
+        const showSpendWarning=monthIncome>0 && spendablePct<35;
+        return {
+          savingsTotalLabel:'$'+savingsTotal.toLocaleString(),
+          savingsGoalLabel: goal?('of $'+goal.toLocaleString()+' goal'):'No goal set yet',
+          savingsPctForRing: savingsPct, savingsRingColor:'#FFFFFF',
+          savingsGoalInput: S.savingsGoalDraft!=null ? S.savingsGoalDraft : (goal||''),
+          setSavingsGoalDraft:(e)=>this.setState({savingsGoalDraft:e.target.value}),
+          saveSavingsGoal:()=>this.setSavingsGoal(S.savingsGoalDraft),
+          saveSavingsGoalKey:enterKey(()=>this.setSavingsGoal(S.savingsGoalDraft)),
+          savingsAddAmt:S.savingsAddAmt||'', setSavingsAddAmt:(e)=>this.setState({savingsAddAmt:e.target.value}),
+          addSavingsQuick:()=>{ const a=parseFloat(S.savingsAddAmt)||0; if(a>0){ this.addSavings(a,'Manual top-up'); this.setState({savingsAddAmt:''}); } },
+          addSavingsQuickKey:enterKey(()=>{ const a=parseFloat(S.savingsAddAmt)||0; if(a>0){ this.addSavings(a,'Manual top-up'); this.setState({savingsAddAmt:''}); } }),
+          showSpendWarning,
+          spendWarningText: showSpendWarning ? ('Only '+Math.max(0,spendablePct)+'% of this month\u2019s income is left unspent after savings and expenses \u2014 consider more income or slowing spending.') : '',
+          spendablePctLabel: monthIncome>0 ? (spendablePct>=0 ? (spendablePct+'% of this month\u2019s income still safe to spend') : ('Spending is '+Math.abs(spendablePct)+'% over this month\u2019s income')) : '',
+          spendablePctColor: showSpendWarning ? '#ff5563' : '#8a8a92',
+          incSaveAmt:S.incSaveAmt||'', setIncSaveAmt:(e)=>this.setState({incSaveAmt:e.target.value}),
+        };
       })(),
       fitTabs:[['Fitness HQ','fitness'],['Health','health'],['Productivity','productivity'],['Checklists','checklists'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
