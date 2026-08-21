@@ -1664,6 +1664,7 @@
               <input value="{{ woEx }}" onInput="{{ setWoEx }}" onKeyDown="{{ addWorkoutKey }}" placeholder="Exercise (e.g. Bench Press)" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <input value="{{ woWeight }}" onInput="{{ setWoWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="kg" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+                <span onClick="{{ toggleWoUnit }}" title="Toggle kg / bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ woUnitC }}; border:1px solid {{ woUnitBd }}; border-radius:8px; padding:0 10px; display:flex; align-items:center; cursor:pointer; background:{{ woUnitBg }};">{{ woUnitLabel }}</span>
                 <input value="{{ woSets }}" onInput="{{ setWoSets }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Sets" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <input value="{{ woReps }}" onInput="{{ setWoReps }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Reps" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <input value="{{ woMin }}" onInput="{{ setWoMin }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Min" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
@@ -1801,6 +1802,7 @@
                       </div>
                       <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         <input value="{{ r.weight }}" onInput="{{ r.setWeight }}" type="number" placeholder="kg" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+                        <span onClick="{{ r.toggleUnit }}" title="Toggle kg / bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:{{ r.unitC }}; border:1px solid {{ r.unitBd }}; border-radius:7px; padding:0 9px; display:flex; align-items:center; cursor:pointer; background:{{ r.unitBg }};">{{ r.unit }}</span>
                         <input value="{{ r.sets }}" onInput="{{ r.setSets }}" type="number" placeholder="Sets" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
                         <input value="{{ r.reps }}" onInput="{{ r.setReps }}" type="number" placeholder="Reps" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
                         <sc-if value="{{ r.isCardio }}" hint-placeholder-val="{{ false }}"><input value="{{ r.minutes }}" onInput="{{ r.setMinutes }}" type="number" placeholder="Min" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"></sc-if>
@@ -8995,7 +8997,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-74 · v11.74 fallback-key-pool';
+const NOTIF_BUILD_VERSION = '2026.08.21-75 · v11.75 smart-workout-parser';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9060,7 +9062,7 @@ class Component extends DCLogic {
         {part:'Core',exercise:'Weighted Planks',min:15,ts:now-45*60000},
         {part:'Cardio',exercise:'5K Run',min:28,ts:now-4*D},
       ],
-      woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
+      woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0,
       income: s.income || [
         {label:'SaaS subscriptions',amt:128000,month:6,ts:now-2*D},
@@ -11350,7 +11352,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(expenses && expenses.data) patch.expenses=expenses.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(savings && savings.data) patch.savings=savings.data.map(r=>({id:r.id,label:r.label,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
-      if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,sets:r.sets||0,reps:r.reps||0,ts:new Date(r.occurred_at).getTime()}));
+      if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,unit:r.unit||'kg',sets:r.sets||0,reps:r.reps||0,ts:new Date(r.occurred_at).getTime()}));
       if(notifs && notifs.data){ const fromDb=notifs.data.map(r=>({id:r.id,cat:r.category||'system',title:r.title,body:r.body,read:!!r.read,ts:new Date(r.created_at).getTime()})); const localIds=new Set(this.state.notifs.map(x=>x.id)); patch.notifs=[...this.state.notifs, ...fromDb.filter(x=>!localIds.has(x.id))].sort((a,b)=>b.ts-a.ts).slice(0,40); }
       if(goalsRes && goalsRes.data && goalsRes.data.length){ const g={}; goalsRes.data.forEach(r=>{ if(r.target!=null) g[r.label]=+r.target; }); patch._pendingGoals=g; }
       if(worldIntel && worldIntel.data && worldIntel.data[0]){ const w=worldIntel.data[0]; if(w.selected_country) patch.selCountry=w.selected_country; if(w.layer) patch.wiLayer=w.layer; if(w.time_range) patch.wiTime=w.time_range; if(w.last_query) patch.wiQuery=w.last_query; }
@@ -12243,7 +12245,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     });
   }
 
-  strengthSeries(){ const days=12, byDay=new Array(days).fill(0), now=Date.now(); this.state.workouts.forEach(w=>{ const d=Math.floor((now-w.ts)/86400000); if(d>=0&&d<days){ const vol=(+w.weight||0)*(+w.sets||0)*(+w.reps||0); byDay[days-1-d]+=(vol|| (+w.min||0)*40); } }); const base=[]; for(let i=0;i<days;i++) base.push(0.35+i*0.028+byDay[i]/6000); const mx=Math.max(...base,1); return base.map(v=>Math.min(1,v/mx*0.92+0.08)); }
+  strengthSeries(){ const days=12, byDay=new Array(days).fill(0), now=Date.now(); this.state.workouts.forEach(w=>{ const d=Math.floor((now-w.ts)/86400000); if(d>=0&&d<days){ byDay[days-1-d]+=(this._workoutVol(w)|| (+w.min||0)*40); } }); const base=[]; for(let i=0;i<days;i++) base.push(0.35+i*0.028+byDay[i]/6000); const mx=Math.max(...base,1); return base.map(v=>Math.min(1,v/mx*0.92+0.08)); }
   startRingOnly(cv,val,color){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
   startTrend(cv,vals,color){ const {ctx,w,h}=this.prep(cv); const n=vals.length; this.loop((ts)=>{ const grow=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); ctx.strokeStyle='rgba(255,255,255,0.05)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } const pts=vals.map((v,i)=>({x:(i/(n-1))*w, y:h-(v*grow*0.8+0.1)*h})); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,this.hexA(color,0.3)); g.addColorStop(1,this.hexA(color,0)); ctx.fillStyle=g; ctx.fill(); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=this.hexA(color,0.7); ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0; const last=pts[pts.length-1]; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); }); }
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
@@ -12288,6 +12290,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.75', date:'Aug 21, 2026', major:true, notes:[
+      'Bulk Import Workout no longer needs an AI provider for common formats — the local parser now reads single-line entries like "Squats & Shoulder Press 30kg x10reps" directly (the exact format that was hitting a Gemini quota error and failing to import at all). Combined names ("&", "+", "and", "x") are split into their real individual exercises, each classified into its own muscle group — so logging "squats x push ups" now shows up under Legs AND Chest instead of one vague "Mixed" bucket. Same splitting now applies to manual/voice logging too. Added a BW (bodyweight) toggle next to the kg field — in the log form, in bulk-import rows, and picked up automatically for reps-only lines with no weight — since not all training uses external weight; bodyweight sets now count toward your volume charts instead of showing as zero.',
+    ]},
     {version:'v11.74', date:'Aug 21, 2026', major:true, notes:[
       'Added fallback key pools \u2014 you can now save more than one key per AI provider (e.g. three separate Gemini keys), not just one. Each connected provider\u2019s card has a new \u201cFALLBACK KEYS\u201d section: paste another key and it\u2019s saved and reachability-tested the same one-step way as the primary key. Entirely server-side from there \u2014 a request tries the primary key first, then fallback keys in order, and if a provider returns a rate-limit (429) response it automatically tries the next key instead of failing, cooling the limited key down for a bit before it\u2019s tried again. For a provider like Gemini with per-key daily limits, three keys effectively triples your free quota before anything needs paying for.',
     ]},
@@ -13378,19 +13383,35 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(/plank|crunch|sit.?up|core|ab(s)?\b/.test(t)) return 'Core';
     if(/run|bike|cycle|row(ing)? machine|cardio|swim|elliptical|treadmill/.test(t)) return 'Cardio';
     return 'Mixed'; }
+  // "Squats & Push Ups", "Squats x Push Ups", "Bench Press/Overhead Press" — split a combined
+  // exercise name into its real individual exercises so each gets its own honest muscle-group
+  // classification instead of an opaque catch-all 'Mixed' bucket.
+  _splitExerciseNames(name){
+    return (name||'').split(/\s*&\s*|\s*\+\s*|\s*\/\s*|\s+and\s+|\s+x\s+/i).map(s=>s.trim()).filter(Boolean).slice(0,4);
+  }
+  // Bodyweight sets (no external weight) still count as training load — approximate them as
+  // reps×sets so they show up in volume charts instead of vanishing at 0.
+  _workoutVol(w){ const wt=+w.weight||0, st=+w.sets||0, rp=+w.reps||0; return wt>0 ? wt*st*rp : st*rp*8; }
   addWorkout(opts){ const o=opts||{}, S=this.state;
-    const ex=(o.exercise!=null?o.exercise:S.woEx||'').trim();
+    const exRaw=(o.exercise!=null?o.exercise:S.woEx||'').trim();
     const mn=o.minutes!=null?(+o.minutes||0):(parseInt(S.woMin)||0);
     const wt=o.weight!=null?(+o.weight||0):(parseFloat(S.woWeight)||0);
     const st=o.sets!=null?(+o.sets||0):(parseInt(S.woSets)||0);
     const rp=o.reps!=null?(+o.reps||0):(parseInt(S.woReps)||0);
-    if(!ex||!(mn>0||wt>0||rp>0)) return;
+    const unit=o.unit||S.woUnit||'kg';
+    if(!exRaw||!(mn>0||wt>0||rp>0)) return;
     const partsValid=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
-    let part=o.part;
-    if(!part || partsValid.indexOf(part)<0) part=(partsValid.indexOf(S.woPart)>=0?S.woPart:this._guessBodyPart(ex));
-    const id=this._uuid(), ts=Date.now();
-    this.mut(s=>({workouts:[...s.workouts,{id,part,exercise:ex,min:mn,weight:wt,sets:st,reps:rp,ts}],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
-    if(this._sbOn()) window.SB.insert('workouts',{id,user_id:this.state.authUserId,body_part:part,exercise:ex,minutes:mn,weight:wt,sets:st,reps:rp,occurred_at:new Date(ts).toISOString()}); }
+    // A part the user explicitly picked (and isn't the catch-all 'Mixed') is respected as-is;
+    // otherwise — including when 'Mixed' is selected — split the name and classify each piece
+    // for real, so "squats x push ups" lands in Legs AND Arms/Chest rather than one vague bucket.
+    const forcedPart=(o.part && partsValid.indexOf(o.part)>=0 && o.part!=='Mixed') ? o.part
+      : ((partsValid.indexOf(S.woPart)>=0 && S.woPart!=='Mixed') ? S.woPart : null);
+    const names=forcedPart?[exRaw]:this._splitExerciseNames(exRaw);
+    const list=names.length?names:[exRaw];
+    const ts=Date.now();
+    const entries=list.map((ex,i)=>({ id:this._uuid(), part:forcedPart||this._guessBodyPart(ex), exercise:ex, min:mn, weight:wt, unit, sets:st, reps:rp, ts:ts-i }));
+    this.mut(s=>({workouts:[...s.workouts,...entries],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()})); }
   addWeight(kg){ const K=window.HealthKit; if(!K) return;
     const w=kg!=null?+kg:parseFloat(this.state.weightInput);
     if(!(w>20&&w<400)) return;
@@ -13696,7 +13717,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   partVolume(){ const c=Date.now()-7*86400000; const v={Chest:0,Back:0,Shoulders:0,Arms:0,Legs:0,Core:0,Cardio:0};
     this.state.workouts.forEach(w=>{ if(w.ts<c||v[w.part]==null) return;
       if(w.part==='Cardio') v.Cardio+=(+w.min||0);
-      else v[w.part]+=(+w.weight||0)*(+w.sets||0)*(+w.reps||0);
+      else v[w.part]+=this._workoutVol(w);
     }); return v; }
   // ===== Bulk workout import — paste a whole session, AI splits it into rows and
   // classifies each exercise's muscle group, reviewed before anything is actually logged. =====
@@ -13704,32 +13725,46 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   closeWoImport(){ this.setState({woImportOpen:false}); }
   setWoImportText(e){ this.setState({woImportText:e.target.value}); }
   setWoImportDay(off){ this.setState({woImportDayOffset:off}); }
-  // Deterministic, no-AI parse for the common "Exercise name" header followed by
-  // "repsxweightkg" (or "N min") set lines — e.g. pasted straight from a checklist app.
+  // Deterministic, no-AI parse — handles both the classic 2-line paste ("Exercise name" header
+  // then a "repsxweightkg"/"N min" set line) AND a single line with everything on it, e.g.
+  // "Squats & Shoulder Press 30kg x10reps" — the actual format real gym-log apps export, which
+  // used to fall through to Gemini (and error out on quota) for no good reason. Combined names
+  // ("&"/"+"/"and"/"x") are split so each real exercise gets its own row and its own honest
+  // muscle-group classification, reusing the same _guessBodyPart used everywhere else.
   // Runs first so a clean, regularly-formatted paste never needs an AI provider at all;
   // AI is only a fallback for genuinely free-form notes this can't confidently read.
   _localParseWorkoutText(text){
-    const MUSCLE_MAP=[
-      [/bench|chest|pec|fly|dip/i,'Chest'],
-      [/row|pull.?up|lat|deadlift|back/i,'Back'],
-      [/shoulder|overhead press|\bohp\b|delt|shrug/i,'Shoulders'],
-      [/curl|tricep|bicep|\barm/i,'Arms'],
-      [/squat|leg|calf|lunge|quad|hamstring|glute/i,'Legs'],
-      [/\bcore\b|\bab[s]?\b|plank|crunch|sit.?up/i,'Core'],
-      [/run|treadmill|rowing machine|cycle|bike|cardio|elliptical/i,'Cardio'],
-    ];
-    const guessPart=(name)=>{ const m=MUSCLE_MAP.find(([re])=>re.test(name)); return m?m[1]:'Full'; };
-    const repsWeightRe=/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*kg/i;
+    const guessPart=(name)=>this._guessBodyPart(name);
+    // "Name  30kg x10reps" / "Name 3x10 @60kg" / "Name 30 x10" — name + weight[+unit] + x + reps.
+    const combinedRe=/^(.+?)\s+(\d+(?:\.\d+)?)\s*(kg|kgs|kilograms|lb|lbs|pounds|bw|bodyweight)?\s*[x×]\s*(\d+(?:\.\d+)?)\s*(?:reps?|rep|sets?)?\s*$/i;
+    // "Push ups x20" / "Burpees x 15 reps" — name + reps only, no weight (bodyweight).
+    const bwRe=/^(.+?)\s+[x×]\s*(\d+(?:\.\d+)?)\s*(?:reps?|rep)?\s*$/i;
+    // A bare data line under an existing header, e.g. "10x30kg" (reps x weight kg).
+    const setLineRe=/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(?:kg|kgs|lb|lbs)?\s*$/i;
     const minsRe=/^(\d+(?:\.\d+)?)\s*(?:min|mins|minutes)\b/i;
-    const rows=[]; let curName=null, curPart=null;
+    const rows=[]; let curNames=[];
+    const pushRow=(names,weight,unit,sets,reps,minutes)=>{
+      names.forEach(n=>rows.push({exercise:n,part:guessPart(n),weight:weight||0,unit:unit||'kg',sets:sets||0,reps:reps||0,minutes:minutes||0}));
+    };
     (text||'').split(/\r?\n/).forEach(raw=>{
       const stripped=raw.trim().replace(/^[-*]\s*(\[[ xX]?\]\s*)?/,'').trim();
       if(!stripped) return;
-      const rw=stripped.match(repsWeightRe);
-      if(rw){ if(curName) rows.push({exercise:curName,part:curPart,weight:+rw[2],sets:1,reps:+rw[1],minutes:0}); return; }
+      let m;
+      if((m=stripped.match(combinedRe))){
+        const names=this._splitExerciseNames(m[1].replace(/[:\-]+$/,'').trim());
+        if(names.length){ const isBW=/bw|bodyweight/i.test(m[3]||''); pushRow(names, isBW?0:(+m[2]||0), isBW?'BW':'kg', 1, +m[4]||0, 0); return; }
+      }
+      if((m=stripped.match(bwRe))){
+        const names=this._splitExerciseNames(m[1].replace(/[:\-]+$/,'').trim());
+        if(names.length){ pushRow(names, 0, 'BW', 1, +m[2]||0, 0); return; }
+      }
+      if((m=stripped.match(setLineRe))){
+        if(curNames.length) pushRow(curNames, +m[2]||0, 'kg', 1, +m[1]||0, 0);
+        return;
+      }
       const mm=stripped.match(minsRe);
-      if(mm){ if(curName) rows.push({exercise:curName,part:curPart,weight:0,sets:0,reps:0,minutes:+mm[1]}); return; }
-      curName=stripped.replace(/[:\-]+$/,'').trim(); curPart=guessPart(curName);
+      if(mm){ if(curNames.length) pushRow(curNames, 0, 'kg', 0, 0, +mm[1]); return; }
+      curNames=this._splitExerciseNames(stripped.replace(/[:\-]+$/,'').trim());
     });
     return rows;
   }
@@ -13738,7 +13773,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({woImportLoading:true, woImportErr:''});
     const local=this._localParseWorkoutText(text);
     if(local.length){
-      const rows=local.map(r=>({ exercise:r.exercise.slice(0,60), part:r.part, weight:r.weight||'', sets:r.sets||'', reps:r.reps||'', minutes:r.minutes||'' }));
+      const rows=local.map(r=>({ exercise:r.exercise.slice(0,60), part:r.part, weight:r.weight||'', unit:r.unit||'kg', sets:r.sets||'', reps:r.reps||'', minutes:r.minutes||'' }));
       this.setState({woImportRows:rows, woImportLoading:false});
       return;
     }
@@ -13751,7 +13786,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const arr=this._extractJSONArray(raw);
       const parts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
       if(arr && arr.length){
-        const rows=arr.map(r=>({ exercise:(r.exercise||'Exercise').toString().slice(0,60), part:parts.includes(r.part)?r.part:'Full', weight:(+r.weight||0)||'', sets:(+r.sets||0)||'', reps:(+r.reps||0)||'', minutes:(+r.minutes||0)||'' }));
+        const rows=arr.map(r=>({ exercise:(r.exercise||'Exercise').toString().slice(0,60), part:parts.includes(r.part)?r.part:'Mixed', weight:(+r.weight||0)||'', unit:'kg', sets:(+r.sets||0)||'', reps:(+r.reps||0)||'', minutes:(+r.minutes||0)||'' }));
         this.setState({woImportRows:rows, woImportLoading:false});
       } else this.setState({woImportLoading:false, woImportErr:'Could not find any exercises in that text — try adding more detail (exercise name, weight, sets and reps).'});
     }catch(e){ this.setState({woImportLoading:false, woImportErr:(e&&e.message)||'Parsing failed — try again.'}); }
@@ -13763,9 +13798,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const rows=(this.state.woImportRows||[]).filter(r=>(r.exercise||'').trim()); if(!rows.length) return;
     const dayOffset=this.state.woImportDayOffset||0;
     const now=Date.now()-dayOffset*86400000;
-    const entries=rows.map((r,i)=>({ id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight:+r.weight||0, sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000 }));
+    const entries=rows.map((r,i)=>({ id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight:+r.weight||0, unit:r.unit||'kg', sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000 }));
     this.mut(s=>({workouts:[...s.workouts, ...entries]}));
-    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()}));
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()}));
     this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log.');
     this.setState({woImportOpen:false, woImportRows:[], woImportText:'', woImportDayOffset:0});
   }
@@ -14916,7 +14951,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const woRangeStart=this._rangeStartTs(S.woRange||'Week');
     const woCanLog=S.woPart!=='Full';
     const woLogHintShow=!woCanLog;
-    const workoutList=[...S.workouts].filter(w=>(S.woPart==='Full'||w.part===S.woPart) && w.ts>=woRangeStart).sort((a,b)=>b.ts-a.ts).map((w)=>{ const idx=S.workouts.indexOf(w); const det=(w.weight? (w.weight+'kg·'+(w.sets||1)+'×'+(w.reps||0)) : ((w.min||0)+'m')); return {exercise:w.exercise,part:w.part,min:w.min,detail:det,ago:this.ago(w.ts),color:partColor[w.part]||'#FFFFFF', remove:()=>{ this.mut(s=>({workouts:s.workouts.filter((_,j)=>j!==idx)})); if(this._sbOn() && w.id) window.SB.remove('workouts',w.id); }}; });
+    const workoutList=[...S.workouts].filter(w=>(S.woPart==='Full'||w.part===S.woPart) && w.ts>=woRangeStart).sort((a,b)=>b.ts-a.ts).map((w)=>{ const idx=S.workouts.indexOf(w); const isBW=w.unit==='BW'; const det=isBW ? ('BW'+(w.weight?'+'+w.weight+'kg':'')+'·'+(w.sets||1)+'×'+(w.reps||0)) : (w.weight? (w.weight+'kg·'+(w.sets||1)+'×'+(w.reps||0)) : ((w.min||0)+'m')); return {exercise:w.exercise,part:w.part,min:w.min,detail:det,ago:this.ago(w.ts),color:partColor[w.part]||'#FFFFFF', remove:()=>{ this.mut(s=>({workouts:s.workouts.filter((_,j)=>j!==idx)})); if(this._sbOn() && w.id) window.SB.remove('workouts',w.id); }}; });
     const trainedList=Object.keys(pm).filter(k=>pm[k]>0);
     const coachMsg = trainedList.length===0 ? 'No sessions logged this week. Start with a full-body session to build momentum.' : `This week you trained ${trainedList.join(', ')} for ${this.weekMin()} min. ${pm.Back===0?'Your back is untrained — add a pull session.':(pm.Legs===0?'Legs are untrained — add a lower-body day.':'Balanced split — prioritise recovery and progressive overload.')}`;
     const pv=this.partVolume();
@@ -15030,8 +15065,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const missionHistoryList=(S.missionHistory||[]).map(h=>({ name:h.name, date:this._niceDate(h.date), time:h.time||'', xp:'+'+(h.xp||0)+' XP', showStreak:!!h.recurring, streak:'\uD83D\uDD25 '+(h.streak||0)+'d', typeLabel:h.recurring?'RECURRING':'DAILY', typeColor:h.recurring?'#ff5563':'#9a9aa2', hasNotes:!!h.notes, notes:h.notes||'' }));
     const oneRM=(w)=> (w.weight&&w.reps)? Math.round((+w.weight)*(1+(+w.reps)/30)) : 0;
     const best1RM=S.workouts.reduce((m,w)=>Math.max(m,oneRM(w)),0);
-    const totVol=S.workouts.reduce((a,w)=>a+((+w.weight||0)*(+w.sets||0)*(+w.reps||0)),0);
-    const wkVol=S.workouts.filter(w=>w.ts>=Date.now()-7*86400000).reduce((a,w)=>a+((+w.weight||0)*(+w.sets||0)*(+w.reps||0)),0);
+    const totVol=S.workouts.reduce((a,w)=>a+this._workoutVol(w),0);
+    const wkVol=S.workouts.filter(w=>w.ts>=Date.now()-7*86400000).reduce((a,w)=>a+this._workoutVol(w),0);
     const mkMsgs=(chat,seed,label)=> (chat.length?chat:[{who:'ai',text:seed}]).map(m=>({who:m.who==='you'?'YOU':label, text:m.text, whoC:m.who==='you'?'#7c7c84':'#C9C9CE', txtC:m.who==='you'?'#c8c8ce':'#eef0f2', align:m.who==='you'?'flex-end':'flex-start', bg:m.who==='you'?'rgba(255,255,255,0.05)':'rgba(255,255,255,0.10)'}));
 
     // Home dashboard "AI Suggested Next" — used to be 3 hardcoded fake items regardless of
@@ -16855,6 +16890,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
       // fitness
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
+      woUnitLabel:(S.woUnit||'kg')==='BW'?'BW':'kg', woUnitIsBW:(S.woUnit||'kg')==='BW',
+      woUnitC:(S.woUnit||'kg')==='BW'?'#0a0a0b':'#b8b8c0', woUnitBg:(S.woUnit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.05)', woUnitBd:(S.woUnit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.14)',
+      toggleWoUnit:()=>this.setState(s=>({woUnit:(s.woUnit||'kg')==='BW'?'kg':'BW'})),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
       addWorkout:()=>this.addWorkout(),
       addWorkoutKey:enterKey(()=>this.addWorkout()),
@@ -16864,6 +16902,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const parts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio'];
         const rows=(S.woImportRows||[]).map((r,i)=>({
           exercise:r.exercise, part:r.part, weight:r.weight, sets:r.sets, reps:r.reps, minutes:r.minutes, isCardio:r.part==='Cardio',
+          unit:(r.unit||'kg')==='BW'?'BW':'kg',
+          unitC:(r.unit||'kg')==='BW'?'#0a0a0b':'#8a8a92', unitBg:(r.unit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.04)', unitBd:(r.unit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.12)',
+          toggleUnit:()=>this.setWoImportRowField(i,'unit',(r.unit||'kg')==='BW'?'kg':'BW'),
           setExercise:(e)=>this.setWoImportRowField(i,'exercise',e.target.value),
           setWeight:(e)=>this.setWoImportRowField(i,'weight',e.target.value),
           setSets:(e)=>this.setWoImportRowField(i,'sets',e.target.value),
