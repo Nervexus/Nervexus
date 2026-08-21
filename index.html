@@ -8998,7 +8998,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-66 · v11.66 dotted-particle-orb';
+const NOTIF_BUILD_VERSION = '2026.08.21-67 · v11.67 fix-time-date-fastpath';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12229,6 +12229,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.67', date:'Aug 21, 2026', major:false, notes:[
+      'Fixed \u201cwhat is the time\u201d / \u201cwhats the time\u201d / \u201cwhat is the date\u201d not working without an AI provider connected \u2014 these are meant to be answered instantly offline (no API needed), but the underlying pattern only matched a bare contraction like \u201cwhat\u2019s the time,\u201d so the very common \u201cwhat IS the time\u201d phrasing fell through to needing a provider for something that should always just work.',
+    ]},
     {version:'v11.66', date:'Aug 21, 2026', major:true, notes:[
       'Redesigned the voice assistant orb \u2014 replaced the swirling plasma/WebGL blob with a sphere of glowing dots that tumbles and drifts on its own, speeds up while listening, and reacts gently to your cursor. Same orb everywhere it appears (the main Voice Assistant screen, the floating button, the sidebar), still themed per raiment (Ultra X maroon, Noir gold, Maison \u00c9lys\u00e9e blue, base silver). Also dropped the external WebGL library it used to load from a CDN on every visit \u2014 it\u2019s a plain Canvas animation now, so the orb appears instantly instead of popping in after a network fetch.',
     ]},

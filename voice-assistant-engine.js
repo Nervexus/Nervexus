@@ -156,8 +156,12 @@
   // ---- Fast offline fallback (no provider connected, or planning failed) ---
   var FALLBACK_INTENTS = [
     { re: /^(?:please )?remember(?: that)?\s+(.+)/i, run: function (m, host) { return toolByName('remember_fact').run({ fact: m[1].trim() }, host); } },
-    { re: /what.?s? (the )?time|current time|time is it/i, run: function () { return 'It\u2019s ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '.'; } },
-    { re: /what.?s? (today.?s |the )?date|what day is it/i, run: function () { return 'Today is ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '.'; } },
+    // Covers "what's/whats/what is the time", "what time is it", "current time" \u2014 the old
+    // regex only matched a bare "'s" contraction, so "what IS the time" (a very common
+    // phrasing, typed or from speech-to-text) fell through to needing an AI provider for
+    // something that was always meant to work offline.
+    { re: /what(?:'?s|\s+is)?\s+(?:the\s+)?time|current time|time is it/i, run: function () { return 'It\u2019s ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '.'; } },
+    { re: /what(?:'?s|\s+is)?\s+(?:today(?:'?s)?\s+|the\s+)?date|what day is it|current date/i, run: function () { return 'Today is ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '.'; } },
     { re: /\bhello|\bhi\b|\bhey\b|good morning|good evening/i, run: function () { return 'Hello. I\u2019m your command assistant.'; } },
     { re: /^(?:add|create)\s+(?:a\s+)?(?:task|to.?do)\s*(?:to (?:my )?(?:list|checklist))?[:,]?\s+(.+)/i, run: function (m, host) { return toolByName('add_task').run({ label: m[1].trim().replace(/[.!?]+$/, '') }, host); } },
     { re: /^remind me to\s+(.+)/i, run: function (m, host) { return toolByName('add_task').run({ label: m[1].trim().replace(/[.!?]+$/, '') }, host); } }
