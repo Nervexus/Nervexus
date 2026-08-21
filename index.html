@@ -8980,7 +8980,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-72 · v11.72 fix-provider-sync-on-reload';
+const NOTIF_BUILD_VERSION = '2026.08.21-73 · v11.73 openai-backup-provider';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9828,7 +9828,7 @@ activities: this._mergeShipLog(s.activities),
     const inTok=rows.reduce((a,r)=>a+r.inTok,0), outTok=rows.reduce((a,r)=>a+r.outTok,0), totalTok=inTok+outTok;
     // Approximate public per-million-token USD pricing — for an at-a-glance estimate only,
     // not a substitute for the provider's own billing dashboard.
-    const PRICE={'claude-opus-5':[15,75],'claude-sonnet-5':[3,15],'claude-haiku-4-5-20251001':[1,5],'gemini-3.7-flash':[0.75,3.75],'gemini-3.6-flash':[0.75,3.75],'gemini-3.5-flash-lite':[0.3,1.5]};
+    const PRICE={'claude-opus-5':[15,75],'claude-sonnet-5':[3,15],'claude-haiku-4-5-20251001':[1,5],'gemini-3.7-flash':[0.75,3.75],'gemini-3.6-flash':[0.75,3.75],'gemini-3.5-flash-lite':[0.3,1.5],'gpt-5.6-sol':[5,30],'gpt-5.6-terra':[2,12],'gpt-5.6-luna':[0.2,1.2]};
     const cost=rows.reduce((a,r)=>{ const p=PRICE[r.model]||[2,6]; return a+(r.inTok/1e6*p[0])+(r.outTok/1e6*p[1]); },0);
     return { hasData:reqs>0, reqs:reqs.toLocaleString(), tokens:totalTok>=1000?(totalTok/1000).toFixed(1)+'K':String(totalTok), cost:'~$'+cost.toFixed(2) };
   }
@@ -12246,6 +12246,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.73', date:'Aug 21, 2026', major:true, notes:[
+      'Added OpenAI (ChatGPT) as a real, connectable third AI provider, specifically so Gemini has an actual backup \u2014 the failover system (Settings \u2192 AI Providers \u2192 Routing: set a Default and Backup provider, switch on Failover) already existed but only ever had one provider to fail over to. Connect an OpenAI key, set it as Backup, and a Gemini error/outage now falls through to it automatically instead of the assistant just failing. Current model lineup (gpt-5.6-sol/terra/luna), no free tier so it only spends anything on days your Default provider actually fails.',
+    ]},
     {version:'v11.72', date:'Aug 21, 2026', major:true, notes:[
       'Fixed a real \u201cAPI key doesn\u2019t sync\u201d bug: a genuinely saved, genuinely connected AI provider key could still get \u201cI need an AI provider connected\u201d from the voice assistant on a fresh page load or a new tab. Root cause \u2014 the server reports a saved key as {saved, masked, enabled}, but every actual \u201cis this provider usable\u201d check in the app (the voice assistant, briefings, news pulling, connection counts) reads a differently-named field, `on`, which the status pull never set. It only ever got set locally when you flipped the toggle switch in that browser tab. Fixed at the one place all of those checks trace back to, so a saved key now works immediately after any reload, not just in the tab you originally connected it in.',
     ]},

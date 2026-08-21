@@ -21,19 +21,21 @@ const PROVIDER_ENV: Record<string, string> = {
   google: 'GOOGLE_API_KEY',
 };
 
-// Model selection — only the two providers exposed in the Settings -> AI Providers picker
-// (anthropic, google) accept a client-chosen model; everything else stays on its fixed
-// model since the UI never offers a choice for those. Requests are validated against this
-// allow-list rather than trusted verbatim, so a client can't smuggle an arbitrary model id.
+// Model selection — only the three providers exposed in the Settings -> AI Providers picker
+// (anthropic, google, openai) accept a client-chosen model; everything else stays on its
+// fixed model since the UI never offers a choice for those. Requests are validated against
+// this allow-list rather than trusted verbatim, so a client can't smuggle an arbitrary model id.
 // google: 2.5-line retired for new API keys Aug 2026 ("no longer available to new users",
 // live error from Google's own API) -- moved to the Gemini 3 stable Flash tier.
 const DEFAULT_MODEL: Record<string, string> = {
   anthropic: 'claude-sonnet-5',
   google: 'gemini-3.6-flash',
+  openai: 'gpt-5.6-luna',
 };
 const ALLOWED_MODELS: Record<string, string[]> = {
   anthropic: ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001'],
   google: ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'],
+  openai: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna'],
 };
 function resolveModel(provider: string, requested?: string): string {
   const fallback = DEFAULT_MODEL[provider];
@@ -221,7 +223,7 @@ function streamCall(provider: string, apiKey: string, prompt: string, model: str
         if (provider === 'openai') {
           url = 'https://api.openai.com/v1/chat/completions';
           headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
-          reqBody = { model: 'gpt-4o-mini', stream: true, messages: [{ role: 'user', content: prompt }] };
+          reqBody = { model: resolveModel('openai', model), stream: true, messages: [{ role: 'user', content: prompt }] };
           extractDelta = (obj) => obj.choices?.[0]?.delta?.content || '';
         } else if (provider === 'anthropic') {
           url = 'https://api.anthropic.com/v1/messages';
@@ -518,14 +520,16 @@ Deno.serve(async (req) => {
 
     let result = '';
     if (provider === 'openai') {
+      const usedModel = resolveModel('openai', model);
       const r = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: usedModel, messages: [{ role: 'user', content: prompt }] }),
       });
       const j = await r.json();
+      if (!r.ok) return json({ error: j.error?.message || 'OpenAI request failed (' + r.status + ')' }, 400);
       result = j.choices?.[0]?.message?.content || '';
-      if (j.usage) await logUsage(admin, uid, provider, 'gpt-4o-mini', j.usage.prompt_tokens, j.usage.completion_tokens);
+      if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.prompt_tokens, j.usage.completion_tokens);
     } else if (provider === 'anthropic') {
       const usedModel = resolveModel('anthropic', model);
       const r = await fetch('https://api.anthropic.com/v1/messages', {

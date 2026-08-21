@@ -23,12 +23,13 @@
 (function (root) {
   'use strict';
 
-  // Simplified down to two supported providers per product decision — Claude for everything
-  // (chat, tutors, briefings, voice assistant) and Gemini specifically for live search (real-time
-  // travel data, safety checks) since it's the only one with a genuine free tier. No routing/
-  // failover/backup complexity. The other 8 adapters (OpenAI, xAI, Mistral, DeepSeek, OpenRouter,
-  // Together, Perplexity, Cohere) stay removed from this list for now, not deleted from the
-  // codebase — re-add an entry here to bring one back.
+  // Claude is the primary provider for everything (chat, tutors, briefings, voice assistant),
+  // Gemini adds live search (real-time travel data, safety checks) and a genuine free tier,
+  // and OpenAI is here specifically as a real backup — set it as your Backup provider and
+  // turn on Failover (Settings -> AI Providers -> Routing) so a Gemini outage/quota error
+  // falls through to it automatically instead of the assistant just failing. The remaining
+  // 7 adapters (xAI, Mistral, DeepSeek, OpenRouter, Together, Perplexity, Cohere) stay removed
+  // from this list for now, not deleted from the codebase — re-add an entry here to bring one back.
   var AI_PROVIDERS = [
     { id:'anthropic', name:'Anthropic (Claude)', mark:'AN', color:'#d97757', endpoint:'https://api.anthropic.com/v1',
       auth:'apikey', keyRe:'^sk-ant-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-ant-…', docs:'docs.anthropic.com',
@@ -47,7 +48,12 @@
       // users") — moved to the current Gemini 3 stable, no-billing-required Flash tier. Pro is
       // deliberately left out: gemini-3.1-pro is preview-only and requires a paid Blaze plan,
       // which would break the same way for anyone on the free tier this provider exists for.
-      models:['gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash-lite'], defaultModel:'gemini-3.6-flash' }
+      models:['gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash-lite'], defaultModel:'gemini-3.6-flash' },
+    { id:'openai', name:'OpenAI (ChatGPT)', mark:'AI', color:'#10a37f', endpoint:'https://api.openai.com/v1',
+      // Covers both classic "sk-..." keys and newer project-scoped "sk-proj-..." keys.
+      auth:'apikey', keyRe:'^sk-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-… or sk-proj-…', docs:'platform.openai.com/docs',
+      usage:true, freeTier:false, freeTierNote:'No free tier — billed per token from your first request. Best used as a Backup provider (Routing below) so it only spends anything if your Default provider fails.',
+      models:['gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna'], defaultModel:'gpt-5.6-luna' }
   ];
 
   // category: News | Markets | Economic | Crypto | Government | Business | Tech
