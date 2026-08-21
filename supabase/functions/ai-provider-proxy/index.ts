@@ -21,6 +21,25 @@ const PROVIDER_ENV: Record<string, string> = {
   google: 'GOOGLE_API_KEY',
 };
 
+// Model selection — only the two providers exposed in the Settings -> AI Providers picker
+// (anthropic, google) accept a client-chosen model; everything else stays on its fixed
+// model since the UI never offers a choice for those. Requests are validated against this
+// allow-list rather than trusted verbatim, so a client can't smuggle an arbitrary model id.
+const DEFAULT_MODEL: Record<string, string> = {
+  anthropic: 'claude-sonnet-5',
+  google: 'gemini-2.5-flash',
+};
+const ALLOWED_MODELS: Record<string, string[]> = {
+  anthropic: ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001'],
+  google: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'],
+};
+function resolveModel(provider: string, requested?: string): string {
+  const fallback = DEFAULT_MODEL[provider];
+  if (!fallback) return requested || '';
+  if (requested && (ALLOWED_MODELS[provider] || []).includes(requested)) return requested;
+  return fallback;
+}
+
 // Every response — success, error, and the OPTIONS preflight — must carry these or the
 // browser's fetch() rejects the whole call before JS ever sees a status code or body
 // (this was previously missing entirely, silently breaking every action from the client).
@@ -175,7 +194,7 @@ function sseFrame(obj: unknown): string { return 'data: ' + JSON.stringify(obj) 
 // provider's own stream and normalizing each provider's delta shape into {delta:string}.
 // Ends with {done:true, citations?} or {error:string}. Added so the voice assistant can
 // start speaking a finished sentence before the full reply finishes generating.
-function streamCall(provider: string, apiKey: string, prompt: string): Response {
+function streamCall(provider: string, apiKey: string, prompt: string, model?: string): Response {
   const stream = new ReadableStream({
     async start(controller) {
       const enc = new TextEncoder();
@@ -193,7 +212,7 @@ function streamCall(provider: string, apiKey: string, prompt: string): Response 
         } else if (provider === 'anthropic') {
           url = 'https://api.anthropic.com/v1/messages';
           headers = { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' };
-          reqBody = { model: 'claude-3-5-sonnet-20241022', max_tokens: 1024, stream: true, messages: [{ role: 'user', content: prompt }] };
+          reqBody = { model: resolveModel('anthropic', model), max_tokens: 1024, stream: true, messages: [{ role: 'user', content: prompt }] };
           extractDelta = (obj) => (obj.type === 'content_block_delta' && obj.delta?.type === 'text_delta') ? (obj.delta.text || '') : '';
         } else if (provider === 'perplexity') {
           url = 'https://api.perplexity.ai/chat/completions';
@@ -209,7 +228,7 @@ function streamCall(provider: string, apiKey: string, prompt: string): Response 
           reqBody = { model: 'grok-4', stream: true, messages: [{ role: 'user', content: prompt }], search_parameters: { mode: 'auto' } };
           extractDelta = (obj) => obj.choices?.[0]?.delta?.content || '';
         } else if (provider === 'google') {
-          url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`;
+          url = `https://generativelanguage.googleapis.com/v1beta/models/${resolveModel('google', model)}:streamGenerateContent?alt=sse&key=${apiKey}`;
           headers = { 'Content-Type': 'application/json' };
           reqBody = { contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] };
           extractDelta = (obj) => {
@@ -463,6 +482,7 @@ Deno.serve(async (req) => {
     }
 
     const prompt = body.prompt;
+    const model = typeof body.model === 'string' ? body.model : undefined;
 
     // Streaming: proxy the provider's own SSE and re-emit a normalized shape so the
     // client (supabase-client.js callAIStream) doesn't need per-provider parsing —
@@ -470,7 +490,7 @@ Deno.serve(async (req) => {
     // providers 'call' already supports below; falls through to the non-streamed
     // path for everything else (unchanged).
     if (body.stream && ['openai', 'anthropic', 'perplexity', 'xai', 'google'].includes(provider)) {
-      return streamCall(provider, apiKey, prompt);
+      return streamCall(provider, apiKey, prompt, model);
     }
 
     let result = '';
@@ -486,7 +506,7 @@ Deno.serve(async (req) => {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-3-5-sonnet-20241022', max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ model: resolveModel('anthropic', model), max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
       });
       const j = await r.json();
       result = j.content?.[0]?.text || '';
@@ -522,7 +542,7 @@ Deno.serve(async (req) => {
     } else if (provider === 'google') {
       // Gemini + "Grounding with Google Search" — genuinely current, and free within Google's
       // monthly grounded-query allowance, so this is the free backup live-search option.
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${resolveModel('google', model)}:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),

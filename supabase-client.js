@@ -75,13 +75,17 @@ window.SB = {
     });
     return res.json();
   },
-  async callAI(provider, prompt){ return window.SB._providerFn({ action:'call', provider, prompt }); },
+  // model is optional — the provider's own saved default is used when omitted. Passing it
+  // is what makes the model picker in Settings -> AI Providers actually do something: it
+  // used to be collected in the UI and never sent anywhere, so every call silently used
+  // whichever model the edge function had hardcoded regardless of what was selected.
+  async callAI(provider, prompt, model){ return window.SB._providerFn({ action:'call', provider, prompt, model }); },
   // Streaming counterpart of callAI — reads the proxy's SSE body as it arrives so the
   // caller (voice assistant) can act on partial text before the full reply is done.
   // onDelta(deltaText) fires per chunk. Resolves {result, citations} or {error}, same
   // shape as callAI, once the stream ends. Falls back cleanly: any non-OK response or
   // missing streaming body resolves {error:...} so callers can retry non-streamed.
-  async callAIStream(provider, prompt, onDelta){
+  async callAIStream(provider, prompt, onDelta, model){
     const { data } = await window.sb.auth.getSession();
     const token = data.session && data.session.access_token;
     if (!token) return { error: 'Not signed in' };
@@ -90,7 +94,7 @@ window.SB = {
       res = await fetch(window.SUPABASE_CONFIG.url + '/functions/v1/ai-provider-proxy', {
         method: 'POST',
         headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action:'call', provider, prompt, stream:true })
+        body: JSON.stringify({ action:'call', provider, prompt, model, stream:true })
       });
     }catch(e){ return { error: (e&&e.message)||'Request failed' }; }
     if (!res.ok || !res.body){

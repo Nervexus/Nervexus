@@ -32,7 +32,9 @@
   var AI_PROVIDERS = [
     { id:'anthropic', name:'Anthropic (Claude)', mark:'AN', color:'#d97757', endpoint:'https://api.anthropic.com/v1',
       auth:'apikey', keyRe:'^sk-ant-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-ant-…', docs:'docs.anthropic.com',
-      usage:true, models:['claude-opus-4.5','claude-sonnet-4.5','claude-haiku-4.5'], defaultModel:'claude-sonnet-4.5' },
+      // Real, currently-live Anthropic model IDs (not the old placeholder-style "4.5" names
+      // with dots, which aren't valid API model slugs and would 404 if ever actually sent).
+      usage:true, models:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5-20251001'], defaultModel:'claude-sonnet-5' },
     { id:'google', name:'Google Gemini', mark:'GE', color:'#4285f4', endpoint:'https://generativelanguage.googleapis.com/v1',
       auth:'apikey', keyRe:'^AIza[A-Za-z0-9_\\-]{30,}$', keyHint:'AIza…', docs:'ai.google.dev',
       usage:true, live:true, freeTier:true, models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }

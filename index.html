@@ -8991,7 +8991,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-63 · v11.63 editable-budget-categories';
+const NOTIF_BUILD_VERSION = '2026.08.21-64 · v11.64 voice-assistant-rebuild';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9415,7 +9415,7 @@ activities: this._mergeShipLog(s.activities),
     try{
       let raw;
       if(providerId==='claude-native'){ raw=await window.claude.complete({system:'Output only JSON.', messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:2000}); }
-      else { const res=await window.SB.callAI(providerId,prompt); if(res.error) throw new Error(res.error); raw=res.result; }
+      else { const res=await window.SB.callAI(providerId,prompt,this._provModel(providerId)); if(res.error) throw new Error(res.error); raw=res.result; }
       const j=this._extractJSON(raw);
       if(j && Array.isArray(j.notifs) && j.notifs.length){
         const now=Date.now(); const fresh=j.notifs.map((text,i)=>({id:'cn'+now+'_'+i, text:String(text).trim()})).filter(c=>c.text.length>3);
@@ -9801,7 +9801,7 @@ activities: this._mergeShipLog(s.activities),
         const sys=(opts.system||'').trim();
         const convo=Array.isArray(opts.messages) ? opts.messages.map(m=>(m.role==='assistant'?'Assistant: ':'User: ')+(typeof m.content==='string'?m.content:JSON.stringify(m.content))).join('\n\n') : '';
         const prompt=(sys?sys+'\n\n':'')+convo;
-        const res=await window.SB.callAI(providerId, prompt);
+        const res=await window.SB.callAI(providerId, prompt, self._provModel(providerId));
         if(res && res.error){ const PD=self._pd(); const pname=(PD&&PD.byId(providerId)||{}).name||providerId; throw new Error(pname+': '+res.error); }
         return (res && res.result) || '';
       }
@@ -9817,6 +9817,10 @@ activities: this._mergeShipLog(s.activities),
       const intel={...(s.prefs.intel||{})}; Object.keys(intel).forEach(id=>{ if(intel[id]&&intel[id].saved) delete intel[id]; });
       return {prefs:{...s.prefs, prov, intel, _fakeSeedCleared:true}}; }); }
   _provCfg(id){ return (this.state.prefs.prov&&this.state.prefs.prov[id])||{}; }
+  // The model the user picked for this provider in Settings -> AI Providers, or its
+  // default — threaded into every callAI/callAIStream so the picker actually does
+  // something (it used to be collected and never sent anywhere).
+  _provModel(id){ const PD=this._pd(); const p=PD&&PD.byId(id); return this._provCfg(id).model || (p&&p.defaultModel) || ''; }
   _intelCfg(id){ return (this.state.prefs.intel&&this.state.prefs.intel[id])||{}; }
   _setProv(id,patch){ this.mut(s=>({prefs:{...s.prefs, prov:{...(s.prefs.prov||{}), [id]:{...((s.prefs.prov||{})[id]||{}), ...patch}}}})); }
   _setIntel(id,patch){ this.mut(s=>({prefs:{...s.prefs, intel:{...(s.prefs.intel||{}), [id]:{...((s.prefs.intel||{})[id]||{}), ...patch}}}})); }
@@ -10494,7 +10498,34 @@ activities: this._mergeShipLog(s.activities),
   setReadingStyle(v){ if(this._ve) this._ve.setSettings({style:v}); this.setPref('readingStyle',v); }
   setVoiceVolume(v){ if(this._ve) this._ve.setSettings({volume:v}); this.setPref('voiceVolume',v); }
   speakBriefing(){ const exec=this.state.scene==='briefing'&&this.state.briefTab==='exec'; const txt=exec?this._execBriefingText():this._briefingText(); this.readAloud(txt, exec?'Executive Intelligence Briefing':'Daily Briefing', (this.state.prefs&&this.state.prefs.briefingVoice)||this.state.voice); }
-  _briefingText(){ const S=this.state; const nm=((S.account&&S.account.name)||'').trim().split(/\s+/)[0]||'there'; const today=(()=>{try{return new Date().toLocaleDateString('en-CA');}catch(e){return '';}})(); const ev=(S.events||[]).filter(e=>this._eventOccursOn(e,today)); const open=(S.checklist||[]).filter(c=>!c.done); const h=S.health||{}; const L=[]; L.push('Good day, '+nm+'. Here is your command briefing.'); L.push('Schedule.'); L.push(ev.length?('You have '+ev.length+' event'+(ev.length===1?'':'s')+' today'+(ev[0]?', starting with '+ev[0].title+' at '+ev[0].time:'')+'.'):'Your calendar is clear today.'); L.push('Priorities.'); L.push(open.length?('You have '+open.length+' open task'+(open.length===1?'':'s')+'. Top of the list: '+open.slice(0,3).map(c=>c.label).join(', ')+'.'):'All tasks are complete. Well done.'); L.push('Markets.'); L.push('Equities are firm, crypto is bid, and capital continues rotating into A.I. infrastructure.'); L.push('Fitness.'); L.push('Recovery is at '+(h.recovery!=null?h.recovery:80)+' percent, hydration '+(h.water!=null?h.water:5)+' of '+(h.waterGoal!=null?h.waterGoal:8)+' glasses.'); L.push('That concludes your briefing. Stay sharp.'); return L.join('\n\n'); }
+  // Real Daily Briefing — every line below is computed from the user's own logged data
+  // (schedule, tasks, missions, sleep/hydration, income/expenses). It previously included
+  // a hardcoded "Markets. Equities are firm, crypto is bid..." line that never changed
+  // and had no connection to anything real — removed. Nothing in this briefing is allowed
+  // to say something that isn't actually true of the user's data.
+  _briefingText(){ const S=this.state; const nm=((S.account&&S.account.name)||'').trim().split(/\s+/)[0]||'there';
+    const today=(()=>{try{return new Date().toLocaleDateString('en-CA');}catch(e){return '';}})();
+    const ev=(S.events||[]).filter(e=>this._eventOccursOn(e,today));
+    const open=(S.checklist||[]).filter(c=>!c.done);
+    const missOpen=(S.missions||[]).filter(m=>!m.completedAt);
+    const h=S.health||{};
+    const avgSleep=(h.sleepH&&h.sleepH.length)?(h.sleepH.reduce((a,b)=>a+b,0)/h.sleepH.length):null;
+    const now=new Date(), yy=now.getFullYear(), mm=now.getMonth();
+    const inMonth=(arr)=>(arr||[]).filter(x=>{ try{ const d=new Date(x.ts); return d.getFullYear()===yy&&d.getMonth()===mm; }catch(e){ return false; } }).reduce((a,x)=>a+(+x.amt||0),0);
+    const incMTD=inMonth(S.income), expMTD=inMonth(S.expenses);
+    const hr=now.getHours(), greet=hr<12?'Good morning':(hr<18?'Good afternoon':'Good evening');
+    const L=[];
+    L.push(greet+', '+nm+'. Here is your briefing for '+now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+'.');
+    L.push('Schedule.');
+    L.push(ev.length?('You have '+ev.length+' event'+(ev.length===1?'':'s')+' today'+(ev[0]?', starting with '+ev[0].title+' at '+ev[0].time:'')+'.'):'Your calendar is clear today.');
+    L.push('Priorities.');
+    L.push(open.length?('You have '+open.length+' open task'+(open.length===1?'':'s')+'. Top of the list: '+open.slice(0,3).map(c=>c.label).join(', ')+'.'):'All tasks are complete. Well done.');
+    L.push(missOpen.length?('You still have '+missOpen.length+' daily mission'+(missOpen.length===1?'':'s')+' open: '+missOpen.slice(0,3).map(m=>m.name).join(', ')+'.'):'All your daily missions are done.');
+    L.push('Health.');
+    L.push(avgSleep!=null?('Your sleep average is '+avgSleep.toFixed(1)+' hours, and hydration is at '+(h.water!=null?h.water:0)+' of '+(h.waterGoal!=null?h.waterGoal:8)+' glasses today.'):'No sleep logged yet — log tonight to start tracking your average.');
+    L.push('Finance.');
+    L.push((incMTD>0||expMTD>0)?('This month you have logged '+this.fmtK(incMTD)+' in income and '+this.fmtK(expMTD)+' in expenses.'):'No income or expenses logged yet this month.');
+    L.push('That concludes your briefing.'); return L.join('\n\n'); }
   _execGreeting(){ const h=new Date().getHours(); const g=h<12?'Good Morning':(h<18?'Good Afternoon':'Good Evening'); const nm=(((this.state.account&&this.state.account.name)||'').trim()||'there').replace(/([a-z])([A-Z])/g,'$1 $2'); return g+', Mr '+nm+'.'; }
   _execBrief(){ return {
     outlook:"Today's environment is defined by capital rotating into A.I. infrastructure, resilient equity markets, and elevated geopolitical risk across two active theatres.",
@@ -10550,7 +10581,7 @@ activities: this._mergeShipLog(s.activities),
     if(id==='brief') return this._briefingText();
     if(id==='notif'){ const recent=(S.notifs||[]).slice(0,6); const L=['Notification summary, '+nm+'.']; if(!recent.length){ L.push('You are all caught up. No new notifications.'); } else { L.push('You have '+recent.length+' recent notification'+(recent.length===1?'':'s')+'.'); recent.forEach(n=>L.push((n.title||'')+'. '+(n.body||''))); } return L.join('\n\n'); }
     if(id==='schedule'){ const ev=(S.events||[]).filter(e=>this._eventOccursOn(e,today)); const open=(S.checklist||[]).filter(c=>!c.done); const L=['Schedule and reminders for today, '+nm+'.']; L.push(ev.length?('You have '+ev.length+' event'+(ev.length===1?'':'s')+'.'):'Your calendar is clear today.'); ev.forEach(e=>L.push(e.title+' at '+e.time+'.')); L.push(open.length?('You have '+open.length+' open task'+(open.length===1?'':'s')+'.'):'All tasks are complete.'); open.slice(0,6).forEach(c=>L.push('Reminder. '+c.label+'.')); return L.join('\n\n'); }
-    if(id==='fitness'){ const h=S.health||{}; const L=['Fitness and recovery update, '+nm+'.']; L.push('Recovery is at '+(h.recovery!=null?h.recovery:80)+' percent, with '+(ctx.soreness||'low')+' soreness.'); L.push('Hydration is '+(h.water!=null?h.water:5)+' of '+(h.waterGoal!=null?h.waterGoal:8)+' glasses, and you have averaged '+(ctx.sleepAvg||'7.4')+' hours of sleep this week.'); if(ctx.gymStreak) L.push('Your gym streak stands at '+ctx.gymStreak+' day'+(ctx.gymStreak===1?'':'s')+'.'); if(ctx.best1RM) L.push('Your best estimated one rep max is '+ctx.best1RM+' kilograms.'); L.push(ctx.didWorkoutToday?'You have trained today. Prioritise recovery: protein, water and sleep.':'No session logged yet today. Readiness is high, so consider training.'); return L.join('\n\n'); }
+    if(id==='fitness'){ const h=S.health||{}; const L=['Fitness and recovery update, '+nm+'.']; L.push('Hydration is '+(h.water!=null?h.water:0)+' of '+(h.waterGoal!=null?h.waterGoal:8)+' glasses today'+(ctx.sleepAvg?(', and you have averaged '+ctx.sleepAvg+' hours of sleep this week.'):'.')); if(ctx.gymStreak) L.push('Your gym streak stands at '+ctx.gymStreak+' day'+(ctx.gymStreak===1?'':'s')+'.'); if(ctx.best1RM) L.push('Your best estimated one rep max is '+ctx.best1RM+' kilograms.'); L.push(ctx.didWorkoutToday?'You have trained today. Prioritise recovery: protein, water and sleep.':'No session logged yet today.'); return L.join('\n\n'); }
     if(id==='money'){ const eb=this._execBrief(); const L=['Financial and markets update, '+nm+'.']; L.push('Overall sentiment is '+eb.summary.sentiment+'.'); eb.sections[0].items.forEach(it=>L.push(it.head+'. '+it.sum)); return L.join('\n\n'); }
     if(id==='business'){ const eb=this._execBrief(); const L=['Business report, '+nm+'.']; eb.sections[2].items.forEach(it=>L.push(it.head+'. '+it.sum)); eb.sections.find(s=>s.num==='04').items.forEach(it=>L.push(it.head+'. '+it.sum)); return L.join('\n\n'); }
     return ''; }
@@ -10633,7 +10664,7 @@ activities: this._mergeShipLog(s.activities),
     const pulled=await this._pullConnectedNewsData('top headlines today');
     if(!pulled) return null;
     const id=this._pickLiveProvider(); if(!id) return null;
-    try{ const res=await window.SB.callAI(id, this._personaPrefix()+' In ONE short spoken sentence, give the single most important headline from this data (no preamble):\n'+pulled);
+    try{ const res=await window.SB.callAI(id, this._personaPrefix()+' In ONE short spoken sentence, give the single most important headline from this data (no preamble):\n'+pulled, this._provModel(id));
       if(res && !res.error && res.text) return {topic:'news', text:res.text.trim()};
     }catch(e){}
     return null;
@@ -10777,14 +10808,17 @@ activities: this._mergeShipLog(s.activities),
         trainingToday:()=>{ const todayStr=this._todayStr(); return (this.state.workouts||[]).filter(w=>{ try{ return new Date(w.ts).toLocaleDateString('en-CA')===todayStr; }catch(e){ return false; } }).map(w=>w.exercise+(w.min?' ('+w.min+'m)':'')); },
         readSource:(id,title)=>{ this.readCoreSource(id,title); },
         safety:(query)=>this._safetyLookup(query),
-        // The following reuse the exact draft-state + save-function pattern each screen's own
-        // form uses, so persistence (including the Supabase insert) is identical either way.
-        logWorkout:(exercise,minutes,weight,sets,reps)=>{ this.setState({woEx:exercise,woMin:String(minutes||''),woWeight:String(weight||''),woSets:String(sets||''),woReps:String(reps||'')},()=>this.addWorkout()); },
+        // All of the following call real class methods directly (see addWorkout/addWeight/
+        // addMeal/addNote near removeBody, and addIncome/addExpense near _moneyLogDay) —
+        // every one of these previously only existed as a renderVals closure, which meant
+        // this.addWorkout/addWeight/addMeal/addNote were undefined and calling them here
+        // threw, silently breaking voice-triggered logging while still speaking "Logged."
+        logWorkout:(exercise,minutes,weight,sets,reps,part)=>this.addWorkout({exercise,minutes,weight,sets,reps,part}),
         logHydration:(ml)=>this.addHydMl(ml),
-        logWeight:(kg)=>{ this.setState({weightInput:String(kg)},()=>this.addWeight()); },
+        logWeight:(kg)=>this.addWeight(kg),
         logSleep:(hours,minutes)=>{ this.setState(s=>({slp:{...s.slp,h:String(hours||0),m:String(minutes||0)}}),()=>this.saveSleep()); },
-        logMeal:(name,kcal,protein)=>{ this.setState({mealName:name,mealKcal:String(kcal||''),mealProtein:String(protein||'')},()=>this.addMeal()); },
-        addNote:(title,body)=>{ this.setState({noteTitle:title,noteBody:body},()=>this.addNote()); },
+        logMeal:(name,kcal,protein)=>this.addMeal({name,kcal,protein}),
+        addNote:(title,body)=>this.addNote(title,body),
         logIncome:(label,amount)=>{ this.setState({incLabel:label,incAmt:String(amount||'')},()=>this.addIncome()); },
         logExpense:(label,amount)=>{ this.setState({expLabel:label,expAmt:String(amount||'')},()=>this.addExpense()); },
         disableAssistant:()=>{ setTimeout(()=>this.toggleAssistantEnabled(),1200); },
@@ -11001,7 +11035,7 @@ activities: this._mergeShipLog(s.activities),
     const attempted=[]; let lastErr='';
     for(let i=0;i<2;i++){
       const id=this._pickAutoProvider('general'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
-      const t0=Date.now(); let res; try{ res=await window.SB.callAI(id, opts.raw?query:(this._personaPrefix()+' '+query)); }catch(e){ res={error:(e&&e.message)||'Request failed'}; }
+      const t0=Date.now(); let res; try{ res=await window.SB.callAI(id, opts.raw?query:(this._personaPrefix()+' '+query), this._provModel(id)); }catch(e){ res={error:(e&&e.message)||'Request failed'}; }
       if(res && !res.error){ this._recordHealth(id,true,Date.now()-t0); return {text:res.result||'No answer returned.'}; }
       lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
       if(!this.state.prefs.failover) break; // no retry unless failover is enabled
@@ -11015,7 +11049,7 @@ activities: this._mergeShipLog(s.activities),
     const q2=this._personaPrefix()+' '+query+(pulled?'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+pulled+')':'');
     for(let i=0;i<2;i++){
       const id=this._pickAutoProvider('live'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
-      const t0=Date.now(); let res; try{ res=await window.SB.callAI(id,q2); }catch(e){ res={error:(e&&e.message)||'Live search failed'}; }
+      const t0=Date.now(); let res; try{ res=await window.SB.callAI(id,q2,this._provModel(id)); }catch(e){ res={error:(e&&e.message)||'Live search failed'}; }
       if(res && !res.error){ this._recordHealth(id,true,Date.now()-t0); let text=res.result||'No answer returned.'; if(res.citations&&res.citations.length) text+='\n\nSources: '+res.citations.slice(0,3).join(', '); return {text}; }
       lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
       if(!this.state.prefs.failover) break;
@@ -11035,8 +11069,8 @@ activities: this._mergeShipLog(s.activities),
       const id=this._pickAutoProvider('general'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
       const t0=Date.now(); let res; anyDelta=false;
       try{
-        if(window.SB.callAIStream) res=await window.SB.callAIStream(id, opts.raw?query:(this._personaPrefix()+' '+query), wrapDelta);
-        else { res=await window.SB.callAI(id, opts.raw?query:(this._personaPrefix()+' '+query)); if(res&&!res.error) wrapDelta(res.result||''); }
+        if(window.SB.callAIStream) res=await window.SB.callAIStream(id, opts.raw?query:(this._personaPrefix()+' '+query), wrapDelta, this._provModel(id));
+        else { res=await window.SB.callAI(id, opts.raw?query:(this._personaPrefix()+' '+query), this._provModel(id)); if(res&&!res.error) wrapDelta(res.result||''); }
       }catch(e){ res={error:(e&&e.message)||'Request failed'}; }
       if(res && !res.error){ this._recordHealth(id,true,Date.now()-t0); return {text:res.result||'No answer returned.'}; }
       lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
@@ -11055,8 +11089,8 @@ activities: this._mergeShipLog(s.activities),
       const id=this._pickAutoProvider('live'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
       const t0=Date.now(); let res; anyDelta=false;
       try{
-        if(window.SB.callAIStream) res=await window.SB.callAIStream(id,q2,wrapDelta);
-        else { res=await window.SB.callAI(id,q2); if(res&&!res.error) wrapDelta(res.result||''); }
+        if(window.SB.callAIStream) res=await window.SB.callAIStream(id,q2,wrapDelta,this._provModel(id));
+        else { res=await window.SB.callAI(id,q2,this._provModel(id)); if(res&&!res.error) wrapDelta(res.result||''); }
       }catch(e){ res={error:(e&&e.message)||'Live search failed'}; }
       if(res && !res.error){
         this._recordHealth(id,true,Date.now()-t0);
@@ -11103,7 +11137,7 @@ activities: this._mergeShipLog(s.activities),
     const _pulled=await this._pullConnectedNewsData(query);
     if(_pulled) query=query+'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+_pulled+')';
     const prompt='You are a location safety analyst. Using multiple current, reputable news and public-safety sources, give a concise safety assessment for: "'+query+'". Cover: 1) Overall safety level (Low/Moderate/High risk). 2) Types of crime reported recently in the area. 3) Any specific recent incidents you can find, with rough dates. 4) Practical safety advice for a visitor. Name the distinct sources you drew from.';
-    let res; try{ res=await window.SB.callAI(id,prompt); }catch(e){ res={error:(e&&e.message)||'Safety check failed'}; }
+    let res; try{ res=await window.SB.callAI(id,prompt,this._provModel(id)); }catch(e){ res={error:(e&&e.message)||'Safety check failed'}; }
     if(res && res.error){ this.setState({safetyLoading:false, safetyErr:res.error}); return; }
     let text=(res && res.result) || 'No answer returned.';
     if(res && res.citations && res.citations.length) text+='\n\nSources: '+res.citations.slice(0,4).join(', ');
@@ -12187,6 +12221,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.64', date:'Aug 21, 2026', major:true, notes:[
+      'Voice assistant reliability: \u201clog my workout\u201d, \u201clog my weight\u201d, \u201clog this meal\u201d and \u201cadd a note\u201d previously threw silently and never saved anything, while the assistant still said \u201cLogged.\u201d \u2014 the same class of bug already fixed once for income/expense logging, now fixed for these four too (plus the underlying weight-log path, which was writing into a disconnected array with no sync at all \u2014 it now saves through the real Body Metrics history). Also added a safety net in the voice dispatcher itself: if a tool ever fails now, you hear an honest \u201cthat didn\u2019t go through\u201d instead of a false success or dead air.',
+      'Daily Briefing rebuilt to be entirely real. It previously included a hardcoded \u201cMarkets. Equities are firm, crypto is bid\u2026\u201d line that never changed and wasn\u2019t connected to anything, plus a \u201cRecovery is at X percent\u201d line pulled from a number that\u2019s frozen at account creation and never updates. Both removed \u2014 the briefing now covers today\u2019s schedule, open tasks and missions, real sleep/hydration, and this month\u2019s income and expenses. \u201cGive me my daily briefing\u201d is now its own clear voice command instead of being buried in a generic \u201cread source\u201d list.',
+      'The AI model picker in Settings \u2192 AI Providers previously did nothing \u2014 whichever model you selected was never actually sent anywhere, and the app always called a fixed, stale model under the hood regardless of your choice. Wired the selected model through every AI call path (chat, live search, streaming, the voice assistant\u2019s planner, briefings, tutors) end to end, and corrected the Anthropic model list to real, valid model IDs.',
+    ]},
     {version:'v11.63', date:'Aug 21, 2026', major:true, notes:[
       'Budget vs Actual categories are no longer a fixed hardcoded list \u2014 add your own category (a text field + button at the bottom of the list) or remove one you don\u2019t use (\u00d7 on each row, at least one category always stays). This same list also drives the category chips on Log Expense, so an added or removed category shows up there too. Removing a category clears its budget number; your historical expenses already logged under it are untouched.',
     ]},
@@ -13226,6 +13265,58 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   saveBody(){ const K=window.HealthKit; if(!K) return; const H=this.state.health; const d=this.state.bodyDraft||{}; const lu=this._hUnit('length'), mu=this._hUnit('mass'); const date=this.state.bodyEditDate || K.today(); const snap={ date }; if(d.weight!==''&&d.weight!=null) snap.weightKg=K.round(K.toCanonical('mass',d.weight,mu),1); if(d.bodyFatPct!==''&&d.bodyFatPct!=null) snap.bodyFatPct=+d.bodyFatPct; if(d.muscleKg!==''&&d.muscleKg!=null) snap.muscleKg=K.round(K.toCanonical('mass',d.muscleKg,mu),1); K.MEASURES.forEach(m=>{ if(d[m.key]!==''&&d[m.key]!=null) snap[m.key]=K.round(K.toCanonical('length',d[m.key],lu),1); }); let heightCm=H.heightCm; if(d.height!==''&&d.height!=null) heightCm=K.round(K.toCanonical('length',d.height,lu),1); const existing=H.bodyLog.find(x=>x.date===date); let log = H.bodyLog.filter(x=>x.date!==date); const prior = K.bySorted(H.bodyLog).filter(x=>x.date<date).pop() || {}; log.push(Object.assign({},prior,snap)); log=K.bySorted(log); const last=log[log.length-1]; const patch={ bodyLog:log, heightCm, bodyFat:last.bodyFatPct, muscleMass:last.muscleKg, waist:last.waist, weights:log.slice(-14).map(x=>x.weightKg).filter(v=>v!=null) }; if(last.weightKg!=null) patch.bmi=K.bmi({heightCm}, last.weightKg); const wasEdit=!!this.state.bodyEditDate; this._setH(patch); this.setState({bodyDraft:{}, bodyEditDate:null}); this.showToast('fitness', wasEdit?'Measurement updated':'Measurement saved', date);
     if(this._sbOn()){ const row={user_id:this.state.authUserId,log_date:date,weight:last.weightKg,body_fat:last.bodyFatPct,muscle_mass:last.muscleKg,waist:last.waist,extra:Object.fromEntries(K.MEASURES.map(m=>[m.key,last[m.key]]).filter(([,v])=>v!=null))}; if(existing && existing.id) window.SB.update('body_metrics',existing.id,row); else { const id=this._uuid(); this.mut(s=>({health:{...s.health,bodyLog:s.health.bodyLog.map(x=>x.date===date?{...x,id}:x)}})); window.SB.insert('body_metrics',{id,...row}); } } }
   removeBody(date){ const existing=this.state.health.bodyLog.find(x=>x.date===date); this._setH({ bodyLog: this.state.health.bodyLog.filter(x=>x.date!==date) }); if(this._sbOn() && existing && existing.id) window.SB.remove('body_metrics',existing.id); }
+  // Real class methods (not just renderVals closures) for the rest of the voice-loggable
+  // actions — same fix already applied to addIncome/addExpense. Each renderVals binding
+  // below (Fitness/Health/Productivity/Notes) now just calls the method here, so both the
+  // UI button AND host.tools.log*/addNote (voice dispatcher) hit the exact same code path.
+  _guessBodyPart(exercise){ const t=(exercise||'').toLowerCase();
+    if(/bench|chest|push.?up|fly|dip/.test(t)) return 'Chest';
+    if(/deadlift|row|pull.?up|lat|back/.test(t)) return 'Back';
+    if(/squat|leg press|lunge|calf|leg curl|leg extension/.test(t)) return 'Legs';
+    if(/shoulder|press overhead|ohp|lateral raise|delt/.test(t)) return 'Shoulders';
+    if(/curl|tricep|bicep|arm/.test(t)) return 'Arms';
+    if(/plank|crunch|sit.?up|core|ab(s)?\b/.test(t)) return 'Core';
+    if(/run|bike|cycle|row(ing)? machine|cardio|swim|elliptical|treadmill/.test(t)) return 'Cardio';
+    return 'Mixed'; }
+  addWorkout(opts){ const o=opts||{}, S=this.state;
+    const ex=(o.exercise!=null?o.exercise:S.woEx||'').trim();
+    const mn=o.minutes!=null?(+o.minutes||0):(parseInt(S.woMin)||0);
+    const wt=o.weight!=null?(+o.weight||0):(parseFloat(S.woWeight)||0);
+    const st=o.sets!=null?(+o.sets||0):(parseInt(S.woSets)||0);
+    const rp=o.reps!=null?(+o.reps||0):(parseInt(S.woReps)||0);
+    if(!ex||!(mn>0||wt>0||rp>0)) return;
+    const partsValid=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
+    let part=o.part;
+    if(!part || partsValid.indexOf(part)<0) part=(partsValid.indexOf(S.woPart)>=0?S.woPart:this._guessBodyPart(ex));
+    const id=this._uuid(), ts=Date.now();
+    this.mut(s=>({workouts:[...s.workouts,{id,part,exercise:ex,min:mn,weight:wt,sets:st,reps:rp,ts}],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
+    if(this._sbOn()) window.SB.insert('workouts',{id,user_id:this.state.authUserId,body_part:part,exercise:ex,minutes:mn,weight:wt,sets:st,reps:rp,occurred_at:new Date(ts).toISOString()}); }
+  addWeight(kg){ const K=window.HealthKit; if(!K) return;
+    const w=kg!=null?+kg:parseFloat(this.state.weightInput);
+    if(!(w>20&&w<400)) return;
+    const mu=this._hUnit('mass');
+    const dispVal=mu==='kg'?K.round(w,1):K.round(K.toDisplay('mass',w,mu),1);
+    this.setState(s=>({bodyDraft:{...s.bodyDraft,weight:dispVal},weightInput:''}),()=>this.saveBody()); }
+  addMeal(opts){ const o=opts||{}, S=this.state;
+    const n=(o.name!=null?o.name:S.mealName||'').trim();
+    const k=o.kcal!=null?(+o.kcal||0):(+S.mealKcal||0);
+    if(!n||!k) return;
+    const id=this._uuid(), protein=o.protein!=null?(+o.protein||0):(+S.mealProtein||0);
+    this.mut(s=>({health:{...s.health,meals:[...s.health.meals,{id,name:n,kcal:k,protein}]},mealName:'',mealKcal:'',mealProtein:''}));
+    this.showToast('fitness','Meal logged',n+' · '+k+' kcal');
+    if(this._sbOn()) window.SB.insert('meals',{id,user_id:this.state.authUserId,name:n,kcal:k,protein}); }
+  addNote(title,body){ const S=this.state;
+    const t=(title!=null?title:S.noteTitle||'').trim();
+    const b=(body!=null?body:S.noteBody||'').trim();
+    if(!t&&!b) return;
+    const id=this._uuid(), finalTitle=t||'Untitled';
+    this.mut(s=>({notes:[{id,title:finalTitle,body:b,ts:Date.now()},...s.notes],noteTitle:'',noteBody:''}));
+    if(this._sbOn()) window.SB.insert('notes',{id,user_id:this.state.authUserId,title:finalTitle,body:b}); }
+  addActivity(){ const S=this.state;
+    const v=(S.actText||'').trim(); if(!v) return;
+    const mn=(parseInt(S.actHr,10)||0)*60+(parseInt(S.actMin,10)||0);
+    const id=this._uuid();
+    this.mut(s=>({activities:[...s.activities,{id,text:v,cat:s.actCat,ts:Date.now(),min:(mn>0?mn:30)}],actText:'',actMin:'',actHr:''})); }
   setProgMetric(k){ this.setState({progMetric:k}); }
   setProgRange(d){ this.setState({progRange:d}); }
   setCmp(which,v){ this.setState({[which]:v}); }
@@ -14913,13 +15004,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           macros:[{label:'PROTEIN',val:proteinTotal+'g',c:'#ff5563'},{label:'CARBS',val:carbs+'g',c:'#eef0f2'},{label:'FAT',val:fat+'g',c:'#9a9aa2'}],
           mealList:H.meals.map((m,idx)=>({name:m.name, kcal:m.kcal, protein:m.protein, remove:()=>{ this.mut(s=>({health:{...s.health,meals:s.health.meals.filter((_,j)=>j!==idx)}})); if(this._sbOn() && m.id) window.SB.remove('meals',m.id); }})),
           mealName:S.mealName, setMealName:(e)=>this.setState({mealName:e.target.value}), mealKcal:S.mealKcal, setMealKcal:(e)=>this.setState({mealKcal:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,4)}), mealProtein:S.mealProtein, setMealProtein:(e)=>this.setState({mealProtein:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,3)}),
-          addMeal:()=>{ const n=(this.state.mealName||'').trim(); const k=+this.state.mealKcal||0; if(n&&k){ const id=this._uuid(); const protein=+this.state.mealProtein||0; this.mut(s=>({health:{...s.health,meals:[...s.health.meals,{id,name:n,kcal:k,protein}]},mealName:'',mealKcal:'',mealProtein:''})); this.showToast('fitness','Meal logged',n+' · '+k+' kcal'); if(this._sbOn()) window.SB.insert('meals',{id,user_id:this.state.authUserId,name:n,kcal:k,protein}); } },
+          addMeal:()=>this.addMeal(),
           waterPlus:()=>this.mut(s=>({health:{...s.health,water:Math.min(20,s.health.water+1)}})), waterMinus:()=>this.mut(s=>({health:{...s.health,water:Math.max(0,s.health.water-1)}})),
           recSignals:[{label:'Muscle soreness',v:H.soreness,w:sig(H.soreness)[0],c:sig(H.soreness)[1]},{label:'Stress',v:H.stress,w:sig(H.stress)[0],c:sig(H.stress)[1]},{label:'Energy',v:H.energy,w:sig(H.energy)[0],c:sig(H.energy)[1]},{label:'Mood',v:H.mood,w:sig(H.mood)[0],c:sig(H.mood)[1]}],
           bodyFat:H.bodyFat, muscleMass:H.muscleMass, bmi:H.bmi, waist:H.waist,
           weightInput:S.weightInput, setWeightInput:(e)=>this.setState({weightInput:(e.target.value||'').replace(/[^0-9.]/g,'').slice(0,5)}),
-          addWeight:()=>{ const w=parseFloat(this.state.weightInput); if(w>20&&w<400){ this.mut(s=>({health:{...s.health,weights:[...s.health.weights.slice(-13),w]},weightInput:''})); this.showToast('fitness','Weight logged',w.toFixed(1)+' kg'); } },
-          addWeightKey:enterKey(()=>{ const w=parseFloat(this.state.weightInput); if(w>20&&w<400){ this.mut(s=>({health:{...s.health,weights:[...s.health.weights.slice(-13),w]},weightInput:''})); } }),
+          addWeight:()=>this.addWeight(),
+          addWeightKey:enterKey(()=>this.addWeight()),
           healthAdvice:mkAdvice(S.healthTopic||'overall'),
           healthChips:[{label:'Analyze sleep',ask:()=>this.setState({healthTopic:'sleep'})},{label:'Improve nutrition',ask:()=>this.setState({healthTopic:'nutrition'})},{label:'Hydration plan',ask:()=>this.setState({healthTopic:'hydration'})},{label:'Overall',ask:()=>this.setState({healthTopic:'overall'})}],
           ...this._healthExtra(H,S),
@@ -16664,8 +16755,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // fitness
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
-      addWorkout:()=>{ const ex=S.woEx.trim(), mn=parseInt(S.woMin)||0, wt=parseFloat(S.woWeight)||0, st=parseInt(S.woSets)||0, rp=parseInt(S.woReps)||0; if(ex&&(mn>0||wt>0||rp>0)){ const id=this._uuid(), part=S.woPart, ts=Date.now(); this.mut(s=>({workouts:[...s.workouts,{id,part,exercise:ex,min:mn,weight:wt,sets:st,reps:rp,ts}],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''})); if(this._sbOn()) window.SB.insert('workouts',{id,user_id:this.state.authUserId,body_part:part,exercise:ex,minutes:mn,weight:wt,sets:st,reps:rp,occurred_at:new Date(ts).toISOString()}); } },
-      addWorkoutKey:enterKey(()=>{ const ex=S.woEx.trim(), mn=parseInt(S.woMin)||0, wt=parseFloat(S.woWeight)||0, st=parseInt(S.woSets)||0, rp=parseInt(S.woReps)||0; if(ex&&(mn>0||wt>0||rp>0)){ const id=this._uuid(), part=S.woPart, ts=Date.now(); this.mut(s=>({workouts:[...s.workouts,{id,part,exercise:ex,min:mn,weight:wt,sets:st,reps:rp,ts}],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''})); if(this._sbOn()) window.SB.insert('workouts',{id,user_id:this.state.authUserId,body_part:part,exercise:ex,minutes:mn,weight:wt,sets:st,reps:rp,occurred_at:new Date(ts).toISOString()}); } }),
+      addWorkout:()=>this.addWorkout(),
+      addWorkoutKey:enterKey(()=>this.addWorkout()),
       workoutList, bodyLegend, coachMsg, moveKcal:(this.todayMin()*8)+' kcal', trainToday:this.todayMin(), trainWeek:this.weekMin(),
       openCoachChat:()=>{ if(!S.fitLoading) this.fitAskAI('Give me a deeper breakdown of my training this week, and what to focus on next.'); },
       ...this._safe(()=>{
@@ -16785,7 +16876,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       actLogEyebrow:'◆ '+((S.actCat==='Full')?'ALL LOGS':S.actCat.toUpperCase()+' LOG')+' · '+(S.actRange||'Week').toUpperCase(),
       actMin:S.actMin, setActMin:(e)=>this.setState({actMin:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,4)}),
       actHr:S.actHr, setActHr:(e)=>this.setState({actHr:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,3)}),
-      addActivity:()=>{ const v=S.actText.trim(); if(v){ const mn=(parseInt(S.actHr,10)||0)*60+(parseInt(S.actMin,10)||0); this.mut(s=>({activities:[...s.activities,{id:this._uuid(),text:v,cat:s.actCat,ts:Date.now(),min:(mn>0?mn:30)}],actText:'',actMin:'',actHr:''})); } },
+      addActivity:()=>this.addActivity(),
       addActKey:enterKey(()=>{ const v=S.actText.trim(); if(v){ const mn=(parseInt(S.actHr,10)||0)*60+(parseInt(S.actMin,10)||0); this.mut(s=>({activities:[...s.activities,{id:this._uuid(),text:v,cat:s.actCat,ts:Date.now(),min:(mn>0?mn:30)}],actText:'',actMin:'',actHr:''})); } }),
       activityList, recTasks, aiTasksBtnLabel, aiTasksSourceLabel, aiTasksErr:S.aiTasksErr||'', generateAiTasks:()=>this.generateAiTasks(),
       catPie:(()=>{ const segs=this.catTime(); const tot=segs.reduce((a,s)=>a+s.min,0)||1; return segs.map(s=>({cat:s.cat,color:s.color,hrs:this.fmtHrs(s.min),pct:Math.round(s.min/tot*100)+'%'})); })(),
@@ -16798,7 +16889,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       lockNotes:()=>this.setState({notesUnlocked:false}),
       noteTitle:S.noteTitle, setNoteTitle:(e)=>this.setState({noteTitle:e.target.value}),
       noteBody:S.noteBody, setNoteBody:(e)=>this.setState({noteBody:this._capitalizeWords(e.target.value)}),
-      addNote:()=>{ const t=(this.state.noteTitle||'').trim(), b=(this.state.noteBody||'').trim(); if(t||b){ const id=this._uuid(); const title=t||'Untitled'; this.mut(s=>({notes:[{id,title,body:b,ts:Date.now()},...s.notes], noteTitle:'', noteBody:''})); if(this._sbOn()) window.SB.insert('notes',{id,user_id:this.state.authUserId,title,body:b}); } },
+      addNote:()=>this.addNote(),
       notesList:[...S.notes].map((n,idx)=>{ const stamp=new Date(n.ts).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).toUpperCase(); return {title:n.title, body:n.body, stamp,
         open:()=>this.setState({noteRead:{title:n.title, body:n.body, stamp}}),
         remove:(e)=>{ e && e.stopPropagation && e.stopPropagation(); this.mut(s=>({notes:s.notes.filter((_,j)=>j!==idx)})); if(this._sbOn() && n.id) window.SB.remove('notes',n.id); } }; }),
