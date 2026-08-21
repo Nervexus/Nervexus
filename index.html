@@ -8986,7 +8986,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-61 · v11.61 savings-system';
+const NOTIF_BUILD_VERSION = '2026.08.21-62 · v11.62 fix-chart-fake-1-label';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11811,7 +11811,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     });
   }
 
-  startBiz(cv,inc,exp){ const {ctx,w,h}=this.prep(cv); const n=12; const mx=Math.max(...inc,...exp,1); const gp=w/n*0.4; const bw=(w/n-gp)/2; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
+  startBiz(cv,inc,exp){ const {ctx,w,h}=this.prep(cv); const n=12; const realMax=Math.max(...inc,...exp); const mx=realMax||1; const gp=w/n*0.4; const bw=(w/n-gp)/2; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const axisColor = isNoir?'rgba(150,143,130,0.6)':isU?'rgba(58,42,32,0.55)':'#75757d';
     const labelH=18, chartH=h-labelH;
@@ -11822,7 +11822,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const eh=(exp[i]/mx)*(chartH-16)*prog; const g2=ctx.createLinearGradient(0,chartH-eh,0,chartH); g2.addColorStop(0,isNoir?'#968F82':'#7A2626'); g2.addColorStop(1,isNoir?'rgba(150,143,130,0.25)':'rgba(122,38,38,0.25)'); ctx.fillStyle=g2; ctx.fillRect(bx+bw+2, chartH-eh, bw, eh);
       }
       ctx.font='9px JetBrains Mono, monospace'; ctx.fillStyle=axisColor;
-      ctx.textAlign='left'; ctx.fillText(this.fmtK(mx), 4, 11);
+      if(realMax>0){ ctx.textAlign='left'; ctx.fillText(this.fmtK(mx), 4, 11); }
       ctx.textAlign='center'; for(let i=0;i<n;i++){ const bx=i*(w/n)+gp/2; ctx.fillText(months[i], bx+bw+1, h-5); }
     });
   }
@@ -12175,6 +12175,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.62', date:'Aug 21, 2026', major:false, notes:[
+      'Fixed the Income vs Expenses chart showing a "$1" scale label when nothing was logged yet for the year. The chart\u2019s bar-height math uses a divide-by-zero guard that falls back to 1 when there\u2019s no real data \u2014 that fallback was harmless until the new scale label started displaying it as if it were a real number. The label now only shows once you actually have real income or expenses logged.',
+    ]},
     {version:'v11.61', date:'Aug 21, 2026', major:true, notes:[
       'Added a real Savings system to Finance Terminal. Savings is a protected pool \u2014 it only grows when you explicitly set money aside (a new optional \u201cSave $\u201d field when logging income, or a standalone \u201cAdd to savings\u201d action), and expenses never touch it. Set a savings goal and track progress with a ring. New \u201csafe to spend\u201d check, scoped to whichever month you\u2019re browsing: income minus savings set aside minus expenses \u2014 if that drops under 35% of that month\u2019s income, you get a warning to bring in more income or slow spending.\n\nAlso fixed a real bug found while building this: reloading the app (or logging back in) never re-fetched the category or recurring flag for income/expenses from Supabase \u2014 both silently reverted to their defaults on every fresh load even though the real values were safely stored in the cloud. Fixed the fetch to pull them back correctly, and also fixed the Savings ring never refreshing after adding a contribution (it wasn\u2019t in the cache signature that decides when to redraw).\n\nRemoved the \u201cSet a budget below to see rings here\u201d placeholder \u2014 the rings row just stays empty when nothing\u2019s budgeted yet.',
     ]},
