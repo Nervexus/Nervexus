@@ -2352,26 +2352,19 @@
             <sc-if value="{{ noPipeline }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6f6f78;">No income logged yet — add one on the left.</span></sc-if>
           </div>
         </div>
-        <div class="cc-glowcard cc-hide-mobile" style="border-radius:20px; background:#16181c; padding:20px; margin-top:18px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;"><span style="font-size:15px; font-weight:700;">Business Intelligence Centre</span><span style="font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">{{ bizIntelBadge }}</span></div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
-            <sc-for list="{{ bizIntelChips }}" as="c" hint-placeholder-count="7"><span onClick="{{ c.select }}" style="display:inline-flex; align-items:center; gap:7px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:7px 12px; cursor:pointer; background:{{ c.bg }};"><span onClick="{{ c.toggleFollow }}" title="Follow" style="width:7px; height:7px; border-radius:50%; background:{{ c.dot }};"></span>{{ c.name }}</span></sc-for>
-          </div>
-          <sc-if value="{{ bizIntelErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:10px; line-height:1.4;">⚠ {{ bizIntelErr }}</div></sc-if>
-          <div class="cc-grid2" style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px;">
-            <div>
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#C9C9CE;">BREAKING · {{ bizIntelSelName }}</span>
-                <span onClick="{{ generateBizIntelAI }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; cursor:pointer; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ bizIntelBtnLabel }}</span>
+        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-top:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;"><span style="font-size:15px; font-weight:700;">Spending Trends</span></div>
+          <div style="font-size:11.5px; color:{{ spendTrendTotalColor }}; margin-bottom:14px;">{{ spendTrendTotalLabel }}</div>
+          <sc-if value="{{ noSpendTrends }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#8a8a92;">Log expenses across a couple of months to see category trends here.</div></sc-if>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <sc-for list="{{ spendTrendRows }}" as="t" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ t.cat }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d;">{{ t.prevLabel }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#eef0f2; width:76px; text-align:right;">{{ t.curLabel }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ t.pctColor }}; width:60px; text-align:right;">{{ t.pctLabel }}</span>
               </div>
-              <div style="font-size:14px; color:#eef0f2; line-height:1.5; margin-bottom:16px;">{{ bizIntelBreaking }}</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#7c7c84; margin-bottom:6px;">WHY IT MATTERS</div>
-              <div style="font-size:12.5px; color:#b8b8c0; line-height:1.55;">{{ bizIntelWhy }}</div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:16px;">
-              <div><div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#6cffba; margin-bottom:7px;">OPPORTUNITIES</div><sc-for list="{{ bizIntelOpps }}" as="o" hint-placeholder-count="2"><div style="display:flex; gap:8px; padding:4px 0; font-size:12.5px; color:#cfcfd4;"><span style="color:#6cffba;">▲</span><span>{{ o }}</span></div></sc-for></div>
-              <div><div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#FFFFFF; margin-bottom:7px;">RISKS</div><sc-for list="{{ bizIntelRisks }}" as="r" hint-placeholder-count="2"><div style="display:flex; gap:8px; padding:4px 0; font-size:12.5px; color:#cfcfd4;"><span style="color:#FFFFFF;">▼</span><span>{{ r }}</span></div></sc-for></div>
-            </div>
+            </sc-for>
           </div>
         </div>
       </div>
@@ -8933,7 +8926,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-53 · v11.53 finance-terminal-merge';
+const NOTIF_BUILD_VERSION = '2026.08.21-54 · v11.54 spending-trends';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9017,7 +9010,6 @@ activities: this._mergeShipLog(s.activities),
       aiNextActionsResult:null, aiNextActionsLoading:false, aiNextActionsErr:'',
       finRecsResult:null, finRecsLoading:false, finRecsErr:'',
       bizRecsResult:null, bizRecsLoading:false, bizRecsErr:'',
-      bizIntelResult:{}, bizIntelLoading:false, bizIntelErr:'',
       wiBriefResult:{}, wiBriefLoading:false, wiBriefErr:'',
       events: s.events || [
         {title:'Q3 launch standup',date:'2026-07-01',time:'09:00'},
@@ -9037,7 +9029,7 @@ activities: this._mergeShipLog(s.activities),
       refreshing:false, refreshPct:0,
       notifs:[], notifOpen:false, toasts:[], notifPreview:[],
       notifTestScheduled:[], testScheduleCat:'system', testScheduleMin:1, notifHistory:[], notifHistoryFilter:'all', notifHistoryLoading:false, notifHistoryErr:'', reminderTickLoading:false, reminderTickResult:null, calendarTestResult:'', missionsTestResult:'',
-      searchOpen:false, searchQuery:'', searchWebResult:'', searchWebErr:'', searchWebLoading:false, vp:{loaded:false,playing:false,paused:false,pct:0,timeLabel:'0:00',totalLabel:'0:00',remainLabel:'0:00',title:'',count:0}, vtx:s.vtx||[], memories:s.memories||[], readText:'', readTitle:'', importErr:'', importing:false, dragOver:false, provView:'ai', provSearch:'', intelCat:'All', provDraft:{}, provExpanded:{}, aiBrief:null, aiBriefLoading:false, aiBriefErr:'', aiBriefProvider:'', aiBriefStamp:'', vtx:[], vInput:'', bizIntelSel:'Artificial Intelligence', bizFollow: s.bizFollow || {'Artificial Intelligence':1,'Ecommerce':1,'Finance':1,'Investing':1,'Technology':1,'Startups':1,'Cybersecurity':1},
+      searchOpen:false, searchQuery:'', searchWebResult:'', searchWebErr:'', searchWebLoading:false, vp:{loaded:false,playing:false,paused:false,pct:0,timeLabel:'0:00',totalLabel:'0:00',remainLabel:'0:00',title:'',count:0}, vtx:s.vtx||[], memories:s.memories||[], readText:'', readTitle:'', importErr:'', importing:false, dragOver:false, provView:'ai', provSearch:'', intelCat:'All', provDraft:{}, provExpanded:{}, aiBrief:null, aiBriefLoading:false, aiBriefErr:'', aiBriefProvider:'', aiBriefStamp:'', vtx:[], vInput:'',
       health: s.health || { water:5, waterGoal:8, kcalGoal:2400, proteinGoal:180, meals:[{name:'Oatmeal & berries',kcal:420,protein:18},{name:'Chicken & rice bowl',kcal:640,protein:52},{name:'Protein shake',kcal:240,protein:38}], sleepH:[7.2,6.8,7.9,7.4,8.1,6.5,7.7], weights:[83.4,83.1,82.8,82.9,82.4,82.1,81.8], recovery:82, soreness:'Low', stress:'Low', energy:'High', mood:'Focused', bodyFat:14.2, muscleMass:63.5, bmi:22.8, waist:81 },
       mealName:'', mealKcal:'', mealProtein:'', weightInput:'',
       healthSub:'overview',
@@ -9487,9 +9479,9 @@ activities: this._mergeShipLog(s.activities),
     if(this._sbOn()){
       const S=this.state;
       if(this._lastSyncedPrefs!==S.prefs){ this._lastSyncedPrefs=S.prefs; this._debounce('sbPrefs', ()=>window.SB.update('profiles', this.state.authUserId, {prefs:this.state.prefs}).then(r=>{ if(r&&r.error) console.error('[sb] prefs save failed', r.error); }), 300); }
-      if(this._lastSyncedCountry!==S.selCountry || this._lastSyncedWiLayer!==S.wiLayer || this._lastSyncedWiTime!==S.wiTime || this._lastSyncedWiQuery!==S.wiQuery || this._lastSyncedBizSel!==S.bizIntelSel || this._lastSyncedBizFollow!==S.bizFollow){
-        this._lastSyncedCountry=S.selCountry; this._lastSyncedWiLayer=S.wiLayer; this._lastSyncedWiTime=S.wiTime; this._lastSyncedWiQuery=S.wiQuery; this._lastSyncedBizSel=S.bizIntelSel; this._lastSyncedBizFollow=S.bizFollow;
-        this._debounce('sbWorldIntel', ()=>window.SB.upsert('world_intel_prefs', {user_id:this.state.authUserId, selected_country:this.state.selCountry, layer:this.state.wiLayer, time_range:this.state.wiTime, last_query:this.state.wiQuery, biz_intel_sel:this.state.bizIntelSel||'', follows:this.state.bizFollow||{}}, 'user_id').then(r=>{ if(r&&r.error) console.error('[sb] world intel save failed', r.error); }), 300);
+      if(this._lastSyncedCountry!==S.selCountry || this._lastSyncedWiLayer!==S.wiLayer || this._lastSyncedWiTime!==S.wiTime || this._lastSyncedWiQuery!==S.wiQuery){
+        this._lastSyncedCountry=S.selCountry; this._lastSyncedWiLayer=S.wiLayer; this._lastSyncedWiTime=S.wiTime; this._lastSyncedWiQuery=S.wiQuery;
+        this._debounce('sbWorldIntel', ()=>window.SB.upsert('world_intel_prefs', {user_id:this.state.authUserId, selected_country:this.state.selCountry, layer:this.state.wiLayer, time_range:this.state.wiTime, last_query:this.state.wiQuery}, 'user_id').then(r=>{ if(r&&r.error) console.error('[sb] world intel save failed', r.error); }), 300);
       }
       // No debounce here (unlike prefs/world-intel): every learning-state change is a discrete
       // event — a test finishing, a level-up — never a continuous drag, so there's no coalescing
@@ -9698,9 +9690,9 @@ activities: this._mergeShipLog(s.activities),
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
-    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, bizFollow:s.bizFollow, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus };
+    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
-    localStorage.setItem('cc_v2', JSON.stringify({ loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, bizFollow:s.bizFollow, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
+    localStorage.setItem('cc_v2', JSON.stringify({ loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
   // ===== AI & INTELLIGENCE PROVIDER MANAGER =====
   _pd(){ return window.PROVIDERS_DATA; }
   // Genuine empty state — every provider/source starts off and unsaved. Nothing is
@@ -9876,20 +9868,6 @@ activities: this._mergeShipLog(s.activities),
       aiBriefProvider:S.aiBriefProvider||'', aiBriefStamp:S.aiBriefStamp||'', synthLabel:S.aiBriefLoading?'SYNTHESIZING…':(S.aiBrief?'RE-SYNTHESIZE LIVE':'SYNTHESIZE LIVE'), briefProviderName:((PD.byId((S.prefs.routing&&S.prefs.routing.briefings)||S.prefs.aiDefault||'anthropic')||{}).name||'AI')
     };
   }
-  _bizIntel(){ return {
-    'Artificial Intelligence':{breaking:'New frontier model tops reasoning benchmarks; enterprise adoption accelerating.',why:'Compute and talent are consolidating — model access is becoming a strategic moat.',opps:['License a frontier API for internal agents','Automate support & operations workflows'],risks:['Vendor lock-in','Fast-moving regulation']},
-    'Ecommerce':{breaking:'AI personalization is lifting average order value 8–12% across mid-market.',why:'Margins hinge on CAC and retention; personalization compounds lifetime value.',opps:['AI product-research for new SKUs','Bundle to raise AOV'],risks:['Ad-cost inflation','Return-rate creep']},
-    'Retail':{breaking:'Omnichannel inventory AI is cutting stockouts; footfall stabilizing.',why:'Working capital is tied up in inventory — accuracy frees cash.',opps:['Demand-forecast pilots','Loyalty re-engagement'],risks:['Shrinkage','Seasonal demand swings']},
-    'Finance':{breaking:'Rates held; credit spreads tightening as inflation cools to 2.4%.',why:'Cheaper capital ahead could reprice growth assets.',opps:['Refinance high-cost debt','Extend runway on better terms'],risks:['Rate-path surprises','Liquidity crunches']},
-    'Investing':{breaking:'Record ETF inflows into AI & energy; rotation out of defensives.',why:'Capital is chasing productivity themes — timing and concentration matter.',opps:['Dollar-cost into secular themes','Trim concentrated winners'],risks:['Valuation froth','Crowded trades']},
-    'Technology':{breaking:'Semiconductor supply easing; edge-AI devices shipping at scale.',why:'Cheaper compute widens what small teams can build.',opps:['Ship AI features fast','Adopt edge inference'],risks:['Platform dependency','Security surface growth']},
-    'Startups':{breaking:'Series B activity rebounding; AI-native teams raising at premium multiples.',why:'Capital favors lean, AI-leveraged teams with real revenue.',opps:['Raise on strength','Hire displaced senior talent'],risks:['Down-rounds','Burn discipline']},
-    'Manufacturing':{breaking:'Reshoring incentives expanding; robotics payback under two years.',why:'Supply resilience is now a board-level priority.',opps:['Automate repetitive lines','Dual-source critical parts'],risks:['Capex intensity','Skilled-labor gaps']},
-    'Supply Chains':{breaking:'Freight normalizing; nearshoring shortens lead times.',why:'Lead-time and concentration risk directly hit cash cycles.',opps:['Nearshore key nodes','Buffer critical SKUs'],risks:['Port disruptions','Geopolitical chokepoints']},
-    'Cybersecurity':{breaking:'Coordinated intrusions on financial infrastructure detected; MFA mandates rising.',why:'A breach is an existential cash and trust event.',opps:['Zero-trust rollout','Tabletop incident drills'],risks:['Ransomware','Third-party exposure']},
-    'Geopolitics':{breaking:'Trade-bloc semiconductor accords are reshaping sourcing.',why:'Policy shifts reroute supply and demand overnight.',opps:['Diversify markets','Hedge FX exposure'],risks:['Sanctions','Tariff swings']},
-    'Taxes':{breaking:'New R&D credit guidance; digital-services levies expanding.',why:'Effective tax rate is a direct lever on net margin.',opps:['Capture R&D credits','Optimize entity structure'],risks:['Compliance load','Retroactive rules']}
-  }; }
   setPref(k,v){ this.mut(s=>({prefs:{...s.prefs,[k]:v}})); }
   setCoach(k,v){ this.mut(s=>({prefs:{...s.prefs, coaching:{...(s.prefs.coaching||{}), [k]:v}}})); }
   setFinanceBudget(cat,v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeBudgets:{...(s.prefs.financeBudgets||{}), [cat]:n}}, financeBudgetDraft:{...(s.financeBudgetDraft||{}), [cat]:undefined}})); }
@@ -9984,7 +9962,7 @@ activities: this._mergeShipLog(s.activities),
   _completeLogin(email){ const em=(email||'').trim().toLowerCase(); const acc0=(this.state.accounts||{})[em];
     const acc=acc0?{...acc0, prefs:{...this._defaultPrefs(), ...(acc0.prefs||{})}}:acc0;
     const user=(this.state.users||[]).find(u=>(u.email||'').trim().toLowerCase()===em);
-    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], bizFollow:{}, health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
+    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
     this.setState(Object.assign({loggedIn:true,currentEmail:email,loginErr:'',loginPass:'',login2FAInput:'',loginStage:'creds',loginFailCount:0,scene:'home'}, acc||blank),()=>{ this._checkDailyLogin(); this.save(); this._notifInit=false; this.initNotifs(); }); }
   doLogin2FA(){ const now=Date.now(); if(this.state.loginLockUntil && now<this.state.loginLockUntil){ this.setState({loginErr:this._lockMsg()}); return; }
     if(window.SB && window.SB.ready()){
@@ -11179,7 +11157,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,sets:r.sets||0,reps:r.reps||0,ts:new Date(r.occurred_at).getTime()}));
       if(notifs && notifs.data){ const fromDb=notifs.data.map(r=>({id:r.id,cat:r.category||'system',title:r.title,body:r.body,read:!!r.read,ts:new Date(r.created_at).getTime()})); const localIds=new Set(this.state.notifs.map(x=>x.id)); patch.notifs=[...this.state.notifs, ...fromDb.filter(x=>!localIds.has(x.id))].sort((a,b)=>b.ts-a.ts).slice(0,40); }
       if(goalsRes && goalsRes.data && goalsRes.data.length){ const g={}; goalsRes.data.forEach(r=>{ if(r.target!=null) g[r.label]=+r.target; }); patch._pendingGoals=g; }
-      if(worldIntel && worldIntel.data && worldIntel.data[0]){ const w=worldIntel.data[0]; if(w.selected_country) patch.selCountry=w.selected_country; if(w.layer) patch.wiLayer=w.layer; if(w.time_range) patch.wiTime=w.time_range; if(w.last_query) patch.wiQuery=w.last_query; if(w.biz_intel_sel) patch.bizIntelSel=w.biz_intel_sel; if(w.follows) patch.bizFollow=w.follows; }
+      if(worldIntel && worldIntel.data && worldIntel.data[0]){ const w=worldIntel.data[0]; if(w.selected_country) patch.selCountry=w.selected_country; if(w.layer) patch.wiLayer=w.layer; if(w.time_range) patch.wiTime=w.time_range; if(w.last_query) patch.wiQuery=w.last_query; }
       if(dayColorsRes && dayColorsRes.data && dayColorsRes.data.length){ const dc={}; dayColorsRes.data.forEach(r=>{ dc[r.day]=r.color; }); patch.dayColors=dc; }
       if(noteVault && noteVault.data && noteVault.data[0] && noteVault.data[0].pw_hash){ patch.notesPw=noteVault.data[0].pw_hash; }
       if(learningRes && learningRes.data && learningRes.data[0] && learningRes.data[0].data){ patch.learning={...this.state.learning, ...learningRes.data[0].data}; }
@@ -12095,6 +12073,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.54', date:'Aug 21, 2026', major:true, notes:[
+      'Replaced Finance Terminal’s "Business Intelligence Centre" with Spending Trends. The old widget looked live but wasn’t: its AI mode explicitly asked for "plausible, specific-sounding" made-up sector news, and its default state was 100% hardcoded text for generic sectors (AI, Ecommerce, Retail...) that had nothing to do with your money. Spending Trends replaces it with a real month-over-month comparison per expense category, computed entirely from what you’ve actually logged — no AI, no fabrication.',
+    ]},
     {version:'v11.53', date:'Aug 21, 2026', major:true, notes:[
       'Merged the three separate Finance pages (Finance, Operations HQ, Finance Planner) into one "Finance Terminal" — one scrolling page instead of three tabs. Deleted the "Markets & Portfolio" stock-market simulation entirely (it was 100% hardcoded fake tickers/prices, not connected to any real data). The two AI chats ("Ask the Finance Assistant" and "AI Business Specialist") are now one Money Assistant focused on budgeting, spending and saving instead of generic business topics. Budget Planner (rings + Budget vs Actual + recommendations) now lives on the same page as income/expense logging, right below it.',
     ]},
@@ -13552,24 +13533,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       this.mut(s=>({wiBriefResult:{...(s.wiBriefResult||{}), [sel.name]:pts}}));
       this.setState({wiBriefLoading:false, wiBriefErr:''});
     }catch(e){ this.setState({wiBriefLoading:false, wiBriefErr:(e&&e.message)||'Generation failed'}); }
-  }
-  // Real AI version of the Business Intelligence Centre — was 100% fixed hardcoded text per
-  // category, badged "LIVE" even though it never changed. The static copy is now an honestly
-  // labeled PREVIEW; tapping AI refresh generates real, category-specific analysis and caches
-  // it per category so switching tabs doesn't lose or re-spend a generation.
-  async generateBizIntelAI(){
-    if(!window.claude){ this.setState({bizIntelErr:'AI unavailable in this environment'}); return; }
-    const cat=this.state.bizIntelSel||'Artificial Intelligence';
-    this.setState({bizIntelLoading:true, bizIntelErr:''});
-    const sys='You are a sharp business intelligence analyst producing a concise sector briefing. Given a category, return a plausible, specific-sounding "breaking" update, why it matters for an operator/investor, 2 concrete opportunities and 2 concrete risks. Return ONLY valid minified JSON, no markdown fences: {"breaking":"1-2 sentences","why":"1-2 sentences","opps":["",""],"risks":["",""]}';
-    const prompt='Category: '+cat+'. Produce the JSON described.';
-    try{
-      const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:500});
-      const j=this._extractJSON(raw);
-      if(!j || !j.breaking){ this.setState({bizIntelLoading:false, bizIntelErr:'Could not parse the AI response — try again.'}); return; }
-      this.mut(s=>({bizIntelResult:{...(s.bizIntelResult||{}), [cat]:j}}));
-      this.setState({bizIntelLoading:false, bizIntelErr:''});
-    }catch(e){ this.setState({bizIntelLoading:false, bizIntelErr:(e&&e.message)||'Generation failed'}); }
   }
   // Real AI version of Business HQ's "AI Recommendations" card — was 2 of 3 bullets permanently
   // fixed text unrelated to any real data, with no AI button at all. Same fix pattern as Finance
@@ -16558,12 +16521,23 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       bizRecsBtnLabel: S.bizRecsLoading?'⏂ Thinking…':'✨ AI suggest',
       bizRecsSourceLabel: (S.bizRecsResult&&S.bizRecsResult.length)?'AI-GENERATED · FROM YOUR INCOME & EXPENSES':'RULE-BASED · TAP FOR AI',
       bizRecsErr: S.bizRecsErr||'', generateBizRecsAI:()=>this.generateBizRecsAI(),
-      bizIntelChips:(()=>{ const I=this._bizIntel(); return Object.keys(I).map(c=>({ name:c, select:()=>this.setState({bizIntelSel:c}), toggleFollow:()=>this.mut(s=>({bizFollow:{...s.bizFollow,[c]:s.bizFollow[c]?0:1}})), c:c===S.bizIntelSel?'#F4F4F5':(S.bizFollow[c]?'#cfcfd4':'#75757d'), b:c===S.bizIntelSel?'rgba(255,255,255,0.5)':(S.bizFollow[c]?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.07)'), bg:c===S.bizIntelSel?'rgba(255,255,255,0.18)':'transparent', dot:S.bizFollow[c]?'#FFFFFF':'#4a4a52' })); })(),
-      ...(()=>{ const cat=S.bizIntelSel; const ai=(S.bizIntelResult||{})[cat]; const demo=this._bizIntel()[cat]||{}; const cur=ai||demo; return {
-        bizIntelSelName:cat, bizIntelBreaking:cur.breaking, bizIntelWhy:cur.why, bizIntelOpps:cur.opps||[], bizIntelRisks:cur.risks||[],
-        bizIntelBadge: ai?'AI-GENERATED':'PREVIEW', bizIntelBtnLabel: S.bizIntelLoading?'⏂ Thinking…':'✨ AI refresh',
-        bizIntelErr: S.bizIntelErr||'', generateBizIntelAI:()=>this.generateBizIntelAI(),
-      }; })(),
+      ...(()=>{ const exp=S.expenses||[]; const now=Date.now(), D=86400000;
+        const thisM=exp.filter(e=>now-e.ts<30*D); const lastM=exp.filter(e=>now-e.ts>=30*D && now-e.ts<60*D);
+        const cats=[...new Set([...thisM.map(e=>e.cat), ...lastM.map(e=>e.cat)])];
+        const sumCat=(arr,c)=>arr.filter(e=>e.cat===c).reduce((a,e)=>a+(+e.amt||0),0);
+        const rows=cats.map(c=>{ const cur=sumCat(thisM,c), prev=sumCat(lastM,c), diff=cur-prev;
+          const pct=prev>0?Math.round((diff/prev)*100):null;
+          return { cat:c, cur, prev, diff, pct,
+            curLabel:'$'+cur.toLocaleString(),
+            prevLabel: prev>0?('vs $'+prev.toLocaleString()+' last month'):'no spend last month',
+            pctLabel: pct!=null ? ((diff>=0?'▲ +':'▼ ')+Math.abs(pct)+'%') : (cur>0?'NEW':'—'),
+            pctColor: diff>0?'#ff5563':(diff<0?'#6cffba':'#8a8a92') };
+        }).filter(r=>r.cur>0||r.prev>0).sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff)).slice(0,6);
+        const totalCur=thisM.reduce((a,e)=>a+(+e.amt||0),0), totalPrev=lastM.reduce((a,e)=>a+(+e.amt||0),0), totalDiff=totalCur-totalPrev;
+        return { spendTrendRows:rows, noSpendTrends:!rows.length,
+          spendTrendTotalLabel: totalPrev>0 ? ('Total spend $'+totalCur.toLocaleString()+' this month vs $'+totalPrev.toLocaleString()+' last month') : (totalCur>0 ? ('Total spend $'+totalCur.toLocaleString()+' this month — no prior month logged yet to compare') : 'Log expenses across a couple of months to see spending trends here.'),
+          spendTrendTotalColor: totalPrev>0 ? (totalDiff>0?'#ff5563':(totalDiff<0?'#6cffba':'#eef0f2')) : '#8a8a92' };
+      })(),
       pipeline:(()=>{ const rows=[...S.income].sort((a,b)=>(+b.amt||0)-(+a.amt||0)); const max=Math.max(1,...rows.map(r=>+r.amt||0)); return rows.map(r=>({stage:r.label, val:this.fmtK(+r.amt||0), pct:Math.round((+r.amt||0)/max*100)+'%'})); })(),
       noPipeline:S.income.length===0,
 
