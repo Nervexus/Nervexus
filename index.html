@@ -2262,7 +2262,7 @@
             <div style="min-width:0;">
               <div style="font-size:13px; font-weight:600; margin-bottom:2px;">{{ moneySelDayLabel }}</div>
               <sc-if value="{{ moneySelDayNetLabel }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ moneySelDayNetColor }}; margin-bottom:10px;">{{ moneySelDayNetLabel }}</div></sc-if>
-              <div style="display:flex; flex-direction:column; gap:2px; max-height:190px; overflow-y:auto;">
+              <div style="display:flex; flex-direction:column; gap:2px; max-height:130px; overflow-y:auto;">
                 <sc-for list="{{ moneySelDayEntries }}" as="e" hint-placeholder-count="2">
                   <div style="display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div style="flex:1; min-width:0;">
@@ -2275,62 +2275,35 @@
                 </sc-for>
               </div>
               <sc-if value="{{ noMoneySelDayEntries }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78; padding:8px 0;">Nothing logged this day.</div></sc-if>
-            </div>
-          </div>
-          <div style="height:1px; background:rgba(255,255,255,0.08); margin:22px 0 18px;"></div>
-          <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
-            <!-- income log -->
-            <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span style="font-size:13px; font-weight:600;">Log Income</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFFFFF;">{{ incTotal }}</span></div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:9px;">
-                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
+
+              <div style="height:1px; background:rgba(255,255,255,0.08); margin:16px 0 14px;"></div>
+
+              <!-- income log -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span style="font-size:12px; font-weight:600;">Log Income</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ incTotal }}</span></div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
               </div>
-              <div style="display:flex; gap:8px; margin-bottom:8px;">
-                <input value="{{ incLabel }}" onInput="{{ setIncLabel }}" onKeyDown="{{ addIncKey }}" placeholder="Source" style="flex:1; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-                <input value="{{ incAmt }}" onInput="{{ setIncAmt }}" onKeyDown="{{ addIncKey }}" type="number" placeholder="$" style="width:82px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+              <div style="display:flex; gap:6px; margin-bottom:6px;">
+                <input value="{{ incLabel }}" onInput="{{ setIncLabel }}" onKeyDown="{{ addIncKey }}" placeholder="Source" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+                <input value="{{ incAmt }}" onInput="{{ setIncAmt }}" onKeyDown="{{ addIncKey }}" type="number" placeholder="$" style="width:64px; padding:8px 8px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
               </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span onClick="{{ toggleIncRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:{{ incRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:12px; height:12px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ incRecurringBg }}; display:inline-block;"></span>Recurring</span>
-                <span onClick="{{ addIncome }}" style="flex:1; text-align:center; padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); color:#F4F4F5; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:14px;">
+                <span onClick="{{ toggleIncRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10px; color:{{ incRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:11px; height:11px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ incRecurringBg }}; display:inline-block;"></span>Recurring</span>
+                <span onClick="{{ addIncome }}" style="flex:1; text-align:center; padding:8px; border-radius:9px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); color:#F4F4F5; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
               </div>
-              <div style="margin-top:10px; max-height:110px; overflow-y:auto;">
-                <sc-for list="{{ incomeList }}" as="i" hint-placeholder-count="3">
-                  <div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div style="flex:1; min-width:0;">
-                      <div style="font-size:12.5px; color:#cfcfd4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><sc-if value="{{ i.recurring }}" hint-placeholder-val="{{ false }}">↻ </sc-if>{{ i.label }}</div>
-                      <div style="font-size:9px; color:#75757d; margin-top:1px;">{{ i.cat }} · {{ i.dateLabel }}</div>
-                    </div>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFFFFF; white-space:nowrap;">{{ i.amt }}</span>
-                    <span onClick="{{ i.remove }}" style="cursor:pointer; color:#6f6f78; font-size:13px;" style-hover="{ color:'#FFFFFF' }">×</span>
-                  </div>
-                </sc-for>
+
+              <!-- expense log -->
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span style="font-size:12px; font-weight:600;">Log Expense</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#e8e8ec;">{{ expTotal }}</span></div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
               </div>
-            </div>
-            <!-- expense log -->
-            <div>
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><span style="font-size:13px; font-weight:600;">Log Expense</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#e8e8ec;">{{ expTotal }}</span></div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:9px;">
-                <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
+              <div style="display:flex; gap:6px; margin-bottom:6px;">
+                <input value="{{ expLabel }}" onInput="{{ setExpLabel }}" onKeyDown="{{ addExpKey }}" placeholder="Item" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+                <input value="{{ expAmt }}" onInput="{{ setExpAmt }}" onKeyDown="{{ addExpKey }}" type="number" placeholder="$" style="width:64px; padding:8px 8px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
               </div>
-              <div style="display:flex; gap:8px; margin-bottom:8px;">
-                <input value="{{ expLabel }}" onInput="{{ setExpLabel }}" onKeyDown="{{ addExpKey }}" placeholder="Item" style="flex:1; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-                <input value="{{ expAmt }}" onInput="{{ setExpAmt }}" onKeyDown="{{ addExpKey }}" type="number" placeholder="$" style="width:82px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span onClick="{{ toggleExpRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:{{ expRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:12px; height:12px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ expRecurringBg }}; display:inline-block;"></span>Recurring</span>
-                <span onClick="{{ addExpense }}" style="flex:1; text-align:center; padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
-              </div>
-              <div style="margin-top:10px; max-height:110px; overflow-y:auto;">
-                <sc-for list="{{ expenseList }}" as="e" hint-placeholder-count="3">
-                  <div style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div style="flex:1; min-width:0;">
-                      <div style="font-size:12.5px; color:#cfcfd4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><sc-if value="{{ e.recurring }}" hint-placeholder-val="{{ false }}">↻ </sc-if>{{ e.label }}</div>
-                      <div style="font-size:9px; color:#75757d; margin-top:1px;">{{ e.cat }} · {{ e.dateLabel }}</div>
-                    </div>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#e8e8ec; white-space:nowrap;">{{ e.amt }}</span>
-                    <span onClick="{{ e.remove }}" style="cursor:pointer; color:#6f6f78; font-size:13px;" style-hover="{ color:'#FFFFFF' }">×</span>
-                  </div>
-                </sc-for>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span onClick="{{ toggleExpRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10px; color:{{ expRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:11px; height:11px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ expRecurringBg }}; display:inline-block;"></span>Recurring</span>
+                <span onClick="{{ addExpense }}" style="flex:1; text-align:center; padding:8px; border-radius:9px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
               </div>
             </div>
           </div>
@@ -8987,7 +8960,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-58 · v11.58 simplify-log-forms';
+const NOTIF_BUILD_VERSION = '2026.08.21-59 · v11.59 logs-in-day-panel';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9940,13 +9913,17 @@ activities: this._mergeShipLog(s.activities),
   // dispatcher's host.tools.logIncome/logExpense (which call this.addIncome/this.addExpense
   // directly) can trigger them — previously these only existed as renderVals closures, which
   // meant this.addIncome was undefined and voice-triggered income/expense logging silently failed.
+  // Logging now lives inside the Cash Flow Calendar's day panel, so a new entry is dated
+  // to whichever day is selected there (defaults to today) instead of always "now" — that
+  // gives backdating for free without a separate date picker.
+  _moneyLogDay(){ const S=this.state; const today=new Date().toLocaleDateString('en-CA'); return S.moneySel||today; }
   addIncome(){ const S=this.state; const l=(S.incLabel||'').trim(), a=parseFloat(S.incAmt)||0; if(!l||!(a>0)) return;
-    const id=this._uuid(), cat=S.incCat||'Salary', recurring=!!S.incRecurring, ts=Date.now();
+    const id=this._uuid(), cat=S.incCat||'Salary', recurring=!!S.incRecurring, ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
     this.mut(s=>({income:[...s.income,{id,label:l,amt:a,cat,recurring,ts}],incLabel:'',incAmt:'',incRecurring:false}));
     if(this._sbOn()) window.SB.insert('income',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
   }
   addExpense(){ const S=this.state; const l=(S.expLabel||'').trim(), a=parseFloat(S.expAmt)||0; if(!l||!(a>0)) return;
-    const id=this._uuid(), cat=S.expCat||'Food', recurring=!!S.expRecurring, ts=Date.now();
+    const id=this._uuid(), cat=S.expCat||'Food', recurring=!!S.expRecurring, ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
     this.mut(s=>({expenses:[...s.expenses,{id,label:l,amt:a,cat,recurring,ts}],expLabel:'',expAmt:'',expRecurring:false}));
     if(this._sbOn()) window.SB.insert('expenses',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
   }
@@ -12152,6 +12129,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.59', date:'Aug 21, 2026', major:true, notes:[
+      'Log Income and Log Expense now live inside the Cash Flow Calendar’s day panel, right below that day’s entries — pick a day on the calendar, then log against it. New entries are dated to whichever day is selected (today by default), which replaces the old date field entirely: no picker needed, just select the day first. The always-on full income/expense history list is gone since the calendar (click any day to see what landed) now covers that.',
+    ]},
     {version:'v11.58', date:'Aug 21, 2026', major:false, notes:[
       'Log Income and Log Expense: removed the date field (new entries always log as today), and Recurring now gets its own row with the + Add button instead of being squeezed in next to the date picker.',
     ]},
@@ -14683,9 +14663,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // business derived
     const totalInc=S.income.reduce((a,i)=>a+(+i.amt||0),0), totalExp=S.expenses.reduce((a,e)=>a+(+e.amt||0),0); const net=totalInc-totalExp; const margin=totalInc>0?Math.round(net/totalInc*100):0;
     const bizKpis=[ {label:'INCOME LOGGED',value:this.fmtK(totalInc),vc:'#eef0f2',delta:'▲ this month',dc:'#FFFFFF'}, {label:'EXPENSES LOGGED',value:this.fmtK(totalExp),vc:'#eef0f2',delta:S.expenses.length+' entries',dc:'#9a9aa2'}, {label:'NET PROFIT',value:this.fmtK(net),vc:net>=0?'#FFFFFF':'#ff3b4a',delta:(net>=0?'▲ positive':'▼ negative'),dc:net>=0?'#FFFFFF':'#ff3b4a'}, {label:'MARGIN',value:margin+'%',vc:'#eef0f2',delta:'of income',dc:'#9a9aa2'} ];
-    const _dateLbl=ts=>new Date(ts).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-    const incomeList=[...S.income].sort((a,b)=>b.ts-a.ts).map(i=>{ const idx=S.income.indexOf(i); return {label:i.label,cat:i.cat||'Other',dateLabel:_dateLbl(i.ts),recurring:!!i.recurring,amt:this.fmtK(+i.amt||0),remove:()=>{ this.mut(s=>({income:s.income.filter((_,j)=>j!==idx)})); if(this._sbOn() && i.id) window.SB.remove('income',i.id); }}; });
-    const expenseList=[...S.expenses].sort((a,b)=>b.ts-a.ts).map(e=>{ const idx=S.expenses.indexOf(e); return {label:e.label,cat:e.cat||'Other',dateLabel:_dateLbl(e.ts),recurring:!!e.recurring,amt:this.fmtK(+e.amt||0),remove:()=>{ this.mut(s=>({expenses:s.expenses.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('expenses',e.id); }}; });
 
     // productivity derived
     const actColor={Work:'#FFFFFF',Health:'#e8e8ec',Gym:'#e8e8ec',Learning:'#FFFFFF',Business:'#ff5563',Personal:'#9a9aa2'};
@@ -16600,7 +16577,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }, {}),
 
       // business
-      bizKpis, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp), incomeList, expenseList,
+      bizKpis, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp),
       setIncLabel:(e)=>this.setState({incLabel:e.target.value}), setIncAmt:(e)=>this.setState({incAmt:e.target.value}), setExpLabel:(e)=>this.setState({expLabel:e.target.value}), setExpAmt:(e)=>this.setState({expAmt:e.target.value}),
       incRecurringColor: S.incRecurring?'#F4F4F5':'#8a8a92', incRecurringBg: S.incRecurring?'#FFFFFF':'transparent', toggleIncRecurring:()=>this.setState({incRecurring:!S.incRecurring}),
       expRecurringColor: S.expRecurring?'#F4F4F5':'#8a8a92', expRecurringBg: S.expRecurring?'#FFFFFF':'transparent', toggleExpRecurring:()=>this.setState({expRecurring:!S.expRecurring}),
