@@ -8511,6 +8511,21 @@
                         <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
                           <sc-if value="{{ p.saved }}" hint-placeholder-val="{{ false }}">
                             <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.masked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.test }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ p.replace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
+                            <div style="margin-top:12px;">
+                              <div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">{{ p.poolCaption }}</div>
+                              <sc-for list="{{ p.poolKeys }}" as="k" hint-placeholder-count="0">
+                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                                  <input value="{{ k.masked }}" readonly style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8a92; font-size:11.5px; font-family:'JetBrains Mono',monospace; outline:none;">
+                                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ k.coolC }}; white-space:nowrap;">{{ k.coolLabel }}</span>
+                                  <span onClick="{{ k.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 10px; cursor:pointer; white-space:nowrap;">REMOVE</span>
+                                </div>
+                              </sc-for>
+                              <div style="display:flex; gap:8px; align-items:center;">
+                                <input value="{{ p.poolDraft }}" onInput="{{ p.onPoolDraft }}" placeholder="Paste another key" style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#eef0f2; font-size:11.5px; font-family:'JetBrains Mono',monospace; outline:none;">
+                                <span onClick="{{ p.addPoolKey }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 12px; cursor:pointer; white-space:nowrap;">{{ p.poolAddLabel }}</span>
+                              </div>
+                              <sc-if value="{{ p.poolErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#ff3b4a; margin-top:5px;">{{ p.poolErr }}</div></sc-if>
+                            </div>
                           </sc-if>
                           <sc-if value="{{ p.notSaved }}" hint-placeholder-val="{{ true }}">
                             <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.draft }}" onInput="{{ p.onDraft }}" placeholder="Paste API key ({{ p.keyHint }})" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
@@ -8980,7 +8995,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-73 · v11.73 openai-backup-provider';
+const NOTIF_BUILD_VERSION = '2026.08.21-74 · v11.74 fallback-key-pool';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9059,6 +9074,7 @@ class Component extends DCLogic {
       ],
       savings: s.savings || [],
       usageLog: s.usageLog || [],
+      providerPools: s.providerPools || {},
       incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false, incSaveAmt:'', savingsAddAmt:'', newExpenseCat:'',
       expLabel:'', expAmt:'', expCat:'Food', expRecurring:false,
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
@@ -9851,6 +9867,25 @@ activities: this._mergeShipLog(s.activities),
     this._setProv(id,{saved:true,on:true,masked:this._maskKey(v),status:'connecting',err:''});
     this.testProvider(id); }
   replaceProvKey(id){ this._setProv(id,{saved:false,status:'idle',err:''}); if(this._sbOn()) window.SB.removeProviderKey(id); }
+  // Fallback key pool — extra keys for a provider beyond the primary one (e.g. two more Gemini
+  // keys, so a per-key rate limit doesn't stop the assistant). Same one-step "paste -> Connect"
+  // pattern as the primary key: the server saves AND reachability-tests it in one call.
+  setPoolDraft(id,e){ const v=e.target.value; this.setState(s=>({poolDraft:{...s.poolDraft,[id]:v}})); }
+  addPoolKey(id){
+    const v=((this.state.poolDraft||{})[id]||'').trim(); if(!v) return;
+    if(!this._validKey(id,v)){ this.setState(s=>({poolErr:{...s.poolErr,[id]:'Invalid key format for this provider'}})); return; }
+    this.setState(s=>{ const d={...s.poolDraft}; delete d[id]; const e2={...(s.poolErr||{})}; delete e2[id]; return {poolDraft:d, poolErr:e2, poolBusy:{...(s.poolBusy||{}),[id]:true}}; });
+    if(!this._sbOn()) return;
+    window.SB.addPoolKey(id,v).then(res=>{
+      this.setState(s=>({poolBusy:{...(s.poolBusy||{}),[id]:false}}));
+      if(res && res.error){ this.setState(s=>({poolErr:{...(s.poolErr||{}),[id]:res.error}})); return; }
+      this._sbPullProviderStatus();
+    }).catch(()=>{ this.setState(s=>({poolBusy:{...(s.poolBusy||{}),[id]:false}, poolErr:{...(s.poolErr||{}),[id]:'Could not reach the server'}})); });
+  }
+  removePoolKey(id, poolId){
+    this.setState(s=>({providerPools:{...s.providerPools, [id]:(s.providerPools[id]||[]).filter(p=>p.id!==poolId)}}));
+    if(this._sbOn()) window.SB.removePoolKey(id, poolId);
+  }
   async testProvider(id){ this._setProv(id,{status:'testing',err:''}); const cfg=this._provCfg(id); const t0=Date.now(); try{
     if(this._sbOn()){ const res=await window.SB.testProviderKey(id); if(res && res.error){ this._setProv(id,{status:'error',err:res.error}); } else { this._setProv(id,{status:'ok',sync:Date.now(),latencyMs:Date.now()-t0,err:''}); } return; }
     await new Promise(r=>setTimeout(r,800+Math.random()*800)); const has=(this._provKeys&&this._provKeys[id])||cfg.saved; if(!has) this._setProv(id,{status:'error',err:'No API key saved'}); else this._setProv(id,{status:'ok',sync:Date.now(),latencyMs:Date.now()-t0,err:''}); }catch(e){ this._setProv(id,{status:'error',err:(e&&e.message)||'Connection failed'}); } }
@@ -9882,7 +9917,14 @@ activities: this._mergeShipLog(s.activities),
       defC:S.prefs.aiDefault===p.id?'#F4F4F5':'#8a8a92', defBd:S.prefs.aiDefault===p.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', defBg:S.prefs.aiDefault===p.id?'rgba(255,255,255,0.16)':'transparent',
       bkC:S.prefs.aiBackup===p.id?'#e8b45a':'#8a8a92', bkBd:S.prefs.aiBackup===p.id?'rgba(232,180,90,0.5)':'rgba(255,255,255,0.12)', bkBg:S.prefs.aiBackup===p.id?'rgba(232,180,90,0.14)':'transparent',
       sync:c.sync?this.ago(c.sync):'never', showUsage:!!(c.saved&&p.usage), uHasData:u.hasData, uReqs:u.reqs, uTokens:u.tokens, uCost:u.cost, expanded:exp, expandIcon:exp?'\u25be':'\u25b8', toggleExpand:()=>this.setState(s=>({provExpanded:{...(s.provExpanded||{}),[p.id]:!(s.provExpanded||{})[p.id]}})),
-      freePaid:p.freeTier?'FREE TIER':'PAID', freePaidC:p.freeTier?'#2fce86':'#e8b45a', freePaidBg:p.freeTier?'rgba(47,206,134,0.12)':'rgba(232,180,90,0.12)', freePaidNote:p.freeTierNote||(p.freeTier?'Free within provider limits \u2014 a card may be required, no charge inside them.':'No ongoing free tier \u2014 billed per token from the first call.')
+      freePaid:p.freeTier?'FREE TIER':'PAID', freePaidC:p.freeTier?'#2fce86':'#e8b45a', freePaidBg:p.freeTier?'rgba(47,206,134,0.12)':'rgba(232,180,90,0.12)', freePaidNote:p.freeTierNote||(p.freeTier?'Free within provider limits \u2014 a card may be required, no charge inside them.':'No ongoing free tier \u2014 billed per token from the first call.'),
+      // Fallback key pool \u2014 extra keys beyond the primary one (e.g. 2 more Gemini keys to
+      // spread across per-key rate limits). Only meaningful once the primary key is saved.
+      poolKeys:(S.providerPools[p.id]||[]).map(k=>({ id:k.id, masked:k.masked, coolLabel:k.cooling?'COOLING DOWN':'READY', coolC:k.cooling?'#e8b45a':'#2fce86', remove:()=>this.removePoolKey(p.id,k.id) })),
+      poolCount:(S.providerPools[p.id]||[]).length,
+      poolDraft:(S.poolDraft||{})[p.id]||'', onPoolDraft:(e)=>this.setPoolDraft(p.id,e), addPoolKey:()=>this.addPoolKey(p.id),
+      poolAddLabel:(S.poolBusy||{})[p.id]?'ADDING\u2026':'ADD', poolErr:(S.poolErr||{})[p.id]||'',
+      poolCaption:'FALLBACK KEYS'+((S.providerPools[p.id]||[]).length?(' \u00b7 '+(S.providerPools[p.id]||[]).length+' saved'):'')+(p.freeTier?' \u2014 spread requests across per-key rate limits':'')
     }; });
     const curIntelCat=S.intelCat||'All';
     // Intel Sources is a browse-only reference directory (per its own data-file comment:
@@ -10082,7 +10124,7 @@ activities: this._mergeShipLog(s.activities),
   _completeLogin(email){ const em=(email||'').trim().toLowerCase(); const acc0=(this.state.accounts||{})[em];
     const acc=acc0?{...acc0, prefs:{...this._defaultPrefs(), ...(acc0.prefs||{})}}:acc0;
     const user=(this.state.users||[]).find(u=>(u.email||'').trim().toLowerCase()===em);
-    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], savings:[], usageLog:[], activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
+    const blank={ account: user ? {name:user.name||'', email:user.email||email, password:user.password||'', twoFA:'', avatar:'', greeting:'', timezone:'auto'} : {name:'', email, password:'', twoFA:'', avatar:'', greeting:'', timezone:'auto'}, bodySex:'male', prefs:this._defaultPrefs(), learning:{}, wiRoutes:[], wiSavedPins:[], health:{water:0,waterGoal:8,kcalGoal:2400,proteinGoal:180,meals:[]}, checklist:[], workouts:[], income:[], expenses:[], savings:[], usageLog:[], providerPools:{}, activities:[], events:[], dayColors:{}, notes:[], missions:[], missionHistory:[], missionXP:0, loginStreak:0, lastLoginDate:'', loginXPLog:[] };
     this.setState(Object.assign({loggedIn:true,currentEmail:email,loginErr:'',loginPass:'',login2FAInput:'',loginStage:'creds',loginFailCount:0,scene:'home'}, acc||blank),()=>{ this._checkDailyLogin(); this.save(); this._notifInit=false; this.initNotifs(); }); }
   doLogin2FA(){ const now=Date.now(); if(this.state.loginLockUntil && now<this.state.loginLockUntil){ this.setState({loginErr:this._lockMsg()}); return; }
     if(window.SB && window.SB.ready()){
@@ -11361,7 +11403,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // all trace back to, instead of patching each call site.
       if(res && res.providers){
         const mapped={}; Object.entries(res.providers).forEach(([id,p])=>{ mapped[id]={...p, on:p.enabled!==false}; });
-        this.mut(s=>({prefs:{...s.prefs, prov:{...(s.prefs.prov||{}), ...mapped}}}));
+        this.mut(s=>({prefs:{...s.prefs, prov:{...(s.prefs.prov||{}), ...mapped}}, providerPools:res.pools||{}}));
       }
       else if(res && res.error){ console.warn('[sb] provider status failed:', res.error); }
     }catch(e){ console.warn('[sb] provider status failed:', (e&&e.message)||e); }
@@ -12246,6 +12288,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.74', date:'Aug 21, 2026', major:true, notes:[
+      'Added fallback key pools \u2014 you can now save more than one key per AI provider (e.g. three separate Gemini keys), not just one. Each connected provider\u2019s card has a new \u201cFALLBACK KEYS\u201d section: paste another key and it\u2019s saved and reachability-tested the same one-step way as the primary key. Entirely server-side from there \u2014 a request tries the primary key first, then fallback keys in order, and if a provider returns a rate-limit (429) response it automatically tries the next key instead of failing, cooling the limited key down for a bit before it\u2019s tried again. For a provider like Gemini with per-key daily limits, three keys effectively triples your free quota before anything needs paying for.',
+    ]},
     {version:'v11.73', date:'Aug 21, 2026', major:true, notes:[
       'Added OpenAI (ChatGPT) as a real, connectable third AI provider, specifically so Gemini has an actual backup \u2014 the failover system (Settings \u2192 AI Providers \u2192 Routing: set a Default and Backup provider, switch on Failover) already existed but only ever had one provider to fail over to. Connect an OpenAI key, set it as Backup, and a Gemini error/outage now falls through to it automatically instead of the assistant just failing. Current model lineup (gpt-5.6-sol/terra/luna), no free tier so it only spends anything on days your Default provider actually fails.',
     ]},

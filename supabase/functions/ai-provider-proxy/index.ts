@@ -54,6 +54,90 @@ async function logUsage(admin: any, uid: string, provider: string, model: string
   } catch (_e) { /* best-effort only */ }
 }
 
+// Fallback key pool — lets a user save more than one key per provider (e.g. three separate
+// Gemini keys to spread across Google's per-key free-tier limits). The primary key in
+// provider_settings is always tried first; pool keys follow in saved order; any key currently
+// cooling down from a recent rate-limit gets skipped automatically. All server-side and
+// transparent to the client — a 'call' either succeeds on some key or exhausts the whole pool.
+type KeyEntry = { key: string; poolId: string | null };
+async function resolveApiKeys(admin: any, uid: string, provider: string): Promise<KeyEntry[]> {
+  const keys: KeyEntry[] = [];
+  const { data: row } = await admin.from('provider_settings').select('api_key_encrypted').eq('user_id', uid).eq('provider', provider).maybeSingle();
+  if (row?.api_key_encrypted) keys.push({ key: row.api_key_encrypted, poolId: null });
+  const { data: pool } = await admin.from('provider_key_pool').select('id,api_key_encrypted,cooldown_until')
+    .eq('user_id', uid).eq('provider', provider).order('position', { ascending: true });
+  const now = Date.now();
+  (pool || []).forEach((p: any) => {
+    if (p.cooldown_until && new Date(p.cooldown_until).getTime() > now) return; // still cooling down, skip
+    keys.push({ key: p.api_key_encrypted, poolId: p.id });
+  });
+  if (!keys.length && PROVIDER_ENV[provider]) {
+    const envKey = Deno.env.get(PROVIDER_ENV[provider]);
+    if (envKey) keys.push({ key: envKey, poolId: null });
+  }
+  return keys;
+}
+// Only pool keys get cooled down (skipped for a while) on a 429 — there's nothing further to
+// fall back to for the single primary key, so leave it eligible for the next request instead
+// of locking the user out entirely if the cooldown estimate is wrong.
+async function markCooldown(admin: any, poolId: string | null, seconds: number) {
+  if (!poolId) return;
+  try { await admin.from('provider_key_pool').update({ cooldown_until: new Date(Date.now() + seconds * 1000).toISOString() }).eq('id', poolId); } catch (_e) { /* best-effort */ }
+}
+function retryAfterSeconds(r: Response): number {
+  const h = r.headers.get('retry-after');
+  const n = h ? parseInt(h, 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? Math.min(n, 300) : 60;
+}
+
+// Reachability check only — never spends real tokens. Shared by the 'test' action (testing
+// the primary key) and 'poolAdd' (testing a new fallback key before it's saved), so both
+// paths catch a bad paste the same way instead of silently saving something unusable.
+async function testProviderKey(provider: string, apiKey: string): Promise<{ error?: string }> {
+  if (provider === 'openai') {
+    const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${apiKey}` } });
+    return r.ok ? {} : { error: 'Key rejected by OpenAI (' + r.status + ')' };
+  }
+  if (provider === 'anthropic') {
+    const r = await fetch('https://api.anthropic.com/v1/models', { headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' } });
+    return r.ok ? {} : { error: 'Key rejected by Anthropic (' + r.status + ')' };
+  }
+  if (provider === 'google') {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    return r.ok ? {} : { error: 'Key rejected by Google (' + r.status + ')' };
+  }
+  if (provider === 'elevenlabs') {
+    const r = await fetch('https://api.elevenlabs.io/v1/user', { headers: { 'xi-api-key': apiKey } });
+    return r.ok ? {} : { error: 'Key rejected by ElevenLabs (' + r.status + ')' };
+  }
+  if (provider === 'newsdataio') {
+    const r = await fetch(`https://newsdata.io/api/1/news?apikey=${apiKey}&q=test`);
+    return r.ok ? {} : { error: 'Key rejected by NewsData.io (' + r.status + ')' };
+  }
+  if (provider === 'guardianapi') {
+    const r = await fetch(`https://content.guardianapis.com/search?api-key=${apiKey}`);
+    return r.ok ? {} : { error: 'Key rejected by The Guardian (' + r.status + ')' };
+  }
+  if (provider === 'currentsapi') {
+    const r = await fetch(`https://api.currentsapi.services/v1/latest-news?apiKey=${apiKey}`);
+    return r.ok ? {} : { error: 'Key rejected by Currents API (' + r.status + ')' };
+  }
+  if (provider === 'gnews') {
+    const r = await fetch(`https://gnews.io/api/v4/top-headlines?token=${apiKey}`);
+    return r.ok ? {} : { error: 'Key rejected by GNews (' + r.status + ')' };
+  }
+  if (provider === 'alphavantage') {
+    const r = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${apiKey}`);
+    const j = await r.json().catch(() => ({}));
+    return (!r.ok || j.Note || j['Error Message']) ? { error: 'Key rejected by Alpha Vantage' } : {};
+  }
+  if (provider === 'finnhub') {
+    const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=AAPL&token=${apiKey}`);
+    return r.ok ? {} : { error: 'Key rejected by Finnhub (' + r.status + ')' };
+  }
+  return {};
+}
+
 // Every response — success, error, and the OPTIONS preflight — must carry these or the
 // browser's fetch() rejects the whole call before JS ever sees a status code or body
 // (this was previously missing entirely, silently breaking every action from the client).
@@ -208,67 +292,90 @@ function sseFrame(obj: unknown): string { return 'data: ' + JSON.stringify(obj) 
 // provider's own stream and normalizing each provider's delta shape into {delta:string}.
 // Ends with {done:true, citations?} or {error:string}. Added so the voice assistant can
 // start speaking a finished sentence before the full reply finishes generating.
-function streamCall(provider: string, apiKey: string, prompt: string, model: string | undefined, admin: any, uid: string): Response {
+// keys: ordered candidates from resolveApiKeys() — primary key first, then pool keys. A 429
+// from one key marks it cooling down and moves on to the next before giving up; any other
+// error status returns immediately rather than burning through the whole pool pointlessly.
+function streamCall(provider: string, keys: KeyEntry[], prompt: string, model: string | undefined, admin: any, uid: string): Response {
   const stream = new ReadableStream({
     async start(controller) {
       const enc = new TextEncoder();
       const send = (obj: unknown) => { try { controller.enqueue(enc.encode(sseFrame(obj))); } catch { /* client closed */ } };
       let usageIn = 0, usageOut = 0;
       try {
-        let url = '', headers: Record<string, string> = {}, reqBody: unknown;
-        let extractDelta: (obj: any) => string = () => '';
-        let extractUsage: (obj: any) => void = () => {};
-        let citations: string[] | undefined;
+        if (!keys.length) { send({ error: 'Provider not configured yet' }); controller.close(); return; }
 
-        if (provider === 'openai') {
-          url = 'https://api.openai.com/v1/chat/completions';
-          headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
-          reqBody = { model: resolveModel('openai', model), stream: true, messages: [{ role: 'user', content: prompt }] };
-          extractDelta = (obj) => obj.choices?.[0]?.delta?.content || '';
-        } else if (provider === 'anthropic') {
-          url = 'https://api.anthropic.com/v1/messages';
-          headers = { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' };
-          reqBody = { model: resolveModel('anthropic', model), max_tokens: 1024, stream: true, messages: [{ role: 'user', content: prompt }] };
-          extractDelta = (obj) => (obj.type === 'content_block_delta' && obj.delta?.type === 'text_delta') ? (obj.delta.text || '') : '';
-          extractUsage = (obj) => {
-            if (obj.type === 'message_start' && obj.message?.usage) usageIn = obj.message.usage.input_tokens || usageIn;
-            if (obj.type === 'message_delta' && obj.usage) usageOut = obj.usage.output_tokens || usageOut;
-          };
-        } else if (provider === 'perplexity') {
-          url = 'https://api.perplexity.ai/chat/completions';
-          headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
-          reqBody = { model: 'sonar-pro', stream: true, messages: [
-            { role: 'system', content: 'Answer concisely and factually using current, real information. Cite sources briefly by name.' },
-            { role: 'user', content: prompt },
-          ] };
-          extractDelta = (obj) => { if (obj.citations) citations = obj.citations; return obj.choices?.[0]?.delta?.content || ''; };
-        } else if (provider === 'xai') {
-          url = 'https://api.x.ai/v1/chat/completions';
-          headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
-          reqBody = { model: 'grok-4', stream: true, messages: [{ role: 'user', content: prompt }], search_parameters: { mode: 'auto' } };
-          extractDelta = (obj) => obj.choices?.[0]?.delta?.content || '';
-        } else if (provider === 'google') {
-          url = `https://generativelanguage.googleapis.com/v1beta/models/${resolveModel('google', model)}:streamGenerateContent?alt=sse&key=${apiKey}`;
-          headers = { 'Content-Type': 'application/json' };
-          reqBody = { contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] };
-          extractDelta = (obj) => {
-            const cand = obj.candidates?.[0];
-            const chunks = cand?.groundingMetadata?.groundingChunks;
-            if (chunks) citations = chunks.map((c: any) => c.web?.title || c.web?.uri).filter(Boolean);
-            return (cand?.content?.parts || []).map((p: any) => p.text || '').join('');
-          };
-          extractUsage = (obj) => {
-            if (obj.usageMetadata) { usageIn = obj.usageMetadata.promptTokenCount || usageIn; usageOut = obj.usageMetadata.candidatesTokenCount || usageOut; }
-          };
+        function buildRequest(apiKey: string) {
+          let url = '', headers: Record<string, string> = {}, reqBody: unknown;
+          let extractDelta: (obj: any) => string = () => '';
+          let extractUsage: (obj: any) => void = () => {};
+          let citations: string[] | undefined;
+
+          if (provider === 'openai') {
+            url = 'https://api.openai.com/v1/chat/completions';
+            headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
+            reqBody = { model: resolveModel('openai', model), stream: true, messages: [{ role: 'user', content: prompt }] };
+            extractDelta = (obj) => obj.choices?.[0]?.delta?.content || '';
+          } else if (provider === 'anthropic') {
+            url = 'https://api.anthropic.com/v1/messages';
+            headers = { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' };
+            reqBody = { model: resolveModel('anthropic', model), max_tokens: 1024, stream: true, messages: [{ role: 'user', content: prompt }] };
+            extractDelta = (obj) => (obj.type === 'content_block_delta' && obj.delta?.type === 'text_delta') ? (obj.delta.text || '') : '';
+            extractUsage = (obj) => {
+              if (obj.type === 'message_start' && obj.message?.usage) usageIn = obj.message.usage.input_tokens || usageIn;
+              if (obj.type === 'message_delta' && obj.usage) usageOut = obj.usage.output_tokens || usageOut;
+            };
+          } else if (provider === 'perplexity') {
+            url = 'https://api.perplexity.ai/chat/completions';
+            headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
+            reqBody = { model: 'sonar-pro', stream: true, messages: [
+              { role: 'system', content: 'Answer concisely and factually using current, real information. Cite sources briefly by name.' },
+              { role: 'user', content: prompt },
+            ] };
+            extractDelta = (obj) => { if (obj.citations) citations = obj.citations; return obj.choices?.[0]?.delta?.content || ''; };
+          } else if (provider === 'xai') {
+            url = 'https://api.x.ai/v1/chat/completions';
+            headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
+            reqBody = { model: 'grok-4', stream: true, messages: [{ role: 'user', content: prompt }], search_parameters: { mode: 'auto' } };
+            extractDelta = (obj) => obj.choices?.[0]?.delta?.content || '';
+          } else if (provider === 'google') {
+            url = `https://generativelanguage.googleapis.com/v1beta/models/${resolveModel('google', model)}:streamGenerateContent?alt=sse&key=${apiKey}`;
+            headers = { 'Content-Type': 'application/json' };
+            reqBody = { contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] };
+            extractDelta = (obj) => {
+              const cand = obj.candidates?.[0];
+              const chunks = cand?.groundingMetadata?.groundingChunks;
+              if (chunks) citations = chunks.map((c: any) => c.web?.title || c.web?.uri).filter(Boolean);
+              return (cand?.content?.parts || []).map((p: any) => p.text || '').join('');
+            };
+            extractUsage = (obj) => {
+              if (obj.usageMetadata) { usageIn = obj.usageMetadata.promptTokenCount || usageIn; usageOut = obj.usageMetadata.candidatesTokenCount || usageOut; }
+            };
+          }
+          return { url, headers, reqBody, extractDelta, extractUsage, getCitations: () => citations };
         }
 
-        const upstream = await fetch(url, { method: 'POST', headers, body: JSON.stringify(reqBody) });
+        let upstream: Response | null = null;
+        let req: ReturnType<typeof buildRequest> | null = null;
+        let lastErrText = '';
+        for (let i = 0; i < keys.length; i++) {
+          req = buildRequest(keys[i].key);
+          const r = await fetch(req.url, { method: 'POST', headers: req.headers, body: JSON.stringify(req.reqBody) });
+          if (r.status === 429) {
+            await markCooldown(admin, keys[i].poolId, retryAfterSeconds(r));
+            lastErrText = 'Rate limited (429)';
+            continue; // try the next key in the pool
+          }
+          upstream = r;
+          break;
+        }
+        if (!upstream || !req) { send({ error: lastErrText || 'All keys for this provider are rate-limited right now — try again shortly.' }); controller.close(); return; }
         if (!upstream.ok || !upstream.body) {
           const errData = await upstream.json().catch(() => ({}));
           send({ error: (errData.error?.message || errData.error || errData.message || ('HTTP ' + upstream.status)) });
           controller.close();
           return;
         }
+        const { extractDelta, extractUsage, getCitations } = req;
         const reader = upstream.body.getReader();
         const decoder = new TextDecoder();
         let buf = '';
@@ -289,7 +396,7 @@ function streamCall(provider: string, apiKey: string, prompt: string, model: str
             extractUsage(obj);
           }
         }
-        send({ done: true, citations });
+        send({ done: true, citations: getCitations() });
       } catch (e) {
         send({ error: (e as Error)?.message || 'Stream failed' });
       } finally {
@@ -386,7 +493,12 @@ Deno.serve(async (req) => {
       const { data } = await admin.from('provider_settings').select('provider,api_key_encrypted,enabled').eq('user_id', uid);
       const out: Record<string, any> = {};
       (data || []).forEach((r: any) => { out[r.provider] = { saved: true, masked: mask(r.api_key_encrypted), enabled: r.enabled !== false }; });
-      return json({ providers: out });
+      const { data: poolRows } = await admin.from('provider_key_pool').select('id,provider,api_key_encrypted,label,cooldown_until').eq('user_id', uid).order('position', { ascending: true });
+      const pools: Record<string, any[]> = {};
+      (poolRows || []).forEach((r: any) => {
+        (pools[r.provider] = pools[r.provider] || []).push({ id: r.id, masked: mask(r.api_key_encrypted), label: r.label || '', cooling: !!(r.cooldown_until && new Date(r.cooldown_until).getTime() > Date.now()) });
+      });
+      return json({ providers: out, pools });
     }
 
     if (!provider) return json({ error: 'Missing provider' }, 400);
@@ -404,6 +516,29 @@ Deno.serve(async (req) => {
 
     if (action === 'remove') {
       const { error } = await admin.from('provider_settings').delete().eq('user_id', uid).eq('provider', provider);
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true });
+    }
+
+    // Fallback key pool — extra keys for a provider beyond the primary one, e.g. two more
+    // Gemini keys. poolAdd both saves and reachability-tests the key in one step, same as the
+    // primary "paste key -> Connect" flow, so a bad paste is caught immediately rather than
+    // silently sitting unused in the pool.
+    if (action === 'poolAdd') {
+      const apiKey = (body.apiKey || '').trim();
+      if (!apiKey) return json({ error: 'Missing apiKey' }, 400);
+      const testResult = await testProviderKey(provider, apiKey);
+      if (testResult.error) return json({ error: testResult.error }, 400);
+      const { count } = await admin.from('provider_key_pool').select('id', { count: 'exact', head: true }).eq('user_id', uid).eq('provider', provider);
+      const { error } = await admin.from('provider_key_pool').insert({ user_id: uid, provider, api_key_encrypted: apiKey, label: (body.label || '').trim() || null, position: count || 0 });
+      if (error) return json({ error: error.message }, 500);
+      return json({ ok: true, masked: mask(apiKey) });
+    }
+
+    if (action === 'poolRemove') {
+      const poolId = body.poolId;
+      if (!poolId) return json({ error: 'Missing poolId' }, 400);
+      const { error } = await admin.from('provider_key_pool').delete().eq('user_id', uid).eq('id', poolId);
       if (error) return json({ error: error.message }, 500);
       return json({ ok: true });
     }
@@ -431,56 +566,8 @@ Deno.serve(async (req) => {
     if (!apiKey) return json({ error: action === 'test' ? 'No API key saved' : 'Provider not configured yet' }, action === 'test' ? 400 : 500);
 
     if (action === 'test') {
-      // Reachability check only — do not spend real tokens on every "Test connection" click.
-      if (provider === 'openai') {
-        const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${apiKey}` } });
-        if (!r.ok) return json({ error: 'Key rejected by OpenAI (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'anthropic') {
-        const r = await fetch('https://api.anthropic.com/v1/models', { headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' } });
-        if (!r.ok) return json({ error: 'Key rejected by Anthropic (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'elevenlabs') {
-        const r = await fetch('https://api.elevenlabs.io/v1/user', { headers: { 'xi-api-key': apiKey } });
-        if (!r.ok) return json({ error: 'Key rejected by ElevenLabs (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      // News/data source keys — actually validate against their real endpoint instead of a
-      // blanket ok:true, so a bad key is caught here rather than only failing silently later.
-      if (provider === 'newsdataio') {
-        const r = await fetch(`https://newsdata.io/api/1/news?apikey=${apiKey}&q=test`);
-        if (!r.ok) return json({ error: 'Key rejected by NewsData.io (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'guardianapi') {
-        const r = await fetch(`https://content.guardianapis.com/search?api-key=${apiKey}`);
-        if (!r.ok) return json({ error: 'Key rejected by The Guardian (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'currentsapi') {
-        const r = await fetch(`https://api.currentsapi.services/v1/latest-news?apiKey=${apiKey}`);
-        if (!r.ok) return json({ error: 'Key rejected by Currents API (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'gnews') {
-        const r = await fetch(`https://gnews.io/api/v4/top-headlines?token=${apiKey}`);
-        if (!r.ok) return json({ error: 'Key rejected by GNews (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'alphavantage') {
-        const r = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${apiKey}`);
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok || j.Note || j['Error Message']) return json({ error: 'Key rejected by Alpha Vantage' }, 400);
-        return json({ ok: true });
-      }
-      if (provider === 'finnhub') {
-        const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=AAPL&token=${apiKey}`);
-        if (!r.ok) return json({ error: 'Key rejected by Finnhub (' + r.status + ')' }, 400);
-        return json({ ok: true });
-      }
-      return json({ ok: true });
+      const result = await testProviderKey(provider, apiKey);
+      return result.error ? json({ error: result.error }, 400) : json({ ok: true });
     }
 
     if (action === 'ttsSpeak') {
@@ -508,6 +595,13 @@ Deno.serve(async (req) => {
 
     const prompt = body.prompt;
     const model = typeof body.model === 'string' ? body.model : undefined;
+    // openai/anthropic/google are the three connectable-from-the-UI providers, so they're the
+    // only ones that can have a fallback key pool — resolve the full ordered candidate list for
+    // them; everything else keeps using the single apiKey already resolved above.
+    const poolProviders = ['openai', 'anthropic', 'google'];
+    const candidateKeys: KeyEntry[] = poolProviders.includes(provider)
+      ? await resolveApiKeys(admin, uid, provider)
+      : (apiKey ? [{ key: apiKey, poolId: null }] : []);
 
     // Streaming: proxy the provider's own SSE and re-emit a normalized shape so the
     // client (supabase-client.js callAIStream) doesn't need per-provider parsing —
@@ -515,31 +609,58 @@ Deno.serve(async (req) => {
     // providers 'call' already supports below; falls through to the non-streamed
     // path for everything else (unchanged).
     if (body.stream && ['openai', 'anthropic', 'perplexity', 'xai', 'google'].includes(provider)) {
-      return streamCall(provider, apiKey, prompt, model, admin, uid);
+      return streamCall(provider, candidateKeys, prompt, model, admin, uid);
     }
 
     let result = '';
-    if (provider === 'openai') {
-      const usedModel = resolveModel('openai', model);
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: usedModel, messages: [{ role: 'user', content: prompt }] }),
-      });
-      const j = await r.json();
-      if (!r.ok) return json({ error: j.error?.message || 'OpenAI request failed (' + r.status + ')' }, 400);
-      result = j.choices?.[0]?.message?.content || '';
-      if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.prompt_tokens, j.usage.completion_tokens);
-    } else if (provider === 'anthropic') {
-      const usedModel = resolveModel('anthropic', model);
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: usedModel, max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
-      });
-      const j = await r.json();
-      result = j.content?.[0]?.text || '';
-      if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.input_tokens, j.usage.output_tokens);
+    if (provider === 'openai' || provider === 'anthropic' || provider === 'google') {
+      if (!candidateKeys.length) return json({ error: 'Provider not configured yet' }, 500);
+      const usedModel = resolveModel(provider, model);
+      let lastErr = '';
+      for (let i = 0; i < candidateKeys.length; i++) {
+        const k = candidateKeys[i].key;
+        if (provider === 'openai') {
+          const r = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST', headers: { Authorization: `Bearer ${k}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: usedModel, messages: [{ role: 'user', content: prompt }] }),
+          });
+          if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
+          const j = await r.json();
+          if (!r.ok) return json({ error: j.error?.message || 'OpenAI request failed (' + r.status + ')' }, 400);
+          result = j.choices?.[0]?.message?.content || '';
+          if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.prompt_tokens, j.usage.completion_tokens);
+          lastErr = ''; break;
+        } else if (provider === 'anthropic') {
+          const r = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST', headers: { 'x-api-key': k, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: usedModel, max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
+          });
+          if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
+          const j = await r.json();
+          if (!r.ok) return json({ error: j.error?.message || 'Anthropic request failed (' + r.status + ')' }, 400);
+          result = j.content?.[0]?.text || '';
+          if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.input_tokens, j.usage.output_tokens);
+          lastErr = ''; break;
+        } else {
+          // google — genuinely current via "Grounding with Google Search", and free within
+          // Google's daily rate limits, which is exactly why a key pool matters most here:
+          // three free keys effectively triple the daily quota before anything needs paying for.
+          const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${usedModel}:generateContent?key=${k}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
+          });
+          if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
+          const j = await r.json();
+          if (!r.ok) return json({ error: j.error?.message || 'Gemini request failed (' + r.status + ')' }, 400);
+          const cand = j.candidates?.[0];
+          const text = cand?.content?.parts?.map((p: any) => p.text).join('') || '';
+          const chunks = cand?.groundingMetadata?.groundingChunks || [];
+          const citations = chunks.map((c: any) => c.web?.title || c.web?.uri).filter(Boolean);
+          if (j.usageMetadata) await logUsage(admin, uid, provider, usedModel, j.usageMetadata.promptTokenCount, j.usageMetadata.candidatesTokenCount);
+          return json({ result: text, citations });
+        }
+      }
+      if (lastErr) return json({ error: lastErr === 'Rate limited (429)' ? 'All keys for this provider are rate-limited right now — try again shortly, or add another fallback key in Settings.' : lastErr }, 429);
     } else if (provider === 'perplexity') {
       // Perplexity's sonar models do a real live web search per request — this is the
       // only provider here that can answer "what's happening today" style questions.
@@ -571,23 +692,6 @@ Deno.serve(async (req) => {
       if (!r.ok) return json({ error: j.error?.message || 'xAI request failed (' + r.status + ')' }, 400);
       result = j.choices?.[0]?.message?.content || '';
       if (j.usage) await logUsage(admin, uid, provider, 'grok-4', j.usage.prompt_tokens, j.usage.completion_tokens);
-    } else if (provider === 'google') {
-      // Gemini + "Grounding with Google Search" — genuinely current, and free within Google's
-      // monthly grounded-query allowance, so this is the free backup live-search option.
-      const usedModel = resolveModel('google', model);
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${usedModel}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
-      });
-      const j = await r.json();
-      if (!r.ok) return json({ error: j.error?.message || 'Gemini request failed (' + r.status + ')' }, 400);
-      const cand = j.candidates?.[0];
-      result = cand?.content?.parts?.map((p: any) => p.text).join('') || '';
-      const chunks = cand?.groundingMetadata?.groundingChunks || [];
-      const citations = chunks.map((c: any) => c.web?.title || c.web?.uri).filter(Boolean);
-      if (j.usageMetadata) await logUsage(admin, uid, provider, usedModel, j.usageMetadata.promptTokenCount, j.usageMetadata.candidatesTokenCount);
-      return json({ result, citations });
     } else {
       return json({ error: 'Provider not implemented yet' }, 400);
     }

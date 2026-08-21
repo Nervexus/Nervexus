@@ -124,6 +124,11 @@ window.SB = {
   async saveProviderKey(provider, apiKey){ return window.SB._providerFn({ action:'save', provider, apiKey }); },
   async removeProviderKey(provider){ return window.SB._providerFn({ action:'remove', provider }); },
   async providerStatus(){ return window.SB._providerFn({ action:'status' }); },
+  // Fallback key pool — extra keys for a provider beyond the primary one (e.g. two more Gemini
+  // keys so a per-key rate limit doesn't stop the assistant). Server tries the primary key
+  // first, then pool keys in order, skipping any currently cooling down from a 429.
+  async addPoolKey(provider, apiKey, label){ return window.SB._providerFn({ action:'poolAdd', provider, apiKey, label }); },
+  async removePoolKey(provider, poolId){ return window.SB._providerFn({ action:'poolRemove', provider, poolId }); },
   async testProviderKey(provider){ return window.SB._providerFn({ action:'test', provider }); },
   async fetchNewsData(provider, query){ return window.SB._providerFn({ action:'fetchNews', provider, query }); },
   async ttsSpeak(provider, text, voiceId){ return window.SB._providerFn({ action:'ttsSpeak', provider, text, voiceId }); }
