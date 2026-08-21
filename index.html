@@ -293,7 +293,7 @@
 <script src="learning-money.js?v=3"></script>
 <script src="learning-gentleman.js?v=1"></script>
 <script src="gentleman-blackbook.js?v=1"></script>
-<script src="orb-engine.js?v=3"></script>
+<script src="orb-engine.js?v=4"></script>
 <script src="voice-assistant-engine.js"></script>
 <script src="notification-engine.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -8998,7 +8998,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-65 · v11.65 open-web-app-button';
+const NOTIF_BUILD_VERSION = '2026.08.21-66 · v11.66 dotted-particle-orb';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12229,6 +12229,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.66', date:'Aug 21, 2026', major:true, notes:[
+      'Redesigned the voice assistant orb \u2014 replaced the swirling plasma/WebGL blob with a sphere of glowing dots that tumbles and drifts on its own, speeds up while listening, and reacts gently to your cursor. Same orb everywhere it appears (the main Voice Assistant screen, the floating button, the sidebar), still themed per raiment (Ultra X maroon, Noir gold, Maison \u00c9lys\u00e9e blue, base silver). Also dropped the external WebGL library it used to load from a CDN on every visit \u2014 it\u2019s a plain Canvas animation now, so the orb appears instantly instead of popping in after a network fetch.',
+    ]},
     {version:'v11.65', date:'Aug 21, 2026', major:false, notes:[
       'Added an \u201copen web app\u201d button to the top bar, next to the raiment switcher \u2014 opens https://nervexus.vercel.app in a new browser tab.',
     ]},
