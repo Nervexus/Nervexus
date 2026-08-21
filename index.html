@@ -1664,7 +1664,7 @@
               <input value="{{ woEx }}" onInput="{{ setWoEx }}" onKeyDown="{{ addWorkoutKey }}" placeholder="Exercise (e.g. Bench Press)" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <input value="{{ woWeight }}" onInput="{{ setWoWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="kg" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                <span onClick="{{ toggleWoUnit }}" title="Toggle kg / bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ woUnitC }}; border:1px solid {{ woUnitBd }}; border-radius:8px; padding:0 10px; display:flex; align-items:center; cursor:pointer; background:{{ woUnitBg }};">{{ woUnitLabel }}</span>
+                <span onClick="{{ toggleWoUnit }}" title="Mark this set as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ woUnitC }}; border:1px solid {{ woUnitBd }}; border-radius:8px; padding:0 10px; display:flex; align-items:center; cursor:pointer; background:{{ woUnitBg }};">{{ woUnitLabel }}</span>
                 <input value="{{ woSets }}" onInput="{{ setWoSets }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Sets" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <input value="{{ woReps }}" onInput="{{ setWoReps }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Reps" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <input value="{{ woMin }}" onInput="{{ setWoMin }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Min" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
@@ -1802,7 +1802,7 @@
                       </div>
                       <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         <input value="{{ r.weight }}" onInput="{{ r.setWeight }}" type="number" placeholder="kg" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
-                        <span onClick="{{ r.toggleUnit }}" title="Toggle kg / bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:{{ r.unitC }}; border:1px solid {{ r.unitBd }}; border-radius:7px; padding:0 9px; display:flex; align-items:center; cursor:pointer; background:{{ r.unitBg }};">{{ r.unit }}</span>
+                        <span onClick="{{ r.toggleUnit }}" title="Mark this row as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:{{ r.unitC }}; border:1px solid {{ r.unitBd }}; border-radius:7px; padding:0 9px; display:flex; align-items:center; cursor:pointer; background:{{ r.unitBg }};">{{ r.unit }}</span>
                         <input value="{{ r.sets }}" onInput="{{ r.setSets }}" type="number" placeholder="Sets" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
                         <input value="{{ r.reps }}" onInput="{{ r.setReps }}" type="number" placeholder="Reps" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
                         <sc-if value="{{ r.isCardio }}" hint-placeholder-val="{{ false }}"><input value="{{ r.minutes }}" onInput="{{ r.setMinutes }}" type="number" placeholder="Min" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"></sc-if>
@@ -8997,7 +8997,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-76 · v11.76 bw-volume-label';
+const NOTIF_BUILD_VERSION = '2026.08.21-77 · v11.77 bw-toggle-label';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12290,6 +12290,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.77', date:'Aug 21, 2026', major:true, notes:[
+      'Fixed the BW toggle next to the weight field showing "kg" as its label by default (looked like a duplicate of the weight input’s own kg placeholder). It’s now a fixed "BW" badge that lights up when a set is marked bodyweight, in both the manual log form and Bulk Import rows — no more label swapping between kg and BW.',
+    ]},
     {version:'v11.76', date:'Aug 21, 2026', major:true, notes:[
       'Fixed the trained-muscles chips and volume legend on Fitness HQ labelling bodyweight-only training as "kg" — a body part trained purely with bodyweight sets (no external weight logged) now reads "BW" instead of a made-up kilogram figure. A part with real weighted sets still shows kg as normal.',
     ]},
@@ -16896,7 +16899,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
       // fitness
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
-      woUnitLabel:(S.woUnit||'kg')==='BW'?'BW':'kg', woUnitIsBW:(S.woUnit||'kg')==='BW',
+      woUnitLabel:'BW', woUnitIsBW:(S.woUnit||'kg')==='BW',
       woUnitC:(S.woUnit||'kg')==='BW'?'#0a0a0b':'#b8b8c0', woUnitBg:(S.woUnit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.05)', woUnitBd:(S.woUnit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.14)',
       toggleWoUnit:()=>this.setState(s=>({woUnit:(s.woUnit||'kg')==='BW'?'kg':'BW'})),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
@@ -16908,7 +16911,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const parts=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio'];
         const rows=(S.woImportRows||[]).map((r,i)=>({
           exercise:r.exercise, part:r.part, weight:r.weight, sets:r.sets, reps:r.reps, minutes:r.minutes, isCardio:r.part==='Cardio',
-          unit:(r.unit||'kg')==='BW'?'BW':'kg',
+          unit:'BW',
           unitC:(r.unit||'kg')==='BW'?'#0a0a0b':'#8a8a92', unitBg:(r.unit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.04)', unitBd:(r.unit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.12)',
           toggleUnit:()=>this.setWoImportRowField(i,'unit',(r.unit||'kg')==='BW'?'kg':'BW'),
           setExercise:(e)=>this.setWoImportRowField(i,'exercise',e.target.value),
