@@ -25,13 +25,15 @@ const PROVIDER_ENV: Record<string, string> = {
 // (anthropic, google) accept a client-chosen model; everything else stays on its fixed
 // model since the UI never offers a choice for those. Requests are validated against this
 // allow-list rather than trusted verbatim, so a client can't smuggle an arbitrary model id.
+// google: 2.5-line retired for new API keys Aug 2026 ("no longer available to new users",
+// live error from Google's own API) -- moved to the Gemini 3 stable Flash tier.
 const DEFAULT_MODEL: Record<string, string> = {
   anthropic: 'claude-sonnet-5',
-  google: 'gemini-2.5-flash',
+  google: 'gemini-3.6-flash',
 };
 const ALLOWED_MODELS: Record<string, string[]> = {
   anthropic: ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001'],
-  google: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.0-flash'],
+  google: ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'],
 };
 function resolveModel(provider: string, requested?: string): string {
   const fallback = DEFAULT_MODEL[provider];

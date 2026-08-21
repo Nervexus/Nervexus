@@ -43,7 +43,11 @@
       // server-side against Google's own API when you hit Connect.
       auth:'apikey', keyRe:'^[A-Za-z0-9_.\\-]{20,}$', keyHint:'AIza… or AQ….', docs:'ai.google.dev',
       usage:true, live:true, freeTier:true, freeTierNote:'Free within Google’s generous daily rate limits — no card required to start. Also the only provider here with live web search built in.',
-      models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }
+      // Google retired the 2.5 line for new API keys in Aug 2026 ("no longer available to new
+      // users") — moved to the current Gemini 3 stable, no-billing-required Flash tier. Pro is
+      // deliberately left out: gemini-3.1-pro is preview-only and requires a paid Blaze plan,
+      // which would break the same way for anyone on the free tier this provider exists for.
+      models:['gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash-lite'], defaultModel:'gemini-3.6-flash' }
   ];
 
   // category: News | Markets | Economic | Crypto | Government | Business | Tech

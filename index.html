@@ -8980,7 +8980,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-70 · v11.70 ai-providers-rebuild';
+const NOTIF_BUILD_VERSION = '2026.08.21-71 · v11.71 fix-gemini-3-models';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9828,7 +9828,7 @@ activities: this._mergeShipLog(s.activities),
     const inTok=rows.reduce((a,r)=>a+r.inTok,0), outTok=rows.reduce((a,r)=>a+r.outTok,0), totalTok=inTok+outTok;
     // Approximate public per-million-token USD pricing — for an at-a-glance estimate only,
     // not a substitute for the provider's own billing dashboard.
-    const PRICE={'claude-opus-5':[15,75],'claude-sonnet-5':[3,15],'claude-haiku-4-5-20251001':[1,5],'gemini-2.5-pro':[1.25,10],'gemini-2.5-flash':[0.3,2.5],'gemini-2.0-flash':[0.1,0.4]};
+    const PRICE={'claude-opus-5':[15,75],'claude-sonnet-5':[3,15],'claude-haiku-4-5-20251001':[1,5],'gemini-3.7-flash':[0.75,3.75],'gemini-3.6-flash':[0.75,3.75],'gemini-3.5-flash-lite':[0.3,1.5]};
     const cost=rows.reduce((a,r)=>{ const p=PRICE[r.model]||[2,6]; return a+(r.inTok/1e6*p[0])+(r.outTok/1e6*p[1]); },0);
     return { hasData:reqs>0, reqs:reqs.toLocaleString(), tokens:totalTok>=1000?(totalTok/1000).toFixed(1)+'K':String(totalTok), cost:'~$'+cost.toFixed(2) };
   }
@@ -12234,6 +12234,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.71', date:'Aug 21, 2026', major:true, notes:[
+      'Fixed Gemini calls failing with \u201cmodels/gemini-2.5-flash is no longer available to new users.\u201d Google retired the 2.5 line for newly-issued API keys \u2014 moved the default and the model picker to the current Gemini 3 stable Flash tier (gemini-3.6-flash by default, plus 3.7-flash and 3.5-flash-lite as options). Left Pro out of the picker on purpose: gemini-3.1-pro is preview-only and requires a paid Google Cloud plan, which would break the exact same way for anyone on the free tier this provider exists for.',
+    ]},
     {version:'v11.70', date:'Aug 21, 2026', major:true, notes:[
       'Rebuilt AI Providers. The \u201cUSAGE \u00b7 LAST 24H\u201d panel was seeded pseudo-random data that showed activity even for a key you\u2019d never used \u2014 replaced with real tracking: the edge function now logs every actual AI call with token counts read straight from each provider\u2019s own response, and the panel shows your real request count, real tokens, and an estimated cost from that \u2014 or an honest \u201cno calls in the last 24 hours\u201d when there aren\u2019t any. The fake rate-limit bar is gone rather than faked further.',
       'Fixed \u201c9 connected\u201d / \u201c10 connected\u201d showing up in AI Providers with nothing ever actually connected \u2014 Intel Sources (Reuters, Alpha Vantage, FRED, and the rest) had a \u201cpaste a key \u2192 Connect\u201d flow that accepted literally any text as valid and always reported success, because the sources themselves make no real API call (most are licensed/enterprise feeds this app was never going to integrate). Stripped that fake flow entirely \u2014 Intel Sources is now honestly a browse-only reference directory with a simple enable/disable toggle, and the connection count only counts genuinely connected AI/News/Voice providers.',
