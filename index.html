@@ -1665,6 +1665,9 @@
               <div style="display:flex; gap:8px; flex-wrap:wrap;">
                 <input value="{{ woWeight }}" onInput="{{ setWoWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="kg" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <span onClick="{{ toggleWoUnit }}" title="Mark this set as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ woUnitC }}; border:1px solid {{ woUnitBd }}; border-radius:8px; padding:0 10px; display:flex; align-items:center; cursor:pointer; background:{{ woUnitBg }};">{{ woUnitLabel }}</span>
+                <sc-if value="{{ woUnitIsBW }}" hint-placeholder-val="{{ false }}">
+                <input value="{{ woBodyWeight }}" onInput="{{ setWoBodyWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Your kg" title="Your current bodyweight — used as the load, and synced to Health" style="width:74px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+                </sc-if>
                 <input value="{{ woSets }}" onInput="{{ setWoSets }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Sets" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <input value="{{ woReps }}" onInput="{{ setWoReps }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Reps" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <input value="{{ woMin }}" onInput="{{ setWoMin }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Min" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
@@ -1784,6 +1787,9 @@
                 <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">{{ importDayLabel }}</span>
                 <span onClick="{{ setImportToday }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; padding:5px 10px; border-radius:7px; cursor:pointer; color:{{ isImportToday ? '#0a0a0b' : '#c3c3ca' }}; background:{{ isImportToday ? '#F4F4F5' : 'rgba(255,255,255,0.08)' }};">TODAY</span>
                 <span onClick="{{ setImportYesterday }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; padding:5px 10px; border-radius:7px; cursor:pointer; color:{{ isImportYesterday ? '#0a0a0b' : '#c3c3ca' }}; background:{{ isImportYesterday ? '#F4F4F5' : 'rgba(255,255,255,0.08)' }};">YESTERDAY</span>
+                <span style="flex:1;"></span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">YOUR WEIGHT</span>
+                <input value="{{ woImportBodyWeight }}" onInput="{{ setWoImportBodyWeight }}" type="number" placeholder="kg" title="Used as the load for BW rows, and synced to Health" style="width:60px; padding:5px 8px; border-radius:7px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none;">
               </div>
               <sc-if value="{{ noWoImportRows }}" hint-placeholder-val="{{ true }}">
                 <textarea value="{{ woImportText }}" onInput="{{ setWoImportText }}" placeholder="e.g.&#10;Bench press 80kg 4x8&#10;Incline dumbbell press 30kg 3x10&#10;Squats 100kg 5x5&#10;Treadmill 20 min" style="width:100%; min-height:160px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:inherit;"></textarea>
@@ -8997,7 +9003,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-79 · v11.79 workout-parser-freeform';
+const NOTIF_BUILD_VERSION = '2026.08.22-80 · v11.80 bw-weight-sync';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9062,8 +9068,8 @@ class Component extends DCLogic {
         {part:'Core',exercise:'Weighted Planks',min:15,ts:now-45*60000},
         {part:'Cardio',exercise:'5K Run',min:28,ts:now-4*D},
       ],
-      woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
-      woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0,
+      woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
+      woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
       income: s.income || [
         {label:'SaaS subscriptions',amt:128000,month:6,ts:now-2*D},
         {label:'Enterprise deal — Helix',amt:42000,month:6,ts:now-5*D},
@@ -12290,6 +12296,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.80', date:'Aug 22, 2026', major:true, notes:[
+      'Bulk Import’s parser now knows more exercise wording — bare "Name N BW" shorthand with no "reps"/"x" word (e.g. "Wall Calf Raises 30 BW"), plus tibialis/shin/wall-sit/hamstring/glute/quad classified correctly as Legs instead of falling into Mixed. Also strips stray trailing "|" characters and extra spacing some paste sources leave in. And: you can now enter your own bodyweight next to a BW set (manual log form and Bulk Import) — it becomes the real load used for that set’s volume, and syncs straight into your Health body-weight tracker instead of being a second, disconnected number.',
+    ]},
     {version:'v11.79', date:'Aug 22, 2026', major:true, notes:[
       'Bulk Import’s local parser now handles free-form wording too, e.g. "Horse Stance Squats x8 sets for 3 seconds per set" — another real line that was falling through to Gemini and hitting a rate-limit error instead of importing. It now pulls out sets, reps, hold time and weight wherever they appear in the sentence and only reaches for AI on text it genuinely can’t make sense of.',
     ]},
@@ -13389,7 +13398,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _guessBodyPart(exercise){ const t=(exercise||'').toLowerCase();
     if(/bench|chest|push.?up|fly|dip/.test(t)) return 'Chest';
     if(/deadlift|row|pull.?up|lat|back/.test(t)) return 'Back';
-    if(/squat|leg press|lunge|calf|leg curl|leg extension/.test(t)) return 'Legs';
+    if(/squat|leg press|lunge|calf|leg curl|leg extension|tibialis|shin raise|wall sit|hamstring|glute|quad/.test(t)) return 'Legs';
     if(/shoulder|press overhead|ohp|lateral raise|delt/.test(t)) return 'Shoulders';
     if(/curl|tricep|bicep|arm/.test(t)) return 'Arms';
     if(/plank|crunch|sit.?up|core|ab(s)?\b/.test(t)) return 'Core';
@@ -13407,10 +13416,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   addWorkout(opts){ const o=opts||{}, S=this.state;
     const exRaw=(o.exercise!=null?o.exercise:S.woEx||'').trim();
     const mn=o.minutes!=null?(+o.minutes||0):(parseInt(S.woMin)||0);
-    const wt=o.weight!=null?(+o.weight||0):(parseFloat(S.woWeight)||0);
+    let wt=o.weight!=null?(+o.weight||0):(parseFloat(S.woWeight)||0);
     const st=o.sets!=null?(+o.sets||0):(parseInt(S.woSets)||0);
     const rp=o.reps!=null?(+o.reps||0):(parseInt(S.woReps)||0);
     const unit=o.unit||S.woUnit||'kg';
+    // A logged bodyweight (e.g. from the BW field) becomes the real load for a bodyweight set
+    // when no separate kg number was entered — and syncs to the Health body-weight tracker
+    // below, so it's one real number, not a second disconnected copy.
+    const bw=unit==='BW' ? (o.bodyWeight!=null?(+o.bodyWeight||0):(parseFloat(S.woBodyWeight)||0)) : 0;
+    if(unit==='BW' && wt<=0 && bw>0) wt=bw;
     if(!exRaw||!(mn>0||wt>0||rp>0)) return;
     const partsValid=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
     // A part the user explicitly picked (and isn't the catch-all 'Mixed') is respected as-is;
@@ -13423,7 +13437,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const ts=Date.now();
     const entries=list.map((ex,i)=>({ id:this._uuid(), part:forcedPart||this._guessBodyPart(ex), exercise:ex, min:mn, weight:wt, unit, sets:st, reps:rp, ts:ts-i }));
     this.mut(s=>({workouts:[...s.workouts,...entries],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
-    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()})); }
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()}));
+    if(bw>0){ this.setState({woBodyWeight:''}); this.addWeight(bw); } }
   addWeight(kg){ const K=window.HealthKit; if(!K) return;
     const w=kg!=null?+kg:parseFloat(this.state.weightInput);
     if(!(w>20&&w<400)) return;
@@ -13762,7 +13777,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       names.forEach(n=>rows.push({exercise:n,part:guessPart(n),weight:weight||0,unit:unit||'kg',sets:sets||0,reps:reps||0,minutes:minutes||0}));
     };
     (text||'').split(/\r?\n/).forEach(raw=>{
-      const stripped=raw.trim().replace(/^[-*]\s*(\[[ xX]?\]\s*)?/,'').trim();
+      const stripped=raw.trim().replace(/^[-*]\s*(\[[ xX]?\]\s*)?/,'').replace(/[|•]+\s*$/,'').replace(/\s+/g,' ').trim();
       if(!stripped) return;
       let m;
       if((m=stripped.match(combinedRe))){
@@ -13790,13 +13805,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const repsM=rest.match(/(\d+(?:\.\d+)?)\s*reps?\b/i);
         const durM=rest.match(/(\d+(?:\.\d+)?)\s*(sec|secs?|second|seconds|min|mins?|minute|minutes)\b/i);
         const wtM=rest.match(/(\d+(?:\.\d+)?)\s*(kg|kgs|lb|lbs)\b/i);
-        if(namePart && (setsM||repsM||durM||wtM)){
+        // Shorthand with no "reps"/"x" word at all, e.g. "Wall Calf Raises 30 BW" — a bare
+        // number sitting right before the BW marker is the rep count.
+        const repsAltM=!repsM ? rest.match(/(\d+(?:\.\d+)?)\s*(?:bw|bodyweight)\b/i) : null;
+        if(namePart && (setsM||repsM||repsAltM||durM||wtM)){
           const names=this._splitExerciseNames(namePart);
           if(names.length){
             let minutes=0;
             if(durM){ const perSet=(/sec/i.test(durM[2])?+durM[1]:+durM[1]*60); minutes=Math.round(perSet*(setsM?+setsM[1]:1)/60*10)/10; }
             const weight=wtM?+wtM[1]:0;
-            pushRow(names, weight, wtM?'kg':'BW', setsM?+setsM[1]:0, repsM?+repsM[1]:0, minutes);
+            const reps=repsM?+repsM[1]:(repsAltM?+repsAltM[1]:0);
+            pushRow(names, weight, wtM?'kg':'BW', setsM?+setsM[1]:0, reps, minutes);
             return;
           }
         }
@@ -13835,11 +13854,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const rows=(this.state.woImportRows||[]).filter(r=>(r.exercise||'').trim()); if(!rows.length) return;
     const dayOffset=this.state.woImportDayOffset||0;
     const now=Date.now()-dayOffset*86400000;
-    const entries=rows.map((r,i)=>({ id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight:+r.weight||0, unit:r.unit||'kg', sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000 }));
+    const bw=+this.state.woImportBodyWeight||0;
+    let usedBw=false;
+    const entries=rows.map((r,i)=>{
+      const unit=r.unit||'kg'; let weight=+r.weight||0;
+      if(unit==='BW' && weight<=0 && bw>0){ weight=bw; usedBw=true; }
+      return { id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight, unit, sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000 };
+    });
     this.mut(s=>({workouts:[...s.workouts, ...entries]}));
     if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()}));
     this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log.');
     this.setState({woImportOpen:false, woImportRows:[], woImportText:'', woImportDayOffset:0});
+    // Syncs the entered weight into the real Health body-weight tracker — one real number,
+    // not a second copy that only lives inside this import.
+    if(usedBw) this.addWeight(bw);
   }
   monthly(year){ const y=year!=null?year:new Date().getFullYear(); const inc=Array(12).fill(0), exp=Array(12).fill(0);
     this.state.income.forEach(i=>{ const d=new Date(i.ts); if(d.getFullYear()===y) inc[d.getMonth()]+=(+i.amt||0); });
@@ -16928,6 +16956,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // fitness
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
       woUnitLabel:'BW', woUnitIsBW:(S.woUnit||'kg')==='BW',
+      woBodyWeight:S.woBodyWeight||(()=>{ const bl=S.health&&S.health.bodyLog; const last=bl&&bl.length?bl[bl.length-1]:null; return last&&last.weightKg!=null?String(Math.round(last.weightKg)):''; })(),
+      setWoBodyWeight:(e)=>this.setState({woBodyWeight:e.target.value}),
       woUnitC:(S.woUnit||'kg')==='BW'?'#F4F4F5':'#b8b8c0', woUnitBg:(S.woUnit||'kg')==='BW'?'rgba(255,255,255,0.14)':'transparent', woUnitBd:(S.woUnit||'kg')==='BW'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       toggleWoUnit:()=>this.setState(s=>({woUnit:(s.woUnit||'kg')==='BW'?'kg':'BW'})),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
@@ -16960,6 +16990,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           isImportToday:dayOff===0, isImportYesterday:dayOff===1,
           setImportToday:()=>this.setWoImportDay(0), setImportYesterday:()=>this.setWoImportDay(1),
           importDayLabel: dayOff===0?'Logging for Today':(dayOff===1?'Logging for Yesterday':'Logging for '+this._niceDate(this._locDate(-dayOff))),
+          woImportBodyWeight:S.woImportBodyWeight||(()=>{ const bl=S.health&&S.health.bodyLog; const last=bl&&bl.length?bl[bl.length-1]:null; return last&&last.weightKg!=null?String(Math.round(last.weightKg)):''; })(),
+          setWoImportBodyWeight:(e)=>this.setState({woImportBodyWeight:e.target.value}),
         };
       }, {}),
 
