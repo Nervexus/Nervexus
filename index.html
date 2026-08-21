@@ -2309,15 +2309,18 @@
           </div>
         </div>
         <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:15px; font-weight:700;">Income vs Expenses · 2026</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:15px; font-weight:700;">Income vs Expenses · {{ bizChartYearLabel }}</span>
             <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:10px;"><span style="color:#8a8a92;"><span style="color:#FFFFFF;">■</span> Income</span><span style="color:#8a8a92;"><span style="color:#ff5563;">■</span> Expenses</span></div>
           </div>
           <canvas data-chart="bizChart" style="width:100%; height:250px; display:block; margin-top:10px;"></canvas>
         </div>
 
-        <div style="margin:26px 0 14px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:4px;">◆ BUDGET PLANNER</div>
-          <div style="font-size:12px; color:#8a8a92;">Set a monthly budget per category and track it against what you log above.</div>
+        <div style="margin:26px 0 14px; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:4px;">◆ BUDGET PLANNER · {{ plannerMonthLabel }}</div>
+            <div style="font-size:12px; color:#8a8a92;">Set a monthly budget per category, tracked against what you log in the calendar above.</div>
+          </div>
+          <sc-if value="{{ plannerPaceLabel }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ plannerPaceColor }};">{{ plannerPaceLabel }}</div></sc-if>
         </div>
         <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:18px;">
           <sc-for list="{{ finPlannerRings }}" as="t" hint-placeholder-count="4">
@@ -2328,10 +2331,10 @@
             </div>
           </sc-for>
         </div>
-        <sc-if value="{{ noFinPlannerRings }}" hint-placeholder-val="{{ false }}"><div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px; margin-bottom:18px; font-size:12px; color:#8a8a92;">Log an expense above to see budget rings here.</div></sc-if>
+        <sc-if value="{{ noFinPlannerRings }}" hint-placeholder-val="{{ false }}"><div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px; margin-bottom:18px; font-size:12px; color:#8a8a92;">Set a budget below to see rings here.</div></sc-if>
         <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;"><span style="font-size:13px; font-weight:600;">Budget vs Actual</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ plannerTotalColor }};">{{ plannerTotalLabel }}</span></div>
-          <div style="font-size:11.5px; color:#8a8a92; margin-bottom:14px;">Tracked live against the expenses you log above.</div>
+          <div style="font-size:11.5px; color:#8a8a92; margin-bottom:14px;">All categories, tracked live against the expenses you log above.</div>
           <div style="display:flex; flex-direction:column; gap:12px;">
             <sc-for list="{{ plannerRows }}" as="p" hint-placeholder-count="3">
               <div style="display:flex; align-items:center; gap:12px;">
@@ -2343,7 +2346,6 @@
               </div>
             </sc-for>
           </div>
-          <sc-if value="{{ noPlannerRows }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">Log an expense above to start planning a budget.</span></sc-if>
         </div>
         <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
@@ -8960,7 +8962,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-59 · v11.59 logs-in-day-panel';
+const NOTIF_BUILD_VERSION = '2026.08.21-60 · v11.60 real-monthly-chart-budget';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11627,7 +11629,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       else if(kind==='float') this._mountFloatOrb(el);
       else if(kind==='voice') this._mountVoiceOrb(el);
     });
-    const key=(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode;
+    const key=(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode+'|'+this.state.moneyCalY;
     const sig=key+'|'+this.dataSig();
     if(sig===this._sig) return;
     this._sig=sig;
@@ -11772,12 +11774,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
 
   startBiz(cv,inc,exp){ const {ctx,w,h}=this.prep(cv); const n=12; const mx=Math.max(...inc,...exp,1); const gp=w/n*0.4; const bw=(w/n-gp)/2; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const axisColor = isNoir?'rgba(150,143,130,0.6)':isU?'rgba(58,42,32,0.55)':'#75757d';
+    const labelH=18, chartH=h-labelH;
     this.loop((ts)=>{ const prog=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h);
-      ctx.strokeStyle='rgba(255,255,255,0.04)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-12)+2; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      ctx.strokeStyle='rgba(255,255,255,0.04)'; for(let g=0;g<4;g++){ const y=(g/3)*(chartH-12)+2; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
       for(let i=0;i<n;i++){ const bx=i*(w/n)+gp/2;
-        const ih=(inc[i]/mx)*(h-16)*prog; const g1=ctx.createLinearGradient(0,h-ih,0,h); g1.addColorStop(0, isNoir?'#C4BDB0':isU?'#292524':'#FFFFFF'); g1.addColorStop(1, isNoir?'rgba(196,189,176,0.3)':isU?'rgba(41,37,36,0.35)':'rgba(255,255,255,0.25)'); ctx.fillStyle=g1; ctx.fillRect(bx, h-ih, bw, ih);
-        const eh=(exp[i]/mx)*(h-16)*prog; const g2=ctx.createLinearGradient(0,h-eh,0,h); g2.addColorStop(0,isNoir?'#968F82':'#7A2626'); g2.addColorStop(1,isNoir?'rgba(150,143,130,0.25)':'rgba(122,38,38,0.25)'); ctx.fillStyle=g2; ctx.fillRect(bx+bw+2, h-eh, bw, eh);
+        const ih=(inc[i]/mx)*(chartH-16)*prog; const g1=ctx.createLinearGradient(0,chartH-ih,0,chartH); g1.addColorStop(0, isNoir?'#C4BDB0':isU?'#292524':'#FFFFFF'); g1.addColorStop(1, isNoir?'rgba(196,189,176,0.3)':isU?'rgba(41,37,36,0.35)':'rgba(255,255,255,0.25)'); ctx.fillStyle=g1; ctx.fillRect(bx, chartH-ih, bw, ih);
+        const eh=(exp[i]/mx)*(chartH-16)*prog; const g2=ctx.createLinearGradient(0,chartH-eh,0,chartH); g2.addColorStop(0,isNoir?'#968F82':'#7A2626'); g2.addColorStop(1,isNoir?'rgba(150,143,130,0.25)':'rgba(122,38,38,0.25)'); ctx.fillStyle=g2; ctx.fillRect(bx+bw+2, chartH-eh, bw, eh);
       }
+      ctx.font='9px JetBrains Mono, monospace'; ctx.fillStyle=axisColor;
+      ctx.textAlign='left'; ctx.fillText(this.fmtK(mx), 4, 11);
+      ctx.textAlign='center'; for(let i=0;i<n;i++){ const bx=i*(w/n)+gp/2; ctx.fillText(months[i], bx+bw+1, h-5); }
     });
   }
 
@@ -12129,6 +12137,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.60', date:'Aug 21, 2026', major:true, notes:[
+      'Income vs Expenses is now a real monthly chart \u2014 added Jan\u2013Dec labels and a scale reference so you can actually read it, instead of unlabeled bars. It also now correctly separates by year (previously months from different years could get merged into the same bar).\n\nBudget Planner rebuilt into an actual system: it now follows whichever month you\u2019re browsing in the Cash Flow Calendar above (so paging the calendar also updates your budget view), shows all expense categories so you can set a budget before you\u2019ve spent anything in it (previously a budgeted category with $0 spent this month just vanished from the list), and adds a pacing indicator \u2014 how far through the month you are vs. how much of your budget is used \u2014 so it flags when you\u2019re burning through a budget faster than the days are passing.',
+    ]},
     {version:'v11.59', date:'Aug 21, 2026', major:true, notes:[
       'Log Income and Log Expense now live inside the Cash Flow Calendar’s day panel, right below that day’s entries — pick a day on the calendar, then log against it. New entries are dated to whichever day is selected (today by default), which replaces the old date field entirely: no picker needed, just select the day first. The always-on full income/expense history list is gone since the calendar (click any day to see what landed) now covers that.',
     ]},
@@ -13098,7 +13109,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       this.showToast('system','Calendar imported', clean.length+' event'+(clean.length>1?'s':'')+' added');
     }catch(e){ this.setState({calImportLoading:false, calImportErr:'Could not read that image'}); }
   }
-  init_business(){ const b=this.root.querySelector('[data-chart="bizChart"]'); if(b){ const {inc,exp}=this.monthly(); this.startBiz(b,inc,exp); } this.root.querySelectorAll('[data-ring]').forEach(c=>this.startProgRing(c, parseFloat(c.dataset.ring), c.dataset.ringc||'#FFFFFF')); }
+  init_business(){ const b=this.root.querySelector('[data-chart="bizChart"]'); if(b){ const {inc,exp}=this.monthly(this.state.moneyCalY); this.startBiz(b,inc,exp); } this.root.querySelectorAll('[data-ring]').forEach(c=>this.startProgRing(c, parseFloat(c.dataset.ring), c.dataset.ringc||'#FFFFFF')); }
   startHGauge(cv,val,color,center){ const isU=this.state.prefs.theme==='Ultra'; if(isU) color=this._ultraRingColor(color); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0009)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isU?'rgba(41,37,36,0.12)':'rgba(255,255,255,0.07)'; ctx.lineWidth=8; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=8; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=13; ctx.stroke(); ctx.shadowBlur=0; ctx.fillStyle=isU?'#292524':'#eef0f2'; ctx.font='600 21px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(center,cx,cy); }); }
   _ultraRingColor(color){ const c=(color||'').toLowerCase(); const isNoir=this.state.prefs.ultraStyle==='Noir';
     if(isNoir){
@@ -13508,7 +13519,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log.');
     this.setState({woImportOpen:false, woImportRows:[], woImportText:'', woImportDayOffset:0});
   }
-  monthly(){ const inc=Array(12).fill(0), exp=Array(12).fill(0); this.state.income.forEach(i=>{ const mo=i.month!=null?i.month:new Date(i.ts).getMonth(); inc[mo]+=(+i.amt||0); }); this.state.expenses.forEach(e=>{ const mo=e.month!=null?e.month:new Date(e.ts).getMonth(); exp[mo]+=(+e.amt||0); });
+  monthly(year){ const y=year!=null?year:new Date().getFullYear(); const inc=Array(12).fill(0), exp=Array(12).fill(0);
+    this.state.income.forEach(i=>{ const d=new Date(i.ts); if(d.getFullYear()===y) inc[d.getMonth()]+=(+i.amt||0); });
+    this.state.expenses.forEach(e=>{ const d=new Date(e.ts); if(d.getFullYear()===y) exp[d.getMonth()]+=(+e.amt||0); });
     return {inc,exp}; }
   fmtK(n){ if(n>=1000000) return '$'+(n/1000000).toFixed(2)+'M'; if(n>=1000) return '$'+Math.round(n/1000)+'K'; return '$'+Math.round(n); }
 
@@ -15295,8 +15308,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       mobDrawerBg:S.prefs.theme==='Ultra'?'#F5F1E8':'#111214', mobDrawerBorder:S.prefs.theme==='Ultra'?'1px solid rgba(91,26,26,0.14)':'1px solid rgba(255,255,255,0.1)',
       mobDrawerHeaderC:S.prefs.theme==='Ultra'?'#8a6a5a':'#7c7c84', mobDrawerLabelC:S.prefs.theme==='Ultra'?'#3A2A20':'#e0e0e4', mobDrawerIconC:S.prefs.theme==='Ultra'?'#5B1A1A':'#dcdce0',
       floatOrbOpacity: scene==='voice'?0:1, floatOrbDisplay: scene==='voice'?'none':'block',
-      ...(()=>{ const exp=S.expenses||[]; const now=Date.now(), D=86400000; const thisM=exp.filter(e=>now-e.ts<30*D);
-        const cats=[...new Set(exp.map(e=>e.cat))]; const budgets=S.prefs.financeBudgets||{};
+      ...(()=>{ const exp=S.expenses||[]; const budgets=S.prefs.financeBudgets||{};
+        const y=S.moneyCalY, m=S.moneyCalM;
+        const plannerMonthLabel=new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'});
+        const daysInMonth=new Date(y,m+1,0).getDate();
+        const now=new Date(); const isCurrentMonth=(y===now.getFullYear() && m===now.getMonth());
+        const dayOfMonth=isCurrentMonth?now.getDate():daysInMonth;
+        const pctThroughMonth=Math.round(dayOfMonth/daysInMonth*100);
+        const thisM=exp.filter(e=>{ const d=new Date(e.ts); return d.getFullYear()===y && d.getMonth()===m; });
+        const cats=this._expenseCats();
         const spentByCat=(c)=>thisM.filter(e=>e.cat===c).reduce((a,e)=>a+(+e.amt||0),0);
         const plannerRows=cats.map(c=>{ const spent=spentByCat(c); const budget=+(budgets[c])||0; const pct=budget?Math.min(150,Math.round(spent/budget*100)):0;
           const over=budget>0 && spent>budget;
@@ -15305,21 +15325,27 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             setBudget:(e)=>this.setState(s=>({financeBudgetDraft:{...(s.financeBudgetDraft||{}),[c]:e.target.value}})),
             save:()=>this.setFinanceBudget(c, (this.state.financeBudgetDraft||{})[c]),
             saveKey:enterKey(()=>this.setFinanceBudget(c, (this.state.financeBudgetDraft||{})[c])) }; });
-        const totalBudget=cats.reduce((a,c)=>a+(+(budgets[c])||0),0), totalSpent=cats.reduce((a,c)=>a+spentByCat(c),0);
-        return { plannerRows, noPlannerRows:!plannerRows.length,
-          plannerTotalLabel: totalBudget? ('$'+totalSpent.toLocaleString()+' / $'+totalBudget.toLocaleString()+' this month') : 'Set budgets below',
+        const budgetedCats=cats.filter(c=>+(budgets[c])>0);
+        const totalBudget=budgetedCats.reduce((a,c)=>a+(+(budgets[c])||0),0), totalSpent=cats.reduce((a,c)=>a+spentByCat(c),0);
+        const pctBudgetUsed=totalBudget?Math.round(totalSpent/totalBudget*100):0;
+        const paceHot=totalBudget>0 && isCurrentMonth && (pctBudgetUsed-pctThroughMonth)>=15;
+        const ringCats=(budgetedCats.length?budgetedCats:cats.filter(c=>spentByCat(c)>0)).slice(0,8);
+        return { plannerMonthLabel,
+          plannerPaceLabel: totalBudget ? (isCurrentMonth ? ('Day '+dayOfMonth+' of '+daysInMonth+' ('+pctThroughMonth+'% through) \u00b7 '+pctBudgetUsed+'% of budget used') : (pctBudgetUsed+'% of budget used')) : '',
+          plannerPaceColor: paceHot ? '#ff5563' : '#8a8a92',
+          plannerRows,
+          plannerTotalLabel: totalBudget? ('$'+totalSpent.toLocaleString()+' / $'+totalBudget.toLocaleString()+' this month') : ('$'+totalSpent.toLocaleString()+' spent \u2014 set budgets below'),
           plannerTotalColor: totalBudget && totalSpent>totalBudget ? '#ff5563' : '#eef0f2',
-          finPlannerRings: cats.slice(0,4).map(c=>{ const spent=spentByCat(c); const budget=+(budgets[c])||0; const val=budget?Math.min(1,spent/budget):0;
+          finPlannerRings: ringCats.map(c=>{ const spent=spentByCat(c); const budget=+(budgets[c])||0; const val=budget?Math.min(1,spent/budget):0;
             return { name:c, sub:budget?('$'+spent.toLocaleString()+' / $'+budget.toLocaleString()):('$'+spent.toLocaleString()+' spent'), val, color:(budget&&spent>budget)?'#ff5563':'#FFFFFF' }; }),
-          noFinPlannerRings: !cats.length,
-          finPlannerRecs: (S.finRecsResult&&S.finRecsResult.length) ? S.finRecsResult : (()=>{ const over=cats.filter(c=>{ const b=+(budgets[c])||0; return b && spentByCat(c)>b; });
-            const r=[]; if(!cats.length) r.push('Log an expense in the Finance tab to start tracking budgets here.');
-            else if(over.length) r.push(over.map(c=>c).join(', ')+(over.length>1?' are':' is')+' over budget this month — review before new spend.');
-            else if(totalBudget) r.push('All categories are within budget this month. Nice work.');
-            else r.push('Set a monthly budget per category below to start tracking against it.');
-            if(totalBudget && totalSpent/totalBudget>0.85 && !over.length) r.push('You\u2019ve used '+Math.round(totalSpent/totalBudget*100)+'% of your total budget with time left in the month.');
+          noFinPlannerRings: !ringCats.length,
+          finPlannerRecs: (S.finRecsResult&&S.finRecsResult.length) ? S.finRecsResult : (()=>{ const over=budgetedCats.filter(c=>spentByCat(c)>(+(budgets[c])||0));
+            const r=[]; if(!budgetedCats.length) r.push('Set a monthly budget per category below to start tracking against it.');
+            else if(over.length) r.push(over.join(', ')+(over.length>1?' are':' is')+' over budget this month \u2014 review before new spend.');
+            else if(paceHot) r.push('You\u2019re '+pctBudgetUsed+'% through your budget but only '+pctThroughMonth+'% through the month \u2014 pace is running hot.');
+            else r.push('All categories are within budget this month. Nice work.');
             return r; })(),
-          finRecsBtnLabel: S.finRecsLoading?'⏂ Thinking…':'✨ AI suggest',
+          finRecsBtnLabel: S.finRecsLoading?'\u23c2 Thinking\u2026':'\u2728 AI suggest',
           finRecsSourceLabel: (S.finRecsResult&&S.finRecsResult.length)?'AI-GENERATED · FROM YOUR SPENDING':'FROM YOUR BUDGETS',
           finRecsErr: S.finRecsErr||'', generateFinRecsAI:()=>this.generateFinRecsAI() };
       })(),
@@ -16577,7 +16603,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }, {}),
 
       // business
-      bizKpis, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp),
+      bizKpis, bizChartYearLabel:S.moneyCalY, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp),
       setIncLabel:(e)=>this.setState({incLabel:e.target.value}), setIncAmt:(e)=>this.setState({incAmt:e.target.value}), setExpLabel:(e)=>this.setState({expLabel:e.target.value}), setExpAmt:(e)=>this.setState({expAmt:e.target.value}),
       incRecurringColor: S.incRecurring?'#F4F4F5':'#8a8a92', incRecurringBg: S.incRecurring?'#FFFFFF':'transparent', toggleIncRecurring:()=>this.setState({incRecurring:!S.incRecurring}),
       expRecurringColor: S.expRecurring?'#F4F4F5':'#8a8a92', expRecurringBg: S.expRecurring?'#FFFFFF':'transparent', toggleExpRecurring:()=>this.setState({expRecurring:!S.expRecurring}),
