@@ -8997,7 +8997,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-77 · v11.77 bw-toggle-label';
+const NOTIF_BUILD_VERSION = '2026.08.22-78 · v11.78 bw-toggle-theme-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12290,6 +12290,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.78', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the BW badge rendering solid black in every state, on and off, in some themes — impossible to tell whether bodyweight was actually selected. It used its own one-off colours instead of the app’s standard chip palette; switched it to the same colour formula the muscle-group and Day/Week/Month chips already use, which is proven to render correctly across every theme.',
+    ]},
     {version:'v11.77', date:'Aug 21, 2026', major:true, notes:[
       'Fixed the BW toggle next to the weight field showing "kg" as its label by default (looked like a duplicate of the weight input’s own kg placeholder). It’s now a fixed "BW" badge that lights up when a set is marked bodyweight, in both the manual log form and Bulk Import rows — no more label swapping between kg and BW.',
     ]},
@@ -16900,7 +16903,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // fitness
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
       woUnitLabel:'BW', woUnitIsBW:(S.woUnit||'kg')==='BW',
-      woUnitC:(S.woUnit||'kg')==='BW'?'#0a0a0b':'#b8b8c0', woUnitBg:(S.woUnit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.05)', woUnitBd:(S.woUnit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.14)',
+      woUnitC:(S.woUnit||'kg')==='BW'?'#F4F4F5':'#b8b8c0', woUnitBg:(S.woUnit||'kg')==='BW'?'rgba(255,255,255,0.14)':'transparent', woUnitBd:(S.woUnit||'kg')==='BW'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       toggleWoUnit:()=>this.setState(s=>({woUnit:(s.woUnit||'kg')==='BW'?'kg':'BW'})),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
       addWorkout:()=>this.addWorkout(),
@@ -16912,7 +16915,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const rows=(S.woImportRows||[]).map((r,i)=>({
           exercise:r.exercise, part:r.part, weight:r.weight, sets:r.sets, reps:r.reps, minutes:r.minutes, isCardio:r.part==='Cardio',
           unit:'BW',
-          unitC:(r.unit||'kg')==='BW'?'#0a0a0b':'#8a8a92', unitBg:(r.unit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.04)', unitBd:(r.unit||'kg')==='BW'?'#FFFFFF':'rgba(255,255,255,0.12)',
+          unitC:(r.unit||'kg')==='BW'?'#c3d2e6':'#8a8a92', unitBg:(r.unit||'kg')==='BW'?'rgba(120,150,200,0.16)':'transparent', unitBd:(r.unit||'kg')==='BW'?'rgba(120,150,200,0.28)':'rgba(255,255,255,0.12)',
           toggleUnit:()=>this.setWoImportRowField(i,'unit',(r.unit||'kg')==='BW'?'kg':'BW'),
           setExercise:(e)=>this.setWoImportRowField(i,'exercise',e.target.value),
           setWeight:(e)=>this.setWoImportRowField(i,'weight',e.target.value),
