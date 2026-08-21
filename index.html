@@ -8997,7 +8997,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-78 · v11.78 bw-toggle-theme-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-79 · v11.79 workout-parser-freeform';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12290,6 +12290,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.79', date:'Aug 22, 2026', major:true, notes:[
+      'Bulk Import’s local parser now handles free-form wording too, e.g. "Horse Stance Squats x8 sets for 3 seconds per set" — another real line that was falling through to Gemini and hitting a rate-limit error instead of importing. It now pulls out sets, reps, hold time and weight wherever they appear in the sentence and only reaches for AI on text it genuinely can’t make sense of.',
+    ]},
     {version:'v11.78', date:'Aug 22, 2026', major:true, notes:[
       'Fixed the BW badge rendering solid black in every state, on and off, in some themes — impossible to tell whether bodyweight was actually selected. It used its own one-off colours instead of the app’s standard chip palette; switched it to the same colour formula the muscle-group and Day/Week/Month chips already use, which is proven to render correctly across every theme.',
     ]},
@@ -13776,6 +13779,28 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }
       const mm=stripped.match(minsRe);
       if(mm){ if(curNames.length) pushRow(curNames, 0, 'kg', 0, 0, +mm[1]); return; }
+      // Last resort before giving up on a single line: pull out sets/reps/hold-time/weight
+      // wherever they appear in the wording, e.g. "Horse Stance Squats x8 sets for 3 seconds
+      // per set" or "Plank, 4 sets, 45 sec hold". Everything before the first digit is the name.
+      const firstNumIdx=stripped.search(/\d/);
+      if(firstNumIdx>0){
+        const namePart=stripped.slice(0,firstNumIdx).replace(/\s*x$/i,'').trim().replace(/[,:\-]+$/,'').trim();
+        const rest=stripped.slice(firstNumIdx);
+        const setsM=rest.match(/(\d+(?:\.\d+)?)\s*sets?\b/i);
+        const repsM=rest.match(/(\d+(?:\.\d+)?)\s*reps?\b/i);
+        const durM=rest.match(/(\d+(?:\.\d+)?)\s*(sec|secs?|second|seconds|min|mins?|minute|minutes)\b/i);
+        const wtM=rest.match(/(\d+(?:\.\d+)?)\s*(kg|kgs|lb|lbs)\b/i);
+        if(namePart && (setsM||repsM||durM||wtM)){
+          const names=this._splitExerciseNames(namePart);
+          if(names.length){
+            let minutes=0;
+            if(durM){ const perSet=(/sec/i.test(durM[2])?+durM[1]:+durM[1]*60); minutes=Math.round(perSet*(setsM?+setsM[1]:1)/60*10)/10; }
+            const weight=wtM?+wtM[1]:0;
+            pushRow(names, weight, wtM?'kg':'BW', setsM?+setsM[1]:0, repsM?+repsM[1]:0, minutes);
+            return;
+          }
+        }
+      }
       curNames=this._splitExerciseNames(stripped.replace(/[:\-]+$/,'').trim());
     });
     return rows;
