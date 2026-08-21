@@ -2290,9 +2290,8 @@
                 <input value="{{ incAmt }}" onInput="{{ setIncAmt }}" onKeyDown="{{ addIncKey }}" type="number" placeholder="$" style="width:82px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <input type="date" value="{{ incDateVal }}" onInput="{{ setIncDate }}" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none; color-scheme:dark;">
                 <span onClick="{{ toggleIncRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:{{ incRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:12px; height:12px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ incRecurringBg }}; display:inline-block;"></span>Recurring</span>
-                <span onClick="{{ addIncome }}" style="padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); color:#F4F4F5; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center;">+</span>
+                <span onClick="{{ addIncome }}" style="flex:1; text-align:center; padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); color:#F4F4F5; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
               </div>
               <div style="margin-top:10px; max-height:110px; overflow-y:auto;">
                 <sc-for list="{{ incomeList }}" as="i" hint-placeholder-count="3">
@@ -2318,9 +2317,8 @@
                 <input value="{{ expAmt }}" onInput="{{ setExpAmt }}" onKeyDown="{{ addExpKey }}" type="number" placeholder="$" style="width:82px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <input type="date" value="{{ expDateVal }}" onInput="{{ setExpDate }}" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none; color-scheme:dark;">
                 <span onClick="{{ toggleExpRecurring }}" style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:{{ expRecurringColor }}; cursor:pointer; white-space:nowrap;"><span style="width:12px; height:12px; border-radius:3px; border:1px solid rgba(255,255,255,0.3); background:{{ expRecurringBg }}; display:inline-block;"></span>Recurring</span>
-                <span onClick="{{ addExpense }}" style="padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center;">+</span>
+                <span onClick="{{ addExpense }}" style="flex:1; text-align:center; padding:9px 15px; border-radius:10px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-size:12.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center;">+ Add</span>
               </div>
               <div style="margin-top:10px; max-height:110px; overflow-y:auto;">
                 <sc-for list="{{ expenseList }}" as="e" hint-placeholder-count="3">
@@ -8989,7 +8987,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-57 · v11.57 unified-cashflow-block';
+const NOTIF_BUILD_VERSION = '2026.08.21-58 · v11.58 simplify-log-forms';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9066,8 +9064,8 @@ class Component extends DCLogic {
         {label:'Cloud infra',amt:14500,cat:'Ops',ts:now-3*D},
         {label:'Paid ads',amt:9800,cat:'Growth',ts:now-4*D},
       ],
-      incLabel:'', incAmt:'', incCat:'Salary', incDateVal:'', incRecurring:false,
-      expLabel:'', expAmt:'', expCat:'Food', expDateVal:'', expRecurring:false,
+      incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false,
+      expLabel:'', expAmt:'', expCat:'Food', expRecurring:false,
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
 activities: this._mergeShipLog(s.activities),
       actText:'', actCat:'Work', actRange:'Week', actMin:'', actHr:'',
@@ -9943,13 +9941,13 @@ activities: this._mergeShipLog(s.activities),
   // directly) can trigger them — previously these only existed as renderVals closures, which
   // meant this.addIncome was undefined and voice-triggered income/expense logging silently failed.
   addIncome(){ const S=this.state; const l=(S.incLabel||'').trim(), a=parseFloat(S.incAmt)||0; if(!l||!(a>0)) return;
-    const id=this._uuid(), cat=S.incCat||'Salary', recurring=!!S.incRecurring, ts=S.incDateVal?new Date(S.incDateVal+'T12:00:00').getTime():Date.now();
-    this.mut(s=>({income:[...s.income,{id,label:l,amt:a,cat,recurring,ts}],incLabel:'',incAmt:'',incDateVal:'',incRecurring:false}));
+    const id=this._uuid(), cat=S.incCat||'Salary', recurring=!!S.incRecurring, ts=Date.now();
+    this.mut(s=>({income:[...s.income,{id,label:l,amt:a,cat,recurring,ts}],incLabel:'',incAmt:'',incRecurring:false}));
     if(this._sbOn()) window.SB.insert('income',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
   }
   addExpense(){ const S=this.state; const l=(S.expLabel||'').trim(), a=parseFloat(S.expAmt)||0; if(!l||!(a>0)) return;
-    const id=this._uuid(), cat=S.expCat||'Food', recurring=!!S.expRecurring, ts=S.expDateVal?new Date(S.expDateVal+'T12:00:00').getTime():Date.now();
-    this.mut(s=>({expenses:[...s.expenses,{id,label:l,amt:a,cat,recurring,ts}],expLabel:'',expAmt:'',expDateVal:'',expRecurring:false}));
+    const id=this._uuid(), cat=S.expCat||'Food', recurring=!!S.expRecurring, ts=Date.now();
+    this.mut(s=>({expenses:[...s.expenses,{id,label:l,amt:a,cat,recurring,ts}],expLabel:'',expAmt:'',expRecurring:false}));
     if(this._sbOn()) window.SB.insert('expenses',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
   }
   _tog(key,label,desc){ const on=this.state.prefs[key]; return { label, desc, bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setPref(key,!this.state.prefs[key]) }; }
@@ -12154,6 +12152,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.58', date:'Aug 21, 2026', major:false, notes:[
+      'Log Income and Log Expense: removed the date field (new entries always log as today), and Recurring now gets its own row with the + Add button instead of being squeezed in next to the date picker.',
+    ]},
     {version:'v11.57', date:'Aug 21, 2026', major:false, notes:[
       'Cash Flow Calendar, Log Income, and Log Expense are now one unified block on Finance Terminal instead of three separate cards — calendar + day detail on top, Log Income and Log Expense side by side below a divider. Income vs Expenses chart moved into its own card below.',
     ]},
@@ -16601,8 +16602,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // business
       bizKpis, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp), incomeList, expenseList,
       setIncLabel:(e)=>this.setState({incLabel:e.target.value}), setIncAmt:(e)=>this.setState({incAmt:e.target.value}), setExpLabel:(e)=>this.setState({expLabel:e.target.value}), setExpAmt:(e)=>this.setState({expAmt:e.target.value}),
-      incDateVal:S.incDateVal||'', setIncDate:(e)=>this.setState({incDateVal:e.target.value}),
-      expDateVal:S.expDateVal||'', setExpDate:(e)=>this.setState({expDateVal:e.target.value}),
       incRecurringColor: S.incRecurring?'#F4F4F5':'#8a8a92', incRecurringBg: S.incRecurring?'#FFFFFF':'transparent', toggleIncRecurring:()=>this.setState({incRecurring:!S.incRecurring}),
       expRecurringColor: S.expRecurring?'#F4F4F5':'#8a8a92', expRecurringBg: S.expRecurring?'#FFFFFF':'transparent', toggleExpRecurring:()=>this.setState({expRecurring:!S.expRecurring}),
       incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent' })),
