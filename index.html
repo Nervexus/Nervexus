@@ -8999,7 +8999,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-68 · v11.68 orb-button-fix+honest-transcript';
+const NOTIF_BUILD_VERSION = '2026.08.21-69 · v11.69 fix-gemini-key-format';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12230,6 +12230,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.69', date:'Aug 21, 2026', major:true, notes:[
+      'Fixed Google Gemini keys being rejected with \u201cInvalid key format for this provider\u201d \u2014 the check only accepted the old \u201cAIza\u2026\u201d key format, but Google is now also issuing keys starting \u201cAQ.\u2026\u201d (seen live from AI Studio), which got rejected client-side before ever reaching Google to actually be checked. The format check is now permissive about the prefix; the real validation is still the live call to Google\u2019s API when you hit Connect.',
+    ]},
     {version:'v11.68', date:'Aug 21, 2026', major:true, notes:[
       'Fixed the new \u201copen web app\u201d button being nearly invisible in Noir/Maison \u00c9lys\u00e9e/base theme \u2014 its icon used a colour that isn\u2019t part of the theme system\u2019s light\u2010mode remap list, so on a cream background it blended almost completely into the button. Now uses the same colour the neighbouring refresh icon already does, which is themed correctly everywhere.',
       'Removed a fake sample conversation from the Voice Assistant\u2019s LIVE TRANSCRIPT panel \u2014 before you\u2019d said anything, it showed a fabricated exchange (\u201cWhat is my day and how are markets?\u201d / \u201cMarkets opened green \u2014 portfolio up 2.1%\u201d) that never actually happened. It now shows an honest \u201cNothing said yet\u201d message instead, same pattern as Conversation History\u2019s empty state.',

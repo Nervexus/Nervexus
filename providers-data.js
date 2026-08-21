@@ -36,7 +36,11 @@
       // with dots, which aren't valid API model slugs and would 404 if ever actually sent).
       usage:true, models:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5-20251001'], defaultModel:'claude-sonnet-5' },
     { id:'google', name:'Google Gemini', mark:'GE', color:'#4285f4', endpoint:'https://generativelanguage.googleapis.com/v1',
-      auth:'apikey', keyRe:'^AIza[A-Za-z0-9_\\-]{30,}$', keyHint:'AIza…', docs:'ai.google.dev',
+      // Google now issues two live key formats — the older "AIza..." keys and newer ones
+      // starting "AQ." (seen from AI Studio in Aug 2026) — so this only sanity-checks length
+      // and character set instead of pinning to one prefix. The real check happens
+      // server-side against Google's own API when you hit Connect.
+      auth:'apikey', keyRe:'^[A-Za-z0-9_.\\-]{20,}$', keyHint:'AIza… or AQ….', docs:'ai.google.dev',
       usage:true, live:true, freeTier:true, models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }
   ];
 
