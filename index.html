@@ -2341,13 +2341,18 @@
           <div style="display:flex; flex-direction:column; gap:12px;">
             <sc-for list="{{ plannerRows }}" as="p" hint-placeholder-count="3">
               <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:12px; color:#c3c3ca; width:100px; flex:0 0 100px;">{{ p.cat }}</span>
+                <span style="font-size:12px; color:#c3c3ca; width:100px; flex:0 0 100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.cat }}</span>
                 <div style="flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden;"><div style="height:100%; width:{{ p.pct }}; background:{{ p.barColor }}; border-radius:4px;"></div></div>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ p.spentColor }}; width:70px; flex:0 0 70px; text-align:right;">{{ p.spentLabel }}</span>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6f6f78;">/</span>
                 <input value="{{ p.budgetInput }}" onInput="{{ p.setBudget }}" onKeyDown="{{ p.saveKey }}" onBlur="{{ p.save }}" placeholder="budget" style="width:74px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none;">
+                <sc-if value="{{ p.canRemove }}" hint-placeholder-val="{{ true }}"><span onClick="{{ p.remove }}" title="Remove category" style="cursor:pointer; color:#6f6f78; font-size:14px; flex:0 0 auto;" style-hover="{ color:'#ff5563' }">×</span></sc-if>
               </div>
             </sc-for>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.06);">
+            <input value="{{ newExpenseCat }}" onInput="{{ setNewExpenseCat }}" onKeyDown="{{ addExpenseCategoryKey }}" placeholder="New category name" style="flex:1; padding:8px 12px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+            <span onClick="{{ addExpenseCategoryClick }}" style="padding:8px 15px; border-radius:9px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; white-space:nowrap;">+ Add category</span>
           </div>
         </div>
         <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px; margin-bottom:18px;">
@@ -8986,7 +8991,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.21-62 · v11.62 fix-chart-fake-1-label';
+const NOTIF_BUILD_VERSION = '2026.08.21-63 · v11.63 editable-budget-categories';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9064,7 +9069,7 @@ class Component extends DCLogic {
         {label:'Paid ads',amt:9800,cat:'Growth',ts:now-4*D},
       ],
       savings: s.savings || [],
-      incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false, incSaveAmt:'', savingsAddAmt:'',
+      incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false, incSaveAmt:'', savingsAddAmt:'', newExpenseCat:'',
       expLabel:'', expAmt:'', expCat:'Food', expRecurring:false,
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
 activities: this._mergeShipLog(s.activities),
@@ -9935,7 +9940,14 @@ activities: this._mergeShipLog(s.activities),
   setCoach(k,v){ this.mut(s=>({prefs:{...s.prefs, coaching:{...(s.prefs.coaching||{}), [k]:v}}})); }
   setFinanceBudget(cat,v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeBudgets:{...(s.prefs.financeBudgets||{}), [cat]:n}}, financeBudgetDraft:{...(s.financeBudgetDraft||{}), [cat]:undefined}})); }
   _incomeCats(){ return ['Salary','Freelance','Business','Investment','Gift','Other']; }
-  _expenseCats(){ return ['Food','Transport','Housing','Bills','Subscriptions','Shopping','Health','Entertainment','Other']; }
+  _expenseCatsDefault(){ return ['Food','Transport','Housing','Bills','Subscriptions','Shopping','Health','Entertainment','Other']; }
+  _expenseCats(){ const c=this.state.prefs.expenseCategories; return (c && c.length) ? c : this._expenseCatsDefault(); }
+  addExpenseCategory(name){ const n=(name||'').trim(); if(!n) return; const cur=this._expenseCats();
+    if(cur.some(c=>c.toLowerCase()===n.toLowerCase())) { this.setState({newExpenseCat:''}); return; }
+    this.mut(s=>({prefs:{...s.prefs, expenseCategories:[...cur, n]}, newExpenseCat:''})); }
+  removeExpenseCategory(name){ const cur=this._expenseCats(); if(cur.length<=1) return;
+    const next=cur.filter(c=>c!==name);
+    this.mut(s=>({prefs:{...s.prefs, expenseCategories:next, financeBudgets:Object.fromEntries(Object.entries(s.prefs.financeBudgets||{}).filter(([k])=>k!==name))}, expCat: s.expCat===name ? (next[0]||'Other') : s.expCat})); }
   // Real class methods (not just renderVals closures) so both the UI button AND the voice
   // dispatcher's host.tools.logIncome/logExpense (which call this.addIncome/this.addExpense
   // directly) can trigger them — previously these only existed as renderVals closures, which
@@ -12175,6 +12187,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.63', date:'Aug 21, 2026', major:true, notes:[
+      'Budget vs Actual categories are no longer a fixed hardcoded list \u2014 add your own category (a text field + button at the bottom of the list) or remove one you don\u2019t use (\u00d7 on each row, at least one category always stays). This same list also drives the category chips on Log Expense, so an added or removed category shows up there too. Removing a category clears its budget number; your historical expenses already logged under it are untouched.',
+    ]},
     {version:'v11.62', date:'Aug 21, 2026', major:false, notes:[
       'Fixed the Income vs Expenses chart showing a "$1" scale label when nothing was logged yet for the year. The chart\u2019s bar-height math uses a divide-by-zero guard that falls back to 1 when there\u2019s no real data \u2014 that fallback was harmless until the new scale label started displaying it as if it were a real number. The label now only shows once you actually have real income or expenses logged.',
     ]},
@@ -15368,7 +15383,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             budgetInput:(S.financeBudgetDraft&&S.financeBudgetDraft[c]!=null)?S.financeBudgetDraft[c]:(budget||''),
             setBudget:(e)=>this.setState(s=>({financeBudgetDraft:{...(s.financeBudgetDraft||{}),[c]:e.target.value}})),
             save:()=>this.setFinanceBudget(c, (this.state.financeBudgetDraft||{})[c]),
-            saveKey:enterKey(()=>this.setFinanceBudget(c, (this.state.financeBudgetDraft||{})[c])) }; });
+            saveKey:enterKey(()=>this.setFinanceBudget(c, (this.state.financeBudgetDraft||{})[c])),
+            canRemove: cats.length>1, remove:()=>this.removeExpenseCategory(c) }; });
         const budgetedCats=cats.filter(c=>+(budgets[c])>0);
         const totalBudget=budgetedCats.reduce((a,c)=>a+(+(budgets[c])||0),0), totalSpent=cats.reduce((a,c)=>a+spentByCat(c),0);
         const pctBudgetUsed=totalBudget?Math.round(totalSpent/totalBudget*100):0;
@@ -15378,6 +15394,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           plannerPaceLabel: totalBudget ? (isCurrentMonth ? ('Day '+dayOfMonth+' of '+daysInMonth+' ('+pctThroughMonth+'% through) \u00b7 '+pctBudgetUsed+'% of budget used') : (pctBudgetUsed+'% of budget used')) : '',
           plannerPaceColor: paceHot ? '#ff5563' : '#8a8a92',
           plannerRows,
+          newExpenseCat:S.newExpenseCat||'', setNewExpenseCat:(e)=>this.setState({newExpenseCat:e.target.value}),
+          addExpenseCategoryClick:()=>this.addExpenseCategory(S.newExpenseCat),
+          addExpenseCategoryKey:enterKey(()=>this.addExpenseCategory(S.newExpenseCat)),
           plannerTotalLabel: totalBudget? ('$'+totalSpent.toLocaleString()+' / $'+totalBudget.toLocaleString()+' this month') : ('$'+totalSpent.toLocaleString()+' spent \u2014 set budgets below'),
           plannerTotalColor: totalBudget && totalSpent>totalBudget ? '#ff5563' : '#eef0f2',
           finPlannerRings: ringCats.map(c=>{ const spent=spentByCat(c); const budget=+(budgets[c])||0; const val=budget?Math.min(1,spent/budget):0;
