@@ -107,11 +107,14 @@
     resize();
 
     var targetHover = 0, hoverAmt = 0;
+    // Current drifted centre (updated every frame below) so hover detection tracks
+    // the cluster's actual on-screen position, not the container's fixed centre.
+    var curOcx = 0, curOcy = 0;
     function onMove(e) {
       var rect = container.getBoundingClientRect();
       var x = e.clientX - rect.left, y = e.clientY - rect.top;
       var size = Math.min(rect.width, rect.height) || 1;
-      var ux = (x - rect.width / 2) / size, uy = (y - rect.height / 2) / size;
+      var ux = (x - curOcx) / size, uy = (y - curOcy) / size;
       targetHover = Math.sqrt(ux * ux + uy * uy) < 0.9 ? 1 : 0;
     }
     function onLeave() { targetHover = 0; }
@@ -127,6 +130,10 @@
     }
 
     var rotY = 0, lastT = 0, breathePhase = Math.random() * Math.PI * 2;
+    // Fish-swim drift: two mismatched-frequency waves make the centre wander an
+    // organic, non-repeating path around the container instead of holding still.
+    var driftPhaseA = Math.random() * Math.PI * 2, driftPhaseB = Math.random() * Math.PI * 2;
+    var driftFA = 0.00023 + Math.random() * 0.00006, driftFB = 0.00015 + Math.random() * 0.00005;
     var rafId;
     function frame(t) {
       rafId = root.requestAnimationFrame(frame);
@@ -150,17 +157,33 @@
       var R = Math.min(cw, ch) * 0.3 * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
       var focal = R * 2.6;
 
+      // Wander the whole cluster's centre around the container like a fish
+      // swimming, and derive a heading + speed from the path's own velocity so
+      // the silhouette can flex (stretch along the direction of travel) as it
+      // moves — both computed once per frame, not per particle.
+      var wanderMax = Math.max(0, Math.min(cw, ch) * 0.5 - R - 26);
+      var wanderRange = Math.min(wanderMax, Math.min(cw, ch) * 0.16);
+      var angA = t * driftFA + driftPhaseA, angB = t * driftFB + driftPhaseB;
+      var ocx = cw / 2 + Math.sin(angA) * wanderRange;
+      var ocy = ch / 2 + Math.sin(angB) * wanderRange * 0.72;
+      var dvx = Math.cos(angA) * driftFA * wanderRange, dvy = Math.cos(angB) * driftFB * wanderRange * 0.72;
+      var headAngle = Math.atan2(dvy, dvx);
+      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / (wanderRange * 0.00016), 0, 1);
+      var squash = 0.14 * speedNorm;
+      var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
+      curOcx = ocx; curOcy = ocy;
+
       ctx.clearRect(0, 0, cw, ch);
 
       // Soft ambient glow behind the sphere, using the mid-tone palette color.
-      var g = ctx.createRadialGradient(cw / 2, ch / 2, 0, cw / 2, ch / 2, R * 1.35);
+      var g = ctx.createRadialGradient(ocx, ocy, 0, ocx, ocy, R * 1.35);
       g.addColorStop(0, toCss(col2, 0.16 * dimMul + hoverAmt * 0.08));
       g.addColorStop(1, toCss(col2, 0));
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, cw, ch);
       // Faint core mass glow so the shard cloud reads as one dense, cohesive
       // object rather than scattered dust — a soft chrome sphere underneath.
-      var core = ctx.createRadialGradient(cw / 2, ch / 2, 0, cw / 2, ch / 2, R * 0.92);
+      var core = ctx.createRadialGradient(ocx, ocy, 0, ocx, ocy, R * 0.92);
       core.addColorStop(0, toCss(mixCol(col3, col1, 0.5), 0.1 * dimMul + hoverAmt * 0.05));
       core.addColorStop(0.75, toCss(col3, 0.06 * dimMul));
       core.addColorStop(1, toCss(col3, 0));
@@ -187,8 +210,15 @@
         var y1 = py * cosX - z1 * sinX, z2 = py * sinX + z1 * cosX;
         var persp = focal / (focal + z2 * R);
         var glint = Math.pow(Math.max(0, Math.sin(t * p.glintSpeed + p.glintPhase)), 9);
+        // Flex the silhouette along the direction of travel: rotate into the
+        // heading frame, stretch/squash there, then rotate back — so the
+        // cluster elongates slightly as it swims rather than staying rigid.
+        var offx = x1 * R * persp, offy = y1 * R * persp;
+        var lx = offx * hc + offy * hs, ly = -offx * hs + offy * hc;
+        lx *= (1 + squash); ly *= (1 - squash * 0.6);
+        var fx = lx * hc - ly * hs, fy = lx * hs + ly * hc;
         proj.push({
-          sx: cw / 2 + x1 * R * persp, sy: ch / 2 + y1 * R * persp,
+          sx: ocx + fx, sy: ocy + fy,
           depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase,
           glint: glint, detach: detach,
           kink: p.spikeKink + Math.sin(t * p.spikeWobSpeed + p.spikeWob) * 0.1, lenMul: p.spikeLenMul
@@ -223,7 +253,7 @@
         // direction from the orb's centre through this point), kinked and
         // length-varied per spike so the silhouette bristles/tufts unevenly —
         // like the reference — instead of a smooth uniform sea-urchin.
-        var dx = q.sx - cw / 2, dy = q.sy - ch / 2, dlen = Math.sqrt(dx * dx + dy * dy) || 1;
+        var dx = q.sx - ocx, dy = q.sy - ocy, dlen = Math.sqrt(dx * dx + dy * dy) || 1;
         var ndx = dx / dlen, ndy = dy / dlen;
         var ca = Math.cos(q.kink), sa = Math.sin(q.kink);
         var rdx = ndx * ca - ndy * sa, rdy = ndx * sa + ndy * ca;
@@ -255,7 +285,7 @@
       if (forceHoverState) {
         var pulse = (Math.sin(t * 0.0026) + 1) / 2;
         ctx.beginPath();
-        ctx.arc(cw / 2, ch / 2, R * (1.06 + pulse * 0.07), 0, Math.PI * 2);
+        ctx.arc(ocx, ocy, R * (1.06 + pulse * 0.07), 0, Math.PI * 2);
         ctx.strokeStyle = toCss(col1, 0.16 + pulse * 0.14);
         ctx.lineWidth = Math.max(1, R * 0.012);
         ctx.stroke();
