@@ -134,9 +134,9 @@
     // centre wander a wide, organic, non-repeating path around the tank
     // instead of holding still or tracing a simple oval.
     var driftPhaseA = Math.random() * Math.PI * 2, driftPhaseB = Math.random() * Math.PI * 2;
-    var driftFA = 0.00072 + Math.random() * 0.00018, driftFB = 0.00046 + Math.random() * 0.00014;
+    var driftFA = 0.00144 + Math.random() * 0.00036, driftFB = 0.00092 + Math.random() * 0.00028;
     var driftPhaseA2 = Math.random() * Math.PI * 2, driftPhaseB2 = Math.random() * Math.PI * 2;
-    var driftFA2 = driftFA * 2.3 + Math.random() * 0.0002, driftFB2 = driftFB * 1.7 + Math.random() * 0.00015;
+    var driftFA2 = driftFA * 2.3 + Math.random() * 0.0004, driftFB2 = driftFB * 1.7 + Math.random() * 0.0003;
     var rafId;
     function frame(t) {
       rafId = root.requestAnimationFrame(frame);
@@ -164,8 +164,8 @@
       // swimming, and derive a heading + speed from the path's own velocity so
       // the silhouette can flex (stretch along the direction of travel) as it
       // moves — both computed once per frame, not per particle.
-      var wanderMax = Math.max(0, Math.min(cw, ch) * 0.5 - R - 16);
-      var wanderRange = Math.min(wanderMax, Math.min(cw, ch) * 0.32);
+      var wanderMax = Math.max(0, Math.min(cw, ch) * 0.5 - R * 0.3 - 6);
+      var wanderRange = Math.min(wanderMax, Math.min(cw, ch) * 0.62);
       var wanderRange2 = wanderRange * 0.4;
       var angA = t * driftFA + driftPhaseA, angB = t * driftFB + driftPhaseB;
       var angA2 = t * driftFA2 + driftPhaseA2, angB2 = t * driftFB2 + driftPhaseB2;
