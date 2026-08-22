@@ -3418,8 +3418,7 @@
       </sc-if>
       <div style="animation:rise .5s ease both; display:flex; flex-direction:column; align-items:center; position:relative; z-index:4;">
         <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="width:100%; max-width:720px; font-size:12px; color:#ff8a5b; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(255,138,91,0.1); border:1px solid rgba(255,138,91,0.25);">⚠ {{ voiceFallbackErr }}</div></sc-if>
-        <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center; padding:36px 0 26px; margin-bottom:18px;">
-          <div style="position:absolute; inset:-40px 0; z-index:0; background:{{ vGlow }};"></div>
+        <div style="position:relative; width:100%; min-height:620px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:36px 0 26px; margin-bottom:18px;">
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
@@ -9005,7 +9004,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-94 · v11.94 orb-remove-box';
+const NOTIF_BUILD_VERSION = '2026.08.22-95 · v11.95 orb-cleanup-resize';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12332,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.95', date:'Aug 22, 2026', major:true, notes:[
+      'Removed a leftover tinted glow panel that used to sit behind the orb\'s old box — now that the orb roams the full screen, that panel was left behind as a visible empty rectangle in its old spot, which read as "the old box." Also sized the orb back down: it had grown to match the size of whatever huge area it was mounted in, so on a full screen it had ballooned to fill a large chunk of it. It\'s now capped at its original compact size regardless of how much room it has to roam. Restored the voice page\'s original vertical spacing so the layout doesn\'t look compressed now that the orb no longer occupies that space itself.',
+    ]},
     {version:'v11.94', date:'Aug 22, 2026', major:true, notes:[
       'Removed the orb\'s box entirely — it now swims across the whole browser window as a fixed backdrop layer behind the page, instead of being sized to a section of it. The section that used to hold it (previously ~52vh tall) is back to its natural compact size around the controls; the orb itself is no longer confined to any div at all.',
     ]},

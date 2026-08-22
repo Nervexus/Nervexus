@@ -157,7 +157,10 @@
 
       // Compact core radius — the spike cluster floats in open space like the
       // reference (a fist-sized bristling clump), not a shape filling the frame.
-      var R = Math.min(cw, ch) * 0.3 * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
+      // Capped in absolute pixels so a full-viewport mount doesn't blow the
+      // cluster up to fill the screen — it should look the same size it did
+      // in the original 460px container, just free to roam a much bigger area.
+      var R = Math.min(Math.min(cw, ch) * 0.3, 140) * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
       var focal = R * 2.6;
 
       // Wander the whole cluster's centre around the container like a fish
