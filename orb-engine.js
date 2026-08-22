@@ -170,8 +170,13 @@
       // moves — both computed once per frame, not per particle. X and Y ranges
       // are sized off the container's own width/height (not just the shorter
       // side) so a wide, short tank lets the cluster roam the full width.
-      var wanderMaxX = Math.max(0, cw * 0.5 - R * 0.3 - 6);
-      var wanderMaxY = Math.max(0, ch * 0.5 - R * 0.3 - 6);
+      // Reserve enough edge margin for the cluster's full visual reach, not
+      // just its core radius — shell points can pulse out to ~1.22x R (detach)
+      // and spikes tip further still, so a small margin let the silhouette
+      // clip off the edge of the container at the far end of the wander path.
+      var edgeMargin = R * 1.3 + 80;
+      var wanderMaxX = Math.max(0, cw * 0.5 - edgeMargin);
+      var wanderMaxY = Math.max(0, ch * 0.5 - edgeMargin);
       var wanderRangeX = Math.min(wanderMaxX, cw * 0.62);
       var wanderRangeY = Math.min(wanderMaxY, ch * 0.62);
       var wanderRangeX2 = wanderRangeX * 0.4, wanderRangeY2 = wanderRangeY * 0.4;
@@ -193,8 +198,10 @@
       // Ease toward the target squash instead of snapping to it every frame —
       // the raw per-frame value could jump around fast enough that the
       // silhouette looked like it was flicking between round/oval/square
-      // instead of gradually flexing.
-      squashSmooth += (0.2 * speedNorm - squashSmooth) * 0.02;
+      // instead of gradually flexing. Range widened so resting (squash~0,
+      // a compact even silhouette) versus full speed (a clearly elongated
+      // long oval) actually reads as two distinct shapes.
+      squashSmooth += (0.42 * speedNorm - squashSmooth) * 0.02;
       var squash = squashSmooth;
       var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
       curOcx = ocx; curOcy = ocy;

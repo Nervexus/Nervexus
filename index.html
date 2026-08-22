@@ -9004,7 +9004,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-96 · v11.96 orb-content-bounds';
+const NOTIF_BUILD_VERSION = '2026.08.22-97 · v11.97 orb-edge-margin-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.97', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the orb visibly clipping off the edge of its section at the far end of its wander path — the roam range only reserved a sliver of margin based on the core radius, not the cluster\'s full reach once spikes and the occasional outward pulse are counted, so the silhouette could poke past the boundary. Margin is now sized off the real worst-case visual reach. Also widened the shape-flex range so resting-vs-full-speed reads as a clear compact-to-long-oval change instead of a subtle one.',
+    ]},
     {version:'v11.96', date:'Aug 22, 2026', major:true, notes:[
       'Orb now stays inside the actual page content area — it measures the real sidebar width and top bar height and clips its own roam area to that, so it can never swim over the nav rail or the header. Slowed the drift down further. Also fixed the shape-flex feeling jumpy (snapping between round/oval/square-ish): it now eases toward its target shape gradually instead of matching the instantaneous speed every single frame.',
     ]},
