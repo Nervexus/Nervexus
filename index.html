@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-81 · v11.81 fake-widget-audit';
+const NOTIF_BUILD_VERSION = '2026.08.22-82 · v11.82 speaking-crash-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12327,6 +12327,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.82', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed Speaking practice crashing — its multiple-choice generator, quick tests and level-based drills all called pick()/shuffle() helpers that every other subject file defines locally but Speaking never did, so hitting those code paths threw a silent error instead of showing a question. Added the same two helpers Speaking was missing.',
+    ]},
     {version:'v11.81', date:'Aug 22, 2026', major:true, notes:[
       'Fake-widget audit pass across Command Center, Power Level and World Intelligence HQ. Command Center: removed a hardcoded "markets open green · recovery optimal" line under Operations Overview that never reflected anything real; the "PRODUCTIVITY · LAST 30 DAYS" chart was a purely decorative animated sine-wave with a fixed "+18%" next to it — both now driven by your real logged activity/mission history, with a genuine period-over-period delta; the "Intelligence Feed" card was 4 permanently-fixed fake headlines badged "LIVE" — relabeled SAMPLE DATA with a note pointing at your real AI Daily Brief and World Intel’s News tab. Power Level: 4 of the 12 "Attributes" (Consistency, Health, Recovery, Mental Resilience) were hardcoded flat values that could never move no matter what you logged, yet the "AI Performance Specialist" panel could still pick one as your "weakest attribute" and tell you to go improve it — now driven by your real login streak, sleep log, hydration, meals and body-weight check-ins. World Intel: "Threat Levels" showed 3 fixed fake counts (23/61/45) that never changed regardless of country selected — replaced with a real distribution across every country in the actual risk model; "Intelligence Alerts" (5 fabricated alerts with fake timestamps and confidence scores, no live source) now honestly labelled SAMPLE DATA, matching the News tab’s existing treatment. Also removed a fully dead "system status" widget list (DEFCON level, quantum link, etc.) that was computed every render but never actually shown anywhere.',
     ]},

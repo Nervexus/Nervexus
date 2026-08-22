@@ -10,6 +10,10 @@
 (function (root) {
   'use strict';
 
+  function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(arr) { return arr[ri(0, arr.length - 1)]; }
+  function shuffle(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = ri(0, i); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
   var TIERS = {
     Basic: [
       { text: 'Hello, how are you?', phonetic: 'heh-LOH, how ar YOO?', tip: 'Rising pitch on "you" — it\u2019s a genuine question, so let your voice lift at the end.' },
