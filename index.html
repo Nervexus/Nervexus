@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-85 · v11.85 transformium-orb';
+const NOTIF_BUILD_VERSION = '2026.08.22-86 · v11.86 orb-spike-cluster';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12334,6 +12334,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.86', date:'Aug 22, 2026', major:true, notes:[
+      'Corrected the orb redesign to actually match the reference clip — a compact, bristling clump of thin metal spikes floating in open space (like the wire-spike cluster forming above the hand), not a shape that filled the whole container. Shrunk the cluster down, switched every particle from a flat diamond to a thin spike radiating outward from the core with its own kink and length so the silhouette bristles unevenly, and brightened the glinting highlights.',
+    ]},
     {version:'v11.85', date:'Aug 22, 2026', major:true, notes:[
       'Redesigned the Voice Assistant orb — inspired by the "transformium" effect from Transformers: Age of Extinction. Instead of a cloud of plain glowing dots, it’s now a dense mass of small metallic shard particles that churns and swirls across the surface, catches sharp glinting highlights as facets rotate into the light, and has individual shards periodically break free and re-settle. Same listening-state ring and hover speed-up as before, just a proper liquid-metal look instead of soft dust.',
     ]},

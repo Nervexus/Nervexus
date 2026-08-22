@@ -38,9 +38,11 @@
         glintPhase: Math.random() * Math.PI * 2, glintSpeed: 0.0009 + Math.random() * 0.0018,
         // Detach: rare, brief outward pulses — a shard breaks free and re-settles.
         detachPhase: Math.random() * Math.PI * 2, detachSpeed: 0.00018 + Math.random() * 0.00022,
-        // Per-shard shape/rotation so flakes don't all face the same way.
-        shardRot: Math.random() * Math.PI * 2, shardSpin: (Math.random() - 0.5) * 0.004,
-        shardAsym: 0.55 + Math.random() * 0.6
+        // Spikes point radially outward from the cluster core (like the reference —
+        // a bristling ball of wire-thin metal spikes), with a per-spike angular kink
+        // and length so the silhouette is tufted/irregular, not a perfect sea urchin.
+        spikeKink: (Math.random() - 0.5) * 0.9, spikeLenMul: 0.45 + Math.random() * 1.9,
+        spikeWob: Math.random() * Math.PI * 2, spikeWobSpeed: 0.0004 + Math.random() * 0.0009
       });
     }
     return pts;
@@ -140,7 +142,9 @@
       // Churn scales up a little with hover/listening, like the mass agitating.
       var churnAmt = 0.055 + hoverAmt * 0.05 + (forceHoverState ? 0.03 : 0);
 
-      var R = Math.min(cw, ch) * 0.46 * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.018 + hoverAmt * 0.03);
+      // Compact core radius — the spike cluster floats in open space like the
+      // reference (a fist-sized bristling clump), not a shape filling the frame.
+      var R = Math.min(cw, ch) * 0.3 * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
       var focal = R * 2.6;
 
       ctx.clearRect(0, 0, cw, ch);
@@ -183,7 +187,8 @@
         proj.push({
           sx: cw / 2 + x1 * R * persp, sy: ch / 2 + y1 * R * persp,
           depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase,
-          glint: glint, detach: detach, rot: p.shardRot + t * p.shardSpin, asym: p.shardAsym
+          glint: glint, detach: detach,
+          kink: p.spikeKink + Math.sin(t * p.spikeWobSpeed + p.spikeWob) * 0.3, lenMul: p.spikeLenMul
         });
       }
       proj.sort(function (a, b) { return a.depth - b.depth; });
@@ -191,8 +196,8 @@
       for (var j = 0; j < proj.length; j++) {
         var q = proj[j];
         var twinkle = 0.85 + Math.sin(t * 0.0022 * q.tw + q.phase) * 0.15;
-        var alpha = clamp(0.32 + q.depth * 0.68, 0, 1) * twinkle * (1 - q.detach * 0.35);
-        var rad = (1.35 + q.depth * 2.5) * (cw < 120 ? 0.6 : 1) * (1 + hoverAmt * 0.25 + q.detach * 0.5);
+        var alpha = clamp(0.46 + q.depth * 0.62, 0, 1) * twinkle * (1 - q.detach * 0.3);
+        var rad = (1.15 + q.depth * 2) * (cw < 120 ? 0.6 : 1) * (1 + hoverAmt * 0.2 + q.detach * 0.4);
 
         // Base shard tone: cool dark metal -> bright chrome by depth, tinted by
         // the theme hue; a sharp glint spikes it towards near-white — the
@@ -206,21 +211,35 @@
         if (glow > 0.05) { ctx.shadowBlur = rad * (2.2 + glow * 3.4); ctx.shadowColor = toCss(glowCol, Math.min(1, 0.55 * glow)); }
         else { ctx.shadowBlur = 0; }
 
-        // Small rotated diamond "shard" instead of a round dot — reads as a metal
-        // flake catching the light rather than a soft glowing point.
-        ctx.save();
-        ctx.translate(q.sx, q.sy);
-        ctx.rotate(q.rot);
-        var len = Math.max(0.8, rad * (1.6 + q.glint * 0.7)), wid = Math.max(0.55, rad * q.asym);
+        // Thin wire spike radiating outward from the cluster core (screen-space
+        // direction from the orb's centre through this point), kinked and
+        // length-varied per spike so the silhouette bristles/tufts unevenly —
+        // like the reference — instead of a smooth uniform sea-urchin.
+        var dx = q.sx - cw / 2, dy = q.sy - ch / 2, dlen = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ndx = dx / dlen, ndy = dy / dlen;
+        var ca = Math.cos(q.kink), sa = Math.sin(q.kink);
+        var rdx = ndx * ca - ndy * sa, rdy = ndx * sa + ndy * ca;
+        var perpx = -rdy, perpy = rdx;
+        var baseIn = rad * 0.5;
+        var bx = q.sx - rdx * baseIn, by = q.sy - rdy * baseIn;
+        var spikeLen = rad * (3.4 + q.glint * 1.8) * q.lenMul;
+        var tx = q.sx + rdx * spikeLen, ty = q.sy + rdy * spikeLen;
+        var wid = Math.max(0.5, rad * 0.5);
         ctx.fillStyle = toCss(shardCol, alpha);
         ctx.beginPath();
-        ctx.moveTo(0, -len);
-        ctx.lineTo(wid, 0);
-        ctx.lineTo(0, len);
-        ctx.lineTo(-wid, 0);
+        ctx.moveTo(bx + perpx * wid, by + perpy * wid);
+        ctx.lineTo(bx - perpx * wid, by - perpy * wid);
+        ctx.lineTo(tx, ty);
         ctx.closePath();
         ctx.fill();
-        ctx.restore();
+        // A bright glint spark right at the tip — the sharpest highlight in the
+        // reference, where a facet flashes as it catches the light.
+        if (q.glint > 0.35) {
+          ctx.fillStyle = toCss([1, 1, 1], alpha * q.glint);
+          ctx.beginPath();
+          ctx.arc(tx, ty, Math.max(0.5, rad * 0.35 * q.glint), 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
       ctx.shadowBlur = 0;
 
