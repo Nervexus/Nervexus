@@ -197,13 +197,11 @@
         else if (snakeY > boundB) { snakeY = boundB; snakeHeading = -snakeHeading; }
       }
       var ocx = snakeX, ocy = snakeY;
-      var hc = Math.cos(snakeHeading), hs = Math.sin(snakeHeading);
-      // Ease toward the target squash instead of snapping to it — a clear
-      // compact "square-ish" resting shape while stopped, easing into a
-      // pronounced long oval once it's actually swimming, rather than a
-      // subtle continuous function of instantaneous speed.
-      squashSmooth += ((driftEnabled ? 0.5 : 0) - squashSmooth) * 0.015;
-      var squash = squashSmooth;
+      // Ease toward the target instead of snapping to it — a squared-off
+      // silhouette while stopped, relaxing into the cluster's natural round
+      // form once it's actually swimming, rather than snapping instantly.
+      squashSmooth += ((driftEnabled ? 0 : 1) - squashSmooth) * 0.015;
+      var squareAmt = squashSmooth;
       curOcx = ocx; curOcy = ocy;
 
       ctx.clearRect(0, 0, cw, ch);
@@ -243,13 +241,15 @@
         var y1 = py * cosX - z1 * sinX, z2 = py * sinX + z1 * cosX;
         var persp = focal / (focal + z2 * R);
         var glint = Math.pow(Math.max(0, Math.sin(t * p.glintSpeed + p.glintPhase)), 9);
-        // Flex the silhouette along the direction of travel: rotate into the
-        // heading frame, stretch/squash there, then rotate back — so the
-        // cluster elongates slightly as it swims rather than staying rigid.
+        // Morph the silhouette between its natural circle (squareAmt 0) and a
+        // rounded square (squareAmt 1): push each point out to where a square
+        // boundary would sit along that same angle from centre, blended by
+        // squareAmt, instead of just stretching into an oval.
         var offx = x1 * R * persp, offy = y1 * R * persp;
-        var lx = offx * hc + offy * hs, ly = -offx * hs + offy * hc;
-        lx *= (1 + squash); ly *= (1 - squash * 0.6);
-        var fx = lx * hc - ly * hs, fy = lx * hs + ly * hc;
+        var offMag = Math.sqrt(offx * offx + offy * offy) || 1;
+        var squareScale = offMag / Math.max(Math.abs(offx), Math.abs(offy));
+        var shapeMul = 1 + (squareScale - 1) * squareAmt;
+        var fx = offx * shapeMul, fy = offy * shapeMul;
         proj.push({
           sx: ocx + fx, sy: ocy + fy,
           depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase,

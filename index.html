@@ -9008,7 +9008,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-101 · v11.101 orb-drift-frozen-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-102 · v11.102 orb-square-circle-shape';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12337,6 +12337,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.102', date:'Aug 22, 2026', major:true, notes:[
+      'Replaced the orb\'s oval stretch with a real square-to-circle morph — stopped, the cluster settles into a rounded square silhouette; swimming, it relaxes back into its natural circular form. Each point is pushed out to where a square boundary would sit at that same angle from centre rather than just being stretched along the direction of travel.',
+    ]},
     {version:'v11.101', date:'Aug 22, 2026', major:true, notes:[
       'Fixed the orb not actually moving — the snake-drift code introduced last update computed its per-frame time delta from a variable that had already been overwritten with the current frame\'s own timestamp earlier in the same function, so the elapsed time was always zero and the cluster never advanced, even with drift switched on. It now uses the correctly-captured delta and swims properly again.',
     ]},
