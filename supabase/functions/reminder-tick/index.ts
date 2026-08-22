@@ -129,34 +129,46 @@ async function sweepMissions(admin: any, userId: string, prefs: Record<string, a
   return { sent: 1 };
 }
 
-// `events` has no repeat_days column server-side — recurrence is currently a
-// client-only field that never actually gets persisted (the insert call sends
-// it, but the live table doesn't have it, so it's silently dropped by
-// PostgREST's column filtering on read). Only one-off events (matched by
-// event_date) can be swept reliably until that's added.
+// `events.repeat_days` (a per-weekday array, e.g. ['MON','WED','FRI']) — mirrors the
+// client's own _eventOccursOn(): an event occurs today if today IS its original
+// event_date, or today is strictly after it and today's weekday is in repeat_days.
+function dowCode(ds: string) {
+  const d = new Date(ds + 'T00:00:00Z');
+  return ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'][(d.getUTCDay() + 6) % 7];
+}
+function eventOccursOn(e: { event_date: string; repeat_days?: string[] | null }, ds: string) {
+  if (e.event_date === ds) return true;
+  if (!e.repeat_days || !e.repeat_days.length) return false;
+  return ds > e.event_date && e.repeat_days.indexOf(dowCode(ds)) !== -1;
+}
 async function sweepCalendarEvents(admin: any, userId: string, prefs: Record<string, any>) {
   if (prefs.reminderPushEnabled === false && !(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0 };
   const leadMin = prefs.reminderLeadMins || 15;
 
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
+  // Every non-deleted event is fetched, not just ones dated today — a recurring event's
+  // own event_date can be any date in the past, so it has to be checked against today's
+  // weekday via repeat_days rather than matched by date directly.
   const { data: events } = await admin
-    .from('events').select('id,title,event_date,event_time')
-    .eq('user_id', userId).eq('event_date', todayStr).is('deleted_at', null);
+    .from('events').select('id,title,event_date,event_time,repeat_days')
+    .eq('user_id', userId).is('deleted_at', null);
   if (!events || !events.length) return { sent: 0 };
 
   let sent = 0;
   for (const e of events) {
     if (!e.event_date || !e.event_time) continue;
-    const occ = e.event_date;
+    if (!eventOccursOn(e, todayStr)) continue;
 
-    const dt = new Date(occ + 'T' + e.event_time + ':00');
+    const dt = new Date(todayStr + 'T' + e.event_time + ':00');
     const mins = (dt.getTime() - now.getTime()) / 60000;
     // Cron runs every 15 min, so a lead-time window this wide (up to 16 min) guarantees
     // exactly one tick lands inside it without needing extra state on `events` itself.
     if (mins > leadMin || mins <= leadMin - 16) continue;
 
-    const dedupeKey = 'calendar:' + e.id + ':' + occ;
+    // Keyed to TODAY's occurrence, not the event's original event_date — a recurring
+    // event used to dedupe against its first-ever firing forever and never fire again.
+    const dedupeKey = 'calendar:' + e.id + ':' + todayStr;
     const { data: already } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
     if (already && already.length) continue;
 

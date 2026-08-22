@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-82 · v11.82 speaking-crash-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-83 · v11.83 recurring-reminders';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9514,12 +9514,16 @@ activities: this._mergeShipLog(s.activities),
   _checkEventReminders(){
     const p=this.state.prefs||{}; if(p.reminderPushEnabled===false && !p.reminderEmailEnabled) return;
     const events=this.state.events||[]; if(!events.length) return;
-    const now=new Date(); const fired=p._remindersFired||{};
+    const now=new Date(); const todayStr=this._todayStr(); const fired=p._remindersFired||{};
     events.forEach(ev=>{
-      if(!ev.date || !ev.time || fired[ev.id]) return;
-      const dt=new Date(ev.date+'T'+ev.time); const mins=(dt-now)/60000; const lead=p.reminderLeadMins||15;
+      // Recurring events used to be keyed to fire[ev.id] only (and computed the trigger
+      // time from the event's original date forever) — a weekly event fired once, ever,
+      // and never again. Both are now keyed to today's actual occurrence.
+      if(!ev.date || !ev.time || !this._eventOccursOn(ev,todayStr)) return;
+      const key=ev.id+':'+todayStr; if(fired[key]) return;
+      const dt=new Date(todayStr+'T'+ev.time); const mins=(dt-now)/60000; const lead=p.reminderLeadMins||15;
       if(mins>lead-2 && mins<=lead){
-        this.mut(s=>({prefs:{...s.prefs, _remindersFired:{...(s.prefs._remindersFired||{}), [ev.id]:true}}}));
+        this.mut(s=>({prefs:{...s.prefs, _remindersFired:{...(s.prefs._remindersFired||{}), [key]:true}}}));
         const title='Upcoming: '+ev.title; const body='Starts at '+ev.time+' today.';
         const channels=['inapp']; if(p.reminderPushEnabled!==false) channels.push('push'); if(p.reminderEmailEnabled && p.reminderEmailAddr) channels.push('email');
         if(window.NotificationManager) window.NotificationManager.notify({type:'calendar', title, body, source:{type:'event',id:ev.id}, channels}, this._notifHost());
@@ -12327,6 +12331,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.83', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed recurring calendar events never getting a push/email reminder past their first occurrence. Three real bugs: the events table was missing the repeat_days column entirely — the app had been sending and reading it for a while, silently dropped every time; the out-of-app reminder sweep only ever checked events dated exactly today, ignoring recurrence altogether; and both the in-app and out-of-app reminder logic deduped a fired reminder by the event’s original date/ID, so a weekly event could only ever fire once in its lifetime. All three are fixed — recurring events are now evaluated against today’s weekday and each occurrence gets its own reminder.',
+    ]},
     {version:'v11.82', date:'Aug 22, 2026', major:true, notes:[
       'Fixed Speaking practice crashing — its multiple-choice generator, quick tests and level-based drills all called pick()/shuffle() helpers that every other subject file defines locally but Speaking never did, so hitting those code paths threw a silent error instead of showing a question. Added the same two helpers Speaking was missing.',
     ]},
