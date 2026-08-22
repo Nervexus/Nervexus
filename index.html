@@ -3394,7 +3394,7 @@
 
       <!-- ===== VOICE ===== -->
       <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
-      <div style="position:fixed; inset:0; z-index:3; background:{{ vOverlay }}; pointer-events:none;"></div>
+      <div style="position:fixed; inset:0; z-index:-1; background:{{ vOverlay }}; pointer-events:none;"></div>
       <div data-orb-mount="voice" style="position:fixed; left:0; top:0; right:0; bottom:0; z-index:0; pointer-events:none;"></div>
 
       <sc-if value="{{ convoHistoryOpen }}" hint-placeholder-val="{{ false }}">
@@ -9008,7 +9008,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-102 · v11.102 orb-square-circle-shape';
+const NOTIF_BUILD_VERSION = '2026.08.22-103 · v11.103 voice-overlay-blackout-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12337,6 +12337,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.103', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the voice page going solid black on any dark theme (including Noir) — a full-screen background tint behind the orb was set to a high z-index that put it in front of the fixed header instead of behind it, painting over the raiment/theme switcher, clock, search bar and the orb itself with opaque black. It now sits behind everything as the backdrop it was meant to be, so the header and the orb are visible again on dark themes.',
+    ]},
     {version:'v11.102', date:'Aug 22, 2026', major:true, notes:[
       'Replaced the orb\'s oval stretch with a real square-to-circle morph — stopped, the cluster settles into a rounded square silhouette; swimming, it relaxes back into its natural circular form. Each point is pushed out to where a square boundary would sit at that same angle from centre rather than just being stretched along the direction of travel.',
     ]},
