@@ -134,9 +134,9 @@
     // centre wander a wide, organic, non-repeating path around the tank
     // instead of holding still or tracing a simple oval.
     var driftPhaseA = Math.random() * Math.PI * 2, driftPhaseB = Math.random() * Math.PI * 2;
-    var driftFA = 0.00144 + Math.random() * 0.00036, driftFB = 0.00092 + Math.random() * 0.00028;
+    var driftFA = 0.00052 + Math.random() * 0.00013, driftFB = 0.00033 + Math.random() * 0.0001;
     var driftPhaseA2 = Math.random() * Math.PI * 2, driftPhaseB2 = Math.random() * Math.PI * 2;
-    var driftFA2 = driftFA * 2.3 + Math.random() * 0.0004, driftFB2 = driftFB * 1.7 + Math.random() * 0.0003;
+    var driftFA2 = driftFA * 2.3 + Math.random() * 0.00014, driftFB2 = driftFB * 1.7 + Math.random() * 0.0001;
     var rafId;
     function frame(t) {
       rafId = root.requestAnimationFrame(frame);
@@ -178,8 +178,15 @@
       var dvx = Math.cos(angA) * driftFA * wanderRangeX + Math.cos(angA2) * driftFA2 * wanderRangeX2;
       var dvy = Math.cos(angB) * driftFB * wanderRangeY + Math.cos(angB2) * driftFB2 * wanderRangeY2;
       var headAngle = Math.atan2(dvy, dvx);
-      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / (Math.min(wanderRangeX, wanderRangeY) * 0.00075 || 1), 0, 1);
-      var squash = 0.14 * speedNorm;
+      // Normalise against the path's own true max speed (not a guessed constant)
+      // so squash actually sweeps from ~0 to its peak as the cluster speeds up
+      // and slows down along its wander path, instead of sitting pinned near
+      // the top the whole time — that pinning was why the flex read as "static."
+      var maxSpeedX = driftFA * wanderRangeX + driftFA2 * wanderRangeX2;
+      var maxSpeedY = driftFB * wanderRangeY + driftFB2 * wanderRangeY2;
+      var maxSpeed = Math.sqrt(maxSpeedX * maxSpeedX + maxSpeedY * maxSpeedY) || 1;
+      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / maxSpeed, 0, 1);
+      var squash = 0.2 * speedNorm;
       var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
       curOcx = ocx; curOcy = ocy;
 

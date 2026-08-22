@@ -9005,7 +9005,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-92 · v11.92 orb-fullwidth-tank';
+const NOTIF_BUILD_VERSION = '2026.08.22-93 · v11.93 orb-slower-flex-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.93', date:'Aug 22, 2026', major:true, notes:[
+      'Slowed the orb\'s drift back down — the last speedups made it dart around faster than intended once it had the full top-half area to roam in. Also fixed the shape-flex while swimming: it was being normalised against a rough guess that kept it pinned near its max almost constantly, so the cluster looked statically stretched instead of actually changing shape. It now normalises against the path\'s real speed at each moment, so the flex genuinely eases in and out as the cluster speeds up and slows down.',
+    ]},
     {version:'v11.92', date:'Aug 22, 2026', major:true, notes:[
       'Orb\'s swim area is now the full width of the panel and roughly the top half of the screen, instead of a fixed 460×460 box — it turned out the old fixed size was the actual "wall" the orb was hitting, not just a CSS artifact. The wander math also now uses the container\'s real width and height separately, so a wide tank lets it roam side to side, not just within a square patch in the middle.',
     ]},
