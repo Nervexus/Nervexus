@@ -9008,7 +9008,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-98 · v11.98 orb-snake-stop-oval';
+const NOTIF_BUILD_VERSION = '2026.08.22-99 · v11.99 orb-float-badge-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12337,6 +12337,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.99', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the small floating voice-orb button (bottom-right shortcut on other pages) rendering completely blank — the edge-margin fix from the last update reserved more space than the tiny 66px badge actually has, which pinned its position entirely outside its own canvas. It now correctly centres itself and spins in place on any mount too small to roam in.',
+    ]},
     {version:'v11.98', date:'Aug 22, 2026', major:true, notes:[
       'Reworked the orb\'s movement into a snake-style glide — it now advances at a steady pace with its heading curving smoothly back and forth, bouncing off the edges of its section instead of the old drifting-wave path. Added a Stop/Swim button on the orb screen: stopped, it holds its position and just spins in place; swimming, it roams around. The shape-flex is now tied to that same state — compact and even at rest, a clear long oval while it\'s actually moving — instead of a subtle effect based on instantaneous speed.',
     ]},

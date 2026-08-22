@@ -170,8 +170,15 @@
       // and spikes tip further still, so a small margin let the silhouette
       // clip off the edge of the container at the far end of the path.
       var edgeMargin = R * 1.3 + 80;
-      var boundL = edgeMargin, boundR = Math.max(edgeMargin, cw - edgeMargin);
-      var boundT = edgeMargin, boundB = Math.max(edgeMargin, ch - edgeMargin);
+      // On a small mount (the 66px floating badge, say) edgeMargin can exceed
+      // the container itself — Math.max(edgeMargin, cw-edgeMargin) would then
+      // collapse both bounds to edgeMargin, a point that sits entirely outside
+      // the canvas and renders nothing. Pin to dead-centre instead in that case.
+      var boundL, boundR, boundT, boundB;
+      if (cw <= edgeMargin * 2) { boundL = boundR = cw / 2; }
+      else { boundL = edgeMargin; boundR = cw - edgeMargin; }
+      if (ch <= edgeMargin * 2) { boundT = boundB = ch / 2; }
+      else { boundT = edgeMargin; boundB = ch - edgeMargin; }
       if (!snakeInit) { snakeInit = true; snakeX = clamp(cw / 2, boundL, boundR); snakeY = clamp(ch / 2, boundT, boundB); }
 
       var dtMs = lastT ? (t - lastT) : 16;
