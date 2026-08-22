@@ -130,10 +130,13 @@
     }
 
     var rotY = 0, lastT = 0, breathePhase = Math.random() * Math.PI * 2;
-    // Fish-swim drift: two mismatched-frequency waves make the centre wander an
-    // organic, non-repeating path around the container instead of holding still.
+    // Fish-swim drift: four mismatched-frequency waves (two per axis) make the
+    // centre wander a wide, organic, non-repeating path around the tank
+    // instead of holding still or tracing a simple oval.
     var driftPhaseA = Math.random() * Math.PI * 2, driftPhaseB = Math.random() * Math.PI * 2;
-    var driftFA = 0.00023 + Math.random() * 0.00006, driftFB = 0.00015 + Math.random() * 0.00005;
+    var driftFA = 0.00072 + Math.random() * 0.00018, driftFB = 0.00046 + Math.random() * 0.00014;
+    var driftPhaseA2 = Math.random() * Math.PI * 2, driftPhaseB2 = Math.random() * Math.PI * 2;
+    var driftFA2 = driftFA * 2.3 + Math.random() * 0.0002, driftFB2 = driftFB * 1.7 + Math.random() * 0.00015;
     var rafId;
     function frame(t) {
       rafId = root.requestAnimationFrame(frame);
@@ -161,14 +164,17 @@
       // swimming, and derive a heading + speed from the path's own velocity so
       // the silhouette can flex (stretch along the direction of travel) as it
       // moves — both computed once per frame, not per particle.
-      var wanderMax = Math.max(0, Math.min(cw, ch) * 0.5 - R - 26);
-      var wanderRange = Math.min(wanderMax, Math.min(cw, ch) * 0.16);
+      var wanderMax = Math.max(0, Math.min(cw, ch) * 0.5 - R - 16);
+      var wanderRange = Math.min(wanderMax, Math.min(cw, ch) * 0.32);
+      var wanderRange2 = wanderRange * 0.4;
       var angA = t * driftFA + driftPhaseA, angB = t * driftFB + driftPhaseB;
-      var ocx = cw / 2 + Math.sin(angA) * wanderRange;
-      var ocy = ch / 2 + Math.sin(angB) * wanderRange * 0.72;
-      var dvx = Math.cos(angA) * driftFA * wanderRange, dvy = Math.cos(angB) * driftFB * wanderRange * 0.72;
+      var angA2 = t * driftFA2 + driftPhaseA2, angB2 = t * driftFB2 + driftPhaseB2;
+      var ocx = cw / 2 + Math.sin(angA) * wanderRange + Math.sin(angA2) * wanderRange2;
+      var ocy = ch / 2 + Math.sin(angB) * wanderRange * 0.72 + Math.sin(angB2) * wanderRange2 * 0.72;
+      var dvx = Math.cos(angA) * driftFA * wanderRange + Math.cos(angA2) * driftFA2 * wanderRange2;
+      var dvy = (Math.cos(angB) * driftFB * wanderRange + Math.cos(angB2) * driftFB2 * wanderRange2) * 0.72;
       var headAngle = Math.atan2(dvy, dvx);
-      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / (wanderRange * 0.00016), 0, 1);
+      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / (wanderRange * 0.00075), 0, 1);
       var squash = 0.14 * speedNorm;
       var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
       curOcx = ocx; curOcy = ocy;

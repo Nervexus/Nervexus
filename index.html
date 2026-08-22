@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-88 · v11.88 orb-fish-drift';
+const NOTIF_BUILD_VERSION = '2026.08.22-89 · v11.89 orb-drift-faster';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12334,6 +12334,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.89', date:'Aug 22, 2026', major:true, notes:[
+      'Orb swims around a lot more now — roughly 3x faster, covers a much wider area of the screen, and its path is built from four mismatched waves instead of two so it wanders more like a real fish darting around a tank rather than tracing a simple slow oval. Still holds its spiky shape and stays smooth at ~60fps.',
+    ]},
     {version:'v11.88', date:'Aug 22, 2026', major:true, notes:[
       'The orb now drifts around the screen like it\'s swimming, on top of the stable spike-cluster shape from the last fix — a slow, organic wander path (not a repeating loop) instead of holding dead-center, with the whole cluster stretching very slightly along its direction of travel as it moves. The listening ring, hover detection and glow all track the cluster\'s real position as it drifts.',
     ]},
