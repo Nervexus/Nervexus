@@ -41,8 +41,10 @@
         // Spikes point radially outward from the cluster core (like the reference —
         // a bristling ball of wire-thin metal spikes), with a per-spike angular kink
         // and length so the silhouette is tufted/irregular, not a perfect sea urchin.
-        spikeKink: (Math.random() - 0.5) * 0.9, spikeLenMul: 0.45 + Math.random() * 1.9,
-        spikeWob: Math.random() * Math.PI * 2, spikeWobSpeed: 0.0004 + Math.random() * 0.0009
+        // Kink/wobble are kept small — this is a fixed kink, not a live wiggle, so
+        // the cluster holds its shape instead of looking like it's swimming.
+        spikeKink: (Math.random() - 0.5) * 0.5, spikeLenMul: 0.45 + Math.random() * 1.9,
+        spikeWob: Math.random() * Math.PI * 2, spikeWobSpeed: 0.00015 + Math.random() * 0.0003
       });
     }
     return pts;
@@ -85,7 +87,7 @@
     var points = [];
     function rebuildPoints() {
       var size = Math.max(container.clientWidth, container.clientHeight) || 200;
-      var n = Math.round(clamp(size / 460 * 420, 110, 520));
+      var n = Math.round(clamp(size / 460 * 220, 80, 260));
       points = fibonacciSphere(n);
     }
     rebuildPoints();
@@ -136,11 +138,12 @@
       hoverAmt += (eff - hoverAmt) * 0.08;
       var speed = 0.22 + hoverAmt * 0.55 * clamp(hoverIntensity + 1, 0.3, 2) + (forceHoverState ? 0.35 : 0);
       rotY += dt * speed;
-      var tiltX = Math.sin(t * 0.00035) * 0.22;
+      var tiltX = Math.sin(t * 0.00035) * 0.14;
       var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
       var cosX = Math.cos(tiltX), sinX = Math.sin(tiltX);
       // Churn scales up a little with hover/listening, like the mass agitating.
-      var churnAmt = 0.055 + hoverAmt * 0.05 + (forceHoverState ? 0.03 : 0);
+      // Kept small — this is surface texture, not the cluster drifting around.
+      var churnAmt = 0.02 + hoverAmt * 0.018 + (forceHoverState ? 0.012 : 0);
 
       // Compact core radius — the spike cluster floats in open space like the
       // reference (a fist-sized bristling clump), not a shape filling the frame.
@@ -176,7 +179,7 @@
         var plen = Math.sqrt(px * px + py * py + pz * pz) || 1;
         // Detach: a rare, brief outward pulse — the shard breaks free and re-settles.
         var detach = Math.pow(Math.max(0, Math.sin(t * p.detachSpeed + p.detachPhase)), 28);
-        var radialMul = 1 + detach * 0.4;
+        var radialMul = 1 + detach * 0.22;
         px = (px / plen) * radialMul; py = (py / plen) * radialMul; pz = (pz / plen) * radialMul;
 
         // rotate around Y then tilt around X
@@ -188,7 +191,7 @@
           sx: cw / 2 + x1 * R * persp, sy: ch / 2 + y1 * R * persp,
           depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase,
           glint: glint, detach: detach,
-          kink: p.spikeKink + Math.sin(t * p.spikeWobSpeed + p.spikeWob) * 0.3, lenMul: p.spikeLenMul
+          kink: p.spikeKink + Math.sin(t * p.spikeWobSpeed + p.spikeWob) * 0.1, lenMul: p.spikeLenMul
         });
       }
       proj.sort(function (a, b) { return a.depth - b.depth; });
@@ -207,9 +210,14 @@
         var shardCol = mixCol(tinted, [1, 1, 1], q.glint * 0.92);
         var glowCol = mixCol(col1, [1, 1, 1], q.glint * 0.7);
 
-        var glow = clamp(specMul * (0.45 + q.depth * 0.95 + q.glint * 2.2) * (1 + hoverAmt * 0.6 + (forceHoverState ? 0.4 : 0)), 0, 4.5);
-        if (glow > 0.05) { ctx.shadowBlur = rad * (2.2 + glow * 3.4); ctx.shadowColor = toCss(glowCol, Math.min(1, 0.55 * glow)); }
-        else { ctx.shadowBlur = 0; }
+        // ctx.shadowBlur is a full blur pass per draw call — very expensive on
+        // canvas2d. Only pay for it on the handful of particles actually glinting
+        // this frame (most sit at glint≈0 most of the time); everything else
+        // renders flat. This is the single biggest lag fix.
+        if (q.glint > 0.15) {
+          var glow = clamp(specMul * (0.6 + q.depth * 0.6 + q.glint * 2.2) * (1 + hoverAmt * 0.6 + (forceHoverState ? 0.4 : 0)), 0, 4.5);
+          ctx.shadowBlur = rad * (2 + glow * 2.6); ctx.shadowColor = toCss(glowCol, Math.min(1, 0.55 * glow));
+        } else if (ctx.shadowBlur !== 0) { ctx.shadowBlur = 0; }
 
         // Thin wire spike radiating outward from the cluster core (screen-space
         // direction from the orb's centre through this point), kinked and

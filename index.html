@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-86 · v11.86 orb-spike-cluster';
+const NOTIF_BUILD_VERSION = '2026.08.22-87 · v11.87 orb-perf-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12334,6 +12334,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.87', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the new orb being laggy and looking like it was "swimming" instead of holding its shape. The lag was ctx.shadowBlur — a full blur pass — being set on every one of up to 520 particles every single frame; it now only applies to the handful of particles actually glinting at that moment (most of the time, none), and particle count is roughly halved. The swimming look was three independent wobble/churn animations stacked on top of each other; all three are toned down significantly so the spike cluster now holds a stable, recognizable form as it rotates instead of continuously morphing.',
+    ]},
     {version:'v11.86', date:'Aug 22, 2026', major:true, notes:[
       'Corrected the orb redesign to actually match the reference clip — a compact, bristling clump of thin metal spikes floating in open space (like the wire-spike cluster forming above the hand), not a shape that filled the whole container. Shrunk the cluster down, switched every particle from a flat diamond to a thin spike radiating outward from the core with its own kink and length so the silhouette bristles unevenly, and brightened the glinting highlights.',
     ]},
