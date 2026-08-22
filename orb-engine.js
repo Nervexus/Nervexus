@@ -130,13 +130,14 @@
     }
 
     var rotY = 0, lastT = 0, breathePhase = Math.random() * Math.PI * 2;
-    // Fish-swim drift: four mismatched-frequency waves (two per axis) make the
-    // centre wander a wide, organic, non-repeating path around the tank
-    // instead of holding still or tracing a simple oval.
-    var driftPhaseA = Math.random() * Math.PI * 2, driftPhaseB = Math.random() * Math.PI * 2;
-    var driftFA = 0.00024 + Math.random() * 0.00006, driftFB = 0.00015 + Math.random() * 0.00005;
-    var driftPhaseA2 = Math.random() * Math.PI * 2, driftPhaseB2 = Math.random() * Math.PI * 2;
-    var driftFA2 = driftFA * 2.3 + Math.random() * 0.00007, driftFB2 = driftFB * 1.7 + Math.random() * 0.00005;
+    // Snake drift: the cluster advances at a steady speed while its heading
+    // undulates side-to-side (a sine wave on the turn rate, not the heading
+    // itself, so the path curves smoothly instead of snapping), bouncing off
+    // the content-area edges like a fish turning back into the tank.
+    var driftEnabled = opts.driftEnabled !== false;
+    var snakeInit = false, snakeX = 0, snakeY = 0, snakeHeading = Math.random() * Math.PI * 2;
+    var snakeTurnPhase = Math.random() * Math.PI * 2, snakeTurnFreq = 0.00035 + Math.random() * 0.00015;
+    var snakeTurnAmp = 0.0001 + Math.random() * 0.00006, snakeSpeed = 0.032 + Math.random() * 0.014;
     var squashSmooth = 0;
     var rafId;
     function frame(t) {
@@ -164,46 +165,38 @@
       var R = Math.min(Math.min(cw, ch) * 0.3, 140) * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
       var focal = R * 2.6;
 
-      // Wander the whole cluster's centre around the container like a fish
-      // swimming, and derive a heading + speed from the path's own velocity so
-      // the silhouette can flex (stretch along the direction of travel) as it
-      // moves — both computed once per frame, not per particle. X and Y ranges
-      // are sized off the container's own width/height (not just the shorter
-      // side) so a wide, short tank lets the cluster roam the full width.
       // Reserve enough edge margin for the cluster's full visual reach, not
       // just its core radius — shell points can pulse out to ~1.22x R (detach)
       // and spikes tip further still, so a small margin let the silhouette
-      // clip off the edge of the container at the far end of the wander path.
+      // clip off the edge of the container at the far end of the path.
       var edgeMargin = R * 1.3 + 80;
-      var wanderMaxX = Math.max(0, cw * 0.5 - edgeMargin);
-      var wanderMaxY = Math.max(0, ch * 0.5 - edgeMargin);
-      var wanderRangeX = Math.min(wanderMaxX, cw * 0.62);
-      var wanderRangeY = Math.min(wanderMaxY, ch * 0.62);
-      var wanderRangeX2 = wanderRangeX * 0.4, wanderRangeY2 = wanderRangeY * 0.4;
-      var angA = t * driftFA + driftPhaseA, angB = t * driftFB + driftPhaseB;
-      var angA2 = t * driftFA2 + driftPhaseA2, angB2 = t * driftFB2 + driftPhaseB2;
-      var ocx = cw / 2 + Math.sin(angA) * wanderRangeX + Math.sin(angA2) * wanderRangeX2;
-      var ocy = ch / 2 + Math.sin(angB) * wanderRangeY + Math.sin(angB2) * wanderRangeY2;
-      var dvx = Math.cos(angA) * driftFA * wanderRangeX + Math.cos(angA2) * driftFA2 * wanderRangeX2;
-      var dvy = Math.cos(angB) * driftFB * wanderRangeY + Math.cos(angB2) * driftFB2 * wanderRangeY2;
-      var headAngle = Math.atan2(dvy, dvx);
-      // Normalise against the path's own true max speed (not a guessed constant)
-      // so squash actually sweeps from ~0 to its peak as the cluster speeds up
-      // and slows down along its wander path, instead of sitting pinned near
-      // the top the whole time — that pinning was why the flex read as "static."
-      var maxSpeedX = driftFA * wanderRangeX + driftFA2 * wanderRangeX2;
-      var maxSpeedY = driftFB * wanderRangeY + driftFB2 * wanderRangeY2;
-      var maxSpeed = Math.sqrt(maxSpeedX * maxSpeedX + maxSpeedY * maxSpeedY) || 1;
-      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / maxSpeed, 0, 1);
-      // Ease toward the target squash instead of snapping to it every frame —
-      // the raw per-frame value could jump around fast enough that the
-      // silhouette looked like it was flicking between round/oval/square
-      // instead of gradually flexing. Range widened so resting (squash~0,
-      // a compact even silhouette) versus full speed (a clearly elongated
-      // long oval) actually reads as two distinct shapes.
-      squashSmooth += (0.42 * speedNorm - squashSmooth) * 0.02;
+      var boundL = edgeMargin, boundR = Math.max(edgeMargin, cw - edgeMargin);
+      var boundT = edgeMargin, boundB = Math.max(edgeMargin, ch - edgeMargin);
+      if (!snakeInit) { snakeInit = true; snakeX = clamp(cw / 2, boundL, boundR); snakeY = clamp(ch / 2, boundT, boundB); }
+
+      var dtMs = lastT ? (t - lastT) : 16;
+      if (driftEnabled) {
+        // Snake drift: advance at a steady speed while the heading itself
+        // undulates (sine on the turn RATE, not the angle) so the path
+        // curves smoothly back and forth like a snake/fish swimming, then
+        // bounces off the content-area edges instead of wrapping or freezing.
+        var turnRate = Math.sin(t * snakeTurnFreq + snakeTurnPhase) * snakeTurnAmp;
+        snakeHeading += turnRate * dtMs;
+        snakeX += Math.cos(snakeHeading) * snakeSpeed * dtMs;
+        snakeY += Math.sin(snakeHeading) * snakeSpeed * dtMs;
+        if (snakeX < boundL) { snakeX = boundL; snakeHeading = Math.PI - snakeHeading; }
+        else if (snakeX > boundR) { snakeX = boundR; snakeHeading = Math.PI - snakeHeading; }
+        if (snakeY < boundT) { snakeY = boundT; snakeHeading = -snakeHeading; }
+        else if (snakeY > boundB) { snakeY = boundB; snakeHeading = -snakeHeading; }
+      }
+      var ocx = snakeX, ocy = snakeY;
+      var hc = Math.cos(snakeHeading), hs = Math.sin(snakeHeading);
+      // Ease toward the target squash instead of snapping to it — a clear
+      // compact "square-ish" resting shape while stopped, easing into a
+      // pronounced long oval once it's actually swimming, rather than a
+      // subtle continuous function of instantaneous speed.
+      squashSmooth += ((driftEnabled ? 0.5 : 0) - squashSmooth) * 0.015;
       var squash = squashSmooth;
-      var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
       curOcx = ocx; curOcy = ocy;
 
       ctx.clearRect(0, 0, cw, ch);
@@ -334,6 +327,7 @@
       setOverrideMix: function (v) { overrideMix = v; },
       setForceHover: function (v) { forceHoverState = !!v; },
       setHoverIntensity: function (v) { hoverIntensity = v; },
+      setDriftEnabled: function (v) { driftEnabled = !!v; },
       resize: resize,
       destroy: function () {
         if (destroyed) return;

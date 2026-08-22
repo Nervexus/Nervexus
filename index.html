@@ -3419,6 +3419,10 @@
       <div style="animation:rise .5s ease both; display:flex; flex-direction:column; align-items:center; position:relative; z-index:4;">
         <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="width:100%; max-width:720px; font-size:12px; color:#ff8a5b; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(255,138,91,0.1); border:1px solid rgba(255,138,91,0.25);">⚠ {{ voiceFallbackErr }}</div></sc-if>
         <div style="position:relative; width:100%; min-height:620px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:36px 0 26px; margin-bottom:18px;">
+          <div onClick="{{ toggleOrbDrift }}" title="{{ orbDriftTitle }}" style="position:absolute; top:14px; right:14px; z-index:2; display:flex; align-items:center; gap:7px; padding:8px 14px; border-radius:20px; cursor:pointer; border:1px solid {{ vLine2 }}; background:{{ vCard }}; color:{{ vMuted }}; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.5px;" style-hover="{ color:'{{ vInk }}' }">
+            <span>{{ orbDriftIcon }}</span>
+            <span>{{ orbDriftLabel }}</span>
+          </div>
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
@@ -9004,7 +9008,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-97 · v11.97 orb-edge-margin-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-98 · v11.98 orb-snake-stop-oval';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10108,7 +10112,7 @@ activities: this._mergeShipLog(s.activities),
       if(this._getTwoFA(r.email)){ this.setState({loginStage:'twofa', pendingAuthEmail:r.email, loginErr:'', login2FAInput:''}); }
       else { this._persistLock(0,0); this._completeLogin(r.email); }
     } else { this._registerFail(r.err); } }
-  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Ultra X', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, notifsEnabled:true, quotesEnabled:false,
+  _defaultPrefs(){ return { theme:'Lime', homeBg:'Spline', ultraStyle:'Ultra X', density:'Comfortable', animations:true, particles:true, glass:true, reduceMotion:false, orbDrift:true, voiceRate:1, voicePitch:1, voiceVolume:1, readingStyle:'Professional', starredVoices:[], hiddenVoices:[], autoRate:false, wake:true, autoListen:false, nReminders:true, nNews:true, nFinance:true, nFitness:true, nBrief:true, nSecurity:true, nSound:true, nDesktop:true, nFreq:'Real-time', twoFA:true, aiMemory:true, analytics:false, telemetry:false, notifsEnabled:true, quotesEnabled:false,
     coaching:{finance:true,fitness:true,checkins:true,spendingAlerts:true,motivational:true,silent:false,vacation:false,frequency:'Normal',workStart:'',workEnd:''}, mutedTopics:[], coachLog:{},
     // ===== Notification & Reminder System settings (notification-engine.js) =====
     notifFrequency:'150min', notifFrequencyCustomMin:60, notifSound:true, notifVibration:true,
@@ -12333,6 +12337,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.98', date:'Aug 22, 2026', major:true, notes:[
+      'Reworked the orb\'s movement into a snake-style glide — it now advances at a steady pace with its heading curving smoothly back and forth, bouncing off the edges of its section instead of the old drifting-wave path. Added a Stop/Swim button on the orb screen: stopped, it holds its position and just spins in place; swimming, it roams around. The shape-flex is now tied to that same state — compact and even at rest, a clear long oval while it\'s actually moving — instead of a subtle effect based on instantaneous speed.',
+    ]},
     {version:'v11.97', date:'Aug 22, 2026', major:true, notes:[
       'Fixed the orb visibly clipping off the edge of its section at the far end of its wander path — the roam range only reserved a sliver of margin based on the core radius, not the cluster\'s full reach once spikes and the occasional outward pulse are counted, so the silhouette could poke past the boundary. Margin is now sized off the real worst-case visual reach. Also widened the shape-flex range so resting-vs-full-speed reads as a clear compact-to-long-oval change instead of a subtle one.',
     ]},
@@ -15036,8 +15043,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _safe(fn,fallback){ try{ return fn(); }catch(e){ console.error('[renderVals] section failed, using fallback:', e); return fallback||{}; } }
   _mountVoiceOrb(el){ if(!el || !window.OrbEngine) return; const themeKey=this.state.prefs.theme+'|'+this.state.prefs.ultraStyle; if(this._orbEl===el && this._orbTheme===themeKey) return; this._orbEl=el; this._orbTheme=themeKey; if(this._orbApi){ this._orbApi.destroy(); this._orbApi=null; }
     const pal=this._orbPalette();
-    this._orbApi=window.OrbEngine.mount(el, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, satMul:1, dimMul:1, hoverIntensity:0, rotateOnHover:true, forceHoverState:!!this.state.listening}); }
+    this._orbApi=window.OrbEngine.mount(el, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, satMul:1, dimMul:1, hoverIntensity:0, rotateOnHover:true, forceHoverState:!!this.state.listening, driftEnabled:this.state.prefs.orbDrift!==false}); }
   _unmountVoiceOrb(){ if(this._orbApi){ this._orbApi.destroy(); this._orbApi=null; } this._orbEl=null; }
+  toggleOrbDrift(){ const next=this.state.prefs.orbDrift===false; this.mut(s=>({prefs:{...s.prefs, orbDrift:next}})); if(this._orbApi && this._orbApi.setDriftEnabled) this._orbApi.setDriftEnabled(next); }
   // Keeps the fixed-position voice orb mount clipped to the real content
   // area — right of the sidebar, below the top bar — instead of the whole
   // viewport, so it never swims over the nav rail or header.
@@ -17291,6 +17299,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       toggleListen:()=>this.toggleListen(),
       vInput:S.vInput, setVInput:(e)=>this.setState({vInput:e.target.value}), sendVoice:()=>this.voiceCommand(this.state.vInput), sendVoiceKey:enterKey(()=>this.voiceCommand(this.state.vInput)),
       toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?vTok.vAccent:vTok.vLine2, assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
+      toggleOrbDrift:()=>this.toggleOrbDrift(), orbDriftOn:S.prefs.orbDrift!==false,
+      orbDriftIcon:(S.prefs.orbDrift!==false)?'⏸':'▶', orbDriftLabel:(S.prefs.orbDrift!==false)?'Stop':'Swim',
+      orbDriftTitle:(S.prefs.orbDrift!==false)?'Stop the orb moving around — it will just spin in place':'Let the orb swim around again',
       listenOpacity:(S.prefs.assistantEnabled!==false)?1:0.4, listenPointerEvents:(S.prefs.assistantEnabled!==false)?'auto':'none',
       listenLabel:(S.prefs.assistantEnabled===false)?'Assistant is off':(S.listening?'Stop listening':'Hold to talk'), listenBg:S.listening?(vTok.vDark?'rgba(255,255,255,0.22)':vTok.vLine2):vTok.vInputBg, listenBdr:S.listening?vTok.vAccent:vTok.vLine, listenDot:S.listening?vTok.vAccent:vTok.vMuted2,
       vLiveTranscript:S.vLiveTranscript||'', hasLiveTranscript:!!(S.listening&&S.vLiveTranscript),
