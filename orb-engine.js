@@ -1,8 +1,9 @@
-/* orb-engine.js — vanilla-JS Canvas2D particle-sphere orb.
-   A cloud of glowing dots arranged on a sphere, tumbling and breathing in place,
-   speeding up on hover and on "listening" (forceHoverState). No external
-   dependencies (previously loaded OGL/WebGL from a CDN) — renders immediately,
-   nothing to fail to load.
+/* orb-engine.js — vanilla-JS Canvas2D "liquid metal" particle-sphere orb.
+   Inspired by the Transformers: Age of Extinction "transformium" effect — a mass
+   of small metallic shard particles that churns/swirls across the sphere's
+   surface, glints as facets catch the light, and has individual shards
+   periodically break free and re-settle, rather than a rigid cloud of static
+   dots. No external dependencies — renders immediately, nothing to fail to load.
 
    Exposes window.OrbEngine.mount(container, opts) -> {
      setHue, setSatMul, setDimMul, setSpecMul, setOverrideMix,
@@ -16,7 +17,8 @@
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
   function lerp(a, b, t) { return a + (b - a) * t; }
 
-  // Evenly distribute n points on a unit sphere (golden-angle spiral).
+  // Evenly distribute n points on a unit sphere (golden-angle spiral), each with
+  // its own churn/glint/detach timing so the surface reads as alive, not synced.
   function fibonacciSphere(n) {
     var pts = [];
     var golden = Math.PI * (3 - Math.sqrt(5));
@@ -27,7 +29,18 @@
       pts.push({
         x: Math.cos(theta) * r, y: y, z: Math.sin(theta) * r,
         phase: Math.random() * Math.PI * 2,
-        tw: 0.6 + Math.random() * 0.8
+        tw: 0.6 + Math.random() * 0.8,
+        // Swirl/churn: 3 independent low-freq wobble waves per particle so the
+        // surface roils instead of rotating as one rigid shell.
+        swA: Math.random() * Math.PI * 2, swB: Math.random() * Math.PI * 2, swC: Math.random() * Math.PI * 2,
+        swFA: 0.00025 + Math.random() * 0.00035, swFB: 0.0003 + Math.random() * 0.0004, swFC: 0.0002 + Math.random() * 0.0003,
+        // Glint: sharp, brief specular flashes as a "facet" catches the light.
+        glintPhase: Math.random() * Math.PI * 2, glintSpeed: 0.0009 + Math.random() * 0.0018,
+        // Detach: rare, brief outward pulses — a shard breaks free and re-settles.
+        detachPhase: Math.random() * Math.PI * 2, detachSpeed: 0.00018 + Math.random() * 0.00022,
+        // Per-shard shape/rotation so flakes don't all face the same way.
+        shardRot: Math.random() * Math.PI * 2, shardSpin: (Math.random() - 0.5) * 0.004,
+        shardAsym: 0.55 + Math.random() * 0.6
       });
     }
     return pts;
@@ -50,6 +63,10 @@
     var col1 = opts.overrideColor1 || hueToRgb01(hue);
     var col2 = opts.overrideColor2 || hueToRgb01(hue + 24);
     var col3 = opts.overrideColor3 || [0.05, 0.05, 0.08];
+    // Chrome/liquid-metal base — near-white hot highlight, cool dark shadow — with
+    // the theme hue applied as a thin tint rather than fully saturating every shard.
+    var metalHi = [0.93, 0.95, 0.99];
+    var metalLo = [0.05, 0.06, 0.09];
     var hoverIntensity = opts.hoverIntensity != null ? opts.hoverIntensity : 0.3;
     var rotateOnHover = opts.rotateOnHover !== false;
     var forceHoverState = !!opts.forceHoverState;
@@ -66,7 +83,7 @@
     var points = [];
     function rebuildPoints() {
       var size = Math.max(container.clientWidth, container.clientHeight) || 200;
-      var n = Math.round(clamp(size / 460 * 260, 60, 320));
+      var n = Math.round(clamp(size / 460 * 420, 110, 520));
       points = fibonacciSphere(n);
     }
     rebuildPoints();
@@ -120,6 +137,8 @@
       var tiltX = Math.sin(t * 0.00035) * 0.22;
       var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
       var cosX = Math.cos(tiltX), sinX = Math.sin(tiltX);
+      // Churn scales up a little with hover/listening, like the mass agitating.
+      var churnAmt = 0.055 + hoverAmt * 0.05 + (forceHoverState ? 0.03 : 0);
 
       var R = Math.min(cw, ch) * 0.46 * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.018 + hoverAmt * 0.03);
       var focal = R * 2.6;
@@ -132,17 +151,39 @@
       g.addColorStop(1, toCss(col2, 0));
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, cw, ch);
+      // Faint core mass glow so the shard cloud reads as one dense, cohesive
+      // object rather than scattered dust — a soft chrome sphere underneath.
+      var core = ctx.createRadialGradient(cw / 2, ch / 2, 0, cw / 2, ch / 2, R * 0.92);
+      core.addColorStop(0, toCss(mixCol(col3, col1, 0.5), 0.1 * dimMul + hoverAmt * 0.05));
+      core.addColorStop(0.75, toCss(col3, 0.06 * dimMul));
+      core.addColorStop(1, toCss(col3, 0));
+      ctx.fillStyle = core;
+      ctx.fillRect(0, 0, cw, ch);
 
       var proj = [];
       for (var i = 0; i < points.length; i++) {
         var p = points[i];
+        // Per-shard churn: nudge the base sphere position along a slowly-drifting
+        // offset so the surface roils instead of rotating as one rigid shell.
+        var swx = Math.sin(t * p.swFA + p.swA) * churnAmt;
+        var swy = Math.sin(t * p.swFB + p.swB) * churnAmt;
+        var swz = Math.sin(t * p.swFC + p.swC) * churnAmt;
+        var px = p.x + swx, py = p.y + swy, pz = p.z + swz;
+        var plen = Math.sqrt(px * px + py * py + pz * pz) || 1;
+        // Detach: a rare, brief outward pulse — the shard breaks free and re-settles.
+        var detach = Math.pow(Math.max(0, Math.sin(t * p.detachSpeed + p.detachPhase)), 28);
+        var radialMul = 1 + detach * 0.4;
+        px = (px / plen) * radialMul; py = (py / plen) * radialMul; pz = (pz / plen) * radialMul;
+
         // rotate around Y then tilt around X
-        var x1 = p.x * cosY + p.z * sinY, z1 = -p.x * sinY + p.z * cosY;
-        var y1 = p.y * cosX - z1 * sinX, z2 = p.y * sinX + z1 * cosX;
+        var x1 = px * cosY + pz * sinY, z1 = -px * sinY + pz * cosY;
+        var y1 = py * cosX - z1 * sinX, z2 = py * sinX + z1 * cosX;
         var persp = focal / (focal + z2 * R);
+        var glint = Math.pow(Math.max(0, Math.sin(t * p.glintSpeed + p.glintPhase)), 9);
         proj.push({
           sx: cw / 2 + x1 * R * persp, sy: ch / 2 + y1 * R * persp,
-          depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase
+          depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase,
+          glint: glint, detach: detach, rot: p.shardRot + t * p.shardSpin, asym: p.shardAsym
         });
       }
       proj.sort(function (a, b) { return a.depth - b.depth; });
@@ -150,16 +191,36 @@
       for (var j = 0; j < proj.length; j++) {
         var q = proj[j];
         var twinkle = 0.85 + Math.sin(t * 0.0022 * q.tw + q.phase) * 0.15;
-        var alpha = clamp(0.12 + q.depth * 0.78, 0, 1) * twinkle;
-        var rad = (0.9 + q.depth * 1.9) * (cw < 120 ? 0.55 : 1) * (1 + hoverAmt * 0.25);
-        var dotCol = mixCol(col3, col1, clamp(q.depth * 1.15, 0, 1));
-        var glow = clamp(specMul * (0.4 + q.depth * 0.9) * (1 + hoverAmt * 0.6 + (forceHoverState ? 0.4 : 0)), 0, 3);
-        if (glow > 0.05) { ctx.shadowBlur = rad * (2 + glow * 3); ctx.shadowColor = toCss(dotCol, Math.min(1, 0.5 * glow)); }
+        var alpha = clamp(0.32 + q.depth * 0.68, 0, 1) * twinkle * (1 - q.detach * 0.35);
+        var rad = (1.35 + q.depth * 2.5) * (cw < 120 ? 0.6 : 1) * (1 + hoverAmt * 0.25 + q.detach * 0.5);
+
+        // Base shard tone: cool dark metal -> bright chrome by depth, tinted by
+        // the theme hue; a sharp glint spikes it towards near-white — the
+        // "facet catching the light" flash.
+        var depthCol = mixCol(metalLo, metalHi, clamp(q.depth * 1.1 + 0.15, 0, 1));
+        var tinted = mixCol(depthCol, col1, 0.22 + overrideMix * 0.18);
+        var shardCol = mixCol(tinted, [1, 1, 1], q.glint * 0.92);
+        var glowCol = mixCol(col1, [1, 1, 1], q.glint * 0.7);
+
+        var glow = clamp(specMul * (0.45 + q.depth * 0.95 + q.glint * 2.2) * (1 + hoverAmt * 0.6 + (forceHoverState ? 0.4 : 0)), 0, 4.5);
+        if (glow > 0.05) { ctx.shadowBlur = rad * (2.2 + glow * 3.4); ctx.shadowColor = toCss(glowCol, Math.min(1, 0.55 * glow)); }
         else { ctx.shadowBlur = 0; }
-        ctx.fillStyle = toCss(dotCol, alpha);
+
+        // Small rotated diamond "shard" instead of a round dot — reads as a metal
+        // flake catching the light rather than a soft glowing point.
+        ctx.save();
+        ctx.translate(q.sx, q.sy);
+        ctx.rotate(q.rot);
+        var len = Math.max(0.8, rad * (1.6 + q.glint * 0.7)), wid = Math.max(0.55, rad * q.asym);
+        ctx.fillStyle = toCss(shardCol, alpha);
         ctx.beginPath();
-        ctx.arc(q.sx, q.sy, Math.max(0.4, rad), 0, Math.PI * 2);
+        ctx.moveTo(0, -len);
+        ctx.lineTo(wid, 0);
+        ctx.lineTo(0, len);
+        ctx.lineTo(-wid, 0);
+        ctx.closePath();
         ctx.fill();
+        ctx.restore();
       }
       ctx.shadowBlur = 0;
 

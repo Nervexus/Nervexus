@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-84 · v11.84 learning-follow-ups';
+const NOTIF_BUILD_VERSION = '2026.08.22-85 · v11.85 transformium-orb';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12334,6 +12334,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.85', date:'Aug 22, 2026', major:true, notes:[
+      'Redesigned the Voice Assistant orb — inspired by the "transformium" effect from Transformers: Age of Extinction. Instead of a cloud of plain glowing dots, it’s now a dense mass of small metallic shard particles that churns and swirls across the surface, catches sharp glinting highlights as facets rotate into the light, and has individual shards periodically break free and re-settle. Same listening-state ring and hover speed-up as before, just a proper liquid-metal look instead of soft dust.',
+    ]},
     {version:'v11.84', date:'Aug 22, 2026', major:true, notes:[
       'Three Learning Centre follow-ups. English vocabulary bank grown from 28 to 89 real words spanning the full level range (1-50), each with a definition, pronunciation guide, example, synonyms and antonyms. Streaks unified across every subject — each of the 9 subjects used to track two separate, often-disagreeing streak counters of its own; every "DAILY STREAK"/"🔥 streak" display now shows the same real cross-subject streak (any day you completed a test in any subject). And genuine spaced repetition: every subject now runs a real Leitner-style schedule — a topic you do well on gets pushed further out for review (1/3/7/14 days), one you do poorly on comes right back due — and each Level Ladder test now pulls its weak-topic questions from what’s actually due for review, not just a same-session accuracy snapshot that never remembered what you’d gotten wrong before.',
     ]},
