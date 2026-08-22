@@ -140,7 +140,6 @@
   .theme-ultra [style*="color: rgb(220, 220, 224)"], .theme-ultra [style*="color:#dcdce0"], .theme-ultra [style*="color: rgb(212, 212, 216)"], .theme-ultra [style*="color:#d4d4d8"], .theme-ultra [style*="color: rgb(228, 228, 231)"], .theme-ultra [style*="color:#e4e4e7"], .theme-ultra [style*="color: rgb(197, 197, 202)"], .theme-ultra [style*="color:#c5c5ca"]{ color:var(--u-ink) !important; }
   .theme-ultra [data-clock]{ color:var(--u-ink) !important; }
   .theme-ultra [data-date]{ color:var(--u-accent) !important; }
-  .theme-ultra [data-orb-mount="voice"]{ border-radius:50% !important; overflow:hidden !important; }
   .theme-ultra [style*="linear-gradient(180deg,rgba(14,14,17,0.98),rgba(9,9,12,0.97))"]{ background:linear-gradient(180deg,var(--u-card),var(--u-card)) !important; border-left-color:var(--u-line) !important; }
   .theme-ultra [style*="background:rgba(23,25,29,0.9)"], .theme-ultra [style*="background: rgba(23, 25, 29, 0.9)"]{ background:var(--u-card) !important; border:1px solid var(--u-line); }
   .theme-ultra [style*="background:rgba(0,0,0,0.7)"], .theme-ultra [style*="background: rgba(0, 0, 0, 0.7)"], .theme-ultra [style*="background:rgba(0,0,0,0.6)"], .theme-ultra [style*="background: rgba(0, 0, 0, 0.6)"], .theme-ultra [style*="background:rgba(0,0,0,0.4)"], .theme-ultra [style*="background: rgba(0, 0, 0, 0.4)"]{ background:rgba(63,63,70,0.18) !important; }
@@ -9006,7 +9005,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-90 · v11.90 orb-drift-wider-2x';
+const NOTIF_BUILD_VERSION = '2026.08.22-91 · v11.91 orb-remove-circle-clip';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12334,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.91', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the orb looking "stuck in a circle" in the Ultra theme — a leftover CSS rule was clipping the orb\'s container into a hard circular window, which only became visible once the orb started roaming far enough to reach its edge. Removed the clip so the orb can drift freely without a visible boundary, same as every other theme.',
+    ]},
     {version:'v11.90', date:'Aug 22, 2026', major:true, notes:[
       'Orb wander range roughly tripled and drift speed doubled again — it now roams across most of the container instead of a tight patch in the middle, and covers that ground twice as fast. Still holds its spiky silhouette and stays smooth at ~60fps.',
     ]},
