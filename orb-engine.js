@@ -163,18 +163,22 @@
       // Wander the whole cluster's centre around the container like a fish
       // swimming, and derive a heading + speed from the path's own velocity so
       // the silhouette can flex (stretch along the direction of travel) as it
-      // moves — both computed once per frame, not per particle.
-      var wanderMax = Math.max(0, Math.min(cw, ch) * 0.5 - R * 0.3 - 6);
-      var wanderRange = Math.min(wanderMax, Math.min(cw, ch) * 0.62);
-      var wanderRange2 = wanderRange * 0.4;
+      // moves — both computed once per frame, not per particle. X and Y ranges
+      // are sized off the container's own width/height (not just the shorter
+      // side) so a wide, short tank lets the cluster roam the full width.
+      var wanderMaxX = Math.max(0, cw * 0.5 - R * 0.3 - 6);
+      var wanderMaxY = Math.max(0, ch * 0.5 - R * 0.3 - 6);
+      var wanderRangeX = Math.min(wanderMaxX, cw * 0.62);
+      var wanderRangeY = Math.min(wanderMaxY, ch * 0.62);
+      var wanderRangeX2 = wanderRangeX * 0.4, wanderRangeY2 = wanderRangeY * 0.4;
       var angA = t * driftFA + driftPhaseA, angB = t * driftFB + driftPhaseB;
       var angA2 = t * driftFA2 + driftPhaseA2, angB2 = t * driftFB2 + driftPhaseB2;
-      var ocx = cw / 2 + Math.sin(angA) * wanderRange + Math.sin(angA2) * wanderRange2;
-      var ocy = ch / 2 + Math.sin(angB) * wanderRange * 0.72 + Math.sin(angB2) * wanderRange2 * 0.72;
-      var dvx = Math.cos(angA) * driftFA * wanderRange + Math.cos(angA2) * driftFA2 * wanderRange2;
-      var dvy = (Math.cos(angB) * driftFB * wanderRange + Math.cos(angB2) * driftFB2 * wanderRange2) * 0.72;
+      var ocx = cw / 2 + Math.sin(angA) * wanderRangeX + Math.sin(angA2) * wanderRangeX2;
+      var ocy = ch / 2 + Math.sin(angB) * wanderRangeY + Math.sin(angB2) * wanderRangeY2;
+      var dvx = Math.cos(angA) * driftFA * wanderRangeX + Math.cos(angA2) * driftFA2 * wanderRangeX2;
+      var dvy = Math.cos(angB) * driftFB * wanderRangeY + Math.cos(angB2) * driftFB2 * wanderRangeY2;
       var headAngle = Math.atan2(dvy, dvx);
-      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / (wanderRange * 0.00075), 0, 1);
+      var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / (Math.min(wanderRangeX, wanderRangeY) * 0.00075 || 1), 0, 1);
       var squash = 0.14 * speedNorm;
       var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
       curOcx = ocx; curOcy = ocy;
