@@ -1096,7 +1096,7 @@
           <div>
             <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ COMMAND CENTER</div>
             <h1 style="font-size:26px; font-weight:700; letter-spacing:-.5px;">Operations Overview</h1>
-            <p style="color:#8b8b93; font-size:14px; margin-top:6px;">{{ checkRemain }} priorities remain · markets open green · recovery optimal.</p>
+            <p style="color:#8b8b93; font-size:14px; margin-top:6px;">{{ checkRemain }} {{ checkRemainWord }} remain today.</p>
           </div>
           <div style="display:flex; align-items:center; gap:12px;">
             <div onClick="{{ logMove }}" style="display:flex; align-items:center; gap:8px; padding:11px 15px; border-radius:13px; cursor:{{ logMoveCursor }}; border:1px solid {{ logMoveBd }}; background:{{ logMoveBg }}; color:{{ logMoveC }}; font-size:12.5px; font-weight:700; white-space:nowrap; box-shadow:{{ logMoveShadow }};" style-hover="{ filter:'brightness(1.08)' }">
@@ -1242,7 +1242,7 @@
             <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <span style="font-size:11px; letter-spacing:1.5px; color:#7c7c84; font-family:'JetBrains Mono',monospace;">PRODUCTIVITY · LAST 30 DAYS</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFFFFF;">▲ +18%</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ prodDeltaColor }};">{{ prodDeltaText }}</span>
               </div>
               <canvas data-chart="dashMain" style="width:100%; height:128px; display:block;"></canvas>
             </div>
@@ -1295,10 +1295,11 @@
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
               <span style="font-size:13px; font-weight:600;">Intelligence Feed</span>
-              <span style="font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">LIVE</span>
+              <span style="font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">SAMPLE DATA</span>
             </div>
+            <div style="font-size:11px; color:#75757d; margin-bottom:10px;">Illustrative stories — not a live feed. For real, sourced coverage, open World Intel’s News tab or generate your AI Daily Brief above.</div>
             <sc-for list="{{ intel }}" as="n" hint-placeholder-count="4">
-              <div onClick="{{ goBrief }}" style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
+              <div onClick="{{ goWorldIntel }}" style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
                 <span style="font-size:9px; font-family:'JetBrains Mono',monospace; letter-spacing:1px; color:{{ n.catColor }}; border:1px solid {{ n.catBdr }}; border-radius:6px; padding:3px 7px; height:fit-content; white-space:nowrap;">{{ n.cat }}</span>
                 <div style="flex:1;">
                   <div style="font-size:13px; color:#dbdbe0; line-height:1.4;">{{ n.headline }}</div>
@@ -1565,7 +1566,8 @@
 
               <sc-if value="{{ showWiThreat }}" hint-placeholder-val="{{ false }}">
                 <div style="border-radius:18px; padding:16px;">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:12px;">THREAT LEVELS</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:4px;">THREAT LEVELS</div>
+                  <div style="font-size:11px; color:#75757d; margin-bottom:14px;">Distribution across all {{ threatCountryCount }} countries in the risk model, by tier.</div>
                   <sc-for list="{{ threats }}" as="t" hint-placeholder-count="3">
                     <div style="margin-bottom:12px;">
                       <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px;"><span style="color:#cfcfd4;">{{ t.k }}</span><span style="font-family:'JetBrains Mono',monospace; color:#9a9aa2;">{{ t.count }} · {{ t.w }}</span></div>
@@ -1590,7 +1592,8 @@
 
               <sc-if value="{{ showWiAlerts }}" hint-placeholder-val="{{ false }}">
                 <div style="border-radius:18px; padding:16px;">
-                  <div style="font-size:13px; font-weight:600; margin-bottom:12px;">Intelligence Alerts</div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:13px; font-weight:600;">Intelligence Alerts</span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">SAMPLE DATA</span></div>
+                  <div style="font-size:11px; color:#75757d; margin-bottom:12px;">Illustrative alerts — not a live feed. No real-time incident source is connected yet.</div>
                   <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="5">
                     <div style="display:flex; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
                       <span style="width:8px; height:8px; border-radius:50%; margin-top:5px; flex:0 0 8px; background:{{ a.sevCol }}; box-shadow:0 0 7px {{ a.sevCol }};"></span>
@@ -9003,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-80 · v11.80 bw-weight-sync';
+const NOTIF_BUILD_VERSION = '2026.08.22-81 · v11.81 fake-widget-audit';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11916,10 +11919,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ctx.fillStyle=isNoir?'#C4BDB0':isU?'#292524':'#eef0f2'; ctx.font='600 15px JetBrains Mono, monospace'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(Math.round(val*100)+'%',cx,cy); });
   }
 
-  startArea(cv){ const {ctx,w,h}=this.prep(cv); const n=46; const base=[]; for(let i=0;i<n;i++){ base.push(0.45+0.30*Math.sin(i*0.32)+0.12*Math.sin(i*0.9)+(i/n)*0.18); }
+  // vals: real normalized (0-1) series to plot — e.g. productivitySeries(). A subtle sine
+  // wobble is still layered on top purely for a "living" look; the shape itself is real data.
+  startArea(cv,vals){ const {ctx,w,h}=this.prep(cv); const base=(vals&&vals.length)?vals:[0.3]; const n=base.length;
     this.loop((ts)=>{ const ph=ts*0.0009; ctx.clearRect(0,0,w,h);
       ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1; for(let gy=0;gy<4;gy++){ const y=(gy/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-      const pts=base.map((v,i)=>({x:(i/(n-1))*w, y:h-(Math.min(0.95,v+0.05*Math.sin(i*0.5+ph)))*h}));
+      const pts=base.map((v,i)=>({x:(n>1?i/(n-1):0)*w, y:h-(Math.min(0.95,v+0.02*Math.sin(i*0.5+ph)))*h}));
       ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0, isNoir?'rgba(150,143,130,0.24)':isU?'rgba(122,38,38,0.22)':'rgba(255,255,255,0.32)'); g.addColorStop(1, isNoir?'rgba(150,143,130,0)':isU?'rgba(122,38,38,0)':'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fill();
       ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=isNoir?'#C9A24A':isU?'#292524':'#FFFFFF'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=isNoir?'rgba(150,143,130,0.6)':isU?'rgba(122,38,38,0.5)':'rgba(255,255,255,0.7)'; ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0;
       const last=pts[pts.length-1]; ctx.fillStyle=isU?'#7A2626':'#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); });
@@ -12159,11 +12164,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const wiSel={ name:sel.name, flag:sel.flag, threat:sel.threat, threatCol:this._threatCol(sel.threat), threatBdr:this.hexA(this._threatCol(sel.threat),0.4), ai:sel.ai, strategic:sel.strategic, summary:sel.summary, bars:[{k:'POLITICAL STABILITY',v:sel.pol},{k:'MILITARY ACTIVITY',v:sel.mil},{k:'ECONOMIC STATUS',v:sel.eco},{k:'CYBER ACTIVITY',v:sel.cyber},{k:'DISASTER RISK',v:sel.dis}].map(b=>({k:b.k,v:b.v,w:b.v+'%',col:b.v>75?'#ff2b3d':b.v>50?'#c02e39':'#7a3036'})) };
     const agent={ id:'AX-0007', codename:'NIGHTHAWK', clearance:'OMEGA / ROOT', status:'DEPLOYED', deployed:'02 JUL 2026', readiness:94, ai:97 };
     const sf=this.countrySafety(sel); const statistics={ idx:sf.idx, lbl:sf.lbl, col:sf.col, w:sf.idx+'%', adv:sf.adv, rows:[{k:'STABILITY',disp:sel.pol+'%'},{k:'THREAT LEVEL',disp:sel.threat},{k:'DISASTER RISK',disp:sel.dis+'%'},{k:'CYBER RISK',disp:sel.cyber+'%'}] };
-    const threats=[{k:'HIGH RISK',count:23,w:'18%',col:'#ff2b3d'},{k:'MEDIUM RISK',count:61,w:'47%',col:'#c02e39'},{k:'LOW RISK',count:45,w:'35%',col:'#7a3036'}];
+    // Real distribution across the actual country risk model below (deterministic per-country
+    // score + curated real-world overrides) — used to be 3 flat fake counts (23/61/45) that
+    // never changed no matter which country was selected or how many countries existed.
+    const _tb={LOW:0,GUARDED:0,ELEVATED:0,HIGH:0,SEVERE:0}; cs.forEach(c=>{ if(_tb[c.threat]!=null) _tb[c.threat]++; else _tb.GUARDED++; });
+    const _tTotal=cs.length||1;
+    const threats=[
+      {k:'SEVERE / HIGH',count:_tb.SEVERE+_tb.HIGH,w:Math.round((_tb.SEVERE+_tb.HIGH)/_tTotal*100)+'%',col:'#ff2b3d'},
+      {k:'ELEVATED / GUARDED',count:_tb.ELEVATED+_tb.GUARDED,w:Math.round((_tb.ELEVATED+_tb.GUARDED)/_tTotal*100)+'%',col:'#c02e39'},
+      {k:'LOW',count:_tb.LOW,w:Math.round(_tb.LOW/_tTotal*100)+'%',col:'#7a3036'},
+    ];
     const newsFeed=this.countryNews(sel.name).map(n=>({cat:n[0],catCol:this._newsCatCol(n[0]),headline:n[1],src:n[2],time:n[3]}));
     const alerts=[ {sev:'CRITICAL',sevCol:'#ff2b3d',time:'02:11',txt:'Satellite movement detected over contested airspace',conf:93}, {sev:'HIGH',sevCol:'#d9333f',time:'01:52',txt:'Coordinated cyber intrusion on financial infrastructure',conf:88}, {sev:'HIGH',sevCol:'#d9333f',time:'01:20',txt:'Military mobilization along northern border corridor',conf:81}, {sev:'MEDIUM',sevCol:'#a83039',time:'00:44',txt:'New financial sanctions package announced',conf:76}, {sev:'MEDIUM',sevCol:'#a83039',time:'00:12',txt:'Political unrest escalating in capital region',conf:71} ];
     const briefing=['Two active conflict zones under continuous monitoring; escalation risk moderate.','Global markets steady; sanctions exposure concentrated in energy and banking.','Emerging AI-infrastructure buildout creating strategic supply-chain leverage.','Cyber threat level elevated after coordinated intrusion attempts.','Orbital assets repositioned — expanded surveillance coverage over three regions.'];
-    const widgets=[ {k:'GLOBAL THREAT',v:'DEFCON 3',col:'#ff2b3d'}, {k:'AI CONFIDENCE',v:'97%',col:'#e8e8ec'}, {k:'MISSION SUCCESS',v:'91.6%',col:'#e8e8ec'}, {k:'SATELLITE NET',v:'ONLINE',col:'#9a9aa2'}, {k:'DATA INTEGRITY',v:'99.98%',col:'#e8e8ec'}, {k:'ENCRYPTED COMMS',v:'SECURE',col:'#9a9aa2'}, {k:'QUANTUM LINK',v:'STABLE',col:'#9a9aa2'}, {k:'SERVER HEALTH',v:'OPTIMAL',col:'#9a9aa2'} ];
+    const threatCountryCount=_tTotal;
     const placeOptions=this._wiPlaceList().map(p=>({name:p.name}));
     const routeFromVal=S.routeFrom||'United Kingdom', routeToVal=S.routeTo||'Bavaria (Munich)';
     const routeList=(S.wiRoutes||[]).map((r,i)=>({label:r.label||(r.from+' \u2192 '+r.to), remove:()=>this.removeRoute(i)}));
@@ -12177,7 +12191,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       safetyQueryVal:S.safetyQuery||'', setSafetyQuery:(e)=>this.setSafetyQuery(e), safetyKey:(e)=>{ if(e.key==='Enter') this.runSafetyCheck(); },
       runSafetyCheck:()=>this.runSafetyCheck(), safetyBtnLabel:S.safetyLoading?'Checking…':'Check Safety', safetyErr:S.safetyErr||'',
       hasSafetyResult:!!S.safetyResult, safetyResultText:S.safetyResult||'',
-      addRoute:()=>this.addRoute(), routeList, hasSavedPins:savedPinList.length>0, savedPinList, wiPanelTabs, wiPanel, setWiPanel:(e)=>this.setState({wiPanel:e.target.value}), showWiStats:wiPanel==='stats', showWiThreat:wiPanel==='threat', showWiNews:wiPanel==='news', showWiAlerts:wiPanel==='alerts', wiQuery:S.wiQuery||'', setWiQuery:(e)=>this.setState({wiQuery:e.target.value}), countryList, countryOptions:cs.map(c=>({name:c.name})).sort((a,b)=>a.name.localeCompare(b.name)), selCountryVal:sel.name, setCountry:(e)=>{ const n=e.target.value; this.setState({selCountry:n}); this.wiFace(this.countries.find(x=>x.name===n)); }, wiSel, wiLayers, wiTimes, agent, statistics, threats, newsFeed, alerts, widgets,
+      addRoute:()=>this.addRoute(), routeList, hasSavedPins:savedPinList.length>0, savedPinList, wiPanelTabs, wiPanel, setWiPanel:(e)=>this.setState({wiPanel:e.target.value}), showWiStats:wiPanel==='stats', showWiThreat:wiPanel==='threat', showWiNews:wiPanel==='news', showWiAlerts:wiPanel==='alerts', wiQuery:S.wiQuery||'', setWiQuery:(e)=>this.setState({wiQuery:e.target.value}), countryList, countryOptions:cs.map(c=>({name:c.name})).sort((a,b)=>a.name.localeCompare(b.name)), selCountryVal:sel.name, setCountry:(e)=>{ const n=e.target.value; this.setState({selCountry:n}); this.wiFace(this.countries.find(x=>x.name===n)); }, wiSel, wiLayers, wiTimes, agent, statistics, threats, threatCountryCount, newsFeed, alerts,
       ...(()=>{ const ai=(S.wiBriefResult||{})[sel.name]; return {
         briefing: ai || briefing,
         wiBriefBadge: ai?'AI-GENERATED':'PREVIEW', wiBriefBtnLabel: S.wiBriefLoading?'⏂ Thinking…':'✨ AI refresh',
@@ -12238,7 +12252,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const activeTab=this.root.querySelector('[data-tab-active="true"]');
     if(activeTab) activeTab.scrollIntoView({ block:'nearest', inline:'center' });
     if(!(this.state.learningTab==='Maths' && this.state.mtMode==='hub')) return; const hist=(((this.state.learning&&this.state.learning.mathsHistory)||[]).filter(h=>h.mode==='GCSE Test').slice(0,10).reverse()); if(hist.length<2) return; const cv=this.root.querySelector('[data-chart="mtProgress"]'); if(cv) this.startTrend(cv, hist.map(h=>h.pct), '#4ADE80'); }
-  init_dashboard(){ const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
+  init_dashboard(){ const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m, this.productivitySeries().series); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
   init_fitness(){ const today=this.todayMin(); const move=Math.min(1,(today*8)/700); const r=this.root.querySelector('[data-chart="fitRings"]'); if(r) this.startRingSet(r,[move, Math.min(1,today/45), 0.9],['#FFFFFF','#eef0f2','#7a7a82'],15,7); const st=this.root.querySelector('[data-chart="strength"]'); if(st) this.startTrend(st, this.strengthSeries(), '#FFFFFF'); }
   init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
   startPowerHills(cv){ const {ctx,w,h}=this.prep(cv); const rows=10;
@@ -12252,6 +12266,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
 
   strengthSeries(){ const days=12, byDay=new Array(days).fill(0), now=Date.now(); this.state.workouts.forEach(w=>{ const d=Math.floor((now-w.ts)/86400000); if(d>=0&&d<days){ byDay[days-1-d]+=(this._workoutVol(w)|| (+w.min||0)*40); } }); const base=[]; for(let i=0;i<days;i++) base.push(0.35+i*0.028+byDay[i]/6000); const mx=Math.max(...base,1); return base.map(v=>Math.min(1,v/mx*0.92+0.08)); }
+  // Real 30-day productivity trend for the Command Center chart — replaces a purely decorative
+  // sine-wave that animated forever and never reflected anything you'd actually done. Driven by
+  // logged Work/Learning/Business activity minutes plus mission completions, per day.
+  productivitySeries(){ const days=30, byDay=new Array(days).fill(0), now=Date.now();
+    this.state.activities.forEach(a=>{ if(a.seeded) return; const d=Math.floor((now-a.ts)/86400000); if(d>=0&&d<days) byDay[days-1-d]+=(+a.min||0); });
+    (this.state.missionHistory||[]).forEach(h=>{ let t=now; try{ const dt=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(dt.getTime())) t=dt.getTime(); }catch(_){}
+      const d=Math.floor((now-t)/86400000); if(d>=0&&d<days) byDay[days-1-d]+=20; });
+    const mx=Math.max(...byDay,1);
+    const series=byDay.map(v=>0.06+Math.min(1,v/mx)*0.86);
+    const recent=byDay.slice(15).reduce((a,v)=>a+v,0), prior=byDay.slice(0,15).reduce((a,v)=>a+v,0);
+    const deltaPct=prior>0?Math.round((recent-prior)/prior*100):(recent>0?100:0);
+    return {series, deltaPct}; }
   startRingOnly(cv,val,color){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
   startTrend(cv,vals,color){ const {ctx,w,h}=this.prep(cv); const n=vals.length; this.loop((ts)=>{ const grow=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); ctx.strokeStyle='rgba(255,255,255,0.05)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } const pts=vals.map((v,i)=>({x:(i/(n-1))*w, y:h-(v*grow*0.8+0.1)*h})); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,this.hexA(color,0.3)); g.addColorStop(1,this.hexA(color,0)); ctx.fillStyle=g; ctx.fill(); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=this.hexA(color,0.7); ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0; const last=pts[pts.length-1]; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); }); }
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
@@ -12268,10 +12294,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const ranks=[...namedRanks, titanAt(600), titanAt(700), titanAt(800), titanAt(900), titanAt(1000)];
     const cat=(name,xp)=>{ let L=1; while(T(L+1)<=xp) L++; return {name,xp:Math.round(xp),level:L,pct:Math.min(100,Math.round((xp-T(L))/(T(L+1)-T(L))*100))}; };
     const totInc=s.income.reduce((a,i)=>a+(+i.amt||0),0), totExp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0);
-    const categories=[ cat('Physical Strength',s.workouts.filter(w=>w.part!=='Cardio').reduce((a,w)=>a+(+w.min||0)*4+((+w.weight||0)*(+w.sets||0)*(+w.reps||0))/50,0)+6600), cat('Endurance',s.workouts.filter(w=>w.part==='Cardio').reduce((a,w)=>a+(+w.min||0)*7,0)+6600), cat('Discipline',doneXP*1.5+missDone*12+6600), cat('Productivity',s.activities.length*25+doneXP*0.5+missDone*8+6600), cat('Intelligence',s.activities.filter(a=>a.cat==='Learning').length*45+6600), cat('Business',s.income.length*40+s.activities.filter(a=>a.cat==='Business').length*30+6600), cat('Finance',Math.max(0,totInc-totExp)/1000+6600), cat('Focus',s.activities.filter(a=>a.cat==='Work').length*30+6600), cat('Consistency',6600), cat('Health',6600), cat('Recovery',6600), cat('Mental Resilience',6600) ];
+    // Consistency/Health/Recovery/Mental Resilience used to be flat 6600 regardless of
+    // anything logged — permanently tied for "weakest attribute" with a "go improve it"
+    // mission that could never actually move. Now driven by the same real Health data
+    // (sleep, hydration, meals, body log) and login streak everything else on this page uses.
+    const H=s.health||{};
+    const categories=[ cat('Physical Strength',s.workouts.filter(w=>w.part!=='Cardio').reduce((a,w)=>a+(+w.min||0)*4+((+w.weight||0)*(+w.sets||0)*(+w.reps||0))/50,0)+6600), cat('Endurance',s.workouts.filter(w=>w.part==='Cardio').reduce((a,w)=>a+(+w.min||0)*7,0)+6600), cat('Discipline',doneXP*1.5+missDone*12+6600), cat('Productivity',s.activities.length*25+doneXP*0.5+missDone*8+6600), cat('Intelligence',s.activities.filter(a=>a.cat==='Learning').length*45+6600), cat('Business',s.income.length*40+s.activities.filter(a=>a.cat==='Business').length*30+6600), cat('Finance',Math.max(0,totInc-totExp)/1000+6600), cat('Focus',s.activities.filter(a=>a.cat==='Work').length*30+6600), cat('Consistency',(s.loginStreak||0)*80+6600), cat('Health',(H.meals||[]).length*15+(H.hydrationLog||[]).length*5+(H.bodyLog||[]).length*20+6600), cat('Recovery',(H.sleepLog||[]).length*20+(H.sleepLog||[]).reduce((a,x)=>a+(+x.quality||0),0)*3+6600), cat('Mental Resilience',s.activities.filter(a=>a.cat==='Personal').length*20+(H.sleepLog||[]).reduce((a,x)=>a+(+x.energy||0),0)*2+6600) ];
     const sorted=[...categories].sort((a,b)=>b.xp-a.xp); const strong=sorted[0], weak=sorted[sorted.length-1];
     const ach=[ {name:'First Blood',desc:'Log your first workout',u:s.workouts.length>=1}, {name:'Iron Will',desc:'Log 5+ workouts',u:s.workouts.length>=5}, {name:'Goal Crusher',desc:'Clear your checklist',u:s.checklist.filter(c=>c.done).length>=s.checklist.length&&s.checklist.length>0}, {name:'Business Builder',desc:'Log 3+ income entries',u:s.income.length>=3}, {name:'Financial Discipline',desc:'Stay net-positive',u:(totInc-totExp)>0}, {name:'Learning Master',desc:'Log a learning session',u:s.activities.some(a=>a.cat==='Learning')}, {name:'Elite Performer',desc:'Reach Level 5',u:level>=5}, {name:'Planner',desc:'Schedule 5+ events',u:s.events.length>=5} ];
-    const mission=weak.name+' is your weakest attribute. '+(weak.name==='Endurance'?'Log a cardio session today.':weak.name==='Physical Strength'?'Add a strength session with weight & reps.':weak.name==='Business'?'Log income or a business task.':weak.name==='Intelligence'?'Log a learning session.':'Complete tasks and log activity to raise it.');
+    const mission=weak.name+' is your weakest attribute. '+(weak.name==='Endurance'?'Log a cardio session today.':weak.name==='Physical Strength'?'Add a strength session with weight & reps.':weak.name==='Business'?'Log income or a business task.':weak.name==='Intelligence'?'Log a learning session.':weak.name==='Consistency'?'Log in and use the app daily to build a streak.':weak.name==='Health'?'Log a meal, some water, or a body-weight check-in.':weak.name==='Recovery'?'Log last night’s sleep in Health.':weak.name==='Mental Resilience'?'Log a Personal activity or your sleep energy rating.':'Complete tasks and log activity to raise it.');
     return {totalXP:Math.round(totalXP),level,rank,next,xpInLevel:Math.round(xpIn),xpForNext:Math.round(xpNext),pct:Math.round(xpIn/xpNext*100),today:sum(day),week:sum(week),month:sum(month),categories,strongest:strong,weakest:weak,achievements:ach,ranks,mission,streak:s.loginStreak||0}; }
   // Parses a changelog date string ("Aug 6, 2026 · 14:55", optionally with a trailing
   // "BST"/"GMT" label) into an epoch ms, treating it as UK local time (BST = UTC+1,
@@ -12296,6 +12327,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.81', date:'Aug 22, 2026', major:true, notes:[
+      'Fake-widget audit pass across Command Center, Power Level and World Intelligence HQ. Command Center: removed a hardcoded "markets open green · recovery optimal" line under Operations Overview that never reflected anything real; the "PRODUCTIVITY · LAST 30 DAYS" chart was a purely decorative animated sine-wave with a fixed "+18%" next to it — both now driven by your real logged activity/mission history, with a genuine period-over-period delta; the "Intelligence Feed" card was 4 permanently-fixed fake headlines badged "LIVE" — relabeled SAMPLE DATA with a note pointing at your real AI Daily Brief and World Intel’s News tab. Power Level: 4 of the 12 "Attributes" (Consistency, Health, Recovery, Mental Resilience) were hardcoded flat values that could never move no matter what you logged, yet the "AI Performance Specialist" panel could still pick one as your "weakest attribute" and tell you to go improve it — now driven by your real login streak, sleep log, hydration, meals and body-weight check-ins. World Intel: "Threat Levels" showed 3 fixed fake counts (23/61/45) that never changed regardless of country selected — replaced with a real distribution across every country in the actual risk model; "Intelligence Alerts" (5 fabricated alerts with fake timestamps and confidence scores, no live source) now honestly labelled SAMPLE DATA, matching the News tab’s existing treatment. Also removed a fully dead "system status" widget list (DEFCON level, quantum link, etc.) that was computed every render but never actually shown anywhere.',
+    ]},
     {version:'v11.80', date:'Aug 22, 2026', major:true, notes:[
       'Bulk Import’s parser now knows more exercise wording — bare "Name N BW" shorthand with no "reps"/"x" word (e.g. "Wall Calf Raises 30 BW"), plus tibialis/shin/wall-sit/hamstring/glute/quad classified correctly as Legs instead of falling into Mixed. Also strips stray trailing "|" characters and extra spacing some paste sources leave in. And: you can now enter your own bodyweight next to a BW set (manual log form and Bulk Import) — it becomes the real load used for that set’s volume, and syncs straight into your Health body-weight tracker instead of being a second, disconnected number.',
     ]},
@@ -16905,7 +16939,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       reviewedReqs:(S.requests||[]).filter(r=>r.status!=='pending').map(r=>({ name:r.name, email:r.email, purpose:(r.purpose||'—'), statusLabel:r.status.toUpperCase(), statusC:r.status==='accepted'?'#6cffba':'#FFFFFF', statusBg:r.status==='accepted'?'rgba(108,255,186,0.12)':'rgba(255,107,118,0.12)', ago:this.ago(r.reviewedTs||r.ts) })),
 
       // dashboard
-      checkDone, checkRemain:missRemainToday, checklist,
+      checkDone, checkRemain:missRemainToday, checkRemainWord:missRemainToday===1?'priority':'priorities', checklist,
       nextActions:nextActionsList, noNextActions:!nextActionsList.length,
       nextActionsBtnLabel: S.aiNextActionsLoading?'⏂ Thinking…':'✨ AI suggest',
       nextActionsSourceLabel: nextActionsIsAI?'AI-GENERATED · FROM YOUR DAY':'FROM YOUR MISSIONS & CALENDAR',
@@ -16942,7 +16976,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       missionRecurring:S.missionRecurring, toggleMissionRecurring:()=>this.setState(s=>({missionRecurring:!s.missionRecurring})),
       missionTypeLabel:S.missionRecurring?'Recurring':'One-time', missionTypeC:S.missionRecurring?'#F4F4F5':'#9a9aa2', missionTypeBg:S.missionRecurring?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', missionTypeBd:S.missionRecurring?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.12)',
       xpFx:(S.xpFx||[]).map(f=>({id:f.id,text:f.text})),
-      intel:[{cat:'AI',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'New frontier model tops reasoning benchmarks',meta:'Financial Times · 14m ago · 9 sources'},{cat:'MARKETS',catColor:'#eef0f2',catBdr:'rgba(255,255,255,0.25)',headline:'Fed holds rates; futures climb as inflation cools',meta:'Bloomberg · 38m ago · 21 sources'},{cat:'FUNDS',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'BlackRock ETF inflows hit fresh record',meta:'Reuters · 1h ago · 12 sources'},{cat:'GOV',catColor:'#9a9aa2',catBdr:'rgba(255,255,255,0.18)',headline:'Allied defense procurement framework expands',meta:'WSJ · 2h ago · 7 sources'}],
+      intel:[{cat:'AI',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'New frontier model tops reasoning benchmarks',meta:'Financial Times · illustrative · 9 sources'},{cat:'MARKETS',catColor:'#eef0f2',catBdr:'rgba(255,255,255,0.25)',headline:'Fed holds rates; futures climb as inflation cools',meta:'Bloomberg · illustrative · 21 sources'},{cat:'FUNDS',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'BlackRock ETF inflows hit fresh record',meta:'Reuters · illustrative · 12 sources'},{cat:'GOV',catColor:'#9a9aa2',catBdr:'rgba(255,255,255,0.18)',headline:'Allied defense procurement framework expands',meta:'WSJ · illustrative · 7 sources'}],
+      goWorldIntel:()=>this.setState({scene:'globe'}),
+      ...(()=>{ const d=this.productivitySeries().deltaPct; return {
+        prodDeltaText: d===0?'—':(d>0?'▲ +':'▼ ')+d+'%',
+        prodDeltaColor: d>0?'#FFFFFF':d<0?'#ff6b76':'#7c7c84',
+      }; })(),
 
       // briefing
       briefStamp:S.briefStamp, briefTabs, briefView, showExec:S.briefTab==='exec', showCards:S.briefTab!=='exec', execView, refreshBrief:()=>this.setState({briefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5)}),
