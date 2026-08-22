@@ -9008,7 +9008,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-99 · v11.99 orb-float-badge-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-100 · v11.100 streak-dead-code-cleanup';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12337,6 +12337,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.100', date:'Aug 22, 2026', major:false, notes:[
+      'Cleanup: removed the old per-subject streak calculations left over from unifying every subject onto one real cross-subject streak — 12 unused date-walking loops across English, Maths, Science, Grammar, History, Speaking, Psychology and Finance that computed a value nothing displayed any more. No behaviour change, just less dead weight in the codebase.',
+    ]},
     {version:'v11.99', date:'Aug 22, 2026', major:true, notes:[
       'Fixed the small floating voice-orb button (bottom-right shortcut on other pages) rendering completely blank — the edge-margin fix from the last update reserved more space than the tiny 66px badge actually has, which pinned its position entirely outside its own canvas. It now correctly centres itself and spins in place on any mount too small to roam in.',
     ]},
@@ -16037,8 +16040,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const enDashHoursVal=Math.round((enAllTotals.t/3600)*10)/10;
         const enNow7d=Date.now()-7*86400000, enNow30d=Date.now()-30*86400000;
         const enWeeklyCount=enHist.filter(h=>h.date>=enNow7d).length, enMonthlyCount=enHist.filter(h=>h.date>=enNow30d).length;
-        const enDayKeys=Array.from(new Set(enHist.map(h=>new Date(h.date).toDateString())));
-        let enStreakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(enDayKeys.includes(dstr)) enStreakDays++; else break; }
         const enDashXPVal=enAllTotals.c*10+enLevel*25;
         const enRemainingMs=Math.max(0,(S.enTimerEnd||0)-(S.enNow||Date.now()));
         const enRemainingSec=Math.ceil(enRemainingMs/1000);
@@ -16136,8 +16137,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const strongTopics=topicEntries.filter(t=>t.total>=3).sort((a,b)=>b.pct-a.pct).slice(0,3);
         const weakTopicsList=topicEntries.filter(t=>t.total>=3).sort((a,b)=>a.pct-b.pct).slice(0,3);
         const todayXP=(qt.xpByDate||{})[today]||0;
-        const activeDates=new Set([...(qt.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let qtStreak=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(activeDates.has(d)) qtStreak++; else break; }
         const r=S.qtLastResult;
         const qtResultCorrect=r?r.score:0, qtResultTotal=r?r.total:0, qtResultIncorrectCount=r?(r.total-r.score):0;
         return {
@@ -16188,16 +16187,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const mtOverallTotals=mtTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const mtQtOverallAccuracyVal=mtOverallTotals.total?Math.round(mtOverallTotals.ok/mtOverallTotals.total*100):0;
         const mtQtTodayXPVal=(qtMt.xpByDate||{})[mtQtToday]||0;
-        const mtActiveDates=new Set([...(qtMt.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let mtQtStreakVal=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(mtActiveDates.has(d)) mtQtStreakVal++; else break; }
-        if(mtQtStreakVal===0 && mtTopicEntries.length===0) mtQtStreakVal=1;
         const allTotals=history.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
         const dashAccuracy=allTotals.q?Math.round(allTotals.c/allTotals.q*100):0;
         const dashHours=Math.round((allTotals.t/3600)*10)/10;
         const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
         const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dayKeys=Array.from(new Set(history.map(h=>new Date(h.date).toDateString())));
-        let streakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(dayKeys.includes(dstr)) streakDays++; else break; }
         const dashXP=allTotals.c*10+mathsLevel*25;
         const formulaQ=(S.mtFormulaSearch||'').toLowerCase();
         const formulaList=(LM&&LM.FORMULAS)?LM.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
@@ -16288,8 +16282,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const dashHours=Math.round((allTotals.t/3600)*10)/10;
         const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
         const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dayKeys=Array.from(new Set(history.map(h=>new Date(h.date).toDateString())));
-        let streakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(dayKeys.includes(dstr)) streakDays++; else break; }
         const dashXP=allTotals.c*10+sciLevel*25;
         const formulaQ=(S.sciFormulaSearch||'').toLowerCase();
         const formulaList=(SC&&SC.FORMULAS)?SC.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
@@ -16306,9 +16298,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const sciQtOverallTotals=sciTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const sciQtOverallAccuracyVal=sciQtOverallTotals.total?Math.round(sciQtOverallTotals.ok/sciQtOverallTotals.total*100):0;
         const sciQtTodayXPVal=(qtSci.xpByDate||{})[sciQtToday]||0;
-        const sciActiveDates=new Set([...(qtSci.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let sciQtStreakVal=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(sciActiveDates.has(d)) sciQtStreakVal++; else break; }
-        if(sciQtStreakVal===0 && sciTopicEntries.length===0) sciQtStreakVal=1;
         const r=S.sciLastResult;
         return {
           isScienceSubject:S.learningTab==='Science',
@@ -16367,8 +16356,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const dashHours=Math.round((allTotals.t/3600)*10)/10;
         const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
         const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dayKeys=Array.from(new Set(history.map(h=>new Date(h.date).toDateString())));
-        let streakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(dayKeys.includes(dstr)) streakDays++; else break; }
         const dashXP=allTotals.c*10+graLevel*25;
         const formulaQ=(S.graFormulaSearch||'').toLowerCase();
         const formulaList=(GR&&GR.FORMULAS)?GR.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
@@ -16385,9 +16372,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const graQtOverallTotals=graTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const graQtOverallAccuracyVal=graQtOverallTotals.total?Math.round(graQtOverallTotals.ok/graQtOverallTotals.total*100):0;
         const graQtTodayXPVal=(qtGra.xpByDate||{})[graQtToday]||0;
-        const graActiveDates=new Set([...(qtGra.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let graQtStreakVal=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(graActiveDates.has(d)) graQtStreakVal++; else break; }
-        if(graQtStreakVal===0 && graTopicEntries.length===0) graQtStreakVal=1;
         const r2=S.graLastResult;
         return {
           isGrammarSubject:S.learningTab==='Grammar',
@@ -16446,8 +16430,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const dashHours=Math.round((allTotals.t/3600)*10)/10;
         const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
         const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dayKeys=Array.from(new Set(history.map(h=>new Date(h.date).toDateString())));
-        let streakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(dayKeys.includes(dstr)) streakDays++; else break; }
         const dashXP=allTotals.c*10+hisLevel*25;
         const formulaQ=(S.hisFormulaSearch||'').toLowerCase();
         const formulaList=(HI&&HI.FORMULAS)?HI.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
@@ -16464,9 +16446,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const hisQtOverallTotals=hisTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const hisQtOverallAccuracyVal=hisQtOverallTotals.total?Math.round(hisQtOverallTotals.ok/hisQtOverallTotals.total*100):0;
         const hisQtTodayXPVal=(qtHis.xpByDate||{})[hisQtToday]||0;
-        const hisActiveDates=new Set([...(qtHis.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let hisQtStreakVal=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(hisActiveDates.has(d)) hisQtStreakVal++; else break; }
-        if(hisQtStreakVal===0 && hisTopicEntries.length===0) hisQtStreakVal=1;
         const r3=S.hisLastResult;
         return {
           isHistorySubject:S.learningTab==='History',
@@ -16531,8 +16510,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const spkDashHours=Math.round((spkAllTotals.t/3600)*10)/10;
         const spkNow7d=Date.now()-7*86400000, spkNow30d=Date.now()-30*86400000;
         const spkWeeklyCount=spkHistory.filter(h=>h.date>=spkNow7d).length, spkMonthlyCount=spkHistory.filter(h=>h.date>=spkNow30d).length;
-        const spkDayKeys=Array.from(new Set(spkHistory.map(h=>new Date(h.date).toDateString())));
-        let spkStreakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(spkDayKeys.includes(dstr)) spkStreakDays++; else break; }
         const spkDashXP=spkAllTotals.c*10+spkLevel*25;
         const spkFormulaQ=(S.spkFormulaSearch||'').toLowerCase();
         const spkFormulaList=(SP&&SP.FORMULAS)?SP.FORMULAS.filter(f=>!spkFormulaQ||f.name.toLowerCase().includes(spkFormulaQ)||f.topic.toLowerCase().includes(spkFormulaQ)):[];
@@ -16554,9 +16531,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const spkQtOverallTotals=spkTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const spkQtOverallAccuracyVal=spkQtOverallTotals.total?Math.round(spkQtOverallTotals.ok/spkQtOverallTotals.total*100):0;
         const spkQtTodayXPVal=(qtSpk.xpByDate||{})[spkQtToday]||0;
-        const spkActiveDates2=new Set([...(qtSpk.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let spkQtStreakVal=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(spkActiveDates2.has(d)) spkQtStreakVal++; else break; }
-        if(spkQtStreakVal===0 && spkTopicEntries.length===0) spkQtStreakVal=1;
         return {
           isSpeakingSubject:S.learningTab==='Speaking',
           isSpkHub:S.spkMode==='hub' && S.qtMode==='closed', isSpkPractice:S.spkMode==='practice', isSpkCoach:S.spkMode==='coach',
@@ -16641,8 +16615,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const dashHours=Math.round((allTotals.t/3600)*10)/10;
         const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
         const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dayKeys=Array.from(new Set(history.map(h=>new Date(h.date).toDateString())));
-        let streakDays=0; for(let i=0;i<365;i++){ const dstr=new Date(Date.now()-i*86400000).toDateString(); if(dayKeys.includes(dstr)) streakDays++; else break; }
         const dashXP=allTotals.c*10+phyLevel*25;
         const formulaQ=(S.phyFormulaSearch||'').toLowerCase();
         const formulaList=(PH&&PH.FORMULAS)?PH.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
@@ -16659,9 +16631,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const phyQtOverallTotals=phyTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const phyQtOverallAccuracyVal=phyQtOverallTotals.total?Math.round(phyQtOverallTotals.ok/phyQtOverallTotals.total*100):0;
         const phyQtTodayXPVal=(qtPhy.xpByDate||{})[phyQtToday]||0;
-        const phyActiveDates=new Set([...(qtPhy.history||[]).map(h=>new Date(h.date).toDateString())]);
-        let phyQtStreakVal=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(phyActiveDates.has(d)) phyQtStreakVal++; else break; }
-        if(phyQtStreakVal===0 && phyTopicEntries.length===0) phyQtStreakVal=1;
         const r4=S.phyLastResult;
         const phyTutorVoiceOptions=((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ id:p.id, label:p.name, go:()=>this.phyTutorSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.phyTutorVoiceId||'21m00Tcm4TlvDq8ikWAM')===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.phyTutorVoiceId||'pro_f')===p.id?'#0a0a0b':'#c5c5ca' }));
         const phyTutorMsgs=(S.phyTutorMessages||[]).map((m,i)=>({ idx:i, isUser:m.role==='user', text:m.text, bubbleBg:m.role==='user'?'#1e1e21':'#141416', align:m.role==='user'?'flex-end':'flex-start', speak:()=>this.phyTutorSpeak(m.text) }));
@@ -16744,8 +16713,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const mDashHours=Math.round((mAllTotals.t/3600)*10)/10;
         const mNow7d=Date.now()-7*86400000, mNow30d=Date.now()-30*86400000;
         const mWeeklyCount=moneyHist.filter(h=>h.date>=mNow7d).length, mMonthlyCount=moneyHist.filter(h=>h.date>=mNow30d).length;
-        const mDayKeys=Array.from(new Set(moneyHist.map(h=>new Date(h.date).toDateString())));
-        let mStreakDays=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(mDayKeys.includes(d)) mStreakDays++; else break; }
         const mDashXP=mAllTotals.c*10+moneyLevel*25;
         const moneyFormulaQ=(S.moneyFormulaSearch||'').toLowerCase();
         const moneyFormulaList=MN?MN.FORMULAS.filter(f=>!moneyFormulaQ||f.name.toLowerCase().includes(moneyFormulaQ)||f.topic.toLowerCase().includes(moneyFormulaQ)):[];
@@ -16816,8 +16783,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const gDashHours=Math.round((gAllTotals.t/3600)*10)/10;
         const gNow7d=Date.now()-7*86400000, gNow30d=Date.now()-30*86400000;
         const gWeeklyCount=gentHist.filter(h=>h.date>=gNow7d).length, gMonthlyCount=gentHist.filter(h=>h.date>=gNow30d).length;
-        const gDayKeys=Array.from(new Set(gentHist.map(h=>new Date(h.date).toDateString())));
-        let gStreakDays=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(gDayKeys.includes(d)) gStreakDays++; else break; }
         const gDashXP=gAllTotals.c*10+gentLevel*25;
         const gentFormulaQ=(S.gentFormulaSearch||'').toLowerCase();
         const gentFormulaList=LG?LG.FORMULAS.filter(f=>!gentFormulaQ||f.name.toLowerCase().includes(gentFormulaQ)||f.topic.toLowerCase().includes(gentFormulaQ)):[];
