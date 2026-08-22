@@ -3395,6 +3395,7 @@
       <!-- ===== VOICE ===== -->
       <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
       <div style="position:fixed; inset:0; z-index:3; background:{{ vOverlay }}; pointer-events:none;"></div>
+      <div data-orb-mount="voice" style="position:fixed; inset:0; z-index:0; pointer-events:none;"></div>
 
       <sc-if value="{{ convoHistoryOpen }}" hint-placeholder-val="{{ false }}">
         <div onClick="{{ closeConvoHistory }}" style="position:fixed; inset:0; z-index:40; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
@@ -3417,9 +3418,8 @@
       </sc-if>
       <div style="animation:rise .5s ease both; display:flex; flex-direction:column; align-items:center; position:relative; z-index:4;">
         <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="width:100%; max-width:720px; font-size:12px; color:#ff8a5b; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(255,138,91,0.1); border:1px solid rgba(255,138,91,0.25);">⚠ {{ voiceFallbackErr }}</div></sc-if>
-        <div style="position:relative; width:100%; min-height:52vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:36px 0 26px; margin-bottom:18px; overflow:hidden;">
-          <div style="position:absolute; inset:0; z-index:0; background:{{ vGlow }};"></div>
-          <div data-orb-mount="voice" style="position:absolute; inset:0; z-index:0;"></div>
+        <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center; padding:36px 0 26px; margin-bottom:18px;">
+          <div style="position:absolute; inset:-40px 0; z-index:0; background:{{ vGlow }};"></div>
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
@@ -9005,7 +9005,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-93 · v11.93 orb-slower-flex-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-94 · v11.94 orb-remove-box';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.94', date:'Aug 22, 2026', major:true, notes:[
+      'Removed the orb\'s box entirely — it now swims across the whole browser window as a fixed backdrop layer behind the page, instead of being sized to a section of it. The section that used to hold it (previously ~52vh tall) is back to its natural compact size around the controls; the orb itself is no longer confined to any div at all.',
+    ]},
     {version:'v11.93', date:'Aug 22, 2026', major:true, notes:[
       'Slowed the orb\'s drift back down — the last speedups made it dart around faster than intended once it had the full top-half area to roam in. Also fixed the shape-flex while swimming: it was being normalised against a rough guess that kept it pinned near its max almost constantly, so the cluster looked statically stretched instead of actually changing shape. It now normalises against the path\'s real speed at each moment, so the flex genuinely eases in and out as the cluster speeds up and slows down.',
     ]},
