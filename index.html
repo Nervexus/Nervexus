@@ -3395,7 +3395,7 @@
       <!-- ===== VOICE ===== -->
       <sc-if value="{{ isVoice }}" hint-placeholder-val="{{ false }}">
       <div style="position:fixed; inset:0; z-index:3; background:{{ vOverlay }}; pointer-events:none;"></div>
-      <div data-orb-mount="voice" style="position:fixed; inset:0; z-index:0; pointer-events:none;"></div>
+      <div data-orb-mount="voice" style="position:fixed; left:0; top:0; right:0; bottom:0; z-index:0; pointer-events:none;"></div>
 
       <sc-if value="{{ convoHistoryOpen }}" hint-placeholder-val="{{ false }}">
         <div onClick="{{ closeConvoHistory }}" style="position:fixed; inset:0; z-index:40; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
@@ -9004,7 +9004,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-95 · v11.95 orb-cleanup-resize';
+const NOTIF_BUILD_VERSION = '2026.08.22-96 · v11.96 orb-content-bounds';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11796,6 +11796,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       else if(kind==='float') this._mountFloatOrb(el);
       else if(kind==='voice') this._mountVoiceOrb(el);
     });
+    this._syncVoiceOrbBounds();
     const key=(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode+'|'+this.state.moneyCalY;
     const sig=key+'|'+this.dataSig();
     if(sig===this._sig) return;
@@ -12332,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.96', date:'Aug 22, 2026', major:true, notes:[
+      'Orb now stays inside the actual page content area — it measures the real sidebar width and top bar height and clips its own roam area to that, so it can never swim over the nav rail or the header. Slowed the drift down further. Also fixed the shape-flex feeling jumpy (snapping between round/oval/square-ish): it now eases toward its target shape gradually instead of matching the instantaneous speed every single frame.',
+    ]},
     {version:'v11.95', date:'Aug 22, 2026', major:true, notes:[
       'Removed a leftover tinted glow panel that used to sit behind the orb\'s old box — now that the orb roams the full screen, that panel was left behind as a visible empty rectangle in its old spot, which read as "the old box." Also sized the orb back down: it had grown to match the size of whatever huge area it was mounted in, so on a full screen it had ballooned to fill a large chunk of it. It\'s now capped at its original compact size regardless of how much room it has to roam. Restored the voice page\'s original vertical spacing so the layout doesn\'t look compressed now that the orb no longer occupies that space itself.',
     ]},
@@ -15031,6 +15035,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const pal=this._orbPalette();
     this._orbApi=window.OrbEngine.mount(el, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, satMul:1, dimMul:1, hoverIntensity:0, rotateOnHover:true, forceHoverState:!!this.state.listening}); }
   _unmountVoiceOrb(){ if(this._orbApi){ this._orbApi.destroy(); this._orbApi=null; } this._orbEl=null; }
+  // Keeps the fixed-position voice orb mount clipped to the real content
+  // area — right of the sidebar, below the top bar — instead of the whole
+  // viewport, so it never swims over the nav rail or header.
+  _syncVoiceOrbBounds(){
+    const el=this.root && this.root.querySelector('[data-orb-mount="voice"]'); if(!el) return;
+    const side=this.root.querySelector('.cc-side');
+    const top=this.root.querySelector('.cc-top');
+    const sideW=(side && side.offsetParent!==null) ? Math.round(side.getBoundingClientRect().width) : 0;
+    const topH=(top && top.offsetParent!==null) ? Math.round(top.getBoundingClientRect().height) : 0;
+    const l=sideW+'px', t=topH+'px';
+    if(el.style.left!==l || el.style.top!==t){ el.style.left=l; el.style.top=t; if(this._orbApi && this._orbApi.resize) this._orbApi.resize(); }
+    if(!this._voiceOrbResizeBound){ this._voiceOrbResizeBound=true; window.addEventListener('resize', ()=>this._syncVoiceOrbBounds()); }
+  }
   // The sidebar logo orb and floating voice-orb button were hardcoded to Ultra X's
   // maroon/red regardless of theme — fine for Ultra X, wrong everywhere else (base
   // theme, Noir, Maison Élysée all showed the same red). Palette per theme instead.

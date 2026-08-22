@@ -134,9 +134,10 @@
     // centre wander a wide, organic, non-repeating path around the tank
     // instead of holding still or tracing a simple oval.
     var driftPhaseA = Math.random() * Math.PI * 2, driftPhaseB = Math.random() * Math.PI * 2;
-    var driftFA = 0.00052 + Math.random() * 0.00013, driftFB = 0.00033 + Math.random() * 0.0001;
+    var driftFA = 0.00024 + Math.random() * 0.00006, driftFB = 0.00015 + Math.random() * 0.00005;
     var driftPhaseA2 = Math.random() * Math.PI * 2, driftPhaseB2 = Math.random() * Math.PI * 2;
-    var driftFA2 = driftFA * 2.3 + Math.random() * 0.00014, driftFB2 = driftFB * 1.7 + Math.random() * 0.0001;
+    var driftFA2 = driftFA * 2.3 + Math.random() * 0.00007, driftFB2 = driftFB * 1.7 + Math.random() * 0.00005;
+    var squashSmooth = 0;
     var rafId;
     function frame(t) {
       rafId = root.requestAnimationFrame(frame);
@@ -189,7 +190,12 @@
       var maxSpeedY = driftFB * wanderRangeY + driftFB2 * wanderRangeY2;
       var maxSpeed = Math.sqrt(maxSpeedX * maxSpeedX + maxSpeedY * maxSpeedY) || 1;
       var speedNorm = clamp(Math.sqrt(dvx * dvx + dvy * dvy) / maxSpeed, 0, 1);
-      var squash = 0.2 * speedNorm;
+      // Ease toward the target squash instead of snapping to it every frame —
+      // the raw per-frame value could jump around fast enough that the
+      // silhouette looked like it was flicking between round/oval/square
+      // instead of gradually flexing.
+      squashSmooth += (0.2 * speedNorm - squashSmooth) * 0.02;
+      var squash = squashSmooth;
       var hc = Math.cos(headAngle), hs = Math.sin(headAngle);
       curOcx = ocx; curOcy = ocy;
 
@@ -321,6 +327,7 @@
       setOverrideMix: function (v) { overrideMix = v; },
       setForceHover: function (v) { forceHoverState = !!v; },
       setHoverIntensity: function (v) { hoverIntensity = v; },
+      resize: resize,
       destroy: function () {
         if (destroyed) return;
         destroyed = true;
