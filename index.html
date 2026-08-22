@@ -9008,7 +9008,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-100 · v11.100 streak-dead-code-cleanup';
+const NOTIF_BUILD_VERSION = '2026.08.22-101 · v11.101 orb-drift-frozen-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12337,6 +12337,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.101', date:'Aug 22, 2026', major:true, notes:[
+      'Fixed the orb not actually moving — the snake-drift code introduced last update computed its per-frame time delta from a variable that had already been overwritten with the current frame\'s own timestamp earlier in the same function, so the elapsed time was always zero and the cluster never advanced, even with drift switched on. It now uses the correctly-captured delta and swims properly again.',
+    ]},
     {version:'v11.100', date:'Aug 22, 2026', major:false, notes:[
       'Cleanup: removed the old per-subject streak calculations left over from unifying every subject onto one real cross-subject streak — 12 unused date-walking loops across English, Maths, Science, Grammar, History, Speaking, Psychology and Finance that computed a value nothing displayed any more. No behaviour change, just less dead weight in the codebase.',
     ]},

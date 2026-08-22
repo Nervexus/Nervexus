@@ -181,7 +181,7 @@
       else { boundT = edgeMargin; boundB = ch - edgeMargin; }
       if (!snakeInit) { snakeInit = true; snakeX = clamp(cw / 2, boundL, boundR); snakeY = clamp(ch / 2, boundT, boundB); }
 
-      var dtMs = lastT ? (t - lastT) : 16;
+      var dtMs = dt * 1000;
       if (driftEnabled) {
         // Snake drift: advance at a steady speed while the heading itself
         // undulates (sine on the turn RATE, not the angle) so the path
