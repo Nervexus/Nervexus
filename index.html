@@ -9006,7 +9006,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-83 · v11.83 recurring-reminders';
+const NOTIF_BUILD_VERSION = '2026.08.22-84 · v11.84 learning-follow-ups';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10233,7 +10233,9 @@ activities: this._mergeShipLog(s.activities),
   enStartPlacement(){ const LE=this._LE(); if(!LE) return; const n=12, dur=10*60000, now=Date.now();
     this.setState({ enMode:'placement', enQueue:LE.generatePlacementSet(n), enQIdx:0, enQ:null, enAnswers:[], enInput:'', enFeedback:null, enScore:0, enTotal:n, enTimerEnd:now+dur, enNow:now, enDuration:dur, enStartedAt:now },()=>{ this.setState({enQ:this.state.enQueue[0]}); }); this._enStartTicker(); }
   enStartLevelTest(){ const LE=this._LE(); if(!LE) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.englishLevel)||1); const n=this._levelTestQuestionCount(lvl,50), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.englishFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.englishFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('English');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const genFor=(kind)=>kind==='Vocabulary'?LE.generateVocabQuestion(lvl):kind==='Grammar'?LE.generateGrammarQuestion():kind==='Reading'?LE.generateReadingQuestion(lvl):null;
     const focusKinds=focusAreas.filter(k=>['Vocabulary','Grammar','Reading'].indexOf(k)>=0);
     let queue;
@@ -10275,6 +10277,7 @@ activities: this._mergeShipLog(s.activities),
   enFinishTest(){ if(this.state.enMode==='results') return; this._enStopTicker(); const LE=this._LE(); const S=this.state; const pct=S.enTotal?Math.round(S.enScore/S.enTotal*100):0;
     const byTopic={}; S.enAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('English',breakdown);
     const timeTaken=Math.round((Date.now()-S.enStartedAt)/1000);
     if(S.enMode==='placement'){ const lvl=LE.placementLevelFromScore(pct); const label=LE.levelLabel(lvl); const grade=LE.gradeFromLevel(lvl); const sw=LE.strongestWeakest(breakdown);
       this.mut(s=>({ learning:{...(s.learning||{}), englishLevel:lvl, englishLabel:label, englishGrade:grade, englishStrongest:sw.strongest, englishWeakest:sw.weakest, englishFocusAreas:sw.focusAreas, englishPlacementDone:true} }));
@@ -12331,6 +12334,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.84', date:'Aug 22, 2026', major:true, notes:[
+      'Three Learning Centre follow-ups. English vocabulary bank grown from 28 to 89 real words spanning the full level range (1-50), each with a definition, pronunciation guide, example, synonyms and antonyms. Streaks unified across every subject — each of the 9 subjects used to track two separate, often-disagreeing streak counters of its own; every "DAILY STREAK"/"🔥 streak" display now shows the same real cross-subject streak (any day you completed a test in any subject). And genuine spaced repetition: every subject now runs a real Leitner-style schedule — a topic you do well on gets pushed further out for review (1/3/7/14 days), one you do poorly on comes right back due — and each Level Ladder test now pulls its weak-topic questions from what’s actually due for review, not just a same-session accuracy snapshot that never remembered what you’d gotten wrong before.',
+    ]},
     {version:'v11.83', date:'Aug 22, 2026', major:true, notes:[
       'Fixed recurring calendar events never getting a push/email reminder past their first occurrence. Three real bugs: the events table was missing the repeat_days column entirely — the app had been sending and reading it for a while, silently dropped every time; the out-of-app reminder sweep only ever checked events dated exactly today, ignoring recurrence altogether; and both the in-app and out-of-app reminder logic deduped a fired reminder by the event’s original date/ID, so a weekly event could only ever fire once in its lifetime. All three are fixed — recurring events are now evaluated against today’s weekday and each occurrence gets its own reminder.',
     ]},
@@ -13766,6 +13772,37 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const hasDay=(i)=>{ const s=this._dayStart(i), e=s+86400000; return acts.some(a=>a.ts>=s&&a.ts<e); };
     let streak=0, i=hasDay(0)?0:1;
     while(hasDay(i)){ streak++; i++; if(streak>365) break; } return streak; }
+  // ===== Spaced repetition (shared across every Learning Centre subject) =====
+  // A minimal Leitner system: each subject+topic pair has a box (1-5) and a dueAt
+  // timestamp. Answering a topic well in a finished test promotes it a box and pushes
+  // its next review further out (1/3/7/14 days); answering it poorly drops it straight
+  // back to box 1 (due again immediately). Replaces the old same-session-only accuracy
+  // bias — a weak topic now actually gets scheduled to come back, instead of only
+  // mattering if the user happens to test again soon after getting it wrong.
+  _srsBoxDays(){ return [0,1,3,7,14]; }
+  _srsUpdateFromBreakdown(subject,breakdown){
+    if(!breakdown||!breakdown.length) return;
+    this.mut(s=>{
+      const srs={...((s.learning&&s.learning.srs)||{})};
+      breakdown.forEach(b=>{
+        if(!b.topic||!b.total) return;
+        const key=subject+':'+b.topic;
+        const cur=srs[key]||{box:1,dueAt:0};
+        const acc=b.ok/b.total;
+        const box=acc>=0.7?Math.min(5,cur.box+1):1;
+        srs[key]={box, dueAt:Date.now()+this._srsBoxDays()[box-1]*86400000, lastAcc:Math.round(acc*100), lastAt:Date.now()};
+      });
+      return {learning:{...(s.learning||{}), srs}};
+    });
+  }
+  // Topics for this subject that are due for review right now, most-overdue first.
+  // Empty when nothing's due yet (cold start, or everything was reviewed recently) —
+  // callers fall back to their existing lifetime-accuracy-based focus areas.
+  _srsDueTopics(subject){
+    const srs=(this.state.learning&&this.state.learning.srs)||{}; const now=Date.now(); const prefix=subject+':';
+    return Object.keys(srs).filter(k=>k.indexOf(prefix)===0 && srs[k].dueAt<=now)
+      .sort((a,b)=>srs[a].dueAt-srs[b].dueAt).map(k=>k.slice(prefix.length));
+  }
   catTime(){ const colors={Work:'#FFFFFF',Health:'#e8e8ec',Learning:'#FFFFFF',Business:'#ff5563',Personal:'#9a9aa2'}; const m={}; (this.state.activities||[]).forEach(a=>{ const v=+a.min||0; if(v>0) m[a.cat]=(m[a.cat]||0)+v; }); return Object.keys(m).map(k=>({cat:k,min:m[k],color:colors[k]||'#FFFFFF'})).sort((a,b)=>b.min-a.min); }
   startCatPie(cv){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,R=Math.min(w,h)*0.46,r=R*0.60; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const segs=this.catTime(); const tot=segs.reduce((a,s)=>a+s.min,0); const prog=Math.min(1,ts*0.0012);
     if(tot<=0){ ctx.beginPath(); ctx.arc(cx,cy,(R+r)/2,0,7); ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=R-r; ctx.stroke(); return; }
@@ -14079,7 +14116,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   mtStartTest(hard){ const LM=this._LM(); if(!LM) return; this._mtBusy=false; const n=15, dur=10*60000, now=Date.now(); this.setState({ mtMode:'test', mtHard:!!hard, mtLevel:0, mtQueue:(hard?LM.generateSetHard(n):LM.generateSet(n)), mtQIdx:0, mtQ:null, mtAnswers:[], mtInput:'', mtFeedback:null, mtScore:0, mtTotal:n, mtTimerEnd:now+dur, mtNow:now, mtDuration:dur, mtStartedAt:now },()=>{ this.setState({mtQ:this.state.mtQueue[0]}); }); this._mtStartTicker(); }
   mtStartLevelTest(){ const LM=this._LM(); if(!LM) return; this._mtBusy=false; const lvl=((this.state.learning&&this.state.learning.mathsLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=LM.levelDurationMs(lvl), now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.mathsFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.mathsFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('Maths');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>{ const t=(LM.TOPICS||[]).find(x=>x.label===label); return t&&t.key; };
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14114,6 +14153,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   mtFinishTest(){ if(this.state.mtMode==='results') return; this._mtStopTicker(); const LM=this._LM(); const S=this.state; const pct=S.mtTotal?Math.round(S.mtScore/S.mtTotal*100):0;
     const byTopic={}; S.mtAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Maths',breakdown);
     const timeTaken=Math.round((Date.now()-S.mtStartedAt)/1000);
     if(S.mtPlacement){
       const level=LM.levelFromScore(pct); const grade=LM.gradeFromLevel(level); const sw=LM.strongestWeakest(breakdown);
@@ -14169,7 +14209,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   sciStartPlacement(){ const SC=window.LearningScience; if(!SC) return; this._sciBusy=false; const n=16, dur=12*60000, now=Date.now();
     this.setState({ sciMode:'test', sciPlacement:true, sciLevel:0, sciQueue:SC.generatePlacementSet(n), sciIdx:0, sciQ:null, sciAnswers:[], sciInput:'', sciFeedback:null, sciScore:0, sciTotal:n, sciTimerEnd:now+dur, sciNow:now, sciDuration:dur, sciStartedAt:now },()=>{ this.setState({sciQ:this.state.sciQueue[0]}); }); this._sciStartTicker(); }
   sciStartLevelTest(){ const SC=window.LearningScience; if(!SC) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.scienceLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.scienceFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.scienceFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('Science');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>Object.keys(SC.TOPIC_LABELS||{}).find(k=>SC.TOPIC_LABELS[k]===label);
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14197,6 +14239,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   sciFinishTest(){ if(this.state.sciMode==='results') return; this._sciStopTicker(); const SC=window.LearningScience; const S=this.state; const pct=S.sciTotal?Math.round(S.sciScore/S.sciTotal*100):0;
     const byTopic={}; S.sciAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Science',breakdown);
     const timeTaken=Math.round((Date.now()-S.sciStartedAt)/1000);
     if(S.sciPlacement){
       const level=SC.levelFromScore(pct); const grade=SC.gradeFromLevel(level); const sw=SC.strongestWeakest(breakdown);
@@ -14250,7 +14293,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   graStartPlacement(){ const GR=window.LearningGrammar; if(!GR) return; this._graBusy=false; const n=16, dur=12*60000, now=Date.now();
     this.setState({ graMode:'test', graPlacement:true, graLevel:0, graQueue:GR.generatePlacementSet(n), graIdx:0, graQ:null, graAnswers:[], graInput:'', graFeedback:null, graScore:0, graTotal:n, graTimerEnd:now+dur, graNow:now, graDuration:dur, graStartedAt:now },()=>{ this.setState({graQ:this.state.graQueue[0]}); }); this._graStartTicker(); }
   graStartLevelTest(){ const GR=window.LearningGrammar; if(!GR) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.grammarLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.grammarFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.grammarFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('Grammar');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>Object.keys(GR.TOPIC_LABELS||{}).find(k=>GR.TOPIC_LABELS[k]===label);
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14278,6 +14323,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   graFinishTest(){ if(this.state.graMode==='results') return; this._graStopTicker(); const GR=window.LearningGrammar; const S=this.state; const pct=S.graTotal?Math.round(S.graScore/S.graTotal*100):0;
     const byTopic={}; S.graAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Grammar',breakdown);
     const timeTaken=Math.round((Date.now()-S.graStartedAt)/1000);
     if(S.graPlacement){
       const level=GR.levelFromScore(pct); const grade=GR.gradeFromLevel(level); const sw=GR.strongestWeakest(breakdown);
@@ -14331,7 +14377,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   hisStartPlacement(){ const HI=window.LearningHistory; if(!HI) return; this._hisBusy=false; const n=16, dur=12*60000, now=Date.now();
     this.setState({ hisMode:'test', hisPlacement:true, hisLevel:0, hisQueue:HI.generatePlacementSet(n), hisIdx:0, hisQ:null, hisAnswers:[], hisInput:'', hisFeedback:null, hisScore:0, hisTotal:n, hisTimerEnd:now+dur, hisNow:now, hisDuration:dur, hisStartedAt:now },()=>{ this.setState({hisQ:this.state.hisQueue[0]}); }); this._hisStartTicker(); }
   hisStartLevelTest(){ const HI=window.LearningHistory; if(!HI) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.historyLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.historyFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.historyFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('History');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>Object.keys(HI.TOPIC_LABELS||{}).find(k=>HI.TOPIC_LABELS[k]===label);
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14359,6 +14407,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   hisFinishTest(){ if(this.state.hisMode==='results') return; this._hisStopTicker(); const HI=window.LearningHistory; const S=this.state; const pct=S.hisTotal?Math.round(S.hisScore/S.hisTotal*100):0;
     const byTopic={}; S.hisAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('History',breakdown);
     const timeTaken=Math.round((Date.now()-S.hisStartedAt)/1000);
     if(S.hisPlacement){
       const level=HI.levelFromScore(pct); const grade=HI.gradeFromLevel(level); const sw=HI.strongestWeakest(breakdown);
@@ -14460,7 +14509,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const queue=PH.generateDarkSet(); const n=queue.length, dur=10*60000, now=Date.now(); const wasDark=this.state.scene==='darkpsych';
     this.setState({ phyMode:'test', phyPlacement:false, phyDarkTest:true, phyLevel:0, phyQueue:queue, phyIdx:0, phyQ:null, phyAnswers:[], phyInput:'', phyFeedback:null, phyScore:0, phyTotal:n, phyTimerEnd:now+dur, phyNow:now, phyDuration:dur, phyStartedAt:now, scene:'learning' },()=>{ this.setState({phyQ:this.state.phyQueue[0]}); }); this._phyStartTicker(); if(wasDark) this._forceReflowNextFrame(); }
   phyStartLevelTest(){ const PH=window.LearningPhysiology; if(!PH) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.physiologyLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.physiologyFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.physiologyFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('Psychology');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>Object.keys(PH.TOPIC_LABELS||{}).find(k=>PH.TOPIC_LABELS[k]===label);
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14488,6 +14539,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   phyFinishTest(){ if(this.state.phyMode==='results') return; this._phyStopTicker(); const PH=window.LearningPhysiology; const S=this.state; const pct=S.phyTotal?Math.round(S.phyScore/S.phyTotal*100):0;
     const byTopic={}; S.phyAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Psychology',breakdown);
     const timeTaken=Math.round((Date.now()-S.phyStartedAt)/1000);
     if(S.phyPlacement){
       const level=PH.levelFromScore(pct); const grade=PH.gradeFromLevel(level); const sw=PH.strongestWeakest(breakdown);
@@ -14567,6 +14619,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   spkFinishTest(){ if(this.state.spkMode==='results') return; this._spkStopTestTicker(); const SPK=window.LearningSpeaking; const S=this.state; const total=S.spkTestQueue.length; const score=S.spkTestAnswers.filter(a=>a.ok).length; const pct=total?Math.round(score/total*100):0;
     const byTopic={}; S.spkTestAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Speaking',breakdown);
     const timeTaken=Math.round((Date.now()-S.spkTestStartedAt)/1000);
     if(S.spkTestPlacement){
       const level=SPK.levelFromScore(pct); const grade=SPK.gradeFromLevel(level); const sw=SPK.strongestWeakest(breakdown);
@@ -14615,7 +14668,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   moneyStartPlacement(){ const MN=window.LearningMoney; if(!MN) return; this._moneyBusy=false; const n=16, dur=12*60000, now=Date.now();
     this.setState({ moneyMode:'test', moneyPlacement:true, moneyLevel:0, moneyQueue:MN.generatePlacementSet(n), moneyIdx:0, moneyQ:null, moneyAnswers:[], moneyInput:'', moneyFeedback:null, moneyScore:0, moneyTotal:n, moneyTimerEnd:now+dur, moneyNow:now, moneyDuration:dur, moneyStartedAt:now },()=>{ this.setState({moneyQ:this.state.moneyQueue[0]}); }); this._moneyStartTicker(); }
   moneyStartLevelTest(){ const MN=window.LearningMoney; if(!MN) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.moneyLevel)||1); const n=this._levelTestQuestionCount(lvl,60), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.moneyFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.moneyFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('Finance');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>Object.keys(MN.TOPIC_LABELS||{}).find(k=>MN.TOPIC_LABELS[k]===label);
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14643,6 +14698,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   moneyFinishTest(){ if(this.state.moneyMode==='results') return; this._moneyStopTicker(); const MN=window.LearningMoney; const S=this.state; const pct=S.moneyTotal?Math.round(S.moneyScore/S.moneyTotal*100):0;
     const byTopic={}; S.moneyAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Finance',breakdown);
     const timeTaken=Math.round((Date.now()-S.moneyStartedAt)/1000);
     if(S.moneyPlacement){
       const level=MN.levelFromScore(pct); const grade=MN.gradeFromLevel(level); const sw=MN.strongestWeakest(breakdown);
@@ -14699,7 +14755,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // drawn specifically from those weak topics — the rest stays normal mixed-level practice,
   // so it never becomes a narrow drill, just weighted toward what you actually got wrong.
   gentStartLevelTest(){ const LG=window.LearningGentleman; if(!LG) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.gentLevel)||1); const n=this._levelTestQuestionCount(lvl,120), dur=8*60000, now=Date.now();
-    const focusAreas=(this.state.learning&&this.state.learning.gentFocusAreas)||[];
+    const storedFocusAreas=(this.state.learning&&this.state.learning.gentFocusAreas)||[];
+    const dueTopics=this._srsDueTopics('Gentleman');
+    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
     const keyFor=(label)=>Object.keys(LG.TOPIC_LABELS).find(k=>LG.TOPIC_LABELS[k]===label);
     const focusKeys=focusAreas.map(keyFor).filter(Boolean);
     let queue;
@@ -14727,6 +14785,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   gentFinishTest(){ if(this.state.gentMode==='results') return; this._gentStopTicker(); const LG=window.LearningGentleman; const S=this.state; const pct=S.gentTotal?Math.round(S.gentScore/S.gentTotal*100):0;
     const byTopic={}; S.gentAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
     const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
+    this._srsUpdateFromBreakdown('Gentleman',breakdown);
     const timeTaken=Math.round((Date.now()-S.gentStartedAt)/1000);
     if(S.gentPlacement){
       const level=LG.levelFromScore(pct); const grade=LG.gradeFromLevel(level); const sw=LG.strongestWeakest(breakdown);
@@ -15939,7 +15998,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           isEnDashboard:S.enMode==='dashboard', goEnDashboard:()=>this.enOpenDashboard(),
           enStrongestStr: enStrongest||'—', enWeakestStr: enWeakest||'—',
           enDashLevel: enLevel, enDashGrade: enGrade?('Grade '+enGrade):'Not yet assessed', enDashStrongest: enStrongest||'—', enDashWeakest: enWeakest||'—',
-          enDashQuestions: enAllTotals.q, enDashAccuracy: enDashAccuracyVal, enDashHours: enDashHoursVal, enDashXP: enDashXPVal, enDashStreak: enStreakDays, enDashWeekly: enWeeklyCount, enDashMonthly: enMonthlyCount,
+          enDashQuestions: enAllTotals.q, enDashAccuracy: enDashAccuracyVal, enDashHours: enDashHoursVal, enDashXP: enDashXPVal, enDashStreak: this._streakFor('Learning'), enDashWeekly: enWeeklyCount, enDashMonthly: enMonthlyCount,
           isEnPlacementOrTest: S.enMode==='placement'||S.enMode==='test',
           enPlacementLabel: enPlacementDone?'Retake Placement Test':'Placement Test',
           enResultPassColor: (S.enLastResult&&S.enLastResult.passed)?'#4ADE80':'#ff5563',
@@ -16041,7 +16100,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           qtResultIncorrectList: r?(r.incorrect||[]).map(inc=>({ prompt:inc.prompt, userAnswer:inc.userAnswer, correctAnswer:inc.correctAnswer, method:inc.method })):[],
           qtResultHasIncorrect: !!(r&&r.incorrect&&r.incorrect.length),
           qtRetake:()=>this.qtStart(),
-          qtOverallAccuracy:overallAccuracy, qtTodayXP:todayXP, qtStreak:qtStreak,
+          qtOverallAccuracy:overallAccuracy, qtTodayXP:todayXP, qtStreak:this._streakFor('Learning'),
           qtStrongTopics:strongTopics, qtWeakTopics:weakTopicsList, qtHasStats: topicEntries.length>0,
         };
       }, {}),
@@ -16099,8 +16158,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           mathsFocusAreasList: mathsFocusAreas.map(t=>({label:t})),
           mtOpenQtSetup:()=>this.qtOpenSetup('maths'),
           mtDailyLabel: mtDailyDoneFlag?'Completed today ✓':'Start Daily Challenge', mtDailyAvailable: mtDailyAvailableFlag, mtDailyColor: mtDailyAvailableFlag?'#C4FF3D':'#7c7c84', mtGoDaily:()=>this.qtStartDaily('maths'),
-          mtQtOverallAccuracy: mtQtOverallAccuracyVal, mtQtTodayXP: mtQtTodayXPVal, mtQtStreak: mtQtStreakVal, mtQtHasStats: mtTopicEntries.length>0,
-          dashQuestions: allTotals.q, dashCorrect: allTotals.c, dashAccuracy, dashHours, dashXP, dashStreak:streakDays, dashWeekly:weeklyCount, dashMonthly:monthlyCount,
+          mtQtOverallAccuracy: mtQtOverallAccuracyVal, mtQtTodayXP: mtQtTodayXPVal, mtQtStreak: this._streakFor('Learning'), mtQtHasStats: mtTopicEntries.length>0,
+          dashQuestions: allTotals.q, dashCorrect: allTotals.c, dashAccuracy, dashHours, dashXP, dashStreak:this._streakFor('Learning'), dashWeekly:weeklyCount, dashMonthly:monthlyCount,
           dashLevel: mathsLevel, dashGrade: mathsGrade?('Grade '+mathsGrade):'Not yet assessed', dashStrongest: mathsStrongest||'\u2014', dashWeakest: mathsWeakest||'\u2014',
           mtFormulaSearchVal:S.mtFormulaSearch||'', setMtFormulaSearch:(e)=>this.setMtFormulaSearch(e), mtFormulaList:formulaList,
           mtHintText:S.mtHint||'', mtHintLoading:!!S.mtHintLoading, mtHintErr:S.mtHintErr||'', getHint:()=>this.mtGetHint(), hasHint:!!S.mtHint,
@@ -16201,8 +16260,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goSciFormulas:()=>this.sciOpenFormulas(), goSciDashboard:()=>this.sciOpenDashboard(), goSciHub:()=>this.sciGoHub(),
           sciOpenQtSetup:()=>this.qtOpenSetup('science'),
           sciDailyLabel: sciDailyDoneFlag?'Completed today ✓':'Start Daily Challenge', sciDailyAvailable: sciDailyAvailableFlag, sciDailyColor: sciDailyAvailableFlag?'#C4FF3D':'#7c7c84', sciGoDaily:()=>this.qtStartDaily('science'),
-          sciQtOverallAccuracy: sciQtOverallAccuracyVal, sciQtTodayXP: sciQtTodayXPVal, sciQtStreak: sciQtStreakVal,
-          sciDashQuestions: allTotals.q, sciDashAccuracy: dashAccuracy, sciDashHours: dashHours, sciDashXP: dashXP, sciDashStreak: streakDays, sciDashWeekly: weeklyCount, sciDashMonthly: monthlyCount,
+          sciQtOverallAccuracy: sciQtOverallAccuracyVal, sciQtTodayXP: sciQtTodayXPVal, sciQtStreak: this._streakFor('Learning'),
+          sciDashQuestions: allTotals.q, sciDashAccuracy: dashAccuracy, sciDashHours: dashHours, sciDashXP: dashXP, sciDashStreak: this._streakFor('Learning'), sciDashWeekly: weeklyCount, sciDashMonthly: monthlyCount,
           sciDashLevel: sciLevel, sciDashGrade: sciGrade?('Grade '+sciGrade):'Not yet assessed', sciDashStrongest: sciStrongest||'—', sciDashWeakest: sciWeakest||'—',
           sciFormulaSearchVal:S.sciFormulaSearch||'', setSciFormulaSearch:(e)=>this.setSciFormulaSearch(e), sciFormulaList:formulaList,
           sciLesson: lesson, sciLessonStartPractice:()=>this.sciStartPractice(S.sciTopic),
@@ -16280,8 +16339,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goGraFormulas:()=>this.graOpenFormulas(), goGraDashboard:()=>this.graOpenDashboard(), goGraHub:()=>this.graGoHub(),
           graOpenQtSetup:()=>this.qtOpenSetup('grammar'),
           graDailyLabel: graDailyDoneFlag?'Completed today ✓':'Start Daily Challenge', graDailyAvailable: graDailyAvailableFlag, graDailyColor: graDailyAvailableFlag?'#C4FF3D':'#7c7c84', graGoDaily:()=>this.qtStartDaily('grammar'),
-          graQtOverallAccuracy: graQtOverallAccuracyVal, graQtTodayXP: graQtTodayXPVal, graQtStreak: graQtStreakVal,
-          graDashQuestions: allTotals.q, graDashAccuracy: dashAccuracy, graDashHours: dashHours, graDashXP: dashXP, graDashStreak: streakDays, graDashWeekly: weeklyCount, graDashMonthly: monthlyCount,
+          graQtOverallAccuracy: graQtOverallAccuracyVal, graQtTodayXP: graQtTodayXPVal, graQtStreak: this._streakFor('Learning'),
+          graDashQuestions: allTotals.q, graDashAccuracy: dashAccuracy, graDashHours: dashHours, graDashXP: dashXP, graDashStreak: this._streakFor('Learning'), graDashWeekly: weeklyCount, graDashMonthly: monthlyCount,
           graDashLevel: graLevel, graDashGrade: graGrade?('Grade '+graGrade):'Not yet assessed', graDashStrongest: graStrongest||'—', graDashWeakest: graWeakest||'—',
           graFormulaSearchVal:S.graFormulaSearch||'', setGraFormulaSearch:(e)=>this.setGraFormulaSearch(e), graFormulaList:formulaList,
           graLesson: lesson, graLessonStartPractice:()=>this.graStartPractice(S.graTopic),
@@ -16359,8 +16418,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goHisFormulas:()=>this.hisOpenFormulas(), goHisDashboard:()=>this.hisOpenDashboard(), goHisHub:()=>this.hisGoHub(),
           hisOpenQtSetup:()=>this.qtOpenSetup('history'),
           hisDailyLabel: hisDailyDoneFlag?'Completed today ✓':'Start Daily Challenge', hisDailyAvailable: hisDailyAvailableFlag, hisDailyColor: hisDailyAvailableFlag?'#C4FF3D':'#7c7c84', hisGoDaily:()=>this.qtStartDaily('history'),
-          hisQtOverallAccuracy: hisQtOverallAccuracyVal, hisQtTodayXP: hisQtTodayXPVal, hisQtStreak: hisQtStreakVal,
-          hisDashQuestions: allTotals.q, hisDashAccuracy: dashAccuracy, hisDashHours: dashHours, hisDashXP: dashXP, hisDashStreak: streakDays, hisDashWeekly: weeklyCount, hisDashMonthly: monthlyCount,
+          hisQtOverallAccuracy: hisQtOverallAccuracyVal, hisQtTodayXP: hisQtTodayXPVal, hisQtStreak: this._streakFor('Learning'),
+          hisDashQuestions: allTotals.q, hisDashAccuracy: dashAccuracy, hisDashHours: dashHours, hisDashXP: dashXP, hisDashStreak: this._streakFor('Learning'), hisDashWeekly: weeklyCount, hisDashMonthly: monthlyCount,
           hisDashLevel: hisLevel, hisDashGrade: hisGrade?('Grade '+hisGrade):'Not yet assessed', hisDashStrongest: hisStrongest||'—', hisDashWeakest: hisWeakest||'—',
           hisFormulaSearchVal:S.hisFormulaSearch||'', setHisFormulaSearch:(e)=>this.setHisFormulaSearch(e), hisFormulaList:formulaList,
           hisLesson: lesson, hisLessonStartPractice:()=>this.hisStartPractice(S.hisTopic),
@@ -16446,8 +16505,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goSpkPlacement:()=>this.spkStartPlacement(), startSpkLevelTest:()=>this.spkStartLevelTest(),
           spkOpenQtSetup:()=>this.qtOpenSetup('speaking'), goSpkFormulas:()=>this.spkOpenFormulas(), goSpkDashboard:()=>this.spkOpenDashboard(),
           spkDailyLabel: spkDailyDoneFlag?'Completed today ✓':'Start Daily Challenge', spkDailyAvailable: spkDailyAvailableFlag, spkDailyColor2: spkDailyAvailableFlag?'#C4FF3D':'#7c7c84', spkGoDaily2:()=>this.qtStartDaily('speaking'),
-          spkQtOverallAccuracy: spkQtOverallAccuracyVal, spkQtTodayXP: spkQtTodayXPVal, spkQtStreak: spkQtStreakVal,
-          spkDashQuestions: spkAllTotals.q, spkDashAccuracy, spkDashHours, spkDashXP, spkDashStreak: spkStreakDays, spkDashWeekly: spkWeeklyCount, spkDashMonthly: spkMonthlyCount,
+          spkQtOverallAccuracy: spkQtOverallAccuracyVal, spkQtTodayXP: spkQtTodayXPVal, spkQtStreak: this._streakFor('Learning'),
+          spkDashQuestions: spkAllTotals.q, spkDashAccuracy, spkDashHours, spkDashXP, spkDashStreak: this._streakFor('Learning'), spkDashWeekly: spkWeeklyCount, spkDashMonthly: spkMonthlyCount,
           spkDashLevel: spkLevel, spkDashGrade: spkGrade?('Grade '+spkGrade):'Not yet assessed', spkDashStrongest: spkStrongest||'—', spkDashWeakest: spkWeakest||'—',
           spkFormulaSearchVal:S.spkFormulaSearch||'', setSpkFormulaSearch:(e)=>this.setSpkFormulaSearch(e), spkFormulaList,
           spkTestLabel, spkTimerLabel, spkTestProgressPct:spkTestProgressPct+'%', spkTestQNum:(S.spkTestIdx||0)+1, spkTestQTotal:(S.spkTestQueue||[]).length,
@@ -16557,8 +16616,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goPhyFormulas:()=>this.phyOpenFormulas(), goPhyDashboard:()=>this.phyOpenDashboard(), goPhyHub:()=>this.phyGoHub(), goPhyTutor:()=>this.phyOpenTutor(),
           phyOpenQtSetup:()=>this.qtOpenSetup('physiology'),
           phyDailyLabel: phyDailyDoneFlag?'Completed today ✓':'Start Daily Challenge', phyDailyAvailable: phyDailyAvailableFlag, phyDailyColor: phyDailyAvailableFlag?'#C4FF3D':'#7c7c84', phyGoDaily:()=>this.qtStartDaily('physiology'),
-          phyQtOverallAccuracy: phyQtOverallAccuracyVal, phyQtTodayXP: phyQtTodayXPVal, phyQtStreak: phyQtStreakVal,
-          phyDashQuestions: allTotals.q, phyDashAccuracy: dashAccuracy, phyDashHours: dashHours, phyDashXP: dashXP, phyDashStreak: streakDays, phyDashWeekly: weeklyCount, phyDashMonthly: monthlyCount,
+          phyQtOverallAccuracy: phyQtOverallAccuracyVal, phyQtTodayXP: phyQtTodayXPVal, phyQtStreak: this._streakFor('Learning'),
+          phyDashQuestions: allTotals.q, phyDashAccuracy: dashAccuracy, phyDashHours: dashHours, phyDashXP: dashXP, phyDashStreak: this._streakFor('Learning'), phyDashWeekly: weeklyCount, phyDashMonthly: monthlyCount,
           phyDashLevel: phyLevel, phyDashGrade: phyGrade?('Grade '+phyGrade):'Not yet assessed', phyDashStrongest: phyStrongest||'—', phyDashWeakest: phyWeakest||'—',
           phyFormulaSearchVal:S.phyFormulaSearch||'', setPhyFormulaSearch:(e)=>this.setPhyFormulaSearch(e), phyFormulaList:formulaList,
           phyLesson: lesson, phyLessonStartPractice:()=>this.phyStartPractice(S.phyTopic),
@@ -16653,8 +16712,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goMoneyFormulas:()=>this.moneyOpenFormulas(), goMoneyDashboard:()=>this.moneyOpenDashboard(), goMoneyHub:()=>this.moneyGoHub(), openMoneyTutor:()=>this.openTutor('finance'),
           moneyOpenQtSetup:()=>this.qtOpenSetup('money'),
           moneyDailyLabel: mDailyState&&mDailyState.completed?'Completed today ✓':'Start Daily Challenge', moneyDailyAvailable: !(mDailyState&&mDailyState.completed), moneyDailyColor: !(mDailyState&&mDailyState.completed)?'#C4FF3D':'#7c7c84', moneyGoDaily:()=>this.qtStartDaily('money'),
-          moneyQtOverallAccuracy: mQtOverallAccuracyVal, moneyQtTodayXP: mQtTodayXPVal, moneyQtStreak: mStreakDays,
-          moneyDashQuestions: mAllTotals.q, moneyDashAccuracy: mDashAccuracy, moneyDashHours: mDashHours, moneyDashXP: mDashXP, moneyDashStreak: mStreakDays, moneyDashWeekly: mWeeklyCount, moneyDashMonthly: mMonthlyCount,
+          moneyQtOverallAccuracy: mQtOverallAccuracyVal, moneyQtTodayXP: mQtTodayXPVal, moneyQtStreak: this._streakFor('Learning'),
+          moneyDashQuestions: mAllTotals.q, moneyDashAccuracy: mDashAccuracy, moneyDashHours: mDashHours, moneyDashXP: mDashXP, moneyDashStreak: this._streakFor('Learning'), moneyDashWeekly: mWeeklyCount, moneyDashMonthly: mMonthlyCount,
           moneyDashLevel: moneyLevel, moneyDashGrade: moneyGrade?('Grade '+moneyGrade):'Not yet assessed', moneyDashStrongest: moneyStrongest||'—', moneyDashWeakest: moneyWeakest||'—',
           moneyFormulaSearchVal:S.moneyFormulaSearch||'', setMoneyFormulaSearch:(e)=>this.setMoneyFormulaSearch(e), moneyFormulaList,
           moneyLesson, moneyLessonStartPractice:()=>this.moneyStartPractice(S.moneyTopic),
@@ -16766,8 +16825,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           goGentFormulas:()=>this.gentOpenFormulas(), goGentDashboard:()=>this.gentOpenDashboard(), goGentHub:()=>this.gentGoHub(), openGentTutor:()=>this.openTutor('gentleman'),
           gentOpenQtSetup:()=>this.qtOpenSetup('gentleman'),
           gentDailyLabel: gDailyState&&gDailyState.completed?'Completed today ✓':'Start Daily Challenge', gentDailyAvailable: !(gDailyState&&gDailyState.completed), gentDailyColor: !(gDailyState&&gDailyState.completed)?'#C4FF3D':'#7c7c84', gentGoDaily:()=>this.qtStartDaily('gentleman'),
-          gentQtOverallAccuracy: gQtOverallAccuracyVal, gentQtTodayXP: gQtTodayXPVal, gentQtStreak: gStreakDays,
-          gentDashQuestions: gAllTotals.q, gentDashAccuracy: gDashAccuracy, gentDashHours: gDashHours, gentDashXP: gDashXP, gentDashStreak: gStreakDays, gentDashWeekly: gWeeklyCount, gentDashMonthly: gMonthlyCount,
+          gentQtOverallAccuracy: gQtOverallAccuracyVal, gentQtTodayXP: gQtTodayXPVal, gentQtStreak: this._streakFor('Learning'),
+          gentDashQuestions: gAllTotals.q, gentDashAccuracy: gDashAccuracy, gentDashHours: gDashHours, gentDashXP: gDashXP, gentDashStreak: this._streakFor('Learning'), gentDashWeekly: gWeeklyCount, gentDashMonthly: gMonthlyCount,
           gentDashLevel: gentLevel, gentDashGrade: gentGrade||'Not yet assessed', gentDashStrongest: gentStrongest||'—', gentDashWeakest: gentWeakest||'—',
           gentFormulaSearchVal:S.gentFormulaSearch||'', setGentFormulaSearch:(e)=>this.setGentFormulaSearch(e), gentFormulaList,
           gentLesson, gentLessonStartPractice:()=>this.gentStartPractice(S.gentTopic),
