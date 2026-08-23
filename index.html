@@ -384,6 +384,13 @@
      hint there's more, matching the swipeable pattern already used for subtabs. */
   .cc-lesson-grid{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; gap:14px !important; scroll-snap-type:x proximity !important; scroll-padding-inline:14px !important; margin:0 -14px 24px !important; padding:0 14px 6px !important; }
   .cc-lesson-grid > .cc-glowcard{ flex:0 0 84% !important; scroll-snap-align:start !important; }
+  /* Learning Centre Progress Dashboard stat cards (Level, XP, Streak, Strongest/Weakest
+     Topic, etc., all 9 subjects): these relied on grid-template-columns:repeat(auto-fit,
+     minmax(...)) to size itself, but that leaves the column count and width up to the
+     browser's own intrinsic-size guess — reported as rendering only one narrow column per
+     row on a phone, wasting the other half of the width, instead of two even columns.
+     Force an explicit, predictable 2-column layout on mobile instead of trusting auto-fit. */
+  .cc-dash-stat-grid{ grid-template-columns:1fr 1fr !important; }
 }
 /* Dark Psychology / The Black Book are private pages — hide the mobile bottom nav too
    while either is open (sidebar/top bar are handled via showChrome/asideDisplay/shellCols). */
@@ -4136,7 +4143,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ dashLevel }} / 60</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">EST. GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ dashGrade }}</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ dashXP }}</div></div>
@@ -4146,7 +4153,7 @@
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ dashHours }}h</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ dashWeekly }} / {{ dashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ dashStrongest }}</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ dashWeakest }}</div></div>
                 </div>
@@ -4677,7 +4684,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ enDashLevel }} / 50</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">EST. GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ enDashGrade }}</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ enDashXP }}</div></div>
@@ -4687,7 +4694,7 @@
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ enDashHours }}h</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ enDashWeekly }} / {{ enDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ enDashStrongest }}</div></div>
                   <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ enDashWeakest }}</div></div>
                 </div>
@@ -5220,7 +5227,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ sciDashLevel }} / 60</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">EST. GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ sciDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ sciDashXP }}</div></div>
@@ -5230,7 +5237,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ sciDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ sciDashWeekly }} / {{ sciDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST SUBJECT</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ sciDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST SUBJECT</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ sciDashWeakest }}</div></div>
                 </div>
@@ -5642,7 +5649,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ graDashLevel }} / 60</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">EST. GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ graDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ graDashXP }}</div></div>
@@ -5652,7 +5659,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ graDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ graDashWeekly }} / {{ graDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ graDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ graDashWeakest }}</div></div>
                 </div>
@@ -6064,7 +6071,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ hisDashLevel }} / 60</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">EST. GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ hisDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ hisDashXP }}</div></div>
@@ -6074,7 +6081,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ hisDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ hisDashWeekly }} / {{ hisDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST ERA</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ hisDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST ERA</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ hisDashWeakest }}</div></div>
                 </div>
@@ -6440,7 +6447,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ spkDashLevel }} / 60</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ spkDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ spkDashXP }}</div></div>
@@ -6450,7 +6457,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ spkDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ spkDashWeekly }} / {{ spkDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST LEVEL</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ spkDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST LEVEL</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ spkDashWeakest }}</div></div>
                 </div>
@@ -6900,7 +6907,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ phyDashLevel }} / 60</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">EXPERTISE GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ phyDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ phyDashXP }}</div></div>
@@ -6910,7 +6917,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ phyDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ phyDashWeekly }} / {{ phyDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ phyDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ phyDashWeakest }}</div></div>
                 </div>
@@ -7387,7 +7394,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ moneyDashLevel }} / 60</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">FINANCIAL GRADE</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ moneyDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ moneyDashXP }}</div></div>
@@ -7397,7 +7404,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ moneyDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ moneyDashWeekly }} / {{ moneyDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ moneyDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ moneyDashWeakest }}</div></div>
                 </div>
@@ -7897,7 +7904,7 @@
                 <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
                 </sc-if>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashLevel }} / 120</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">RANK</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashGrade }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashXP }}</div></div>
@@ -7907,7 +7914,7 @@
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashHours }}h</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashWeekly }} / {{ gentDashMonthly }}</div></div>
                 </div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
+                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ gentDashStrongest }}</div></div>
                   <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ gentDashWeakest }}</div></div>
                 </div>
@@ -9016,7 +9023,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-110 · v11.110 greeting-two-line-wrap';
+const NOTIF_BUILD_VERSION = '2026.08.23-111 · v11.111 dash-stat-grid-mobile-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12345,6 +12352,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.111', date:'Aug 23, 2026', major:false, notes:[
+      'Fixed the Learning Centre’s Progress Dashboard (Level, XP, Streak, Strongest/Weakest Topic, etc., all 9 subjects) using only about half the screen width on mobile, with the stat cards stacked one-per-row instead of filling the row — it relied on the browser to auto-size the grid columns, which wasn’t landing on two even columns reliably. Now forces an explicit, predictable 2-column layout on mobile so the cards fill the full width.',
+    ]},
     {version:'v11.110', date:'Aug 23, 2026', major:false, notes:[
       'The home screen greeting fix from a moment ago had a gap on mobile specifically — a separate, older mobile-only rule was still sizing it against the raw device width, so longer names could still bleed past the card border there. Closed that gap, and on mobile the greeting now wraps onto a second line when it doesn’t fit on one, instead of cutting it short with an ellipsis.',
     ]},
