@@ -135,6 +135,11 @@
     // itself, so the path curves smoothly instead of snapping), bouncing off
     // the content-area edges like a fish turning back into the tank.
     var driftEnabled = opts.driftEnabled !== false;
+    // Home: where the cluster eases back to when stopped — the page's own
+    // "resting spot" above the controls — instead of just freezing wherever
+    // it happened to be swimming. Null until the host explicitly sets one
+    // (via setHome), so it falls back to dead-centre.
+    var homeX = null, homeY = null;
     var snakeInit = false, snakeX = 0, snakeY = 0, snakeHeading = Math.random() * Math.PI * 2;
     var snakeTurnPhase = Math.random() * Math.PI * 2, snakeTurnFreq = 0.00035 + Math.random() * 0.00015;
     var snakeTurnAmp = 0.0001 + Math.random() * 0.00006, snakeSpeed = 0.032 + Math.random() * 0.014;
@@ -195,6 +200,14 @@
         else if (snakeX > boundR) { snakeX = boundR; snakeHeading = Math.PI - snakeHeading; }
         if (snakeY < boundT) { snakeY = boundT; snakeHeading = -snakeHeading; }
         else if (snakeY > boundB) { snakeY = boundB; snakeHeading = -snakeHeading; }
+      } else {
+        // Stopped: glide back to the resting spot (set via setHome, or
+        // dead-centre if none was given) instead of just freezing wherever
+        // the cluster happened to be swimming.
+        var hx = homeX != null ? homeX : cw / 2, hy = homeY != null ? homeY : ch / 2;
+        var homeEase = 1 - Math.pow(0.001, dt);
+        snakeX += (hx - snakeX) * homeEase;
+        snakeY += (hy - snakeY) * homeEase;
       }
       var ocx = snakeX, ocy = snakeY;
       // Ease toward the target instead of snapping to it — a squared-off
@@ -335,6 +348,7 @@
       setForceHover: function (v) { forceHoverState = !!v; },
       setHoverIntensity: function (v) { hoverIntensity = v; },
       setDriftEnabled: function (v) { driftEnabled = !!v; },
+      setHome: function (x, y) { homeX = x; homeY = y; },
       resize: resize,
       destroy: function () {
         if (destroyed) return;

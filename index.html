@@ -3418,12 +3418,13 @@
       </sc-if>
       <div style="animation:rise .5s ease both; display:flex; flex-direction:column; align-items:center; position:relative; z-index:4;">
         <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="width:100%; max-width:720px; font-size:12px; color:#ff8a5b; margin-bottom:14px; padding:10px 14px; border-radius:10px; background:rgba(255,138,91,0.1); border:1px solid rgba(255,138,91,0.25);">⚠ {{ voiceFallbackErr }}</div></sc-if>
-        <div style="position:relative; width:100%; min-height:620px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:36px 0 26px; margin-bottom:18px;">
+        <div style="position:relative; width:100%; min-height:620px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; padding:36px 0 26px; margin-bottom:18px;">
           <div onClick="{{ toggleOrbDrift }}" title="{{ orbDriftTitle }}" style="position:absolute; top:14px; right:14px; z-index:2; display:flex; align-items:center; gap:7px; padding:8px 14px; border-radius:20px; cursor:pointer; border:1px solid {{ vLine2 }}; background:{{ vCard }}; color:{{ vMuted }}; font-size:11px; font-family:'JetBrains Mono',monospace; letter-spacing:.5px;" style-hover="{ color:'{{ vInk }}' }">
             <span>{{ orbDriftIcon }}</span>
             <span>{{ orbDriftLabel }}</span>
           </div>
           <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center;">
+            <div data-orb-home style="width:1px; height:1px;"></div>
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
               <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:{{ vMuted }};">VOICE ASSISTANT</span>
@@ -9008,7 +9009,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-103 · v11.103 voice-overlay-blackout-fix';
+const NOTIF_BUILD_VERSION = '2026.08.22-104 · v11.104 orb-home-position';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12337,6 +12338,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.104', date:'Aug 22, 2026', major:true, notes:[
+      'Pressing Stop now sends the orb back to its original resting spot — directly above the VOICE ASSISTANT toggle and Hold to talk button — instead of just freezing wherever it happened to be swimming. Also moved that control group further down the page, giving the orb more open space above it to roam in while swimming.',
+    ]},
     {version:'v11.103', date:'Aug 22, 2026', major:true, notes:[
       'Fixed the voice page going solid black on any dark theme (including Noir) — a full-screen background tint behind the orb was set to a high z-index that put it in front of the fixed header instead of behind it, painting over the raiment/theme switcher, clock, search bar and the orb itself with opaque black. It now sits behind everything as the backdrop it was meant to be, so the header and the orb are visible again on dark themes.',
     ]},
@@ -15073,6 +15077,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const l=sideW+'px', t=topH+'px';
     if(el.style.left!==l || el.style.top!==t){ el.style.left=l; el.style.top=t; if(this._orbApi && this._orbApi.resize) this._orbApi.resize(); }
     if(!this._voiceOrbResizeBound){ this._voiceOrbResizeBound=true; window.addEventListener('resize', ()=>this._syncVoiceOrbBounds()); }
+    // Tell the orb where "home" is — the spot above the VOICE ASSISTANT
+    // toggle/Hold-to-talk button it started at — so pressing Stop sends it
+    // back there instead of just freezing wherever it was swimming.
+    const home=this.root.querySelector('[data-orb-home]');
+    if(home && this._orbApi && this._orbApi.setHome){
+      const mr=el.getBoundingClientRect(), hr=home.getBoundingClientRect();
+      this._orbApi.setHome(hr.left-mr.left, hr.top-mr.top);
+    }
   }
   // The sidebar logo orb and floating voice-orb button were hardcoded to Ultra X's
   // maroon/red regardless of theme — fine for Ultra X, wrong everywhere else (base
