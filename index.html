@@ -8009,11 +8009,6 @@
 
             </sc-if>
 
-            <sc-if value="{{ isOtherSubject }}" hint-placeholder-val="{{ false }}">
-              <div style="font-size:18px; font-weight:600;">{{ learningTabLabel }}</div>
-              <div style="font-size:12.5px; color:#8a8a92; margin-top:8px;">{{ learningTabPlaceholder }}</div>
-            </sc-if>
-
           </div>
         </div>
       </div>
@@ -9009,7 +9004,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-104 · v11.104 orb-home-position';
+const NOTIF_BUILD_VERSION = '2026.08.22-105 · v11.105 speaking-bank-cleanup';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12338,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.105', date:'Aug 22, 2026', major:false, notes:[
+      'Two follow-ups from the Learning Centre review: tripled Speaking’s sentence bank from 30 to 90 (20 new sentences per tier, each with its own phonetic guide and delivery tip), bringing it in line with the other subjects’ content depth. Also removed a small unreachable "Coming soon" fallback block that could never actually be shown, since every real subject already has its own dedicated screen.',
+    ]},
     {version:'v11.104', date:'Aug 22, 2026', major:true, notes:[
       'Pressing Stop now sends the orb back to its original resting spot — directly above the VOICE ASSISTANT toggle and Hold to talk button — instead of just freezing wherever it happened to be swimming. Also moved that control group further down the page, giving the orb more open space above it to roam in while swimming.',
     ]},
@@ -16226,7 +16224,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const gradeBounds=[9,8,7,6,5,4,3,2,1].map((g,i,arr)=>{ const lo=gbPct[g]; const hiG=arr[i-1]; const label= g===9 ? (lo+'%+') : (lo+'\u2013'+(gbPct[hiG]-1)+'%'); const hit=!!(S.mtLastResult&&S.mtLastResult.grade===g); return { g, label, hit, bg: hit?'#4ADE80':'transparent', c: hit?'#0a0a0b':'#9a9aa2' }; });
         const candidateName=((S.account&&S.account.name)||'Candidate').trim();
         return {
-          isMathsSubject:(S.learningTab||'Maths')==='Maths', isOtherSubject:(S.learningTab||'Maths')!=='Maths' && S.learningTab!=='English' && S.learningTab!=='Science' && S.learningTab!=='Grammar' && S.learningTab!=='History' && S.learningTab!=='Speaking' && S.learningTab!=='Human Physiology' && S.learningTab!=='Money' && S.learningTab!=='Gentleman’s Etiquette', learningTabPlaceholder: S.learningTab==='Human Physiology'?'A dark, anatomical reference module — coming soon.':'Coming soon.',
+          isMathsSubject:(S.learningTab||'Maths')==='Maths',
           isMtHub:S.mtMode==='hub' && S.qtMode==='closed', isMtPractice:S.mtMode==='practice', isMtQuickfire:S.mtMode==='quickfire', isMtTest:S.mtMode==='test', isMtResults:S.mtMode==='results', isMtLearn:S.mtMode==='learn',
           isMtFormulas:S.mtMode==='formulas', isMtDashboard:S.mtMode==='dashboard',
           isMtPlacementActive: S.mtMode==='test' && !!S.mtPlacement, isMtMentalActive: S.mtMode==='quickfire' && !!S.mtMental,
@@ -16978,7 +16976,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         };
       }, {}),
       learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money','Gentleman’s Etiquette'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
-      learningTabLabel:S.learningTab||'Maths',
       homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',
 
