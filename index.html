@@ -8355,6 +8355,10 @@
                 </select>
               </div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <div onClick="{{ toggleDailyLogReminder }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ dailyLogReminderBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ dailyLogReminderPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                <span style="font-size:12px; color:#c8c8ce;">Daily log reminders — fitness, energy &amp; money, from 7pm if not yet logged</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                 <div onClick="{{ toggleReminderEmail }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ reminderEmailBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ reminderEmailPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
                 <span style="font-size:12px; color:#c8c8ce;">Also email me</span>
                 <span onClick="{{ sendTestReminderEmail }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:6px 11px; cursor:pointer;">{{ testEmailLabel }}</span>
@@ -9023,7 +9027,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-111 · v11.111 dash-stat-grid-mobile-fix';
+const NOTIF_BUILD_VERSION = '2026.08.23-112 · v11.112 daily-log-reminders';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9236,7 +9240,7 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._briefingTimer=setInterval(()=>this._checkScheduledBriefing(),60000); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._briefingTimer=setInterval(()=>this._checkScheduledBriefing(),60000); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this.showToast('system','Update available','A new version is ready — please close and reopen the app to update.'); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -9527,6 +9531,33 @@ activities: this._mergeShipLog(s.activities),
     const title='Checklist: '+open.length+' item'+(open.length===1?'':'s')+' still open';
     const body=open.slice(0,3).map(c=>c.label).join(', ')+(open.length>3?', …':'');
     if(window.NotificationManager) window.NotificationManager.notify({ type:'checklist', title, body, dedupeKey:'quick-checklist' }, this._notifHost());
+  }
+  // Daily nudge to log fitness, energy and money if the day hasn't had an entry yet by
+  // early evening — one check per type per day, gated on the existing Fitness/Health/
+  // Finance notification categories (Settings → Notifications) rather than a new toggle,
+  // since those already exist and are already user-controllable. Firing is tracked by
+  // date string in prefs (synced, unlike the notification engine's in-session cooldown)
+  // so a page reload doesn't cause a duplicate nudge later the same day.
+  _checkDailyLogReminders(){
+    const p=this.state.prefs||{}; if(p.dailyLogReminderEnabled===false) return;
+    if(new Date().getHours()<19) return; // give the day a chance before nagging
+    const S=this.state, today=this._todayStr();
+    const firedToday=(dt)=>dt===today;
+    const fired=p._dailyLogFired||{};
+    const onToday=(ts)=>{ try{ return new Date(ts).toLocaleDateString('en-CA')===today; }catch(e){ return false; } };
+    const K=window.HealthKit;
+    const items=[
+      { key:'fitness', type:'fitness', logged:(S.workouts||[]).some(w=>onToday(w.ts)), title:'No workout logged today', body:'Don’t forget to log today’s training in Fitness.' },
+      { key:'energy', type:'health', logged: K ? !!K.energyEntry(S.health||{}, today) : true, title:'Energy not logged today', body:'Take a moment to log your energy levels for today.' },
+      { key:'money', type:'finance', logged:(S.income||[]).some(x=>onToday(x.ts)) || (S.expenses||[]).some(x=>onToday(x.ts)), title:'No money logged today', body:'Log today’s income or expenses in Finance.' }
+    ];
+    const nextFired={...fired}; let changed=false;
+    items.forEach(it=>{
+      if(firedToday(fired[it.key]) || it.logged) return;
+      nextFired[it.key]=today; changed=true;
+      if(window.NotificationManager) window.NotificationManager.notify({ type:it.type, title:it.title, body:it.body, dedupeKey:'daily-log-'+it.key+':'+today, source:{type:'dailylog',id:it.key} }, this._notifHost());
+    });
+    if(changed) this.mut(s=>({prefs:{...s.prefs, _dailyLogFired:nextFired}}));
   }
   _checkEventReminders(){
     const p=this.state.prefs||{}; if(p.reminderPushEnabled===false && !p.reminderEmailEnabled) return;
@@ -12352,6 +12383,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.112', date:'Aug 23, 2026', major:true, notes:[
+      'New: daily reminders to log fitness, energy and money. From 7pm, if you haven’t logged a workout, an energy entry, or any income/expense yet that day, you’ll get one in-app + push nudge for each — genuinely checked against your real data, not just a blind daily alarm, so nothing fires for something you’ve already logged. Reuses the existing Fitness/Health/Finance notification categories in Settings → Notifications, so they’re controllable there like every other reminder type, plus a dedicated on/off toggle in the same Reminders section.',
+    ]},
     {version:'v11.111', date:'Aug 23, 2026', major:false, notes:[
       'Fixed the Learning Centre’s Progress Dashboard (Level, XP, Streak, Strongest/Weakest Topic, etc., all 9 subjects) using only about half the screen width on mobile, with the stat cards stacked one-per-row instead of filling the row — it relied on the browser to auto-size the grid columns, which wasn’t landing on two even columns reliably. Now forces an explicit, predictable 2-column layout on mobile so the cards fill the full width.',
     ]},
@@ -15781,6 +15815,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       toggleReminderPush:()=>this.setPref('reminderPushEnabled',S.prefs.reminderPushEnabled===false),
       checklistReminderBg:S.prefs.checklistReminderEnabled!==false?'#FFFFFF':'rgba(255,255,255,0.14)', checklistReminderPos:S.prefs.checklistReminderEnabled!==false?'20px':'2px',
       toggleChecklistReminder:()=>this.setPref('checklistReminderEnabled',S.prefs.checklistReminderEnabled===false),
+      dailyLogReminderBg:S.prefs.dailyLogReminderEnabled!==false?'#FFFFFF':'rgba(255,255,255,0.14)', dailyLogReminderPos:S.prefs.dailyLogReminderEnabled!==false?'20px':'2px',
+      toggleDailyLogReminder:()=>this.setPref('dailyLogReminderEnabled',S.prefs.dailyLogReminderEnabled===false),
       checklistFreqOptions:[15,30,45,60,90,120,180,240,360,480,720,1440].map(v=>({v, l:v<60?v+' min':(v/60)+' hr'})),
       checklistReminderFreqSel:S.prefs.checklistReminderFreqMins||120,
       setChecklistReminderFreqSel:(e)=>this.setPref('checklistReminderFreqMins',+e.target.value),
