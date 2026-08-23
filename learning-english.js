@@ -375,7 +375,8 @@
       text: 'Ambition is often portrayed as an unambiguous virtue, yet history is littered with examples of its corrosive potential. The same drive that propels an individual toward remarkable achievement can, left unchecked, erode their relationships and integrity. It is not ambition itself that determines its moral value, but rather the means by which it is pursued and the ends to which it is directed.',
       questions: [
         { q: 'What does the writer suggest determines whether ambition is good or bad?', a: 'the means and ends of how it is pursued', keywords: ['means', 'ends', 'pursued'] },
-        { q: 'Explain the effect of the word choice in "history is littered with examples" and "corrosive potential."', a: '"littered" suggests something messy and widespread, while "corrosive" compares ambition to a substance that eats away at something \u2014 together they present ambition\u2019s dangers as extensive and destructive', keywords: ['littered', 'corrosive', 'destruct', 'widespread', 'metaphor'] }
+        { q: 'Explain the effect of the word choice in "history is littered with examples" and "corrosive potential."', a: '"littered" suggests something messy and widespread, while "corrosive" compares ambition to a substance that eats away at something \u2014 together they present ambition\u2019s dangers as extensive and destructive', keywords: ['littered', 'corrosive', 'destruct', 'widespread', 'metaphor'] },
+        { q: 'What is the effect of the sentence structure in the final sentence, "It is not ambition itself that determines its moral value, but rather the means by which it is pursued and the ends to which it is directed"?', a: 'the "not X, but Y" construction directly corrects a common assumption, giving the writer\u2019s own conclusion extra weight and clarity as the passage\u2019s final word', keywords: ['not', 'but', 'correct', 'contrast', 'conclusion', 'emphas'] }
       ]
     },
     {

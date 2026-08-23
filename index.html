@@ -9004,7 +9004,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-106 · v11.106 dark-psych-detective-lessons';
+const NOTIF_BUILD_VERSION = '2026.08.23-107 · v11.107 lesson-content-expansion';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.107', date:'Aug 23, 2026', major:true, notes:[
+      'A full pass through the Learning Centre’s lesson content, prioritised by an audit of depth across all 9 subjects. Maths was the biggest gap — every one of its 13 topics only had 2 lesson sections where every other subject had 4, so all 13 now have a full 4 sections, 3 misconceptions and 3 expert notes, matching the rest of the Centre. History’s five period question banks (Ancient, Medieval, Early Modern, Modern, 20th Century) were noticeably thinner than Historical Skills and other subjects’ banks, so each gained 5-6 new questions on topics like the Vikings, the Wars of the Roses, the Scramble for Africa and the Space Race. Science’s Practical Skills and Vocabulary banks, and Finance’s Credit and Insurance banks, were both roughly half the size of their sibling banks and have been brought up to match. Also fixed a comprehension passage with only 2 questions instead of 3, and topped up Gentleman’s Etiquette’s Grooming and Cigars banks. Checked mobile layout for the new, longer content specifically — no overflow or cramped cards at phone widths.',
+    ]},
     {version:'v11.106', date:'Aug 23, 2026', major:true, notes:[
       'Big expansion for Dark Psychology (18+): 14 new questions and 8 new lesson sections on lie detection, reading behavioural patterns, and spotting changes in people over time — the "detective level" observation skills people associate with shows like The Mentalist. Grounded in real research rather than TV magic: Paul Ekman’s FACS work on universal micro-expressions, and the Bond & DePaulo meta-analysis showing why isolated "tells" barely beat a coin flip. Covers baseline-setting, statement analysis, cognitive-load interviewing, cluster-based profiling, and how cold reading actually works — plus new misconceptions and worked examples throughout.',
     ]},
