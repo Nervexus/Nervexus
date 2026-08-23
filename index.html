@@ -372,6 +372,14 @@
   .cc-phydark-grid{ grid-template-columns:1fr !important; }
   .cc-phydark-hero{ padding:18px 16px !important; }
   .cc-phydark-title{ font-size:19px !important; }
+  /* Learning Centre lesson cards (Deep Dive / Misconceptions / Expert Notes / Worked
+     Examples, all 8 subjects that have a lesson viewer): on desktop these are a
+     wrapping grid, but stacked full-width on a phone they turn a short lesson into a
+     long scroll of near-identical-looking blocks. Turn them into a horizontal,
+     snap-to-card carousel instead — one card in view at a time, a peek of the next to
+     hint there's more, matching the swipeable pattern already used for subtabs. */
+  .cc-lesson-grid{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; gap:14px !important; scroll-snap-type:x proximity !important; scroll-padding-inline:14px !important; margin:0 -14px 24px !important; padding:0 14px 6px !important; }
+  .cc-lesson-grid > .cc-glowcard{ flex:0 0 84% !important; scroll-snap-align:start !important; }
 }
 /* Dark Psychology / The Black Book are private pages — hide the mobile bottom nav too
    while either is open (sidebar/top bar are handled via showChrome/asideDisplay/shellCols). */
@@ -3835,7 +3843,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ mtLesson.sections }}" as="sec" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -3845,7 +3853,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ mtLesson.misconceptions }}" as="mi" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -3855,7 +3863,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ mtLesson.expertNotes }}" as="en" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -3865,7 +3873,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ mtLesson.examples }}" as="ex" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:14px; font-weight:700; color:#eef0f2; margin-bottom:6px;">{{ ex.q }}</div>
@@ -4429,7 +4437,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ enLesson.sections }}" as="sec" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -4439,7 +4447,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ enLesson.misconceptions }}" as="mi" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -4449,7 +4457,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ enLesson.expertNotes }}" as="en" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -4459,7 +4467,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ enLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -5016,7 +5024,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ sciLesson.sections }}" as="sec" hint-placeholder-count="4">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -5026,7 +5034,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ sciLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -5036,7 +5044,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ sciLesson.expertNotes }}" as="en" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -5046,7 +5054,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ sciLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -5438,7 +5446,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ graLesson.sections }}" as="sec" hint-placeholder-count="4">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -5448,7 +5456,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ graLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -5458,7 +5466,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ graLesson.expertNotes }}" as="en" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -5468,7 +5476,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ graLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -5860,7 +5868,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ hisLesson.sections }}" as="sec" hint-placeholder-count="4">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -5870,7 +5878,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ hisLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -5880,7 +5888,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ hisLesson.expertNotes }}" as="en" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -5890,7 +5898,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ hisLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -6689,7 +6697,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ phyLesson.sections }}" as="sec" hint-placeholder-count="4">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -6699,7 +6707,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ phyLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -6709,7 +6717,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ phyLesson.expertNotes }}" as="en" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -6719,7 +6727,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ phyLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -7183,7 +7191,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ moneyLesson.sections }}" as="sec" hint-placeholder-count="4">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -7193,7 +7201,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ moneyLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -7203,7 +7211,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ moneyLesson.expertNotes }}" as="en" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -7213,7 +7221,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ moneyLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -7684,7 +7692,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ gentLesson.sections }}" as="sec" hint-placeholder-count="4">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
                         <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
@@ -7694,7 +7702,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ gentLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
                         <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
@@ -7704,7 +7712,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
                     <sc-for list="{{ gentLesson.expertNotes }}" as="en" hint-placeholder-count="3">
                       <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
                         <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
@@ -7714,7 +7722,7 @@
                   </div>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
+                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
                     <sc-for list="{{ gentLesson.examples }}" as="ex" hint-placeholder-count="2">
                       <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
                         <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
@@ -9004,7 +9012,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-107 · v11.107 lesson-content-expansion';
+const NOTIF_BUILD_VERSION = '2026.08.23-108 · v11.108 lesson-card-carousels';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12341,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.108', date:'Aug 23, 2026', major:false, notes:[
+      'On mobile, the Learning Centre’s lesson cards (Deep Dive, Common Misconceptions, Expert Notes and Worked Examples, across all 8 subjects with a lesson viewer) now swipe as a horizontal carousel instead of stacking into one long vertical scroll — one card in view at a time, with a peek of the next card’s edge to hint there’s more.',
+    ]},
     {version:'v11.107', date:'Aug 23, 2026', major:true, notes:[
       'A full pass through the Learning Centre’s lesson content, prioritised by an audit of depth across all 9 subjects. Maths was the biggest gap — every one of its 13 topics only had 2 lesson sections where every other subject had 4, so all 13 now have a full 4 sections, 3 misconceptions and 3 expert notes, matching the rest of the Centre. History’s five period question banks (Ancient, Medieval, Early Modern, Modern, 20th Century) were noticeably thinner than Historical Skills and other subjects’ banks, so each gained 5-6 new questions on topics like the Vikings, the Wars of the Roses, the Scramble for Africa and the Space Race. Science’s Practical Skills and Vocabulary banks, and Finance’s Credit and Insurance banks, were both roughly half the size of their sibling banks and have been brought up to match. Also fixed a comprehension passage with only 2 questions instead of 3, and topped up Gentleman’s Etiquette’s Grooming and Cigars banks. Checked mobile layout for the new, longer content specifically — no overflow or cramped cards at phone widths.',
     ]},
