@@ -364,7 +364,11 @@
   .cc-fin-kpi-wrap{ background:#16181c !important; border-radius:20px !important; padding:20px !important; }
   .cc-fin-kpi-item{ background:transparent !important; border:none !important; padding:0 !important; border-radius:0 !important; }
   .cc-dash-brief-row, .cc-dash-stats-row{ display:none !important; }
-  .cc-home-greeting{ max-width:94vw !important; }
+  /* Was max-width:94vw — viewport-relative, so it still let long names bleed past the
+     card's decorative border on mobile even after the inline max-width was fixed to be
+     container-relative. Sized to the container now, and allowed to wrap onto a second
+     line (rather than truncating with an ellipsis) if it doesn't fit on one. */
+  .cc-home-greeting{ max-width:100% !important; white-space:normal !important; display:-webkit-box !important; -webkit-line-clamp:2 !important; -webkit-box-orient:vertical !important; overflow:hidden !important; text-overflow:ellipsis !important; }
   /* Log Activity row (Productivity): the text field plus fixed hr/min boxes plus the Log
      button used to be forced onto one unbreakable line, crushing the text field to a sliver
      on narrow phones. Give the text field its own full-width row, hr/min/Log wrap below it. */
@@ -9012,7 +9016,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-109 · v11.109 greeting-overflow-fix';
+const NOTIF_BUILD_VERSION = '2026.08.23-110 · v11.110 greeting-two-line-wrap';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12341,6 +12345,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.110', date:'Aug 23, 2026', major:false, notes:[
+      'The home screen greeting fix from a moment ago had a gap on mobile specifically — a separate, older mobile-only rule was still sizing it against the raw device width, so longer names could still bleed past the card border there. Closed that gap, and on mobile the greeting now wraps onto a second line when it doesn’t fit on one, instead of cutting it short with an ellipsis.',
+    ]},
     {version:'v11.109', date:'Aug 23, 2026', major:false, notes:[
       'Fixed the home screen greeting text (e.g. "Good afternoon, [name]") overflowing past its decorative border on longer names, on all four Ultra theme styles (Noir, Maison Élysée, Light) plus the base theme — it was sized against the raw device width instead of the card’s actual padded content width, so on mobile it could bleed edge-to-edge instead of staying inside the frame and truncating with an ellipsis as intended.',
     ]},
