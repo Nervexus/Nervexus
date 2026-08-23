@@ -9004,7 +9004,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.22-105 · v11.105 speaking-bank-cleanup';
+const NOTIF_BUILD_VERSION = '2026.08.23-106 · v11.106 dark-psych-detective-lessons';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12333,6 +12333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.106', date:'Aug 23, 2026', major:true, notes:[
+      'Big expansion for Dark Psychology (18+): 14 new questions and 8 new lesson sections on lie detection, reading behavioural patterns, and spotting changes in people over time — the "detective level" observation skills people associate with shows like The Mentalist. Grounded in real research rather than TV magic: Paul Ekman’s FACS work on universal micro-expressions, and the Bond & DePaulo meta-analysis showing why isolated "tells" barely beat a coin flip. Covers baseline-setting, statement analysis, cognitive-load interviewing, cluster-based profiling, and how cold reading actually works — plus new misconceptions and worked examples throughout.',
+    ]},
     {version:'v11.105', date:'Aug 22, 2026', major:false, notes:[
       'Two follow-ups from the Learning Centre review: tripled Speaking’s sentence bank from 30 to 90 (20 new sentences per tier, each with its own phonetic guide and delivery tip), bringing it in line with the other subjects’ content depth. Also removed a small unreachable "Coming soon" fallback block that could never actually be shown, since every real subject already has its own dedicated screen.',
     ]},
