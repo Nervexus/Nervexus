@@ -1167,6 +1167,13 @@
                     <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.5px; color:{{ m.typeColor }}; border:1px solid {{ m.typeBd }}; border-radius:6px; padding:2px 6px; white-space:nowrap;">{{ m.typeLabel }}</span>
                     <span onClick="{{ m.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span>
                   </div>
+                  <sc-if value="{{ m.showMeta }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; align-items:center; gap:6px; margin:6px 0 0 31px; flex-wrap:wrap;">
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.5px; color:#8a8a92; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 6px;">{{ m.catLabel }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.5px; color:{{ m.prioColor }}; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 6px;">{{ m.prioLabel }}</span>
+                      <sc-if value="{{ m.hasDue }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.3); border-radius:6px; padding:2px 6px;">{{ m.dueLabel }}</span></sc-if>
+                    </div>
+                  </sc-if>
                   <sc-if value="{{ m.pending }}" hint-placeholder-val="{{ true }}">
                     <div style="display:flex; align-items:center; gap:8px; margin:9px 0 0 31px;">
                       <input value="{{ m.noteVal }}" onInput="{{ m.setNote }}" onKeyDown="{{ m.completeKey }}" placeholder="Add a note… (optional)" style="flex:1; min-width:0; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
@@ -1186,9 +1193,29 @@
               <input value="{{ missionInput }}" onInput="{{ setMissionInput }}" onKeyDown="{{ addMissionKey }}" placeholder="Add a mission and press Enter…" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
               <span onClick="{{ toggleMissionRecurring }}" title="Toggle mission type" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ missionTypeC }}; border:1px solid {{ missionTypeBd }}; background:{{ missionTypeBg }}; border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;">{{ missionTypeLabel }}</span>
             </div>
-            <div style="margin-top:10px;">
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <span onClick="{{ toggleMissionOpts }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">{{ missionOptsLabel }}</span>
               <span onClick="{{ toggleMissionGen }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 13px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">✨ Suggest tasks</span>
             </div>
+            <sc-if value="{{ missionOptsOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); padding:14px;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78; margin-bottom:5px; letter-spacing:1px;">CATEGORY</div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+                  <sc-for list="{{ missionCategoryChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.pick }}" style="font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ c.bg }};">{{ c.label }}</span></sc-for>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78; margin-bottom:5px; letter-spacing:1px;">PRIORITY</div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+                  <sc-for list="{{ missionPriorityChips }}" as="p" hint-placeholder-count="4"><span onClick="{{ p.pick }}" style="font-size:10.5px; color:{{ p.c }}; border:1px solid {{ p.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ p.bg }};">{{ p.label }}</span></sc-for>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78; margin-bottom:5px; letter-spacing:1px;">REPEAT</div>
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+                  <sc-for list="{{ missionRepeatChips }}" as="r" hint-placeholder-count="4"><span onClick="{{ r.pick }}" style="font-size:10.5px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ r.bg }};">{{ r.label }}</span></sc-for>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78; margin-bottom:5px; letter-spacing:1px;">DUE DATE (optional)</div>
+                <input type="date" value="{{ newMissionDue }}" onInput="{{ setNewMissionDue }}" style="width:100%; box-sizing:border-box; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+                <div style="font-size:10.5px; color:#6f6f78; margin-top:8px; line-height:1.5;">These apply to the next mission you add — type the name above and press Enter, or use the ＋ row.</div>
+              </div>
+            </sc-if>
             <sc-if value="{{ missGenOpen }}" hint-placeholder-val="{{ false }}">
               <div style="margin-top:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); padding:14px;">
                 <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:#7c7c84; margin-bottom:10px;">WHAT KIND OF TASKS?</div>
@@ -1867,6 +1894,10 @@
         <div style="display:flex; gap:8px; margin-bottom:14px;">
           <sc-for list="{{ fitTabs }}" as="t" hint-placeholder-count="2"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
         </div>
+        <div style="display:flex; gap:8px; margin-bottom:18px;">
+          <span onClick="{{ goHealthView }}" style="font-size:11.5px; font-weight:600; color:{{ healthViewC }}; border:1px solid {{ healthViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ healthViewBg }};">🩺 Health</span>
+          <span onClick="{{ goProdView }}" style="font-size:11.5px; font-weight:600; color:{{ prodViewC }}; border:1px solid {{ prodViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ prodViewBg }};">📊 Productivity</span>
+        </div>
         <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
           <div>
             <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; color:#C9C9CE; font-size:11px; letter-spacing:3px; margin-bottom:7px;">◆ FITNESS HQ · HEALTH CENTRE</div>
@@ -2490,6 +2521,10 @@
         <div style="display:flex; gap:8px; margin-bottom:18px;">
           <sc-for list="{{ fitTabs }}" as="t" hint-placeholder-count="3"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
         </div>
+        <div style="display:flex; gap:8px; margin-bottom:18px;">
+          <span onClick="{{ goHealthView }}" style="font-size:11.5px; font-weight:600; color:{{ healthViewC }}; border:1px solid {{ healthViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ healthViewBg }};">🩺 Health</span>
+          <span onClick="{{ goProdView }}" style="font-size:11.5px; font-weight:600; color:{{ prodViewC }}; border:1px solid {{ prodViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ prodViewBg }};">📊 Productivity</span>
+        </div>
         <div style="margin-bottom:20px;">
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ PRODUCTIVITY OS</div>
           <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Trackers &amp; Activity</h1>
@@ -2651,76 +2686,6 @@
       </div>
       </sc-if>
 
-      <!-- ===== CHECKLISTS (multi-checklist Reminder Engine) ===== -->
-      <sc-if value="{{ isChecklists }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <sc-for list="{{ fitTabs }}" as="t" hint-placeholder-count="5"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
-        </div>
-        <div style="margin-bottom:20px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ CHECKLIST ENGINE</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Checklists &amp; Reminders</h1>
-          <div style="font-size:12.5px; color:#9a9aa2; margin-top:6px;">Unlimited named checklists — the Reminder Engine checks every hour (or your custom frequency) and nudges you about whatever's still open.</div>
-        </div>
-        <div class="cc-grid2" style="display:grid; grid-template-columns:280px 1fr; gap:18px; align-items:start;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:16px;">
-            <div style="font-size:12px; font-weight:600; color:#C9C9CE; margin-bottom:10px;">YOUR LISTS</div>
-            <div style="display:flex; flex-direction:column; gap:8px; max-height:340px; overflow-y:auto; margin-bottom:14px;">
-              <sc-for list="{{ checklistCards }}" as="c" hint-placeholder-count="3">
-                <div onClick="{{ c.select }}" class="cc-glowcard" style="border-radius:13px; background:{{ c.bg }}; border:1px solid {{ c.bd }}; padding:12px 13px; cursor:pointer;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">
-                  <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                    <span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ c.title }}</span>
-                    <span onClick="{{ c.remove }}" style="cursor:pointer; color:#6f6f78; font-size:13px;" style-hover="{ color:'#ff6b76' }">×</span>
-                  </div>
-                  <div style="font-size:10px; color:#8a8a92; margin-top:3px; font-family:'JetBrains Mono',monospace;">{{ c.catLabel }} · {{ c.doneOf }}{{ c.repeatLabel }}</div>
-                  <div style="height:5px; border-radius:3px; background:rgba(255,255,255,0.06); overflow:hidden; margin-top:7px;"><div style="height:100%; width:{{ c.pct }}; background:#FFFFFF; border-radius:3px;"></div></div>
-                </div>
-              </sc-for>
-              <sc-if value="{{ noChecklists }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 2px;">No checklists yet — create your first below.</div></sc-if>
-            </div>
-            <div style="font-size:11px; color:#8a8a92; margin-bottom:8px;">New checklist</div>
-            <input value="{{ newChecklistTitle }}" onInput="{{ setNewChecklistTitle }}" onKeyDown="{{ addChecklistKey }}" placeholder="e.g. Holiday Packing" style="width:100%; box-sizing:border-box; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:8px;">
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-              <sc-for list="{{ checklistCategoryChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.pick }}" style="font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ c.bg }};">{{ c.label }}</span></sc-for>
-            </div>
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-              <sc-for list="{{ checklistPriorityChips }}" as="p" hint-placeholder-count="4"><span onClick="{{ p.pick }}" style="font-size:10.5px; color:{{ p.c }}; border:1px solid {{ p.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ p.bg }};">{{ p.label }}</span></sc-for>
-            </div>
-            <div style="font-size:9.5px; color:#6f6f78; margin-bottom:5px; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">REPEAT</div>
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-              <sc-for list="{{ checklistRepeatChips }}" as="r" hint-placeholder-count="4"><span onClick="{{ r.pick }}" style="font-size:10.5px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 9px; cursor:pointer; background:{{ r.bg }};">{{ r.label }}</span></sc-for>
-            </div>
-            <input type="date" value="{{ newChecklistDue }}" onInput="{{ setNewChecklistDue }}" style="width:100%; box-sizing:border-box; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; margin-bottom:10px;">
-            <span onClick="{{ addChecklist }}" class="cc-glowbtn" style="display:block; text-align:center; padding:10px 14px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer;">+ Create Checklist</span>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; min-height:340px;">
-            <sc-if value="{{ hasActiveChecklist }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-                <span style="font-size:17px; font-weight:700;">{{ activeChecklistTitle }}</span>
-                <span onClick="{{ markActiveComplete }}" style="cursor:pointer; font-size:10.5px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); border-radius:8px; padding:6px 12px;" style-hover="{ background:'rgba(255,255,255,0.15)' }">Mark All Complete</span>
-              </div>
-              <div style="font-size:11px; color:#8a8a92; margin-bottom:16px; font-family:'JetBrains Mono',monospace;">{{ activeChecklistMeta }}</div>
-              <div style="display:flex; gap:9px; margin-bottom:16px;">
-                <input value="{{ newChecklistItemDraft }}" onInput="{{ setChecklistItemDraft }}" onKeyDown="{{ addActiveChecklistItemKey }}" placeholder="Add an item…" style="flex:1; min-width:0; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                <span onClick="{{ addActiveChecklistItem }}" class="cc-glowbtn" style="padding:11px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">Add</span>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:2px;">
-                <sc-for list="{{ activeChecklistItems }}" as="i" hint-placeholder-count="4">
-                  <div style="display:flex; align-items:center; gap:12px; padding:10px 2px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <span onClick="{{ i.toggle }}" style="width:19px; height:19px; flex:0 0 19px; border-radius:6px; border:1.5px solid {{ i.boxBd }}; background:{{ i.boxBg }}; color:#0a0a0b; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; cursor:pointer;">{{ i.box }}</span>
-                    <span style="flex:1; font-size:13.5px; {{ i.labelStyle }}">{{ i.label }}</span>
-                    <span onClick="{{ i.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
-                  </div>
-                </sc-for>
-              </div>
-              <sc-if value="{{ noChecklistItems }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:14px 2px;">No items yet — add the first one above.</div></sc-if>
-            </sc-if>
-            <sc-if value="{{ noChecklists }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px; color:#75757d; padding:20px 2px;">Create a checklist on the left to get started.</div></sc-if>
-          </div>
-        </div>
-      </div>
-      </sc-if>
-
       <!-- ===== NOTIFICATION TESTING PANEL ===== -->
       <sc-if value="{{ isNotifTest }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
@@ -2731,7 +2696,7 @@
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6f6f78; margin-top:6px;">{{ notifBuildVersion }}</div>
           </div>
           <div style="display:flex; gap:8px;">
-            <span onClick="{{ goChecklistsFromTest }}" style="font-size:11.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 14px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.06)' }">☑ Checklists</span>
+            <span onClick="{{ goChecklistsFromTest }}" style="font-size:11.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 14px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.06)' }">☑ Daily Missions</span>
             <span onClick="{{ goSettingsFromTest }}" style="font-size:11.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 14px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.06)' }">⚙ Settings</span>
           </div>
         </div>
@@ -8412,7 +8377,7 @@
                 </div>
               </sc-if>
 
-              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Reminder Engine</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">Governs the Checklist Engine's hourly (or custom) reminders — see Productivity → Checklists.</div></div>
+              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Reminder Engine</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">Governs the Checklist Engine's hourly (or custom) reminders — see Fitness HQ → Training Checklist, or Daily Missions on the Dashboard.</div></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">FREQUENCY</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
                 <sc-for list="{{ notifFreqChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; background:{{ c.bg }}; border-radius:9px; padding:8px 13px; cursor:pointer;">{{ c.label }}</span></sc-for>
@@ -9048,7 +9013,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.24-114 · v11.114 lesson-carousel-voice-teacher';
+const NOTIF_BUILD_VERSION = '2026.08.24-115 · v11.115 health-productivity-merge';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9103,6 +9068,7 @@ class Component extends DCLogic {
       perfHolStart:'', perfHolEnd:'', perfHolErr:'', perfAppealDraft:'',
       perfTeamProfiles:[], perfTeamStatusRaw:[], perfTeamLogsRaw:[],
       missionNotes:{}, missionInput:'', missionRecurring:false, missionView:'active', xpFx:[],
+      missionOptsOpen:false, newMissionCategory:'mission', newMissionPriority:'normal', newMissionRepeat:'daily', newMissionDue:'',
       missGenOpen:false, missGenCat:null, missGenLoading:false, missGenErr:'', missGenResult:null,
       move: s.move || { streak:13, last:yestC, longest:21 },
       lastRollover: s.lastRollover || todayC,
@@ -9815,7 +9781,7 @@ activities: this._mergeShipLog(s.activities),
     if(this._sbOn()) window.SB.update('user_checklists',checklistId,{snoozed_until:until});
   }
   // "Opening the notification must navigate directly to the correct checklist."
-  openChecklistFromNotif(checklistId){ this.setState({scene:'checklists', activeChecklistId:checklistId}); }
+  openChecklistFromNotif(checklistId){ this.setState({scene:'dashboard', activeChecklistId:checklistId}); }
   // Fitness Centre checklist widget — same Checklist Engine, forced category:'fitness', with
   // its own active-id/draft state so it never touches the global Checklists screen's state.
   setNewFitChecklistTitle(e){ this.setState({newFitChecklistTitle:e.target.value}); }
@@ -11800,7 +11766,29 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(this._sbOn()) window.SB.upsert('performance_status', {user_id:userId, banned, banned_at:banned?new Date().toISOString():null}, 'user_id').catch(()=>{});
   }
   _xpRate(){ const r=(this._role()||'').toLowerCase(); return (r==='owner'||r==='admin'||r==='superadmin')?40:10; }
-  maybeRollover(){ if(!this.state.loggedIn) return; const today=this._todayStr(); const hasToday=(this.state.missions||[]).some(m=>!m.recurring && m.dayKey===today); if(this.state.lastRollover!==today || !hasToday) this.rolloverMissions(); }
+  // A mission's repeat cadence — falls back to the legacy `recurring` boolean for rows
+  // synced before the category/priority/repeat/due-date fields existed (or before the
+  // matching Supabase columns are migrated in), so old data keeps working unchanged.
+  _missionRepeat(m){ return m.repeat || (m.recurring ? 'daily' : 'none'); }
+  _missionPersistent(m){ return this._missionRepeat(m)!=='none'; }
+  _missionDueToday(m, today){
+    const rep=this._missionRepeat(m);
+    if(rep==='none') return m.dayKey===today;
+    if(rep==='daily') return true;
+    const now=new Date();
+    if(rep==='weekly') return now.getDay()===(m.dueDow!=null?m.dueDow:now.getDay());
+    if(rep==='monthly'){ const dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate(); const dom=Math.min(m.dueDom!=null?m.dueDom:now.getDate(),dim); return now.getDate()===dom; }
+    return m.dayKey===today;
+  }
+  // The date a mission must have last been completed on to keep its streak alive —
+  // yesterday for daily, 7 days ago for weekly, ~1 calendar month ago for monthly.
+  _missionPrevPeriodStr(m){
+    const rep=this._missionRepeat(m);
+    if(rep==='weekly') return this._locDate(-7);
+    if(rep==='monthly'){ const d=new Date(); d.setMonth(d.getMonth()-1); try{ return d.toLocaleDateString('en-CA'); }catch(_){ return this._yestStr(); } }
+    return this._yestStr();
+  }
+  maybeRollover(){ if(!this.state.loggedIn) return; const today=this._todayStr(); const hasToday=(this.state.missions||[]).some(m=>!this._missionPersistent(m) && m.dayKey===today); if(this.state.lastRollover!==today || !hasToday) this.rolloverMissions(); }
   // The daily reset used to be entirely local (setState + localStorage save, no Supabase
   // write) — a missed-day streak reset or a fresh day's set of daily missions on one
   // device never reached any other device, so two devices could silently disagree about
@@ -11809,8 +11797,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // (another device may have already rolled the day over) so devices converge on the
   // same rows instead of each minting their own.
   async rolloverMissions(){
-    const today=this._todayStr(), yest=this._yestStr();
-    const resetIds=(this.state.missions||[]).filter(m=>m.recurring && m.lastCompleted && m.lastCompleted!==today && m.lastCompleted!==yest).map(m=>m.id);
+    const today=this._todayStr();
+    const resetIds=(this.state.missions||[]).filter(m=>this._missionPersistent(m) && m.lastCompleted && m.lastCompleted!==today && m.lastCompleted!==this._missionPrevPeriodStr(m)).map(m=>m.id);
     let existingDailies=null;
     if(this._sbOn()){
       try{ const {data}=await window.SB.list('missions',{match:{user_id:this.state.authUserId, day_key:today}}); existingDailies=(data||[]).filter(r=>!r.recurring); }catch(e){ existingDailies=null; }
@@ -11818,11 +11806,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     let staleIds=[];
     this.setState(s=>{
       let missions=(s.missions||[]).map(m=>resetIds.includes(m.id)?{...m,streak:0}:m);
-      const stale=missions.filter(m=>!m.recurring && m.dayKey!==today);
+      const stale=missions.filter(m=>!this._missionPersistent(m) && m.dayKey!==today);
       staleIds=stale.map(m=>m.id);
-      missions=missions.filter(m=>m.recurring || m.dayKey===today);
-      if(!missions.some(m=>!m.recurring && m.dayKey===today) && existingDailies && existingDailies.length){
-        missions=missions.concat(existingDailies.map(r=>({id:r.id,name:r.name,recurring:false,dayKey:r.day_key||today,streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||''})));
+      missions=missions.filter(m=>this._missionPersistent(m) || m.dayKey===today);
+      if(!missions.some(m=>!this._missionPersistent(m) && m.dayKey===today) && existingDailies && existingDailies.length){
+        missions=missions.concat(existingDailies.map(r=>({id:r.id,name:r.name,recurring:false,repeat:'none',dayKey:r.day_key||today,streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||''})));
       }
       const health=s.health?{...s.health, diet:(s.health.diet||[]).map(d=>d.locked?d:{...d,checked:false})}:s.health;
       return { missions, lastRollover:today, health };
@@ -11837,13 +11825,46 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       staleIds.forEach(id=>window.SB.remove('missions',id).catch(()=>{}));
     }
   }
-  completeMission(id){ const today=this._todayStr(), yest=this._yestStr(), time=this._nowTime(); const m=(this.state.missions||[]).find(x=>x.id===id); if(!m || m.lastCompleted===today) return; const rate=this._xpRate(); const newStreak=(m.lastCompleted===yest)?(m.streak||0)+1:1; const newLongest=Math.max(m.longest||0,newStreak); const newTotal=(m.total||0)+1; const note=((this.state.missionNotes||{})[id]||'').trim(); const histId=this._uuid();
+  completeMission(id){ const today=this._todayStr(), time=this._nowTime(); const m=(this.state.missions||[]).find(x=>x.id===id); if(!m || m.lastCompleted===today) return; const rate=this._xpRate(); const newStreak=(m.lastCompleted===this._missionPrevPeriodStr(m))?(m.streak||0)+1:1; const newLongest=Math.max(m.longest||0,newStreak); const newTotal=(m.total||0)+1; const note=((this.state.missionNotes||{})[id]||'').trim(); const histId=this._uuid();
     this.mut(s=>{ const missions=s.missions.map(x=>x.id===id?{...x,lastCompleted:today,streak:newStreak,longest:newLongest,total:newTotal}:x); const hist=[{id:histId,missionId:id,name:m.name,date:today,time,notes:note,xp:rate,streak:newStreak,recurring:!!m.recurring}, ...(s.missionHistory||[])].slice(0,200); const notes={...(s.missionNotes||{})}; delete notes[id]; return { missions, missionHistory:hist, missionXP:(s.missionXP||0)+rate, missionNotes:notes }; });
-    this.pushXpFx(rate); this.showToast('system','+'+rate+' XP · '+m.name, note?('\u201C'+note+'\u201D'):(m.recurring?('\uD83D\uDD25 '+newStreak+'-day streak'):'Daily mission complete'));
+    this.pushXpFx(rate); this.showToast('system','+'+rate+' XP · '+m.name, note?('“'+note+'”'):(this._missionPersistent(m)?('🔥 '+newStreak+'-day streak'):'Mission complete'));
     if(this._sbOn()){ window.SB.update('missions',id,{last_completed:today,streak:newStreak,longest_streak:newLongest,total_completions:newTotal}); window.SB.insert('mission_history',{id:histId,user_id:this.state.authUserId,mission_id:id,name:m.name,completed_date:today,completed_time:time,notes:note,xp:rate,streak:newStreak,recurring:!!m.recurring}); } }
   deleteMission(id){ this.mut(s=>({ missions:(s.missions||[]).filter(m=>m.id!==id) })); if(this._sbOn()) window.SB.remove('missions',id); }
-  toggleRecurring(id){ const today=this._todayStr(); const cur=(this.state.missions||[]).find(m=>m.id===id); if(!cur) return; const rec=!cur.recurring, dayKey=rec?'':today; this.mut(s=>({ missions:(s.missions||[]).map(m=>m.id===id?{...m,recurring:rec,dayKey}:m) })); if(this._sbOn()) window.SB.update('missions',id,{recurring:rec,day_key:dayKey}); }
-  addMission(){ const v=((this.state.missionInput)||'').trim(); if(!v) return; const rec=!!this.state.missionRecurring; const today=this._todayStr(); const id=this._uuid(); const m={ id, name:v, recurring:rec, dayKey: rec?'':today, streak:0, longest:0, total:0, lastCompleted:'' }; this.mut(s=>({ missions:[...(s.missions||[]), m], missionInput:'' })); if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name:v,recurring:rec,day_key:m.dayKey,streak:0,longest_streak:0,total_completions:0}); }
+  // Cycles a mission's repeat cadence None -> Daily -> Weekly -> Monthly -> None, matching
+  // the Checklist Engine's REPEAT chip set. Weekly/Monthly anchor to whichever day/date the
+  // mission first switches into that cadence. repeat/dueDow/dueDom stay local-only (not
+  // pushed to Supabase) until the missions table has matching columns -- see addMission.
+  cycleMissionRepeat(id){
+    const order=['none','daily','weekly','monthly'];
+    const cur=(this.state.missions||[]).find(m=>m.id===id); if(!cur) return;
+    const curRep=this._missionRepeat(cur);
+    const next=order[(order.indexOf(curRep)+1)%order.length];
+    const today=this._todayStr(), now=new Date();
+    const patch={ repeat:next, recurring:next==='daily', dayKey: next==='none'?today:'' };
+    if(next==='weekly') patch.dueDow = cur.dueDow!=null?cur.dueDow:now.getDay();
+    if(next==='monthly') patch.dueDom = cur.dueDom!=null?cur.dueDom:now.getDate();
+    this.mut(s=>({ missions:(s.missions||[]).map(m=>m.id===id?{...m,...patch}:m) }));
+    if(this._sbOn()) window.SB.update('missions',id,{recurring:patch.recurring,day_key:patch.dayKey}).catch(()=>{});
+  }
+  addMission(){
+    const S=this.state; const v=(S.missionInput||'').trim(); if(!v) return;
+    const detailed=!!S.missionOptsOpen;
+    const rep = detailed ? (S.newMissionRepeat||'daily') : (S.missionRecurring?'daily':'none');
+    const category = detailed ? (S.newMissionCategory||'mission') : 'mission';
+    const priority = detailed ? (S.newMissionPriority||'normal') : 'normal';
+    const dueDate = detailed ? (S.newMissionDue||'') : '';
+    const today=this._todayStr(), now=new Date(), id=this._uuid();
+    const m={ id, name:v, recurring:rep==='daily', repeat:rep, category, priority, dueDate,
+      dueDow: rep==='weekly'?now.getDay():null, dueDom: rep==='monthly'?now.getDate():null,
+      dayKey: rep==='none'?today:'', streak:0, longest:0, total:0, lastCompleted:'' };
+    this.mut(s=>({ missions:[...(s.missions||[]), m], missionInput:'', newMissionDue:'' }));
+    // Only columns that already exist server-side are sent -- category/priority/repeat/
+    // due-date live locally until missions gets those columns: ALTER TABLE missions ADD
+    // COLUMN category text, ADD COLUMN priority text, ADD COLUMN repeat text, ADD COLUMN
+    // due_date date, ADD COLUMN due_dow smallint, ADD COLUMN due_dom smallint. Sending
+    // unknown columns would fail the whole insert, so the mission wouldn't sync at all.
+    if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name:v,recurring:m.recurring,day_key:m.dayKey,streak:0,longest_streak:0,total_completions:0});
+  }
   markMovedToday(silent){ const today=this._todayStr(), yest=this._yestStr(); const mv=this.state.move||{streak:0,last:'',longest:0}; if(mv.last===today) return; const streak=(mv.last===yest)?(mv.streak||0)+1:1; const longest=Math.max(mv.longest||0,streak); this.mut(s=>({ move:{streak,last:today,longest} })); if(!silent){ this.pushXpFx(0,'\uD83D\uDD25 '+streak+'d'); this.showToast('fitness','Movement logged · \uD83D\uDD25 '+streak+'d','Daily streak updated — keep it alive.'); } }
   pushXpFx(amt,label){ const id=(this._xpid=(this._xpid||0)+1); const text=label||('+'+amt+' XP'); this.setState(s=>({ xpFx:[...(s.xpFx||[]),{id,text}] })); setTimeout(()=>{ this.setState(s=>({ xpFx:(s.xpFx||[]).filter(f=>f.id!==id) })); },1300); }
 
@@ -12408,6 +12429,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.115', date:'Aug 24, 2026', major:true, notes:[
+      'Health and Productivity are now one tab — "Health & Productivity" in the Fitness HQ row — with a Health/Productivity toggle at the top instead of two separate pages. Nothing inside either one changed, they just live under one roof now.',
+      'Removed the standalone Checklists page. Its "YOUR LISTS" creation fields — category, priority, repeat (does not repeat/daily/weekly/monthly) and a due date — have moved onto Daily Missions on the Dashboard, which is the app’s one main checklist now: tap "Category, priority, repeat, due date" under the add-mission box to set them before adding a mission, and the ↻ button on a pending mission cycles its repeat cadence afterwards. Fitness HQ’s own Training Checklist widget is untouched.',
+      'Daily Missions now genuinely supports Weekly and Monthly repeat, not just Daily/one-time — a weekly mission reappears on the same weekday it was created, monthly on the same date, and streaks track correctly against each cadence.',
+      'The category/priority/repeat/due-date fields on missions are stored locally for now — syncing them across devices needs a small Supabase migration (new columns on the missions table) queued for the next deploy with database access.',
+    ]},
     {version:'v11.114', date:'Aug 24, 2026', major:true, notes:[
       'Learning Centre lessons — Deep Dive, Common Misconceptions, Expert Notes and Worked Examples, across all 8 subjects with a lesson viewer — no longer show every card’s full text at once in a wrapping grid on desktop. They’re a carousel at every screen size now: one section focused at a time, with a Prev/Next control and a "2 / 5" position counter, so a dense lesson reads as a sequence of bite-sized sections instead of a wall of text.',
       'New: a voice teacher for every lesson. "🎧 Listen to this lesson" reads the whole thing aloud — title, origin, every Deep Dive section, misconception, expert note and worked example — using the same ElevenLabs voice already powering Daily Briefing narration and Read Aloud, with the local/browser voice as a fallback if it’s unavailable.',
@@ -15485,7 +15512,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const focusMinYest=(S.activities||[]).filter(a=>a.ts>=_st0-86400000 && a.ts<_st0 && _fc[a.cat]).reduce((a,x)=>a+(+x.min||0),0);
     const focusDeltaMin=focusMinToday-focusMinYest;
     const focusDelta=(focusMinYest<=0 && focusMinToday>0)?'\u25b2 new':((focusDeltaMin>=0?'\u25b2 ':'\u25bc ')+this.fmtHrs(Math.abs(focusDeltaMin)||0));
-    const _todayMissions=(S.missions||[]).filter(m=>m.recurring || m.dayKey===_today);
+    const _todayMissions=(S.missions||[]).filter(m=>this._missionDueToday(m,_today));
     const missDoneToday=_todayMissions.filter(m=>m.lastCompleted===_today).length;
     const missTotalToday=_todayMissions.length;
     const missRemainToday=missTotalToday-missDoneToday;
@@ -15495,7 +15522,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const moveStreakDisp=moveAlive?(_mv.streak||0):0;
     const dayScore=Math.round((Math.min(1,focusMinToday/360)*0.4 + (missTotalToday?missDoneToday/missTotalToday:0)*0.4 + (movedToday?1:0)*0.2)*100);
     const _rate=this._xpRate();
-    const missionList=_todayMissions.slice().sort((a,b)=>{ const ad=a.lastCompleted===_today?1:0, bd=b.lastCompleted===_today?1:0; if(ad!==bd) return ad-bd; return (b.recurring?1:0)-(a.recurring?1:0); }).map(m=>{ const done=m.lastCompleted===_today; const alive=done||m.lastCompleted===_yest; const sd=alive?(m.streak||0):0; const hist=done?(S.missionHistory||[]).find(h=>h.missionId===m.id && h.date===_today):null; return { id:m.id, name:m.name, recurring:!!m.recurring, done, pending:!done, typeLabel:m.recurring?'RECURRING':'DAILY', typeColor:m.recurring?'#ff5563':'#9a9aa2', typeBd:m.recurring?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.14)', showStreak:!!m.recurring, streakText:'\uD83D\uDD25 '+sd, xpText:'+'+_rate+' XP', check:done?'\u2713':'', fill:done?'#FFFFFF':'transparent', bdr:done?'#FFFFFF':'rgba(255,255,255,0.22)', glow:done?'0 0 10px rgba(255,255,255,0.6)':'none', txt:done?'#7c7c84':'#eef0f2', strike:done?'line-through':'none', noteVal:(S.missionNotes||{})[m.id]||'', setNote:(e)=>{ const v=e.target.value; this.setState(s=>({missionNotes:{...(s.missionNotes||{}),[m.id]:v}})); }, complete:()=>this.completeMission(m.id), completeKey:enterKey(()=>this.completeMission(m.id)), remove:()=>this.deleteMission(m.id), toggleRec:()=>this.toggleRecurring(m.id), recurTitle:m.recurring?'Recurring — click to make one-time':'Make recurring', recurColor:m.recurring?'#FFFFFF':'#7c7c84', doneMeta:(done&&hist)?('\u2713 '+hist.time+' · +'+hist.xp+' XP'+(m.recurring?(' · \uD83D\uDD25 '+sd+'d'):'')):(done?('\u2713 done today · +'+_rate+' XP'):''), hasDoneNote:!!(done&&hist&&hist.notes), doneNote:(done&&hist&&hist.notes)?hist.notes:'' }; });
+    const _repLabel={none:'ONE-TIME',daily:'DAILY',weekly:'WEEKLY',monthly:'MONTHLY'};
+    const _catLabel={mission:'Mission',finance:'Finance',fitness:'Fitness',health:'Health',checklist:'Checklist',calendar:'Calendar',travel:'Travel',business:'Business',custom:'Custom'};
+    const _prioColor={critical:'#ff5563',high:'#ff8a5b',normal:'#9a9aa2',low:'#6f6f78',silent:'#4a4a50'};
+    const missionList=_todayMissions.slice().sort((a,b)=>{ const ad=a.lastCompleted===_today?1:0, bd=b.lastCompleted===_today?1:0; if(ad!==bd) return ad-bd; return (this._missionPersistent(b)?1:0)-(this._missionPersistent(a)?1:0); }).map(m=>{ const done=m.lastCompleted===_today; const rep=this._missionRepeat(m); const persistent=rep!=='none'; const alive=done||m.lastCompleted===this._missionPrevPeriodStr(m); const sd=alive?(m.streak||0):0; const hist=done?(S.missionHistory||[]).find(h=>h.missionId===m.id && h.date===_today):null; const cat=m.category||'mission'; const prio=m.priority||'normal'; return { id:m.id, name:m.name, recurring:!!m.recurring, done, pending:!done, typeLabel:_repLabel[rep]||'DAILY', typeColor:persistent?'#ff5563':'#9a9aa2', typeBd:persistent?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.14)', showStreak:persistent, streakText:'🔥 '+sd, xpText:'+'+_rate+' XP', check:done?'✓':'', fill:done?'#FFFFFF':'transparent', bdr:done?'#FFFFFF':'rgba(255,255,255,0.22)', glow:done?'0 0 10px rgba(255,255,255,0.6)':'none', txt:done?'#7c7c84':'#eef0f2', strike:done?'line-through':'none', noteVal:(S.missionNotes||{})[m.id]||'', setNote:(e)=>{ const v=e.target.value; this.setState(s=>({missionNotes:{...(s.missionNotes||{}),[m.id]:v}})); }, complete:()=>this.completeMission(m.id), completeKey:enterKey(()=>this.completeMission(m.id)), remove:()=>this.deleteMission(m.id), toggleRec:()=>this.cycleMissionRepeat(m.id), recurTitle:'Repeat: '+(_repLabel[rep]||'DAILY')+' — click to cycle', recurColor:persistent?'#FFFFFF':'#7c7c84', doneMeta:(done&&hist)?('✓ '+hist.time+' · +'+hist.xp+' XP'+(persistent?(' · 🔥 '+sd+'d'):'')):(done?('✓ done today · +'+_rate+' XP'):''), hasDoneNote:!!(done&&hist&&hist.notes), doneNote:(done&&hist&&hist.notes)?hist.notes:'', showMeta:cat!=='mission'||prio!=='normal'||!!m.dueDate, catLabel:_catLabel[cat]||cat, prioLabel:prio.charAt(0).toUpperCase()+prio.slice(1), prioColor:_prioColor[prio]||'#9a9aa2', hasDue:!!m.dueDate, dueLabel:m.dueDate?('Due '+m.dueDate):'' }; });
     const missionHistoryList=(S.missionHistory||[]).map(h=>({ name:h.name, date:this._niceDate(h.date), time:h.time||'', xp:'+'+(h.xp||0)+' XP', showStreak:!!h.recurring, streak:'\uD83D\uDD25 '+(h.streak||0)+'d', typeLabel:h.recurring?'RECURRING':'DAILY', typeColor:h.recurring?'#ff5563':'#9a9aa2', hasNotes:!!h.notes, notes:h.notes||'' }));
     const oneRM=(w)=> (w.weight&&w.reps)? Math.round((+w.weight)*(1+(+w.reps)/30)) : 0;
     const best1RM=S.workouts.reduce((m,w)=>Math.max(m,oneRM(w)),0);
@@ -16103,11 +16133,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           incSaveAmt:S.incSaveAmt||'', setIncSaveAmt:(e)=>this.setState({incSaveAmt:e.target.value}),
         };
       })(),
-      fitTabs:[['Fitness HQ','fitness'],['Health','health'],['Productivity','productivity'],['Checklists','checklists'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
+      fitTabs:[['Fitness HQ','fitness'],['Health & Productivity','health'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
       goHealthDiet:()=>this.setState({scene:'health', healthSub:'diet'}),
-      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health', isBiz:scene==='business', isProd:scene==='productivity', isChecklists:scene==='checklists', isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
+      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health' && S.healthProdView!=='productivity', isBiz:scene==='business', isProd:scene==='health' && S.healthProdView==='productivity', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
+      healthProdView: S.healthProdView==='productivity'?'productivity':'health',
+      goHealthView:()=>this.setState({scene:'health', healthProdView:'health'}),
+      goProdView:()=>this.setState({scene:'health', healthProdView:'productivity'}),
+      healthViewC: (S.healthProdView!=='productivity')?'#F4F4F5':'#9a9aa2', healthViewBg: (S.healthProdView!=='productivity')?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', healthViewBd: (S.healthProdView!=='productivity')?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)',
+      prodViewC: (S.healthProdView==='productivity')?'#F4F4F5':'#9a9aa2', prodViewBg: (S.healthProdView==='productivity')?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', prodViewBd: (S.healthProdView==='productivity')?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)',
       noteEditorOpen: !!S.noteEditor, noteEditorLabel: S.noteEditor?S.noteEditor.label:'', noteEditorDraft: S.noteEditor?S.noteEditor.draft:'',
       setNoteEditorDraft:(e)=>this.setEntryNoteDraft(e), saveNoteEditor:()=>this.saveEntryNote(), closeNoteEditor:()=>this.closeEntryNote(), clearNoteEditor:()=>this.clearEntryNote(),
       ...this._safe(()=>{
@@ -16225,7 +16260,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           })),
           noHistoryRows: !hist.length,
           clearNotifHistory:()=>{ this.clearAllNotifs(); this.setState({notifHistory:[]}); },
-          goChecklistsFromTest:()=>this.setState({scene:'checklists'}),
+          goChecklistsFromTest:()=>this.setState({scene:'dashboard'}),
           goSettingsFromTest:()=>this.setState({scene:'settings', settingsTab:'Notifications'}),
         };
       }),
@@ -17280,6 +17315,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       addMission:()=>this.addMission(), addMissionKey:enterKey(()=>this.addMission()),
       missionRecurring:S.missionRecurring, toggleMissionRecurring:()=>this.setState(s=>({missionRecurring:!s.missionRecurring})),
       missionTypeLabel:S.missionRecurring?'Recurring':'One-time', missionTypeC:S.missionRecurring?'#F4F4F5':'#9a9aa2', missionTypeBg:S.missionRecurring?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', missionTypeBd:S.missionRecurring?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.12)',
+      // "YOUR LISTS"-style category/priority/repeat/due-date fields, relocated from the
+      // old standalone Checklists page onto Daily Missions (now the app's one main
+      // checklist) instead of a separate multi-list page — same chip set, same labels.
+      missionOptsOpen:!!S.missionOptsOpen, toggleMissionOpts:()=>this.setState(s=>({missionOptsOpen:!s.missionOptsOpen})),
+      missionOptsLabel:S.missionOptsOpen?'Hide details ▾':'Category, priority, repeat, due date ▸',
+      missionCategoryChips:['mission','finance','fitness','health','checklist','calendar','travel','business','custom'].map(c=>({ id:c, label:c.charAt(0).toUpperCase()+c.slice(1), pick:()=>this.setState({newMissionCategory:c}),
+        c:(S.newMissionCategory||'mission')===c?'#F4F4F5':'#9a9aa2', bg:(S.newMissionCategory||'mission')===c?'rgba(255,255,255,0.18)':'transparent', b:(S.newMissionCategory||'mission')===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
+      missionPriorityChips:['critical','high','normal','low','silent'].map(p=>({ id:p, label:p.charAt(0).toUpperCase()+p.slice(1), pick:()=>this.setState({newMissionPriority:p}),
+        c:(S.newMissionPriority||'normal')===p?'#F4F4F5':'#9a9aa2', bg:(S.newMissionPriority||'normal')===p?'rgba(255,255,255,0.18)':'transparent', b:(S.newMissionPriority||'normal')===p?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
+      missionRepeatChips:['none','daily','weekly','monthly'].map(r=>({ id:r, label:r==='none'?'Does not repeat':(r.charAt(0).toUpperCase()+r.slice(1)), pick:()=>this.setState({newMissionRepeat:r}),
+        c:(S.newMissionRepeat||'daily')===r?'#F4F4F5':'#9a9aa2', bg:(S.newMissionRepeat||'daily')===r?'rgba(255,255,255,0.18)':'transparent', b:(S.newMissionRepeat||'daily')===r?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
+      newMissionDue:S.newMissionDue||'', setNewMissionDue:(e)=>this.setState({newMissionDue:e.target.value}),
       xpFx:(S.xpFx||[]).map(f=>({id:f.id,text:f.text})),
       intel:[{cat:'AI',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'New frontier model tops reasoning benchmarks',meta:'Financial Times · illustrative · 9 sources'},{cat:'MARKETS',catColor:'#eef0f2',catBdr:'rgba(255,255,255,0.25)',headline:'Fed holds rates; futures climb as inflation cools',meta:'Bloomberg · illustrative · 21 sources'},{cat:'FUNDS',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'BlackRock ETF inflows hit fresh record',meta:'Reuters · illustrative · 12 sources'},{cat:'GOV',catColor:'#9a9aa2',catBdr:'rgba(255,255,255,0.18)',headline:'Allied defense procurement framework expands',meta:'WSJ · illustrative · 7 sources'}],
       goWorldIntel:()=>this.setState({scene:'globe'}),
