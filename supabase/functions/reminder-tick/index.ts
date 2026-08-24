@@ -39,58 +39,28 @@ async function sendTemplatedEmail(prefs: Record<string, any>, title: string, bod
   return sendReminderEmail(prefs.reminderEmailAddr, tpl.subject, tpl.text, prefs.emailProvider);
 }
 
-function pickChecklistText(title: string, open: number) {
-  if (open === 1) return `Only one task left on ${title} today.`;
-  return `You still have ${open} items remaining on ${title}.`;
-}
-
-async function sweepChecklists(admin: any, userId: string, prefs: Record<string, any>) {
-  if (prefs.notifsEnabled === false) return { sent: 0 };
-  const freqMin = FREQUENCY_MINUTES[prefs.notifFrequency || 'hourly'] || 60;
-
-  const { data: checklists } = await admin
-    .from('user_checklists').select('id,title,category,priority,last_reminded_at')
-    .eq('user_id', userId).is('completed_at', null);
-  if (!checklists || !checklists.length) return { sent: 0 };
-
-  let sent = 0;
-  for (const c of checklists) {
-    const last = c.last_reminded_at ? new Date(c.last_reminded_at).getTime() : 0;
-    if (Date.now() - last < freqMin * 60000 - 30000) continue; // not due yet
-
-    const { count: openCount } = await admin
-      .from('checklist_items').select('id', { count: 'exact', head: true })
-      .eq('checklist_id', c.id).eq('done', false);
-    if (!openCount) continue;
-
-    const body = pickChecklistText(c.title, openCount);
-    const priority = c.priority || 'normal';
-
-    if (prefs.pushEnabled) await sendPushToUser(admin, userId, { title: c.title, body, category: c.category, priority, url: './index.html' });
-    if (prefs.reminderEmailEnabled && prefs.reminderEmailAddr) await sendTemplatedEmail(prefs, c.title, body);
-
-    await admin.from('notifications').insert({
-      user_id: userId, title: c.title, body, category: c.category || 'checklist',
-      priority, status: 'sent', source_type: 'checklist', source_id: c.id,
-      dedupe_key: 'checklist:' + c.id, channels: ['push'],
-    });
-    await admin.from('user_checklists').update({ last_reminder_text: body, last_reminded_at: new Date().toISOString() }).eq('id', c.id);
-    sent++;
+// Checklist reminders (user_checklists) and the Daily Missions digest used to be two
+// separate emails that said the same thing in slightly different words — "here's what's
+// still open, and how many." Merged into one digest covering both, on the missions
+// digest's cadence (one send per due window, not per checklist), rather than each
+// checklist nagging on its own independent schedule.
+function pickDigestText(missionNames: string[], checklistSummaries: { title: string; open: number }[]) {
+  const parts: string[] = [];
+  if (missionNames.length) {
+    parts.push(missionNames.length === 1
+      ? `1 mission left today: ${missionNames[0]}.`
+      : `${missionNames.length} missions left today: ${missionNames.join(', ')}.`);
   }
-  return { sent };
+  if (checklistSummaries.length) {
+    const totalItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
+    const list = checklistSummaries.map((c) => `${c.title} (${c.open})`).join(', ');
+    parts.push(checklistSummaries.length === 1
+      ? `${totalItems} checklist item${totalItems === 1 ? '' : 's'} open on ${list}.`
+      : `${totalItems} checklist items open across ${checklistSummaries.length} checklists: ${list}.`);
+  }
+  return parts.join(' ');
 }
-
-// Daily Missions (the dashboard's actual recurring-task feature — separate table from
-// the Checklist Engine above, and the one users actually see day to day). Sends ONE
-// digest per due window listing how many are left and their names, rather than a
-// separate email per mission — matches what was actually asked for: "confirm how many
-// tasks are left and what they are." No last_reminded_at column here, so recency is
-// derived from the most recent digest notification instead of a dedicated field.
-function pickMissionsText(names: string[]) {
-  if (names.length === 1) return 'You have 1 mission left today: ' + names[0] + '.';
-  return 'You have ' + names.length + ' missions left today: ' + names.join(', ') + '.';
-}
-async function sweepMissions(admin: any, userId: string, prefs: Record<string, any>) {
+async function sweepDigest(admin: any, userId: string, prefs: Record<string, any>) {
   if (prefs.notifsEnabled === false) return { sent: 0 };
   const freqMin = FREQUENCY_MINUTES[prefs.notifFrequency || 'hourly'] || 60;
   const today = new Date().toISOString().slice(0, 10);
@@ -98,25 +68,36 @@ async function sweepMissions(admin: any, userId: string, prefs: Record<string, a
   const { data: missions } = await admin
     .from('missions').select('id,name,last_completed,recurring,day_key')
     .eq('user_id', userId).eq('status', 'active').is('deleted_at', null);
-  if (!missions || !missions.length) return { sent: 0 };
-
   // Non-recurring rows are one-off dailies tied to the day they were created
   // (day_key). Old ones from previous days were never deleted server-side —
   // without this filter they'd stay "active" forever and inflate the count
   // (e.g. reporting 36 tasks left when the app itself shows today's real 4).
   // Recurring missions have no day_key and are always in scope.
-  const todaysMissions = missions.filter((m: any) => m.recurring || m.day_key === today);
-  const open = todaysMissions.filter((m: any) => m.last_completed !== today);
-  if (!open.length) return { sent: 0 };
+  const todaysMissions = (missions || []).filter((m: any) => m.recurring || m.day_key === today);
+  const openMissions = todaysMissions.filter((m: any) => m.last_completed !== today);
+
+  const { data: checklists } = await admin
+    .from('user_checklists').select('id,title')
+    .eq('user_id', userId).is('completed_at', null);
+  const checklistSummaries: { title: string; open: number }[] = [];
+  for (const c of checklists || []) {
+    const { count: openCount } = await admin
+      .from('checklist_items').select('id', { count: 'exact', head: true })
+      .eq('checklist_id', c.id).eq('done', false);
+    if (openCount) checklistSummaries.push({ title: c.title, open: openCount });
+  }
+
+  if (!openMissions.length && !checklistSummaries.length) return { sent: 0 };
 
   const { data: lastNotif } = await admin.from('notifications').select('created_at')
-    .eq('user_id', userId).eq('source_type', 'missions_digest')
+    .eq('user_id', userId).eq('source_type', 'digest')
     .order('created_at', { ascending: false }).limit(1);
   const lastTs = (lastNotif && lastNotif[0]) ? new Date(lastNotif[0].created_at).getTime() : 0;
   if (Date.now() - lastTs < freqMin * 60000 - 30000) return { sent: 0 };
 
-  const title = open.length === 1 ? 'Daily Missions — 1 task left' : 'Daily Missions — ' + open.length + ' tasks left';
-  const body = pickMissionsText(open.map((m: any) => m.name));
+  const totalOpen = openMissions.length + checklistSummaries.reduce((a, c) => a + c.open, 0);
+  const title = totalOpen === 1 ? '1 task still open today' : totalOpen + ' tasks still open today';
+  const body = pickDigestText(openMissions.map((m: any) => m.name), checklistSummaries);
   const priority = 'normal';
 
   if (prefs.pushEnabled) await sendPushToUser(admin, userId, { title, body, category: 'mission', priority, url: './index.html' });
@@ -124,7 +105,7 @@ async function sweepMissions(admin: any, userId: string, prefs: Record<string, a
 
   await admin.from('notifications').insert({
     user_id: userId, title, body, category: 'mission', priority, status: 'sent',
-    source_type: 'missions_digest', dedupe_key: 'missions_digest:' + userId + ':' + Date.now(), channels: ['push'],
+    source_type: 'digest', dedupe_key: 'digest:' + userId + ':' + Date.now(), channels: ['push'],
   });
   return { sent: 1 };
 }
@@ -322,15 +303,14 @@ async function sweepWellnessCheckin(admin: any, userId: string, prefs: Record<st
 }
 
 async function sweepUser(admin: any, userId: string, prefs: Record<string, any>) {
-  const checklistResult = await sweepChecklists(admin, userId, prefs);
-  const missionResult = await sweepMissions(admin, userId, prefs);
+  const digestResult = await sweepDigest(admin, userId, prefs);
   const calendarResult = await sweepCalendarEvents(admin, userId, prefs);
   const perfResult = await sweepPerformanceTerminal(admin, userId, prefs);
   const versionResult = await sweepVersionUpdate(admin, userId, prefs);
   const checkinResult = await sweepWellnessCheckin(admin, userId, prefs);
   return {
-    sent: (checklistResult.sent || 0) + (missionResult.sent || 0) + (calendarResult.sent || 0) + (perfResult.sent || 0) + (versionResult.sent || 0) + (checkinResult.sent || 0),
-    checklists: checklistResult.sent || 0, missions: missionResult.sent || 0, calendar: calendarResult.sent || 0,
+    sent: (digestResult.sent || 0) + (calendarResult.sent || 0) + (perfResult.sent || 0) + (versionResult.sent || 0) + (checkinResult.sent || 0),
+    digest: digestResult.sent || 0, calendar: calendarResult.sent || 0,
     performance: perfResult.sent || 0, version: versionResult.sent || 0, checkin: checkinResult.sent || 0,
   };
 }
