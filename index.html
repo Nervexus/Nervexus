@@ -9027,7 +9027,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-112 · v11.112 daily-log-reminders';
+const NOTIF_BUILD_VERSION = '2026.08.23-113 · v11.113 email-signoff';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9478,12 +9478,15 @@ activities: this._mergeShipLog(s.activities),
   // plain '{{title}}'/'{{message}}', i.e. today's exact output, so this is a no-op
   // until the user actually customizes something. Mirrors applyEmailTemplate() in
   // reminder-tick/index.ts — keep both in sync if the placeholder syntax ever changes.
+  // EMAIL_SIGNOFF is appended to every outgoing email's body, unconditionally, after the
+  // user's own template is applied — requested to always close every email the same way.
   _renderEmailTemplate(title,body){
     const p=this.state.prefs||{};
     const subjTpl=(p.emailTemplateSubject||'').trim()||'{{title}}';
     const bodyTpl=(p.emailTemplateBody||'').trim()||'{{message}}';
     const fill=(tpl)=>tpl.replace(/\{\{\s*title\s*\}\}/g,title).replace(/\{\{\s*message\s*\}\}/g,body).replace(/\{\{\s*body\s*\}\}/g,body);
-    return { subject:fill(subjTpl)||title, text:fill(bodyTpl)||body };
+    const EMAIL_SIGNOFF='\n\nBest,\nUltra X management team';
+    return { subject:fill(subjTpl)||title, text:(fill(bodyTpl)||body)+EMAIL_SIGNOFF };
   }
   // Draft fields so typing doesn't silently overwrite the synced template on every
   // keystroke — nothing commits until "Save template" is pressed, then it's written to
@@ -12383,6 +12386,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.113', date:'Aug 23, 2026', major:false, notes:[
+      'Every automated email now closes the same way — "Best, Ultra X management team" is appended after the body on every send, including test emails from Settings’ Testing Panel. Applied once at the shared template-rendering step so it covers every current and future email type, rather than being added to each one individually.',
+    ]},
     {version:'v11.112', date:'Aug 23, 2026', major:true, notes:[
       'New: daily reminders to log fitness, energy and money. From 7pm, if you haven’t logged a workout, an energy entry, or any income/expense yet that day, you’ll get one in-app + push nudge for each — genuinely checked against your real data, not just a blind daily alarm, so nothing fires for something you’ve already logged. Reuses the existing Fitness/Health/Finance notification categories in Settings → Notifications, so they’re controllable there like every other reminder type, plus a dedicated on/off toggle in the same Reminders section.',
     ]},

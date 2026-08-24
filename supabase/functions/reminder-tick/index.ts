@@ -31,6 +31,10 @@ function firstName(fullName: string) {
 // User-customizable email template (Settings → Notifications → Email template). Empty
 // fields fall back to '{{title}}' / '{{message}}' — i.e. today's exact plain output —
 // so nobody's email changes shape until they actually opt into customizing it.
+// EMAIL_SIGNOFF is appended to every outgoing email's body, unconditionally, after the
+// template is applied — requested to always close every email the same way. Mirrored in
+// index.html's _renderEmailTemplate() for the client-side test-email paths.
+const EMAIL_SIGNOFF = '\n\nBest,\nUltra X management team';
 function applyEmailTemplate(prefs: Record<string, any>, title: string, body: string) {
   const subjTpl = (prefs.emailTemplateSubject || '').trim() || '{{title}}';
   const bodyTpl = (prefs.emailTemplateBody || '').trim() || '{{message}}';
@@ -38,7 +42,7 @@ function applyEmailTemplate(prefs: Record<string, any>, title: string, body: str
     .replace(/\{\{\s*title\s*\}\}/g, title)
     .replace(/\{\{\s*message\s*\}\}/g, body)
     .replace(/\{\{\s*body\s*\}\}/g, body);
-  return { subject: fill(subjTpl) || title, text: fill(bodyTpl) || body };
+  return { subject: fill(subjTpl) || title, text: (fill(bodyTpl) || body) + EMAIL_SIGNOFF };
 }
 async function sendTemplatedEmail(prefs: Record<string, any>, title: string, body: string) {
   const tpl = applyEmailTemplate(prefs, title, body);
