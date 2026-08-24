@@ -22,6 +22,12 @@ function json(body: unknown, status = 200) {
 
 const FREQUENCY_MINUTES: Record<string, number> = { '15min': 15, '30min': 30, hourly: 60, '150min': 150, '2hour': 120, '4hour': 240, daily: 1440 };
 
+// Mirrors the client's own first-name extraction (index.html's firstName/nm helpers) so
+// personalized email copy reads the same way the in-app greeting does.
+function firstName(fullName: string) {
+  return (fullName || '').trim().split(/\s+/)[0] || '';
+}
+
 // User-customizable email template (Settings → Notifications → Email template). Empty
 // fields fall back to '{{title}}' / '{{message}}' — i.e. today's exact plain output —
 // so nobody's email changes shape until they actually opt into customizing it.
@@ -41,15 +47,18 @@ async function sendTemplatedEmail(prefs: Record<string, any>, title: string, bod
 
 // Checklist reminders (user_checklists) and the Daily Missions digest used to be two
 // separate emails that said the same thing in slightly different words — "here's what's
-// still open, and how many." Merged into one digest covering both, on the missions
-// digest's cadence (one send per due window, not per checklist), rather than each
-// checklist nagging on its own independent schedule.
+// still open, and how many." Merged into one digest covering both. Per the owner's
+// explicit request: fixed to a 6am-11pm send window and a flat 4-hour minimum cadence,
+// overriding the configurable notifFrequency setting for this specific email.
+function pickDigestSubject(name: string, openMissions: number, openChecklistItems: number) {
+  const who = name ? name + ', y' : 'Y';
+  if (openMissions > 0) return `${who}ou have ${openMissions} mission${openMissions === 1 ? '' : 's'} pending.`;
+  return `${who}ou have ${openChecklistItems} checklist item${openChecklistItems === 1 ? '' : 's'} pending.`;
+}
 function pickDigestText(missionNames: string[], checklistSummaries: { title: string; open: number }[]) {
   const parts: string[] = [];
   if (missionNames.length) {
-    parts.push(missionNames.length === 1
-      ? `1 mission left today: ${missionNames[0]}.`
-      : `${missionNames.length} missions left today: ${missionNames.join(', ')}.`);
+    parts.push(`${missionNames.join(', ')} — you have ${missionNames.length} mission${missionNames.length === 1 ? '' : 's'} pending completion.`);
   }
   if (checklistSummaries.length) {
     const totalItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
@@ -60,9 +69,13 @@ function pickDigestText(missionNames: string[], checklistSummaries: { title: str
   }
   return parts.join(' ');
 }
-async function sweepDigest(admin: any, userId: string, prefs: Record<string, any>) {
+async function sweepDigest(admin: any, userId: string, name: string, prefs: Record<string, any>) {
   if (prefs.notifsEnabled === false) return { sent: 0 };
-  const freqMin = FREQUENCY_MINUTES[prefs.notifFrequency || 'hourly'] || 60;
+  // Fixed 4-hour minimum cadence and a 6am-11pm window, overriding notifFrequency —
+  // requested explicitly, rather than left on the general configurable cadence.
+  const freqMin = 240;
+  const hour = localHour(new Date(), prefs.timezone);
+  if (hour < 6 || hour >= 23) return { sent: 0 };
   const today = new Date().toISOString().slice(0, 10);
 
   const { data: missions } = await admin
@@ -95,8 +108,8 @@ async function sweepDigest(admin: any, userId: string, prefs: Record<string, any
   const lastTs = (lastNotif && lastNotif[0]) ? new Date(lastNotif[0].created_at).getTime() : 0;
   if (Date.now() - lastTs < freqMin * 60000 - 30000) return { sent: 0 };
 
-  const totalOpen = openMissions.length + checklistSummaries.reduce((a, c) => a + c.open, 0);
-  const title = totalOpen === 1 ? '1 task still open today' : totalOpen + ' tasks still open today';
+  const openChecklistItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
+  const title = pickDigestSubject(name, openMissions.length, openChecklistItems);
   const body = pickDigestText(openMissions.map((m: any) => m.name), checklistSummaries);
   const priority = 'normal';
 
@@ -122,8 +135,15 @@ function eventOccursOn(e: { event_date: string; repeat_days?: string[] | null },
   if (!e.repeat_days || !e.repeat_days.length) return false;
   return ds > e.event_date && e.repeat_days.indexOf(dowCode(ds)) !== -1;
 }
-async function sweepCalendarEvents(admin: any, userId: string, prefs: Record<string, any>) {
-  if (prefs.reminderPushEnabled === false && !(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0 };
+// Push keeps its original near-event-time behaviour (configurable lead time, default 15
+// min). Email is now a separate, fixed 24-hours-before heads-up with its own copy and its
+// own dedupe key — the owner asked for email specifically to always go out a day ahead,
+// not for push to move too.
+const EMAIL_LEAD_MIN = 1440;
+async function sweepCalendarEvents(admin: any, userId: string, name: string, prefs: Record<string, any>) {
+  const canPush = prefs.reminderPushEnabled !== false;
+  const canEmail = prefs.reminderEmailEnabled && prefs.reminderEmailAddr;
+  if (!canPush && !canEmail) return { sent: 0 };
   const leadMin = prefs.reminderLeadMins || 15;
 
   const now = new Date();
@@ -143,28 +163,42 @@ async function sweepCalendarEvents(admin: any, userId: string, prefs: Record<str
 
     const dt = new Date(todayStr + 'T' + e.event_time + ':00');
     const mins = (dt.getTime() - now.getTime()) / 60000;
-    // Cron runs every 15 min, so a lead-time window this wide (up to 16 min) guarantees
-    // exactly one tick lands inside it without needing extra state on `events` itself.
-    if (mins > leadMin || mins <= leadMin - 16) continue;
+    // Cron runs every 15 min, so a window this wide (up to 16 min) guarantees exactly one
+    // tick lands inside it without needing extra state on `events` itself.
+    const inWindow = (lead: number) => mins <= lead && mins > lead - 16;
 
-    // Keyed to TODAY's occurrence, not the event's original event_date — a recurring
-    // event used to dedupe against its first-ever firing forever and never fire again.
-    const dedupeKey = 'calendar:' + e.id + ':' + todayStr;
-    const { data: already } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
-    if (already && already.length) continue;
+    if (canPush && inWindow(leadMin)) {
+      // Keyed to TODAY's occurrence, not the event's original event_date — a recurring
+      // event used to dedupe against its first-ever firing forever and never fire again.
+      const dedupeKey = 'calendar:' + e.id + ':' + todayStr;
+      const { data: already } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
+      if (!already || !already.length) {
+        const title = 'Upcoming: ' + e.title;
+        const body = 'Starts at ' + e.event_time + ' today.';
+        await sendPushToUser(admin, userId, { title, body, category: 'calendar', priority: 'normal', url: './index.html' });
+        await admin.from('notifications').insert({
+          user_id: userId, title, body, category: 'calendar', priority: 'normal', status: 'sent',
+          source_type: 'event', source_id: e.id, dedupe_key: dedupeKey, channels: ['push'],
+        });
+        sent++;
+      }
+    }
 
-    const title = 'Upcoming: ' + e.title;
-    const body = 'Starts at ' + e.event_time + ' today.';
-    const priority = 'normal';
-
-    if (prefs.reminderPushEnabled !== false) await sendPushToUser(admin, userId, { title, body, category: 'calendar', priority, url: './index.html' });
-    if (prefs.reminderEmailEnabled && prefs.reminderEmailAddr) await sendTemplatedEmail(prefs, title, body);
-
-    await admin.from('notifications').insert({
-      user_id: userId, title, body, category: 'calendar', priority, status: 'sent',
-      source_type: 'event', source_id: e.id, dedupe_key: dedupeKey, channels: ['push'],
-    });
-    sent++;
+    if (canEmail && inWindow(EMAIL_LEAD_MIN)) {
+      const dedupeKey = 'calendar-email:' + e.id + ':' + todayStr;
+      const { data: already } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
+      if (!already || !already.length) {
+        const title = 'Event schedule';
+        const who = name ? name + ', y' : 'Y';
+        const body = `${who}ou have ${e.title} at ${e.event_time} tomorrow.`;
+        await sendTemplatedEmail(prefs, title, body);
+        await admin.from('notifications').insert({
+          user_id: userId, title, body, category: 'calendar', priority: 'normal', status: 'sent',
+          source_type: 'event', source_id: e.id, dedupe_key: dedupeKey, channels: ['email'],
+        });
+        sent++;
+      }
+    }
   }
   return { sent };
 }
@@ -181,6 +215,16 @@ function localDateStr(now: Date, tz: string) {
 function localHour(now: Date, tz: string) {
   try { return parseInt(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hour12: false, timeZone: tz || 'UTC' }).format(now), 10) % 24; }
   catch { return now.getUTCHours(); }
+}
+// Minutes since local midnight — used where a trigger needs half-hour precision (e.g.
+// 21:30) rather than localHour()'s whole-hour granularity.
+function localMinuteOfDay(now: Date, tz: string) {
+  try {
+    const parts = new Intl.DateTimeFormat('en-GB', { hour: 'numeric', minute: 'numeric', hour12: false, timeZone: tz || 'UTC' }).formatToParts(now);
+    const h = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10) % 24;
+    const m = parseInt(parts.find((p) => p.type === 'minute')?.value || '0', 10);
+    return h * 60 + m;
+  } catch { return now.getUTCHours() * 60 + now.getUTCMinutes(); }
 }
 async function alreadySent(admin: any, dedupeKey: string) {
   const { data } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
@@ -211,14 +255,14 @@ function addDaysToDateStr(ds: string, delta: number) {
   d.setUTCDate(d.getUTCDate() + delta);
   return d.toISOString().slice(0, 10);
 }
-async function sweepPerformanceTerminal(admin: any, userId: string, prefs: Record<string, any>) {
+async function sweepPerformanceTerminal(admin: any, userId: string, name: string, prefs: Record<string, any>) {
   const { data: statusRows } = await admin.from('performance_status').select('*').eq('user_id', userId).limit(1);
   const status = (statusRows && statusRows[0]) || { miss_streak: 0, banned: false };
   if (status.banned) return { sent: 0 }; // locked pending appeal — nothing more to nag about
 
   const now = new Date();
   const ukToday = localDateStr(now, UK_TZ);
-  const ukHour = localHour(now, UK_TZ);
+  const ukMinuteOfDay = localMinuteOfDay(now, UK_TZ);
   const ukYesterday = addDaysToDateStr(ukToday, -1);
 
   const { data: holidayRows } = await admin.from('performance_holidays').select('start_date,end_date').eq('user_id', userId);
@@ -227,14 +271,16 @@ async function sweepPerformanceTerminal(admin: any, userId: string, prefs: Recor
   let sent = 0;
   const canEmail = prefs.reminderEmailEnabled && prefs.reminderEmailAddr;
 
-  // Job 1: same-day 22:00 UK nudge, not yet a miss.
-  if (ukHour >= 22 && !onHoliday(ukToday)) {
+  // Job 1: same-day nudge at 21:30 UK (30 min ahead of the 22:00 hard deadline, giving
+  // extra warning), if today isn't logged yet.
+  if (ukMinuteOfDay >= 21 * 60 + 30 && !onHoliday(ukToday)) {
     const { data: todayLog } = await admin.from('performance_logs').select('id').eq('user_id', userId).eq('log_date', ukToday).maybeSingle();
     if (!todayLog && canEmail) {
+      const who = name ? name + ', t' : 'T';
       sent += await emailOnly(admin, userId, prefs, 'system', 'performance',
         'perf-nudge:' + userId + ':' + ukToday,
-        'Performance Terminal — today’s check-in is still open',
-        'It’s past 10pm UK and today’s mandatory Performance Terminal check-in hasn’t been done yet. Log it before the day ends to keep your streak clean.',
+        `${who}oday's performance check-in is pending`,
+        'It’s 9:30pm UK and today’s mandatory Performance Terminal check-in still hasn’t been done. You have until 10pm to log it and keep your streak clean.',
         'high');
     }
   }
@@ -302,10 +348,11 @@ async function sweepWellnessCheckin(admin: any, userId: string, prefs: Record<st
   return { sent };
 }
 
-async function sweepUser(admin: any, userId: string, prefs: Record<string, any>) {
-  const digestResult = await sweepDigest(admin, userId, prefs);
-  const calendarResult = await sweepCalendarEvents(admin, userId, prefs);
-  const perfResult = await sweepPerformanceTerminal(admin, userId, prefs);
+async function sweepUser(admin: any, userId: string, fullName: string, prefs: Record<string, any>) {
+  const name = firstName(fullName);
+  const digestResult = await sweepDigest(admin, userId, name, prefs);
+  const calendarResult = await sweepCalendarEvents(admin, userId, name, prefs);
+  const perfResult = await sweepPerformanceTerminal(admin, userId, name, prefs);
   const versionResult = await sweepVersionUpdate(admin, userId, prefs);
   const checkinResult = await sweepWellnessCheckin(admin, userId, prefs);
   return {
@@ -325,17 +372,17 @@ Deno.serve(async (req) => {
     const cronSecret = req.headers.get('X-Cron-Secret');
     if (cronSecret) {
       if (cronSecret !== Deno.env.get('CRON_SECRET')) return json({ error: 'Bad cron secret' }, 401);
-      const { data: profiles } = await admin.from('profiles').select('id,prefs');
+      const { data: profiles } = await admin.from('profiles').select('id,name,prefs');
       const results: Record<string, any> = {};
-      for (const p of profiles || []) results[p.id] = await sweepUser(admin, p.id, p.prefs || {});
+      for (const p of profiles || []) results[p.id] = await sweepUser(admin, p.id, p.name || '', p.prefs || {});
       return json({ ok: true, users: Object.keys(results).length, results });
     }
 
     const jwt = (req.headers.get('Authorization') || '').replace('Bearer ', '');
     const { data: userData, error: userErr } = await admin.auth.getUser(jwt);
     if (userErr || !userData.user) return json({ error: 'Not authenticated' }, 401);
-    const { data: profile } = await admin.from('profiles').select('prefs').eq('id', userData.user.id).maybeSingle();
-    const result = await sweepUser(admin, userData.user.id, profile?.prefs || {});
+    const { data: profile } = await admin.from('profiles').select('name,prefs').eq('id', userData.user.id).maybeSingle();
+    const result = await sweepUser(admin, userData.user.id, profile?.name || '', profile?.prefs || {});
     return json({ ok: true, ...result });
   } catch (e) {
     return json({ error: String(e) }, 500);
