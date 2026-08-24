@@ -313,12 +313,16 @@
 .cc-vault-pt::before{ content:'◆'; font-size:9px; color:var(--vault-accent,#c9a24a); }
 /* Learning Centre lesson cards (Deep Dive / Misconceptions / Expert Notes / Worked
    Examples): were a plain wrapping grid showing every card's full paragraph at once on
-   desktop — genuinely a lot of text to face in one screen. Carousel at every width now,
-   not just mobile: one card focused at a time, scroll-snap plus the Prev/Next bar
-   _wireLessonCarousels() inserts. The mobile media query below narrows the card width
-   further and adds its edge-to-edge bleed on top of this base rule. */
-.cc-lesson-grid{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; gap:14px !important; scroll-snap-type:x proximity !important; scroll-padding-inline:14px !important; scroll-behavior:smooth; }
-.cc-lesson-grid > .cc-glowcard{ flex:0 0 clamp(320px,65%,620px) !important; max-width:100% !important; scroll-snap-align:start !important; }
+   desktop — genuinely a lot of text to face in one screen. First pass made it a
+   side-scrolling carousel (peeking at the next card); this is a proper page-per-section
+   view instead — one section fills the card fully, Prev/Next in _wireLessonCarousels()
+   swaps which one is showing, no horizontal scrolling anywhere. Same rule at every
+   screen size, so the old mobile-only carousel override is gone too. */
+.cc-lesson-grid{ display:block !important; position:relative !important; }
+.cc-lesson-grid > .cc-glowcard{ width:100% !important; max-width:100% !important; box-sizing:border-box !important; }
+.cc-lesson-grid > .cc-glowcard:not(.cc-lc-active){ position:absolute !important; top:0 !important; left:0 !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
+.cc-lesson-grid > .cc-glowcard.cc-lc-active{ position:relative !important; animation:cc-lesson-page-in .28s ease both; }
+@keyframes cc-lesson-page-in{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:translateY(0); } }
 .cc-lesson-carousel-bar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-bottom:8px; }
 .cc-lesson-carousel-bar .cc-lc-btn{ width:26px; height:26px; flex:0 0 auto; border-radius:50%; border:1px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#c8c8ce; font-size:15px; user-select:none; }
 .cc-lesson-carousel-bar .cc-lc-btn:hover{ background:rgba(255,255,255,0.08); color:#eef0f2; }
@@ -389,14 +393,6 @@
   .cc-phydark-grid{ grid-template-columns:1fr !important; }
   .cc-phydark-hero{ padding:18px 16px !important; }
   .cc-phydark-title{ font-size:19px !important; }
-  /* Learning Centre lesson cards (Deep Dive / Misconceptions / Expert Notes / Worked
-     Examples, all 8 subjects that have a lesson viewer): on desktop these are a
-     wrapping grid, but stacked full-width on a phone they turn a short lesson into a
-     long scroll of near-identical-looking blocks. Turn them into a horizontal,
-     snap-to-card carousel instead — one card in view at a time, a peek of the next to
-     hint there's more, matching the swipeable pattern already used for subtabs. */
-  .cc-lesson-grid{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; gap:14px !important; scroll-snap-type:x proximity !important; scroll-padding-inline:14px !important; margin:0 -14px 24px !important; padding:0 14px 6px !important; }
-  .cc-lesson-grid > .cc-glowcard{ flex:0 0 84% !important; scroll-snap-align:start !important; }
   /* Learning Centre Progress Dashboard stat cards (Level, XP, Streak, Strongest/Weakest
      Topic, etc., all 9 subjects): these relied on grid-template-columns:repeat(auto-fit,
      minmax(...)) to size itself, but that leaves the column count and width up to the
@@ -9013,7 +9009,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.24-115 · v11.115 health-productivity-merge';
+const NOTIF_BUILD_VERSION = '2026.08.24-116 · v11.116 lesson-pages';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12429,6 +12425,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.116', date:'Aug 24, 2026', major:false, notes:[
+      'Learning Centre lesson sections (Deep Dive, Misconceptions, Expert Notes, Worked Examples) are real pages now, not a side-scrolling row of cards — one section fills the card fully, Prev/Next flips between them, and the card’s height adapts to whatever’s actually on that page instead of staying fixed to the first one. No more horizontal scrolling or a peek of the next card poking in from the side.',
+    ]},
     {version:'v11.115', date:'Aug 24, 2026', major:true, notes:[
       'Health and Productivity are now one tab — "Health & Productivity" in the Fitness HQ row — with a Health/Productivity toggle at the top instead of two separate pages. Nothing inside either one changed, they just live under one roof now.',
       'Removed the standalone Checklists page. Its "YOUR LISTS" creation fields — category, priority, repeat (does not repeat/daily/weekly/monthly) and a due date — have moved onto Daily Missions on the Dashboard, which is the app’s one main checklist now: tap "Category, priority, repeat, due date" under the add-mission box to set them before adding a mission, and the ↻ button on a pending mission cycles its repeat cadence afterwards. Fitness HQ’s own Training Checklist widget is untouched.',
@@ -15215,35 +15214,43 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     }
   }
   // Learning Centre lesson cards (Deep Dive / Misconceptions / Expert Notes / Worked
-  // Examples) used to show every card's full text at once in a wrapping grid on desktop —
-  // "lots of text." Every .cc-lesson-grid is now a snap-scroll carousel at every screen
-  // size (see the base .cc-lesson-grid CSS rule), one card focused at a time; this wires
-  // a small Prev/Next + "N / total" control bar in front of each one, generic across all
-  // 8 subjects since it works off the DOM alone, not per-subject state. Runs every sync()
-  // but skips grids already wired (data-carousel-wired), so it's cheap and idempotent.
+  // Examples) used to show every card's full text at once in a wrapping grid on desktop.
+  // A first pass turned .cc-lesson-grid into a side-scrolling carousel; this rebuilds it as
+  // real pages instead -- one section fully visible at a time (see the .cc-lesson-grid CSS:
+  // every card is absolutely stacked except the one with .cc-lc-active), Prev/Next flips the
+  // active index rather than scrolling. Generic across all 8 subjects since it reads the
+  // grid's own children, not per-subject state. Runs every sync(); cheap and idempotent --
+  // it reuses an already-inserted bar and only resets the page index when the section count
+  // actually changes (e.g. switching topics), not on every re-render.
   _wireLessonCarousels(){
     if(!this.root) return;
-    const grids=this.root.querySelectorAll('.cc-lesson-grid:not([data-carousel-wired])');
+    const grids=this.root.querySelectorAll('.cc-lesson-grid');
     grids.forEach(grid=>{
-      grid.setAttribute('data-carousel-wired','1');
-      const bar=document.createElement('div');
-      bar.className='cc-lesson-carousel-bar';
-      bar.innerHTML='<span class="cc-lc-btn cc-lc-prev" aria-label="Previous">‹</span><span class="cc-lc-count"></span><span class="cc-lc-btn cc-lc-next" aria-label="Next">›</span>';
-      grid.parentNode.insertBefore(bar,grid);
+      const kids=()=>Array.prototype.filter.call(grid.children, c=>c.classList && c.classList.contains('cc-glowcard'));
+      const n=kids().length;
+      if(grid.dataset.lcCount!==String(n)){ grid.dataset.lcCount=String(n); grid._lcIndex=0; }
+      let bar=grid.previousElementSibling;
+      if(!bar || !bar.classList || !bar.classList.contains('cc-lesson-carousel-bar')){
+        bar=document.createElement('div');
+        bar.className='cc-lesson-carousel-bar';
+        bar.innerHTML='<span class="cc-lc-btn cc-lc-prev" aria-label="Previous section">‹</span><span class="cc-lc-count"></span><span class="cc-lc-btn cc-lc-next" aria-label="Next section">›</span>';
+        grid.parentNode.insertBefore(bar,grid);
+        bar.querySelector('.cc-lc-prev').addEventListener('click',()=>show((grid._lcIndex||0)-1));
+        bar.querySelector('.cc-lc-next').addEventListener('click',()=>show((grid._lcIndex||0)+1));
+      }
       const prev=bar.querySelector('.cc-lc-prev'), next=bar.querySelector('.cc-lc-next'), count=bar.querySelector('.cc-lc-count');
-      const step=()=>{ const c=grid.children[0]; if(!c) return 300; const cs=getComputedStyle(grid); return c.getBoundingClientRect().width+(parseFloat(cs.gap)||14); };
-      const update=()=>{
-        const n=grid.children.length; if(!n){ bar.style.display='none'; return; }
-        const idx=Math.min(n-1,Math.max(0,Math.round(grid.scrollLeft/step())));
-        count.textContent=(idx+1)+' / '+n;
-        prev.classList.toggle('cc-lc-disabled', grid.scrollLeft<=4);
-        next.classList.toggle('cc-lc-disabled', grid.scrollLeft>=grid.scrollWidth-grid.clientWidth-4);
-        bar.style.display=n>1?'flex':'none';
+      const show=(idx)=>{
+        const list=kids(), total=list.length;
+        if(!total){ bar.style.display='none'; return; }
+        const clamped=Math.min(total-1,Math.max(0,idx));
+        grid._lcIndex=clamped;
+        list.forEach((c,i)=>c.classList.toggle('cc-lc-active', i===clamped));
+        count.textContent=(clamped+1)+' / '+total;
+        prev.classList.toggle('cc-lc-disabled', clamped<=0);
+        next.classList.toggle('cc-lc-disabled', clamped>=total-1);
+        bar.style.display=total>1?'flex':'none';
       };
-      prev.addEventListener('click',()=>grid.scrollBy({left:-step(),behavior:'smooth'}));
-      next.addEventListener('click',()=>grid.scrollBy({left:step(),behavior:'smooth'}));
-      grid.addEventListener('scroll',()=>{ clearTimeout(grid._lcScrollT); grid._lcScrollT=setTimeout(update,80); });
-      update();
+      show(grid._lcIndex||0);
     });
   }
   // ===== Voice Teacher (ElevenLabs lesson narration) =====
