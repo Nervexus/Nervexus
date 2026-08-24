@@ -311,6 +311,19 @@
 .cc-vault-tile{ border-radius:3px 16px 16px 16px; border:1px solid var(--vault-line,rgba(255,255,255,0.12)); background:var(--vault-bg,#141416); }
 .cc-vault-pt{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; }
 .cc-vault-pt::before{ content:'◆'; font-size:9px; color:var(--vault-accent,#c9a24a); }
+/* Learning Centre lesson cards (Deep Dive / Misconceptions / Expert Notes / Worked
+   Examples): were a plain wrapping grid showing every card's full paragraph at once on
+   desktop — genuinely a lot of text to face in one screen. Carousel at every width now,
+   not just mobile: one card focused at a time, scroll-snap plus the Prev/Next bar
+   _wireLessonCarousels() inserts. The mobile media query below narrows the card width
+   further and adds its edge-to-edge bleed on top of this base rule. */
+.cc-lesson-grid{ display:flex !important; flex-wrap:nowrap !important; overflow-x:auto !important; gap:14px !important; scroll-snap-type:x proximity !important; scroll-padding-inline:14px !important; scroll-behavior:smooth; }
+.cc-lesson-grid > .cc-glowcard{ flex:0 0 clamp(320px,65%,620px) !important; max-width:100% !important; scroll-snap-align:start !important; }
+.cc-lesson-carousel-bar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-bottom:8px; }
+.cc-lesson-carousel-bar .cc-lc-btn{ width:26px; height:26px; flex:0 0 auto; border-radius:50%; border:1px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#c8c8ce; font-size:15px; user-select:none; }
+.cc-lesson-carousel-bar .cc-lc-btn:hover{ background:rgba(255,255,255,0.08); color:#eef0f2; }
+.cc-lesson-carousel-bar .cc-lc-disabled{ opacity:0.3; pointer-events:none; }
+.cc-lesson-carousel-bar .cc-lc-count{ font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; min-width:38px; text-align:center; }
 @media (max-width:900px){
   /* Mobile Safari/Chrome auto-zoom the page on focusing any input/textarea/select
      whose effective font-size is under 16px — nearly every field in this app is
@@ -3846,6 +3859,7 @@
                 <span onClick="{{ goMtHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ mtLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ mtLesson.title }}</div>
+                  <span onClick="{{ mtReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ mtLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ mtLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -4440,6 +4454,7 @@
                 <span onClick="{{ goEnHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ enLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ enLesson.title }}</div>
+                  <span onClick="{{ enReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ enLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ enLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -5027,6 +5042,7 @@
                 <span onClick="{{ goSciHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ sciLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ sciLesson.title }}</div>
+                  <span onClick="{{ sciReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ sciLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ sciLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -5449,6 +5465,7 @@
                 <span onClick="{{ goGraHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ graLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ graLesson.title }}</div>
+                  <span onClick="{{ graReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ graLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ graLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -5871,6 +5888,7 @@
                 <span onClick="{{ goHisHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ hisLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ hisLesson.title }}</div>
+                  <span onClick="{{ hisReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ hisLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ hisLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -6700,6 +6718,7 @@
                 <span onClick="{{ goPhyHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ phyLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ phyLesson.title }}</div>
+                  <span onClick="{{ phyReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ phyLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ phyLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -7194,6 +7213,7 @@
                 <span onClick="{{ goMoneyHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ moneyLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ moneyLesson.title }}</div>
+                  <span onClick="{{ moneyReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ moneyLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ moneyLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -7695,6 +7715,7 @@
                 <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
                 <sc-if value="{{ gentLesson }}" hint-placeholder-val="{{ true }}">
                   <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ gentLesson.title }}</div>
+                  <span onClick="{{ gentReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ gentLessonSpeakLabel }}</span>
                   <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ gentLesson.intro }}</p>
 
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
@@ -9027,7 +9048,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.23-113 · v11.113 email-signoff';
+const NOTIF_BUILD_VERSION = '2026.08.24-114 · v11.114 lesson-carousel-voice-teacher';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11850,6 +11871,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       else if(kind==='voice') this._mountVoiceOrb(el);
     });
     this._syncVoiceOrbBounds();
+    this._wireLessonCarousels();
     const key=(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode+'|'+this.state.moneyCalY;
     const sig=key+'|'+this.dataSig();
     if(sig===this._sig) return;
@@ -12386,6 +12408,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.114', date:'Aug 24, 2026', major:true, notes:[
+      'Learning Centre lessons — Deep Dive, Common Misconceptions, Expert Notes and Worked Examples, across all 8 subjects with a lesson viewer — no longer show every card’s full text at once in a wrapping grid on desktop. They’re a carousel at every screen size now: one section focused at a time, with a Prev/Next control and a "2 / 5" position counter, so a dense lesson reads as a sequence of bite-sized sections instead of a wall of text.',
+      'New: a voice teacher for every lesson. "🎧 Listen to this lesson" reads the whole thing aloud — title, origin, every Deep Dive section, misconception, expert note and worked example — using the same ElevenLabs voice already powering Daily Briefing narration and Read Aloud, with the local/browser voice as a fallback if it’s unavailable.',
+    ]},
     {version:'v11.113', date:'Aug 23, 2026', major:false, notes:[
       'Every automated email now closes the same way — "Best, Ultra X management team" is appended after the body on every send, including test emails from Settings’ Testing Panel. Applied once at the shared template-rendering step so it covers every current and future email type, rather than being added to each one individually.',
     ]},
@@ -15161,6 +15187,85 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       this._orbApi.setHome(hr.left-mr.left, hr.top-mr.top);
     }
   }
+  // Learning Centre lesson cards (Deep Dive / Misconceptions / Expert Notes / Worked
+  // Examples) used to show every card's full text at once in a wrapping grid on desktop —
+  // "lots of text." Every .cc-lesson-grid is now a snap-scroll carousel at every screen
+  // size (see the base .cc-lesson-grid CSS rule), one card focused at a time; this wires
+  // a small Prev/Next + "N / total" control bar in front of each one, generic across all
+  // 8 subjects since it works off the DOM alone, not per-subject state. Runs every sync()
+  // but skips grids already wired (data-carousel-wired), so it's cheap and idempotent.
+  _wireLessonCarousels(){
+    if(!this.root) return;
+    const grids=this.root.querySelectorAll('.cc-lesson-grid:not([data-carousel-wired])');
+    grids.forEach(grid=>{
+      grid.setAttribute('data-carousel-wired','1');
+      const bar=document.createElement('div');
+      bar.className='cc-lesson-carousel-bar';
+      bar.innerHTML='<span class="cc-lc-btn cc-lc-prev" aria-label="Previous">‹</span><span class="cc-lc-count"></span><span class="cc-lc-btn cc-lc-next" aria-label="Next">›</span>';
+      grid.parentNode.insertBefore(bar,grid);
+      const prev=bar.querySelector('.cc-lc-prev'), next=bar.querySelector('.cc-lc-next'), count=bar.querySelector('.cc-lc-count');
+      const step=()=>{ const c=grid.children[0]; if(!c) return 300; const cs=getComputedStyle(grid); return c.getBoundingClientRect().width+(parseFloat(cs.gap)||14); };
+      const update=()=>{
+        const n=grid.children.length; if(!n){ bar.style.display='none'; return; }
+        const idx=Math.min(n-1,Math.max(0,Math.round(grid.scrollLeft/step())));
+        count.textContent=(idx+1)+' / '+n;
+        prev.classList.toggle('cc-lc-disabled', grid.scrollLeft<=4);
+        next.classList.toggle('cc-lc-disabled', grid.scrollLeft>=grid.scrollWidth-grid.clientWidth-4);
+        bar.style.display=n>1?'flex':'none';
+      };
+      prev.addEventListener('click',()=>grid.scrollBy({left:-step(),behavior:'smooth'}));
+      next.addEventListener('click',()=>grid.scrollBy({left:step(),behavior:'smooth'}));
+      grid.addEventListener('scroll',()=>{ clearTimeout(grid._lcScrollT); grid._lcScrollT=setTimeout(update,80); });
+      update();
+    });
+  }
+  // ===== Voice Teacher (ElevenLabs lesson narration) =====
+  // Reads a full Learning Centre lesson object aloud — title, intro, origin, every Deep
+  // Dive section, misconception, expert note and worked example — reusing the same
+  // streaming TTS queue built for the voice assistant (ElevenLabs per chunk, falling back
+  // to the local/browser voice on any error), rather than a new speech pipeline. One
+  // generic method works for all 8 subjects since each just passes its own lesson object.
+  _lessonToSpeechChunks(lesson){
+    if(!lesson) return [];
+    const chunks=[];
+    if(lesson.title) chunks.push(lesson.title+'.');
+    if(lesson.intro) chunks.push(lesson.intro);
+    if(lesson.origin) chunks.push('Origin and context. '+lesson.origin);
+    (lesson.sections||[]).forEach(s=>{ if(s&&s.heading) chunks.push(s.heading+'. '+(s.body||'')); });
+    if((lesson.misconceptions||[]).length){
+      chunks.push('Common misconceptions.');
+      lesson.misconceptions.forEach(m=>{ if(m) chunks.push('Myth: '+(m.myth||'')+' In reality, '+(m.reality||'')); });
+    }
+    if((lesson.expertNotes||[]).length){
+      chunks.push('How experts think about this.');
+      lesson.expertNotes.forEach(n=>{ if(n) chunks.push(n); });
+    }
+    if((lesson.examples||[]).length){
+      chunks.push('Worked examples.');
+      lesson.examples.forEach(ex=>{ if(ex) chunks.push((ex.q||'')+'. '+(ex.working||'')+'. Answer: '+(ex.answer||'')); });
+    }
+    // Split any single chunk over ~380 chars on sentence boundaries — keeps each ElevenLabs
+    // call comfortably under its 2000-char cap and lets playback start sooner per chunk.
+    const out=[];
+    chunks.forEach(c=>{
+      const t=(c||'').trim(); if(!t) return;
+      if(t.length<=380){ out.push(t); return; }
+      const parts=t.split(/(?<=[.!?])\s+/); let buf='';
+      parts.forEach(p=>{ if((buf+' '+p).trim().length>380 && buf){ out.push(buf.trim()); buf=p; } else { buf=(buf+' '+p).trim(); } });
+      if(buf.trim()) out.push(buf.trim());
+    });
+    return out;
+  }
+  readLessonAloud(lesson){
+    if(this._lessonSpeaking){ this._ttsStreamStop(); this.setState({_lessonSpeaking:false}); return; }
+    const chunks=this._lessonToSpeechChunks(lesson);
+    if(!chunks.length) return;
+    this._ttsStreamReset();
+    this._ttsQueue.push(...chunks);
+    this.setState({_lessonSpeaking:true});
+    const myId=this._ttsStreamId;
+    this._ttsDrain().then(()=>{ if(myId===this._ttsStreamId) this.setState({_lessonSpeaking:false}); });
+  }
   // The sidebar logo orb and floating voice-orb button were hardcoded to Ultra X's
   // maroon/red regardless of theme — fine for Ultra X, wrong everywhere else (base
   // theme, Noir, Maison Élysée all showed the same red). Palette per theme instead.
@@ -16184,7 +16289,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           curWord, hasCurWord: !!curWord,
           vocabPrev:()=>this.enVocabNav(-1), vocabNext:()=>this.enVocabNav(1),
           vocabPosStr: LEwords.length ? ((Math.min(S.enVocabIdx||0,LEwords.length-1)+1)+' / '+LEwords.length) : '',
-          enLesson,
+          enLesson, enReadLesson:()=>this.readLessonAloud(enLesson), enLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           enResultIsPlacement: !!(S.enLastResult && S.enLastResult.mode==='Placement Test'),
           enResultIsLevel: !!(S.enLastResult && S.enLastResult.mode && S.enLastResult.mode.indexOf('Level ')===0),
           enResultScore: S.enLastResult?(S.enLastResult.score+' / '+S.enLastResult.total):'',
@@ -16320,6 +16425,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           mtReactionAvgSoFar: (S.mtReactionTimes&&S.mtReactionTimes.length)?Math.round(S.mtReactionTimes.reduce((a,b)=>a+b,0)/S.mtReactionTimes.length):0,
           mtTopicCards: (LM&&LM.TOPICS) ? LM.TOPICS.map(t=>({...t, learn:()=>this.mtStartLearn(t.key), practice:()=>this.mtStartPractice(t.key)})) : [],
           mtLesson: (()=>{ const l=LM&&LM.LESSONS[S.mtTopic]; return l||null; })(),
+          mtReadLesson:()=>this.readLessonAloud(LM&&LM.LESSONS[S.mtTopic]), mtLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           startPracticeFromLearn:()=>this.mtStartPractice(S.mtTopic),
           mtBestGrade: bestTest ? ('Grade '+bestTest.grade) : '—',
           mtBestHigherGrade: bestHigher ? ('Grade '+bestHigher.grade) : '—',
@@ -16414,6 +16520,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           sciDashLevel: sciLevel, sciDashGrade: sciGrade?('Grade '+sciGrade):'Not yet assessed', sciDashStrongest: sciStrongest||'—', sciDashWeakest: sciWeakest||'—',
           sciFormulaSearchVal:S.sciFormulaSearch||'', setSciFormulaSearch:(e)=>this.setSciFormulaSearch(e), sciFormulaList:formulaList,
           sciLesson: lesson, sciLessonStartPractice:()=>this.sciStartPractice(S.sciTopic),
+          sciReadLesson:()=>this.readLessonAloud(lesson), sciLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           sciQPrompt: q?q.prompt:'', sciQTopic: q?q.topic:'', sciIsMC:isMC, sciOptions,
           sciInput:S.sciInput||'', setSciInput:(e)=>this.setSciInput(e), sciSubmit:()=>this.sciSubmit(), sciSubmitKey:enterKey(()=>this.sciSubmit()),
           sciFeedbackShow: !!(S.sciFeedback && S.sciMode==='practice'), sciFeedbackOk: !!(S.sciFeedback&&S.sciFeedback.ok), sciFeedbackText: S.sciFeedback?S.sciFeedback.text:'', sciFeedbackColor:(S.sciFeedback&&S.sciFeedback.ok)?'#4ADE80':'#ff5563',
@@ -16488,6 +16595,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           graDashLevel: graLevel, graDashGrade: graGrade?('Grade '+graGrade):'Not yet assessed', graDashStrongest: graStrongest||'—', graDashWeakest: graWeakest||'—',
           graFormulaSearchVal:S.graFormulaSearch||'', setGraFormulaSearch:(e)=>this.setGraFormulaSearch(e), graFormulaList:formulaList,
           graLesson: lesson, graLessonStartPractice:()=>this.graStartPractice(S.graTopic),
+          graReadLesson:()=>this.readLessonAloud(lesson), graLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           graQPrompt: q?q.prompt:'', graQTopic: q?q.topic:'', graIsMC:isMC, graOptions,
           graInput:S.graInput||'', setGraInput:(e)=>this.setGraInput(e), graSubmit:()=>this.graSubmit(), graSubmitKey:enterKey(()=>this.graSubmit()),
           graFeedbackShow: !!(S.graFeedback && S.graMode==='practice'), graFeedbackOk: !!(S.graFeedback&&S.graFeedback.ok), graFeedbackText: S.graFeedback?S.graFeedback.text:'', graFeedbackColor:(S.graFeedback&&S.graFeedback.ok)?'#4ADE80':'#ff5563',
@@ -16562,6 +16670,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hisDashLevel: hisLevel, hisDashGrade: hisGrade?('Grade '+hisGrade):'Not yet assessed', hisDashStrongest: hisStrongest||'—', hisDashWeakest: hisWeakest||'—',
           hisFormulaSearchVal:S.hisFormulaSearch||'', setHisFormulaSearch:(e)=>this.setHisFormulaSearch(e), hisFormulaList:formulaList,
           hisLesson: lesson, hisLessonStartPractice:()=>this.hisStartPractice(S.hisTopic),
+          hisReadLesson:()=>this.readLessonAloud(lesson), hisLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           hisQPrompt: q?q.prompt:'', hisQTopic: q?q.topic:'', hisIsMC:isMC, hisOptions,
           hisInput:S.hisInput||'', setHisInput:(e)=>this.setHisInput(e), hisSubmit:()=>this.hisSubmit(), hisSubmitKey:enterKey(()=>this.hisSubmit()),
           hisFeedbackShow: !!(S.hisFeedback && S.hisMode==='practice'), hisFeedbackOk: !!(S.hisFeedback&&S.hisFeedback.ok), hisFeedbackText: S.hisFeedback?S.hisFeedback.text:'', hisFeedbackColor:(S.hisFeedback&&S.hisFeedback.ok)?'#4ADE80':'#ff5563',
@@ -16750,6 +16859,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           phyDashLevel: phyLevel, phyDashGrade: phyGrade?('Grade '+phyGrade):'Not yet assessed', phyDashStrongest: phyStrongest||'—', phyDashWeakest: phyWeakest||'—',
           phyFormulaSearchVal:S.phyFormulaSearch||'', setPhyFormulaSearch:(e)=>this.setPhyFormulaSearch(e), phyFormulaList:formulaList,
           phyLesson: lesson, phyLessonStartPractice:()=>this.phyStartPractice(S.phyTopic),
+          phyReadLesson:()=>this.readLessonAloud(lesson), phyLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           phyQPrompt: q?q.prompt:'', phyQTopic: q?q.topic:'', phyIsMC:isMC, phyOptions,
           phyInput:S.phyInput||'', setPhyInput:(e)=>this.setPhyInput(e), phySubmit:()=>this.phySubmit(), phySubmitKey:enterKey(()=>this.phySubmit()),
           phyFeedbackShow: !!(S.phyFeedback && S.phyMode==='practice'), phyFeedbackOk: !!(S.phyFeedback&&S.phyFeedback.ok), phyFeedbackText: S.phyFeedback?S.phyFeedback.text:'', phyFeedbackColor:(S.phyFeedback&&S.phyFeedback.ok)?'#4ADE80':'#ff5563',
@@ -16844,6 +16954,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           moneyDashLevel: moneyLevel, moneyDashGrade: moneyGrade?('Grade '+moneyGrade):'Not yet assessed', moneyDashStrongest: moneyStrongest||'—', moneyDashWeakest: moneyWeakest||'—',
           moneyFormulaSearchVal:S.moneyFormulaSearch||'', setMoneyFormulaSearch:(e)=>this.setMoneyFormulaSearch(e), moneyFormulaList,
           moneyLesson, moneyLessonStartPractice:()=>this.moneyStartPractice(S.moneyTopic),
+          moneyReadLesson:()=>this.readLessonAloud(moneyLesson), moneyLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           moneyQPrompt: mq?mq.prompt:'', moneyQTopic: mq?mq.topic:'', moneyIsMC:mIsMC, moneyOptions:mOptions,
           moneyInput:S.moneyInput||'', setMoneyInput:(e)=>this.setMoneyInput(e), moneySubmit:()=>this.moneySubmit(), moneySubmitKey:enterKey(()=>this.moneySubmit()),
           moneyFeedbackShow: !!(S.moneyFeedback && S.moneyMode==='practice'), moneyFeedbackOk: !!(S.moneyFeedback&&S.moneyFeedback.ok), moneyFeedbackText: S.moneyFeedback?S.moneyFeedback.text:'', moneyFeedbackColor:(S.moneyFeedback&&S.moneyFeedback.ok)?'#4ADE80':'#ff5563',
@@ -16955,6 +17066,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           gentDashLevel: gentLevel, gentDashGrade: gentGrade||'Not yet assessed', gentDashStrongest: gentStrongest||'—', gentDashWeakest: gentWeakest||'—',
           gentFormulaSearchVal:S.gentFormulaSearch||'', setGentFormulaSearch:(e)=>this.setGentFormulaSearch(e), gentFormulaList,
           gentLesson, gentLessonStartPractice:()=>this.gentStartPractice(S.gentTopic),
+          gentReadLesson:()=>this.readLessonAloud(gentLesson), gentLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
           gentQPrompt: gq?gq.prompt:'', gentQTopic: gq?gq.topic:'', gentIsMC:gIsMC, gentOptions:gOptions,
           gentInput:S.gentInput||'', setGentInput:(e)=>this.setGentInput(e), gentSubmit:()=>this.gentSubmit(), gentSubmitKey:enterKey(()=>this.gentSubmit()),
           gentFeedbackShow: !!(S.gentFeedback && S.gentMode==='practice'), gentFeedbackOk: !!(S.gentFeedback&&S.gentFeedback.ok), gentFeedbackText: S.gentFeedback?S.gentFeedback.text:'', gentFeedbackColor:(S.gentFeedback&&S.gentFeedback.ok)?'#4ADE80':'#ff5563',
