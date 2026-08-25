@@ -8966,7 +8966,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-133 · v11.133 work-hours';
+const NOTIF_BUILD_VERSION = '2026.08.25-134 · v11.134 hotfix-blank-page';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12828,6 +12828,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.134', date:'Aug 25, 2026', major:true, notes:[
+      'Hotfix: v11.133 took the whole app down to a blank screen. The trackers change I shipped referred to the app\u2019s data with a lower-case s where that part of the code calls it S. One character, and every screen stopped rendering \u2014 there is no partial failure here, the page either builds or it does not.',
+      'It passed a syntax check, which is exactly why it got through: the name was spelled correctly, it simply did not exist at that point in the code. That is only caught by running the app, and I shipped it without doing so.',
+    ]},
     {version:'v11.133', date:'Aug 25, 2026', major:true, notes:[
       'Work Hours is a real thing now rather than a number on a ring. It has its own card at the top of Productivity with its own entry form, the same shape as Log Training: pick the kind of work \u2014 Deep Work, Meetings, Admin, Client or Planning \u2014 write what you did, put in the hours and minutes, and log it. It shows what you have put in today, how that compares to an eight-hour day, and every entry with its time.',
       'Under it is a work task list you tick off, like Daily Missions but work only. Those tasks are not a separate list living in its own corner: they are the same checklist the Command Center shows, tagged as work. Add one here and it is there; tick it there and it is ticked here.',
@@ -18124,7 +18128,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         };
       })(),
       trackers:(()=>{ const L=this._trackerLive(); const wh=L.todayMin('Work')/60, gymC=L.weekCount('Gym'), bizM=L.todayMin('Business'), lrnH=L.todayMin('Learning')/60;
-        const CL=(s.checklist||[]);
+        const CL=(S.checklist||[]);
         const tick=(tag)=>CL.filter(c=>c.done && String(c.tag||'').toUpperCase()===tag).length;
         const clWork=tick('WORK'), clGym=tick('HEALTH'), clBiz=tick('BIZ'), clLearn=tick('INTEL');
         const defs=[
