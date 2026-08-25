@@ -1873,10 +1873,6 @@
           </div>
         </div>
 
-        <!-- SUB-TAB NAV -->
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px;">
-          <sc-for list="{{ hSubs }}" as="s" hint-placeholder-count="8"><span onClick="{{ s.go }}" style="display:inline-flex; align-items:center; gap:7px; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; font-weight:600; color:{{ s.c }}; border:1px solid {{ s.bd }}; border-radius:10px; padding:8px 14px; cursor:pointer; background:{{ s.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.45)' }">{{ s.icon }} {{ s.name }}</span></sc-for>
-        </div>
 
         <!-- ============ OVERVIEW ============ -->
         <sc-if value="{{ hOverview }}" hint-placeholder-val="{{ true }}">
@@ -8929,7 +8925,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-131 · v11.131 anatomy-reattach';
+const NOTIF_BUILD_VERSION = '2026.08.25-132 · v11.132 health-one-page';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12755,6 +12751,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.132', date:'Aug 25, 2026', major:true, notes:[
+      'Health is one page now instead of nine tabs. Diet, Energy, Sleep, Hydration, Body, Progress and Goals sit together in the order you actually use them \u2014 what you log daily first, then your body measurements, then progress against your goals. No more hunting through a tab bar to enter three numbers.',
+      'Overview and Photos are gone. Overview was the worst offender: it showed the same recovery, sleep, calories and hydration figures that the sections below it already showed, so it was a tab whose only job was repeating the page underneath it.',
+      'Diet and Body stayed, despite not being on the list, and it is worth saying why: the Diet Checklist on your Command Center reads from Diet, and Progress charts the weight and body fat that Body records. Removing either would have quietly broken something you use every day.',
+    ]},
     {version:'v11.131', date:'Aug 25, 2026', major:false, notes:[
       'Fixed the anatomy model vanishing, or the old drawn figure appearing in its place. Both were the same fault. Whenever the page redrew itself \u2014 logging a set, switching a filter \u2014 the box holding the 3D model was replaced, and the model went with it. The app still believed it was showing it, so nothing ever rebuilt it: you were left with either an empty space or the simple drawn figure that sits underneath as a backup.',
       'It now notices the model has been detached and moves it back into place, rather than reloading it. The body, the muscle labels and whatever was glowing are all still in memory, so it reappears instantly with nothing re-downloaded.',
@@ -14297,10 +14298,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const todayD=K.today();
       const snap=K.latestSnap(H)||{};
       const curWeightU= snap.weightKg!=null?K.fmtMass(snap.weightKg,mu):'—';
-      const subsDef=[['overview','Overview','◇'],['diet','Diet','△'],['energy','Energy','⚡'],['sleep','Sleep','☾'],['hydration','Hydration','◉'],['body','Body','▤'],['progress','Progress','↗'],['photos','Photos','▣'],['goals','Goals','◎']];
-      const curSub=S.healthSub||'overview';
-      const hSubs=subsDef.map(s=>({ name:s[1], icon:s[2], go:()=>this.setState({healthSub:s[0]}), c:curSub===s[0]?'#F4F4F5':'#9a9aa2', bg:curSub===s[0]?'rgba(255,255,255,0.14)':'transparent', bd:curSub===s[0]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)' }));
-      const hOverview=curSub==='overview', hDiet=curSub==='diet', hEnergy=curSub==='energy', hSleep=curSub==='sleep', hHydration=curSub==='hydration', hBody=curSub==='body', hProgress=curSub==='progress', hPhotos=curSub==='photos', hGoals=curSub==='goals';
+      // Health is one page now rather than nine tabs. Overview only restated the sections
+      // below it, and Photos goes with it. Both are switched off rather than deleted: the
+      // markup carries a couple of unmatched closing conditional tags, so cutting blocks out
+      // re-parents whatever follows them. Guarding them off is the safe equivalent.
+      const hOverview=false, hPhotos=false;
+      const hDiet=true, hEnergy=true, hSleep=true, hHydration=true, hBody=true, hProgress=true, hGoals=true;
       const dietList=H.diet||[];
       const dietDoneToday=dietList.filter(d=>d.checked).length, dietTotalToday=dietList.length, dietLockedCount=dietList.filter(d=>d.locked).length;
       const dietEdit=!!S.dietEdit;
@@ -14431,7 +14434,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const fmtGoalVal=(key,v)=>{ if(v==null) return '—'; if(key==='bodyFatPct') return v.toFixed(1)+'%'; if(key==='hydrationMl') return K.fmtVol(v,vu); if(key==='sleepH') return v.toFixed(1)+'h'; return K.fmtMass(v,mu); };
       const goalProgress=progressGoalDefs.filter(g=>goals[g[0]]!=null).map(g=>{ const key=g[0]; const target=goals[key]; const cur=curVal(key); const higherBetter=g[2]; const start = (key==='hydrationMl'||key==='sleepH') ? cur : (firstVal(key)!=null?firstVal(key):cur); let pct=0; if(cur!=null && start!=null){ if(higherBetter){ const span=(target-start); pct = span!==0 ? ((cur-start)/span)*100 : (cur>=target?100:0); } else { const span=(start-target); pct = span!==0 ? ((start-cur)/span)*100 : (cur<=target?100:0); } } pct=Math.max(0,Math.min(100,Math.round(pct||0))); const met = cur!=null && (higherBetter ? cur>=target : cur<=target); let eta='On track'; if(!met && ['weightKg','bodyFatPct','muscleKg'].includes(key)){ const days=K.etaDays(K.bodySeries(H,key), target); eta = days==null ? 'Trend unclear' : ('~'+days+'d to goal'); } else if(met){ eta='Goal reached ✓'; } const barC = met?'#6cffba': pct>60?'#e8b45a':'#ff5563'; return { label:goalLabelMap[key], current:fmtGoalVal(key,cur), target:fmtGoalVal(key,target), pct:pct+'%', barC, pctLabel:pct+'% there', pctC: met?'#6cffba':'#c9c9d0', eta }; });
       return {
-        curWeightU, hSubs, hOverview, hDiet, hEnergy, hSleep, hHydration, hBody, hProgress, hPhotos, hGoals,
+        curWeightU, hOverview, hDiet, hEnergy, hSleep, hHydration, hBody, hProgress, hPhotos, hGoals,
         dietGroups, dietDoneToday, dietTotalToday, dietLockedCount, dietEdit, toggleDietEdit, newCatName, setNewCatName, addDietCat, dietEditBtnColor, dietEditBtnBdr, dietEditBtnBg, dietEditBtnLabel,
         hydPct, hydTodayShort, hydGoalShort, hydRemaining, hydRemainColor, hydUnder, hydReminder, hydTodayLabel,
         slpConsColor, slpConsistency, slpConsShort:slpConsistency, slpWeekAvg, slpMonthAvg, slpTodayLabel,
