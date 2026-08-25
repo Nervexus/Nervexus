@@ -295,6 +295,7 @@
 <script src="orb-engine.js?v=4"></script>
 <script src="voice-assistant-engine.js"></script>
 <script src="notification-engine.js"></script>
+<script src="anatomy-3d.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -1685,7 +1686,10 @@
                 <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
               </div>
             </div>
+            <div data-anatomy3d="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
             <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
+            <div data-anatomy-credit style="display:none; font-family:'JetBrains Mono',monospace; font-size:8px; color:#5c5c64; text-align:center; margin-top:6px; line-height:1.5;"></div>
+            <div data-anatomy-hint style="display:none; font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78; text-align:center; margin-top:4px;">DRAG TO ROTATE</div>
             <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px;">
               <sc-for list="{{ anatomyActive }}" as="a" hint-placeholder-count="0"><span style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#ffb3ba; border:1px solid rgba(255,85,99,0.35); border-radius:20px; padding:4px 10px;"><span style="width:6px; height:6px; border-radius:50%; background:#ff3b4a; box-shadow:0 0 7px #ff3b4a;"></span>{{ a.name }} · {{ a.ago }}</span></sc-for>
               <sc-if value="{{ noAnatomyActive }}" hint-placeholder-val="{{ true }}"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6f6f78; text-align:center;">Log a set — the muscle you trained glows red here for 2 hours.</span></sc-if>
@@ -8913,7 +8917,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-120 · v11.120 anatomy-ecorche';
+const NOTIF_BUILD_VERSION = '2026.08.25-121 · v11.121 anatomy-3d';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11338,25 +11342,56 @@ activities: this._mergeShipLog(s.activities),
     return '<svg viewBox="0 0 340 480" style="width:100%; max-width:100%; height:auto; display:block; overflow:visible;">'
       + this._anatomyDefs() + base + p.mid + p.side + mirror + '</svg>';
   }
+  // Drives whichever anatomy view is active. The 3D model is preferred; it lazily pulls a
+  // 730KB three.js bundle plus a 2.1MB mesh the first time the Fitness page is opened, so it
+  // never costs anything on any other screen. If WebGL is missing or either asset fails, the
+  // drawn SVG figure stays visible and the feature still works — hence both mounts exist.
   _syncAnatomy(){
     if(!this.root) return;
-    const mount=this.root.querySelector('[data-anatomy]');
-    if(!mount) return;
-    const view=mount.getAttribute('data-anatomy-view')==='back' ? 'back' : 'front';
-    if(mount.dataset.rendered!==view){ mount.innerHTML=this._anatomySvg(view); mount.dataset.rendered=view; }
+    const svgMount=this.root.querySelector('[data-anatomy]');
+    const mount3d=this.root.querySelector('[data-anatomy3d]');
+    if(!svgMount && !mount3d) return;
+    const view=(svgMount||mount3d).getAttribute('data-anatomy-view')==='back' ? 'back' : 'front';
     const glow=this._activeMuscleGlow();
-    mount.querySelectorAll('[data-m]').forEach(el=>{
+    const strengths={}; Object.keys(glow).forEach(k=>{ strengths[k]=glow[k].strength; });
+
+    const A3=window.NervexusAnatomy3D;
+    if(mount3d && A3 && A3.supported() && this._anat3dFailed!==true){
+      if(!this._anat3dLoading && !A3.isMounted()){
+        this._anat3dLoading=true;
+        A3.mount(mount3d).then(()=>{
+          this._anat3dLoading=false;
+          mount3d.style.display='block';
+          if(svgMount) svgMount.style.display='none';
+          const cr=this.root.querySelector('[data-anatomy-credit]');
+          if(cr){ cr.textContent=A3.CREDIT; cr.style.display='block'; }
+          const hn=this.root.querySelector('[data-anatomy-hint]');
+          if(hn) hn.style.display='block';
+          A3.setView(view); A3.setGlow(strengths);
+        }).catch((e)=>{
+          // Stay on the SVG rather than showing an empty box.
+          this._anat3dLoading=false; this._anat3dFailed=true;
+          console.warn('[anatomy] 3D unavailable, using drawn figure:', e && e.message);
+        });
+      } else if(A3.isMounted()){
+        A3.setView(view);
+        A3.setGlow(strengths);
+        return;   // 3D is live; the SVG below is hidden and needs no work
+      }
+    }
+
+    if(!svgMount) return;
+    if(svgMount.dataset.rendered!==view){ svgMount.innerHTML=this._anatomySvg(view); svgMount.dataset.rendered=view; }
+    svgMount.querySelectorAll('[data-m]').forEach(el=>{
       const g=glow[el.getAttribute('data-m')];
       if(g){
-        // Swap to the red gradient rather than a flat colour so the sculpted shading survives;
-        // opacity and glow radius carry the fade over the 2-hour window.
         el.setAttribute('fill','url(#axR)');
         el.setAttribute('stroke','rgba(255,150,155,'+(0.30+0.35*g.strength).toFixed(2)+')');
         el.style.opacity=(0.62+0.38*g.strength).toFixed(2);
         el.style.filter='drop-shadow(0 0 '+(5+10*g.strength).toFixed(1)+'px rgba(255,40,55,'+(0.45+0.4*g.strength).toFixed(2)+'))';
       } else {
         el.setAttribute('fill','url(#axM)');
-        el.setAttribute('stroke','rgba(0,0,0,0.45)');
+        el.setAttribute('stroke','rgba(0,0,0,0.78)');
         el.style.opacity='1';
         el.style.filter='none';
       }
@@ -12577,6 +12612,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.121', date:'Aug 25, 2026', major:true, notes:[
+      'The anatomy model is now a real 3D body. Drag it to spin it, or use Front/Back to swing it round, and the muscle you trained lights up red on the actual mesh \u2014 chest for a bench press, calves for calf raises, lats for a pull-up, and so on for all 14 muscle groups.',
+      'The shoulders were widened by about 15%. The source model measured 0.207 shoulder-to-height, which is genuinely narrow; it now sits at 0.238, in the normal range. Arm span is unchanged, so the arms simply hang at a slightly different angle rather than being stretched.',
+      'The model went from 29MB to 2.1MB (welded, simplified, meshopt-compressed) and only downloads the first time you open Fitness & Recovery \u2014 no other page pays for it. three.js is bundled into the app rather than pulled off a CDN, so it still works offline.',
+      'If a device has no WebGL, or the model fails to download, the drawn anatomy figure stays on screen and the glow still works \u2014 the feature degrades instead of breaking.',
+      'Model credit: \u201cman muscle human body\u201d by Rena, licensed under Creative Commons Attribution. The credit is shown under the model as the licence requires.',
+    ]},
     {version:'v11.120', date:'Aug 25, 2026', major:false, notes:[
       'Rebuilt the anatomy model as a proper anatomical figure rather than a block mannequin. The muscles now form the body itself \u2014 there is no separate silhouette underneath for them to drift out of alignment with \u2014 and each belly is individually shaded with fibre striations so it reads as a sculpted form: separate deltoid, biceps and forearm down each arm, segmented abs, obliques, quads and adductors, and on the back view the trapezius diamond, lats, triceps, erector spinae, glutes, hamstrings and calves.',
       'Lit muscles keep that shading \u2014 they switch to a red gradient rather than a flat fill, so a trained muscle still looks three-dimensional while it glows.',
