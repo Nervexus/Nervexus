@@ -8929,7 +8929,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-130 · v11.130 learning-progress-fix';
+const NOTIF_BUILD_VERSION = '2026.08.25-131 · v11.131 anatomy-reattach';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11378,6 +11378,16 @@ activities: this._mergeShipLog(s.activities),
 
     const A3=window.NervexusAnatomy3D;
     if(mount3d && A3 && A3.supported() && this._anat3dFailed!==true){
+      // A page re-render replaces these nodes, so the canvas ends up orphaned and the drawn
+      // figure below shows through. Re-home the existing canvas rather than reloading it.
+      if(A3.hasScene && A3.hasScene() && !A3.isMounted() && A3.reattach(mount3d)){
+        mount3d.style.display='block';
+        if(svgMount) svgMount.style.display='none';
+        const vw0=this.root.querySelector('.cc-anatomy-views');
+        if(vw0) vw0.style.display='none';
+        A3.setGlow(strengths);
+        return;
+      }
       if(!this._anat3dLoading && !A3.isMounted()){
         this._anat3dLoading=true;
         A3.mount(mount3d).then(()=>{
@@ -12745,6 +12755,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.131', date:'Aug 25, 2026', major:false, notes:[
+      'Fixed the anatomy model vanishing, or the old drawn figure appearing in its place. Both were the same fault. Whenever the page redrew itself \u2014 logging a set, switching a filter \u2014 the box holding the 3D model was replaced, and the model went with it. The app still believed it was showing it, so nothing ever rebuilt it: you were left with either an empty space or the simple drawn figure that sits underneath as a backup.',
+      'It now notices the model has been detached and moves it back into place, rather than reloading it. The body, the muscle labels and whatever was glowing are all still in memory, so it reappears instantly with nothing re-downloaded.',
+    ]},
     {version:'v11.130', date:'Aug 25, 2026', major:true, notes:[
       'Progress Overview was reading the wrong half of your work. Every subject keeps two separate records: finished full tests in one place, and everything you do in Quick Test and practice in another. The overview only ever looked at the first one \u2014 so a day of real questions showed 0 questions, 0% accuracy, 0 hours and nothing in the weekly count. The work was always being saved correctly; the panel simply was not reading it. It now merges both.',
       'The XP figure was the misleading part. It was calculated as your level multiplied by 25, plus 10 for each correct answer in a full test. With no full tests done, that leaves level 1 \u00d7 25 = exactly the 25 XP you saw \u2014 a fixed number for having reached level 1, sitting under a heading that made it look like something you had earned today. Do nothing at all and it still read 25. XP is now what you actually earned: 10 a correct answer, plus any daily-challenge bonus, across both practice and tests. It starts at 0 and only moves when you do.',

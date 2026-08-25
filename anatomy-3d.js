@@ -377,9 +377,27 @@
     return { total: total, bounds: bounds, zones: hist, meshes: S.meshes.length, per: per };
   }
 
+  // A re-render of the page throws away the div the canvas lived in, taking the canvas with
+  // it. The mounted flag stayed true, so nothing rebuilt it: the model vanished and the drawn
+  // fallback underneath reappeared. Move the existing canvas into the new container instead
+  // of rebuilding — the scene, the model and the glow are all still in memory.
+  function attached() {
+    return !!(S.renderer && S.renderer.domElement && S.renderer.domElement.isConnected);
+  }
+  function reattach(el) {
+    if (!S.mounted || !S.renderer || !el) return false;
+    var c = S.renderer.domElement;
+    if (c.parentNode !== el) { el.innerHTML = ''; el.appendChild(c); }
+    S.el = el;
+    fit();
+    S.dirty = true;
+    return true;
+  }
+
   window.NervexusAnatomy3D = {
-    mount: mount, setGlow: setGlow, setView: setView, dispose: dispose,
-    supported: supported, isMounted: function () { return S.mounted; },
+    mount: mount, setGlow: setGlow, setView: setView, dispose: dispose, reattach: reattach,
+    supported: supported, isMounted: function () { return S.mounted && attached(); },
+    hasScene: function () { return !!(S.mounted && S.renderer); },
     setAutoSpin: function (on) { S.spin = !!on; S.dirty = true; },
     setAspect: function (r) { S.aspect = r || 1.5; fit(); },
     debugZones: debugZones,
