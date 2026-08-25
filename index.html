@@ -7,6 +7,11 @@
 <link rel="apple-touch-icon" href="favicon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="ext-resource-dependency" content="favicon.png" data-resource-id="faviconIcon" />
+<!-- React is vendored locally. It used to come from unpkg at boot, and if that request
+     failed the boot threw and the page rendered nothing at all — not a degraded app, a
+     blank screen. support.js skips its CDN fetch when window.React is already present. -->
+<script src="vendor/react.production.min.js"></script>
+<script src="vendor/react-dom.production.min.js"></script>
 <script src="./support.js"></script>
 <script>
   window.__installPromptEvt = null;
@@ -266,16 +271,11 @@
   @media (max-width:1300px){ .cc-grid-globe{ grid-template-columns:1fr !important; } }  @media (max-width:900px){ .cc-shell{ grid-template-columns:1fr !important; } .cc-side{ display:none !important; } .cc-mobnav{ display:flex !important; } .cc-mobsheet-backdrop{ display:block !important; } .cc-grid2,.cc-grid-fin,.cc-grid-globe,.cc-grid-fit,.cc-grid-biz,.cc-grid-cal,.cc-money-cal-grid{ grid-template-columns:1fr !important; } .cc-stat4,.cc-stat5{ grid-template-columns:1fr 1fr !important; } .cc-scene{ padding:16px 14px 90px !important; } .cc-top{ padding:12px 14px !important; } .cc-search{ max-width:none !important; } .cc-nw{ display:none !important; } .cc-kbd{ display:none !important; } .cc-asstxt{ display:none !important; } .cc-asst{ padding:9px !important; } .cc-voiceorb{ bottom:82px !important; right:16px !important; width:54px !important; height:54px !important; } .cc-voiceorb canvas{ width:54px !important; height:54px !important; } .cc-toaststack{ left:12px !important; right:12px !important; max-width:none !important; top:68px !important; } }
   @media (max-width:560px){ .cc-stat4{ grid-template-columns:1fr !important; gap:12px !important; } .cc-stat5{ grid-template-columns:1fr !important; gap:12px !important; } .cc-grid-fin,.cc-grid-biz{ gap:12px !important; } }
 </style>
-<script type="importmap">
-{
-  "imports": { "three": "https://unpkg.com/three@0.184.0/build/three.module.js" },
-  "integrity": {
-    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
-    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT"
-  }
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="vendor/supabase.min.js"></script>
+<!-- Safety net: if the local copy ever fails to load or parse, fall back to the CDN so
+     login and sync still work. document.write is deliberate — it blocks the parser here,
+     which keeps supabase-client.js below from running before the library exists. -->
+<script>if(!window.supabase){document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>');}</script>
 <script src="supabase-client.js"></script>
 <script src="countries-data.js"></script>
 <script src="notif-engine.js"></script>
@@ -8929,7 +8929,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-128 · v11.128 no-seeded-data';
+const NOTIF_BUILD_VERSION = '2026.08.25-129 · v11.129 vendored-runtime';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9153,7 +9153,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js'];
+    const files=['index.html','countries-data.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -12721,6 +12721,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.129', date:'Aug 25, 2026', major:true, notes:[
+      'The app no longer depends on a third-party CDN to start. React was being fetched from unpkg.com every time you opened Nervexus, and if that one request failed the whole thing rendered a blank white screen \u2014 not a degraded page, nothing at all. That was true on every device, every load, and it was a single outage away from the app simply not existing. React now ships with the app.',
+      'This only came to light because the app was run rather than read. Checking the source would never have shown it; the dependency looked perfectly normal sitting there in the markup.',
+      'The Supabase library is now bundled too, so sign-in and syncing no longer depend on a second CDN. If the bundled copy ever fails it quietly falls back to the network version, so this can only ever be safer than before.',
+      'Both are now stored in the offline cache and refreshed by the manual refresh button, along with the anatomy model files, which had been missing from that list.',
+      'Also removed a leftover instruction telling the browser to fetch three.js from the CDN. Nothing had used it since the anatomy model switched to its own bundled copy.',
+      'The map on World Intel still loads from a CDN. It is the one piece left, and if it fails only the map is affected \u2014 the rest of the app carries on.',
+    ]},
     {version:'v11.128', date:'Aug 25, 2026', major:true, notes:[
       'Removed five seeded workouts \u2014 an 80kg bench press, a 110kg back squat, barbell curls, weighted planks and a 5K run. They were timestamped relative to whenever you opened the app rather than to a real date, so they never aged out: someone who had logged nothing still saw the anatomy model glowing red on legs and core for training they had never done, and carried those lifts in their Muscle Training Split totals and Strength Chart. Your fitness numbers are now only what you have actually logged.',
       'Removed the seeded finances. There were three invented income entries totalling $182,000 \u2014 including \u201CSaaS subscriptions\u201D at $128,000 \u2014 and three invented expenses totalling $92,300. The Money Assistant was reading all of it as real and advising you on margins that did not exist. Correcting something said here previously: this was described as the adviser having no data to work with. That was wrong \u2014 it had plenty, and all of it was fabricated.',
