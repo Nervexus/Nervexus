@@ -8931,7 +8931,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-124 · v11.124 real-world-intel';
+const NOTIF_BUILD_VERSION = '2026.08.25-125 · v11.125 exact-muscle-glow';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12705,6 +12705,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.125', date:'Aug 25, 2026', major:true, notes:[
+      'The training glow now lands on the exact muscle. Until now the app worked out what to light from position alone \u2014 \u201Canything between 22% and 44% of body height, on the front\u201D was called quads \u2014 which is why the red came out as bands with straight cut lines across the thigh and shin. Every vertex of the model now carries the name of the muscle that actually sits underneath it, so training calves lights the real gastrocnemius, tapering into the Achilles, and nothing else.',
+      'Those labels come from BodyParts3D, the anatomical database from the Database Center for Life Science at the University of Tokyo \u2014 146 individually named muscle meshes, mapped onto this body one vertex at a time. The muscle geometry itself is not shipped; only the labels are, so the model is the same size it was.',
+      'Hands and feet are deliberately left out. They are tendon and small intrinsic muscle that nobody trains as a group, and lighting the whole foot red for calf raises looked like a fault rather than a feature.',
+      'Two places where the glow deliberately disagrees with the anatomy, because the anatomy gives the wrong answer for a training app: the external oblique sheets across the midline on top of the six-pack, so \u201Cwhat is under this skin\u201D is honestly oblique across your whole abdomen \u2014 the centre strip is given back to abs. And adductor magnus genuinely covers the back of the thigh, which would mean hamstring work lit your adductors \u2014 the posterior thigh reads as hamstrings.',
+      'Not perfect, and worth saying so: the glutes run a little far down the thigh, the chest sits slightly low over the upper abdomen, and the lower-back edges are ragged. That is the floor of mapping one body\u2019s anatomy onto another. It is a long way better than bands.',
+      'If an older copy of the model is still cached on your device, the glow quietly falls back to the old height bands rather than breaking \u2014 a refresh picks up the new one.',
+    ]},
     {version:'v11.124', date:'Aug 25, 2026', major:true, notes:[
       'World Intel\u2019s News tab is real now. It was fourteen countries of hardcoded headlines \u2014 and worse than that, they were invented stories printed under real mastheads: \u201CS&P 500 edges to record as inflation cools to 2.4%\u201D credited to Bloomberg, \u201CFTSE 100 steady as Bank of England holds rates\u201D credited to the FT. None of it was ever written by those newsrooms. All of it is deleted. The tab now pulls live from BBC World, Guardian World, Al Jazeera, Sky News and France 24, filters to the country you have selected, and tapping a story opens the real article.',
       'Because it is real, it can be empty. If nothing in the current world feed mentions the country you picked, it says so instead of manufacturing coverage. On a typical pull around eleven of the fourteen countries have stories; somewhere like Switzerland often has none, and that is the honest answer rather than a bug.',

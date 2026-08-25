@@ -116,6 +116,28 @@
     return /head|face|eye|hair|teeth|tongue/i.test(n);
   }
 
+  // Preferred path: the model carries a real per-vertex muscle label, baked from an
+  // anatomical atlas (BodyParts3D). Every vertex knows which muscle actually sits under
+  // it, so a glow follows the real boundary of that muscle instead of a height band.
+  // Returns false if the model has no labels, in which case we fall back to the geometric
+  // zoning below — an older cached model still works, it just glows in bands.
+  function useEmbeddedZones(THREE, root) {
+    var ok = false, missing = false;
+    S.meshes.forEach(function (m) {
+      var a = m.geometry.attributes._muscle || m.geometry.attributes._MUSCLE;
+      if (!a) { missing = true; return; }
+      var n = a.count, ids = new Uint8Array(n);
+      for (var i = 0; i < n; i++) {
+        var v = Math.round(a.getX(i));
+        ids[i] = (v > 0 && v < ZONE_NAMES.length) ? v : 0;
+      }
+      m.userData.zoneIds = ids;
+      m.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+      ok = true;
+    });
+    return ok && !missing;
+  }
+
   function buildZones(THREE, root) {
     root.updateMatrixWorld(true);
     var box = new THREE.Box3().setFromObject(root);
@@ -282,7 +304,7 @@
           S.meshes.push(o);
           o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0.03 });
         });
-        buildZones(THREE, root);
+        if (!useEmbeddedZones(THREE, root)) buildZones(THREE, root);
         paint();
         var box = new THREE.Box3().setFromObject(root);
         var size = box.getSize(new THREE.Vector3());
