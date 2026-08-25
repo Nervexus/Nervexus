@@ -8929,7 +8929,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-129 · v11.129 vendored-runtime';
+const NOTIF_BUILD_VERSION = '2026.08.25-130 · v11.130 learning-progress-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10262,6 +10262,30 @@ activities: this._mergeShipLog(s.activities),
   _qtToday(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   _qtDefaults(){ return { history:[], topicStats:{}, xpByDate:{}, dailyChallenge:null }; }
   _qtEngine(subj){ subj=subj||this.state.qtSubject; if(subj==='maths') return window.LearningMaths; if(subj==='science') return window.LearningScience; if(subj==='grammar') return window.LearningGrammar; if(subj==='history') return window.LearningHistory; if(subj==='physiology') return window.LearningPhysiology; if(subj==='speaking') return window.LearningSpeaking; if(subj==='money') return window.LearningMoney; if(subj==='gentleman') return window.LearningGentleman; return this._LE(); }
+  // A subject's Progress Overview was reading only <subject>History, which holds finished
+  // full tests. Everything you do in Quick Test and practice lands in a separate
+  // quickTest<Subject> store, so a day of real questions showed 0 questions, 0% accuracy
+  // and 0 hours. XP looked alive only because it was level*25 — a constant for reaching a
+  // level, not anything you earned. This merges both stores and reports earned XP.
+  _learnTotals(subj, testHist){
+    const t=(testHist||[]).reduce((a,h)=>{ a.q+=(+h.total||0); a.c+=(+h.score||0); a.t+=(+h.timeTaken||0); return a; },{q:0,c:0,t:0});
+    const qt=this._qtState(subj);
+    const qh=(qt&&qt.history)||[];
+    const k=qh.reduce((a,h)=>{ a.q+=(+h.total||0); a.c+=(+h.score||0); a.t+=(+h.timeTaken||0); return a; },{q:0,c:0,t:0});
+    const qtXP=Object.keys(qt&&qt.xpByDate||{}).reduce((a,d)=>a+(+qt.xpByDate[d]||0),0);
+    const now7=Date.now()-7*86400000, now30=Date.now()-30*86400000;
+    const dates=[...(testHist||[]),...qh].map(h=>+h.date||0);
+    return {
+      q:t.q+k.q, c:t.c+k.c, t:t.t+k.t,
+      accuracy:(t.q+k.q)?Math.round((t.c+k.c)/(t.q+k.q)*100):0,
+      hours:Math.round(((t.t+k.t)/3600)*10)/10,
+      // Test answers are worth 10 each; quick-test XP is already banked per day
+      // (10 a correct answer plus any daily-challenge bonus), so it is added, not recounted.
+      xp:t.c*10+qtXP,
+      weekly:dates.filter(d=>d>=now7).length,
+      monthly:dates.filter(d=>d>=now30).length,
+    };
+  }
   _qtStorageKey(subj){ subj=subj||this.state.qtSubject; if(subj==='maths') return 'quickTestMaths'; if(subj==='science') return 'quickTestScience'; if(subj==='grammar') return 'quickTestGrammar'; if(subj==='history') return 'quickTestHistory'; if(subj==='physiology') return 'quickTestPhysiology'; if(subj==='speaking') return 'quickTestSpeaking'; if(subj==='money') return 'quickTestMoney'; if(subj==='gentleman') return 'quickTestGentleman'; return 'quickTest'; }
   _qtState(subj){ const s=this.state; return (s.learning&&s.learning[this._qtStorageKey(subj)])||this._qtDefaults(); }
   _qtDefaultsMerge(s, subj){ return {...this._qtDefaults(), ...((s.learning&&s.learning[this._qtStorageKey(subj)])||{})}; }
@@ -12721,6 +12745,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.130', date:'Aug 25, 2026', major:true, notes:[
+      'Progress Overview was reading the wrong half of your work. Every subject keeps two separate records: finished full tests in one place, and everything you do in Quick Test and practice in another. The overview only ever looked at the first one \u2014 so a day of real questions showed 0 questions, 0% accuracy, 0 hours and nothing in the weekly count. The work was always being saved correctly; the panel simply was not reading it. It now merges both.',
+      'The XP figure was the misleading part. It was calculated as your level multiplied by 25, plus 10 for each correct answer in a full test. With no full tests done, that leaves level 1 \u00d7 25 = exactly the 25 XP you saw \u2014 a fixed number for having reached level 1, sitting under a heading that made it look like something you had earned today. Do nothing at all and it still read 25. XP is now what you actually earned: 10 a correct answer, plus any daily-challenge bonus, across both practice and tests. It starts at 0 and only moves when you do.',
+      'Fixed on all nine subjects. Six were reading only full-test history; Speaking was too. Finance and Gentleman\u2019s Etiquette already merged both records correctly, but their XP used the same level\u00d725 formula and their weekly counts still ignored practice. All nine now run through one shared calculation, so they cannot drift apart again.',
+    ]},
     {version:'v11.129', date:'Aug 25, 2026', major:true, notes:[
       'The app no longer depends on a third-party CDN to start. React was being fetched from unpkg.com every time you opened Nervexus, and if that one request failed the whole thing rendered a blank white screen \u2014 not a degraded page, nothing at all. That was true on every device, every load, and it was a single outage away from the app simply not existing. React now ships with the app.',
       'This only came to light because the app was run rather than read. Checking the source would never have shown it; the dependency looked perfectly normal sitting there in the markup.',
@@ -16806,12 +16835,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const enGrade=(S.learning&&S.learning.englishGrade)||0;
         const enStrongest=(S.learning&&S.learning.englishStrongest)||'';
         const enWeakest=(S.learning&&S.learning.englishWeakest)||'';
-        const enAllTotals=enHist.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const enDashAccuracyVal=enAllTotals.q?Math.round(enAllTotals.c/enAllTotals.q*100):0;
-        const enDashHoursVal=Math.round((enAllTotals.t/3600)*10)/10;
-        const enNow7d=Date.now()-7*86400000, enNow30d=Date.now()-30*86400000;
-        const enWeeklyCount=enHist.filter(h=>h.date>=enNow7d).length, enMonthlyCount=enHist.filter(h=>h.date>=enNow30d).length;
-        const enDashXPVal=enAllTotals.c*10+enLevel*25;
+        const enLT=this._learnTotals('english', enHist);
+        const enAllTotals={q:enLT.q,c:enLT.c,t:enLT.t};
+        const enDashAccuracyVal=enLT.accuracy;
+        const enDashHoursVal=enLT.hours;
+        const enWeeklyCount=enLT.weekly, enMonthlyCount=enLT.monthly;
+        const enDashXPVal=enLT.xp;
         const enRemainingMs=Math.max(0,(S.enTimerEnd||0)-(S.enNow||Date.now()));
         const enRemainingSec=Math.ceil(enRemainingMs/1000);
         const enTimerLabel=Math.floor(enRemainingSec/60)+':'+String(enRemainingSec%60).padStart(2,'0');
@@ -16958,12 +16987,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const mtOverallTotals=mtTopicEntries.reduce((acc,t)=>({ok:acc.ok+t.ok,total:acc.total+t.total}),{ok:0,total:0});
         const mtQtOverallAccuracyVal=mtOverallTotals.total?Math.round(mtOverallTotals.ok/mtOverallTotals.total*100):0;
         const mtQtTodayXPVal=(qtMt.xpByDate||{})[mtQtToday]||0;
-        const allTotals=history.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const dashAccuracy=allTotals.q?Math.round(allTotals.c/allTotals.q*100):0;
-        const dashHours=Math.round((allTotals.t/3600)*10)/10;
-        const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
-        const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dashXP=allTotals.c*10+mathsLevel*25;
+        const LT=this._learnTotals('maths', history);
+        const allTotals={q:LT.q,c:LT.c,t:LT.t};
+        const dashAccuracy=LT.accuracy;
+        const dashHours=LT.hours;
+        const weeklyCount=LT.weekly, monthlyCount=LT.monthly;
+        const dashXP=LT.xp;
         const formulaQ=(S.mtFormulaSearch||'').toLowerCase();
         const formulaList=(LM&&LM.FORMULAS)?LM.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
         const bestTest=history.filter(h=>h.mode==='GCSE Test').sort((a,b)=>b.pct-a.pct)[0];
@@ -17049,12 +17078,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const sciStrongest=(S.learning&&S.learning.scienceStrongest)||'';
         const sciWeakest=(S.learning&&S.learning.scienceWeakest)||'';
         const sciFocusAreas=(S.learning&&S.learning.scienceFocusAreas)||[];
-        const allTotals=history.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const dashAccuracy=allTotals.q?Math.round(allTotals.c/allTotals.q*100):0;
-        const dashHours=Math.round((allTotals.t/3600)*10)/10;
-        const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
-        const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dashXP=allTotals.c*10+sciLevel*25;
+        const LT=this._learnTotals('science', history);
+        const allTotals={q:LT.q,c:LT.c,t:LT.t};
+        const dashAccuracy=LT.accuracy;
+        const dashHours=LT.hours;
+        const weeklyCount=LT.weekly, monthlyCount=LT.monthly;
+        const dashXP=LT.xp;
         const formulaQ=(S.sciFormulaSearch||'').toLowerCase();
         const formulaList=(SC&&SC.FORMULAS)?SC.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
         const q=S.sciQ;
@@ -17124,12 +17153,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const graStrongest=(S.learning&&S.learning.grammarStrongest)||'';
         const graWeakest=(S.learning&&S.learning.grammarWeakest)||'';
         const graFocusAreas=(S.learning&&S.learning.grammarFocusAreas)||[];
-        const allTotals=history.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const dashAccuracy=allTotals.q?Math.round(allTotals.c/allTotals.q*100):0;
-        const dashHours=Math.round((allTotals.t/3600)*10)/10;
-        const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
-        const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dashXP=allTotals.c*10+graLevel*25;
+        const LT=this._learnTotals('grammar', history);
+        const allTotals={q:LT.q,c:LT.c,t:LT.t};
+        const dashAccuracy=LT.accuracy;
+        const dashHours=LT.hours;
+        const weeklyCount=LT.weekly, monthlyCount=LT.monthly;
+        const dashXP=LT.xp;
         const formulaQ=(S.graFormulaSearch||'').toLowerCase();
         const formulaList=(GR&&GR.FORMULAS)?GR.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
         const q=S.graQ;
@@ -17199,12 +17228,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const hisStrongest=(S.learning&&S.learning.historyStrongest)||'';
         const hisWeakest=(S.learning&&S.learning.historyWeakest)||'';
         const hisFocusAreas=(S.learning&&S.learning.historyFocusAreas)||[];
-        const allTotals=history.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const dashAccuracy=allTotals.q?Math.round(allTotals.c/allTotals.q*100):0;
-        const dashHours=Math.round((allTotals.t/3600)*10)/10;
-        const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
-        const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dashXP=allTotals.c*10+hisLevel*25;
+        const LT=this._learnTotals('history', history);
+        const allTotals={q:LT.q,c:LT.c,t:LT.t};
+        const dashAccuracy=LT.accuracy;
+        const dashHours=LT.hours;
+        const weeklyCount=LT.weekly, monthlyCount=LT.monthly;
+        const dashXP=LT.xp;
         const formulaQ=(S.hisFormulaSearch||'').toLowerCase();
         const formulaList=(HI&&HI.FORMULAS)?HI.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
         const q=S.hisQ;
@@ -17280,12 +17309,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const spkWeakest=(S.learning&&S.learning.speakingWeakest)||'';
         const spkFocusAreas=(S.learning&&S.learning.speakingFocusAreas)||[];
         const spkHistory=(S.learning&&S.learning.speakingHistory)||[];
-        const spkAllTotals=spkHistory.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const spkDashAccuracy=spkAllTotals.q?Math.round(spkAllTotals.c/spkAllTotals.q*100):0;
-        const spkDashHours=Math.round((spkAllTotals.t/3600)*10)/10;
-        const spkNow7d=Date.now()-7*86400000, spkNow30d=Date.now()-30*86400000;
-        const spkWeeklyCount=spkHistory.filter(h=>h.date>=spkNow7d).length, spkMonthlyCount=spkHistory.filter(h=>h.date>=spkNow30d).length;
-        const spkDashXP=spkAllTotals.c*10+spkLevel*25;
+        const spkLT=this._learnTotals('speaking', spkHistory);
+        const spkAllTotals={q:spkLT.q,c:spkLT.c,t:spkLT.t};
+        const spkDashAccuracy=spkLT.accuracy;
+        const spkDashHours=spkLT.hours;
+        const spkWeeklyCount=spkLT.weekly, spkMonthlyCount=spkLT.monthly;
+        const spkDashXP=spkLT.xp;
         const spkFormulaQ=(S.spkFormulaSearch||'').toLowerCase();
         const spkFormulaList=(SP&&SP.FORMULAS)?SP.FORMULAS.filter(f=>!spkFormulaQ||f.name.toLowerCase().includes(spkFormulaQ)||f.topic.toLowerCase().includes(spkFormulaQ)):[];
         const spkTestQ=S.spkTestQueue&&S.spkTestQueue[S.spkTestIdx];
@@ -17385,12 +17414,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const phyStrongest=(S.learning&&S.learning.physiologyStrongest)||'';
         const phyWeakest=(S.learning&&S.learning.physiologyWeakest)||'';
         const phyFocusAreas=(S.learning&&S.learning.physiologyFocusAreas)||[];
-        const allTotals=history.reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const dashAccuracy=allTotals.q?Math.round(allTotals.c/allTotals.q*100):0;
-        const dashHours=Math.round((allTotals.t/3600)*10)/10;
-        const now7d=Date.now()-7*86400000, now30d=Date.now()-30*86400000;
-        const weeklyCount=history.filter(h=>h.date>=now7d).length, monthlyCount=history.filter(h=>h.date>=now30d).length;
-        const dashXP=allTotals.c*10+phyLevel*25;
+        const LT=this._learnTotals('physiology', history);
+        const allTotals={q:LT.q,c:LT.c,t:LT.t};
+        const dashAccuracy=LT.accuracy;
+        const dashHours=LT.hours;
+        const weeklyCount=LT.weekly, monthlyCount=LT.monthly;
+        const dashXP=LT.xp;
         const formulaQ=(S.phyFormulaSearch||'').toLowerCase();
         const formulaList=(PH&&PH.FORMULAS)?PH.FORMULAS.filter(f=>!formulaQ||f.name.toLowerCase().includes(formulaQ)||f.topic.toLowerCase().includes(formulaQ)):[];
         const q=S.phyQ;
@@ -17484,12 +17513,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const moneyWeakest=(S.learning&&S.learning.moneyWeakest)||'';
         const moneyFocusAreas=(S.learning&&S.learning.moneyFocusAreas)||[];
         const mQtState=this._qtState('money'); const mHist=(mQtState.history||[]);
-        const mAllTotals=[...moneyHist, ...mHist].reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const mDashAccuracy=mAllTotals.q?Math.round(mAllTotals.c/mAllTotals.q*100):0;
-        const mDashHours=Math.round((mAllTotals.t/3600)*10)/10;
-        const mNow7d=Date.now()-7*86400000, mNow30d=Date.now()-30*86400000;
-        const mWeeklyCount=moneyHist.filter(h=>h.date>=mNow7d).length, mMonthlyCount=moneyHist.filter(h=>h.date>=mNow30d).length;
-        const mDashXP=mAllTotals.c*10+moneyLevel*25;
+        const mLT=this._learnTotals('money', moneyHist);
+        const mAllTotals={q:mLT.q,c:mLT.c,t:mLT.t};
+        const mDashAccuracy=mLT.accuracy;
+        const mDashHours=mLT.hours;
+        const mWeeklyCount=mLT.weekly, mMonthlyCount=mLT.monthly;
+        const mDashXP=mLT.xp;
         const moneyFormulaQ=(S.moneyFormulaSearch||'').toLowerCase();
         const moneyFormulaList=MN?MN.FORMULAS.filter(f=>!moneyFormulaQ||f.name.toLowerCase().includes(moneyFormulaQ)||f.topic.toLowerCase().includes(moneyFormulaQ)):[];
         const mq=S.moneyQ;
@@ -17555,12 +17584,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const gentWeakest=(S.learning&&S.learning.gentWeakest)||'';
         const gentFocusAreas=(S.learning&&S.learning.gentFocusAreas)||[];
         const gQtState=this._qtState('gentleman'); const gHist=(gQtState.history||[]);
-        const gAllTotals=[...gentHist, ...gHist].reduce((acc,h)=>{ acc.q+=(h.total||0); acc.c+=(h.score||0); if(h.timeTaken) acc.t+=h.timeTaken; return acc; },{q:0,c:0,t:0});
-        const gDashAccuracy=gAllTotals.q?Math.round(gAllTotals.c/gAllTotals.q*100):0;
-        const gDashHours=Math.round((gAllTotals.t/3600)*10)/10;
-        const gNow7d=Date.now()-7*86400000, gNow30d=Date.now()-30*86400000;
-        const gWeeklyCount=gentHist.filter(h=>h.date>=gNow7d).length, gMonthlyCount=gentHist.filter(h=>h.date>=gNow30d).length;
-        const gDashXP=gAllTotals.c*10+gentLevel*25;
+        const gLT=this._learnTotals('gentleman', gentHist);
+        const gAllTotals={q:gLT.q,c:gLT.c,t:gLT.t};
+        const gDashAccuracy=gLT.accuracy;
+        const gDashHours=gLT.hours;
+        const gWeeklyCount=gLT.weekly, gMonthlyCount=gLT.monthly;
+        const gDashXP=gLT.xp;
         const gentFormulaQ=(S.gentFormulaSearch||'').toLowerCase();
         const gentFormulaList=LG?LG.FORMULAS.filter(f=>!gentFormulaQ||f.name.toLowerCase().includes(gentFormulaQ)||f.topic.toLowerCase().includes(gentFormulaQ)):[];
         const gq=S.gentQ;
