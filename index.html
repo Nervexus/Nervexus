@@ -1625,10 +1625,13 @@
 
               <sc-if value="{{ showWiNews }}" hint-placeholder-val="{{ false }}">
                 <div style="border-radius:18px; padding:16px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><span style="font-size:13px; font-weight:600;">News</span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">SAMPLE DATA</span></div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#8a8a92; margin-bottom:6px;">{{ wiSel.flag }} {{ wiSel.name }}</div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><span style="font-size:13px; font-weight:600;">News</span><span onClick="{{ refreshWiNews }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px; cursor:pointer;">↻ REFRESH</span></div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#8a8a92; margin-bottom:6px;">{{ wiSel.flag }} {{ wiSel.name }} · BBC · GUARDIAN · AL JAZEERA · SKY</div>
+                  <sc-if value="{{ wiNewsLoading }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#75757d; padding:10px 0;">Loading live headlines…</div></sc-if>
+                  <sc-if value="{{ hasWiNewsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#d9333f; padding:10px 0;">{{ wiNewsErr }}</div></sc-if>
+                  <sc-if value="{{ noWiNews }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#75757d; padding:10px 0; line-height:1.5;">Nothing in the current world feed mentions {{ wiSel.name }}. This shows real coverage only — it will not invent stories for a country that is not in the news right now.</div></sc-if>
                   <sc-for list="{{ newsFeed }}" as="n" hint-placeholder-count="3">
-                    <div style="display:flex; gap:11px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
+                    <div onClick="{{ n.open }}" style="display:flex; gap:11px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
                       <span style="font-size:9px; font-family:'JetBrains Mono',monospace; letter-spacing:1px; color:{{ n.catCol }}; border:1px solid rgba(255,255,255,0.14); border-radius:6px; padding:3px 7px; height:fit-content; white-space:nowrap;">{{ n.cat }}</span>
                       <div style="flex:1;"><div style="font-size:12.5px; color:#dbdbe0; line-height:1.4;">{{ n.headline }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; margin-top:3px;">{{ n.src }} · {{ n.time }}</div></div>
                     </div>
@@ -1638,15 +1641,18 @@
 
               <sc-if value="{{ showWiAlerts }}" hint-placeholder-val="{{ false }}">
                 <div style="border-radius:18px; padding:16px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:13px; font-weight:600;">Intelligence Alerts</span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">SAMPLE DATA</span></div>
-                  <div style="font-size:11px; color:#75757d; margin-bottom:12px;">Illustrative alerts — not a live feed. No real-time incident source is connected yet.</div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:13px; font-weight:600;">Risk Signals</span><span onClick="{{ refreshWiNews }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px; cursor:pointer;">↻ REFRESH</span></div>
+                  <div style="font-size:11px; color:#75757d; margin-bottom:12px; line-height:1.5;">Live headlines for {{ wiSel.name }} that match conflict, unrest, cyber or disaster keywords. These are news stories, not a classified incident feed — tap one to read the source.</div>
+                  <sc-if value="{{ wiNewsLoading }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#75757d; padding:10px 0;">Loading live headlines…</div></sc-if>
+                  <sc-if value="{{ hasWiNewsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#d9333f; padding:10px 0;">{{ wiNewsErr }}</div></sc-if>
+                  <sc-if value="{{ noWiAlerts }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#75757d; padding:10px 0; line-height:1.5;">No risk-flagged stories for {{ wiSel.name }} in the current feed. That is a real result, not an empty widget.</div></sc-if>
                   <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="5">
-                    <div style="display:flex; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+                    <div onClick="{{ a.open }}" style="display:flex; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
                       <span style="width:8px; height:8px; border-radius:50%; margin-top:5px; flex:0 0 8px; background:{{ a.sevCol }}; box-shadow:0 0 7px {{ a.sevCol }};"></span>
                       <div style="flex:1;">
                         <div style="display:flex; justify-content:space-between;"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ a.sevCol }};">{{ a.sev }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#75757d;">{{ a.time }}</span></div>
                         <div style="font-size:12px; color:#dbdbe0; line-height:1.4; margin-top:3px;">{{ a.txt }}</div>
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#8a8a92; margin-top:3px;">CONFIDENCE {{ a.conf }}%</div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#8a8a92; margin-top:3px;">{{ a.src }}</div>
                       </div>
                     </div>
                   </sc-for>
@@ -8925,7 +8931,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-123 · v11.123 anatomy-clean';
+const NOTIF_BUILD_VERSION = '2026.08.25-124 · v11.124 real-world-intel';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -8986,6 +8992,7 @@ class Component extends DCLogic {
       // re-entering the dashboard doesn't refetch; the ↻ button forces a fresh pull.
       anatomyView:'front',
       moneyNews:[], lawNews:[], moneyNewsAt:0, lawNewsAt:0,
+      wiNews:[], wiNewsAt:0, wiNewsLoading:false, wiNewsErr:'',
       moneyNewsLoading:false, lawNewsLoading:false, moneyNewsErr:'', lawNewsErr:'',
       missGenOpen:false, missGenCat:null, missGenLoading:false, missGenErr:'', missGenResult:null,
       move: s.move || { streak:13, last:yestC, longest:21 },
@@ -11438,6 +11445,90 @@ activities: this._mergeShipLog(s.activities),
         [K.err]: items.length?'':'No stories came back — try refresh.' });
     }catch(e){ this.setState({[K.loading]:false, [K.err]:(e&&e.message)||'Could not load news'}); }
   }
+  // World Intel's News and Intelligence Alerts both read from one real world-news pull.
+  // They used to be hardcoded headlines attributed to Reuters, Bloomberg, the FT and the
+  // BBC — invented copy under real mastheads. This replaces them with the actual feeds.
+  async loadWorldNews(force){
+    const S=this.state;
+    if(S.wiNewsLoading) return;
+    if(!force && S.wiNewsAt && (Date.now()-S.wiNewsAt)<20*60000 && (S.wiNews||[]).length) return;
+    if(!this._sbOn()){ this.setState({wiNewsErr:'Sign in to load live news.'}); return; }
+    this.setState({wiNewsLoading:true, wiNewsErr:''});
+    try{
+      const r=await window.SB.fetchNewsData('worldnews','');
+      if(!r || r.error) throw new Error((r&&r.error)||'News feed unavailable');
+      const items=(r.headlines||[]).filter(h=>h&&h.title)
+        .map(h=>({ title:String(h.title).slice(0,200), source:h.source||'', url:h.url||'', ts:+h.ts||0 }));
+      this.setState({ wiNews:items, wiNewsLoading:false, wiNewsAt:Date.now(),
+        wiNewsErr: items.length?'':'No stories came back — try refresh.' });
+    }catch(e){ this.setState({wiNewsLoading:false, wiNewsErr:(e&&e.message)||'Could not load news'}); }
+  }
+  // Extra terms so a story about a country still matches when it names the capital,
+  // the demonym or the currency rather than the country itself.
+  _countryTerms(name){
+    const extra={
+      'United States':['US','U.S.','USA','America','American','Washington','Biden','Trump','Fed'],
+      'United Kingdom':['UK','U.K.','Britain','British','London','Westminster','Bank of England'],
+      'Russia':['Russian','Moscow','Kremlin','Putin'],
+      'China':['Chinese','Beijing','Xi Jinping','Shanghai','Hong Kong'],
+      'Ukraine':['Ukrainian','Kyiv','Kiev','Zelensky'],
+      'Germany':['German','Berlin','Bundestag'],
+      'France':['French','Paris','Macron','Elysee'],
+      'India':['Indian','Delhi','New Delhi','Mumbai','Modi'],
+      'Japan':['Japanese','Tokyo','Nikkei'],
+      'Israel':['Israeli','Jerusalem','Tel Aviv','Netanyahu','Gaza'],
+      'Brazil':['Brazilian','Brasilia','Sao Paulo','Lula'],
+      'Australia':['Australian','Canberra','Sydney','Melbourne'],
+      'Switzerland':['Swiss','Bern','Zurich','Geneva','franc'],
+      'Saudi Arabia':['Saudi','Riyadh','Jeddah','OPEC'],
+    };
+    return [name].concat(extra[name]||[]);
+  }
+  _matchCountry(title, name){
+    const t=' '+String(title||'').toLowerCase()+' ';
+    return this._countryTerms(name).some(term=>{
+      const w=String(term).toLowerCase();
+      return t.indexOf(' '+w+' ')>=0 || t.indexOf(' '+w+"'")>=0 || t.indexOf(' '+w+',')>=0 || t.indexOf(' '+w+'.')>=0;
+    });
+  }
+  // Category comes from words actually present in the headline. Nothing is invented;
+  // when nothing matches the story is simply labelled NEWS.
+  _headlineCat(title){
+    const t=String(title||'').toLowerCase();
+    if(/\bwar\b|missile|strike|troops|military|invasion|ceasefire|attack|militant|airstrike/.test(t)) return 'CONFLICT';
+    if(/sanction|treaty|summit|diplomat|election|parliament|minister|president|government|policy|vote/.test(t)) return 'POLICY';
+    if(/market|stock|shares|inflation|econom|gdp|rate|bank|currency|trade|tariff|budget/.test(t)) return 'MARKETS';
+    if(/oil|gas|energy|power|grid|nuclear|pipeline|renewable/.test(t)) return 'ENERGY';
+    if(/cyber|hack|breach|ransomware|data leak/.test(t)) return 'SECURITY';
+    if(/court|trial|charged|lawsuit|prosecut|verdict|judge/.test(t)) return 'LEGAL';
+    return 'NEWS';
+  }
+  _agoLabel(ts){
+    if(!ts) return '';
+    const m=Math.max(0,Math.round((Date.now()-ts)/60000));
+    if(m<60) return m+'m';
+    const h=Math.round(m/60); if(h<48) return h+'h';
+    return Math.round(h/24)+'d';
+  }
+  // Risk signals, derived from headlines that are actually in the feed. Severity comes from
+  // which words matched. There is no confidence score because there is nothing to compute
+  // one from — the old panel showed invented percentages next to invented incidents.
+  _riskSignals(items, name){
+    const RULES=[
+      { sev:'CRITICAL', col:'#ff2b3d', re:/missile|airstrike|invasion|explosion|killed|attack|terror|coup|earthquake|evacuat/ },
+      { sev:'HIGH',     col:'#d9333f', re:/troops|military|clash|violence|unrest|riot|shooting|hostage|cyberattack|breach|outage|flood|wildfire|storm/ },
+      { sev:'MEDIUM',   col:'#a83039', re:/sanction|protest|strike|warning|tension|dispute|arrest|border|emergency|recall/ },
+    ];
+    const out=[];
+    for(const it of items){
+      const t=String(it.title||'').toLowerCase();
+      const hit=RULES.find(r=>r.re.test(t));
+      if(!hit) continue;
+      out.push({ sev:hit.sev, sevCol:hit.col, time:this._agoLabel(it.ts), txt:it.title, src:it.source||'', url:it.url||'' });
+      if(out.length>=8) break;
+    }
+    return out;
+  }
   mut(u){ this.setState(u, ()=>this.save()); }
   openWebApp(){ window.open('https://nervexus.vercel.app', '_blank', 'noopener'); }
   startRefresh(){
@@ -12265,23 +12356,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   countrySafety(c){ const idx=Math.max(3,Math.min(99,Math.round(c.pol*0.5+(100-c.dis)*0.2+(100-this._threatWeight(c.threat))*0.3))); const lbl=idx>=78?'VERY SAFE':idx>=62?'SAFE':idx>=46?'MODERATE':idx>=32?'ELEVATED RISK':'HIGH RISK'; const col=idx>=62?'#e8e8ec':idx>=46?'#c9a24b':idx>=32?'#c02e39':'#ff2b3d'; const adv=idx>=78?'Normal precautions':idx>=62?'Increased caution':idx>=46?'Reconsider travel':idx>=32?'Avoid non-essential travel':'Do not travel'; return {idx,lbl,col,adv}; }
   _newsCatCol(cat){ return /CONFLICT|SECURITY|DEFENSE|WAR/.test(cat)?'#ff2b3d':/MARKET|FINANCE|ECONOMY|TRADE|ENERGY|BANKING|AGRI|INFRA/.test(cat)?'#e8e8ec':'#9a9aa2'; }
   wiFace(c){ if(!c) return; let tp=-c.lon*Math.PI/180; const base=this._gphi||0; while(tp<base-Math.PI)tp+=2*Math.PI; while(tp>base+Math.PI)tp-=2*Math.PI; this._gTgtPhi=tp; this._gTgtTheta=Math.max(-1.05,Math.min(1.05,c.lat*Math.PI/180)); this._gHold=Date.now()+3200; }
-  countryNews(name){ const m={
-    'United States':[['MARKETS','S&P 500 edges to record as inflation cools to 2.4%','Bloomberg','12m'],['POLICY','White House expands federal AI-infrastructure procurement','Reuters','1h'],['DEFENSE','Pentagon awards $4B in new contracts to defense primes','WSJ','3h']],
-    'United Kingdom':[['MARKETS','FTSE 100 steady as Bank of England holds rates','FT','20m'],['POLICY','UK unveils financial-services reform package','Reuters','2h'],['SECURITY','Allied intelligence-sharing expanded in new accord','BBC','5h']],
-    'Switzerland':[['FINANCE','SNB comments on franc strength amid safe-haven demand','Reuters','30m'],['BANKING','UBS reports progress on Credit Suisse integration','Bloomberg','2h'],['TECH','Zurich emerges as European AI-research hub','TechWire','6h']],
-    'Ukraine':[['CONFLICT','Diplomatic push intensifies over energy-corridor security','AP','8m'],['ECONOMY','Reconstruction financing framework advances','Reuters','1h'],['ENERGY','Grain-corridor negotiations resume','FT','4h']],
-    'China':[['MARKETS','Beijing signals fresh stimulus as property sector drags','Bloomberg','15m'],['TECH','Semiconductor output hits record amid export talks','Reuters','2h'],['TRADE','New EV export accords reached with trade blocs','WSJ','5h']],
-    'Japan':[['MARKETS','Nikkei climbs on strong chip-equipment demand','Nikkei','18m'],['POLICY','BoJ policy path in focus after yen weakness','Bloomberg','2h'],['TECH','Governance reforms lift corporate valuations','FT','6h']],
-    'Germany':[['MARKETS','DAX firms as industrial orders stabilize','Reuters','25m'],['ENERGY','Energy-transition capex reaches new highs','FT','3h'],['POLICY','ECB rate path debated amid cooling inflation','Bloomberg','5h']],
-    'India':[['MARKETS','Sensex at record on resilient domestic demand','Reuters','10m'],['INFRA','Government expands infrastructure procurement','ET','2h'],['TECH','IT-services and startup base accelerates','TechWire','4h']],
-    'Russia':[['ENERGY','Energy-revenue dynamics shift under sanctions','Reuters','22m'],['TRADE','Trade rerouting to Asian markets continues','Bloomberg','3h'],['SECURITY','Elevated geopolitical risk premium persists','AP','6h']],
-    'Brazil':[['MARKETS','Bovespa steady as commodity exports strengthen','Reuters','30m'],['POLICY','Central bank continues its easing cycle','Bloomberg','2h'],['AGRI','Agribusiness and mining capex remains robust','FT','5h']],
-    'Saudi Arabia':[['ECONOMY','Sovereign giga-project spending continues','Reuters','20m'],['ENERGY','Oil policy steering global supply balance','Bloomberg','2h'],['TECH','Diversification into AI and logistics accelerates','WSJ','6h']],
-    'Australia':[['MARKETS','ASX firms on miners as RBA stays data-dependent','AFR','15m'],['TRADE','Critical-minerals and LNG exports central to trade','Reuters','3h'],['SECURITY','Allied-intelligence integration deepens','ABC','5h']],
-    'France':[['MARKETS','CAC 40 steady amid aerospace-sector strength','Reuters','20m'],['DEFENSE','Independent defense posture reaffirmed','AFP','2h'],['POLICY','Domestic political friction under close watch','FT','5h']],
-    'Israel':[['SECURITY','Regional security tensions remain elevated','Reuters','8m'],['TECH','Cyber and defense-tech sector leads the region','Bloomberg','2h'],['ECONOMY','Heightened intelligence activity across sector','AP','6h']]
-  }; return m[name]||[['UPDATE',name+': markets steady amid global uncertainty','Wire','1h'],['POLICY',name+': government outlines new spending plan','Reuters','3h'],['SECURITY',name+': regional security developments monitored','AP','6h']]; }
-  init_globe(){ const rd=this.root.querySelector('[data-chart="wiRadar"]'); if(rd) this.startRadar(rd); this._initMapLibre(); this.countUp(); }
+  init_globe(){ const rd=this.root.querySelector('[data-chart="wiRadar"]'); if(rd) this.startRadar(rd); this._initMapLibre(); this.countUp(); this.loadWorldNews(); }
   countUp(){ if(!this.root) return; this.root.querySelectorAll('[data-count]').forEach(el=>{ const tgt=parseFloat(el.dataset.count)||0; const dec=el.dataset.dec?+el.dataset.dec:0; const t0=performance.now(), dur=1100; const step=(t)=>{ const k=Math.min(1,(t-t0)/dur); const e=1-Math.pow(1-k,3); el.textContent=(tgt*e).toFixed(dec); if(k<1) requestAnimationFrame(step); }; requestAnimationFrame(step); }); }
   startRadar(cv){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,R=Math.min(w,h)/2-4; const blips=[]; for(let i=0;i<10;i++) blips.push({a:Math.random()*7,r:R*(0.22+Math.random()*0.72),ph:Math.random()*7});
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); for(let k=1;k<=3;k++){ ctx.beginPath(); ctx.arc(cx,cy,R*k/3,0,7); ctx.strokeStyle='rgba(255,255,255,0.14)'; ctx.lineWidth=1; ctx.stroke(); } ctx.beginPath(); ctx.moveTo(cx-R,cy); ctx.lineTo(cx+R,cy); ctx.moveTo(cx,cy-R); ctx.lineTo(cx,cy+R); ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.stroke();
@@ -12436,8 +12511,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       {k:'ELEVATED / GUARDED',count:_tb.ELEVATED+_tb.GUARDED,w:Math.round((_tb.ELEVATED+_tb.GUARDED)/_tTotal*100)+'%',col:'#c02e39'},
       {k:'LOW',count:_tb.LOW,w:Math.round(_tb.LOW/_tTotal*100)+'%',col:'#7a3036'},
     ];
-    const newsFeed=this.countryNews(sel.name).map(n=>({cat:n[0],catCol:this._newsCatCol(n[0]),headline:n[1],src:n[2],time:n[3]}));
-    const alerts=[ {sev:'CRITICAL',sevCol:'#ff2b3d',time:'02:11',txt:'Satellite movement detected over contested airspace',conf:93}, {sev:'HIGH',sevCol:'#d9333f',time:'01:52',txt:'Coordinated cyber intrusion on financial infrastructure',conf:88}, {sev:'HIGH',sevCol:'#d9333f',time:'01:20',txt:'Military mobilization along northern border corridor',conf:81}, {sev:'MEDIUM',sevCol:'#a83039',time:'00:44',txt:'New financial sanctions package announced',conf:76}, {sev:'MEDIUM',sevCol:'#a83039',time:'00:12',txt:'Political unrest escalating in capital region',conf:71} ];
+    // Real headlines, narrowed to the selected country. If nothing in the current pull
+    // mentions it, say so rather than manufacturing coverage.
+    const wiAll=S.wiNews||[];
+    const wiHits=wiAll.filter(h=>this._matchCountry(h.title, sel.name));
+    const newsFeed=wiHits.slice(0,10).map(h=>({ cat:this._headlineCat(h.title), catCol:this._newsCatCol(this._headlineCat(h.title)),
+      headline:h.title, src:h.source, time:this._agoLabel(h.ts), url:h.url, open:()=>{ if(h.url) window.open(h.url,'_blank','noopener'); } }));
+    const alerts=this._riskSignals(wiHits, sel.name).map(a=>Object.assign({}, a, { open:()=>{ if(a.url) window.open(a.url,'_blank','noopener'); } }));
+    const wiNewsLoading=!!S.wiNewsLoading, wiNewsErr=S.wiNewsErr||'';
+    const wiNewsCount=wiAll.length;
+    const noWiNews=!wiNewsLoading && !wiNewsErr && newsFeed.length===0;
+    const noWiAlerts=!wiNewsLoading && !wiNewsErr && alerts.length===0;
     const threatCountryCount=_tTotal;
     const placeOptions=this._wiPlaceList().map(p=>({name:p.name}));
     const routeFromVal=S.routeFrom||'United Kingdom', routeToVal=S.routeTo||'Bavaria (Munich)';
@@ -12452,7 +12536,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       safetyQueryVal:S.safetyQuery||'', setSafetyQuery:(e)=>this.setSafetyQuery(e), safetyKey:(e)=>{ if(e.key==='Enter') this.runSafetyCheck(); },
       runSafetyCheck:()=>this.runSafetyCheck(), safetyBtnLabel:S.safetyLoading?'Checking…':'Check Safety', safetyErr:S.safetyErr||'',
       hasSafetyResult:!!S.safetyResult, safetyResultText:S.safetyResult||'',
-      addRoute:()=>this.addRoute(), routeList, hasSavedPins:savedPinList.length>0, savedPinList, wiPanelTabs, wiPanel, setWiPanel:(e)=>this.setState({wiPanel:e.target.value}), showWiStats:wiPanel==='stats', showWiThreat:wiPanel==='threat', showWiNews:wiPanel==='news', showWiAlerts:wiPanel==='alerts', wiQuery:S.wiQuery||'', setWiQuery:(e)=>this.setState({wiQuery:e.target.value}), countryList, countryOptions:cs.map(c=>({name:c.name})).sort((a,b)=>a.name.localeCompare(b.name)), selCountryVal:sel.name, setCountry:(e)=>{ const n=e.target.value; this.setState({selCountry:n}); this.wiFace(this.countries.find(x=>x.name===n)); }, wiSel, wiLayers, wiTimes, agent, statistics, threats, threatCountryCount, newsFeed, alerts,
+      addRoute:()=>this.addRoute(), routeList, hasSavedPins:savedPinList.length>0, savedPinList, wiPanelTabs, wiPanel, setWiPanel:(e)=>this.setState({wiPanel:e.target.value}), showWiStats:wiPanel==='stats', showWiThreat:wiPanel==='threat', showWiNews:wiPanel==='news', showWiAlerts:wiPanel==='alerts', wiQuery:S.wiQuery||'', setWiQuery:(e)=>this.setState({wiQuery:e.target.value}), countryList, countryOptions:cs.map(c=>({name:c.name})).sort((a,b)=>a.name.localeCompare(b.name)), selCountryVal:sel.name, setCountry:(e)=>{ const n=e.target.value; this.setState({selCountry:n}); this.wiFace(this.countries.find(x=>x.name===n)); }, wiSel, wiLayers, wiTimes, agent, statistics, threats, threatCountryCount, newsFeed, alerts, wiNewsLoading, wiNewsErr, wiNewsCount, noWiNews, noWiAlerts,
+      hasWiNewsErr:!!wiNewsErr, refreshWiNews:()=>this.loadWorldNews(true),
       savedAddressVal:S.savedAddressInput||'', setSavedAddress:(e)=>this.setState({savedAddressInput:e.target.value}), savedAddressKey:(e)=>{ if(e.key==='Enter') this.saveAddressLocation(); }, savedAddressErr:S.savedAddressErr||'', saveAddressLocation:()=>this.saveAddressLocation(), saveAddressBtnLabel:S.savedAddressLoading?'Saving…':'Save', myLocationErr:S.myLocationErr||'' };
   }
 
@@ -12620,6 +12705,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.124', date:'Aug 25, 2026', major:true, notes:[
+      'World Intel\u2019s News tab is real now. It was fourteen countries of hardcoded headlines \u2014 and worse than that, they were invented stories printed under real mastheads: \u201CS&P 500 edges to record as inflation cools to 2.4%\u201D credited to Bloomberg, \u201CFTSE 100 steady as Bank of England holds rates\u201D credited to the FT. None of it was ever written by those newsrooms. All of it is deleted. The tab now pulls live from BBC World, Guardian World, Al Jazeera, Sky News and France 24, filters to the country you have selected, and tapping a story opens the real article.',
+      'Because it is real, it can be empty. If nothing in the current world feed mentions the country you picked, it says so instead of manufacturing coverage. On a typical pull around eleven of the fourteen countries have stories; somewhere like Switzerland often has none, and that is the honest answer rather than a bug.',
+      'Intelligence Alerts is now Risk Signals. The old panel listed five fabricated incidents \u2014 \u201Csatellite movement detected over contested airspace\u201D, \u201Cmilitary mobilization along northern border corridor\u201D \u2014 each with an invented confidence score of 93%, 88%, 81%. There was no feed behind any of it and no way to compute a confidence figure. It now flags real headlines for your selected country that match conflict, unrest, cyber or disaster keywords, rated by which words matched, with the publisher named and a link to the source. The confidence percentages are gone because there was never anything to calculate them from.',
+      'The Money Assistant will now tell you when it has nothing to work on. Your income, expenses and savings are all empty, so asking it for advice produced confident generic guidance as though it had studied your finances. It now checks first and says plainly that there is nothing logged, and offers to record entries for you \u2014 rather than quoting totals of \u00a30 back at you as if they were findings.',
+    ]},
     {version:'v11.123', date:'Aug 25, 2026', major:false, notes:[
       'The speckling on the anatomy model is properly fixed. The source model was built as eight separate mesh chunks, and the simplification step was shrinking each chunk independently — so the shared edges between them no longer met and the body cracked open along the seams. The eight chunks are now merged into one continuous mesh before simplifying, so there are no seams left to split. The surface is watertight; there are no dots.',
       'That also made the model smaller and better looking at the same time: 1.5MB down to 1.0MB, with cleaner muscle definition, because the simplifier had one whole body to work with instead of eight fragments.',
@@ -13804,6 +13895,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     return {
       currency:'USD ($)',
       today:this._todayStr(),
+      // How much the adviser actually has to work with. Without this it will happily
+      // give confident budget advice to someone who has never logged a single entry.
+      entries:{ income:inc.length, expenses:exp.length, savings:sav.length },
+      hasAnyData: (inc.length + exp.length + sav.length) > 0,
       allTime:{ income:totInc, expenses:totExp, net:totInc-totExp, marginPct: totInc>0?Math.round((totInc-totExp)/totInc*100):0 },
       thisMonth:{
         income:sum(inc.filter(i=>monthOff(i.ts,0))),
@@ -13865,6 +13960,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   bizReply(text){
     const t=String(text||'').toLowerCase(), s=this._financeSnapshot();
     const f=(n)=>this.fmtK(n);
+    if(!s.hasAnyData)
+      return 'I have nothing logged yet — no income, no expenses, no savings — so there is nothing for me to analyse. Add a few entries with Log Income and Log Expense, or just tell me (“log £42 Tesco shop”) and I will record it for you. Once there is a month of data I can compare spending, flag overspend and rank where your money comes from.';
     const over=s.byCategory.filter(c=>c.monthlyBudget>0 && c.spentThisMonth>c.monthlyBudget);
     if(/budget|categ|overspend|over budget/.test(t))
       return over.length ? ('Over budget this month: '+over.map(c=>c.category+' ('+f(c.spentThisMonth)+' of '+f(c.monthlyBudget)+')').join(', ')+'.')
@@ -13890,6 +13987,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       'You are the user’s personal financial adviser inside their finance app. You are not a generic chatbot: you can see all of their real logged money data, and you can write entries back into the app.',
       'Be concise and direct (2-5 sentences unless they ask for depth). No filler, no hedging, no "consult a professional" boilerplate. Give a real opinion and a specific next step, and use their actual numbers.',
       'You can do all of this: review budgets and flag overspend, compare spending month over month, rank income sources, read the cash flow calendar (recurring commitments and this month’s totals), advise on savings, and log entries for them.',
+      'IMPORTANT — if "hasAnyData" is false, or the relevant part of their data is empty, say so plainly in one line and ask them to log some entries (or offer to log them right now). Do NOT give generic personal-finance advice as though you had analysed their situation, do not quote totals of 0 as if they were findings, and do not invent example figures. Having no data is a real answer.',
       '',
       'TO WRITE SOMETHING INTO THE APP, append a directive on its own line at the very end of your reply, in exactly this form:',
       '[[DO:{"a":"expense","label":"Tesco shop","amount":42.5,"category":"Food","recurring":false}]]',

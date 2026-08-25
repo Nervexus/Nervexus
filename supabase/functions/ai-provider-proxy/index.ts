@@ -179,6 +179,13 @@ const FEED_BUNDLES: Record<string, { name: string; url: string }[]> = {
     { name: 'JURIST', url: 'https://www.jurist.org/news/feed/' },
     { name: 'Courthouse News', url: 'https://www.courthousenews.com/feed/' },
   ],
+  worldnews: [
+    { name: 'BBC World', url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+    { name: 'Guardian World', url: 'https://www.theguardian.com/world/rss' },
+    { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml' },
+    { name: 'Sky News World', url: 'https://feeds.skynews.com/feeds/rss/world.xml' },
+    { name: 'France 24', url: 'https://www.france24.com/en/rss' },
+  ],
 };
 
 // Publisher feeds routinely double-escape punctuation (&#8217;, &amp;, &quot;), which showed
@@ -231,11 +238,11 @@ async function parseRss(url: string) {
 // Pulls every feed in a bundle in parallel, tolerating individual feed failures, then
 // interleaves one story per publisher per round so a single prolific feed cannot crowd
 // the others out, and finally sorts the result newest-first.
-async function fetchFeedBundle(bundle: { name: string; url: string }[]) {
+async function fetchFeedBundle(bundle: { name: string; url: string }[], limit = 12) {
   const per = await Promise.all(bundle.map(async (f) => {
     try {
       const items = await parseRss(f.url);
-      return items.slice(0, 6).map((i) => ({ title: i.title, source: f.name, url: i.link, ts: i.ts }));
+      return items.slice(0, Math.max(6, Math.ceil(limit / bundle.length))).map((i) => ({ title: i.title, source: f.name, url: i.link, ts: i.ts }));
     } catch { return []; }
   }));
   const merged: { title: string; source: string; url: string; ts: number }[] = [];
@@ -244,13 +251,13 @@ async function fetchFeedBundle(bundle: { name: string; url: string }[]) {
   const seen = new Set<string>();
   const unique = merged.filter((h) => { const k = h.title.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
   unique.sort((a, b) => (b.ts || 0) - (a.ts || 0));
-  return { headlines: unique.slice(0, 12) };
+  return { headlines: unique.slice(0, limit) };
 }
 
 // Returns { headlines: [{title, source, url}] } or { data: string } for market/price sources.
 // Returns null for sources with no public API (premium/licensed — enterprise only).
 async function fetchNewsSource(provider: string, key: string | undefined, q: string) {
-  if (FEED_BUNDLES[provider]) return await fetchFeedBundle(FEED_BUNDLES[provider]);
+  if (FEED_BUNDLES[provider]) return await fetchFeedBundle(FEED_BUNDLES[provider], provider === 'worldnews' ? 120 : 12);
   if (RSS_FEEDS[provider]) {
     const items = await parseRss(RSS_FEEDS[provider]);
     return { headlines: items.slice(0, 8).map((i) => ({ title: i.title, source: provider, url: i.link, ts: i.ts })) };
