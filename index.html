@@ -8966,7 +8966,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-134 · v11.134 hotfix-blank-page';
+const NOTIF_BUILD_VERSION = '2026.08.25-135 · v11.135 real-attributes';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10305,6 +10305,24 @@ activities: this._mergeShipLog(s.activities),
   // quickTest<Subject> store, so a day of real questions showed 0 questions, 0% accuracy
   // and 0 hours. XP looked alive only because it was level*25 — a constant for reaching a
   // level, not anything you earned. This merges both stores and reports earned XP.
+  // Total earned XP across the whole Learning Centre — every subject's quick-test bank plus
+  // 10 a correct answer in finished tests. Feeds the Intelligence attribute, which used to
+  // count "activities tagged Learning" and so ignored every question actually answered.
+  _learningTotalXP(){
+    const L=this.state.learning||{};
+    const SUBJ=['english','maths','science','grammar','history','physiology','speaking','money','gentleman'];
+    const HIST={english:'englishHistory', maths:'mathsHistory', science:'scienceHistory',
+      grammar:'grammarHistory', history:'historyHistory', physiology:'physiologyHistory',
+      speaking:'speakingHistory', money:'moneyHistory', gentleman:'gentHistory'};
+    let xp=0;
+    for(const s of SUBJ){
+      const qt=(L[this._qtStorageKey(s)])||{};
+      const by=qt.xpByDate||{};
+      for(const d in by) xp += (+by[d]||0);
+      xp += ((L[HIST[s]]||[]).reduce((t,h)=>t+(+h.score||0),0))*10;
+    }
+    return xp;
+  }
   _learnTotals(subj, testHist){
     const t=(testHist||[]).reduce((a,h)=>{ a.q+=(+h.total||0); a.c+=(+h.score||0); a.t+=(+h.timeTaken||0); return a; },{q:0,c:0,t:0});
     const qt=this._qtState(subj);
@@ -12784,15 +12802,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
     const ev=[]; s.workouts.forEach(w=>ev.push({xp:30+(+w.min||0),ts:w.ts})); s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); }); if(this._isOwner()) this._changelog().forEach(c=>ev.push({xp:100, ts:this._parseChangelogDate(c.date), shipXP:true})); s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
     (s.loginXPLog||[]).forEach(l=>ev.push({xp:+l.xp||0, ts:l.ts}));
-    const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const T=(L)=>50*(L-1)*L; const LEVEL_FLOOR=900; const totalXP=T(LEVEL_FLOOR)+doneXP+ev.reduce((a,e)=>a+e.xp,0); const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
+    const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const T=(L)=>50*(L-1)*L;  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
     let level=1; while(T(level+1)<=totalXP) level++; const xpIn=totalXP-T(level), xpNext=T(level+1)-T(level);
     const toRoman=(n)=>{ const vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r=''; for(const [v,s] of vals){ while(n>=v){ r+=s; n-=v; } } return r; };
-    const namedRanks=[{n:'Recruit',min:1,d:'Levels 1–100'},{n:'Specialist',min:100,d:'Levels 100–200'},{n:'Elite',min:200,d:'Levels 200–300'},{n:'Commander',min:300,d:'Levels 300–400'},{n:'Master',min:400,d:'Levels 400–600'}];
-    const titanAt=(min)=>({n:'Titan '+toRoman(Math.floor((min-600)/100)+1),min,d:'Levels '+min+'–'+(min+100)});
+    const namedRanks=[{n:'Recruit',min:1,d:'Levels 1–5'},{n:'Specialist',min:5,d:'Levels 5–12'},{n:'Elite',min:12,d:'Levels 12–25'},{n:'Commander',min:25,d:'Levels 25–40'},{n:'Master',min:40,d:'Levels 40–60'}];
+    const titanAt=(min,idx,next)=>({n:'Titan '+toRoman(idx),min,d:'Levels '+min+'–'+next});
     const rankForLevel=(lvl)=>{ if(lvl<600){ let r=namedRanks[0]; for(const nr of namedRanks) if(lvl>=nr.min) r=nr; return r; } return titanAt(600+Math.floor((lvl-600)/100)*100); };
     const nextForLevel=(lvl)=>{ if(lvl<100) return namedRanks[1]; if(lvl<200) return namedRanks[2]; if(lvl<300) return namedRanks[3]; if(lvl<400) return namedRanks[4]; if(lvl<600) return titanAt(600); return titanAt(600+Math.floor((lvl-600)/100)*100+100); };
     const rank=rankForLevel(level), next=nextForLevel(level);
-    const ranks=[...namedRanks, titanAt(600), titanAt(700), titanAt(800), titanAt(900), titanAt(1000)];
+    const ranks=[...namedRanks, titanAt(60,1,85), titanAt(85,2,115), titanAt(115,3,150), titanAt(150,4,200), titanAt(200,5,999)];
     const cat=(name,xp)=>{ let L=1; while(T(L+1)<=xp) L++; return {name,xp:Math.round(xp),level:L,pct:Math.min(100,Math.round((xp-T(L))/(T(L+1)-T(L))*100))}; };
     const totInc=s.income.reduce((a,i)=>a+(+i.amt||0),0), totExp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0);
     // Consistency/Health/Recovery/Mental Resilience used to be flat 6600 regardless of
@@ -12800,10 +12818,55 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // mission that could never actually move. Now driven by the same real Health data
     // (sleep, hydration, meals, body log) and login streak everything else on this page uses.
     const H=s.health||{};
-    const categories=[ cat('Physical Strength',s.workouts.filter(w=>w.part!=='Cardio').reduce((a,w)=>a+(+w.min||0)*4+((+w.weight||0)*(+w.sets||0)*(+w.reps||0))/50,0)+6600), cat('Endurance',s.workouts.filter(w=>w.part==='Cardio').reduce((a,w)=>a+(+w.min||0)*7,0)+6600), cat('Discipline',doneXP*1.5+missDone*12+6600), cat('Productivity',s.activities.length*25+doneXP*0.5+missDone*8+6600), cat('Intelligence',s.activities.filter(a=>a.cat==='Learning').length*45+6600), cat('Business',s.income.length*40+s.activities.filter(a=>a.cat==='Business').length*30+6600), cat('Finance',Math.max(0,totInc-totExp)/1000+6600), cat('Focus',s.activities.filter(a=>a.cat==='Work').length*30+6600), cat('Consistency',(s.loginStreak||0)*80+6600), cat('Health',(H.meals||[]).length*15+(H.hydrationLog||[]).length*5+(H.bodyLog||[]).length*20+6600), cat('Recovery',(H.sleepLog||[]).length*20+(H.sleepLog||[]).reduce((a,x)=>a+(+x.quality||0),0)*3+6600), cat('Mental Resilience',s.activities.filter(a=>a.cat==='Personal').length*20+(H.sleepLog||[]).reduce((a,x)=>a+(+x.energy||0),0)*2+6600) ];
+    // Every attribute used to carry a flat +6600, and T(12) is exactly 6600 — so all twelve
+    // sat at level 12 from a standing start and needed 1,200 more XP just to reach 13. The
+    // floor is gone; these are now earned from the logs named against each one.
+    const W=s.workouts||[], ACT=s.activities||[], MISS=(s.missionHistory||[]);
+    const workMin=ACT.filter(a=>a.cat==='Work').reduce((t,a)=>t+(+a.min||0),0);
+    const dietTicks=((s.health&&s.health.diet)||[]).filter(d=>d.checked).length;
+    const perf=(s.perfLogs||[]).length;
+    const lift=W.filter(w=>w.part!=='Cardio');
+    const cardio=W.filter(w=>w.part==='Cardio');
+    const liftMin=lift.reduce((t,w)=>t+(+w.min||0),0);
+    const volume=lift.reduce((t,w)=>t+((+w.weight||0)*(+w.sets||0)*(+w.reps||0)),0);
+    const cardioMin=cardio.reduce((t,w)=>t+(+w.min||0),0);
+    const learnXP=this._learningTotalXP();
+    const savedTotal=(s.savings||[]).reduce((t,x)=>t+(+x.amt||0),0);
+    // "All logs" for Consistency and Mental Resilience: how many separate places you are
+    // actually keeping up, rather than one busy log carrying the score on its own.
+    const streams=[W.length, ACT.length, MISS.length, dietTicks, perf, (s.savings||[]).length,
+      (H.sleepLog||[]).length, (H.hydrationLog||[]).length, (H.meals||[]).length, learnXP>0?1:0];
+    const activeStreams=streams.filter(n=>n>0).length;
+    const allLogXP=streams.reduce((t,n)=>t+n,0);
+    const categories=[
+      cat('Physical Strength', liftMin*4 + volume/50),
+      cat('Endurance',         cardioMin*7 + liftMin*1.5),
+      cat('Discipline',        MISS.length*12 + dietTicks*8 + perf*25 + workMin*0.4),
+      cat('Productivity',      MISS.length*8 + dietTicks*3 + perf*15 + workMin*0.8),
+      cat('Intelligence',      learnXP*1.5),
+      cat('Finance',           (s.savings||[]).length*40 + savedTotal/100),
+      cat('Focus',             workMin*1.2),
+      cat('Consistency',       (s.loginStreak||0)*40 + activeStreams*60 + allLogXP*2),
+      cat('Health',            liftMin*2 + cardioMin*2 + dietTicks*10 + (H.meals||[]).length*8),
+      cat('Mental Resilience', allLogXP*1.5 + (s.loginStreak||0)*25 + activeStreams*40),
+    ];
     const sorted=[...categories].sort((a,b)=>b.xp-a.xp); const strong=sorted[0], weak=sorted[sorted.length-1];
     const ach=[ {name:'First Blood',desc:'Log your first workout',u:s.workouts.length>=1}, {name:'Iron Will',desc:'Log 5+ workouts',u:s.workouts.length>=5}, {name:'Goal Crusher',desc:'Clear your checklist',u:s.checklist.filter(c=>c.done).length>=s.checklist.length&&s.checklist.length>0}, {name:'Business Builder',desc:'Log 3+ income entries',u:s.income.length>=3}, {name:'Financial Discipline',desc:'Stay net-positive',u:(totInc-totExp)>0}, {name:'Learning Master',desc:'Log a learning session',u:s.activities.some(a=>a.cat==='Learning')}, {name:'Elite Performer',desc:'Reach Level 5',u:level>=5}, {name:'Planner',desc:'Schedule 5+ events',u:s.events.length>=5} ];
-    const mission=weak.name+' is your weakest attribute. '+(weak.name==='Endurance'?'Log a cardio session today.':weak.name==='Physical Strength'?'Add a strength session with weight & reps.':weak.name==='Business'?'Log income or a business task.':weak.name==='Intelligence'?'Log a learning session.':weak.name==='Consistency'?'Log in and use the app daily to build a streak.':weak.name==='Health'?'Log a meal, some water, or a body-weight check-in.':weak.name==='Recovery'?'Log last night’s sleep in Health.':weak.name==='Mental Resilience'?'Log a Personal activity or your sleep energy rating.':'Complete tasks and log activity to raise it.');
+    // Advice now points at the log that actually feeds each attribute, and no longer
+    // mentions Business or Recovery, which no longer exist.
+    const MISSION_HINT={
+      'Physical Strength':'Log a strength session with weight, sets and reps.',
+      'Endurance':'Log a cardio session in the training log.',
+      'Discipline':'Finish a Daily Mission, tick your Diet Checklist, or fill in a performance log.',
+      'Productivity':'Log some work hours, or clear a mission.',
+      'Intelligence':'Do a Quick Test or a lesson in the Learning Centre.',
+      'Finance':'Add to savings on the Finance Terminal.',
+      'Focus':'Log work hours on Productivity.',
+      'Consistency':'Keep more than one log going — this one rewards breadth, not volume.',
+      'Health':'Log a session and tick off your Diet Checklist.',
+      'Mental Resilience':'Keep several logs ticking over across the week.',
+    };
+    const mission=weak.name+' is your weakest attribute. '+(MISSION_HINT[weak.name]||'Log something against it today.');
     return {totalXP:Math.round(totalXP),level,rank,next,xpInLevel:Math.round(xpIn),xpForNext:Math.round(xpNext),pct:Math.round(xpIn/xpNext*100),today:sum(day),week:sum(week),month:sum(month),categories,strongest:strong,weakest:weak,achievements:ach,ranks,mission,streak:s.loginStreak||0}; }
   // Parses a changelog date string ("Aug 6, 2026 · 14:55", optionally with a trailing
   // "BST"/"GMT" label) into an epoch ms, treating it as UK local time (BST = UTC+1,
@@ -12828,6 +12891,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.135', date:'Aug 25, 2026', major:true, notes:[
+      'Found where the 12 came from. Every attribute had a hidden 6,600 XP added to it, and 6,600 is exactly the threshold for level 12 \u2014 so all twelve attributes sat at level 12 on a brand new account and needed another 1,200 XP just to reach 13. Nothing you logged was visible underneath it. That padding is gone; attributes now start at 1 and are earned.',
+      'The headline Power Level was the same trick, much larger. It was handed 40,455,000 XP for free, pinning everyone at level 900, rank Titan IV, from the moment they signed up. That is gone too. It now reads your real total \u2014 which means it will show a small number, and that number will be true and will move when you do something.',
+      'Because the rank ladder was built around starting at 900, every rank was unreachable once the padding went (Specialist wanted level 100, which is 495,000 XP). The ladder is rescaled to levels you can actually reach: Recruit 1\u20135, Specialist 5\u201312, Elite 12\u201325, Commander 25\u201340, Master 40\u201360, then the Titan tiers.',
+      'Each attribute is now wired to the logs it claims to measure. Endurance reads your cardio and training minutes instead of nothing. Discipline and Productivity read Daily Missions, the Diet Checklist, your performance logs and work hours. Intelligence reads real Learning Centre XP across all nine subjects \u2014 it used to count activities merely tagged Learning, so every question you answered was invisible to it. Finance reads your savings. Focus reads work hours. Health reads training and diet. Consistency and Mental Resilience reward keeping several logs going rather than one.',
+      'Business and Recovery are removed, and the \u201Cweakest attribute\u201D advice now points at the log that actually feeds whichever attribute is lowest.',
+    ]},
     {version:'v11.134', date:'Aug 25, 2026', major:true, notes:[
       'Hotfix: v11.133 took the whole app down to a blank screen. The trackers change I shipped referred to the app\u2019s data with a lower-case s where that part of the code calls it S. One character, and every screen stopped rendering \u2014 there is no partial failure here, the page either builds or it does not.',
       'It passed a syntax check, which is exactly why it got through: the name was spelled correctly, it simply did not exist at that point in the code. That is only caught by running the app, and I shipped it without doing so.',
