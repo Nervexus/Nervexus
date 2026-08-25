@@ -377,7 +377,12 @@
   .cc-voiceorb{ display:none !important; }
   .cc-asst{ display:none !important; }
   .cc-hide-mobile{ display:none !important; }
+  /* World Intel Routes / Saved Locations: single column on a phone, and the paired
+     from/to controls (two dropdowns, two city inputs) stack instead of being squeezed
+     side by side into unusable slivers. */
   .cc-wi-routes-grid{ grid-template-columns:1fr !important; }
+  .cc-wi-2up{ flex-direction:column !important; }
+  .cc-wi-2up > select, .cc-wi-2up > input{ width:100% !important; flex:1 1 auto !important; }
   .cc-fin-kpi-wrap{ background:#16181c !important; border-radius:20px !important; padding:20px !important; }
   .cc-fin-kpi-item{ background:transparent !important; border:none !important; padding:0 !important; border-radius:0 !important; }
   .cc-dash-brief-row, .cc-dash-stats-row{ display:none !important; }
@@ -1278,89 +1283,47 @@
           </div>
         </div>
         </sc-if>
-        <sc-if value="{{ showBriefRow }}" hint-placeholder-val="{{ true }}">
-        <div class="cc-dash-brief-row cc-grid2" style="display:grid; grid-template-columns:1.55fr 1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#17191d; padding:22px; overflow:hidden;">
-            <div style="position:absolute; right:-40px; top:-40px; width:220px; height:220px; background:radial-gradient(circle,rgba(255,255,255,0.05),transparent 70%); pointer-events:none;"></div>
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">AI DAILY BRIEF</span>
-              <span style="font-size:9px; color:#b8b8c0; border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:2px 8px;">{{ homeBriefBadge }}</span>
-            </div>
-            <p style="font-size:15.5px; line-height:1.6; color:#d6d6da; max-width:620px;">{{ homeBriefText }}</p>
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
-              <span onClick="{{ genBriefing }}" style="font-size:12px; color:{{ ultraBriefBtnColor }}; border:1px solid {{ ultraBriefBtnBorder }}; border-radius:10px; padding:7px 13px; background:{{ ultraBriefBtnBg }}; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.2)' }">{{ homeBriefBtnLabel }}</span>
-              <span onClick="{{ goVoice }}" style="font-size:12px; color:{{ ultraSecBtnColor }}; border:1px solid {{ ultraSecBtnBorder }}; border-radius:10px; padding:7px 13px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">▶ Play voice brief</span>
-              <span onClick="{{ goBrief }}" style="font-size:12px; color:{{ ultraSecBtnColor }}; border:1px solid {{ ultraSecBtnBorder }}; border-radius:10px; padding:7px 13px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">Open full briefing</span>
-            </div>
-            <sc-if value="{{ aiBriefErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-top:10px;">⚠ {{ aiBriefErr }}</div></sc-if>
-            <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-size:11px; letter-spacing:1.5px; color:#7c7c84; font-family:'JetBrains Mono',monospace;">PRODUCTIVITY · LAST 30 DAYS</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ prodDeltaColor }};">{{ prodDeltaText }}</span>
+        <sc-if value="{{ showNewsRow }}" hint-placeholder-val="{{ true }}">
+        <div class="cc-dash-news-row cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
+          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:3px;">
+              <div style="display:flex; align-items:baseline; gap:9px;">
+                <span style="font-size:13px; font-weight:600;">Money / News</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#6cffba; letter-spacing:.5px;">LIVE</span>
               </div>
-              <canvas data-chart="dashMain" style="width:100%; height:128px; display:block;"></canvas>
+              <span onClick="{{ refreshMoneyNews }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px; cursor:pointer; white-space:nowrap;" style-hover="{ color:'#F4F4F5', borderColor:'rgba(255,255,255,0.4)' }">{{ moneyNewsBtnLabel }}</span>
             </div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:18px;">
-              <canvas data-chart="dashRings" style="width:118px; height:118px; flex:0 0 118px;"></canvas>
-              <div style="display:flex; flex-direction:column; gap:11px;">
-                <div><div style="font-size:11px; color:#7c7c84; letter-spacing:1px;">FOCUS</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#FFFFFF;">{{ focusRingText }}</div></div>
-                <div><div style="font-size:11px; color:#7c7c84; letter-spacing:1px;">MOVE</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#eef0f2;">{{ moveRingText }}</div></div>
-                <div><div style="font-size:11px; color:#7c7c84; letter-spacing:1px;">GOALS</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#9a9aa2;">{{ goalsRingText }}</div></div>
-              </div>
-            </div>
-            <div class="cc-glowcard" style="flex:1; border-radius:20px; background:#17191d; padding:20px;">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
-                <span style="font-size:11px; letter-spacing:1.5px; color:#7c7c84; font-family:'JetBrains Mono',monospace;">SUGGESTED NEXT</span>
-                <span onClick="{{ generateNextActionsAI }}" style="font-size:10px; color:#F4F4F5; cursor:pointer; font-family:'JetBrains Mono',monospace; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ nextActionsBtnLabel }}</span>
-              </div>
-              <div style="font-size:9px; color:#8a8a92; font-family:'JetBrains Mono',monospace; margin-bottom:10px;">{{ nextActionsSourceLabel }}</div>
-              <sc-if value="{{ nextActionsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:8px; line-height:1.4;">⚠ {{ nextActionsErr }}</div></sc-if>
-              <sc-if value="{{ noNextActions }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px; color:#75757d;">Nothing due today — add a mission or calendar event to see it here.</div></sc-if>
-              <sc-for list="{{ nextActions }}" as="a" hint-placeholder-count="3">
-                <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <span style="width:7px; height:7px; border-radius:50%; flex:0 0 7px; background:{{ a.dot }}; box-shadow:0 0 8px {{ a.dot }};"></span>
-                  <span style="font-size:13px; color:#d6d6da; flex:1;">{{ a.label }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#7c7c84;">{{ a.time }}</span>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#6f6f78; margin-bottom:12px;">{{ moneyNewsMeta }}</div>
+            <sc-if value="{{ moneyNewsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#ff6b76; margin-bottom:10px; line-height:1.4;">⚠ {{ moneyNewsErr }}</div></sc-if>
+            <div style="max-height:322px; overflow-y:auto; margin:0 -4px; padding:0 4px;">
+              <sc-for list="{{ moneyNews }}" as="n" hint-placeholder-count="5">
+                <div onClick="{{ n.open }}" style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
+                  <div style="font-size:13px; color:#dbdbe0; line-height:1.45;">{{ n.title }}</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; margin-top:4px;">{{ n.meta }}</div>
                 </div>
               </sc-for>
+              <sc-if value="{{ noMoneyNews }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:14px 2px;">{{ moneyNewsEmpty }}</div></sc-if>
             </div>
           </div>
-        </div>
-        </sc-if>
-        <sc-if value="{{ showStatsRow }}" hint-placeholder-val="{{ true }}">
-        <div class="cc-dash-stats-row cc-stat4" style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:18px;">
-          <sc-for list="{{ statCards }}" as="s" hint-placeholder-count="4">
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <span style="font-size:11px; letter-spacing:1px; color:#7c7c84;">{{ s.label }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ s.delColor }};">{{ s.delta }}</span>
-              </div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:25px; font-weight:600; margin:8px 0 2px; color:#eef0f2;">{{ s.value }}</div>
-              <sc-if value="{{ s.hasSub }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8a8a92; margin-top:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ s.sub }}</div></sc-if>
-              <sc-if value="{{ s.hasSpark }}" hint-placeholder-val="{{ true }}"><canvas data-spark="{{ s.spark }}" style="width:100%; height:30px; display:block; margin-top:6px;"></canvas></sc-if>
-            </div>
-          </sc-for>
-        </div>
-        </sc-if>
-        <sc-if value="{{ showIntelRow }}" hint-placeholder-val="{{ true }}">
-        <div class="cc-dash-intel-row">
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-              <span style="font-size:13px; font-weight:600;">Intelligence Feed</span>
-              <span style="font-size:9px; color:#C9C9CE; border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:2px 8px;">SAMPLE DATA</span>
-            </div>
-            <div style="font-size:11px; color:#75757d; margin-bottom:10px;">Illustrative stories — not a live feed. For real, sourced coverage, open World Intel’s News tab or generate your AI Daily Brief above.</div>
-            <sc-for list="{{ intel }}" as="n" hint-placeholder-count="4">
-              <div onClick="{{ goWorldIntel }}" style="display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
-                <span style="font-size:9px; font-family:'JetBrains Mono',monospace; letter-spacing:1px; color:{{ n.catColor }}; border:1px solid {{ n.catBdr }}; border-radius:6px; padding:3px 7px; height:fit-content; white-space:nowrap;">{{ n.cat }}</span>
-                <div style="flex:1;">
-                  <div style="font-size:13px; color:#dbdbe0; line-height:1.4;">{{ n.headline }}</div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#75757d; margin-top:4px;">{{ n.meta }}</div>
-                </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:3px;">
+              <div style="display:flex; align-items:baseline; gap:9px;">
+                <span style="font-size:13px; font-weight:600;">Law News</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#6cffba; letter-spacing:.5px;">LIVE</span>
               </div>
-            </sc-for>
+              <span onClick="{{ refreshLawNews }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px; cursor:pointer; white-space:nowrap;" style-hover="{ color:'#F4F4F5', borderColor:'rgba(255,255,255,0.4)' }">{{ lawNewsBtnLabel }}</span>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#6f6f78; margin-bottom:12px;">{{ lawNewsMeta }}</div>
+            <sc-if value="{{ lawNewsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#ff6b76; margin-bottom:10px; line-height:1.4;">⚠ {{ lawNewsErr }}</div></sc-if>
+            <div style="max-height:322px; overflow-y:auto; margin:0 -4px; padding:0 4px;">
+              <sc-for list="{{ lawNews }}" as="n" hint-placeholder-count="5">
+                <div onClick="{{ n.open }}" style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
+                  <div style="font-size:13px; color:#dbdbe0; line-height:1.45;">{{ n.title }}</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; margin-top:4px;">{{ n.meta }}</div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ noLawNews }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:14px 2px;">{{ lawNewsEmpty }}</div></sc-if>
+            </div>
           </div>
         </div>
         </sc-if>
@@ -1471,11 +1434,10 @@
                 </div>
               </div>
 
-              <sc-if value="{{ routesUnlocked }}" hint-placeholder-val="{{ false }}">
               <div class="cc-wi-routes-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
                 <div style="border-radius:16px; background:#16181c; padding:14px 16px;">
                   <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">◆ ROUTES</div>
-                  <div style="display:flex; gap:8px; margin-bottom:8px;">
+                  <div class="cc-wi-2up" style="display:flex; gap:8px; margin-bottom:8px;">
                     <select value="{{ routeFrom }}" onChange="{{ setRouteFrom }}" style="flex:1; min-width:0; padding:8px 9px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:11.5px;">
                       <sc-for list="{{ placeOptions }}" as="p" hint-placeholder-count="6"><option value="{{ p.name }}">{{ p.name }}</option></sc-for>
                     </select>
@@ -1485,7 +1447,7 @@
                   </div>
                   <div onClick="{{ addRoute }}" class="cc-glowbtn" style="text-align:center; padding:8px; border-radius:9px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0a0a0b; font-size:11.5px; font-weight:700; margin-bottom:12px;">+ Add Route</div>
                   <div style="font-size:9px; color:#5f5f66; text-align:center; margin-bottom:10px; letter-spacing:1px;">— OR ENTER A CITY / POSTCODE —</div>
-                  <div style="display:flex; gap:8px; margin-bottom:8px;">
+                  <div class="cc-wi-2up" style="display:flex; gap:8px; margin-bottom:8px;">
                     <input value="{{ routeCityFromVal }}" onInput="{{ setRouteCityFrom }}" placeholder="City or postcode (from)" style="flex:1; min-width:0; padding:8px 9px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:11.5px; outline:none; box-sizing:border-box;">
                     <input value="{{ routeCityToVal }}" onInput="{{ setRouteCityTo }}" placeholder="City or postcode (to)" style="flex:1; min-width:0; padding:8px 9px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:11.5px; outline:none; box-sizing:border-box;">
                   </div>
@@ -1523,18 +1485,6 @@
                   <sc-if value="{{ myLocationErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:#ff5563; margin-top:8px;">⚠ {{ myLocationErr }}</div></sc-if>
                 </div>
               </div>
-              </sc-if>
-              <sc-if value="{{ routesLocked }}" hint-placeholder-val="{{ true }}">
-              <div style="border-radius:16px; background:#16181c; padding:26px 16px; margin-bottom:16px; text-align:center;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">◆ ROUTES · RESTRICTED</div>
-                <div style="font-size:12px; color:#8a8a92; margin-bottom:14px;">Enter password to access saved routes &amp; locations.</div>
-                <div style="display:flex; gap:8px; max-width:280px; margin:0 auto 8px;">
-                  <input type="password" value="{{ routesPwVal }}" onInput="{{ setRoutesPw }}" onKeyDown="{{ routesPwKey }}" placeholder="Password" style="flex:1; padding:9px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:12px; outline:none;">
-                  <div onClick="{{ submitRoutesPw }}" class="cc-glowbtn" style="padding:9px 16px; border-radius:9px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0a0a0b; font-size:11.5px; font-weight:700; white-space:nowrap;">Unlock</div>
-                </div>
-                <sc-if value="{{ routesPwErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff5563;">⚠ {{ routesPwErr }}</div></sc-if>
-              </div>
-              </sc-if>
 
               <div style="border-radius:16px; background:#16181c; padding:14px 16px; margin-bottom:16px;">
                 <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">◆ LOCATION SAFETY CHECK</div>
@@ -1549,16 +1499,6 @@
                 </sc-if>
               </div>
 
-              <div style="border-radius:16px; border:1px solid rgba(255,255,255,0.22); padding:14px 16px;">
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ AI BRIEFING · {{ wiBriefBadge }}</span>
-                  <span onClick="{{ generateWiBriefAI }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; cursor:pointer; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ wiBriefBtnLabel }}</span>
-                </div>
-                <sc-if value="{{ wiBriefErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:8px; line-height:1.4;">⚠ {{ wiBriefErr }}</div></sc-if>
-                <sc-for list="{{ briefing }}" as="b" hint-placeholder-count="5">
-                  <div style="display:flex; gap:9px; padding:5px 0;"><span style="color:#C9C9CE;">▸</span><span style="font-size:11.5px; line-height:1.45; color:#d6d6da;">{{ b }}</span></div>
-                </sc-for>
-              </div>
             </div>
 
             <div class="cc-hide-mobile" style="border-radius:18px; padding:14px 16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -2295,17 +2235,20 @@
           </sc-for>
         </div>
         <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ MONEY ASSISTANT</span><span style="font-size:9px; color:#8a8a92;">reads your logged numbers</span></div>
-          <div style="max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ FINANCIAL ADVISER</span><span style="font-size:9px; color:#8a8a92;">reads your income, expenses, budgets, savings &amp; cash flow — and can log entries for you</span></div>
+          <div style="display:flex; gap:7px; flex-wrap:wrap; margin:10px 0 12px;">
+            <sc-for list="{{ adviserChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.ask }}" style="font-size:11.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:6px 11px; cursor:pointer; white-space:nowrap;" style-hover="{ color:'#F4F4F5', borderColor:'rgba(255,255,255,0.45)' }">{{ c.label }}</span></sc-for>
+          </div>
+          <div style="max-height:300px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; margin-bottom:12px;">
             <sc-for list="{{ bizMsgs }}" as="m" hint-placeholder-count="1">
               <div style="align-self:{{ m.align }}; max-width:76%; padding:10px 14px; border-radius:13px; background:{{ m.bg }}; border:1px solid rgba(255,255,255,0.06);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ m.whoC }}; margin-bottom:3px;">{{ m.who }}</div><div style="font-size:13px; color:{{ m.txtC }}; line-height:1.5;">{{ m.text }}</div></div>
             </sc-for>
             <sc-if value="{{ bizLoading }}" hint-placeholder-val="{{ false }}">
-              <div style="align-self:flex-start; max-width:76%; padding:10px 14px; border-radius:13px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#C9C9CE; margin-bottom:3px;">MONEY ASSISTANT</div><div style="font-size:13px; color:#8a8a92;">Thinking…</div></div>
+              <div style="align-self:flex-start; max-width:76%; padding:10px 14px; border-radius:13px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#C9C9CE; margin-bottom:3px;">ADVISER</div><div style="font-size:13px; color:#8a8a92;">Thinking…</div></div>
             </sc-if>
           </div>
           <div style="display:flex; gap:9px;">
-            <input value="{{ bizInput }}" onInput="{{ setBizInput }}" onKeyDown="{{ bizSendKey }}" placeholder="Ask about budgeting, spending, saving, or a money decision…" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+            <input value="{{ bizInput }}" onInput="{{ setBizInput }}" onKeyDown="{{ bizSendKey }}" placeholder="Ask anything, or tell me what to log — e.g. &quot;log £42 Tesco shop&quot;…" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
             <span onClick="{{ bizSend }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; opacity:{{ bizSendOpacity }};">{{ bizSendLabel }}</span>
           </div>
         </div>
@@ -2431,21 +2374,6 @@
             <span onClick="{{ addExpenseCategoryClick }}" style="padding:8px 15px; border-radius:9px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#eef0f2; font-size:12px; font-weight:600; cursor:pointer; display:flex; align-items:center; white-space:nowrap;">+ Add category</span>
           </div>
         </div>
-        <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ BUDGET RECOMMENDATIONS</span>
-            <span onClick="{{ generateFinRecsAI }}" style="font-size:10px; color:#F4F4F5; cursor:pointer; font-family:'JetBrains Mono',monospace; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ finRecsBtnLabel }}</span>
-          </div>
-          <div style="font-size:9px; color:#8a8a92; font-family:'JetBrains Mono',monospace; margin-bottom:10px;">{{ finRecsSourceLabel }}</div>
-          <sc-if value="{{ finRecsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:8px; line-height:1.4;">⚠ {{ finRecsErr }}</div></sc-if>
-          <sc-for list="{{ finPlannerRecs }}" as="r" hint-placeholder-count="2">
-            <div style="display:flex; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-              <span style="color:#C9C9CE; font-size:13px;">▸</span>
-              <span style="font-size:12.5px; line-height:1.5; color:#d6d6da; flex:1;">{{ r }}</span>
-            </div>
-          </sc-for>
-        </div>
-
         <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
           <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:4px;">◆ SAVINGS</div>
           <sc-if value="{{ showSpendWarning }}" hint-placeholder-val="{{ false }}"><div style="border-radius:12px; background:rgba(255,85,99,0.1); border:1px solid rgba(255,85,99,0.3); padding:10px 12px; margin:10px 0; font-size:12px; color:#ff9099; line-height:1.5;">⚠ {{ spendWarningText }}</div></sc-if>
@@ -2467,47 +2395,6 @@
           </div>
         </div>
 
-        <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; padding:20px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ RECOMMENDATIONS</span>
-              <span onClick="{{ generateBizRecsAI }}" style="font-size:10px; color:#F4F4F5; cursor:pointer; font-family:'JetBrains Mono',monospace; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ bizRecsBtnLabel }}</span>
-            </div>
-            <div style="font-size:9px; color:#8a8a92; font-family:'JetBrains Mono',monospace; margin-bottom:10px;">{{ bizRecsSourceLabel }}</div>
-            <sc-if value="{{ bizRecsErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:8px; line-height:1.4;">⚠ {{ bizRecsErr }}</div></sc-if>
-            <sc-for list="{{ bizRecs }}" as="r" hint-placeholder-count="3">
-              <div style="display:flex; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                <span style="color:#C9C9CE; font-size:13px;">▸</span>
-                <span style="font-size:12.5px; line-height:1.5; color:#d6d6da; flex:1;">{{ r }}</span>
-              </div>
-            </sc-for>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; margin-bottom:14px;">Sales Pipeline</div>
-            <sc-for list="{{ pipeline }}" as="p" hint-placeholder-count="5">
-              <div style="margin-bottom:13px;">
-                <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;"><span style="color:#cfcfd4;">{{ p.stage }}</span><span style="font-family:'JetBrains Mono',monospace; color:#9a9aa2;">{{ p.val }}</span></div>
-                <div style="height:9px; border-radius:6px; background:rgba(255,255,255,0.05); overflow:hidden;"><div style="height:100%; width:{{ p.pct }}; border-radius:6px; background:#FFFFFF;"></div></div>
-              </div>
-            </sc-for>
-            <sc-if value="{{ noPipeline }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#6f6f78;">No income logged yet — add one on the left.</span></sc-if>
-          </div>
-        </div>
-        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-top:18px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;"><span style="font-size:15px; font-weight:700;">Spending Trends</span></div>
-          <div style="font-size:11.5px; color:{{ spendTrendTotalColor }}; margin-bottom:14px;">{{ spendTrendTotalLabel }}</div>
-          <sc-if value="{{ noSpendTrends }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#8a8a92;">Log expenses across a couple of months to see category trends here.</div></sc-if>
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <sc-for list="{{ spendTrendRows }}" as="t" hint-placeholder-count="4">
-              <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ t.cat }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d;">{{ t.prevLabel }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#eef0f2; width:76px; text-align:right;">{{ t.curLabel }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ t.pctColor }}; width:60px; text-align:right;">{{ t.pctLabel }}</span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
       </div>
       </sc-if>
 
@@ -9009,7 +8896,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.24-117 · v11.117 mission-fields-sync';
+const NOTIF_BUILD_VERSION = '2026.08.25-118 · v11.118 command-center-news-adviser';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9065,6 +8952,11 @@ class Component extends DCLogic {
       perfTeamProfiles:[], perfTeamStatusRaw:[], perfTeamLogsRaw:[],
       missionNotes:{}, missionInput:'', missionRecurring:false, missionView:'active', xpFx:[],
       missionOptsOpen:false, newMissionCategory:'mission', newMissionPriority:'normal', newMissionRepeat:'daily', newMissionDue:'',
+      // Command Center's two live news cards. Real publisher RSS via the ai-provider-proxy
+      // 'moneynews'/'lawnews' bundles — no key, no rate limit. Cached in state for 20 min so
+      // re-entering the dashboard doesn't refetch; the ↻ button forces a fresh pull.
+      moneyNews:[], lawNews:[], moneyNewsAt:0, lawNewsAt:0,
+      moneyNewsLoading:false, lawNewsLoading:false, moneyNewsErr:'', lawNewsErr:'',
       missGenOpen:false, missGenCat:null, missGenLoading:false, missGenErr:'', missGenResult:null,
       move: s.move || { streak:13, last:yestC, longest:21 },
       lastRollover: s.lastRollover || todayC,
@@ -9097,9 +8989,6 @@ activities: this._mergeShipLog(s.activities),
       actText:'', actCat:'Work', actRange:'Week', actMin:'', actHr:'',
       aiTasksResult:null, aiTasksLoading:false, aiTasksErr:'',
       aiNextActionsResult:null, aiNextActionsLoading:false, aiNextActionsErr:'',
-      finRecsResult:null, finRecsLoading:false, finRecsErr:'',
-      bizRecsResult:null, bizRecsLoading:false, bizRecsErr:'',
-      wiBriefResult:{}, wiBriefLoading:false, wiBriefErr:'',
       events: s.events || [
         {title:'Q3 launch standup',date:'2026-07-01',time:'09:00'},
         {title:'Investor call',date:'2026-07-01',time:'11:00'},
@@ -11265,6 +11154,39 @@ activities: this._mergeShipLog(s.activities),
     }catch(e){ return null; } }));
     return results.filter(Boolean).join('\n\n');
   }
+  // ===== Command Center live news (Money / News + Law News) =====
+  // Real publisher RSS, pulled through the ai-provider-proxy 'moneynews'/'lawnews' bundles.
+  // Deliberately not GDELT: that API rate-limits to one request per 5 seconds per IP, and
+  // every user of this app shares the edge function's egress address, so it would throttle.
+  _newsAgo(ts){
+    if(!ts) return '';
+    const mins=Math.round((Date.now()-ts)/60000);
+    if(mins<1) return 'just now';
+    if(mins<60) return mins+'m ago';
+    const hrs=Math.round(mins/60);
+    if(hrs<24) return hrs+'h ago';
+    const days=Math.round(hrs/24);
+    return days+'d ago';
+  }
+  async loadDashNews(kind, force){
+    const money=kind==='money';
+    const K={ list:money?'moneyNews':'lawNews', at:money?'moneyNewsAt':'lawNewsAt',
+      loading:money?'moneyNewsLoading':'lawNewsLoading', err:money?'moneyNewsErr':'lawNewsErr' };
+    const S=this.state;
+    if(S[K.loading]) return;
+    // 20-minute cache: re-entering the dashboard reuses what's already loaded.
+    if(!force && S[K.at] && (Date.now()-S[K.at])<20*60000 && (S[K.list]||[]).length) return;
+    if(!this._sbOn()){ this.setState({[K.err]:'Sign in to load live news.'}); return; }
+    this.setState({[K.loading]:true, [K.err]:''});
+    try{
+      const r=await window.SB.fetchNewsData(money?'moneynews':'lawnews','');
+      if(!r || r.error) throw new Error((r&&r.error)||'News feed unavailable');
+      const items=(r.headlines||[]).filter(h=>h&&h.title).slice(0,10)
+        .map(h=>({ title:String(h.title).slice(0,180), source:h.source||'', url:h.url||'', ts:+h.ts||0 }));
+      this.setState({ [K.list]:items, [K.loading]:false, [K.at]:Date.now(),
+        [K.err]: items.length?'':'No stories came back — try refresh.' });
+    }catch(e){ this.setState({[K.loading]:false, [K.err]:(e&&e.message)||'Could not load news'}); }
+  }
   mut(u){ this.setState(u, ()=>this.save()); }
   openWebApp(){ window.open('https://nervexus.vercel.app', '_blank', 'noopener'); }
   startRefresh(){
@@ -12216,10 +12138,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       this.save(); this._wiRedrawRoutes();
     }, ()=>{ this.setState({myLocationErr:'Could not get your location — check permissions'}); }, {enableHighAccuracy:true, timeout:10000});
   }
-  submitRoutesPw(){
-    if((this.state.routesPwInput||'')==='Warroom21'){ this.setState({routesUnlocked:true, routesPwErr:'', routesPwInput:''}); }
-    else this.setState({routesPwErr:'Incorrect password'});
-  }
   addSavedPin(lng,lat){ const n=((this.state.wiSavedPins||[]).length)+1; this.mut(s=>({ wiSavedPins:[...(s.wiSavedPins||[]), {id:'pin'+Date.now(), name:'Pin '+n, lng, lat}] })); this.save(); this._wiRedrawPins(); }
   removeSavedPin(id){ this.mut(s=>({ wiSavedPins:(s.wiSavedPins||[]).filter(p=>p.id!==id) })); this.save(); this._wiRedrawPins(); }
   _initMapLibre(){ const el=this.root&&this.root.querySelector('#wiMapLibre'); if(!el) return;
@@ -12268,7 +12186,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     ];
     const newsFeed=this.countryNews(sel.name).map(n=>({cat:n[0],catCol:this._newsCatCol(n[0]),headline:n[1],src:n[2],time:n[3]}));
     const alerts=[ {sev:'CRITICAL',sevCol:'#ff2b3d',time:'02:11',txt:'Satellite movement detected over contested airspace',conf:93}, {sev:'HIGH',sevCol:'#d9333f',time:'01:52',txt:'Coordinated cyber intrusion on financial infrastructure',conf:88}, {sev:'HIGH',sevCol:'#d9333f',time:'01:20',txt:'Military mobilization along northern border corridor',conf:81}, {sev:'MEDIUM',sevCol:'#a83039',time:'00:44',txt:'New financial sanctions package announced',conf:76}, {sev:'MEDIUM',sevCol:'#a83039',time:'00:12',txt:'Political unrest escalating in capital region',conf:71} ];
-    const briefing=['Two active conflict zones under continuous monitoring; escalation risk moderate.','Global markets steady; sanctions exposure concentrated in energy and banking.','Emerging AI-infrastructure buildout creating strategic supply-chain leverage.','Cyber threat level elevated after coordinated intrusion attempts.','Orbital assets repositioned — expanded surveillance coverage over three regions.'];
     const threatCountryCount=_tTotal;
     const placeOptions=this._wiPlaceList().map(p=>({name:p.name}));
     const routeFromVal=S.routeFrom||'United Kingdom', routeToVal=S.routeTo||'Bavaria (Munich)';
@@ -12284,13 +12201,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       runSafetyCheck:()=>this.runSafetyCheck(), safetyBtnLabel:S.safetyLoading?'Checking…':'Check Safety', safetyErr:S.safetyErr||'',
       hasSafetyResult:!!S.safetyResult, safetyResultText:S.safetyResult||'',
       addRoute:()=>this.addRoute(), routeList, hasSavedPins:savedPinList.length>0, savedPinList, wiPanelTabs, wiPanel, setWiPanel:(e)=>this.setState({wiPanel:e.target.value}), showWiStats:wiPanel==='stats', showWiThreat:wiPanel==='threat', showWiNews:wiPanel==='news', showWiAlerts:wiPanel==='alerts', wiQuery:S.wiQuery||'', setWiQuery:(e)=>this.setState({wiQuery:e.target.value}), countryList, countryOptions:cs.map(c=>({name:c.name})).sort((a,b)=>a.name.localeCompare(b.name)), selCountryVal:sel.name, setCountry:(e)=>{ const n=e.target.value; this.setState({selCountry:n}); this.wiFace(this.countries.find(x=>x.name===n)); }, wiSel, wiLayers, wiTimes, agent, statistics, threats, threatCountryCount, newsFeed, alerts,
-      ...(()=>{ const ai=(S.wiBriefResult||{})[sel.name]; return {
-        briefing: ai || briefing,
-        wiBriefBadge: ai?'AI-GENERATED':'PREVIEW', wiBriefBtnLabel: S.wiBriefLoading?'⏂ Thinking…':'✨ AI refresh',
-        wiBriefErr: S.wiBriefErr||'', generateWiBriefAI:()=>this.generateWiBriefAI(),
-      }; })(),
-      routesUnlocked:!!S.routesUnlocked, routesLocked:!S.routesUnlocked,
-      routesPwVal:S.routesPwInput||'', setRoutesPw:(e)=>this.setState({routesPwInput:e.target.value}), routesPwKey:(e)=>{ if(e.key==='Enter') this.submitRoutesPw(); }, routesPwErr:S.routesPwErr||'', submitRoutesPw:()=>this.submitRoutesPw(),
       savedAddressVal:S.savedAddressInput||'', setSavedAddress:(e)=>this.setState({savedAddressInput:e.target.value}), savedAddressKey:(e)=>{ if(e.key==='Enter') this.saveAddressLocation(); }, savedAddressErr:S.savedAddressErr||'', saveAddressLocation:()=>this.saveAddressLocation(), saveAddressBtnLabel:S.savedAddressLoading?'Saving…':'Save', myLocationErr:S.myLocationErr||'' };
   }
 
@@ -12344,7 +12254,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const activeTab=this.root.querySelector('[data-tab-active="true"]');
     if(activeTab) activeTab.scrollIntoView({ block:'nearest', inline:'center' });
     if(!(this.state.learningTab==='Maths' && this.state.mtMode==='hub')) return; const hist=(((this.state.learning&&this.state.learning.mathsHistory)||[]).filter(h=>h.mode==='GCSE Test').slice(0,10).reverse()); if(hist.length<2) return; const cv=this.root.querySelector('[data-chart="mtProgress"]'); if(cv) this.startTrend(cv, hist.map(h=>h.pct), '#4ADE80'); }
-  init_dashboard(){ const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m, this.productivitySeries().series); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
+  init_dashboard(){ this.loadDashNews('money'); this.loadDashNews('law'); const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m, this.productivitySeries().series); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
   init_fitness(){ const today=this.todayMin(); const move=Math.min(1,(today*8)/700); const r=this.root.querySelector('[data-chart="fitRings"]'); if(r) this.startRingSet(r,[move, Math.min(1,today/45), 0.9],['#FFFFFF','#eef0f2','#7a7a82'],15,7); const st=this.root.querySelector('[data-chart="strength"]'); if(st) this.startTrend(st, this.strengthSeries(), '#FFFFFF'); }
   init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
   startPowerHills(cv){ const {ctx,w,h}=this.prep(cv); const rows=10;
@@ -12419,6 +12329,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.118', date:'Aug 25, 2026', major:true, notes:[
+      'Command Center is now just the four things that matter: Daily Missions, Diet Checklist, Money / News and Law News. The AI Daily Brief row, the Focus/Move/Goals rings, Suggested Next, the four stat cards and the old Intelligence Feed are all gone.',
+      'Money / News and Law News are real, live news — not sample content. Money pulls BBC Business, Guardian Business and Sky News Business; Law pulls Guardian Law, JURIST and Courthouse News. Headlines are merged newest-first, tap one to open the article, ↻ forces a refresh, and they cache for 20 minutes so re-opening the dashboard is instant.',
+      'Finance Terminal\u2019s Money Assistant is now a proper financial adviser. It can see everything — income, expenses, budget vs actual, month-over-month spending movement, savings and goal, recurring commitments on the Cash Flow Calendar, and your ranked income sources — and it can write back: tell it to log an expense, log income, add to savings or set a category budget and it does it, then confirms what it entered.',
+      'Because the adviser now covers all of it, four separate cards were removed: Budget Recommendations, Recommendations, Sales Pipeline and Spending Trends. Each was a one-shot AI panel seeing a slice of the data with no ability to act. Four one-tap prompts under the adviser cover the same ground \u2014 Review my budgets, Where is my money going, Am I on track, Rank my income.',
+      'World Intel: Routes and Saved Locations are no longer behind a password \u2014 they open straight away. The from/to dropdowns and city inputs now stack properly on a phone instead of being squeezed side by side.',
+      'World Intel: removed the AI Briefing panel.',
+    ]},
     {version:'v11.117', date:'Aug 24, 2026', major:false, notes:[
       'Daily Missions’ category, priority, repeat and due-date now sync across your devices — the missions table has the matching columns, so a mission created on your phone shows the same details on desktop.',
       'The reminder-tick email changes from the last few updates (merged missions+checklist digest, calendar reminder 24h before the event, Performance Terminal’s 9:30pm nudge, personalized subjects, the sign-off) are now live on the server, not just in code.',
@@ -13532,24 +13450,144 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(/protein|diet|eat|nutrition|food/.test(t)) return 'Aim ~1.8–2.2g protein per kg bodyweight across 3–4 meals, stay hydrated (~3L). Log meals in the Health Centre for tailored targets.';
     if(/1rm|max|strength/.test(t)) return 'I estimate 1RM via Epley: weight × (1 + reps/30). Add weight, sets and reps when logging and the strength trend updates automatically.';
     return 'This week you trained '+(trained.length?trained.join(', '):'nothing yet')+' for '+wk+' min. '+(untr.length?('Next, hit '+untr[0]+'.'):'Keep progressive overload going.')+' Ask me for a plan, weak points, recovery, or nutrition.'; }
-  bizReply(text){ const t=text.toLowerCase(); const s=this.state; const inc=s.income.reduce((a,i)=>a+(+i.amt||0),0), exp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0), net=inc-exp, margin=inc>0?Math.round(net/inc*100):0;
-    if(/cash|flow|profit|margin|money/.test(t)) return 'Income '+this.fmtK(inc)+', expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'% margin). '+(net<0?'You are spending more than you bring in — cut discretionary spend or find another income source.':'Healthy — route a fixed % of what is left to savings or debt payoff.');
-    if(/save|saving|goal|reserve/.test(t)) return 'A simple rule: pay yourself first. Move a fixed % of income to savings the moment it lands, before it can be spent. At '+margin+'% margin you have '+(margin>0?'room to increase that %.':'no margin yet — trim spend before automating savings.');
-    if(/invest|risk|purchase|buy|spend/.test(t)) return 'For a big purchase: size it against your cash on hand, not your income. Ask what it costs you if income drops next month before committing.';
-    if(/budget|categ|overspend|over budget/.test(t)) return 'Check the Budget Planner below — it shows exactly which categories are over for the month, live against what you have logged.';
-    if(/code|debug|automat|bug|script/.test(t)) return 'Describe the workflow or paste the error. In a live deployment I would run a coding agent; here I can outline the fix, the steps, and the automation logic for you to implement.';
-    return 'Snapshot — income '+this.fmtK(inc)+', expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'%). Ask me about budgeting, spending, saving, or a money decision.'; }
-  async bizAskAI(v){ const s=this.state;
+  // ===== FINANCIAL ADVISER (Finance Terminal) =====
+  // Replaced the old "Money Assistant" chat plus four separate one-shot AI cards (Budget
+  // Recommendations, Recommendations, Sales Pipeline, Spending Trends). Each of those saw
+  // only a slice of the data and could not act on anything. The adviser gets the whole
+  // picture in one snapshot and can write entries back, so all four are now just questions
+  // you can ask it.
+  _financeSnapshot(){
+    const S=this.state;
+    const inc=S.income||[], exp=S.expenses||[], sav=S.savings||[];
+    const sum=(rows)=>Math.round(rows.reduce((a,r)=>a+(+r.amt||0),0));
+    const totInc=sum(inc), totExp=sum(exp), totSav=sum(sav);
+    const now=new Date();
+    const monthOff=(ts,off)=>{ const d=new Date(ts), t=new Date(now.getFullYear(), now.getMonth()-(off||0), 1);
+      return d.getMonth()===t.getMonth() && d.getFullYear()===t.getFullYear(); };
+    const budgets=(S.prefs||{}).financeBudgets||{};
+    const cats=[...new Set([...exp.map(e=>e.cat||'Other'), ...Object.keys(budgets)])];
+    // Budget vs actual + month-over-month movement — this is what the removed Budget
+    // Recommendations and Spending Trends cards were each showing separately.
+    const byCategory=cats.map(cat=>({
+      category:cat,
+      spentThisMonth:sum(exp.filter(e=>(e.cat||'Other')===cat && monthOff(e.ts,0))),
+      spentLastMonth:sum(exp.filter(e=>(e.cat||'Other')===cat && monthOff(e.ts,1))),
+      monthlyBudget:Math.round(+budgets[cat]||0),
+    })).sort((a,b)=>b.spentThisMonth-a.spentThisMonth);
+    // Cash flow calendar view: what recurs, and what this month actually looks like.
+    const recurring={
+      incomeEachMonth:inc.filter(i=>i.recurring).map(i=>({label:i.label, amount:Math.round(+i.amt||0), category:i.cat||''})),
+      expensesEachMonth:exp.filter(e=>e.recurring).map(e=>({label:e.label, amount:Math.round(+e.amt||0), category:e.cat||''})),
+    };
+    return {
+      currency:'USD ($)',
+      today:this._todayStr(),
+      allTime:{ income:totInc, expenses:totExp, net:totInc-totExp, marginPct: totInc>0?Math.round((totInc-totExp)/totInc*100):0 },
+      thisMonth:{
+        income:sum(inc.filter(i=>monthOff(i.ts,0))),
+        expenses:sum(exp.filter(e=>monthOff(e.ts,0))),
+        lastMonthExpenses:sum(exp.filter(e=>monthOff(e.ts,1))),
+      },
+      savings:{ balance:totSav, goal:Math.round(+(S.prefs||{}).financeSavingsGoal||0) },
+      byCategory,
+      recurring,
+      // Ranked income sources — what the removed Sales Pipeline card visualised.
+      topIncomeSources:[...inc].sort((a,b)=>(+b.amt||0)-(+a.amt||0)).slice(0,6)
+        .map(i=>({label:i.label, amount:Math.round(+i.amt||0), recurring:!!i.recurring})),
+      largestExpenses:[...exp].sort((a,b)=>(+b.amt||0)-(+a.amt||0)).slice(0,6)
+        .map(e=>({label:e.label, amount:Math.round(+e.amt||0), category:e.cat||''})),
+      knownExpenseCategories:this._expenseCats(),
+      knownIncomeCategories:this._incomeCats(),
+    };
+  }
+  // Direct write paths for the adviser. The existing addIncome/addExpense read the on-screen
+  // form fields, so they cannot be reused here — these take explicit values but mirror the
+  // same local-state + Supabase insert exactly, so an adviser-logged entry is identical to a
+  // hand-typed one (same shape, same sync, same placement on the cash flow calendar).
+  _logIncomeDirect(label, amt, cat, recurring){
+    const l=String(label||'').trim(), a=+amt||0;
+    if(!l || !(a>0)) return null;
+    const id=this._uuid(), category=cat||'Salary', ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
+    this.mut(s=>({income:[...s.income,{id,label:l,amt:a,cat:category,recurring:!!recurring,ts}]}));
+    if(this._sbOn()) window.SB.insert('income',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category,recurring:!!recurring,occurred_at:new Date(ts).toISOString()});
+    return 'Logged income '+this.fmtK(a)+' — '+l+' ('+category+(recurring?', recurring':'')+')';
+  }
+  _logExpenseDirect(label, amt, cat, recurring){
+    const l=String(label||'').trim(), a=+amt||0;
+    if(!l || !(a>0)) return null;
+    const id=this._uuid(), category=cat||'Other', ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
+    this.mut(s=>({expenses:[...s.expenses,{id,label:l,amt:a,cat:category,recurring:!!recurring,ts}]}));
+    if(this._sbOn()) window.SB.insert('expenses',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category,recurring:!!recurring,occurred_at:new Date(ts).toISOString()});
+    return 'Logged expense '+this.fmtK(a)+' — '+l+' ('+category+(recurring?', recurring':'')+')';
+  }
+  // Pulls [[DO:{...}]] directives out of an adviser reply, runs them, and returns the reply
+  // text with the directives stripped plus a list of confirmations to show underneath.
+  _adviserRunActions(raw){
+    const done=[];
+    const text=String(raw||'').replace(/\[\[DO:\s*(\{[\s\S]*?\})\s*\]\]/g, (_m, jsonStr)=>{
+      let act=null; try{ act=JSON.parse(jsonStr); }catch(e){ return ''; }
+      if(!act || typeof act!=='object') return '';
+      const amt=+act.amount||0;
+      try{
+        if(act.a==='expense'){ const r=this._logExpenseDirect(act.label, amt, act.category, act.recurring); if(r) done.push(r); }
+        else if(act.a==='income'){ const r=this._logIncomeDirect(act.label, amt, act.category, act.recurring); if(r) done.push(r); }
+        else if(act.a==='savings'){ if(amt>0){ this.addSavings(amt, act.label||'Savings'); done.push('Added '+this.fmtK(amt)+' to savings'); } }
+        else if(act.a==='budget'){ const cat=String(act.category||'').trim();
+          if(cat && amt>=0){ this.setFinanceBudget(cat, amt); done.push('Set '+cat+' budget to '+this.fmtK(amt)+'/month'); } }
+      }catch(e){}
+      return '';
+    }).replace(/\n{3,}/g,'\n\n').trim();
+    return { text, done };
+  }
+  // Offline / no-AI fallback — still grounded in the real numbers, never invented.
+  bizReply(text){
+    const t=String(text||'').toLowerCase(), s=this._financeSnapshot();
+    const f=(n)=>this.fmtK(n);
+    const over=s.byCategory.filter(c=>c.monthlyBudget>0 && c.spentThisMonth>c.monthlyBudget);
+    if(/budget|categ|overspend|over budget/.test(t))
+      return over.length ? ('Over budget this month: '+over.map(c=>c.category+' ('+f(c.spentThisMonth)+' of '+f(c.monthlyBudget)+')').join(', ')+'.')
+                         : 'Nothing is over budget this month. Set a budget per category and I will track it against what you log.';
+    if(/trend|last month|compare|going up|rising/.test(t)){
+      const moved=s.byCategory.filter(c=>c.spentLastMonth>0).map(c=>({cat:c.category, diff:c.spentThisMonth-c.spentLastMonth}))
+        .sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff)).slice(0,3);
+      return moved.length ? ('Biggest month-over-month moves: '+moved.map(c=>c.cat+' '+(c.diff>=0?'+':'')+f(c.diff)).join(', ')+'.')
+                          : 'Not enough history yet — log across two months and I can compare them.';
+    }
+    if(/save|saving|goal|reserve/.test(t))
+      return 'Savings balance '+f(s.savings.balance)+(s.savings.goal?(' of a '+f(s.savings.goal)+' goal'):' (no goal set)')+'. Net position is '+f(s.allTime.net)+' at a '+s.allTime.marginPct+'% margin.';
+    if(/income|earn|revenue|source/.test(t))
+      return s.topIncomeSources.length ? ('Top income sources: '+s.topIncomeSources.slice(0,3).map(i=>i.label+' '+f(i.amount)).join(', ')+'.')
+                                       : 'No income logged yet — tell me what came in and I will log it.';
+    return 'Snapshot — income '+f(s.allTime.income)+', expenses '+f(s.allTime.expenses)+', net '+f(s.allTime.net)+' ('+s.allTime.marginPct+'% margin), savings '+f(s.savings.balance)+'. Ask me about budgets, trends, savings, or tell me what to log.';
+  }
+  async bizAskAI(v){
     this.setState(st=>({bizChat:[...st.bizChat,{who:'you',text:v}], bizInput:'', bizLoading:true}));
     if(!window.claude){ this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:this.bizReply(v)}], bizLoading:false})); return; }
-    const inc=s.income.reduce((a,i)=>a+(+i.amt||0),0), exp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0), net=inc-exp, margin=inc>0?Math.round(net/inc*100):0;
-    const topInc=[...s.income].sort((a,b)=>(+b.amt||0)-(+a.amt||0)).slice(0,5).map(i=>i.label+': '+this.fmtK(+i.amt||0)).join(', ')||'none logged';
-    const topExp=[...s.expenses].sort((a,b)=>(+b.amt||0)-(+a.amt||0)).slice(0,5).map(e=>e.label+': '+this.fmtK(+e.amt||0)).join(', ')||'none logged';
-    const sys='You are an AI money management assistant embedded in a command-center app. Be concise (2-4 sentences), direct, and practical — no filler, no disclaimers. Help with budgeting, spending, saving and everyday financial decisions. Ground answers in these real logged numbers when relevant: total income '+this.fmtK(inc)+', total expenses '+this.fmtK(exp)+', net '+this.fmtK(net)+' ('+margin+'% margin). Top income sources: '+topInc+'. Top expenses: '+topExp+'.';
-    const history=(s.bizChat||[]).slice(-10).map(m=>({role:m.who==='you'?'user':'assistant', content:m.text}));
-    try{ const text=await window.claude.complete({system:sys, messages:[...history,{role:'user',content:v}], max_tokens:400});
-      this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:(text||'').trim()||this.bizReply(v)}], bizLoading:false}));
-    }catch(e){ this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:this.bizReply(v)}], bizLoading:false})); } }
+    const snap=this._financeSnapshot();
+    const sys=[
+      'You are the user’s personal financial adviser inside their finance app. You are not a generic chatbot: you can see all of their real logged money data, and you can write entries back into the app.',
+      'Be concise and direct (2-5 sentences unless they ask for depth). No filler, no hedging, no "consult a professional" boilerplate. Give a real opinion and a specific next step, and use their actual numbers.',
+      'You can do all of this: review budgets and flag overspend, compare spending month over month, rank income sources, read the cash flow calendar (recurring commitments and this month’s totals), advise on savings, and log entries for them.',
+      '',
+      'TO WRITE SOMETHING INTO THE APP, append a directive on its own line at the very end of your reply, in exactly this form:',
+      '[[DO:{"a":"expense","label":"Tesco shop","amount":42.5,"category":"Food","recurring":false}]]',
+      '[[DO:{"a":"income","label":"Salary","amount":2400,"category":"Salary","recurring":true}]]',
+      '[[DO:{"a":"savings","label":"Emergency fund","amount":200}]]',
+      '[[DO:{"a":"budget","category":"Food","amount":400}]]',
+      'Rules for directives: only emit one when the user clearly asked you to log/record/add/set something, or explicitly confirmed it. Never invent an amount — if the amount or the label is missing, ask instead of guessing. One directive per entry; several are fine. Pick "category" from the known category lists in the data below when one fits. Never mention the directive syntax or show it to the user; just say plainly what you logged.',
+      '',
+      'THEIR CURRENT FINANCIAL DATA (JSON, amounts in whole dollars):',
+      JSON.stringify(snap),
+    ].join('\n');
+    const history=(this.state.bizChat||[]).slice(-10).map(m=>({role:m.who==='you'?'user':'assistant', content:m.text}));
+    try{
+      const raw=await window.claude.complete({system:sys, messages:[...history,{role:'user',content:v}], max_tokens:700});
+      const res=this._adviserRunActions(raw);
+      let reply=(res.text||'').trim() || this.bizReply(v);
+      if(res.done.length) reply += '\n\n' + res.done.map(d=>'✓ '+d).join('\n');
+      this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:reply}], bizLoading:false}));
+    }catch(e){ this.setState(st=>({bizChat:[...st.bizChat,{who:'ai',text:this.bizReply(v)}], bizLoading:false})); }
+  }
   _extractJSONArray(t){ if(!t) return null; try{ const a=t.indexOf('['), b=t.lastIndexOf(']'); if(a<0||b<0) return null; return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
   async importCalendarScreenshot(file){ if(!file) return;
     this.setState({calImportLoading:true, calImportErr:''});
@@ -14223,61 +14261,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // Real AI version of World Intel's "AI BRIEFING" panel — was 5 fixed strings that never
   // referenced the selected country at all, labeled "AI" with no AI call anywhere. Now grounded
   // in the selected country's real indicators, cached per country like Business Intel above.
-  async generateWiBriefAI(){
-    if(!window.claude){ this.setState({wiBriefErr:'AI unavailable in this environment'}); return; }
-    const cs=this.countries; const sel=cs.find(c=>c.name===this.state.selCountry)||cs[0];
-    this.setState({wiBriefLoading:true, wiBriefErr:''});
-    const sys='You are a geopolitical and business intelligence analyst producing a short briefing for an operator/investor. Given a country and its current indicators, produce 4 to 5 concise, specific-sounding briefing bullet points covering political, military, economic and cyber angles as relevant. Return ONLY valid minified JSON, no markdown fences: {"points":["","","",""]}';
-    const prompt='Country: '+sel.name+'. Threat level: '+sel.threat+'. Political stability: '+sel.pol+'%. Military activity: '+sel.mil+'%. Economic status: '+sel.eco+'%. Cyber activity: '+sel.cyber+'%. Disaster risk: '+sel.dis+'%. Strategic note: '+(sel.strategic||'')+'. Produce the JSON described.';
-    try{
-      const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:500});
-      const j=this._extractJSON(raw);
-      const pts=(j&&j.points)||null;
-      if(!pts || !pts.length){ this.setState({wiBriefLoading:false, wiBriefErr:'Could not parse the AI response — try again.'}); return; }
-      this.mut(s=>({wiBriefResult:{...(s.wiBriefResult||{}), [sel.name]:pts}}));
-      this.setState({wiBriefLoading:false, wiBriefErr:''});
-    }catch(e){ this.setState({wiBriefLoading:false, wiBriefErr:(e&&e.message)||'Generation failed'}); }
-  }
   // Real AI version of Business HQ's "AI Recommendations" card — was 2 of 3 bullets permanently
   // fixed text unrelated to any real data, with no AI button at all. Same fix pattern as Finance
   // Planner below: honest rule-based fallback from real income/expenses, AI suggest on request.
-  async generateBizRecsAI(){
-    if(!window.claude){ this.setState({bizRecsErr:'AI unavailable in this environment'}); return; }
-    this.setState({bizRecsLoading:true, bizRecsErr:''});
-    const income=this.state.income||[], expenses=this.state.expenses||[];
-    if(!income.length && !expenses.length){ this.setState({bizRecsLoading:false, bizRecsErr:'Log some income or expenses first — nothing to analyse yet.'}); return; }
-    const rows={ income: income.map(i=>({label:i.label, amt:+i.amt||0})), expenses: expenses.map(e=>({label:e.label, cat:e.cat||'Ops', amt:+e.amt||0})) };
-    const sys='You are a sharp, practical business advisor. You are given someone’s real logged income and expense entries for their business. Give 2-3 specific, actionable recommendations genuinely based on THIS data — not generic advice. Return ONLY valid minified JSON, no markdown fences, no prose: an array of short strings, e.g. ["specific recommendation sentence", "another one"].';
-    const prompt='My business income and expense entries:\n'+JSON.stringify(rows)+'\n\nGive 2-3 recommendations as the JSON array of strings described.';
-    try{
-      const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:400});
-      const arr=this._extractJSONArray(raw);
-      const clean=(arr||[]).filter(r=>typeof r==='string'&&r.trim()).map(r=>r.slice(0,220)).slice(0,3);
-      if(!clean.length){ this.setState({bizRecsLoading:false, bizRecsErr:'Could not parse the AI response — try again.'}); return; }
-      this.setState({bizRecsLoading:false, bizRecsErr:'', bizRecsResult:clean});
-    }catch(e){ this.setState({bizRecsLoading:false, bizRecsErr:(e&&e.message)||'Could not generate recommendations'}); }
-  }
-  // Real AI version of the Finance Planner "Recommendations" card — same fix as the two
-  // above, reading the user's actual last-30-days spend-vs-budget instead of fixed if/else text.
-  async generateFinRecsAI(){
-    if(!window.claude){ this.setState({finRecsErr:'AI unavailable in this environment'}); return; }
-    this.setState({finRecsLoading:true, finRecsErr:''});
-    const exp=this.state.expenses||[]; const now=Date.now(), D=86400000; const thisM=exp.filter(e=>now-e.ts<30*D);
-    const cats=[...new Set(exp.map(e=>e.cat))]; const budgets=this.state.prefs.financeBudgets||{};
-    const rows=cats.map(c=>({category:c, spentLast30Days:thisM.filter(e=>e.cat===c).reduce((a,e)=>a+(+e.amt||0),0), monthlyBudget:+(budgets[c])||0}));
-    if(!rows.length){ this.setState({finRecsLoading:false, finRecsErr:'Log a few expenses first — nothing to analyse yet.'}); return; }
-    const sys='You are a sharp, practical personal finance coach. You are given someone’s real spending by category over the last 30 days, and the monthly budget they set for each (0 means no budget set). Give 2-3 specific, actionable recommendations genuinely based on THIS data — not generic advice. Return ONLY valid minified JSON, no markdown fences, no prose: an array of short strings, e.g. ["specific recommendation sentence", "another one"].';
-    const prompt='My spending by category over the last 30 days, with my set budgets:\n'+JSON.stringify(rows)+'\n\nGive 2-3 recommendations as the JSON array of strings described.';
-    try{
-      const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:400});
-      const arr=this._extractJSONArray(raw);
-      const clean=(arr||[]).filter(r=>typeof r==='string'&&r.trim()).map(r=>r.slice(0,220)).slice(0,3);
-      if(!clean.length){ this.setState({finRecsLoading:false, finRecsErr:'Could not parse the AI response — try again.'}); return; }
-      this.setState({finRecsLoading:false, finRecsErr:'', finRecsResult:clean});
-    }catch(e){ this.setState({finRecsLoading:false, finRecsErr:(e&&e.message)||'Could not generate recommendations'}); }
-  }
-
-
   // ===== GCSE MATHS ENGINE =====
   _LM(){ return window.LearningMaths; }
   _mtSaveHistory(entry){ this.mut(s=>({ learning:{ ...(s.learning||{}), mathsHistory:[entry, ...((s.learning&&s.learning.mathsHistory)||[])].slice(0,30) } })); this.save(); }
@@ -15596,7 +15582,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       fitSend:()=>{ const v=S.fitInput.trim(); if(v&&!S.fitLoading) this.fitAskAI(v); },
       fitSendKey:enterKey(()=>{ const v=S.fitInput.trim(); if(v&&!S.fitLoading) this.fitAskAI(v); }),
       fitLoading:!!S.fitLoading, fitSendLabel:S.fitLoading?'…':'Send', fitSendOpacity:S.fitLoading?'0.5':'1',
-      bizMsgs:mkMsgs(S.bizChat,'I am your money assistant. Ask about budgeting, spending, saving, or a money decision — I read your logged numbers.','MONEY ASSISTANT'), bizInput:S.bizInput, setBizInput:(e)=>this.setState({bizInput:e.target.value}),
+      bizMsgs:mkMsgs(S.bizChat,'I am your financial adviser. I can see your income, expenses, budgets, savings and cash flow calendar — ask me anything, or just tell me what to log and I will enter it for you.','ADVISER'), bizInput:S.bizInput, setBizInput:(e)=>this.setState({bizInput:e.target.value}),
+      // The four cards this adviser replaced, as one-tap prompts: Budget Recommendations,
+      // Recommendations, Sales Pipeline and Spending Trends are all just questions now.
+      adviserChips:[
+        ['Review my budgets','Review my budgets — which categories are over, and what should I change?'],
+        ['Where is my money going?','Where is my money going? Compare this month to last month by category and call out anything that moved.'],
+        ['Am I on track?','Look at my income, expenses, savings and recurring commitments — am I on track, and what is the single highest-impact thing to fix?'],
+        ['Rank my income','Rank my income sources and tell me how concentrated or fragile my income is.'],
+      ].map(p=>({ label:p[0], ask:()=>{ if(!S.bizLoading) this.bizAskAI(p[1]); } })),
       bizSend:()=>{ const v=S.bizInput.trim(); if(v&&!S.bizLoading) this.bizAskAI(v); },
       bizSendKey:enterKey(()=>{ const v=S.bizInput.trim(); if(v&&!S.bizLoading) this.bizAskAI(v); }),
       bizLoading:!!S.bizLoading, bizSendLabel:S.bizLoading?'…':'Send', bizSendOpacity:S.bizLoading?'0.5':'1',
@@ -15859,7 +15853,33 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       convoHistoryLoading:!!S.convoHistoryLoading, convoHistoryErr:S.convoHistoryErr||'', convoHistoryErrShow:!!S.convoHistoryErr,
       convoHistoryEmpty:!S.convoHistoryLoading && !S.convoHistoryErr && S.convoHistory && !S.convoHistory.length,
       convoHistoryList:(S.convoHistory||[]).map(c=>({who:c.role==='user'?'YOU':'AI', whoC:c.role==='user'?vTok.vMuted2:vTok.vAccent, text:c.content, time:new Date(c.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})})),
-      showMissionsRow:(S.dashboardLayout||{}).missions!==false, showBriefRow:(S.dashboardLayout||{}).brief!==false, showStatsRow:(S.dashboardLayout||{}).stats!==false, showIntelRow:(S.dashboardLayout||{}).intel!==false,
+      showMissionsRow:(S.dashboardLayout||{}).missions!==false, showNewsRow:(S.dashboardLayout||{}).news!==false,
+      ...(()=>{
+        const card=(kind)=>{
+          const money=kind==='money';
+          const list=(money?S.moneyNews:S.lawNews)||[];
+          const loading=money?S.moneyNewsLoading:S.lawNewsLoading;
+          const at=money?S.moneyNewsAt:S.lawNewsAt;
+          const err=(money?S.moneyNewsErr:S.lawNewsErr)||'';
+          const srcs=money?'BBC · Guardian · Sky News':'Guardian Law · JURIST · Courthouse News';
+          return {
+            list:list.map(n=>({ title:n.title, meta:[n.source,this._newsAgo(n.ts)].filter(Boolean).join(' · '),
+              open:()=>{ if(n.url) window.open(n.url,'_blank','noopener'); } })),
+            none:!list.length,
+            err,
+            btnLabel:loading?'…':'↻',
+            meta:loading?'Loading…':(at?(srcs+' · updated '+this._newsAgo(at)):srcs),
+            empty:loading?'Loading live headlines…':(err?'':'Tap ↻ to pull the latest headlines.'),
+          };
+        };
+        const m=card('money'), l=card('law');
+        return {
+          moneyNews:m.list, noMoneyNews:m.none, moneyNewsErr:m.err, moneyNewsBtnLabel:m.btnLabel, moneyNewsMeta:m.meta, moneyNewsEmpty:m.empty,
+          lawNews:l.list, noLawNews:l.none, lawNewsErr:l.err, lawNewsBtnLabel:l.btnLabel, lawNewsMeta:l.meta, lawNewsEmpty:l.empty,
+          refreshMoneyNews:()=>this.loadDashNews('money',true),
+          refreshLawNews:()=>this.loadDashNews('law',true),
+        };
+      })(),
       appVersion:appVer,
       backupCodeToCloud:()=>this.backupCodeToCloud(), backupErr:S.backupErr||'',
       backupBtnLabel:S.backupBusy?'BACKING UP…':(S.backupLast?'✓ BACKED UP':'☁ BACKUP CODE'), backupBtnColor:S.backupBusy?'#7c7c84':(S.backupLast?'#4ADE80':'#c8c8ce'),
@@ -15908,7 +15928,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       latestNotes:(this._changelog()[0]||{}).notes||[],
       pushLoading:!!S.pushLoading, pushErr:S.pushErr||'', pushErrShow:!!S.pushErr,
       clearAllNotifs:()=>this.clearAllNotifs(),
-      dashboardWidgets:[['missions','Missions & Diet Checklist'],['brief','AI Daily Brief'],['stats','Stat Cards'],['intel','Intelligence Feed']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
+      dashboardWidgets:[['missions','Daily & Diet Checklists'],['news','Money / News & Law News']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
       emailProvider:S.prefs.emailProvider||'resend', setEmailProvider:(e)=>this.setPref('emailProvider',e.target.value),
       autoBriefBg:S.prefs.autoBriefingEnabled?vTok.vAccent:vTok.vLine2, autoBriefPos:S.prefs.autoBriefingEnabled?'20px':'2px',
@@ -16099,15 +16119,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           plannerTotalColor: totalBudget && totalSpent>totalBudget ? '#ff5563' : '#eef0f2',
           finPlannerRings: ringCats.map(c=>{ const spent=spentByCat(c); const budget=+(budgets[c])||0; const val=budget?Math.min(1,spent/budget):0;
             return { name:c, sub:budget?('$'+spent.toLocaleString()+' / $'+budget.toLocaleString()):('$'+spent.toLocaleString()+' spent'), val, color:(budget&&spent>budget)?'#ff5563':'#FFFFFF' }; }),
-          finPlannerRecs: (S.finRecsResult&&S.finRecsResult.length) ? S.finRecsResult : (()=>{ const over=budgetedCats.filter(c=>spentByCat(c)>(+(budgets[c])||0));
-            const r=[]; if(!budgetedCats.length) r.push('Set a monthly budget per category below to start tracking against it.');
-            else if(over.length) r.push(over.join(', ')+(over.length>1?' are':' is')+' over budget this month \u2014 review before new spend.');
-            else if(paceHot) r.push('You\u2019re '+pctBudgetUsed+'% through your budget but only '+pctThroughMonth+'% through the month \u2014 pace is running hot.');
-            else r.push('All categories are within budget this month. Nice work.');
-            return r; })(),
-          finRecsBtnLabel: S.finRecsLoading?'\u23c2 Thinking\u2026':'\u2728 AI suggest',
-          finRecsSourceLabel: (S.finRecsResult&&S.finRecsResult.length)?'AI-GENERATED · FROM YOUR SPENDING':'FROM YOUR BUDGETS',
-          finRecsErr: S.finRecsErr||'', generateFinRecsAI:()=>this.generateFinRecsAI() };
+        };
       })(),
       ...(()=>{ const sav=S.savings||[]; const goal=+(S.prefs.financeSavingsGoal)||0;
         const savingsTotal=sav.reduce((a,x)=>a+(+x.amt||0),0);
@@ -17431,32 +17443,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           nextMoneyMonth:()=>this.setState(s=>{ let mm=s.moneyCalM+1,yy=s.moneyCalY; if(mm>11){mm=0;yy++;} return {moneyCalM:mm,moneyCalY:yy}; }),
         };
       })(),
-      bizRecs: (S.bizRecsResult&&S.bizRecsResult.length) ? S.bizRecsResult : [
-        net<0?'Expenses exceed logged income this period — review your largest cost lines before new commitments.':'Net is positive — consider allocating a fixed % of profit to reserves and growth.',
-        (S.income.length||S.expenses.length)?'Tap AI suggest for recommendations genuinely based on your logged income and expenses.':'Log income and expenses to unlock real recommendations here.'
-      ],
-      bizRecsBtnLabel: S.bizRecsLoading?'⏂ Thinking…':'✨ AI suggest',
-      bizRecsSourceLabel: (S.bizRecsResult&&S.bizRecsResult.length)?'AI-GENERATED · FROM YOUR INCOME & EXPENSES':'RULE-BASED · TAP FOR AI',
-      bizRecsErr: S.bizRecsErr||'', generateBizRecsAI:()=>this.generateBizRecsAI(),
-      ...(()=>{ const exp=S.expenses||[]; const now=Date.now(), D=86400000;
-        const thisM=exp.filter(e=>now-e.ts<30*D); const lastM=exp.filter(e=>now-e.ts>=30*D && now-e.ts<60*D);
-        const cats=[...new Set([...thisM.map(e=>e.cat), ...lastM.map(e=>e.cat)])];
-        const sumCat=(arr,c)=>arr.filter(e=>e.cat===c).reduce((a,e)=>a+(+e.amt||0),0);
-        const rows=cats.map(c=>{ const cur=sumCat(thisM,c), prev=sumCat(lastM,c), diff=cur-prev;
-          const pct=prev>0?Math.round((diff/prev)*100):null;
-          return { cat:c, cur, prev, diff, pct,
-            curLabel:'$'+cur.toLocaleString(),
-            prevLabel: prev>0?('vs $'+prev.toLocaleString()+' last month'):'no spend last month',
-            pctLabel: pct!=null ? ((diff>=0?'▲ +':'▼ ')+Math.abs(pct)+'%') : (cur>0?'NEW':'—'),
-            pctColor: diff>0?'#ff5563':(diff<0?'#6cffba':'#8a8a92') };
-        }).filter(r=>r.cur>0||r.prev>0).sort((a,b)=>Math.abs(b.diff)-Math.abs(a.diff)).slice(0,6);
-        const totalCur=thisM.reduce((a,e)=>a+(+e.amt||0),0), totalPrev=lastM.reduce((a,e)=>a+(+e.amt||0),0), totalDiff=totalCur-totalPrev;
-        return { spendTrendRows:rows, noSpendTrends:!rows.length,
-          spendTrendTotalLabel: totalPrev>0 ? ('Total spend $'+totalCur.toLocaleString()+' this month vs $'+totalPrev.toLocaleString()+' last month') : (totalCur>0 ? ('Total spend $'+totalCur.toLocaleString()+' this month — no prior month logged yet to compare') : 'Log expenses across a couple of months to see spending trends here.'),
-          spendTrendTotalColor: totalPrev>0 ? (totalDiff>0?'#ff5563':(totalDiff<0?'#6cffba':'#eef0f2')) : '#8a8a92' };
-      })(),
-      pipeline:(()=>{ const rows=[...S.income].sort((a,b)=>(+b.amt||0)-(+a.amt||0)); const max=Math.max(1,...rows.map(r=>+r.amt||0)); return rows.map(r=>({stage:r.label, val:this.fmtK(+r.amt||0), pct:Math.round((+r.amt||0)/max*100)+'%'})); })(),
-      noPipeline:S.income.length===0,
 
       // productivity
       trackers:(()=>{ const L=this._trackerLive(); const wh=L.todayMin('Work')/60, gymC=L.weekCount('Gym'), bizM=L.todayMin('Business'), lrnH=L.todayMin('Learning')/60;

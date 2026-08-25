@@ -164,29 +164,96 @@ const RSS_FEEDS: Record<string, string> = {
   wired: 'https://www.wired.com/feed/rss',
 };
 
-function stripTags(s: string) { return (s || '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, '').trim(); }
+// Multi-feed bundles powering the Command Center's two news cards. Each is a blend of real
+// publisher RSS feeds (free, no key, no rate limit — unlike GDELT, which caps at one request
+// per 5s per IP and would be throttled behind this function's shared egress address).
+// Results are interleaved so every publisher is represented, then sorted newest-first.
+const FEED_BUNDLES: Record<string, { name: string; url: string }[]> = {
+  moneynews: [
+    { name: 'BBC Business', url: 'https://feeds.bbci.co.uk/news/business/rss.xml' },
+    { name: 'Guardian Business', url: 'https://www.theguardian.com/uk/business/rss' },
+    { name: 'Sky News Business', url: 'https://feeds.skynews.com/feeds/rss/business.xml' },
+  ],
+  lawnews: [
+    { name: 'Guardian Law', url: 'https://www.theguardian.com/law/rss' },
+    { name: 'JURIST', url: 'https://www.jurist.org/news/feed/' },
+    { name: 'Courthouse News', url: 'https://www.courthousenews.com/feed/' },
+  ],
+};
 
+// Publisher feeds routinely double-escape punctuation (&#8217;, &amp;, &quot;), which showed
+// up raw in headlines. Decode the numeric forms plus the handful of named ones that matter.
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  lsquo: '‘', rsquo: '’', ldquo: '“', rdquo: '”',
+  ndash: '–', mdash: '—', hellip: '…', pound: '£', euro: '€',
+};
+function decodeEntities(s: string) {
+  return (s || '')
+    .replace(/&#x([0-9a-f]+);/gi, (_m, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return _m; } })
+    .replace(/&#(\d+);/g, (_m, d) => { try { return String.fromCodePoint(parseInt(d, 10)); } catch { return _m; } })
+    .replace(/&([a-z]+);/gi, (_m, n) => NAMED_ENTITIES[String(n).toLowerCase()] ?? _m);
+}
+function stripTags(s: string) {
+  return decodeEntities((s || '').replace(/<!\[CDATA\[|\]\]>/g, '').replace(/<[^>]+>/g, '')).trim();
+}
+
+// Handles RSS 2.0 (<item>) and Atom (<entry>) — The Verge's feed is Atom, so the old
+// item-only parser silently returned nothing for it. Also captures the publish date so
+// bundled feeds can be merged in true recency order rather than per-feed order.
 async function parseRss(url: string) {
-  const r = await fetch(url);
+  const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; NervexusBot/1.0)' } });
   const xml = await r.text();
-  const items: { title: string; link: string }[] = [];
-  const re = /<item>([\s\S]*?)<\/item>/g;
+  const items: { title: string; link: string; ts: number }[] = [];
+  const dateOf = (s: string) => { const t = Date.parse(s || ''); return isNaN(t) ? 0 : t; };
+  const reItem = /<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/g;
   let m;
-  while ((m = re.exec(xml)) && items.length < 8) {
+  while ((m = reItem.exec(xml)) && items.length < 12) {
     const block = m[1];
-    const title = stripTags((block.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || '');
-    const link = stripTags((block.match(/<link>([\s\S]*?)<\/link>/) || [])[1] || '');
-    if (title) items.push({ title, link });
+    const title = stripTags((block.match(/<title(?:\s[^>]*)?>([\s\S]*?)<\/title>/) || [])[1] || '');
+    const link = stripTags((block.match(/<link(?:\s[^>]*)?>([\s\S]*?)<\/link>/) || [])[1] || '');
+    const date = stripTags((block.match(/<(?:pubDate|dc:date|published|updated)(?:\s[^>]*)?>([\s\S]*?)<\/(?:pubDate|dc:date|published|updated)>/) || [])[1] || '');
+    if (title) items.push({ title, link, ts: dateOf(date) });
+  }
+  if (!items.length) {
+    const reEntry = /<entry(?:\s[^>]*)?>([\s\S]*?)<\/entry>/g;
+    while ((m = reEntry.exec(xml)) && items.length < 12) {
+      const block = m[1];
+      const title = stripTags((block.match(/<title(?:\s[^>]*)?>([\s\S]*?)<\/title>/) || [])[1] || '');
+      const link = (block.match(/<link[^>]*href=["']([^"']+)["']/) || [])[1] || '';
+      const date = stripTags((block.match(/<(?:published|updated)(?:\s[^>]*)?>([\s\S]*?)<\/(?:published|updated)>/) || [])[1] || '');
+      if (title) items.push({ title, link, ts: dateOf(date) });
+    }
   }
   return items;
+}
+
+// Pulls every feed in a bundle in parallel, tolerating individual feed failures, then
+// interleaves one story per publisher per round so a single prolific feed cannot crowd
+// the others out, and finally sorts the result newest-first.
+async function fetchFeedBundle(bundle: { name: string; url: string }[]) {
+  const per = await Promise.all(bundle.map(async (f) => {
+    try {
+      const items = await parseRss(f.url);
+      return items.slice(0, 6).map((i) => ({ title: i.title, source: f.name, url: i.link, ts: i.ts }));
+    } catch { return []; }
+  }));
+  const merged: { title: string; source: string; url: string; ts: number }[] = [];
+  const depth = Math.max(0, ...per.map((p) => p.length));
+  for (let i = 0; i < depth; i++) for (const p of per) if (p[i]) merged.push(p[i]);
+  const seen = new Set<string>();
+  const unique = merged.filter((h) => { const k = h.title.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  unique.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  return { headlines: unique.slice(0, 12) };
 }
 
 // Returns { headlines: [{title, source, url}] } or { data: string } for market/price sources.
 // Returns null for sources with no public API (premium/licensed — enterprise only).
 async function fetchNewsSource(provider: string, key: string | undefined, q: string) {
+  if (FEED_BUNDLES[provider]) return await fetchFeedBundle(FEED_BUNDLES[provider]);
   if (RSS_FEEDS[provider]) {
     const items = await parseRss(RSS_FEEDS[provider]);
-    return { headlines: items.map((i) => ({ title: i.title, source: provider, url: i.link })) };
+    return { headlines: items.slice(0, 8).map((i) => ({ title: i.title, source: provider, url: i.link, ts: i.ts })) };
   }
   switch (provider) {
     case 'hackernews': {
