@@ -1685,7 +1685,7 @@
                 <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
               </div>
             </div>
-            <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:flex; justify-content:center; padding:4px 0 2px;"></div>
+            <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
             <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px;">
               <sc-for list="{{ anatomyActive }}" as="a" hint-placeholder-count="0"><span style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#ffb3ba; border:1px solid rgba(255,85,99,0.35); border-radius:20px; padding:4px 10px;"><span style="width:6px; height:6px; border-radius:50%; background:#ff3b4a; box-shadow:0 0 7px #ff3b4a;"></span>{{ a.name }} · {{ a.ago }}</span></sc-for>
               <sc-if value="{{ noAnatomyActive }}" hint-placeholder-val="{{ true }}"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6f6f78; text-align:center;">Log a set — the muscle you trained glows red here for 2 hours.</span></sc-if>
@@ -8913,7 +8913,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-119 · v11.119 anatomy-strength-chart';
+const NOTIF_BUILD_VERSION = '2026.08.25-120 · v11.120 anatomy-ecorche';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11252,65 +11252,92 @@ activities: this._mergeShipLog(s.activities),
     });
     return out;
   }
-  _anatomySvg(view){
-    const back = view==='back';
-    // One coherent 200x300 grid: head y4-36, shoulders y46, waist y120, hips y150,
-    // knee y218, ankle y272. Base body parts and muscle overlays share these coordinates
-    // so the muscles actually sit on the limb they belong to.
-    const BASE='#1c1f24', BLINE='rgba(255,255,255,0.10)';
-    const base=(shape)=>shape.replace('{f}',BASE).replace('{s}',BLINE);
-    const body=[
-      '<ellipse cx="100" cy="20" rx="15" ry="17" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<path d="M92 32h16v14h-16z" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      // torso: wide shoulders -> waist -> hips
-      '<path d="M100 44c-14 0-26 3-32 8-5 4-7 10-7 17l2 26c1 9 3 16 5 24l3 14c1 6 2 11 2 17h54c0-6 1-11 2-17l3-14c2-8 4-15 5-24l2-26c0-7-2-13-7-17-6-5-18-8-32-8z" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      // hips
-      '<path d="M73 150h54c1 8 0 14-2 20-3 8-10 12-25 12s-22-4-25-12c-2-6-3-12-2-20z" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      // arms
-      '<ellipse cx="54" cy="82" rx="9" ry="26" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="146" cy="82" rx="9" ry="26" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="48" cy="124" rx="7.5" ry="23" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="152" cy="124" rx="7.5" ry="23" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="45" cy="152" rx="5" ry="7" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="155" cy="152" rx="5" ry="7" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      // legs
-      '<ellipse cx="85" cy="186" rx="14" ry="38" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="115" cy="186" rx="14" ry="38" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="86" cy="245" rx="9.5" ry="27" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="114" cy="245" rx="9.5" ry="27" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="85" cy="282" rx="7" ry="6" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-      '<ellipse cx="115" cy="282" rx="7" ry="6" fill="{f}" stroke="{s}" stroke-width="0.9"/>',
-    ].map(base).join('');
-    const M=(id,d)=>'<path data-m="'+id+'" d="'+d+'" fill="#2a2d33" stroke="rgba(255,255,255,0.09)" stroke-width="0.7"/>';
-    const E=(id,cx,cy,rx,ry,rot)=>'<ellipse data-m="'+id+'" cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"'+(rot?' transform="rotate('+rot+' '+cx+' '+cy+')"':'')+' fill="#2a2d33" stroke="rgba(255,255,255,0.09)" stroke-width="0.7"/>';
-    let g='';
-    if(!back){
-      g+=M('traps','M92 45c-9 1-16 3-21 6l4 8c5-3 11-5 17-6zM108 45c9 1 16 3 21 6l-4 8c-5-3-11-5-17-6z');
-      g+=E('delts',67,60,12,12,-10)+E('delts',133,60,12,12,10);
-      g+=M('chest','M98 60c-9 0-16 2-20 5-3 2-4 6-3 11 1 7 6 11 12 11 6 0 10-3 11-8V60zM102 60c9 0 16 2 20 5 3 2 4 6 3 11-1 7-6 11-12 11-6 0-10-3-11-8V60z');
-      g+=E('biceps',56,82,7.5,19,-4)+E('biceps',144,82,7.5,19,4);
-      g+=E('forearms',49,124,6,19,-3)+E('forearms',151,124,6,19,3);
-      g+=M('abs','M90 94h20v46c0 4-4 7-10 7s-10-3-10-7V94z');
-      g+=M('obliques','M87 97c-5 2-7 6-7 11l1 22c0 4 2 6 5 5l2-1V97zM113 97c5 2 7 6 7 11l-1 22c0 4-2 6-5 5l-2-1V97z');
-      g+=E('quads',86,184,11,32,2)+E('quads',114,184,11,32,-2);
-      g+=E('adductors',95,180,4.5,24,3)+E('adductors',105,180,4.5,24,-3);
-      g+=E('calves',87,246,7,22,1)+E('calves',113,246,7,22,-1);
-    } else {
-      g+=M('traps','M100 44c-13 0-24 3-31 8l8 34c7-4 15-6 23-6s16 2 23 6l8-34c-7-5-18-8-31-8z');
-      g+=E('delts_rear',67,60,12,12,-10)+E('delts_rear',133,60,12,12,10);
-      g+=M('lats','M79 72c-6 4-9 11-9 20l2 24c0 5 3 7 6 5l14-10V76l-13-4zM121 72c6 4 9 11 9 20l-2 24c0 5-3 7-6 5l-14-10V76l13-4z');
-      g+=E('triceps',56,82,7.5,19,-4)+E('triceps',144,82,7.5,19,4);
-      g+=E('forearms',49,124,6,19,-3)+E('forearms',151,124,6,19,3);
-      g+=M('lower_back','M88 116h24v28c0 5-5 8-12 8s-12-3-12-8v-28z');
-      g+=M('glutes','M100 152c-13 0-22 6-22 14 0 9 9 15 22 15s22-6 22-15c0-8-9-14-22-14z');
-      g+=E('hamstrings',86,192,12,32,2)+E('hamstrings',114,192,12,32,-2);
-      g+=E('calves',87,246,8,24,1)+E('calves',113,246,8,24,-1);
-    }
-    return '<svg viewBox="0 0 200 300" style="width:100%; max-width:215px; height:auto; display:block; overflow:visible;">'+body+g+'</svg>';
+  // Anatomical écorché figure, drawn here as SVG rather than sourced from stock art (the
+  // reference supplied was watermarked licensed stock and could not be shipped). Depth comes
+  // from per-muscle gradient shading plus fibre striations rather than WebGL — this app has no
+  // build step, so a real 3D model would mean a CDN dependency and a multi-megabyte mesh.
+  // One lateral half is drawn and mirrored, so left/right can never drift apart.
+  _anatomyDefs(){
+    return '<defs>'
+      + '<linearGradient id="axBody" x1="0.2" y1="0" x2="0.85" y2="1">'
+      +   '<stop offset="0" stop-color="#252a31"/><stop offset="1" stop-color="#15181d"/></linearGradient>'
+      + '<linearGradient id="axM" x1="0.15" y1="0" x2="0.9" y2="1">'
+      +   '<stop offset="0" stop-color="#525965"/><stop offset="0.42" stop-color="#343a44"/>'
+      +   '<stop offset="1" stop-color="#191d22"/></linearGradient>'
+      + '<linearGradient id="axR" x1="0.15" y1="0" x2="0.9" y2="1">'
+      +   '<stop offset="0" stop-color="#ff6b73"/><stop offset="0.4" stop-color="#f01f31"/>'
+      +   '<stop offset="1" stop-color="#8d0d1a"/></linearGradient>'
+      + '</defs>';
   }
-  // Paints the mount with the current view's figure and lights whatever is inside the 2-hour
-  // window. Runs on every sync (cheap, DOM-diff free) plus on a 60s ticker so the glow fades
-  // and expires without the user needing to touch anything.
+  _anatomyParts(view){
+    const back = view==='back';
+    const M=(id,d)=>'<path data-m="'+id+'" d="'+d+'" fill="url(#axM)" stroke="rgba(0,0,0,0.78)" stroke-width="1.3" stroke-linejoin="round"/>';
+    const F=(d)=>'<path d="'+d+'" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="1.05" stroke-linecap="round"/>';
+    let mid='', side='';
+    if(!back){
+      // Centre column: rectus abdominis in tendinous blocks, like the reference.
+      mid += M('abs','M152 156h36v92c0 12-8 20-18 20s-18-8-18-20z');
+      mid += F('M170 158v106')+F('M153 180h34')+F('M154 202h32')+F('M156 224h28');
+      mid += M('traps','M160 84h20l-4 20c-1 5-3 7-6 7s-5-2-6-7z');
+    } else {
+      mid += M('traps','M170 84c-20 0-37 6-48 15l16 62c10-6 21-9 32-9s22 3 32 9l16-62c-11-9-28-15-48-15z');
+      mid += F('M170 90v72')+F('M140 106l28 30')+F('M200 106l-28 30');
+      mid += M('lower_back','M154 166h32v76c0 12-7 19-16 19s-16-7-16-19z');
+      mid += F('M162 170v96')+F('M178 170v96');
+      mid += M('glutes','M170 254c-25 0-42 13-42 29 0 18 18 31 42 31s42-13 42-31c0-16-17-29-42-29z');
+      mid += F('M170 258v56')+F('M136 274q34 12 68 0');
+    }
+    if(!back){
+      side += M('traps','M158 84c-14 2-26 8-35 16l12 18c8-6 17-10 27-11z');
+      side += F('M133 100q14 4 24 12');
+      side += M('delts','M123 100c-16 4-26 17-26 34 0 14 8 22 19 20 12-2 21-15 24-30 2-12 0-22-5-24z');
+      side += F('M104 116q14 6 22 20')+F('M100 128q14 4 22 18')+F('M101 140q13 1 21 12');
+      side += M('chest','M166 100c-18 0-33 5-41 13-8 8-9 21-2 30 8 11 24 17 39 15 8-1 12-6 12-15v-43z');
+      side += F('M128 116q22 4 38 14')+F('M126 128q22 4 40 12')+F('M129 140q20 2 37 10');
+      side += M('obliques','M137 150c-9 4-14 13-14 25l2 34c1 9 6 12 12 8l11-8v-59z');
+      side += F('M127 166l14 6')+F('M125 182l16 6')+F('M126 198l15 5');
+      side += M('biceps','M97 136c-13 8-23 21-27 34-3 11 3 18 13 15 12-4 22-18 26-33 2-11 0-18-12-16z');
+      side += F('M78 166q14-4 24-18')+F('M76 176q16-2 26-16');
+      side += M('forearms','M72 182c-13 10-24 24-28 35-3 10 2 16 11 13 11-4 22-17 27-30 3-10 0-19-10-18z');
+      side += F('M52 212q14-4 24-18')+F('M50 222q15-3 25-16');
+      side += M('quads','M152 268c-15 3-23 17-24 39l-3 48c-1 17 7 27 19 26 13-1 21-12 23-30l6-52c2-22-6-34-21-31z');
+      side += F('M150 274l-8 90')+F('M133 296q14 4 17 15')+F('M129 326q16 3 19 15');
+      side += M('adductors','M167 268c-9 2-14 11-15 24l-3 38c-1 11 3 17 9 16 7-1 11-8 12-19l4-40c1-13-1-20-7-19z');
+      side += F('M164 274l-6 66');
+      side += M('calves','M143 382c-12 3-18 15-18 33l1 26c1 13 8 19 16 16 9-3 14-13 14-27l1-30c0-13-5-20-14-18z');
+      side += F('M142 388l-4 68')+F('M129 406q13 3 15 13')+F('M128 428q13 2 15 12');
+    } else {
+      side += M('delts_rear','M123 100c-16 4-26 17-26 34 0 14 8 22 19 20 12-2 21-15 24-30 2-12 0-22-5-24z');
+      side += F('M104 116q14 6 22 20')+F('M101 132q14 3 22 16');
+      side += M('lats','M136 120c-14 8-21 22-23 42l-3 48c-1 12 5 16 13 11l35-24c5-3 7-8 7-15v-52z');
+      side += F('M118 148q20 8 36 22')+F('M114 174q22 6 40 18')+F('M112 200q22 3 38 14');
+      side += M('triceps','M97 136c-13 8-23 21-27 34-3 11 3 18 13 15 12-4 22-18 26-33 2-11 0-18-12-16z');
+      side += F('M74 152l24 16')+F('M77 170q14-4 24-18');
+      side += M('forearms','M72 182c-13 10-24 24-28 35-3 10 2 16 11 13 11-4 22-17 27-30 3-10 0-19-10-18z');
+      side += F('M52 212q14-4 24-18');
+      side += M('hamstrings','M152 274c-15 3-23 17-24 39l-3 46c-1 17 7 27 19 26 13-1 21-12 23-30l6-50c2-22-6-34-21-31z');
+      side += F('M150 280l-8 88')+F('M132 306q15 4 18 14')+F('M129 334q16 3 19 14');
+      side += M('calves','M143 378c-12 3-19 16-19 35l1 26c1 14 8 20 17 17 9-3 14-14 14-28l1-31c0-14-5-21-14-19z');
+      side += F('M142 384l-4 70')+F('M128 402q14 3 16 13')+F('M127 426q14 3 16 12');
+    }
+    return { mid, side };
+  }
+  _anatomySvg(view){
+    // Head, neck, hands and feet are the only non-muscle parts — everything else you can see is
+    // a muscle, so nothing can drift out of alignment with an underlying silhouette.
+    const base='<g fill="url(#axBody)" stroke="rgba(255,255,255,0.10)" stroke-width="1">'
+      + '<ellipse cx="170" cy="42" rx="23" ry="29"/>'
+      + '<path d="M158 62h24v26h-24z"/>'
+      + '<ellipse cx="38" cy="228" rx="12" ry="8" transform="rotate(-40 38 228)"/>'
+      + '<ellipse cx="302" cy="228" rx="12" ry="8" transform="rotate(40 302 228)"/>'
+      + '<path d="M126 452h22c3 0 5 3 5 7s-2 7-5 7h-26c-4 0-6-3-6-6 0-4 4-8 10-8z"/>'
+      + '<path d="M214 452h-22c-3 0-5 3-5 7s2 7 5 7h26c4 0 6-3 6-6 0-4-4-8-10-8z"/>'
+      + '</g>';
+    const p=this._anatomyParts(view);
+    const mirror='<g transform="translate(340,0) scale(-1,1)">'+p.side+'</g>';
+    return '<svg viewBox="0 0 340 480" style="width:100%; max-width:100%; height:auto; display:block; overflow:visible;">'
+      + this._anatomyDefs() + base + p.mid + p.side + mirror + '</svg>';
+  }
   _syncAnatomy(){
     if(!this.root) return;
     const mount=this.root.querySelector('[data-anatomy]');
@@ -11321,13 +11348,16 @@ activities: this._mergeShipLog(s.activities),
     mount.querySelectorAll('[data-m]').forEach(el=>{
       const g=glow[el.getAttribute('data-m')];
       if(g){
-        const a=0.35+0.65*g.strength;
-        el.setAttribute('fill','rgba(255,45,60,'+a.toFixed(2)+')');
-        el.setAttribute('stroke','rgba(255,120,130,'+(0.35+0.4*g.strength).toFixed(2)+')');
-        el.style.filter='drop-shadow(0 0 '+(4+8*g.strength).toFixed(1)+'px rgba(255,45,60,'+(0.5+0.4*g.strength).toFixed(2)+'))';
+        // Swap to the red gradient rather than a flat colour so the sculpted shading survives;
+        // opacity and glow radius carry the fade over the 2-hour window.
+        el.setAttribute('fill','url(#axR)');
+        el.setAttribute('stroke','rgba(255,150,155,'+(0.30+0.35*g.strength).toFixed(2)+')');
+        el.style.opacity=(0.62+0.38*g.strength).toFixed(2);
+        el.style.filter='drop-shadow(0 0 '+(5+10*g.strength).toFixed(1)+'px rgba(255,40,55,'+(0.45+0.4*g.strength).toFixed(2)+'))';
       } else {
-        el.setAttribute('fill','#2a2d33');
-        el.setAttribute('stroke','rgba(255,255,255,0.09)');
+        el.setAttribute('fill','url(#axM)');
+        el.setAttribute('stroke','rgba(0,0,0,0.45)');
+        el.style.opacity='1';
         el.style.filter='none';
       }
     });
@@ -12547,6 +12577,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.120', date:'Aug 25, 2026', major:false, notes:[
+      'Rebuilt the anatomy model as a proper anatomical figure rather than a block mannequin. The muscles now form the body itself \u2014 there is no separate silhouette underneath for them to drift out of alignment with \u2014 and each belly is individually shaded with fibre striations so it reads as a sculpted form: separate deltoid, biceps and forearm down each arm, segmented abs, obliques, quads and adductors, and on the back view the trapezius diamond, lats, triceps, erector spinae, glutes, hamstrings and calves.',
+      'Lit muscles keep that shading \u2014 they switch to a red gradient rather than a flat fill, so a trained muscle still looks three-dimensional while it glows.',
+      'One half of the figure is drawn and mirrored, so the left and right sides can never disagree.',
+    ]},
     {version:'v11.119', date:'Aug 25, 2026', major:true, notes:[
       'New: a human anatomy model in Fitness & Recovery. Log a set and the exact muscle you trained glows red for 2 hours, fading as it ages. It works off the exercise name, not just the muscle group \u2014 calf raises light the calves, not the whole leg; a bench press lights chest and triceps; a Romanian deadlift lights hamstrings and glutes. Front and back views, and each toggle shows a count so a glow on the side you are not looking at is never hidden.',
       'Muscle Training Split keeps the per-muscle kg totals but the bar chart is gone \u2014 the anatomy model shows the same thing far more usefully.',
