@@ -383,7 +383,6 @@
      side by side into unusable slivers. */
   /* Anatomy model on a phone: the figure rotates continuously on its own, so the
      Front/Back buttons are redundant — drop them and give the canvas the whole card. */
-  .cc-anatomy-views{ display:none !important; }
   [data-anatomy3d]{ max-width:100% !important; }
   [data-anatomy]{ max-width:100% !important; }
   .cc-wi-routes-grid{ grid-template-columns:1fr !important; }
@@ -3191,7 +3190,7 @@
         </sc-if>
 
         <sc-if value="{{ showCards }}" hint-placeholder-val="{{ false }}">
-          <div style="font-size:11px; color:#75757d; margin-bottom:14px;">Illustrative sample stories — not live news yet. The EXECUTIVE tab is your real AI-generated briefing.</div>
+          <div style="font-size:11px; color:#75757d; margin-bottom:14px;">Live headlines from BBC, Guardian, Al Jazeera, Sky, France 24, JURIST and Courthouse News. Tap a story to read the source. EXECUTIVE is your AI-generated briefing.</div>
           <sc-for list="{{ briefView }}" as="s" hint-placeholder-count="4">
             <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:0; margin-bottom:12px; overflow:hidden;">
               <div onClick="{{ s.toggle }}" style="display:flex; align-items:center; justify-content:space-between; padding:16px 18px; cursor:pointer;">
@@ -3201,10 +3200,9 @@
               <sc-if value="{{ s.open }}" hint-placeholder-val="{{ false }}">
                 <div style="padding:0 18px 16px;">
                   <sc-for list="{{ s.items }}" as="it" hint-placeholder-count="4">
-                    <div style="padding:12px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                    <div onClick="{{ it.open }}" style="padding:12px 0; border-top:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
                       <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;"><span style="font-size:9px; letter-spacing:.5px; color:{{ it.tagColor }}; border:1px solid {{ it.tagBdr }}; border-radius:6px; padding:2px 7px;">{{ it.tag }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6f6f78;">{{ it.src }} · {{ it.ago }}</span></div>
                       <div style="font-size:13.5px; font-weight:600; color:#eef0f2;">{{ it.head }}</div>
-                      <div style="font-size:12.5px; color:#9a9aa2; margin-top:5px; line-height:1.5;">{{ it.sum }}</div>
                     </div>
                   </sc-for>
                 </div>
@@ -8931,7 +8929,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-125 · v11.125 exact-muscle-glow';
+const NOTIF_BUILD_VERSION = '2026.08.25-126 · v11.126 brief-real-spin-all';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9026,13 +9024,9 @@ activities: this._mergeShipLog(s.activities),
       actText:'', actCat:'Work', actRange:'Week', actMin:'', actHr:'',
       aiTasksResult:null, aiTasksLoading:false, aiTasksErr:'',
       aiNextActionsResult:null, aiNextActionsLoading:false, aiNextActionsErr:'',
-      events: s.events || [
-        {title:'Q3 launch standup',date:'2026-07-01',time:'09:00'},
-        {title:'Investor call',date:'2026-07-01',time:'11:00'},
-        {title:'Gym — push day',date:'2026-07-01',time:'17:30'},
-        {title:'Board meeting',date:'2026-07-03',time:'14:00'},
-        {title:'Product review',date:'2026-07-09',time:'10:30'},
-      ],
+      // No seeded events. These used to be five fictional meetings dated July 2026, which
+      // showed up in a new user's calendar as though they were real appointments.
+      events: s.events || [],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
       safetyQuery:'', safetyLoading:false, safetyResult:'', safetyErr:'',
@@ -11380,8 +11374,13 @@ activities: this._mergeShipLog(s.activities),
           if(svgMount) svgMount.style.display='none';
           const phone=(typeof window!=='undefined' && window.innerWidth<=900);
           A3.setAspect(phone?1.25:1.5);
-          A3.setAutoSpin(phone);          // endless rotation on mobile; buttons drive it on desktop
-          if(!phone) A3.setView(view);
+          A3.setAutoSpin(true);           // endless rotation everywhere; drag overrides it
+          // Front/Back only exist for the drawn fallback, which cannot spin. With the 3D
+          // model up they are dead weight, so hide them rather than leave two ways to do
+          // the same thing (this used to be a mobile-only CSS rule, which left desktop
+          // showing buttons next to a model that ignored them).
+          const vw=this.root.querySelector('.cc-anatomy-views');
+          if(vw) vw.style.display='none';
           A3.setGlow(strengths);
         }).catch((e)=>{
           // Stay on the SVG rather than showing an empty box.
@@ -11389,7 +11388,6 @@ activities: this._mergeShipLog(s.activities),
           console.warn('[anatomy] 3D unavailable, using drawn figure:', e && e.message);
         });
       } else if(A3.isMounted()){
-        if(!(typeof window!=='undefined' && window.innerWidth<=900)) A3.setView(view);
         A3.setGlow(strengths);
         return;   // 3D is live; the SVG below is hidden and needs no work
       }
@@ -12356,6 +12354,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   countrySafety(c){ const idx=Math.max(3,Math.min(99,Math.round(c.pol*0.5+(100-c.dis)*0.2+(100-this._threatWeight(c.threat))*0.3))); const lbl=idx>=78?'VERY SAFE':idx>=62?'SAFE':idx>=46?'MODERATE':idx>=32?'ELEVATED RISK':'HIGH RISK'; const col=idx>=62?'#e8e8ec':idx>=46?'#c9a24b':idx>=32?'#c02e39':'#ff2b3d'; const adv=idx>=78?'Normal precautions':idx>=62?'Increased caution':idx>=46?'Reconsider travel':idx>=32?'Avoid non-essential travel':'Do not travel'; return {idx,lbl,col,adv}; }
   _newsCatCol(cat){ return /CONFLICT|SECURITY|DEFENSE|WAR/.test(cat)?'#ff2b3d':/MARKET|FINANCE|ECONOMY|TRADE|ENERGY|BANKING|AGRI|INFRA/.test(cat)?'#e8e8ec':'#9a9aa2'; }
   wiFace(c){ if(!c) return; let tp=-c.lon*Math.PI/180; const base=this._gphi||0; while(tp<base-Math.PI)tp+=2*Math.PI; while(tp>base+Math.PI)tp-=2*Math.PI; this._gTgtPhi=tp; this._gTgtTheta=Math.max(-1.05,Math.min(1.05,c.lat*Math.PI/180)); this._gHold=Date.now()+3200; }
+  init_briefing(){ this.loadWorldNews(); this.loadDashNews('money'); this.loadDashNews('law'); }
   init_globe(){ const rd=this.root.querySelector('[data-chart="wiRadar"]'); if(rd) this.startRadar(rd); this._initMapLibre(); this.countUp(); this.loadWorldNews(); }
   countUp(){ if(!this.root) return; this.root.querySelectorAll('[data-count]').forEach(el=>{ const tgt=parseFloat(el.dataset.count)||0; const dec=el.dataset.dec?+el.dataset.dec:0; const t0=performance.now(), dur=1100; const step=(t)=>{ const k=Math.min(1,(t-t0)/dur); const e=1-Math.pow(1-k,3); el.textContent=(tgt*e).toFixed(dec); if(k<1) requestAnimationFrame(step); }; requestAnimationFrame(step); }); }
   startRadar(cv){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,R=Math.min(w,h)/2-4; const blips=[]; for(let i=0;i<10;i++) blips.push({a:Math.random()*7,r:R*(0.22+Math.random()*0.72),ph:Math.random()*7});
@@ -12705,6 +12704,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.126', date:'Aug 25, 2026', major:true, notes:[
+      'The anatomy model now spins on the web too. The endless rotation was written as a mobile-only rule, so on a desktop browser you still got the old Front/Back buttons and a model that sat still \u2014 it looked like the update had not shipped, but it was doing exactly what it had been told. Same behaviour everywhere now: it turns by itself, you can drag it, and it picks the spin back up when you let go. Front and Back only appear if your device cannot run the 3D model and falls back to the drawn figure, which genuinely needs them.',
+      'The Daily Brief\u2019s story cards were fake. Twenty invented headlines across Large Government Purchases, Large Business Purchases, Swiss \u00b7 BlackRock \u00b7 Vanguard, High-End AI and Money Opportunities \u2014 every one bylined to a real newsroom: the Financial Times six times, Reuters five, Bloomberg five, the Wall Street Journal three. None of them were ever written by those newsrooms, and the Money Opportunities section was inventing investment commentary under trusted mastheads. All of it is gone.',
+      'In its place the brief now carries real headlines, on three tabs \u2014 World, Money & Markets, and Law \u2014 pulled from the same publisher feeds the rest of the app already uses, with the real source and time on each card and a tap through to the article. The four themed tabs that no free feed can actually supply have been retired rather than filled with something pretending to be them. EXECUTIVE is unchanged; it was always your genuine AI briefing.',
+      'Removed five fictional calendar events \u2014 \u201CQ3 launch standup\u201D, \u201CInvestor call\u201D, \u201CBoard meeting\u201D and friends, all dated July 2026 \u2014 that were seeded into an empty calendar and sat there looking like real appointments you had forgotten about.',
+      'Deleted a dead block of four more fabricated headlines that was being rebuilt on every single render and then never shown to anyone.',
+    ]},
     {version:'v11.125', date:'Aug 25, 2026', major:true, notes:[
       'The training glow now lands on the exact muscle. Until now the app worked out what to light from position alone \u2014 \u201Canything between 22% and 44% of body height, on the front\u201D was called quads \u2014 which is why the red came out as bands with straight cut lines across the thigh and shin. Every vertex of the model now carries the name of the muscle that actually sits underneath it, so training calves lights the real gastrocnemius, tapering into the Achilles, and nothing else.',
       'Those labels come from BodyParts3D, the anatomical database from the Database Center for Life Science at the University of Tokyo \u2014 146 individually named muscle meshes, mapped onto this body one vertex at a time. The muscle geometry itself is not shipped; only the labels are, so the model is the same size it was.',
@@ -15863,42 +15869,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const evRepeatSummary=evRepeatDays.length?this._repeatLabel(evRepeatDays):'Doesn\u2019t repeat';
     const selD=new Date(S.calSel+'T00:00:00'); const selDayLabel=selD.toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric'}); const selShort=selD.toLocaleString('en-US',{month:'short',day:'numeric'});
 
-    // briefing
-    const T=(c,b)=>({tagColor:c,tagBdr:b});
-    const R=T('#ff5563','rgba(255,255,255,0.35)'), W=T('#e8e8ec','rgba(255,255,255,0.25)'), G=T('#9a9aa2','rgba(255,255,255,0.18)');
+    // briefing — real headlines from the same publisher feeds the rest of the app uses.
+    // This block used to hold 20 invented stories bylined to the FT, Reuters, Bloomberg,
+    // WSJ and The Information. None of them were ever written by those newsrooms.
+    const _briefSec=(id,title,rows)=>({ id, title, items:(rows||[]).slice(0,8).map(h=>{
+      const cat=this._headlineCat(h.title);
+      return { tag:cat, tagColor:this._newsCatCol(cat), tagBdr:'rgba(255,255,255,0.25)',
+               src:h.source||'', ago:this._agoLabel(h.ts), head:h.title,
+               open:()=>{ if(h.url) window.open(h.url,'_blank','noopener'); } };
+    }) });
     const sections=[
-      {id:'gov',title:'Large Government Purchases',items:[
-        {src:'Financial Times',ago:'12m',tag:'GOV',...R,head:'Allied ministries expand multi-year defense procurement',sum:'Several governments are finalising multi-billion frameworks for air defense, drones and munitions; supplier order books extend into 2028.'},
-        {src:'Reuters',ago:'40m',tag:'INFRA',...G,head:'Sovereign fund commits to national grid upgrade',sum:'A public infrastructure programme earmarks large capital for power-grid modernisation and data-center-ready substations.'},
-        {src:'Bloomberg',ago:'1h',tag:'CLOUD',...W,head:'Government cloud mega-contract enters final round',sum:'A major public-sector cloud tender narrows to a shortlist; hyperscalers positioned for a multi-year sovereign mandate.'},
-        {src:'WSJ',ago:'2h',tag:'GOV',...R,head:'State health system orders large diagnostics fleet',sum:'A national procurement round covers imaging hardware and AI triage software across regional hospitals.'},
-      ]},
-      {id:'biz',title:'Large Business Purchases',items:[
-        {src:'Financial Times',ago:'22m',tag:'CAPEX',...R,head:'Chipmaker raises capex guidance to fund new fabs',sum:'A leading semiconductor firm lifts capital-spending plans to expand advanced-node capacity amid AI demand.'},
-        {src:'WSJ',ago:'50m',tag:'M&A',...W,head:'Retailer acquires last-mile logistics network',sum:'A large acquisition consolidates delivery capacity ahead of peak season and pressures rivals on speed.'},
-        {src:'Bloomberg',ago:'1h',tag:'ENERGY',...G,head:'Energy major buys into grid-scale storage',sum:'A big-oil player deploys significant capital into battery storage and renewables to hedge the transition.'},
-        {src:'Reuters',ago:'2h',tag:'DATA',...R,head:'Cloud group commits record data-center build-out',sum:'A multi-gigawatt campus programme is announced, tied to long-term power and cooling agreements.'},
-      ]},
-      {id:'swiss',title:'Swiss · BlackRock · Vanguard',items:[
-        {src:'Financial Times',ago:'15m',tag:'UBS',...R,head:'UBS reports Credit Suisse integration milestone',sum:'Cost-synergy targets reiterated as wealth-management inflows stay resilient; capital ratios remain strong.'},
-        {src:'Bloomberg',ago:'35m',tag:'BLACKROCK',...W,head:'BlackRock iShares posts record monthly inflows',sum:'ETF complex leads with AI-theme and money-market products; total AUM pushes to fresh highs.'},
-        {src:'Reuters',ago:'1h',tag:'VANGUARD',...G,head:'Vanguard trims fees across index funds again',sum:'Expense-ratio cuts intensify price competition, pressuring active managers on cost.'},
-        {src:'Financial Times',ago:'2h',tag:'SNB',...R,head:'SNB comments on franc strength and rate path',sum:'The Swiss National Bank signals a data-dependent stance; safe-haven demand keeps the franc firm.'},
-      ]},
-      {id:'ai',title:'High-End AI · Launches',items:[
-        {src:'Financial Times',ago:'8m',tag:'MODEL',...R,head:'New frontier model launches with agentic tooling',sum:'A major lab ships a model with stronger reasoning and native tool use; enterprise API access opens today.'},
-        {src:'Bloomberg',ago:'30m',tag:'FUNDING',...W,head:'AI infrastructure startup closes mega-round',sum:'A compute and inference provider raises a large round at a premium valuation to expand capacity.'},
-        {src:'Reuters',ago:'1h',tag:'CHIPS',...G,head:'Next-gen accelerator roadmap accelerates',sum:'New training chips announced with large memory-bandwidth gains, targeting frontier-scale workloads.'},
-        {src:'The Information',ago:'2h',tag:'PRODUCT',...R,head:'Voice-native AI assistant enters GA',sum:'A consumer assistant ships low-latency voice with interruptible speech and on-device options.'},
-      ]},
-      {id:'money',title:'Money Opportunities',items:[
-        {src:'Financial Times',ago:'18m',tag:'YIELD',...R,head:'Short-duration cash yields stay elevated',sum:'Money-market instruments continue to offer attractive yields; investors weigh duration risk. Not advice.'},
-        {src:'Bloomberg',ago:'45m',tag:'THEME',...W,head:'AI-adjacent infrastructure draws capital',sum:'Power, cooling and networking suppliers see rising demand tied to data-center build-out. Higher volatility.'},
-        {src:'WSJ',ago:'1h',tag:'CREDIT',...G,head:'Private credit expands with new vehicles',sum:'Funds raise fresh capital; higher yields carry higher risk and lower liquidity. Do your own diligence.'},
-        {src:'Reuters',ago:'2h',tag:'COMMODITY',...R,head:'Critical-minerals demand outlook strengthens',sum:'Supply-chain reshoring lifts interest in copper, lithium and rare earths. Cyclical and policy-sensitive.'},
-      ]},
+      _briefSec('world','World',      S.wiNews),
+      _briefSec('money','Money & Markets', S.moneyNews),
+      _briefSec('law','Law',         S.lawNews),
     ];
-    const briefTabDefs=[{id:'exec',label:'EXECUTIVE'},{id:'full',label:'FULL BRIEFING'},{id:'gov',label:'GOVERNMENT'},{id:'biz',label:'BUSINESS'},{id:'swiss',label:'SWISS · FUNDS'},{id:'ai',label:'AI · LAUNCHES'},{id:'money',label:'MONEY'}];
+    const briefTabDefs=[{id:'exec',label:'EXECUTIVE'},{id:'full',label:'FULL BRIEFING'},{id:'world',label:'WORLD'},{id:'money',label:'MONEY'},{id:'law',label:'LAW'}];
     const briefTabs=briefTabDefs.map(t=>({label:t.label, pick:()=>this.setState({briefTab:t.id}), c:S.briefTab===t.id?'#F4F4F5':'#7c7c84', b:S.briefTab===t.id?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.12)', bg:S.briefTab===t.id?'rgba(255,255,255,0.14)':'transparent', sideC:S.briefTab===t.id?'#0a0a0b':'#c5c5ca', sideBg:S.briefTab===t.id?'#F4F4F5':'transparent'}));
     const briefView=(S.briefTab==='full'?sections:sections.filter(s=>s.id===S.briefTab)).map(s=>{ const open=!!(S.briefSecOpen||{})[s.id]; return {title:s.title,count:s.items.length,items:s.items,open,chev:open?'▾':'▸',toggle:()=>this.setState(st=>({briefSecOpen:{...(st.briefSecOpen||{}),[s.id]:!open}}))}; });
     const _eb=S.aiBrief||this._execBrief(); const _sent=(_eb.summary&&_eb.summary.sentiment)||'Neutral'; const _sentColor=_sent==='Bullish'?'#2fce86':(_sent==='Bearish'?'#ff5563':'#e8b45a');
@@ -17842,7 +17827,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         c:(S.newMissionRepeat||'daily')===r?'#F4F4F5':'#9a9aa2', bg:(S.newMissionRepeat||'daily')===r?'rgba(255,255,255,0.18)':'transparent', b:(S.newMissionRepeat||'daily')===r?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
       newMissionDue:S.newMissionDue||'', setNewMissionDue:(e)=>this.setState({newMissionDue:e.target.value}),
       xpFx:(S.xpFx||[]).map(f=>({id:f.id,text:f.text})),
-      intel:[{cat:'AI',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'New frontier model tops reasoning benchmarks',meta:'Financial Times · illustrative · 9 sources'},{cat:'MARKETS',catColor:'#eef0f2',catBdr:'rgba(255,255,255,0.25)',headline:'Fed holds rates; futures climb as inflation cools',meta:'Bloomberg · illustrative · 21 sources'},{cat:'FUNDS',catColor:'#ff5563',catBdr:'rgba(255,255,255,0.35)',headline:'BlackRock ETF inflows hit fresh record',meta:'Reuters · illustrative · 12 sources'},{cat:'GOV',catColor:'#9a9aa2',catBdr:'rgba(255,255,255,0.18)',headline:'Allied defense procurement framework expands',meta:'WSJ · illustrative · 7 sources'}],
       goWorldIntel:()=>this.setState({scene:'globe'}),
       ...(()=>{ const d=this.productivitySeries().deltaPct; return {
         prodDeltaText: d===0?'—':(d>0?'▲ +':'▼ ')+d+'%',
