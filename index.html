@@ -2544,13 +2544,13 @@
           <sc-if value="{{ notesLocked }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:32px 20px;">
               <div style="width:64px; height:64px; border-radius:18px; border:1px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.12),transparent 70%); display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:16px;">🔒</div>
-              <div style="font-size:15px; font-weight:600; margin-bottom:4px;">Vault Locked</div>
-              <div style="font-size:12px; color:#8a8a92; margin-bottom:16px;">Enter your notes password to unlock.</div>
+              <div style="font-size:15px; font-weight:600; margin-bottom:4px;">{{ vaultTitle }}</div>
+              <div style="font-size:12px; color:#8a8a92; margin-bottom:16px;">{{ vaultHint }}</div>
               <div style="display:flex; gap:9px; max-width:340px; width:100%;">
                 <input value="{{ notesPwInput }}" onInput="{{ setNotesPwInput }}" onKeyDown="{{ unlockNotesKey }}" type="password" placeholder="Password" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid {{ notesErrBorder }}; background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; letter-spacing:3px;">
                 <span onClick="{{ unlockNotes }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">Unlock</span>
               </div>
-              <sc-if value="{{ notesErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">Incorrect password.</div></sc-if>
+              <sc-if value="{{ notesErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">{{ vaultErr }}</div></sc-if>
             </div>
           </sc-if>
           <sc-if value="{{ notesUnlocked }}" hint-placeholder-val="{{ false }}">
@@ -8929,7 +8929,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-127 · v11.127 no-seeded-tasks';
+const NOTIF_BUILD_VERSION = '2026.08.25-128 · v11.128 no-seeded-data';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -8989,25 +8989,16 @@ class Component extends DCLogic {
       missGenOpen:false, missGenCat:null, missGenLoading:false, missGenErr:'', missGenResult:null,
       move: s.move || { streak:13, last:yestC, longest:21 },
       lastRollover: s.lastRollover || todayC,
-      workouts: s.workouts || [
-        {part:'Chest',exercise:'Bench Press',min:35,weight:80,sets:4,reps:8,ts:now-2*3600000},
-        {part:'Arms',exercise:'Barbell Curls',min:20,weight:20,sets:3,reps:12,ts:now-2*3600000},
-        {part:'Legs',exercise:'Back Squat',min:42,weight:110,sets:5,reps:5,ts:now-1*3600000},
-        {part:'Core',exercise:'Weighted Planks',min:15,ts:now-45*60000},
-        {part:'Cardio',exercise:'5K Run',min:28,ts:now-4*D},
-      ],
+      // No seeded workouts. These five were timestamped relative to now, so they never aged out:
+      // a user who had logged nothing still saw the anatomy model glowing on legs and core,
+      // and carried an 80kg bench and a 110kg squat in their Strength Chart.
+      workouts: s.workouts || [],
       woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
-      income: s.income || [
-        {label:'SaaS subscriptions',amt:128000,month:6,ts:now-2*D},
-        {label:'Enterprise deal — Helix',amt:42000,month:6,ts:now-5*D},
-        {label:'Consulting',amt:12000,month:6,ts:now-8*D},
-      ],
-      expenses: s.expenses || [
-        {label:'Payroll',amt:68000,cat:'Team',ts:now-2*D},
-        {label:'Cloud infra',amt:14500,cat:'Ops',ts:now-3*D},
-        {label:'Paid ads',amt:9800,cat:'Growth',ts:now-4*D},
-      ],
+      // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
+      income: s.income || [],
+      // No seeded expenses. Was $92,300 of invented costs, analysed as though they were yours.
+      expenses: s.expenses || [],
       savings: s.savings || [],
       usageLog: s.usageLog || [],
       providerPools: s.providerPools || {},
@@ -9024,8 +9015,11 @@ activities: this._mergeShipLog(s.activities),
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
       safetyQuery:'', safetyLoading:false, safetyResult:'', safetyErr:'',
-      notes: s.notes || [{title:'Q3 launch — angle',body:'Position the command center as a private AI OS, not a productivity dashboard.',ts:now-3600000*5},{title:'Reading list',body:'Deep Work · Antifragile · The Almanack of Naval.',ts:now-D*2}],
-      notesPw: s.notesPw || '227722', notesUnlocked:false, notesPwInput:'', notesErr:false, noteTitle:'', noteBody:'',
+      // No seeded notes.
+      notes: s.notes || [],
+      // No default PIN. One used to be hardcoded here in the page source — a real lock with
+      // a published key. Empty means "not set yet"; the vault asks you to choose one.
+      notesPw: s.notesPw || '', notesUnlocked:false, notesPwInput:'', notesErr:false, noteTitle:'', noteBody:'',
       acctUnlocked:false, acctPwInput:'', acctErr:false, acctPwErr:'', acctUnlockBusy:false, notesPwDraft:'',
       twoFAWarnOpen:false, twoFAWarnMode:'', twoFAWarnAck:false,
       briefTab:'exec', briefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),
@@ -11521,6 +11515,35 @@ activities: this._mergeShipLog(s.activities),
     }
     return out;
   }
+  // The vault PIN is stored as a SHA-256 hash, never in the clear. Existing users have a
+  // plaintext value saved (the column was already named pw_hash, but held the PIN itself),
+  // so a value that is not 64 hex chars is treated as legacy, compared directly, and
+  // upgraded to a hash on the next successful unlock.
+  async _hashPin(v){
+    const raw=String(v==null?'':v);
+    try{
+      const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){ return 'plain:'+raw; }        // no SubtleCrypto (insecure origin) — still never a bare PIN
+  }
+  _isHashed(v){ return /^[0-9a-f]{64}$/.test(String(v||'')); }
+  async _checkPin(entered){
+    const stored=this.state.notesPw||'';
+    if(!stored){                                  // first use: this entry becomes the PIN
+      const v=String(entered||'').trim();
+      if(v.length<3) return false;
+      const h=await this._hashPin(v);
+      this.mut({notesPw:h});
+      if(this._sbOn()) this._saveNotesPw(h);
+      return true;
+    }
+    if(this._isHashed(stored)) return (await this._hashPin(entered))===stored;
+    if(String(entered)!==String(stored)) return false;
+    this.mut({notesPw: await this._hashPin(entered)});   // upgrade legacy plaintext in place
+    if(this._sbOn()) this._saveNotesPw(this.state.notesPw);
+    return true;
+  }
+  _saveNotesPw(h){ try{ window.SB.upsert('note_vault_settings',{user_id:this.state.authUserId,pw_hash:h},'user_id'); }catch(e){} }
   mut(u){ this.setState(u, ()=>this.save()); }
   openWebApp(){ window.open('https://nervexus.vercel.app', '_blank', 'noopener'); }
   startRefresh(){
@@ -12698,6 +12721,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.128', date:'Aug 25, 2026', major:true, notes:[
+      'Removed five seeded workouts \u2014 an 80kg bench press, a 110kg back squat, barbell curls, weighted planks and a 5K run. They were timestamped relative to whenever you opened the app rather than to a real date, so they never aged out: someone who had logged nothing still saw the anatomy model glowing red on legs and core for training they had never done, and carried those lifts in their Muscle Training Split totals and Strength Chart. Your fitness numbers are now only what you have actually logged.',
+      'Removed the seeded finances. There were three invented income entries totalling $182,000 \u2014 including \u201CSaaS subscriptions\u201D at $128,000 \u2014 and three invented expenses totalling $92,300. The Money Assistant was reading all of it as real and advising you on margins that did not exist. Correcting something said here previously: this was described as the adviser having no data to work with. That was wrong \u2014 it had plenty, and all of it was fabricated.',
+      'Removed two seeded notes.',
+      'The Notes vault PIN was hardcoded in the page source, so anyone who opened the page could read the key to the lock. It was also stored in the clear and printed back at you in Settings under \u201CCurrent:\u201D. PINs are now stored as a SHA-256 hash, never shown again, and there is no default \u2014 the first PIN you enter becomes yours. If you already had one set it still works, and it is quietly upgraded to a hash the next time you unlock.',
+    ]},
     {version:'v11.127', date:'Aug 25, 2026', major:false, notes:[
       'Removed the seven fictional tasks seeded into the Daily Checklist \u2014 \u201CQ3 launch standup\u201D, \u201CShip pricing page\u201D, \u201CCall with investors\u201D and the rest \u2014 three of which arrived already ticked off. They were not harmless decoration: the checklist feeds the real done/open counts on your dashboard, and the voice assistant reads those numbers out, so it would tell you about outstanding tasks that never existed and credit you for finishing work you never did. The checklist now starts empty and fills with what you actually add.',
     ]},
@@ -16072,9 +16101,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       unlockAcct:()=>this.unlockAccount(), unlockAcctKey:enterKey(()=>this.unlockAccount()),
       unlockAcctLabel:S.acctUnlockBusy?'Checking…':'Unlock',
       notesPwDraft:S.notesPwDraft, setNotesPwDraft:(e)=>this.setState({notesPwDraft:(e.target.value||'').replace(/\s/g,'')}),
-      notesPwCurrent:S.notesPw, notesPwBtnLabel:S.notesPwSaved?'Updated ✓':'Update',
+      notesPwCurrent:(S.notesPw?'set':'not set yet'), notesPwBtnLabel:S.notesPwSaved?'Updated ✓':'Update',
       notesPwBtnBg:S.notesPwSaved?'#FFFFFF':((S.notesPwDraft&&S.notesPwDraft.length>=3)?'#FFFFFF':'rgba(255,255,255,0.06)'),
-      saveNotesPw:()=>{ const v=(this.state.notesPwDraft||'').trim(); if(v.length>=3){ this.mut(s=>({notesPw:v, notesPwDraft:'', notesUnlocked:false, notesPwSaved:true})); if(this._sbOn()) window.SB.upsert('note_vault_settings',{user_id:this.state.authUserId,pw_hash:v},'user_id'); if(this._npv) clearTimeout(this._npv); this._npv=setTimeout(()=>this.setState({notesPwSaved:false}),1700); } },
+      saveNotesPw:async()=>{ const v=(this.state.notesPwDraft||'').trim(); if(v.length>=3){ const h=await this._hashPin(v); this.mut(s=>({notesPw:h, notesPwDraft:'', notesUnlocked:false, notesPwSaved:true})); if(this._sbOn()) this._saveNotesPw(h); if(this._npv) clearTimeout(this._npv); this._npv=setTimeout(()=>this.setState({notesPwSaved:false}),1700); } },
       acctName:S.acctDraft.name, acctEmail:S.acctDraft.email, acctPass:S.acctDraft.password, acctTwoFA:S.acctDraft.twoFA, acctGreeting:S.acctDraft.greeting,
       setAcctName:(e)=>{ const v=e.target.value; this.setState(st=>({acctDraft:{...st.acctDraft,name:v}})); },
       setAcctEmail:(e)=>{ const v=e.target.value; this.setState(st=>({acctDraft:{...st.acctDraft,email:v}})); },
@@ -17953,10 +17982,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       catPie:(()=>{ const segs=this.catTime(); const tot=segs.reduce((a,s)=>a+s.min,0)||1; return segs.map(s=>({cat:s.cat,color:s.color,hrs:this.fmtHrs(s.min),pct:Math.round(s.min/tot*100)+'%'})); })(),
       noCatPie:this.catTime().length===0,
       notesLocked:!S.notesUnlocked, notesUnlocked:S.notesUnlocked,
+      // With no default PIN, a first-time vault has nothing to check against — say so and
+      // let the first entry become the PIN, rather than showing a lock nobody can open.
+      vaultTitle: S.notesPw ? 'Vault Locked' : 'Set a Vault PIN',
+      vaultHint: S.notesPw ? 'Enter your notes password to unlock.'
+                           : 'Choose a PIN of at least 3 characters. It is stored as a hash — nobody, including this app, can read it back.',
+      vaultErr: S.notesPw ? 'Incorrect password.' : 'PIN must be at least 3 characters.',
       notesPwInput:S.notesPwInput, setNotesPwInput:(e)=>this.setState({notesPwInput:e.target.value, notesErr:false}),
       notesErr:!!S.notesErr, notesErrBorder:S.notesErr?'rgba(255,255,255,0.6)':'rgba(255,255,255,0.1)',
-      unlockNotes:()=>{ if(this.state.notesPwInput===this.state.notesPw){ this.setState({notesUnlocked:true,notesPwInput:'',notesErr:false}); } else this.setState({notesErr:true}); },
-      unlockNotesKey:enterKey(()=>{ if(this.state.notesPwInput===this.state.notesPw){ this.setState({notesUnlocked:true,notesPwInput:'',notesErr:false}); } else this.setState({notesErr:true}); }),
+      unlockNotes:async()=>{ if(await this._checkPin(this.state.notesPwInput)){ this.setState({notesUnlocked:true,notesPwInput:'',notesErr:false}); } else this.setState({notesErr:true}); },
+      unlockNotesKey:enterKey(async()=>{ if(await this._checkPin(this.state.notesPwInput)){ this.setState({notesUnlocked:true,notesPwInput:'',notesErr:false}); } else this.setState({notesErr:true}); }),
       lockNotes:()=>this.setState({notesUnlocked:false}),
       noteTitle:S.noteTitle, setNoteTitle:(e)=>this.setState({noteTitle:e.target.value}),
       noteBody:S.noteBody, setNoteBody:(e)=>this.setState({noteBody:this._capitalizeWords(e.target.value)}),
