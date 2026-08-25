@@ -381,6 +381,11 @@
   /* World Intel Routes / Saved Locations: single column on a phone, and the paired
      from/to controls (two dropdowns, two city inputs) stack instead of being squeezed
      side by side into unusable slivers. */
+  /* Anatomy model on a phone: the figure rotates continuously on its own, so the
+     Front/Back buttons are redundant — drop them and give the canvas the whole card. */
+  .cc-anatomy-views{ display:none !important; }
+  [data-anatomy3d]{ max-width:100% !important; }
+  [data-anatomy]{ max-width:100% !important; }
   .cc-wi-routes-grid{ grid-template-columns:1fr !important; }
   .cc-wi-2up{ flex-direction:column !important; }
   .cc-wi-2up > select, .cc-wi-2up > input{ width:100% !important; flex:1 1 auto !important; }
@@ -1681,12 +1686,12 @@
             </div>
             <div style="display:flex; align-items:center; justify-content:space-between; margin:16px 0 10px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.07); gap:10px; flex-wrap:wrap;">
               <span style="font-size:13px; font-weight:600;">Anatomy</span>
-              <div style="display:flex; gap:6px;">
+              <div class="cc-anatomy-views" style="display:flex; gap:6px;">
                 <span onClick="{{ setAnatomyFront }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyFrontC }}; border:1px solid {{ anatomyFrontBd }}; background:{{ anatomyFrontBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">FRONT{{ anatomyFrontCount }}</span>
                 <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
               </div>
             </div>
-            <div data-anatomy3d="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
+            <div data-anatomy3d="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:420px; margin:0 auto; padding:4px 0 2px;"></div>
             <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
             <div data-anatomy-credit style="display:none; font-family:'JetBrains Mono',monospace; font-size:8px; color:#5c5c64; text-align:center; margin-top:6px; line-height:1.5;"></div>
             <div data-anatomy-hint style="display:none; font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78; text-align:center; margin-top:4px;">DRAG TO ROTATE</div>
@@ -8917,7 +8922,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-121 · v11.121 anatomy-3d';
+const NOTIF_BUILD_VERSION = '2026.08.25-122 · v11.122 anatomy-mobile';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11365,16 +11370,20 @@ activities: this._mergeShipLog(s.activities),
           if(svgMount) svgMount.style.display='none';
           const cr=this.root.querySelector('[data-anatomy-credit]');
           if(cr){ cr.textContent=A3.CREDIT; cr.style.display='block'; }
+          const phone=(typeof window!=='undefined' && window.innerWidth<=900);
           const hn=this.root.querySelector('[data-anatomy-hint]');
-          if(hn) hn.style.display='block';
-          A3.setView(view); A3.setGlow(strengths);
+          if(hn){ hn.style.display='block'; hn.textContent = phone ? 'DRAG TO SPIN IT YOURSELF' : 'DRAG TO ROTATE'; }
+          A3.setAspect(phone?1.25:1.5);
+          A3.setAutoSpin(phone);          // endless rotation on mobile; buttons drive it on desktop
+          if(!phone) A3.setView(view);
+          A3.setGlow(strengths);
         }).catch((e)=>{
           // Stay on the SVG rather than showing an empty box.
           this._anat3dLoading=false; this._anat3dFailed=true;
           console.warn('[anatomy] 3D unavailable, using drawn figure:', e && e.message);
         });
       } else if(A3.isMounted()){
-        A3.setView(view);
+        if(!(typeof window!=='undefined' && window.innerWidth<=900)) A3.setView(view);
         A3.setGlow(strengths);
         return;   // 3D is live; the SVG below is hidden and needs no work
       }
@@ -12612,6 +12621,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.122', date:'Aug 25, 2026', major:false, notes:[
+      'On a phone the anatomy model now turns by itself — one slow, continuous rotation that never stops, so you can see the whole body without touching anything. The Front/Back buttons are gone on mobile because they are no longer needed; you can still grab the model and spin it yourself, and it picks the rotation back up a couple of seconds after you let go. On desktop the Front/Back buttons stay.',
+      'The model now fills the card properly instead of being capped at a fixed 300px width, and its height is worked out from the actual card width and the camera lens rather than being fixed, so the figure is framed head-to-foot with no wasted space and no cropping. It is also capped at 62% of the screen height so it can never push the rest of the page off the bottom on a small phone.',
+      'Fixed the white speckling over the model. Those were pinholes — a handful of triangles ended up facing inwards during mesh simplification and were being culled, letting the card background show through. Both sides of the mesh are now drawn, so the surface is solid.',
+      'The model is smaller again — 2.1MB down to 1.5MB — and at the same time the surface normals are stored at 16-bit instead of 8-bit, so the shading across the shoulders and thighs is noticeably smoother than before rather than worse.',
+    ]},
     {version:'v11.121', date:'Aug 25, 2026', major:true, notes:[
       'The anatomy model is now a real 3D body. Drag it to spin it, or use Front/Back to swing it round, and the muscle you trained lights up red on the actual mesh \u2014 chest for a bench press, calves for calf raises, lats for a pull-up, and so on for all 14 muscle groups.',
       'The shoulders were widened by about 15%. The source model measured 0.207 shoulder-to-height, which is genuinely narrow; it now sits at 0.238, in the normal range. Arm span is unchanged, so the arms simply hang at a slightly different angle rather than being stretched.',

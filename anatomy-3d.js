@@ -24,6 +24,7 @@
     THREE: null, renderer: null, scene: null, camera: null, root: null,
     meshes: [], raf: 0, targetYaw: 0, yaw: 0, pitch: 0, dragging: false,
     lastX: 0, lastY: 0, glow: {}, dirty: true, dist: 4, disposed: false,
+    spin: false, spinResumeAt: 0, size: null, aspect: 1.5,
   };
 
   function supported() {
@@ -167,26 +168,47 @@
   function frame() {
     if (S.disposed) return;
     S.raf = requestAnimationFrame(frame);
-    var d = S.targetYaw - S.yaw;
-    if (d > Math.PI) d -= Math.PI * 2;
-    if (d < -Math.PI) d += Math.PI * 2;
-    if (Math.abs(d) > 0.0015) { S.yaw += d * 0.12; S.dirty = true; }
+    if (S.spin && !S.dragging && Date.now() >= S.spinResumeAt) {
+      // Continuous, never-ending rotation. Kept slow enough to read the muscles as they pass.
+      S.yaw += 0.0052;
+      if (S.yaw > Math.PI) S.yaw -= Math.PI * 2;
+      S.targetYaw = S.yaw;
+      S.dirty = true;
+    } else {
+      var d = S.targetYaw - S.yaw;
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d < -Math.PI) d += Math.PI * 2;
+      if (Math.abs(d) > 0.0015) { S.yaw += d * 0.12; S.dirty = true; }
+    }
     if (!S.dirty) return;
     S.dirty = false;
     if (S.root) S.root.rotation.y = S.yaw;
-    var ph = Math.max(-0.5, Math.min(0.5, S.pitch));
+    var ph = Math.max(-0.45, Math.min(0.45, S.pitch));
     S.camera.position.set(0, Math.sin(ph) * S.dist, Math.cos(ph) * S.dist);
     S.camera.lookAt(0, 0, 0);
     S.renderer.render(S.scene, S.camera);
   }
 
   function fit() {
-    if (!S.el || !S.renderer) return;
+    if (!S.el || !S.renderer || !S.camera) return;
     var w = Math.max(120, S.el.clientWidth);
-    var h = Math.max(200, Math.round(w * 1.55));
+    var h = Math.max(220, Math.round(w * S.aspect));
+    // Cap height so the model never dominates a tall phone viewport.
+    var maxH = Math.round((window.innerHeight || 800) * 0.62);
+    if (h > maxH) { h = Math.max(220, maxH); }
     S.renderer.setSize(w, h, true);
     S.camera.aspect = w / h;
     S.camera.updateProjectionMatrix();
+    if (S.size) {
+      // Distance that just contains the figure, checked against BOTH axes and against the
+      // widest silhouette it presents while spinning (arm span), so it never clips mid-turn.
+      var fovR = S.camera.fov * Math.PI / 180;
+      var t = Math.tan(fovR / 2);
+      var spanX = Math.max(S.size.x, S.size.z);
+      var needH = (S.size.y / 2) / t;
+      var needW = (spanX / 2) / t / S.camera.aspect;
+      S.dist = Math.max(needH, needW) / 0.92;   // 0.92 leaves a small breathing margin
+    }
     S.dirty = true;
   }
 
@@ -201,12 +223,12 @@
       var t = e.touches ? e.touches[0] : e;
       var dx = t.clientX - S.lastX, dy = t.clientY - S.lastY;
       S.lastX = t.clientX; S.lastY = t.clientY;
-      S.yaw += dx * 0.011; S.targetYaw = S.yaw;
+      S.yaw += dx * 0.011; S.targetYaw = S.yaw; S.spinResumeAt = Date.now() + 2500;
       S.pitch += dy * 0.005;
       S.dirty = true;
       if (e.cancelable) e.preventDefault();
     };
-    var up = function () { S.dragging = false; };
+    var up = function () { S.dragging = false; S.spinResumeAt = Date.now() + 2500; };
     canvas.addEventListener('mousedown', down);
     window.addEventListener('mousemove', move);
     window.addEventListener('mouseup', up);
@@ -245,7 +267,9 @@
         root.traverse(function (o) {
           if (!o.isMesh) return;
           S.meshes.push(o);
-          o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0.03 });
+          // DoubleSide: the simplified mesh has a few inverted triangles; backface culling
+          // turns those into white pinholes against the card background.
+          o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0.03, side: THREE.DoubleSide });
         });
         buildZones(THREE, root);
         paint();
@@ -258,7 +282,8 @@
         pivot.add(root);
         scene.add(pivot);
         S.root = pivot;
-        S.dist = size.y * 2.0;
+        S.size = { x: size.x, y: size.y, z: size.z };
+        S.dist = size.y * 2.0;          // provisional; fit() computes the real distance
         S.mounted = true;
         fit();
         wireDrag(renderer.domElement);
@@ -315,6 +340,8 @@
   window.NervexusAnatomy3D = {
     mount: mount, setGlow: setGlow, setView: setView, dispose: dispose,
     supported: supported, isMounted: function () { return S.mounted; },
+    setAutoSpin: function (on) { S.spin = !!on; S.dirty = true; },
+    setAspect: function (r) { S.aspect = r || 1.5; fit(); },
     debugZones: debugZones,
     CREDIT: 'Model: “man muscle human body” by Rena — CC Attribution',
   };
