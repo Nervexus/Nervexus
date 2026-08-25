@@ -9009,7 +9009,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.24-116 · v11.116 lesson-pages';
+const NOTIF_BUILD_VERSION = '2026.08.24-117 · v11.117 mission-fields-sync';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11396,7 +11396,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const patch={};
       if(tasks && tasks.data) patch.checklist=tasks.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,label:r.label,tag:r.tag||'TASK',done:!!r.done,xpAwarded:!!r.done}));
       if(notes && notes.data) patch.notes=notes.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,title:r.title||'',body:r.body||'',ts:new Date(r.created_at).getTime()}));
-      if(missions && missions.data) patch.missions=missions.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,name:r.name,recurring:!!r.recurring,dayKey:r.day_key||'',streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||''}));
+      if(missions && missions.data) patch.missions=missions.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,name:r.name,recurring:!!r.recurring,dayKey:r.day_key||'',streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||'',category:r.category||'mission',priority:r.priority||'normal',repeat:r.repeat||(r.recurring?'daily':'none'),dueDate:r.due_date||'',dueDow:(r.due_dow===null||r.due_dow===undefined)?null:r.due_dow,dueDom:(r.due_dom===null||r.due_dom===undefined)?null:r.due_dom}));
       if(missionHistory && missionHistory.data) patch.missionHistory=missionHistory.data.map(r=>({missionId:r.mission_id,name:r.name,date:r.completed_date,time:r.completed_time||'',notes:r.notes||'',xp:r.xp||0,streak:r.streak||0,recurring:!!r.recurring}));
       if(events && events.data) patch.events=events.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,title:r.title,date:r.event_date,time:r.event_time||'09:00',repeat:r.repeat_days||[]}));
       if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
@@ -11828,8 +11828,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   deleteMission(id){ this.mut(s=>({ missions:(s.missions||[]).filter(m=>m.id!==id) })); if(this._sbOn()) window.SB.remove('missions',id); }
   // Cycles a mission's repeat cadence None -> Daily -> Weekly -> Monthly -> None, matching
   // the Checklist Engine's REPEAT chip set. Weekly/Monthly anchor to whichever day/date the
-  // mission first switches into that cadence. repeat/dueDow/dueDom stay local-only (not
-  // pushed to Supabase) until the missions table has matching columns -- see addMission.
+  // mission first switches into that cadence.
   cycleMissionRepeat(id){
     const order=['none','daily','weekly','monthly'];
     const cur=(this.state.missions||[]).find(m=>m.id===id); if(!cur) return;
@@ -11840,7 +11839,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(next==='weekly') patch.dueDow = cur.dueDow!=null?cur.dueDow:now.getDay();
     if(next==='monthly') patch.dueDom = cur.dueDom!=null?cur.dueDom:now.getDate();
     this.mut(s=>({ missions:(s.missions||[]).map(m=>m.id===id?{...m,...patch}:m) }));
-    if(this._sbOn()) window.SB.update('missions',id,{recurring:patch.recurring,day_key:patch.dayKey}).catch(()=>{});
+    if(this._sbOn()) window.SB.update('missions',id,{recurring:patch.recurring,day_key:patch.dayKey,repeat:next,due_dow:patch.dueDow!=null?patch.dueDow:null,due_dom:patch.dueDom!=null?patch.dueDom:null}).catch(()=>{});
   }
   addMission(){
     const S=this.state; const v=(S.missionInput||'').trim(); if(!v) return;
@@ -11854,12 +11853,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       dueDow: rep==='weekly'?now.getDay():null, dueDom: rep==='monthly'?now.getDate():null,
       dayKey: rep==='none'?today:'', streak:0, longest:0, total:0, lastCompleted:'' };
     this.mut(s=>({ missions:[...(s.missions||[]), m], missionInput:'', newMissionDue:'' }));
-    // Only columns that already exist server-side are sent -- category/priority/repeat/
-    // due-date live locally until missions gets those columns: ALTER TABLE missions ADD
-    // COLUMN category text, ADD COLUMN priority text, ADD COLUMN repeat text, ADD COLUMN
-    // due_date date, ADD COLUMN due_dow smallint, ADD COLUMN due_dom smallint. Sending
-    // unknown columns would fail the whole insert, so the mission wouldn't sync at all.
-    if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name:v,recurring:m.recurring,day_key:m.dayKey,streak:0,longest_streak:0,total_completions:0});
+    if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name:v,recurring:m.recurring,day_key:m.dayKey,streak:0,longest_streak:0,total_completions:0,category,priority,repeat:rep,due_date:dueDate||null,due_dow:m.dueDow,due_dom:m.dueDom});
   }
   markMovedToday(silent){ const today=this._todayStr(), yest=this._yestStr(); const mv=this.state.move||{streak:0,last:'',longest:0}; if(mv.last===today) return; const streak=(mv.last===yest)?(mv.streak||0)+1:1; const longest=Math.max(mv.longest||0,streak); this.mut(s=>({ move:{streak,last:today,longest} })); if(!silent){ this.pushXpFx(0,'\uD83D\uDD25 '+streak+'d'); this.showToast('fitness','Movement logged · \uD83D\uDD25 '+streak+'d','Daily streak updated — keep it alive.'); } }
   pushXpFx(amt,label){ const id=(this._xpid=(this._xpid||0)+1); const text=label||('+'+amt+' XP'); this.setState(s=>({ xpFx:[...(s.xpFx||[]),{id,text}] })); setTimeout(()=>{ this.setState(s=>({ xpFx:(s.xpFx||[]).filter(f=>f.id!==id) })); },1300); }
@@ -12425,6 +12419,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.117', date:'Aug 24, 2026', major:false, notes:[
+      'Daily Missions’ category, priority, repeat and due-date now sync across your devices — the missions table has the matching columns, so a mission created on your phone shows the same details on desktop.',
+      'The reminder-tick email changes from the last few updates (merged missions+checklist digest, calendar reminder 24h before the event, Performance Terminal’s 9:30pm nudge, personalized subjects, the sign-off) are now live on the server, not just in code.',
+    ]},
     {version:'v11.116', date:'Aug 24, 2026', major:false, notes:[
       'Learning Centre lesson sections (Deep Dive, Misconceptions, Expert Notes, Worked Examples) are real pages now, not a side-scrolling row of cards — one section fills the card fully, Prev/Next flips between them, and the card’s height adapts to whatever’s actually on that page instead of staying fixed to the first one. No more horizontal scrolling or a peek of the next card poking in from the side.',
     ]},
