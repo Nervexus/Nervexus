@@ -57,9 +57,11 @@
   //
   // Bands below were measured from this figure's silhouette (209 units tall): calves to 22%,
   // thigh 22-44%, hips/glutes 43-53%, waist 53-71%, chest 71-80%, delts/traps 77-90%,
-  // head above 90%. The arms sit beyond 11.5% of height from the centre line.
+  // head above 86% — the eye mesh sits at 93.4% of height, which puts the chin at ~86.8%,
+  // so a higher cutoff leaves the jaw and lower lip inside the traps zone. The arms sit
+  // beyond 11.5% of height from the centre line.
   var B = {
-    head: 0.898, trapsTop: 0.802, deltTop: 0.774, chestTop: 0.707,
+    head: 0.860, trapsTop: 0.802, deltTop: 0.774, chestTop: 0.707,
     upperArm: 0.621, lats: 0.583, waist: 0.525, lowBack: 0.506,
     hips: 0.439, glutes: 0.430, knee: 0.220, ankle: 0.038,
     armX: 0.1146, absX: 0.0573,
@@ -109,12 +111,18 @@
     return v || 0;
   }
 
+  function isHeadMesh(m) {
+    var n = (m.name || '') + ' ' + ((m.parent && m.parent.name) || '');
+    return /head|face|eye|hair|teeth|tongue/i.test(n);
+  }
+
   function buildZones(THREE, root) {
     root.updateMatrixWorld(true);
     var box = new THREE.Box3().setFromObject(root);
     var min = box.min, max = box.max;
     var H = Math.max(1e-6, max.y - min.y);
     var cx = (min.x + max.x) / 2, cz = (min.z + max.z) / 2;
+    S.THREE = THREE; S.rootMinY = min.y; S.rootH = H;
     var v = new THREE.Vector3();
     // Normalised world position of vertex i, as (lateral fraction, height fraction, depth fraction).
     var at = function (mesh, pos, i) {
@@ -125,6 +133,7 @@
     // split for biceps vs triceps uses the arms' own centroid rather than a flat zero.
     var armZSum = 0, armN = 0, torsoZSum = 0, torsoN = 0;
     S.meshes.forEach(function (m) {
+      if (isHeadMesh(m)) return;
       var p = m.geometry.attributes.position;
       for (var i = 0; i < p.count; i++) {
         var q = at(m, p, i);
@@ -137,7 +146,11 @@
     S.meshes.forEach(function (m) {
       var p = m.geometry.attributes.position, n = p.count;
       var ids = new Uint8Array(n);
-      for (var i = 0; i < n; i++) { var q = at(m, p, i); ids[i] = zoneOf(q[0], q[1], q[2]); }
+      // The head is its own mesh. Its jaw and chin sit below the height cutoff, so
+      // zoning it by position alone lights the face up whenever traps are trained.
+      if (!isHeadMesh(m)) {
+        for (var i = 0; i < n; i++) { var q = at(m, p, i); ids[i] = zoneOf(q[0], q[1], q[2]); }
+      }
       m.userData.zoneIds = ids;
       m.geometry.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
     });
@@ -267,9 +280,7 @@
         root.traverse(function (o) {
           if (!o.isMesh) return;
           S.meshes.push(o);
-          // DoubleSide: the simplified mesh has a few inverted triangles; backface culling
-          // turns those into white pinholes against the card background.
-          o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0.03, side: THREE.DoubleSide });
+          o.material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.58, metalness: 0.03 });
         });
         buildZones(THREE, root);
         paint();
@@ -334,7 +345,14 @@
         hist[n] = (hist[n] || 0) + 1; total++;
       }
     });
-    return { total: total, bounds: bounds, zones: hist, meshes: S.meshes.length };
+    var per = S.meshes.map(function (m) {
+      var bb = new S.THREE.Box3().setFromObject(m);
+      return { name: m.name, verts: m.geometry.attributes.position.count,
+               yMin: +((bb.min.y - S.rootMinY) / S.rootH).toFixed(4),
+               yMax: +((bb.max.y - S.rootMinY) / S.rootH).toFixed(4),
+               head: isHeadMesh(m) };
+    });
+    return { total: total, bounds: bounds, zones: hist, meshes: S.meshes.length, per: per };
   }
 
   window.NervexusAnatomy3D = {
