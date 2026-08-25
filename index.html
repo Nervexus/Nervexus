@@ -8929,7 +8929,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-126 · v11.126 brief-real-spin-all';
+const NOTIF_BUILD_VERSION = '2026.08.25-127 · v11.127 no-seeded-tasks';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -8952,15 +8952,9 @@ class Component extends DCLogic {
       account: s.account ? { timezone:'auto', twoFA:'', ...s.account } : { name:'Maddox Harvey', email:'maddoxsharvey@icloud.com', password:'Jude_Harvey22', twoFA:'', avatar:'', greeting:'', timezone:'auto' },
       acctDraft: s.account ? { timezone:'auto', twoFA:'', ...s.account } : { name:'Maddox Harvey', email:'maddoxsharvey@icloud.com', password:'Jude_Harvey22', twoFA:'', avatar:'', greeting:'', timezone:'auto' },
       acctSaved:false,
-      checklist: s.checklist || [
-        {label:'Q3 launch standup',tag:'WORK',done:true},
-        {label:'Review finance dashboard',tag:'FINANCE',done:true},
-        {label:'Ship pricing page',tag:'WORK',done:false},
-        {label:'Gym — strength',tag:'HEALTH',done:true},
-        {label:'Call with investors',tag:'BIZ',done:false},
-        {label:'Read AI policy brief',tag:'INTEL',done:false},
-        {label:'Plan tomorrow',tag:'PLAN',done:false},
-      ],
+      // No seeded tasks. These were seven fictional items with three pre-ticked, and they
+      // feed the real done/open counts the dashboard and the voice assistant read out.
+      checklist: s.checklist || [],
       newTask:'',
       // ===== Checklist Engine (multi-checklist) — distinct from the flat quick-task
       // `checklist` above. Unlimited named lists, each with its own category/priority/
@@ -12704,6 +12698,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.127', date:'Aug 25, 2026', major:false, notes:[
+      'Removed the seven fictional tasks seeded into the Daily Checklist \u2014 \u201CQ3 launch standup\u201D, \u201CShip pricing page\u201D, \u201CCall with investors\u201D and the rest \u2014 three of which arrived already ticked off. They were not harmless decoration: the checklist feeds the real done/open counts on your dashboard, and the voice assistant reads those numbers out, so it would tell you about outstanding tasks that never existed and credit you for finishing work you never did. The checklist now starts empty and fills with what you actually add.',
+    ]},
     {version:'v11.126', date:'Aug 25, 2026', major:true, notes:[
       'The anatomy model now spins on the web too. The endless rotation was written as a mobile-only rule, so on a desktop browser you still got the old Front/Back buttons and a model that sat still \u2014 it looked like the update had not shipped, but it was doing exactly what it had been told. Same behaviour everywhere now: it turns by itself, you can drag it, and it picks the spin back up when you let go. Front and Back only appear if your device cannot run the 3D model and falls back to the drawn figure, which genuinely needs them.',
       'The Daily Brief\u2019s story cards were fake. Twenty invented headlines across Large Government Purchases, Large Business Purchases, Swiss \u00b7 BlackRock \u00b7 Vanguard, High-End AI and Money Opportunities \u2014 every one bylined to a real newsroom: the Financial Times six times, Reuters five, Bloomberg five, the Wall Street Journal three. None of them were ever written by those newsrooms, and the Money Opportunities section was inventing investment commentary under trusted mastheads. All of it is gone.',
