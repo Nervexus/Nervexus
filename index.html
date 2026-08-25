@@ -2435,7 +2435,48 @@
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ PRODUCTIVITY OS</div>
           <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Trackers &amp; Activity</h1>
         </div>
-        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
+        <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-bottom:18px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ whTodayEyebrow }}</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+              <span style="font-size:13px; font-weight:600;">Work Hours</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84;">{{ whGoalPct }}% OF AN 8H DAY</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px;">
+              <sc-for list="{{ whTypes }}" as="t" hint-placeholder-count="5"><span onClick="{{ t.pick }}" style="font-size:11.5px; color:{{ t.c }}; background:{{ t.bg }}; border:1px solid {{ t.bd }}; border-radius:9px; padding:6px 12px; cursor:pointer;">{{ t.name }}</span></sc-for>
+            </div>
+            <div class="cc-actrow" style="display:flex; gap:9px; flex-wrap:wrap;">
+              <input value="{{ whText }}" onInput="{{ setWhText }}" onKeyDown="{{ addWorkHoursKey }}" placeholder="What did you work on?" style="flex:1 1 190px; min-width:150px; padding:11px 14px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none;">
+              <input value="{{ whHr }}" onInput="{{ setWhHr }}" onKeyDown="{{ addWorkHoursKey }}" type="number" placeholder="hr" style="width:56px; flex:0 0 56px; padding:11px 10px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none;">
+              <input value="{{ whMin }}" onInput="{{ setWhMin }}" onKeyDown="{{ addWorkHoursKey }}" type="number" placeholder="min" style="width:56px; flex:0 0 56px; padding:11px 10px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none;">
+              <span onClick="{{ addWorkHours }}" class="cc-glowbtn" style="flex:1 1 auto; text-align:center; padding:11px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0c0c0d; font-size:12.5px; font-weight:700; cursor:pointer;">Log Work</span>
+            </div>
+
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84; margin:18px 0 8px;">WORK TASKS · {{ whTasksDone }}/{{ whTasksTotal }}</div>
+            <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:10px;">
+              <input value="{{ whTaskDraft }}" onInput="{{ setWhTaskDraft }}" onKeyDown="{{ addWorkTaskKey }}" placeholder="Add a work task" style="flex:1 1 190px; min-width:150px; padding:10px 14px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:12.5px; outline:none;">
+              <span onClick="{{ addWorkTask }}" style="padding:10px 16px; border-radius:11px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer;">Add</span>
+            </div>
+            <sc-if value="{{ hasWhTasks }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ whTasks }}" as="t" hint-placeholder-count="3">
+                <div onClick="{{ t.toggle }}" style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
+                  <span style="width:18px; height:18px; flex:0 0 18px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:11px; color:{{ t.col }};">{{ t.mark }}</span>
+                  <span style="flex:1; font-size:12.5px; color:{{ t.col }};">{{ t.label }}</span>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{ hasWhEntries }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84; margin:18px 0 8px;">LOGGED TODAY</div>
+              <sc-for list="{{ whEntries }}" as="e" hint-placeholder-count="3">
+                <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#7c7c84; border:1px solid rgba(255,255,255,0.14); border-radius:6px; padding:2px 7px; white-space:nowrap;">{{ e.sub }}</span>
+                  <span style="flex:1; font-size:12.5px; color:#dbdbe0;">{{ e.text }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">{{ e.mins }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78;">{{ e.time }}</span>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
           <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Trackers</div>
           <sc-for list="{{ trackers }}" as="t" hint-placeholder-count="4">
             <div onClick="{{ t.pick }}" style="display:flex; align-items:center; gap:14px; padding:12px 4px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
@@ -8925,7 +8966,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-132 · v11.132 health-one-page';
+const NOTIF_BUILD_VERSION = '2026.08.25-133 · v11.133 work-hours';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9003,6 +9044,7 @@ class Component extends DCLogic {
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
 activities: this._mergeShipLog(s.activities),
       actText:'', actCat:'Work', actRange:'Week', actMin:'', actHr:'',
+      whType:'Deep Work', whText:'', whHr:'', whMin:'', whTaskDraft:'',
       aiTasksResult:null, aiTasksLoading:false, aiTasksErr:'',
       aiNextActionsResult:null, aiNextActionsLoading:false, aiNextActionsErr:'',
       // No seeded events. These used to be five fictional meetings dated July 2026, which
@@ -11574,6 +11616,41 @@ activities: this._mergeShipLog(s.activities),
     return true;
   }
   _saveNotesPw(h){ try{ window.SB.upsert('note_vault_settings',{user_id:this.state.authUserId,pw_hash:h},'user_id'); }catch(e){} }
+  // ===== Work Hours =====
+  // Work time used to be typed into the generic Log Activity box, which took any category.
+  // These write the same activity rows (so the work log, the trackers and Time Distribution
+  // all still read them) but only ever as Work, with the kind of work kept alongside.
+  WORK_TYPES = ['Deep Work','Meetings','Admin','Client','Planning'];
+  addWorkHours(){
+    const S=this.state;
+    const label=(S.whText||'').trim();
+    const mins=Math.round((parseFloat(S.whHr)||0)*60 + (parseFloat(S.whMin)||0));
+    if(!label || mins<=0) return;
+    const id=this._uuid();
+    const row={ id, text:label, cat:'Work', sub:S.whType||'Deep Work', ts:Date.now(), min:mins };
+    this.mut(s=>({ activities:[...s.activities, row], whText:'', whHr:'', whMin:'' }));
+    if(this._sbOn()){ try{ window.SB.upsert('activities',{ id, user_id:this.state.authUserId,
+      text:label, cat:'Work', sub:row.sub, min:mins, ts:new Date(row.ts).toISOString() },'id'); }catch(e){} }
+  }
+  addWorkHoursKey(e){ if(e.key==='Enter'){ e.preventDefault(); this.addWorkHours(); } }
+  // Work tasks live in the same checklist as everything else, tagged WORK, so ticking one
+  // here is the same tick the Command Center and the trackers see. One list, three views.
+  addWorkTask(){
+    const v=(this.state.whTaskDraft||'').trim();
+    if(!v) return;
+    this.setState({newChecklistTitle:v, newChecklistCategory:'checklist'}, ()=>{
+      const item={ id:this._uuid(), label:v, tag:'WORK', done:false, xpAwarded:false };
+      this.mut(s=>({ checklist:[...(s.checklist||[]), item], whTaskDraft:'' }));
+      if(this._sbOn()){ try{ window.SB.upsert('tasks',{ id:item.id, user_id:this.state.authUserId,
+        label:v, tag:'WORK', done:false },'id'); }catch(e){} }
+    });
+  }
+  addWorkTaskKey(e){ if(e.key==='Enter'){ e.preventDefault(); this.addWorkTask(); } }
+  _workToday(){
+    const start=this._dayStart(0);
+    const rows=(this.state.activities||[]).filter(a=>a.cat==='Work' && a.ts>=start);
+    return { rows, mins:rows.reduce((t,a)=>t+(+a.min||0),0) };
+  }
   mut(u){ this.setState(u, ()=>this.save()); }
   openWebApp(){ window.open('https://nervexus.vercel.app', '_blank', 'noopener'); }
   startRefresh(){
@@ -12751,6 +12828,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.133', date:'Aug 25, 2026', major:true, notes:[
+      'Work Hours is a real thing now rather than a number on a ring. It has its own card at the top of Productivity with its own entry form, the same shape as Log Training: pick the kind of work \u2014 Deep Work, Meetings, Admin, Client or Planning \u2014 write what you did, put in the hours and minutes, and log it. It shows what you have put in today, how that compares to an eight-hour day, and every entry with its time.',
+      'Under it is a work task list you tick off, like Daily Missions but work only. Those tasks are not a separate list living in its own corner: they are the same checklist the Command Center shows, tagged as work. Add one here and it is there; tick it there and it is ticked here.',
+      'The trackers now count what you have ticked as well as what you have timed. They only ever read logged minutes before, so a day spent finishing things off moved nothing at all. Each tracker shows its ticked count next to its hours.',
+      'Everything written here goes into the same activity log that was always there, so the Weekly Overview, Time Distribution and your work history all pick it up without anything being migrated.',
+    ]},
     {version:'v11.132', date:'Aug 25, 2026', major:true, notes:[
       'Health is one page now instead of nine tabs. Diet, Energy, Sleep, Hydration, Body, Progress and Goals sit together in the order you actually use them \u2014 what you log daily first, then your body measurements, then progress against your goals. No more hunting through a tab bar to enter three numbers.',
       'Overview and Photos are gone. Overview was the worst offender: it showed the same recovery, sleep, calories and hydration figures that the sections below it already showed, so it was a tab whose only job was repeating the page underneath it.',
@@ -18006,15 +18089,52 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       })(),
 
       // productivity
+      // Trackers now also count what you have ticked off. They used to read logged minutes
+      // only, so a day of finished checklist items moved nothing.
+      whTypes:this.WORK_TYPES.map(t=>({ name:t, pick:()=>this.setState({whType:t}),
+        c:S.whType===t?'#0a0a0b':'#c5c5ca', bg:S.whType===t?'#F4F4F5':'transparent',
+        bd:S.whType===t?'rgba(255,255,255,0.45)':'rgba(255,255,255,0.14)' })),
+      whText:S.whText||'', setWhText:(e)=>this.setState({whText:e.target.value}),
+      whHr:S.whHr||'', setWhHr:(e)=>this.setState({whHr:e.target.value}),
+      whMin:S.whMin||'', setWhMin:(e)=>this.setState({whMin:e.target.value}),
+      addWorkHours:()=>this.addWorkHours(), addWorkHoursKey:(e)=>this.addWorkHoursKey(e),
+      whTaskDraft:S.whTaskDraft||'', setWhTaskDraft:(e)=>this.setState({whTaskDraft:e.target.value}),
+      addWorkTask:()=>this.addWorkTask(), addWorkTaskKey:(e)=>this.addWorkTaskKey(e),
+      ...(()=>{ const W=this._workToday();
+        const h=Math.floor(W.mins/60), m=W.mins%60;
+        const tasks=(S.checklist||[]).filter(c=>String(c.tag||'').toUpperCase()==='WORK');
+        return {
+          whTodayLabel:(W.mins?(h+'h '+String(m).padStart(2,'0')+'m'):'0h 00m'),
+          whTodayEyebrow:'TODAY · '+(W.mins?(h+'h '+String(m).padStart(2,'0')+'m'):'NOTHING LOGGED YET'),
+          whGoalPct:Math.min(100,Math.round(W.mins/480*100)),
+          whEntries:W.rows.slice().sort((a,b)=>b.ts-a.ts).map(r=>({
+            text:r.text, sub:r.sub||'Work',
+            mins:(Math.floor((+r.min||0)/60)?Math.floor((+r.min||0)/60)+'h ':'')+((+r.min||0)%60)+'m',
+            time:new Date(r.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) })),
+          hasWhEntries:W.rows.length>0,
+          whTasks:tasks.map(c=>{ const i=(S.checklist||[]).indexOf(c); return {
+            label:c.label, done:!!c.done,
+            mark:c.done?'✓':'',
+            col:c.done?'#6cffba':'#7c7c84',
+            toggle:()=>{ const nowDone=!c.done; const firstAward=nowDone && !c.xpAwarded;
+              this.mut(st=>{ const a=[...st.checklist]; a[i]={...a[i],done:nowDone,xpAwarded:a[i].xpAwarded||firstAward}; return {checklist:a}; });
+              if(this._sbOn()){ try{ window.SB.upsert('tasks',{id:c.id,user_id:this.state.authUserId,done:nowDone},'id'); }catch(e){} } } }; }),
+          hasWhTasks:tasks.length>0,
+          whTasksDone:tasks.filter(c=>c.done).length, whTasksTotal:tasks.length,
+        };
+      })(),
       trackers:(()=>{ const L=this._trackerLive(); const wh=L.todayMin('Work')/60, gymC=L.weekCount('Gym'), bizM=L.todayMin('Business'), lrnH=L.todayMin('Learning')/60;
+        const CL=(s.checklist||[]);
+        const tick=(tag)=>CL.filter(c=>c.done && String(c.tag||'').toUpperCase()===tag).length;
+        const clWork=tick('WORK'), clGym=tick('HEALTH'), clBiz=tick('BIZ'), clLearn=tick('INTEL');
         const defs=[
-          {name:'Work Hours',cur:wh,goal:8,unit:'h',val:Math.min(1,wh/8),color:'#FFFFFF',cat:'Work'},
-          {name:'Gym',cur:gymC,goal:5,unit:' wk',val:Math.min(1,gymC/5),color:'#eef0f2',cat:'Gym',isCount:true},
-          {name:'Business',cur:bizM,goal:10,unit:'min',val:Math.min(1,bizM/10),color:'#eef0f2',cat:'Business'},
-          {name:'Learning',cur:lrnH,goal:2,unit:'h',val:Math.min(1,lrnH/2),color:'#FFFFFF',cat:'Learning'}
+          {name:'Work Hours',cur:wh,goal:8,unit:'h',val:Math.min(1,wh/8),color:'#FFFFFF',cat:'Work',ticks:clWork},
+          {name:'Gym',cur:gymC,goal:5,unit:' wk',val:Math.min(1,gymC/5),color:'#eef0f2',cat:'Gym',isCount:true,ticks:clGym},
+          {name:'Business',cur:bizM,goal:10,unit:'min',val:Math.min(1,bizM/10),color:'#eef0f2',cat:'Business',ticks:clBiz},
+          {name:'Learning',cur:lrnH,goal:2,unit:'h',val:Math.min(1,lrnH/2),color:'#FFFFFF',cat:'Learning',ticks:clLearn}
         ];
         return defs.map(t=>({ name:t.name, color:t.color, cat:t.cat, val:t.val,
-          sub:(t.isCount?Math.round(t.cur):(t.cur>=10?Math.round(t.cur):t.cur.toFixed(1)))+' / '+t.goal+t.unit,
+          sub:(t.isCount?Math.round(t.cur):(t.cur>=10?Math.round(t.cur):t.cur.toFixed(1)))+' / '+t.goal+t.unit+(t.ticks?('  ·  '+t.ticks+' ticked'):''),
           streak:this._streakFor(t.cat),
           pick:()=>this.setState({actCat:t.cat, actText:t.name}),
           bg:(S.actCat===t.cat&&S.actText===t.name)?'#202226':'#16181c',
