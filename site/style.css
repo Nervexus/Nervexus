@@ -1,0 +1,349 @@
+:root{
+  --bg:#EFEBE3; --bg2:#E6E1D5; --card:rgba(255,255,255,0.82); --line:rgba(63,63,70,0.14); --line2:rgba(63,63,70,0.24);
+  --ink:#292524; --ink2:#3f3f46; --muted:#52525b; --muted2:#7a7a82;
+  --accent:#5B1A1A; --maroon:#5B1A1A; --gold:#C9A55C; --glow1:rgba(91,26,26,0.13); --glow2:rgba(201,165,92,0.16);
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  background:var(--bg); color:var(--ink2);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+a{ color:inherit; text-decoration:none; }
+.wrap{ max-width:1120px; margin:0 auto; padding:0 28px; }
+
+/* ---- intro screen (a separate full-viewport block, before the header/hero — you scroll past it) ---- */
+.intro-mask{
+  position:relative; height:100vh; min-height:520px; overflow:hidden;
+  background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+}
+.intro-logo-wrap{ position:relative; display:flex; align-items:center; justify-content:center; }
+.intro-logo-glow{
+  position:absolute; width:340px; height:340px; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,165,92,0.45) 0%, transparent 70%);
+  filter:blur(4px);
+  animation:introGlowPulse 3.4s ease-in-out infinite;
+}
+@keyframes introGlowPulse{
+  0%,100%{ transform:scale(0.9); opacity:0.55; }
+  50%{ transform:scale(1.08); opacity:1; }
+}
+.intro-logo{ position:relative; width:180px; height:180px; object-fit:contain; opacity:0.98; }
+.intro-scroll{
+  position:absolute; bottom:44px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.intro-scroll span{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:4px; color:var(--maroon); }
+.intro-scroll .line{ width:1px; height:40px; background:rgba(91,26,26,0.25); position:relative; overflow:hidden; }
+.intro-scroll .line::after{
+  content:''; position:absolute; top:-100%; left:0; width:100%; height:100%;
+  background:linear-gradient(180deg, transparent, var(--maroon), transparent);
+  animation:introScrollLine 1.9s ease-in-out infinite;
+}
+@keyframes introScrollLine{ 0%{ top:-100%; } 100%{ top:100%; } }
+@media (prefers-reduced-motion:reduce){
+  .intro-logo-glow, .intro-scroll .line::after{ animation:none; opacity:1; transform:none; }
+}
+
+/* ---- nav ---- */
+header{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  background:rgba(239,235,227,0.8); backdrop-filter:blur(20px) saturate(1.4); -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border-bottom:1px solid var(--line);
+}
+header .wrap{ height:64px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.brand{ display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; letter-spacing:-0.01em; flex:0 0 auto; color:var(--ink); }
+.brand-mark{ width:26px; height:26px; border-radius:6px; flex:0 0 26px; object-fit:contain; }
+.nav-links{ display:flex; align-items:center; gap:30px; flex:1; justify-content:center; }
+.nav-link{ font-size:13.5px; font-weight:500; color:var(--muted); transition:color .18s ease; position:relative; }
+.nav-link:hover{ color:var(--ink); }
+.nav-link.active{ color:var(--ink); }
+.nav-link.active::after{
+  content:''; position:absolute; left:0; right:0; bottom:-20px; height:2px;
+  background:linear-gradient(90deg,var(--maroon),var(--gold));
+}
+.nav-login{
+  font-size:13px; font-weight:600; padding:9px 18px; border-radius:100px;
+  background:var(--maroon); color:#F5F1E8; transition:transform .18s ease, opacity .18s ease; flex:0 0 auto;
+}
+.nav-login:hover{ transform:translateY(-1px); opacity:0.92; }
+/* The header is position:fixed, so an anchor jump (#features) lands the target under it.
+   Nothing offset for that, so section headings arrived hidden behind the bar. */
+html{ scroll-padding-top:78px; }
+
+/* ---- mobile nav ----
+   Below 760px the desktop links were simply hidden with nothing in their place, which left
+   the phone header as logo + Log In only: About Us and Ultra X were unreachable from a
+   phone even though both pages exist. Hidden links now collapse into a toggle panel. */
+.nav-toggle{ display:none; }
+.mobile-nav{ display:none; }
+@media (max-width:760px){
+  .nav-links{ display:none; }
+  .nav-toggle{
+    display:flex; flex-direction:column; justify-content:center; gap:5px;
+    width:40px; height:40px; padding:0 9px; margin-left:auto;
+    background:none; border:0; cursor:pointer; flex:0 0 auto;
+  }
+  .nav-toggle span{ display:block; height:2px; border-radius:2px; background:var(--ink); transition:transform .22s ease, opacity .18s ease; }
+  .nav-toggle[aria-expanded="true"] span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+  .nav-toggle[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+  .nav-toggle[aria-expanded="true"] span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+  .mobile-nav{ display:block; max-height:0; overflow:hidden; transition:max-height .26s ease; background:var(--bg); }
+  header.nav-open{ opacity:1 !important; }
+  header.nav-open .mobile-nav{ max-height:240px; border-top:1px solid var(--line); }
+  .mobile-nav a{
+    display:block; padding:15px 24px; font-size:15px; font-weight:500;
+    color:var(--muted); border-bottom:1px solid var(--line);
+  }
+  .mobile-nav a:last-child{ border-bottom:0; }
+  .mobile-nav a.is-here{ color:var(--ink); }
+  .nav-login{ margin-left:0; }
+}
+
+/* ---- crest divider ---- */
+.crest-divider{
+  position:relative; z-index:1; display:flex; align-items:center; justify-content:center; gap:9px;
+  margin:0 auto 22px;
+}
+.crest-divider span{ width:40px; height:1px; background:var(--maroon); }
+.crest-divider i{ font-style:normal; color:var(--maroon); font-size:13px; }
+
+/* ---- hero ---- */
+.hero{
+  position:relative; padding:200px 0 140px; text-align:center; overflow:hidden;
+}
+.hero-glow{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 45% at 30% 10%, var(--glow1) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 40% at 75% 25%, var(--glow2) 0%, transparent 60%);
+  animation:driftGlow 18s ease-in-out infinite alternate;
+}
+@keyframes driftGlow{
+  0%{ transform:translate(0,0) scale(1); }
+  100%{ transform:translate(-2%,3%) scale(1.06); }
+}
+.eyebrow{
+  position:relative; z-index:1; display:inline-flex; align-items:center; gap:8px;
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--maroon);
+  border:1px solid var(--line2); border-radius:100px; padding:8px 16px; margin-bottom:22px;
+}
+.eyebrow-dot{ width:6px; height:6px; border-radius:50%; background:var(--maroon); box-shadow:0 0 8px rgba(91,26,26,0.5); }
+.hero .wrap{ max-width:1500px; }
+.hero h1{
+  position:relative; z-index:1;
+  font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300;
+  font-size:clamp(34px,5vw,82px); letter-spacing:.5px; line-height:1.12; color:var(--ink);
+  max-width:1500px; margin:0 auto 26px; white-space:nowrap;
+}
+@media (max-width:900px){
+  .hero h1{ white-space:normal; font-size:clamp(34px,7.5vw,52px); }
+}
+.hero h1 .accent{
+  font-style:italic;
+  background:linear-gradient(120deg,var(--maroon) 0%,var(--gold) 100%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.hero p{
+  position:relative; z-index:1;
+  font-size:clamp(16px,2vw,20px); color:var(--muted); line-height:1.6; max-width:560px; margin:0 auto 44px;
+  font-weight:400;
+}
+.hero-ctas{ position:relative; z-index:1; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.btn{
+  display:inline-flex; align-items:center; gap:8px; font-size:15px; font-weight:600;
+  padding:15px 30px; border-radius:100px; transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+.btn-primary{ background:var(--maroon); color:#F5F1E8; box-shadow:0 8px 30px rgba(91,26,26,0.25); }
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 12px 36px rgba(91,26,26,0.35); }
+.btn-ghost{ border:1px solid var(--line2); color:var(--maroon); }
+.btn-ghost:hover{ border-color:rgba(91,26,26,0.5); color:var(--ink); }
+
+/* ---- section shell ---- */
+section{ position:relative; padding:120px 0; }
+.section-label{
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--muted2);
+  text-align:center; margin-bottom:18px;
+}
+.section-title{
+  font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; color:var(--ink);
+  font-size:clamp(28px,3.8vw,44px); letter-spacing:.3px; text-align:center;
+  max-width:680px; margin:0 auto 20px; line-height:1.25;
+}
+.section-sub{
+  font-size:17px; color:var(--muted); text-align:center; max-width:560px; margin:0 auto 80px; line-height:1.6;
+}
+
+/* ---- feature stack (sticky scroll-stacking cards) ---- */
+.stack-wrap{ position:relative; padding-bottom:24px; }
+.feature{
+  position:sticky;
+  background:#FBF7EF; border:1px solid var(--line2); border-radius:32px;
+  padding:40px 44px; margin-bottom:22px;
+  display:flex; align-items:center; gap:28px;
+}
+.feature-icon{
+  width:52px; height:52px; border-radius:6px; display:flex; align-items:center; justify-content:center;
+  font-size:22px; flex:0 0 52px;
+}
+.feature h3{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; color:var(--ink); font-size:23px; margin-bottom:8px; letter-spacing:.2px; }
+.feature p{ font-size:14.5px; color:var(--muted); line-height:1.65; max-width:460px; }
+.feature-list{ list-style:none; margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; max-width:520px; }
+.feature-list li{ font-size:13px; color:var(--ink2); padding-left:15px; position:relative; line-height:1.4; }
+.feature-list li::before{ content:'—'; position:absolute; left:0; color:var(--maroon); }
+@media (max-width:640px){ .feature-list{ grid-template-columns:1fr; } }
+
+/* ---- showcase (alternating) ---- */
+.showcase-row{
+  display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center;
+  padding:64px 0; border-top:1px solid var(--line);
+}
+.showcase-row:first-of-type{ border-top:none; }
+.showcase-row.reverse{ direction:rtl; }
+.showcase-row.reverse > *{ direction:ltr; }
+.showcase-visual{
+  aspect-ratio:4/3; border-radius:8px; position:relative; overflow:hidden;
+  border:1px solid var(--line2); background:var(--card);
+  display:flex; align-items:center; justify-content:center;
+}
+.showcase-visual .glow{ position:absolute; inset:-30%; filter:blur(50px); opacity:0.5; }
+.showcase-visual .glyph{ position:relative; z-index:1; font-size:56px; opacity:0.92; color:var(--maroon); }
+.showcase-text .kicker{ font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:var(--muted2); margin-bottom:14px; }
+.showcase-text h3{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; color:var(--ink); font-size:clamp(24px,3vw,32px); letter-spacing:.2px; margin-bottom:16px; line-height:1.3; }
+.showcase-text p{ font-size:15.5px; color:var(--muted); line-height:1.7; max-width:420px; }
+
+/* ---- api provider card carousel (never-ending spin, no hover-pause) ---- */
+.api-marquee-wrap{ overflow:hidden; }
+.api-marquee-track{
+  display:flex; gap:16px; width:max-content;
+  animation:apiCarouselSpin 46s linear infinite;
+}
+@keyframes apiCarouselSpin{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+.api-card{
+  position:relative; overflow:hidden; flex:0 0 190px;
+  background:var(--card); border:1px solid var(--line2); border-radius:22px;
+  padding:22px 20px 20px; min-height:150px;
+  display:flex; flex-direction:column; align-items:flex-start;
+}
+.api-card::before{
+  content:''; position:absolute; top:-26px; right:-26px; width:76px; height:76px; border-radius:50%;
+  background:radial-gradient(circle, rgba(91,26,26,0.12), transparent 70%);
+  pointer-events:none;
+}
+.api-label{ position:relative; z-index:1; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:var(--muted2); }
+.api-mark{
+  position:relative; z-index:1; width:38px; height:38px; border-radius:10px; flex:0 0 38px;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:11.5px; color:#fff;
+  margin:14px 0 10px;
+}
+.api-name{ position:relative; z-index:1; font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:18px; color:var(--ink); letter-spacing:.2px; }
+.api-underline{ position:relative; z-index:1; width:36px; height:1px; background:var(--line2); margin-top:auto; padding-top:14px; }
+@media (max-width:640px){ .api-card{ flex-basis:160px; } }
+
+/* ---- how it works ---- */
+.how-steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:36px; counter-reset:step; }
+.how-step{ text-align:center; padding:0 12px; }
+.how-step .step-num{
+  font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:34px; color:var(--gold);
+  border:1px solid var(--line2); border-radius:50%; width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+  margin:0 auto 20px;
+}
+.how-step h3{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; color:var(--ink); font-size:21px; margin-bottom:10px; letter-spacing:.2px; }
+.how-step p{ font-size:14px; color:var(--muted); line-height:1.65; max-width:280px; margin:0 auto; }
+@media (max-width:860px){ .how-steps{ grid-template-columns:1fr; gap:32px; } }
+
+/* ---- standalone statement ---- */
+.statement{ text-align:center; max-width:760px; margin:0 auto; }
+.statement p{
+  font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:400; color:var(--ink);
+  font-size:clamp(24px,3.6vw,40px); line-height:1.4; letter-spacing:.2px;
+}
+
+/* ---- faq ---- */
+.faq{ max-width:720px; margin:0 auto; }
+.faq-item{ border-bottom:1px solid var(--line); padding:22px 0; }
+.faq-item summary{
+  cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:16px;
+  font-size:16.5px; font-weight:500; color:var(--ink); -webkit-tap-highlight-color:transparent;
+}
+.faq-item summary::-webkit-details-marker{ display:none; }
+.faq-item summary::after{
+  content:'+'; font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; color:var(--maroon); flex:0 0 auto;
+  transition:transform .2s ease;
+}
+.faq-item[open] summary::after{ transform:rotate(45deg); }
+.faq-item p{ font-size:14.5px; color:var(--muted); line-height:1.7; margin-top:14px; max-width:600px; }
+
+/* ---- cta closing statement (no card, matches hero) ---- */
+.cta-band{
+  text-align:center; max-width:640px; margin:0 auto; padding:0 28px;
+}
+.cta-band h2{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; color:var(--ink); font-size:clamp(24px,3.2vw,32px); letter-spacing:.2px; margin-bottom:14px; }
+.cta-band p{ font-size:15px; color:var(--muted); margin-bottom:28px; }
+
+footer{ padding:48px 28px 40px; border-top:1px solid var(--line); }
+footer .wrap{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+footer .brand{ opacity:0.75; }
+footer .foot-note{ font-size:12.5px; color:var(--muted2); }
+
+/* ---- scroll reveal ---- */
+/* Scoped to html.js-reveal so this is fail-open. Unscoped, any failure to run main.js -
+   a throw, a blocked or slow script - left every section below the hero at opacity 0
+   permanently, with no way for the reader to know there was anything there. */
+html.js-reveal .reveal{
+  opacity:0; transform:translateY(36px);
+  transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
+  will-change:opacity, transform;
+}
+html.js-reveal .reveal.in{ opacity:1; transform:translateY(0); }
+
+@keyframes wordIn{ to{ opacity:1; transform:translateY(0); } }
+
+@media (max-width:860px){
+  .showcase-row, .showcase-row.reverse{ grid-template-columns:1fr; direction:ltr; }
+  .hero{ padding:150px 0 100px; }
+  section{ padding:80px 0; }
+  .feature{ flex-direction:column; align-items:flex-start; padding:32px 28px; top:80px !important; }
+}
+@media (prefers-reduced-motion:reduce){
+  html.js-reveal .reveal{ opacity:1; transform:none; transition:none; }
+  .hero-glow{ animation:none; }
+}
+
+/* ---- feature cards on a phone ----
+   Three things change below 760px:
+
+   1. position:sticky comes off. The cards are a deliberate stacked deck on desktop, each
+      pinning under the last. On a 390px screen that just means cards sitting on top of one
+      another, and it is why they looked see-through: mid-scroll a card is part-way through
+      its reveal fade with the next one stacked directly beneath it, so you read both at once.
+   2. The reveal fade is dropped for these cards specifically, so a card is never painted at
+      partial opacity over another. They still animate on desktop.
+   3. Each card folds. Eight cards at roughly 380px each made the features section 3,585px on
+      its own; collapsed to their titles the whole section fits in about two screens, and you
+      open the one you care about.
+*/
+@media (max-width:760px){
+  .feature{
+    position:static; top:auto !important;
+    padding:20px 22px; margin-bottom:12px; gap:16px;
+    align-items:flex-start; cursor:pointer;
+    background:#FBF7EF;
+  }
+  html.js-reveal .feature.reveal{ opacity:1; transform:none; transition:none; }
+  .feature-icon{ width:40px; height:40px; flex:0 0 40px; font-size:18px; }
+  .feature > div:not(.feature-icon){ flex:1; min-width:0; }
+  .feature h3{ margin-bottom:0; padding-right:26px; position:relative; }
+  .feature h3::after{
+    content:''; position:absolute; right:2px; top:50%; width:8px; height:8px;
+    border-right:1.6px solid var(--maroon); border-bottom:1.6px solid var(--maroon);
+    transform:translateY(-70%) rotate(45deg); transition:transform .22s ease;
+  }
+  .feature.open h3::after{ transform:translateY(-20%) rotate(-135deg); }
+  .feature-body{ max-height:0; overflow:hidden; transition:max-height .28s ease; }
+  .feature.open .feature-body{ max-height:520px; }
+  .feature-body > p{ margin-top:10px; }
+}

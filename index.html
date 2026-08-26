@@ -1332,6 +1332,41 @@
           </div>
         </div>
         </sc-if>
+        <div class="cc-grid2" style="display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:18px;">
+          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ actLogEyebrow }}</div>
+            <div style="font-size:13px; font-weight:600; margin-bottom:12px;">Log Activity</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:7px;">
+              <sc-for list="{{ actCats }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.pick }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:8px; padding:5px 11px; cursor:pointer; background:{{ c.bg }};">{{ c.name }}</span></sc-for>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:11px;">
+              <sc-for list="{{ actRanges }}" as="r" hint-placeholder-count="3"><span onClick="{{ r.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 10px; cursor:pointer; background:{{ r.bg }};">{{ r.name }}</span></sc-for>
+            </div>
+            <sc-if value="{{ actCanLog }}" hint-placeholder-val="{{ true }}">
+            <div class="cc-actrow" style="display:flex; gap:9px; flex-wrap:wrap;">
+              <input value="{{ actText }}" onInput="{{ setActText }}" onKeyDown="{{ addActKey }}" placeholder="What did you work on?" style="flex:1 1 160px; min-width:0; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+              <input value="{{ actHr }}" onInput="{{ setActHr }}" onKeyDown="{{ addActKey }}" placeholder="hr" style="width:52px; flex:0 0 52px; padding:11px 8px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; font-family:'JetBrains Mono',monospace;">
+              <input value="{{ actMin }}" onInput="{{ setActMin }}" onKeyDown="{{ addActKey }}" placeholder="min" style="width:52px; flex:0 0 52px; padding:11px 8px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; font-family:'JetBrains Mono',monospace;">
+              <span onClick="{{ addActivity }}" class="cc-glowbtn" style="flex:1 1 auto; padding:11px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; white-space:nowrap;">Log</span>
+            </div>
+            </sc-if>
+            <sc-if value="{{ actLogHintShow }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11px; color:#6f6f78; font-style:italic;">Pick a category above to log a new entry — Full is for viewing everything at once.</div>
+            </sc-if>
+            <div style="margin-top:14px; max-height:190px; overflow-y:auto;">
+              <sc-for list="{{ activityList }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex; align-items:center; gap:11px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <span style="width:7px; height:7px; border-radius:50%; flex:0 0 7px; background:{{ a.color }};"></span>
+                  <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ a.text }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#FFFFFF; width:34px; text-align:right;">{{ a.mins }}</span>
+                  <span style="font-size:9px; letter-spacing:.5px; color:#8a8a92; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 7px;">{{ a.cat }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; width:56px; text-align:right;">{{ a.ago }}</span>
+                  <span onClick="{{ a.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
         <sc-if value="{{ showTrainingRow }}" hint-placeholder-val="{{ true }}">
         <div class="cc-dash-training-row" style="margin-bottom:18px;">
           <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
@@ -2547,40 +2582,7 @@
             </sc-for>
           </div>
         </div>
-        <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ actLogEyebrow }}</div>
-            <div style="font-size:13px; font-weight:600; margin-bottom:12px;">Log Activity</div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:7px;">
-              <sc-for list="{{ actCats }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.pick }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:8px; padding:5px 11px; cursor:pointer; background:{{ c.bg }};">{{ c.name }}</span></sc-for>
-            </div>
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:11px;">
-              <sc-for list="{{ actRanges }}" as="r" hint-placeholder-count="3"><span onClick="{{ r.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 10px; cursor:pointer; background:{{ r.bg }};">{{ r.name }}</span></sc-for>
-            </div>
-            <sc-if value="{{ actCanLog }}" hint-placeholder-val="{{ true }}">
-            <div class="cc-actrow" style="display:flex; gap:9px; flex-wrap:wrap;">
-              <input value="{{ actText }}" onInput="{{ setActText }}" onKeyDown="{{ addActKey }}" placeholder="What did you work on?" style="flex:1 1 160px; min-width:0; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-              <input value="{{ actHr }}" onInput="{{ setActHr }}" onKeyDown="{{ addActKey }}" placeholder="hr" style="width:52px; flex:0 0 52px; padding:11px 8px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; font-family:'JetBrains Mono',monospace;">
-              <input value="{{ actMin }}" onInput="{{ setActMin }}" onKeyDown="{{ addActKey }}" placeholder="min" style="width:52px; flex:0 0 52px; padding:11px 8px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; font-family:'JetBrains Mono',monospace;">
-              <span onClick="{{ addActivity }}" class="cc-glowbtn" style="flex:1 1 auto; padding:11px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; white-space:nowrap;">Log</span>
-            </div>
-            </sc-if>
-            <sc-if value="{{ actLogHintShow }}" hint-placeholder-val="{{ false }}">
-              <div style="font-size:11px; color:#6f6f78; font-style:italic;">Pick a category above to log a new entry — Full is for viewing everything at once.</div>
-            </sc-if>
-            <div style="margin-top:14px; max-height:190px; overflow-y:auto;">
-              <sc-for list="{{ activityList }}" as="a" hint-placeholder-count="4">
-                <div style="display:flex; align-items:center; gap:11px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <span style="width:7px; height:7px; border-radius:50%; flex:0 0 7px; background:{{ a.color }};"></span>
-                  <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ a.text }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#FFFFFF; width:34px; text-align:right;">{{ a.mins }}</span>
-                  <span style="font-size:9px; letter-spacing:.5px; color:#8a8a92; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 7px;">{{ a.cat }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; width:56px; text-align:right;">{{ a.ago }}</span>
-                  <span onClick="{{ a.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
-                </div>
-              </sc-for>
-            </div>
-          </div>
+        <div class="cc-grid2" style="display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:18px;">
           <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:8px;">
               <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ SUGGESTED TASKS</span>
@@ -9010,7 +9012,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-148 · v11.148 site-link';
+const NOTIF_BUILD_VERSION = '2026.08.26-149 · v11.149 worklog-to-command';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12982,6 +12984,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.149', date:'Aug 26, 2026', notes:[
+      'Moved the activity log \u2014 the card headed \u201cWork Log \u00b7 Week\u201d when it is filtered to work \u2014 from Productivity to the Command Center, where it sits full width under Daily Missions. The category and range chips move with it, so it still covers every kind of log, not just work.',
+      'Productivity\u2019s Suggested Tasks card was left alone in a two-column row by that move, so it would have rendered at half width next to an empty column. That row is a single column now.',
+    ]},
     {version:'v11.148', date:'Aug 26, 2026', notes:[
       'The globe button goes to the Nervexus website now. It was pointing at nervexus.vercel.app \u2014 which is this app \u2014 so pressing it just opened the thing you were already in, and looked like a reload. It now opens the actual site.',
     ]},

@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nervexus</title>
+<meta name="description" content="Nervexus — a personal command centre for life, work, and everything in between.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+/* Set before first paint so the reveal animation has no flash of visible content. The
+   watchdog is the safety net: if main.js has not confirmed the observer is running within
+   3s - blocked, errored, or never arrived - the hiding is dropped so the page is readable. */
+(function(){var d=document.documentElement;d.className+=' js-reveal';
+setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.className.replace(' js-reveal','');},3000);})();
+</script>
+</head>
+<body>
+
+<div class="intro-mask" id="introMask">
+  <div class="intro-logo-wrap">
+    <div class="intro-logo-glow"></div>
+    <img class="intro-logo" src="favicon.png" alt="Nervexus">
+  </div>
+  <div class="intro-scroll">
+    <span>SCROLL</span>
+    <div class="line"></div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <div class="brand"><img class="brand-mark" src="favicon.png" alt="Nervexus">Nervexus</div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="about.html" class="nav-link">About Us</a>
+      <a href="ultra-x.html" class="nav-link">Ultra X</a>
+    </nav>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
+    <a class="nav-login" href="https://nervexus.vercel.app">Log In</a>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html" class="is-here">Home</a>
+    <a href="about.html">About Us</a>
+    <a href="ultra-x.html">Ultra X</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <div class="eyebrow"><span class="eyebrow-dot"></span>PERSONAL COMMAND CENTRE</div>
+    <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+    <h1>Everything in your life, <span class="accent">one place.</span></h1>
+    <p>Nervexus is a private command centre — fitness, finance, learning, and a voice assistant that actually knows your day. Built for one person to run everything from.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary" href="https://nervexus.vercel.app">Log In to Nervexus →</a>
+      <a class="btn btn-ghost" href="#features">See what's inside</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label reveal">◆ UNDER THE HOOD</div>
+    <div class="section-title reveal">Real providers, not filler.</div>
+    <div class="section-sub reveal">Every one of these is a live, connectable integration inside the app — AI, market data, and news, all in one registry.</div>
+  </div>
+  <div class="api-marquee-wrap reveal">
+      <div class="api-marquee-track">
+        <div class="api-card"><div class="api-label">AI ASSISTANT</div><div class="api-mark" style="background:#d97757;">AN</div><div class="api-name">Anthropic</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">LIVE SEARCH</div><div class="api-mark" style="background:#4285f4;">GE</div><div class="api-name">Gemini</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">AI VOICE</div><div class="api-mark" style="background:#111114;">EL</div><div class="api-name">ElevenLabs</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#ff8000;">RE</div><div class="api-name">Reuters</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#000000;">BB</div><div class="api-name">Bloomberg</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#8B2A2A;">FT</div><div class="api-name">Financial Times</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#000000;">NY</div><div class="api-name">New York Times</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#000000;">WSJ</div><div class="api-name">Wall Street Journal</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#e01f27;">AP</div><div class="api-name">Associated Press</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#e3120b;">EC</div><div class="api-name">The Economist</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">FREE NEWS</div><div class="api-mark" style="background:#052962;">GU</div><div class="api-name">The Guardian</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#0a9e01;">TC</div><div class="api-name">TechCrunch</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#8a6423;">TV</div><div class="api-name">The Verge</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#000000;">WI</div><div class="api-name">Wired</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#ff4e00;">AR</div><div class="api-name">Ars Technica</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">CRYPTO DATA</div><div class="api-mark" style="background:#8dc63f;">CG</div><div class="api-name">CoinGecko</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">CRYPTO DATA</div><div class="api-mark" style="background:#f2a900;">CM</div><div class="api-name">CoinMarketCap</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">FREE / DEV</div><div class="api-mark" style="background:#ff6600;">HN</div><div class="api-name">Hacker News</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">AI ASSISTANT</div><div class="api-mark" style="background:#d97757;">AN</div><div class="api-name">Anthropic</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">LIVE SEARCH</div><div class="api-mark" style="background:#4285f4;">GE</div><div class="api-name">Gemini</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">AI VOICE</div><div class="api-mark" style="background:#111114;">EL</div><div class="api-name">ElevenLabs</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#ff8000;">RE</div><div class="api-name">Reuters</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#000000;">BB</div><div class="api-name">Bloomberg</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#8B2A2A;">FT</div><div class="api-name">Financial Times</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#000000;">NY</div><div class="api-name">New York Times</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#000000;">WSJ</div><div class="api-name">Wall Street Journal</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#e01f27;">AP</div><div class="api-name">Associated Press</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">PREMIUM NEWS</div><div class="api-mark" style="background:#e3120b;">EC</div><div class="api-name">The Economist</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">FREE NEWS</div><div class="api-mark" style="background:#052962;">GU</div><div class="api-name">The Guardian</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#0a9e01;">TC</div><div class="api-name">TechCrunch</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#8a6423;">TV</div><div class="api-name">The Verge</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#000000;">WI</div><div class="api-name">Wired</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">TECH NEWS</div><div class="api-mark" style="background:#ff4e00;">AR</div><div class="api-name">Ars Technica</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">CRYPTO DATA</div><div class="api-mark" style="background:#8dc63f;">CG</div><div class="api-name">CoinGecko</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">CRYPTO DATA</div><div class="api-mark" style="background:#f2a900;">CM</div><div class="api-name">CoinMarketCap</div><div class="api-underline"></div></div>
+        <div class="api-card"><div class="api-label">FREE / DEV</div><div class="api-mark" style="background:#ff6600;">HN</div><div class="api-name">Hacker News</div><div class="api-underline"></div></div>
+      </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-label reveal">◆ BUILT IN</div>
+    <div class="section-title reveal">One system. No app-switching.</div>
+    <div class="section-sub reveal">Every part of the day, tracked and connected — not six different apps pretending to talk to each other.</div>
+    <div class="stack-wrap">
+      <div class="feature reveal" style="top:96px; z-index:1;">
+        <div class="feature-icon" style="background:rgba(91,26,26,0.10); color:#5B1A1A;">◆</div>
+        <div>
+        <h3>Voice Assistant</h3>
+        <div class="feature-body">
+        <p>Talk to it like a real assistant — ask for your briefing, add a task, or get the news, hands-free.</p>
+        <ul class="feature-list">
+          <li>On-demand daily briefing</li>
+          <li>Hands-free task &amp; reminder creation</li>
+          <li>Reads news and updates aloud</li>
+          <li>Full conversation history</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:116px; z-index:2;">
+        <div class="feature-icon" style="background:rgba(201,165,92,0.16); color:#a97f2e;">◈</div>
+        <div>
+        <h3>Fitness &amp; Health</h3>
+        <div class="feature-body">
+        <p>Training volume, sleep, meals, and recovery in one dashboard — not scattered across trackers.</p>
+        <ul class="feature-list">
+          <li>Volume-based training log</li>
+          <li>Sleep &amp; recovery tracking</li>
+          <li>Full nutrition &amp; meal tracking</li>
+          <li>Bulk-upload past training data</li>
+          <li>Daily Missions checklist, synced</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:136px; z-index:3;">
+        <div class="feature-icon" style="background:rgba(139,42,42,0.12); color:#8B2A2A;">◇</div>
+        <div>
+        <h3>Finance HQ</h3>
+        <div class="feature-body">
+        <p>Income, expenses, and budgets tracked live, with a planner that actually reflects what you spend.</p>
+        <ul class="feature-list">
+          <li>Live income &amp; expense tracking</li>
+          <li>Budgets that reflect real spending</li>
+          <li>Planner tied to your actual numbers</li>
+          <li>Full financial history at a glance</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:156px; z-index:4;">
+        <div class="feature-icon" style="background:rgba(107,45,74,0.12); color:#6b2d4a;">◆</div>
+        <div>
+        <h3>Learning Centre</h3>
+        <div class="feature-body">
+        <p>Nine subjects, real tests, real progress tracking — from mental maths to grammar to etiquette.</p>
+        <ul class="feature-list">
+          <li>9 subjects with real placement tests</li>
+          <li>Progress dashboard per subject</li>
+          <li>Gentleman's Etiquette scenario simulator</li>
+          <li>Difficulty adapts to your weak spots</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:176px; z-index:5;">
+        <div class="feature-icon" style="background:rgba(163,120,54,0.16); color:#8a6423;">◈</div>
+        <div>
+        <h3>Performance Terminal</h3>
+        <div class="feature-body">
+        <p>A daily check-in that actually holds you to what you said you'd do — not just another journal.</p>
+        <ul class="feature-list">
+          <li>Daily accountability check-in</li>
+          <li>Tracks what you said you'd do</li>
+          <li>Closes the loop day to day</li>
+          <li>No auto-generated busywork</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:196px; z-index:6;">
+        <div class="feature-icon" style="background:rgba(74,46,38,0.10); color:#4a2e26;">◇</div>
+        <div>
+        <h3>Intelligence Desk</h3>
+        <div class="feature-body">
+        <p>World events, market moves, and location safety checks — briefed the way you'd want them.</p>
+        <ul class="feature-list">
+          <li>World &amp; market briefings</li>
+          <li>Location safety checks with map pins</li>
+          <li>AI-generated daily briefing</li>
+          <li>Sourced, trustable intel</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:216px; z-index:7;">
+        <div class="feature-icon" style="background:rgba(91,26,26,0.10); color:#5B1A1A;">❦</div>
+        <div>
+        <h3>Black Book</h3>
+        <div class="feature-body">
+        <p>A private, hand-picked directory of luxury hotels and locations — organized by country and city, not just noise.</p>
+        <ul class="feature-list">
+          <li>Curated luxury hotel directory</li>
+          <li>Search by country or city</li>
+          <li>Private &amp; exclusive stays flagged</li>
+          <li>Growing city by city</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+      <div class="feature reveal" style="top:236px; z-index:8;">
+        <div class="feature-icon" style="background:rgba(201,165,92,0.16); color:#a97f2e;">◆</div>
+        <div>
+        <h3>Command Center</h3>
+        <div class="feature-body">
+        <p>Every goal, checklist, and daily mission in one dashboard — synced automatically, never auto-generated busywork.</p>
+        <ul class="feature-list">
+          <li>Custom daily missions &amp; checklists</li>
+          <li>Smart push &amp; email reminders</li>
+          <li>Focus &amp; goal tracking</li>
+          <li>Syncs across every module</li>
+        </ul>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label reveal">◆ HOW IT WORKS</div>
+    <div class="section-title reveal">Private. Daily. Genuinely intelligent.</div>
+    <div class="section-sub reveal">From getting in, to living in it every day, to the AI actually behind each part.</div>
+    <div class="how-steps">
+      <div class="how-step reveal">
+        <div class="step-num">1</div>
+        <h3>Request access</h3>
+        <p>This is a private platform — you'll need to be accepted to join. There's no open sign-up; every account is reviewed before it's created.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">2</div>
+        <h3>Built into your day</h3>
+        <p>Log your training before breakfast, check the budget at lunch, run a learning module in the evening, ask for a briefing before bed. It's not a tool you visit — it's one you live in.</p>
+      </div>
+      <div class="how-step reveal">
+        <div class="step-num">3</div>
+        <h3>A live AI for every module</h3>
+        <p>Fitness, finance, learning, performance — each is backed by its own live AI, not one generic chatbot bolted on top. Ask the fitness assistant about recovery, the finance assistant about a purchase, the learning assistant to explain something twice — each one actually knows that part of your life.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label reveal">◆ QUESTIONS</div>
+    <div class="section-title reveal">Before you ask.</div>
+    <div class="section-sub reveal">The honest answers, upfront.</div>
+    <div class="faq">
+      <details class="faq-item reveal">
+        <summary>Is my data private?</summary>
+        <p>Yes. Nervexus is a personal system, not a product sold to advertisers or a third party. Everything logged stays yours.</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>What does it cost?</summary>
+        <p>Nothing — it's a personal project, not a commercial product. There's no subscription, no paywall, no upsell.</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>Will it remind me about things?</summary>
+        <p>Yes — smart push and email reminders are built into every module, so nothing quietly falls through the cracks during a busy day.</p>
+      </details>
+      <details class="faq-item reveal">
+        <summary>Does it work across every device?</summary>
+        <p>Yes — log in from your phone, tablet, or laptop and everything is exactly where you left it, synced automatically.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="cta-band reveal">
+    <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+    <h2>Everything above. Running today.</h2>
+    <p>No setup, no onboarding — log in and it's already tracking your day.</p>
+    <a class="btn btn-primary" href="https://nervexus.vercel.app">Log In to Nervexus →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><img class="brand-mark" src="favicon.png" alt="Nervexus">Nervexus</div>
+    <div class="foot-note">Personal project · Built and run by one person</div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+
+</body>
+</html>
