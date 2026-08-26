@@ -8966,7 +8966,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-138 · v11.138 rank-ladder-1000';
+const NOTIF_BUILD_VERSION = '2026.08.26-139 · v11.139 ship-xp-reprice';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12800,9 +12800,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   startRingOnly(cv,val,color){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
   startTrend(cv,vals,color){ const {ctx,w,h}=this.prep(cv); const n=vals.length; this.loop((ts)=>{ const grow=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); ctx.strokeStyle='rgba(255,255,255,0.05)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } const pts=vals.map((v,i)=>({x:(i/(n-1))*w, y:h-(v*grow*0.8+0.1)*h})); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,this.hexA(color,0.3)); g.addColorStop(1,this.hexA(color,0)); ctx.fillStyle=g; ctx.fill(); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=this.hexA(color,0.7); ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0; const last=pts[pts.length-1]; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); }); }
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
-    const ev=[]; s.workouts.forEach(w=>ev.push({xp:30+(+w.min||0),ts:w.ts})); s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); }); if(this._isOwner()) this._changelog().forEach(c=>ev.push({xp:500, ts:this._parseChangelogDate(c.date), shipXP:true})); s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
+    const ev=[]; s.workouts.forEach(w=>ev.push({xp:30+(+w.min||0),ts:w.ts})); s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); }); if(this._isOwner()) this._ownerShipXP(now).forEach(e=>ev.push(e)); s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
     (s.loginXPLog||[]).forEach(l=>ev.push({xp:+l.xp||0, ts:l.ts}));
-    const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const T=(L)=>50*(L-1)*L;  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
+    const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const T=(L)=>50*(L-1)*L;  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f && !e.carry).reduce((a,e)=>a+e.xp,0);
     let level=1; while(T(level+1)<=totalXP) level++; const xpIn=totalXP-T(level), xpNext=T(level+1)-T(level);
     const toRoman=(n)=>{ const vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r=''; for(const [v,s] of vals){ while(n>=v){ r+=s; n-=v; } } return r; };
     // Bands tighten early and widen late: every 20 levels up to 180, then every 100 up to
@@ -12903,7 +12903,30 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
+  // Owner-only shipped-update XP, plus the one-off carry-over.
+  //
+  // Updates shipped from SHIP_XP_CUTOFF onward are worth SHIP_XP_NEW. Everything older is
+  // worth SHIP_XP_OLD: the changelog holds hundreds of entries and paying them all at the
+  // new rate made shipped updates 86% of the account's total XP, drowning out every real
+  // log. Repricing the history alone would have dropped the account from level 62 to 29,
+  // so LEGACY_CARRY is the exact difference, granted once. It is a fixed starting balance
+  // agreed on 26 Aug 2026, not a floor: it never grows, it is excluded from the today /
+  // week / month figures, and every level above 62 still has to be earned.
+  _ownerShipXP(now){
+    const SHIP_XP_NEW=500, SHIP_XP_OLD=50, SHIP_XP_CUTOFF='v11.139', LEGACY_CARRY=148050;
+    const vn=(v)=>{ const p=String(v||'').replace(/^v/,'').split('.'); return (+p[0]||0)*100000+(+p[1]||0); };
+    const cut=vn(SHIP_XP_CUTOFF), log=this._changelog(), out=[];
+    log.forEach(c=>out.push({ xp: vn(c.version)>=cut ? SHIP_XP_NEW : SHIP_XP_OLD,
+      ts:this._parseChangelogDate(c.date), shipXP:true }));
+    const oldest = log.length ? this._parseChangelogDate(log[log.length-1].date) : now;
+    out.push({ xp:LEGACY_CARRY, ts:oldest-1, carry:true });
+    return out;
+  }
   _changelog(){ return [
+    {version:'v11.139', date:'Aug 26, 2026', major:true, notes:[
+      'Shipped-update XP repriced. Updates from this one onward are worth 500 XP; everything already in this changelog is worth 50. Paying the whole history at 500 made shipped updates 86% of the account total \u2014 190,348 XP, of which 164,500 was changelog \u2014 which buried every workout, mission and login underneath it. They are now 8.6% of the total, and the logs you actually keep are what move the number.',
+      'Repricing the history on its own would have dropped the account from level 62 to level 29, so the difference is granted once as a carry-over and the level is held exactly where it was: level 62, Recruit IV, 20% of the way to level 63. The carry-over is a fixed starting balance, not a floor \u2014 it never grows, it is left out of the today / this week / this month figures, and every level above 62 still has to be earned.',
+    ]},
     {version:'v11.138', date:'Aug 26, 2026', major:true, notes:[
       'Rank ladder re-spaced and the cap raised to level 1000. Ranks come every 20 levels through the early climb \u2014 Recruit I\u2013V at 1/20/40/60/80, Specialist I\u2013V at 100/120/140/160/180 \u2014 and then every 100 from there: Elite I\u2013III at 200/300/400, Commander I\u2013III at 500/600/700, Master I\u2013II at 800/900, and Titan alone at 1000 as the max rank. 19 ranks in total.',
       'Swept every level from 1 to 1060 against the live code: the rank you hold is always the highest band at or below your level, the rank named as next is always the band directly above it, and Titan correctly reports nothing above it.',
