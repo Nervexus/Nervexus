@@ -1022,7 +1022,7 @@
           </sc-for>
         </div>
         </sc-if>
-        <a href="https://nervexus.vercel.app" target="_blank" rel="noopener noreferrer" title="Open the website in your browser" style="text-decoration:none; width:40px; height:40px; flex:0 0 40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
+        <a href="https://nervexus-site.vercel.app" target="_blank" rel="noopener noreferrer" title="Visit the Nervexus website" style="text-decoration:none; width:40px; height:40px; flex:0 0 40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
           <svg viewBox="0 0 18 18" width="17" height="17" fill="none" stroke="#cfcfd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="9" cy="9" r="6.6"></circle>
             <path d="M2.4 9h13.2"></path>
@@ -9010,7 +9010,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-147 · v11.147 globe-icon';
+const NOTIF_BUILD_VERSION = '2026.08.26-148 · v11.148 site-link';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12982,6 +12982,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.148', date:'Aug 26, 2026', notes:[
+      'The globe button goes to the Nervexus website now. It was pointing at nervexus.vercel.app \u2014 which is this app \u2014 so pressing it just opened the thing you were already in, and looked like a reload. It now opens the actual site.',
+    ]},
     {version:'v11.147', date:'Aug 26, 2026', notes:[
       'New icon on the open-in-browser button. The old one was a box with an arrow leaving it, which reads as \u201cthis opens somewhere else\u201d rather than \u201cthis is the website\u201d \u2014 it is now a globe, which is the shape everyone recognises for the web.',
     ]},
