@@ -23,10 +23,14 @@
     hover: null, t0: 0, onPick: null, reduced: false
   };
 
+  /* Palette sampled from the reference rather than guessed. Cropping to the nebula and
+     bucketing saturated pixels by hue gave roughly 40% warm (red/orange), 40% rose through
+     magenta, and a thin seam of blue, over a near-black #05030A ground. The first pass here
+     used muted gold/steel/sage, which is why it read as the right shape in the wrong key. */
   var CAT = {
-    ai:    { c: '#c9a24a', label: 'AI' },
-    intel: { c: '#5b8dd6', label: 'INTEL' },
-    news:  { c: '#7ec9a0', label: 'NEWS' }
+    ai:    { c: '#FFB347', label: 'AI' },
+    intel: { c: '#4DA3FF', label: 'INTEL' },
+    news:  { c: '#FF5FA8', label: 'NEWS' }
   };
 
   function rand(a, b) { return a + Math.random() * (b - a); }
@@ -132,12 +136,12 @@
        reads as a nebula in aggregate without any blur filter (those are the expensive part
        on a weak GPU). */
     S.motes = [];
-    var m = 420, pal = ['#c9a24a', '#5b8dd6', '#7ec9a0', '#b57bd0', '#e07a6a'];
+    var m = 620, pal = ['#FF5FA8', '#F2793C', '#F23C5E', '#FF9ECF', '#FFB347', '#4DA3FF', '#C86BFF'];
     for (var j = 0; j < m; j++) {
       S.motes.push({
-        a: rand(0, 6.28), r: Math.pow(Math.random(), 0.55) * Math.min(S.w, S.h) * 0.145,
+        a: rand(0, 6.28), r: Math.pow(Math.random(), 0.55) * Math.min(S.w, S.h) * 0.155,
         sp: rand(0.06, 0.34) * (Math.random() < 0.5 ? -1 : 1),
-        rr: rand(0.5, 2.3), c: pal[(Math.random() * pal.length) | 0],
+        rr: rand(0.5, 2.3), c: pal[Math.min(pal.length - 1, (Math.pow(Math.random(), 1.5) * pal.length) | 0)],
         al: rand(0.25, 0.95), bob: rand(0, 6.28), bs: rand(0.3, 1.1)
       });
     }
@@ -179,8 +183,8 @@
 
     // core glow, painted as stacked translucent discs rather than a shadow blur
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(S.w, S.h) * 0.22);
-    g.addColorStop(0, 'rgba(160,130,215,0.26)');
-    g.addColorStop(0.5, 'rgba(95,75,150,0.12)');
+    g.addColorStop(0, 'rgba(190,90,170,0.24)');
+    g.addColorStop(0.5, 'rgba(120,60,150,0.11)');
     g.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, S.w, S.h);

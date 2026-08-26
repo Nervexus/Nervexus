@@ -8473,8 +8473,10 @@
 
               <!-- Provider constellation. Desktop only via cc-hide-mobile: 45 labelled nodes
                    cannot be read on a phone, and the cards below carry the same information
-                   in a form that works there. -->
-              <div class="cc-glowcard cc-hide-mobile" style="position:relative; border-radius:16px; background:#0c0c0f; border:1px solid rgba(255,255,255,0.08); padding:0; margin-bottom:16px; overflow:hidden;">
+                   in a form that works there. Full-bleed and viewport-tall: this is the page's
+                   main view, not a widget sitting on top of one. Ground is #05030A, sampled from
+                   the reference rather than picked by eye. -->
+              <div class="cc-glowcard cc-hide-mobile" style="position:relative; border-radius:18px; background:#05030A; border:1px solid rgba(255,255,255,0.07); padding:0; margin-bottom:18px; overflow:hidden;">
                 <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
                   <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
                   <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
@@ -8484,7 +8486,7 @@
                   <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5b8dd6;">● INTEL</span>
                   <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7ec9a0;">● NEWS</span>
                 </div>
-                <div data-constellation="1" style="width:100%; height:430px;"></div>
+                <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
               </div>
               <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
@@ -9028,7 +9030,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-151 · v11.151 connection-map';
+const NOTIF_BUILD_VERSION = '2026.08.26-152 · v11.152 map-full-bleed';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13036,6 +13038,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.152', date:'Aug 26, 2026', notes:[
+      'Connection Map is now the API page rather than a panel on it \u2014 full width, and as tall as the window allows, so opening the page opens the map. The cards are still there, one scroll down.',
+      'Colours corrected. The first pass was muted gold, steel and sage, which had the right shape in the wrong key. Sampling the reference \u2014 cropping to the core and sorting saturated pixels by hue \u2014 gave roughly 40% warm red and orange, 40% rose through magenta, a thin seam of blue, all over a near-black ground. The core now runs on that palette and the ground is the same near-black.',
+    ]},
     {version:'v11.151', date:'Aug 26, 2026', major:true, notes:[
       'New Connection Map on the API page: every provider you have registered, drawn as a constellation around the app. It is not decoration \u2014 a provider that is saved and switched on gets a lit node and a solid line, one you have never touched gets a dim dot and a dashed one, and the colour says whether it is AI, intel or news. Click any node to jump to the card that controls it.',
       'Desktop only, deliberately. Forty-odd labelled nodes cannot be read on a phone without pinching around, and the cards underneath already tell you the same thing in a form that works at that width.',
