@@ -115,8 +115,8 @@
   .theme-ultra.theme-noir [style*="color:#5B1A1A"], .theme-ultra.theme-noir [style*="color: rgb(91, 26, 26)"], .theme-ultra.theme-noir [style*="border:1px solid #5B1A1A"]{ color:#968F82 !important; }
   .theme-ultra.theme-noir [style*="background:#FAF7F0"], .theme-ultra.theme-noir [style*="background: rgb(250, 247, 240)"]{ background:#181818 !important; }
   .theme-ultra.theme-noir [style*="background:#F8F4EC"], .theme-ultra.theme-noir [style*="background: rgb(248, 244, 236)"]{ background:#181818 !important; }
-  .theme-ultra.theme-noir, .theme-ultra.theme-noir *:not([style*="JetBrains Mono"]):not([style*="Pinyon"]):not(canvas){ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
-  .theme-ultra.theme-noir [style*="Pinyon"]{ font-family:'Pinyon Script',cursive !important; }
+  .theme-ultra.theme-noir, .theme-ultra.theme-noir *:not([style*="JetBrains Mono"]):not(.cc-home-wordmark):not(canvas){ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-noir .cc-home-wordmark{ font-family:'Pinyon Script',cursive !important; }
   .theme-ultra.theme-noir [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
   .theme-ultra.theme-noir [style*="Cormorant Garamond"]{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
   .theme-ultra.theme-noir h1, .theme-ultra.theme-noir h2, .theme-ultra.theme-noir h3{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
@@ -9010,7 +9010,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-144 · v11.144 script-wordmarks';
+const NOTIF_BUILD_VERSION = '2026.08.26-145 · v11.145 wordmark-scope';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12968,6 +12968,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.145', date:'Aug 26, 2026', notes:[
+      'Tightened yesterday\u2019s font change so it only touches the home screen wordmark. To let the script face through, Noir had to make an exception to the rule that puts its own lettering on everything \u2014 but the exception was written loosely enough that it also caught the \u201cDark Psychology\u201d and \u201cThe Black Book\u201d headings, which would have quietly changed face in Noir. The exception now names the wordmark and nothing else; those headings keep Noir\u2019s lettering exactly as before.',
+    ]},
     {version:'v11.144', date:'Aug 26, 2026', notes:[
       'Noir and Ultra X now use Maison \u00c9lys\u00e9e\u2019s Pinyon Script for the home screen wordmark, set the way a script face wants it \u2014 in title case, without the wide letter-spacing the caps versions carried. Maison\u2019s own wordmark is untouched; it was already Pinyon Script and still is.',
       'Noir needed a small change underneath to allow it. That style forces its own display face onto everything on the page, so an inline script font was simply overridden. It now makes the same exception for Pinyon Script that Maison \u00c9lys\u00e9e already did.',
