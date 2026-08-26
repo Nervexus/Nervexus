@@ -93,7 +93,7 @@
      the mark reads as a small smudge inside the ring. Oversizing to 110% of the ring and
      nudging down by that 8% offset makes the emblem about 55% of the ring: centred and bold. */
   .cc-home-logo img{ width:106px; height:106px; object-fit:contain; display:block; transform:translateY(8px); }
-  .cc-home-wordmark{ margin:0; line-height:1.1; max-width:100%; }
+  .cc-home-wordmark{ margin:0; line-height:1.3; max-width:100%; }
   .sovereign-lite .cc-glowcard{ position:relative; }
   .sovereign-lite .cc-glowcard::before{ content:''; position:absolute; top:-1px; left:-1px; width:9px; height:9px; background:rgba(255,255,255,0.55); transform:rotate(45deg); border-radius:1px; pointer-events:none; }
 
@@ -115,7 +115,8 @@
   .theme-ultra.theme-noir [style*="color:#5B1A1A"], .theme-ultra.theme-noir [style*="color: rgb(91, 26, 26)"], .theme-ultra.theme-noir [style*="border:1px solid #5B1A1A"]{ color:#968F82 !important; }
   .theme-ultra.theme-noir [style*="background:#FAF7F0"], .theme-ultra.theme-noir [style*="background: rgb(250, 247, 240)"]{ background:#181818 !important; }
   .theme-ultra.theme-noir [style*="background:#F8F4EC"], .theme-ultra.theme-noir [style*="background: rgb(248, 244, 236)"]{ background:#181818 !important; }
-  .theme-ultra.theme-noir, .theme-ultra.theme-noir *:not([style*="JetBrains Mono"]):not(canvas){ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-noir, .theme-ultra.theme-noir *:not([style*="JetBrains Mono"]):not([style*="Pinyon"]):not(canvas){ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-noir [style*="Pinyon"]{ font-family:'Pinyon Script',cursive !important; }
   .theme-ultra.theme-noir [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
   .theme-ultra.theme-noir [style*="Cormorant Garamond"]{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
   .theme-ultra.theme-noir h1, .theme-ultra.theme-noir h2, .theme-ultra.theme-noir h3{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
@@ -390,9 +391,6 @@
   .cc-home-focus{ display:none !important; }
   .cc-home-logo{ width:74px !important; height:74px !important; margin-bottom:10px !important; }
   .cc-home-logo img{ width:82px !important; height:82px !important; transform:translateY(6px) !important; }
-  /* Only the letter-spaced caps wordmarks need shrinking — "Maison Éverpine" is 15 characters
-     and ran past the border at desktop tracking. Maison Élysée's script wordmark is left alone. */
-  .cc-home-wordmark-caps{ font-size:17px !important; letter-spacing:3.5px !important; }
   .cc-home-hero svg{ max-width:100% !important; height:auto !important; }
   .cc-home-sysline{ font-size:8.5px !important; letter-spacing:1.4px !important; line-height:1.8 !important; max-width:100% !important; white-space:normal !important; }
   .cc-home-toprow{ justify-content:flex-start !important; flex-direction:column !important; align-items:flex-start !important; gap:12px !important; }
@@ -1085,7 +1083,7 @@
         <div style="position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; padding:20px 0;">
           <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
             <div class="cc-home-logo" style="border-color:rgba(196,189,176,0.6);"><img src="favicon.png" alt="Nervexus"></div>
-            <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; font-weight:600; letter-spacing:8px; text-transform:uppercase; color:#C4BDB0;">{{ homeWordmark }}</p>
+            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#C4BDB0;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#C4BDB0; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="margin:56px 0 12px;">
               <svg width="360" height="26" viewBox="0 0 600 28" style="display:block;">
@@ -1139,7 +1137,7 @@
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
             <div class="cc-home-logo" style="border-color:rgba(91,26,26,0.45);"><img src="favicon.png" alt="Nervexus"></div>
-            <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-size:22px; font-weight:800; letter-spacing:6px; text-transform:uppercase; color:#fff;">{{ homeWordmark }}</p>
+            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#fff;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="display:flex; align-items:center; gap:12px; margin:6px 0 2px;">
               <div style="width:120px; height:1px; background:rgba(91,26,26,0.32);"></div>
@@ -1151,7 +1149,7 @@
           </sc-if>
           <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
             <div class="cc-home-logo" style="border-color:rgba(255,255,255,0.55);"><img src="favicon.png" alt="Nervexus"></div>
-            <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-size:22px; font-weight:800; letter-spacing:6px; text-transform:uppercase; color:#fff;">{{ homeWordmark }}</p>
+            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#fff;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="display:flex; align-items:center; gap:12px; margin:6px 0 2px;">
               <div style="width:120px; height:1px; background:rgba(255,255,255,0.42);"></div>
@@ -9012,7 +9010,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-143 · v11.143 maison-fleuron';
+const NOTIF_BUILD_VERSION = '2026.08.26-144 · v11.144 script-wordmarks';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12970,6 +12968,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.144', date:'Aug 26, 2026', notes:[
+      'Noir and Ultra X now use Maison \u00c9lys\u00e9e\u2019s Pinyon Script for the home screen wordmark, set the way a script face wants it \u2014 in title case, without the wide letter-spacing the caps versions carried. Maison\u2019s own wordmark is untouched; it was already Pinyon Script and still is.',
+      'Noir needed a small change underneath to allow it. That style forces its own display face onto everything on the page, so an inline script font was simply overridden. It now makes the same exception for Pinyon Script that Maison \u00c9lys\u00e9e already did.',
+    ]},
     {version:'v11.143', date:'Aug 26, 2026', notes:[
       'Swapped the home screen dividers over. The plain rule\u2013diamond\u2013rule that Maison \u00c9lys\u00e9e was using has moved to Ultra X, where it belonged, and Maison now has an ornament of its own: a leaf fleuron with a lozenge at its centre, sitting between two fine rules. Ultra X had only a bare 64px line before.',
       'Ultra X\u2019s divider is drawn in its deep red rather than white \u2014 that style always renders on a light card, where white rules and a white diamond simply disappear. The base theme keeps the white version on its dark card.',
