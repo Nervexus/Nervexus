@@ -8966,7 +8966,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.25-135 · v11.135 real-attributes';
+const NOTIF_BUILD_VERSION = '2026.08.26-136 · v11.136 rank-xp-consistency';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12800,17 +12800,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   startRingOnly(cv,val,color){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
   startTrend(cv,vals,color){ const {ctx,w,h}=this.prep(cv); const n=vals.length; this.loop((ts)=>{ const grow=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); ctx.strokeStyle='rgba(255,255,255,0.05)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } const pts=vals.map((v,i)=>({x:(i/(n-1))*w, y:h-(v*grow*0.8+0.1)*h})); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,this.hexA(color,0.3)); g.addColorStop(1,this.hexA(color,0)); ctx.fillStyle=g; ctx.fill(); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=this.hexA(color,0.7); ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0; const last=pts[pts.length-1]; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); }); }
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
-    const ev=[]; s.workouts.forEach(w=>ev.push({xp:30+(+w.min||0),ts:w.ts})); s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); }); if(this._isOwner()) this._changelog().forEach(c=>ev.push({xp:100, ts:this._parseChangelogDate(c.date), shipXP:true})); s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
+    const ev=[]; s.workouts.forEach(w=>ev.push({xp:30+(+w.min||0),ts:w.ts})); s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); }); if(this._isOwner()) this._changelog().forEach(c=>ev.push({xp:500, ts:this._parseChangelogDate(c.date), shipXP:true})); s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
     (s.loginXPLog||[]).forEach(l=>ev.push({xp:+l.xp||0, ts:l.ts}));
     const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const T=(L)=>50*(L-1)*L;  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
     let level=1; while(T(level+1)<=totalXP) level++; const xpIn=totalXP-T(level), xpNext=T(level+1)-T(level);
     const toRoman=(n)=>{ const vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r=''; for(const [v,s] of vals){ while(n>=v){ r+=s; n-=v; } } return r; };
     const namedRanks=[{n:'Recruit',min:1,d:'Levels 1–5'},{n:'Specialist',min:5,d:'Levels 5–12'},{n:'Elite',min:12,d:'Levels 12–25'},{n:'Commander',min:25,d:'Levels 25–40'},{n:'Master',min:40,d:'Levels 40–60'}];
     const titanAt=(min,idx,next)=>({n:'Titan '+toRoman(idx),min,d:'Levels '+min+'–'+next});
-    const rankForLevel=(lvl)=>{ if(lvl<600){ let r=namedRanks[0]; for(const nr of namedRanks) if(lvl>=nr.min) r=nr; return r; } return titanAt(600+Math.floor((lvl-600)/100)*100); };
-    const nextForLevel=(lvl)=>{ if(lvl<100) return namedRanks[1]; if(lvl<200) return namedRanks[2]; if(lvl<300) return namedRanks[3]; if(lvl<400) return namedRanks[4]; if(lvl<600) return titanAt(600); return titanAt(600+Math.floor((lvl-600)/100)*100+100); };
-    const rank=rankForLevel(level), next=nextForLevel(level);
     const ranks=[...namedRanks, titanAt(60,1,85), titanAt(85,2,115), titanAt(115,3,150), titanAt(150,4,200), titanAt(200,5,999)];
+    // ranks must exist before these run — they used to read the old hardcoded 600/100/200
+    // thresholds and so could be declared first. Walking the array means order matters.
+    const rankForLevel=(lvl)=>{ let r=ranks[0]; for(const x of ranks) if(lvl>=x.min) r=x; return r; };
+    const nextForLevel=(lvl)=>{ for(const x of ranks) if(x.min>lvl) return x; return null; };
+    const rank=rankForLevel(level), next=nextForLevel(level);
     const cat=(name,xp)=>{ let L=1; while(T(L+1)<=xp) L++; return {name,xp:Math.round(xp),level:L,pct:Math.min(100,Math.round((xp-T(L))/(T(L+1)-T(L))*100))}; };
     const totInc=s.income.reduce((a,i)=>a+(+i.amt||0),0), totExp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0);
     // Consistency/Health/Recovery/Mental Resilience used to be flat 6600 regardless of
@@ -12872,11 +12874,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // "BST"/"GMT" label) into an epoch ms, treating it as UK local time (BST = UTC+1,
   // which covers every date in this changelog so far — all summer).
   _parseChangelogDate(str){
-    const m=(str||'').match(/([A-Za-z]{3})[a-z]*\s+(\d{1,2}),\s+(\d{4}).*?(\d{1,2}):(\d{2})/);
+    const m=(str||'').match(/([A-Za-z]{3})[a-z]*\s+(\d{1,2}),\s+(\d{4})(?:.*?(\d{1,2}):(\d{2}))?/);
     if(!m) return Date.now();
     const months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
     const mo=months[m[1]]; if(mo==null) return Date.now();
-    return Date.UTC(+m[3],mo,+m[2],+m[4],+m[5]) - 3600000;
+    const hh = m[4]!=null ? +m[4] : 12, mi = m[5]!=null ? +m[5] : 0;   /* date-only entries land at midday, not "now" */
+    return Date.UTC(+m[3],mo,+m[2],hh,mi) - 3600000;
   }
   // Work Hours ship log: one entry per changelog version, timestamped to match that
   // version's actual UK ship time — always in sync with the changelog by construction,
@@ -12891,6 +12894,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.136', date:'Aug 26, 2026', major:true, notes:[
+      'The rank shown next to your Power Level and the \u201cnext rank\u201d line underneath it were reading from two different places. The next-rank line was hardcoded to answer \u201cSpecialist at level 5\u201d for anything below level 100, so a Commander was being told the next rank was one they had passed long ago. Both now walk the same ladder, so the rank you hold and the rank you are climbing towards always line up.',
+      'The daily XP figure was wildly inflated \u2014 around 9,000 on a normal day. Every shipped-update entry in this changelog awards XP, and the dates on those entries carry no clock time, so the code fell back to \u201cright now\u201d for all of them. That meant the entire history of the app counted as earned today, every day. Those entries now land on their real dates, and today\u2019s number reflects what you actually did today.',
+      'Owner account XP values set as asked: 250 XP for a daily login (was 200), and 500 XP for each new app update logged (was 100). Every other log keeps the XP it already gave.',
+    ]},
     {version:'v11.135', date:'Aug 25, 2026', major:true, notes:[
       'Found where the 12 came from. Every attribute had a hidden 6,600 XP added to it, and 6,600 is exactly the threshold for level 12 \u2014 so all twelve attributes sat at level 12 on a brand new account and needed another 1,200 XP just to reach 13. Nothing you logged was visible underneath it. That padding is gone; attributes now start at 1 and are earned.',
       'The headline Power Level was the same trick, much larger. It was handed 40,455,000 XP for free, pinning everyone at level 900, rank Titan IV, from the moment they signed up. That is gone too. It now reads your real total \u2014 which means it will show a small number, and that number will be true and will move when you do something.',
@@ -14090,7 +14098,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(this.state.lastLoginDate===today) return;
     if(!this._isOwner()) return;
     const newStreak=(this.state.lastLoginDate===yest)?(this.state.loginStreak||0)+1:1;
-    const xp=200;
+    const xp=250;   /* owner daily login */
     this.mut(s=>({ loginStreak:newStreak, lastLoginDate:today, loginXPLog:[...(s.loginXPLog||[]), {id:this._uuid(),xp,ts:Date.now(),date:today}] }));
     this.save();
   }
