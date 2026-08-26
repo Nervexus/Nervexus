@@ -1424,7 +1424,7 @@
           </div>
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:14px;">↗ RANK PROGRESSION</div>
-            <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="26">
+            <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="19">
               <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); opacity:{{ r.op }};">
                 <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid {{ r.bd }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ r.numC }};">{{ r.min }}</span>
                 <div style="flex:1;"><div style="font-size:13px; color:{{ r.nameC }}; font-weight:600;">{{ r.n }}</div><div style="font-size:10.5px; color:#75757d;">{{ r.d }}</div></div>
@@ -8966,7 +8966,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-137 · v11.137 rank-ladder-500';
+const NOTIF_BUILD_VERSION = '2026.08.26-138 · v11.138 rank-ladder-1000';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12805,16 +12805,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const T=(L)=>50*(L-1)*L;  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
     let level=1; while(T(level+1)<=totalXP) level++; const xpIn=totalXP-T(level), xpNext=T(level+1)-T(level);
     const toRoman=(n)=>{ const vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r=''; for(const [v,s] of vals){ while(n>=v){ r+=s; n-=v; } } return r; };
-    // 26 ranks, one every 20 levels, topping out at level 500. Five families of five
-    // (Recruit I–V, Specialist I–V, Elite I–V, Commander I–V, Master I–V) then Titan as
-    // the single max rank. Band k starts at level (k-1)*20, except band 1 which starts at 1.
-    const RANK_FAMS=['Recruit','Specialist','Elite','Commander','Master'], RANK_BANDS=26;
-    const ranks=[];
-    for(let k=1;k<=RANK_BANDS;k++){
-      const min = k===1 ? 1 : (k-1)*20, top = k<RANK_BANDS ? k*20 : null;
-      const n = k===RANK_BANDS ? 'Titan' : RANK_FAMS[Math.floor((k-1)/5)]+' '+toRoman(((k-1)%5)+1);
-      ranks.push({ n, min, d: top ? 'Levels '+min+'–'+(top-1) : 'Level '+min+' · max rank' });
-    }
+    // Bands tighten early and widen late: every 20 levels up to 180, then every 100 up to
+    // the level-1000 cap. 19 bands, grouped into families whose sizes must sum to
+    // RANK_MINS.length — 5+5+3+3+2+1. Titan is a family of one, so it carries no numeral.
+    const RANK_MINS=[1,20,40,60,80,100,120,140,160,180,200,300,400,500,600,700,800,900,1000];
+    const RANK_FAMS=[['Recruit',5],['Specialist',5],['Elite',3],['Commander',3],['Master',2],['Titan',1]];
+    const ranks=[]; let rfi=0, rti=0;
+    RANK_MINS.forEach((min,k)=>{
+      const fam=RANK_FAMS[rfi][0], size=RANK_FAMS[rfi][1]; rti++;
+      const top = k+1<RANK_MINS.length ? RANK_MINS[k+1] : null;
+      ranks.push({ n: size>1 ? fam+' '+toRoman(rti) : fam, min,
+        d: top ? 'Levels '+min+'–'+(top-1) : 'Level '+min+' · max rank' });
+      if(rti===size){ rfi++; rti=0; }
+    });
     // ranks must exist before these run — they used to read the old hardcoded 600/100/200
     // thresholds and so could be declared first. Walking the array means order matters.
     const rankForLevel=(lvl)=>{ let r=ranks[0]; for(const x of ranks) if(lvl>=x.min) r=x; return r; };
@@ -12901,6 +12904,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.138', date:'Aug 26, 2026', major:true, notes:[
+      'Rank ladder re-spaced and the cap raised to level 1000. Ranks come every 20 levels through the early climb \u2014 Recruit I\u2013V at 1/20/40/60/80, Specialist I\u2013V at 100/120/140/160/180 \u2014 and then every 100 from there: Elite I\u2013III at 200/300/400, Commander I\u2013III at 500/600/700, Master I\u2013II at 800/900, and Titan alone at 1000 as the max rank. 19 ranks in total.',
+      'Swept every level from 1 to 1060 against the live code: the rank you hold is always the highest band at or below your level, the rank named as next is always the band directly above it, and Titan correctly reports nothing above it.',
+    ]},
     {version:'v11.137', date:'Aug 26, 2026', major:true, notes:[
       'Rank ladder rebuilt: 26 ranks, one every 20 levels, topping out at level 500. Five families of five \u2014 Recruit I\u2013V, Specialist I\u2013V, Elite I\u2013V, Commander I\u2013V, Master I\u2013V \u2014 and then Titan on its own as the max rank. Recruit I covers levels 1\u201319, Recruit II starts at 20, and every band after that is exactly 20 levels wide.',
       'Checked the whole ladder rather than the top of it: across levels 1 to 540 the rank you hold and the rank named as next are always adjacent, and Titan correctly reports no rank above it.',
