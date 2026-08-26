@@ -84,6 +84,16 @@
 
   /* ===== SOVEREIGN (base theme, light Ultra-inspired touch — additive only, no inline overrides) ===== */
   .sovereign-lite .cc-home-greeting{ font-family:'Cormorant Garamond',Georgia,serif !important; font-style:italic !important; font-weight:500 !important; letter-spacing:0 !important; }
+  /* One logo layout for every raiment, so the home screen reads as the same brand whichever
+     style is on: same ring, same mark, same spacing. Each style sets only the colour, inline.
+     Noir used to draw a 60px ring with a 28px mark and the light styles had no mark at all. */
+  .cc-home-logo{ width:96px; height:96px; margin:0 auto 12px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; flex:0 0 auto; overflow:hidden; }
+  /* favicon.png is 1024px square but the visible laurel only fills the middle 50% of it, and
+     sits high — its centre is at 42% of the height, not 50%. Dropped in at its natural size
+     the mark reads as a small smudge inside the ring. Oversizing to 110% of the ring and
+     nudging down by that 8% offset makes the emblem about 55% of the ring: centred and bold. */
+  .cc-home-logo img{ width:106px; height:106px; object-fit:contain; display:block; transform:translateY(8px); }
+  .cc-home-wordmark{ margin:0; line-height:1.1; max-width:100%; }
   .sovereign-lite .cc-glowcard{ position:relative; }
   .sovereign-lite .cc-glowcard::before{ content:''; position:absolute; top:-1px; left:-1px; width:9px; height:9px; background:rgba(255,255,255,0.55); transform:rotate(45deg); border-radius:1px; pointer-events:none; }
 
@@ -378,6 +388,11 @@
      divider overflowing the card by 9px a side. Padding now clears the innermost line. */
   .cc-home-hero{ padding:26px 34px !important; min-height:calc(100vh - 220px) !important; }
   .cc-home-focus{ display:none !important; }
+  .cc-home-logo{ width:74px !important; height:74px !important; margin-bottom:10px !important; }
+  .cc-home-logo img{ width:82px !important; height:82px !important; transform:translateY(6px) !important; }
+  /* Only the letter-spaced caps wordmarks need shrinking — "Maison Éverpine" is 15 characters
+     and ran past the border at desktop tracking. Maison Élysée's script wordmark is left alone. */
+  .cc-home-wordmark-caps{ font-size:17px !important; letter-spacing:3.5px !important; }
   .cc-home-hero svg{ max-width:100% !important; height:auto !important; }
   .cc-home-sysline{ font-size:8.5px !important; letter-spacing:1.4px !important; line-height:1.8 !important; max-width:100% !important; white-space:normal !important; }
   .cc-home-toprow{ justify-content:flex-start !important; flex-direction:column !important; align-items:flex-start !important; gap:12px !important; }
@@ -1069,9 +1084,8 @@
         </div>
         <div style="position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; padding:20px 0;">
           <sc-if value="{{ isUltraNoir }}" hint-placeholder-val="{{ false }}">
-            <div style="width:60px; height:60px; margin:0 auto 4px; border-radius:50%; border:1px solid rgba(196,189,176,0.5); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; box-shadow:0 0 34px rgba(150,143,130,0.16), inset 0 0 16px rgba(150,143,130,0.1);">
-              <img src="favicon.png" alt="" style="width:28px; height:28px; object-fit:contain; opacity:0.9;">
-            </div>
+            <div class="cc-home-logo" style="border-color:rgba(196,189,176,0.6);"><img src="favicon.png" alt="Nervexus"></div>
+            <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; font-weight:600; letter-spacing:8px; text-transform:uppercase; color:#C4BDB0;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#C4BDB0; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="margin:56px 0 12px;">
               <svg width="360" height="26" viewBox="0 0 600 28" style="display:block;">
@@ -1098,10 +1112,8 @@
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
-            <div style="width:104px; height:104px; margin:0 auto 6px; border-radius:50%; border:1px solid rgba(246,240,228,0.75); display:flex; align-items:center; justify-content:center;">
-              <img src="favicon.png" alt="" style="width:56px; height:56px; object-fit:contain; opacity:0.92;">
-            </div>
-            <p style="font-family:'Pinyon Script',cursive; font-size:30px; color:#F6F0E4; line-height:1; margin:6px 0 0;">Maison Élysée</p>
+            <div class="cc-home-logo" style="border-color:rgba(246,240,228,0.8);"><img src="favicon.png" alt="Nervexus"></div>
+            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#F6F0E4;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:500; letter-spacing:0; line-height:1.12; color:#FDFAF4; margin:2px 0 0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="display:flex; align-items:center; gap:12px; margin:34px 0 6px;">
               <div style="width:120px; height:1px; background:rgba(246,240,228,0.55);"></div>
@@ -1112,12 +1124,16 @@
             <span onClick="{{ powerOn }}" style="margin-top:14px; display:inline-flex; align-items:center; gap:10px; padding:13px 36px; border-radius:2px; border:1px solid rgba(246,240,228,0.7); color:#FDFAF4; font-size:10.5px; letter-spacing:2.6px; text-transform:uppercase; cursor:pointer;" style-hover="{ background:'rgba(253,250,244,0.14)', borderColor:'#FDFAF4' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
+            <div class="cc-home-logo" style="border-color:rgba(91,26,26,0.45);"><img src="favicon.png" alt="Nervexus"></div>
+            <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-size:22px; font-weight:800; letter-spacing:6px; text-transform:uppercase; color:#fff;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
+            <div class="cc-home-logo" style="border-color:rgba(255,255,255,0.55);"><img src="favicon.png" alt="Nervexus"></div>
+            <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-size:22px; font-weight:800; letter-spacing:6px; text-transform:uppercase; color:#fff;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
@@ -8974,7 +8990,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-141 · v11.141 mobile-home-hero';
+const NOTIF_BUILD_VERSION = '2026.08.26-142 · v11.142 universal-home-logo';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12932,6 +12948,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.142', date:'Aug 26, 2026', notes:[
+      'One logo layout across every raiment. The mark used to be drawn differently in each style \u2014 Noir had a 60px ring with a 28px emblem, Maison \u00c9lys\u00e9e a 104px ring with a 56px one, and Ultra X and the base theme had no mark at all. Every style now shares the same ring, the same emblem size and the same spacing, on desktop and on mobile; colour is the only thing each style still sets for itself.',
+      'The emblem also reads properly now. favicon.png is a 1024px square but the laurel only fills the middle half of it and sits high in the frame, so dropped in at face value it showed up as a small smudge inside the ring. It is scaled and re-centred so it fills the ring the way it should.',
+      'Noir and Ultra X now carry a wordmark on the home screen, the way Maison \u00c9lys\u00e9e always has \u2014 each set in its own style\u2019s lettering. The name follows the raiment you have on, so Maison \u00c9verpine reads as itself rather than borrowing Ultra X\u2019s.',
+    ]},
     {version:'v11.141', date:'Aug 26, 2026', notes:[
       'Fixed the home screen on a phone. The decorative border is drawn 18px in from the card edge (Maison \u00c9lys\u00e9e has a second line at 26px), but the content only had 16px of padding \u2014 so the greeting, the date line and Noir\u2019s divider were all positioned outside those lines and cut straight through them. Measured on a 390px screen: the date line sat 16px from the edge, the greeting 19px, and Noir\u2019s divider overhung the whole card by 9px a side. Padding now clears the innermost line on every style, the divider is capped to the card width, and the date line is sized to fit on one row.',
       'Removed the Focus Mode chip on phones. It sat in the top-left corner right on top of the border and was the worst of the clashes. It is unchanged on desktop.',
@@ -18013,7 +18034,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         };
       }, {}),
       learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money','Gentleman’s Etiquette'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
-      homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
+      homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, homeWordmark:(S.prefs.ultraStyle||'Ultra X'), powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',
 
       // login
