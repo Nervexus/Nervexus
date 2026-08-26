@@ -1022,13 +1022,13 @@
           </sc-for>
         </div>
         </sc-if>
-        <div onClick="{{ openWebApp }}" title="Open web app in browser" style="width:40px; height:40px; flex:0 0 40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
+        <a href="https://nervexus.vercel.app" target="_blank" rel="noopener noreferrer" title="Open the website in your browser" style="text-decoration:none; width:40px; height:40px; flex:0 0 40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
           <svg viewBox="0 0 18 18" width="16" height="16" fill="none" stroke="#cfcfd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M7.5 3H3.75A0.75 0.75 0 0 0 3 3.75v10.5c0 0.414 0.336 0.75 0.75 0.75h10.5a0.75 0.75 0 0 0 0.75-0.75V10.5"></path>
             <path d="M10.5 3H15v4.5"></path>
             <path d="M7.5 10.5L15 3"></path>
           </svg>
-        </div>
+        </a>
         <div class="cc-nw" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; text-align:right; line-height:1.3; flex:0 0 auto;">
           <div data-clock="" style="color:#dcdce0;">--:--:--</div>
           <div data-date="" style="font-size:9px; color:#C9C9CE; letter-spacing:1.5px;">--</div>
@@ -9010,7 +9010,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-145 · v11.145 wordmark-scope';
+const NOTIF_BUILD_VERSION = '2026.08.26-146 · v11.146 real-refresh';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11714,7 +11714,21 @@ activities: this._mergeShipLog(s.activities),
     return { rows, mins:rows.reduce((t,a)=>t+(+a.min||0),0) };
   }
   mut(u){ this.setState(u, ()=>this.save()); }
-  openWebApp(){ window.open('https://nervexus.vercel.app', '_blank', 'noopener'); }
+  // The old refresh re-pulled Supabase and pinged the service worker but never reloaded, so
+  // the running build stayed in memory — "Force refresh now" could not actually pick up a new
+  // version, which is why devices sat several deploys behind. The service worker is
+  // network-first, so an empty cache plus a fresh document fetch is enough; the registration
+  // is deliberately left in place, since unregistering it would throw away the push
+  // subscription and silently kill reminders. The query param is there because the browser's
+  // own HTTP cache sits in front of the service worker and can still hand back a stale
+  // index.html on a plain reload.
+  async _hardReload(){
+    try{ this.save(); }catch(e){}
+    try{ if(window.caches){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); } }catch(e){}
+    try{ if('serviceWorker' in navigator){ const reg=await navigator.serviceWorker.getRegistration(); if(reg) await reg.update(); } }catch(e){}
+    try{ const u=new URL(location.href); u.searchParams.set('_r', String(Date.now())); location.replace(u.toString()); }
+    catch(e){ location.reload(); }
+  }
   startRefresh(){
     if(this.state.refreshing) return;
     clearInterval(this._refreshTimer);
@@ -11731,7 +11745,7 @@ activities: this._mergeShipLog(s.activities),
         this.setState({refreshPct:100},()=>{
           setTimeout(()=>{
             this._sig=null;
-            this.setState({refreshing:false, refreshPct:0}, ()=>{ this.sync(); this.showToast('system','System refreshed','All data streams reconnected and dashboards rebuilt.'); });
+            this.setState({refreshing:false, refreshPct:0}, ()=>{ this.sync(); this._hardReload(); });
           },260);
         });
       } else {
@@ -12968,6 +12982,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.146', date:'Aug 26, 2026', major:true, notes:[
+      'The refresh button now actually refreshes. It re-pulled your data and pinged the service worker, but it never reloaded the page \u2014 so the build already running stayed exactly where it was, and \u201cForce refresh now\u201d in Settings could not pick up a new version no matter how often you pressed it. That is why the app could sit several updates behind. It now clears the cache and reloads properly.',
+      'The reload deliberately keeps the app registered for notifications. Wiping that too would have been the simpler way to force a clean start, but it throws away the push subscription and silently stops reminders arriving.',
+      'The open-in-browser button is a real link now. It used a scripted pop-up, which an installed app is free to ignore \u2014 and does, opening in the same window, which looked like the page simply reloading.',
+    ]},
     {version:'v11.145', date:'Aug 26, 2026', notes:[
       'Tightened yesterday\u2019s font change so it only touches the home screen wordmark. To let the script face through, Noir had to make an exception to the rule that puts its own lettering on everything \u2014 but the exception was written loosely enough that it also caught the \u201cDark Psychology\u201d and \u201cThe Black Book\u201d headings, which would have quietly changed face in Noir. The exception now names the wordmark and nothing else; those headings keep Noir\u2019s lettering exactly as before.',
     ]},
@@ -16327,7 +16346,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       rootRef:(el)=>{ this.root=el; },
       refreshing:S.refreshing, refreshPct:rp, refreshSteps, refreshStatusLine,
       refreshBarFillC:S.prefs.theme==='Ultra'?'#5B1A1A':'#eef0f2', startRefresh:()=>this.startRefresh(),
-      openWebApp:()=>this.openWebApp(),
       refreshBtnCursor:S.refreshing?'default':'pointer', refreshBtnBg:S.refreshing?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.03)', refreshBtnBd:S.refreshing?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)', refreshIconStroke:S.refreshing?'#FFFFFF':'#cfcfd4', refreshIconAnim:S.refreshing?'spin 1s linear infinite':'none',
       notifBtnBd:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.3)':'rgba(255,255,255,0.1)', notifBtnBg:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.06)':'rgba(255,255,255,0.03)', notifIconStroke:S.prefs.theme==='Ultra'?'#5B1A1A':'#cfcfd4',
       isPower:scene==='power',
