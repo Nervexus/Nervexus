@@ -307,6 +307,7 @@
 <script src="voice-assistant-engine.js"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
+<script src="constellation-engine.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -8470,6 +8471,21 @@
                 <div style="font-size:12px; color:#8a8a92; margin-top:3px; line-height:1.5;">Connect every service that powers briefings, voice &amp; analysis. Modular adapters &mdash; register a provider to add it, no core changes.</div>
               </div>
 
+              <!-- Provider constellation. Desktop only via cc-hide-mobile: 45 labelled nodes
+                   cannot be read on a phone, and the cards below carry the same information
+                   in a form that works there. -->
+              <div class="cc-glowcard cc-hide-mobile" style="position:relative; border-radius:16px; background:#0c0c0f; border:1px solid rgba(255,255,255,0.08); padding:0; margin-bottom:16px; overflow:hidden;">
+                <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
+                </div>
+                <div style="position:absolute; top:14px; right:18px; z-index:2; display:flex; gap:12px; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#c9a24a;">● AI</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5b8dd6;">● INTEL</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7ec9a0;">● NEWS</span>
+                </div>
+                <div data-constellation="1" style="width:100%; height:430px;"></div>
+              </div>
               <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
                 <sc-if value="{{ noConnections }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing connected yet — save a key and switch it on above.</div></sc-if>
@@ -8507,7 +8523,7 @@
               <sc-if value="{{ isProvAI }}" hint-placeholder-val="{{ true }}">
                 <div style="display:grid; grid-template-columns:1fr; max-width:460px; gap:12px;">
                   <sc-for list="{{ aiProviderCards }}" as="p" hint-placeholder-count="1">
-                    <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px;">
+                    <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
                       <div style="display:flex; align-items:center; gap:11px;">
                         <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
                         <div style="flex:1; min-width:0;">
@@ -8574,7 +8590,7 @@
               <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">Connected &amp; enabled sources are named to the live assistant so its answers cite and prioritize them.</div>
               <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <sc-for list="{{ newsSourceCards }}" as="p" hint-placeholder-count="6">
-                  <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px;">
+                  <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
                     <div style="display:flex; align-items:center; gap:11px;">
                       <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
                       <div style="flex:1; min-width:0;">
@@ -8609,7 +8625,7 @@
               <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">A reference directory by category — News, Markets, Economic, Crypto, Government, Business, Tech. This is not a live connection to any of these (most require enterprise licensing this app can't offer); toggling a source on just tells your AI Briefing to lean into that category. For a real, live-fetched connection, use News Source APIs below.</div>
               <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <sc-for list="{{ intelCards }}" as="p" hint-placeholder-count="6">
-                  <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px;">
+                  <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
                     <div style="display:flex; align-items:center; gap:11px;">
                       <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:{{ p.markText }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
                       <div style="flex:1; min-width:0;">
@@ -9012,7 +9028,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-150 · v11.150 import-units';
+const NOTIF_BUILD_VERSION = '2026.08.26-151 · v11.151 connection-map';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9237,7 +9253,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -9995,6 +10011,9 @@ activities: this._mergeShipLog(s.activities),
     const view=S.provView||'ai';
     return {
       isProvAI:view==='ai', isProvNews:view==='news', isProvRoute:view==='route', isProvIntel:view==='intel',
+      // Counts come from the same pass that built the constellation nodes, so the caption
+      // can never disagree with what the map is drawing.
+      constellationCaption:((this._constOnCount||0)+' LIVE / '+(this._constNodeCount||0)+' REGISTERED'),
       setProvViewAI:()=>this.setProvView('ai'), setProvViewNews:()=>this.setProvView('news'), setProvViewRoute:()=>this.setProvView('route'), setProvViewIntel:()=>this.setProvView('intel'),
       provViewAIc:view==='ai'?'#F4F4F5':'#9a9aa2', provViewAIbg:view==='ai'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewAIbd:view==='ai'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provViewNEc:view==='news'?'#F4F4F5':'#9a9aa2', provViewNEbg:view==='news'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewNEbd:view==='news'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
@@ -11469,6 +11488,38 @@ activities: this._mergeShipLog(s.activities),
   // 730KB three.js bundle plus a 2.1MB mesh the first time the Fitness page is opened, so it
   // never costs anything on any other screen. If WebGL is missing or either asset fails, the
   // drawn SVG figure stays visible and the feature still works — hence both mounts exist.
+  // Provider constellation. Mount is hidden below 900px by cc-hide-mobile, so clientWidth
+  // reads 0 there and we skip entirely rather than animating a canvas nobody can see.
+  _syncConstellation(){
+    const mount=this.root && this.root.querySelector('[data-constellation]');
+    const C=window.ProviderConstellation;
+    if(!C) return;
+    if(!mount || !mount.clientWidth){ if(C.isMounted()) C.destroy(); return; }
+    const PD=this._pd(); if(!PD) return;
+    const nodes=[];
+    (PD.AI_PROVIDERS||[]).forEach(p=>{ const c=this._provCfg(p.id); nodes.push({id:p.id, label:p.name, cat:'ai', on:!!(c.on && c.saved)}); });
+    (PD.INTEL_SOURCES||[]).forEach(x=>{ nodes.push({id:'intel:'+x.id, label:x.name, cat:'intel', on:!!this._intelCfg(x.id).on}); });
+    (PD.NEWS_SOURCES||[]).forEach(x=>{ const c=this._provCfg(x.id); nodes.push({id:'news:'+x.id, label:x.name, cat:'news', on:!!(c.on && c.saved)}); });
+    if(!C.isMounted()){
+      C.mount(mount, { onPick:(id)=>this._constellationPick(id) });
+    }
+    C.setNodes(nodes);
+    C.resize();
+    this._constNodeCount=nodes.length;
+    this._constOnCount=nodes.filter(n=>n.on).length;
+  }
+  // Clicking a node takes you to the card that actually controls it — the map is for seeing,
+  // the cards are for editing.
+  _constellationPick(id){
+    const raw=String(id||'').replace(/^(intel|news):/,'');
+    const view = id.indexOf('intel:')===0 ? 'intel' : (id.indexOf('news:')===0 ? 'news' : 'ai');
+    this.setState({provView:view}, ()=>{
+      setTimeout(()=>{
+        const card=this.root && this.root.querySelector('[data-prov-id="'+raw+'"]');
+        if(card && card.scrollIntoView) card.scrollIntoView({behavior:'smooth', block:'center'});
+      }, 60);
+    });
+  }
   _syncAnatomy(){
     if(!this.root) return;
     const svgMount=this.root.querySelector('[data-anatomy]');
@@ -12348,6 +12399,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this._syncVoiceOrbBounds();
     this._wireLessonCarousels();
     this._syncAnatomy();
+    this._syncConstellation();
     const key=(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode+'|'+this.state.moneyCalY;
     const sig=key+'|'+this.dataSig();
     if(sig===this._sig) return;
@@ -12984,6 +13036,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.151', date:'Aug 26, 2026', major:true, notes:[
+      'New Connection Map on the API page: every provider you have registered, drawn as a constellation around the app. It is not decoration \u2014 a provider that is saved and switched on gets a lit node and a solid line, one you have never touched gets a dim dot and a dashed one, and the colour says whether it is AI, intel or news. Click any node to jump to the card that controls it.',
+      'Desktop only, deliberately. Forty-odd labelled nodes cannot be read on a phone without pinching around, and the cards underneath already tell you the same thing in a form that works at that width.',
+      'The provider cards are untouched \u2014 the map is for seeing what is connected, the cards are still where you paste a key and switch things on.',
+    ]},
     {version:'v11.150', date:'Aug 26, 2026', major:true, notes:[
       'Bulk import was reading pounds as kilograms. It recognised lb, lbs and pounds well enough to accept the line, then threw the unit away and filed everything as kg \u2014 so \u201cBench 225 lbs x3\u201d was stored as 225 kg. That is a 2.2x overstatement, and it fed straight into your training volume, the Physical Strength attribute and Power Level. All three places that build a row now keep the unit you typed.',
       'A bare set line under an exercise heading, like \u201c8x135 lbs\u201d, was worse: its unit was not even read. That is fixed too, and kilograms, kilogram spellings and bodyweight all still work.',
