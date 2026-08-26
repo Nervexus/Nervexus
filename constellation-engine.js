@@ -20,7 +20,11 @@
   var S = {
     el: null, cv: null, ctx: null, raf: null, dpr: 1,
     w: 0, h: 0, nodes: [], stars: [], motes: [],
-    hover: null, t0: 0, onPick: null, reduced: false
+    hover: null, t0: 0, onPick: null, reduced: false,
+    // View transform: pan offset in screen px, k = zoom. Nodes are laid out once in world
+    // space and this is applied at draw time, so panning never re-runs layout or the label
+    // relaxation — those stay stable while you move around.
+    vx: 0, vy: 0, k: 1, drag: null
   };
 
   /* Palette sampled from the reference rather than guessed. Cropping to the nebula and
@@ -132,11 +136,11 @@
         r: rand(0.3, 1.15), a: rand(0.10, 0.5), tw: rand(0.4, 1.7), ph: rand(0, 6.28)
       });
     }
-    /* The core. Same idea as the voice orb: a cloud of coloured motes on slow orbits, which
-       reads as a nebula in aggregate without any blur filter (those are the expensive part
-       on a weak GPU). */
+    /* No mote cloud any more — the host mounts the app's actual voice-assistant orb over the
+       centre of this canvas, so the core is the same object that appears on the voice screen
+       rather than a lookalike. All that is left here is the glow it sits inside. */
     S.motes = [];
-    var m = 620, pal = ['#FF5FA8', '#F2793C', '#F23C5E', '#FF9ECF', '#FFB347', '#4DA3FF', '#C86BFF'];
+    var m = 0, pal = ['#FF5FA8', '#F2793C', '#F23C5E', '#FF9ECF', '#FFB347', '#4DA3FF', '#C86BFF'];
     for (var j = 0; j < m; j++) {
       S.motes.push({
         a: rand(0, 6.28), r: Math.pow(Math.random(), 0.55) * Math.min(S.w, S.h) * 0.155,
@@ -164,6 +168,9 @@
     relaxLabels();
   }
 
+  function toScreen(x, y) { return { x: (x - S.w / 2) * S.k + S.w / 2 + S.vx, y: (y - S.h / 2) * S.k + S.h / 2 + S.vy }; }
+  function toWorld(x, y)  { return { x: (x - S.w / 2 - S.vx) / S.k + S.w / 2, y: (y - S.h / 2 - S.vy) / S.k + S.h / 2 }; }
+
   function draw(ts) {
     if (!S.ctx) return;
     var ctx = S.ctx, t = (ts - S.t0) / 1000;
@@ -180,6 +187,13 @@
       ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
     }
     ctx.globalAlpha = 1;
+
+    // Everything from here on is in world space, so panning and zooming move the whole
+    // constellation together. The starfield above stays put, which reads as depth.
+    ctx.save();
+    ctx.translate(S.w / 2 + S.vx, S.h / 2 + S.vy);
+    ctx.scale(S.k, S.k);
+    ctx.translate(-S.w / 2, -S.h / 2);
 
     // core glow, painted as stacked translucent discs rather than a shadow blur
     var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(S.w, S.h) * 0.22);
@@ -258,11 +272,13 @@
       ctx.fillText(nd.label, lx, ly);
     }
 
+    ctx.restore();
     S.raf = requestAnimationFrame(draw);
   }
 
-  function pick(mx, my) {
-    var best = null, bd = 22 * 22;
+  function pick(sx, sy) {
+    var p = toWorld(sx, sy), mx = p.x, my = p.y;
+    var best = null, bd = (22 / S.k) * (22 / S.k);
     for (var i = 0; i < S.nodes.length; i++) {
       var n = S.nodes[i];
       if (n.x == null) continue;
@@ -294,20 +310,54 @@
 
       cv.addEventListener('mousemove', function (e) {
         var r = cv.getBoundingClientRect();
-        var n = pick(e.clientX - r.left, e.clientY - r.top);
-        if (n !== S.hover) { S.hover = n; cv.style.cursor = n ? 'pointer' : 'default'; }
+        var mx = e.clientX - r.left, my = e.clientY - r.top;
+        if (S.drag) {
+          S.vx = S.drag.vx + (mx - S.drag.x);
+          S.vy = S.drag.vy + (my - S.drag.y);
+          if (Math.abs(mx - S.drag.x) + Math.abs(my - S.drag.y) > 4) S.drag.moved = true;
+          return;
+        }
+        var n = pick(mx, my);
+        if (n !== S.hover) { S.hover = n; cv.style.cursor = n ? 'pointer' : 'grab'; }
+      });
+      cv.addEventListener('mousedown', function (e) {
+        var r = cv.getBoundingClientRect();
+        S.drag = { x: e.clientX - r.left, y: e.clientY - r.top, vx: S.vx, vy: S.vy, moved: false };
+        cv.style.cursor = 'grabbing';
+      });
+      window.addEventListener('mouseup', function () {
+        if (S.drag) { S.dragEnded = S.drag.moved; S.drag = null; }
+        if (S.cv) S.cv.style.cursor = S.hover ? 'pointer' : 'grab';
       });
       cv.addEventListener('mouseleave', function () { S.hover = null; });
       cv.addEventListener('click', function (e) {
+        // A drag that happens to end on a node should not count as selecting it.
+        if (S.dragEnded) { S.dragEnded = false; return; }
         var r = cv.getBoundingClientRect();
         var n = pick(e.clientX - r.left, e.clientY - r.top);
         if (n && S.onPick) S.onPick(n.id, n.cat);
       });
+      cv.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        var r = cv.getBoundingClientRect();
+        var mx = e.clientX - r.left, my = e.clientY - r.top;
+        var before = toWorld(mx, my);
+        var k = S.k * (e.deltaY < 0 ? 1.12 : 1 / 1.12);
+        S.k = Math.max(0.45, Math.min(3.2, k));
+        // Keep the point under the cursor pinned while zooming.
+        var after = toWorld(mx, my);
+        S.vx += (after.x - before.x) * S.k;
+        S.vy += (after.y - before.y) * S.k;
+        if (S.onView) S.onView();
+      }, { passive: false });
+      cv.addEventListener('dblclick', function () { API.resetView(); });
+      cv.style.cursor = 'grab';
 
       S._onResize = function () { API.resize(); };
       window.addEventListener('resize', S._onResize);
 
       S.w = 0; S.h = 0;
+      S.vx = 0; S.vy = 0; S.k = 1;
       resize();
       S.t0 = performance.now();
       if (!S.raf) S.raf = requestAnimationFrame(draw);
@@ -330,6 +380,10 @@
     },
 
     resize: function () { resize(); },
+    resetView: function () { S.vx = 0; S.vy = 0; S.k = 1; if (S.onView) S.onView(); },
+    // The host needs these to keep the orb element parked over the world-space centre.
+    getView: function () { return { x: S.vx, y: S.vy, k: S.k }; },
+    onViewChange: function (fn) { S.onView = fn; },
     isMounted: function () { return !!(S.cv && S.el && S.el.isConnected); },
     destroy: function () {
       if (S.raf) { cancelAnimationFrame(S.raf); S.raf = null; }

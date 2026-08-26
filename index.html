@@ -87,6 +87,13 @@
   /* One logo layout for every raiment, so the home screen reads as the same brand whichever
      style is on: same ring, same mark, same spacing. Each style sets only the colour, inline.
      Noir used to draw a 60px ring with a 28px mark and the light styles had no mark at all. */
+  /* API page runs on the constellation's ground rather than the app's usual grey, so the map
+     is not a black rectangle sitting on a lighter page. The map panel keeps its own darker
+     fill; every other card on the page is lifted just enough off the ground to read as a card. */
+  .cc-api-dark{ background:#05030A; border-radius:18px; padding:14px 14px 6px; margin:-6px -6px 0; }
+  .cc-api-dark .cc-glowcard{ background:#0C0A12 !important; border-color:rgba(255,255,255,0.075) !important; }
+  .cc-api-dark .cc-glowcard[style*="#05030A"]{ background:#05030A !important; }
+  .cc-api-dark input, .cc-api-dark select, .cc-api-dark textarea{ background:rgba(255,255,255,0.035) !important; }
   .cc-home-logo{ width:96px; height:96px; margin:0 auto 12px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; flex:0 0 auto; overflow:hidden; }
   /* favicon.png is 1024px square but the visible laurel only fills the middle 50% of it, and
      sits high — its centre is at 42% of the height, not 50%. Dropped in at its natural size
@@ -8466,6 +8473,7 @@
             </sc-if>
 
             <sc-if value="{{ tabAI }}" hint-placeholder-val="{{ false }}">
+              <div class="cc-api-dark">
               <div style="margin-bottom:16px;">
                 <div style="font-size:16px; font-weight:700; color:#eef0f2;">AI &amp; Intelligence Hub</div>
                 <div style="font-size:12px; color:#8a8a92; margin-top:3px; line-height:1.5;">Connect every service that powers briefings, voice &amp; analysis. Modular adapters &mdash; register a provider to add it, no core changes.</div>
@@ -8487,6 +8495,11 @@
                   <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7ec9a0;">● NEWS</span>
                 </div>
                 <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
+                <!-- The real voice-assistant orb, parked over the canvas centre and moved by
+                     the same pan/zoom transform the constellation uses. pointer-events:none so
+                     dragging still grabs the map underneath it. -->
+                <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
+                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO PAN · SCROLL TO ZOOM · DOUBLE-CLICK TO RESET</div>
               </div>
               <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
@@ -8663,6 +8676,7 @@
               </sc-if>
 
               <div style="margin-top:16px; font-size:11px; color:#6f6f78; display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><span style="color:#ffd66b;">&#9888;</span><span>Paste a key and hit Connect &mdash; it's validated against the real provider and saved server-side in one step. Keys are masked here and never shown again.</span></div>
+              </div>
             </sc-if>
 
             <sc-if value="{{ tabPerf }}" hint-placeholder-val="{{ false }}">
@@ -9030,7 +9044,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-152 · v11.152 map-full-bleed';
+const NOTIF_BUILD_VERSION = '2026.08.26-153 · v11.153 map-navigable';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11496,7 +11510,7 @@ activities: this._mergeShipLog(s.activities),
     const mount=this.root && this.root.querySelector('[data-constellation]');
     const C=window.ProviderConstellation;
     if(!C) return;
-    if(!mount || !mount.clientWidth){ if(C.isMounted()) C.destroy(); return; }
+    if(!mount || !mount.clientWidth){ if(C.isMounted()) this._unmountConstellation(); return; }
     const PD=this._pd(); if(!PD) return;
     const nodes=[];
     (PD.AI_PROVIDERS||[]).forEach(p=>{ const c=this._provCfg(p.id); nodes.push({id:p.id, label:p.name, cat:'ai', on:!!(c.on && c.saved)}); });
@@ -11504,6 +11518,16 @@ activities: this._mergeShipLog(s.activities),
     (PD.NEWS_SOURCES||[]).forEach(x=>{ const c=this._provCfg(x.id); nodes.push({id:'news:'+x.id, label:x.name, cat:'news', on:!!(c.on && c.saved)}); });
     if(!C.isMounted()){
       C.mount(mount, { onPick:(id)=>this._constellationPick(id) });
+      C.onViewChange(()=>this._placeConstellationOrb());
+      // The map redraws every frame but the view only changes on drag/zoom, so the orb is
+      // repositioned from those events plus one rAF loop while a drag is in flight.
+      const follow=()=>{ if(!C.isMounted()){ this._constOrbRaf=null; return; } this._placeConstellationOrb(); this._constOrbRaf=requestAnimationFrame(follow); };
+      if(!this._constOrbRaf) this._constOrbRaf=requestAnimationFrame(follow);
+    }
+    const orbEl=this.root.querySelector('[data-constellation-orb]');
+    if(orbEl && window.OrbEngine && !this._constOrbApi){
+      const pal=this._orbPalette();
+      this._constOrbApi=window.OrbEngine.mount(orbEl, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, dimMul:1, hoverIntensity:0, rotateOnHover:false, forceHoverState:false});
     }
     C.setNodes(nodes);
     C.resize();
@@ -11512,6 +11536,19 @@ activities: this._mergeShipLog(s.activities),
   }
   // Clicking a node takes you to the card that actually controls it — the map is for seeing,
   // the cards are for editing.
+  // Keeps the orb element centred on the constellation's world origin under pan and zoom, so
+  // it behaves like part of the scene rather than a badge stuck to the middle of the panel.
+  _placeConstellationOrb(){
+    const C=window.ProviderConstellation, el=this.root && this.root.querySelector('[data-constellation-orb]');
+    if(!C || !el || !C.isMounted()) return;
+    const v=C.getView();
+    el.style.transform='translate('+v.x+'px,'+v.y+'px) scale('+v.k+')';
+  }
+  _unmountConstellation(){
+    if(this._constOrbRaf){ cancelAnimationFrame(this._constOrbRaf); this._constOrbRaf=null; }
+    if(this._constOrbApi){ try{ this._constOrbApi.destroy(); }catch(e){} this._constOrbApi=null; }
+    if(window.ProviderConstellation) window.ProviderConstellation.destroy();
+  }
   _constellationPick(id){
     const raw=String(id||'').replace(/^(intel|news):/,'');
     const view = id.indexOf('intel:')===0 ? 'intel' : (id.indexOf('news:')===0 ? 'news' : 'ai');
@@ -13038,6 +13075,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.153', date:'Aug 26, 2026', major:true, notes:[
+      'You can move around inside the Connection Map now. Drag to pan, scroll to zoom \u2014 zoom holds whatever is under the pointer in place, so you can lean into a cluster rather than watching it slide away \u2014 and double-click to snap back. A drag that happens to finish on a node no longer counts as clicking it.',
+      'The core is the real voice-assistant orb, not a lookalike. The same object from the voice screen sits at the centre of the map and moves and scales with everything else, in whatever colours your current raiment uses.',
+      'The black now carries through the whole API page rather than stopping at the edge of the map, so the map is no longer a dark rectangle on a lighter page. Cards sit just off that ground so they still read as cards.',
+    ]},
     {version:'v11.152', date:'Aug 26, 2026', notes:[
       'Connection Map is now the API page rather than a panel on it \u2014 full width, and as tall as the window allows, so opening the page opens the map. The cards are still there, one scroll down.',
       'Colours corrected. The first pass was muted gold, steel and sage, which had the right shape in the wrong key. Sampling the reference \u2014 cropping to the core and sorting saturated pixels by hue \u2014 gave roughly 40% warm red and orange, 40% rose through magenta, a thin seam of blue, all over a near-black ground. The core now runs on that palette and the ground is the same near-black.',
