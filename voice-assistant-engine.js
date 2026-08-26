@@ -50,9 +50,15 @@
       run: async function (a, host) { var d = host.tools.doneToday(); var parts = []; if (d.tasks.length) parts.push(d.tasks.length + ' task' + (d.tasks.length === 1 ? '' : 's') + ' completed: ' + d.tasks.join(', ')); if (d.missions.length) parts.push(d.missions.length + ' mission' + (d.missions.length === 1 ? '' : 's') + ' completed today: ' + d.missions.join(', ')); return parts.length ? parts.join('. ') + '.' : 'Nothing marked complete yet.'; } },
     { name: 'training_done_today', desc: 'Report workouts/training logged today.', params: 'none',
       run: async function (a, host) { var done = host.tools.trainingToday(); return done.length ? ('Training completed today: ' + done.join(', ') + '.') : 'No training logged today yet.'; } },
-    { name: 'read_source', desc: 'Read a report aloud.', params: 'id (one of: exec, brief, notif, schedule, fitness, money, business)',
+    { name: 'daily_briefing', desc: 'Give the user\u2019s daily briefing: today\u2019s schedule, open tasks/missions, sleep & hydration, and this month\u2019s income/expenses \u2014 use this for "what\u2019s my briefing", "brief me", "what\u2019s on today", "catch me up".', params: 'none',
       run: async function (a, host) {
-        var titles = { exec: 'Executive Briefing', brief: 'Daily Briefing', notif: 'Notifications', schedule: 'Schedule & Reminders', fitness: 'Fitness & Recovery', money: 'Markets & Money', business: 'Business Report' };
+        host.say('Here is your briefing\u2026');
+        host.tools.readSource('brief', 'Daily Briefing');
+        return null; // readSource speaks the briefing itself
+      } },
+    { name: 'read_source', desc: 'Read a specific report aloud (not the daily briefing \u2014 use daily_briefing for that).', params: 'id (one of: exec, notif, schedule, fitness, money, business)',
+      run: async function (a, host) {
+        var titles = { exec: 'Executive Briefing', notif: 'Notifications', schedule: 'Schedule & Reminders', fitness: 'Fitness & Recovery', money: 'Markets & Money', business: 'Business Report' };
         host.say('Reading your ' + (titles[a.id] || a.id) + '\u2026');
         host.tools.readSource(a.id, titles[a.id] || a.id);
         return null; // readSource speaks the source itself
@@ -150,8 +156,12 @@
   // ---- Fast offline fallback (no provider connected, or planning failed) ---
   var FALLBACK_INTENTS = [
     { re: /^(?:please )?remember(?: that)?\s+(.+)/i, run: function (m, host) { return toolByName('remember_fact').run({ fact: m[1].trim() }, host); } },
-    { re: /what.?s? (the )?time|current time|time is it/i, run: function () { return 'It\u2019s ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '.'; } },
-    { re: /what.?s? (today.?s |the )?date|what day is it/i, run: function () { return 'Today is ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '.'; } },
+    // Covers "what's/whats/what is the time", "what time is it", "current time" \u2014 the old
+    // regex only matched a bare "'s" contraction, so "what IS the time" (a very common
+    // phrasing, typed or from speech-to-text) fell through to needing an AI provider for
+    // something that was always meant to work offline.
+    { re: /what(?:'?s|\s+is)?\s+(?:the\s+)?time|current time|time is it/i, run: function () { return 'It\u2019s ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) + '.'; } },
+    { re: /what(?:'?s|\s+is)?\s+(?:today(?:'?s)?\s+|the\s+)?date|what day is it|current date/i, run: function () { return 'Today is ' + new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '.'; } },
     { re: /\bhello|\bhi\b|\bhey\b|good morning|good evening/i, run: function () { return 'Hello. I\u2019m your command assistant.'; } },
     { re: /^(?:add|create)\s+(?:a\s+)?(?:task|to.?do)\s*(?:to (?:my )?(?:list|checklist))?[:,]?\s+(.+)/i, run: function (m, host) { return toolByName('add_task').run({ label: m[1].trim().replace(/[.!?]+$/, '') }, host); } },
     { re: /^remind me to\s+(.+)/i, run: function (m, host) { return toolByName('add_task').run({ label: m[1].trim().replace(/[.!?]+$/, '') }, host); } }
@@ -174,23 +184,35 @@
   async function handle(raw, host) {
     var t = (raw || '').trim();
     if (!t) return;
-    var fast = await matchFastIntent(t, host);
-    if (fast) { host.speak(fast); return; }
-    if (host.hasGeneralProvider()) {
-      var plan = await planWithLLM(t, host);
-      if (plan) {
-        var tool = toolByName(plan.tool);
-        var out = await tool.run(plan.args || {}, host);
-        if (out) host.speak(out);
+    // Everything below is wrapped in one try/catch \u2014 a tool that throws (missing host
+    // method, network failure, bad app state) used to become an unhandled promise
+    // rejection: the assistant would sometimes still speak a canned "Logged."/"Done."
+    // reply from the tool's own return statement being skipped mid-throw, or just go
+    // silent with no visible error. Now any failure gets an honest spoken reply instead
+    // of a false success or dead air \u2014 this is a safety net, not a fix for the underlying
+    // bug (host.tools.* not existing as real methods is fixed on the app side), but it
+    // means a *future* wiring mistake here fails loudly to the user instead of silently.
+    try {
+      var fast = await matchFastIntent(t, host);
+      if (fast) { host.speak(fast); return; }
+      if (host.hasGeneralProvider()) {
+        var plan = await planWithLLM(t, host);
+        if (plan) {
+          var tool = toolByName(plan.tool);
+          var out = await tool.run(plan.args || {}, host);
+          if (out) host.speak(out);
+          return;
+        }
+        // planning failed to parse \u2014 treat directly as a live/general question
+        var isLive = /^(what|who|when|where|why|how|which|is|are|does|do|can)\b/i.test(t) || /\?\s*$/.test(t) || /\b(news|latest|today.?s|current|price of|weather|happening|score)\b/i.test(t);
+        var out2 = await (isLive ? toolByName('live_question') : toolByName('chat')).run(isLive ? { query: t } : { query: t, reply: '' }, host);
+        if (out2) host.speak(out2);
         return;
       }
-      // planning failed to parse \u2014 treat directly as a live/general question
-      var isLive = /^(what|who|when|where|why|how|which|is|are|does|do|can)\b/i.test(t) || /\?\s*$/.test(t) || /\b(news|latest|today.?s|current|price of|weather|happening|score)\b/i.test(t);
-      var out2 = await (isLive ? toolByName('live_question') : toolByName('chat')).run(isLive ? { query: t } : { query: t, reply: '' }, host);
-      if (out2) host.speak(out2);
-      return;
+      host.speak('I need an AI provider connected to help with that \u2014 add one in Settings \u2192 AI Providers.');
+    } catch (e) {
+      host.speak('Sorry \u2014 that didn\u2019t go through. Please try again, or use the screen directly.');
     }
-    host.speak('I need an AI provider connected to help with that \u2014 add one in Settings \u2192 AI Providers.');
   }
 
   root.VoiceAssistant = { handle: handle, TOOLS: TOOLS };

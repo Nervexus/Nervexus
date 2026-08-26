@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us — Nervexus</title>
+<meta name="description" content="Nervexus is a private, self-improvement command centre — one system built to run and improve every part of your life. Built and run by one person.">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .values{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:20px; }
+  .values-5{ grid-template-columns:repeat(5,1fr); }
+  @media (max-width:1100px){ .values-5{ grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); } }
+  .value-card{
+    position:relative; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height:300px; padding:32px 28px;
+    border-radius:28px; border:1px solid var(--line2);
+    background-image:linear-gradient(160deg, var(--vc1) 0%, var(--vc2) 100%);
+  }
+  .value-card .num{
+    position:relative; z-index:1;
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:1px; color:var(--muted2);
+    margin-bottom:26px;
+  }
+  .value-card .glyph{ position:relative; z-index:1; font-size:32px; color:var(--maroon); margin-bottom:auto; }
+  .value-card h3{
+    position:relative; z-index:1;
+    font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; color:var(--ink);
+    font-size:21px; margin-bottom:10px; letter-spacing:.2px;
+  }
+  .value-card p{ position:relative; z-index:1; font-size:14px; color:var(--muted); line-height:1.65; }
+
+  /* ---- scroll-morph hero (18 real provider cards, circle -> arc, driven by real page scroll) ---- */
+  .morph-hero-scroll{ position:relative; height:240vh; }
+  .morph-hero{
+    position:sticky; top:0; height:100vh; min-height:560px; overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--bg);
+  }
+  .morph-intro-text, .morph-arc-text{
+    position:absolute; z-index:2; text-align:center; max-width:420px; padding:0 24px;
+    opacity:0; transition:opacity .6s ease; pointer-events:none;
+  }
+  .morph-intro-text.mh-show, .morph-arc-text.mh-show{ opacity:1; }
+  .morph-intro-text{ top:50%; transform:translateY(-50%); }
+  .morph-arc-text{ top:14%; }
+  .morph-intro-text h1{
+    font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300;
+    font-size:clamp(26px,3.2vw,38px); letter-spacing:.3px; line-height:1.15; color:var(--ink);
+    margin:0 0 14px;
+  }
+  .morph-intro-text h1 .accent{
+    background:linear-gradient(120deg,var(--maroon) 0%,var(--gold) 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .morph-intro-text p{ font-size:13.5px; color:var(--muted); line-height:1.55; }
+  .morph-arc-text h2{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:clamp(22px,3vw,30px); color:var(--ink); margin-bottom:10px; }
+  .morph-arc-text p{ font-size:13.5px; color:var(--muted); line-height:1.55; }
+  .mh-hint{ font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:var(--maroon); margin-top:16px; }
+
+  .morph-cards{ position:relative; width:100%; height:100%; }
+  .mh-card{
+    position:absolute; top:50%; left:50%; width:46px; height:46px; margin:-23px 0 0 -23px;
+    will-change:transform, opacity; opacity:0;
+    transition:transform .05s linear, opacity .4s ease;
+    cursor:pointer;
+  }
+  .mh-card-inner{
+    position:relative; width:100%; height:100%; transform-style:preserve-3d;
+    transition:transform .6s cubic-bezier(.2,.8,.2,1);
+  }
+  .mh-card:hover .mh-card-inner{ transform:rotateY(180deg); }
+  .mh-front, .mh-back{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line2); box-shadow:0 10px 24px -10px rgba(41,37,36,0.25);
+  }
+  .mh-front{ background:var(--card); }
+  .mh-mark{
+    width:36px; height:36px; border-radius:9px;
+    -webkit-mask-size:56% 56%; mask-size:56% 56%;
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    -webkit-mask-position:center; mask-position:center;
+  }
+  .mh-mark-text{
+    -webkit-mask-image:none; mask-image:none;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700;
+  }
+  .mh-mark-text.mh-mark-dark{ color:var(--ink); }
+  .mh-back{ background:var(--maroon); transform:rotateY(180deg); }
+  @media (max-width:760px){
+    .morph-hero-scroll{ height:auto; }
+    .morph-cards{ display:none; }
+    .morph-hero{ position:relative; top:auto; height:auto; min-height:0; padding:160px 0 100px; }
+    .morph-intro-text{ position:relative; top:auto; transform:none; opacity:1; max-width:520px; }
+    .morph-arc-text{ display:none; }
+  }
+
+  /* ---- stacked story cards (fold into each other on scroll) ---- */
+  .stack-cards{ max-width:1000px; margin:0 auto; padding:20px 24px 30vh; position:relative; }
+  .stack-card{
+    position:sticky;
+    display:grid; grid-template-columns:220px 1fr; gap:40px; align-items:center;
+    background:#fff; border:1px solid var(--line2); border-radius:28px;
+    padding:44px 48px; margin-bottom:28px;
+  }
+  .stack-card:nth-child(1){ top:96px; }
+  .stack-card:nth-child(2){ top:120px; }
+  .stack-card:nth-child(3){ top:144px; }
+  .stack-card:nth-child(4){ top:168px; }
+  .stack-card-visual{
+    aspect-ratio:1/1; border-radius:20px; position:relative; overflow:hidden;
+    border:1px solid var(--line2); background:var(--bg2);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stack-card-visual .glow{ position:absolute; inset:-30%; filter:blur(50px); opacity:0.5; }
+  .stack-card-visual .glyph{ position:relative; z-index:1; font-size:44px; opacity:0.92; color:var(--maroon); }
+  .stack-card-text .kicker{ font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:var(--muted2); margin-bottom:12px; }
+  .stack-card-text .crest-divider{ justify-content:flex-start; margin:0 0 16px; }
+  .stack-card-text .crest-divider span{ width:32px; }
+  .stack-card-text h3{ font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; color:var(--ink); font-size:clamp(24px,3vw,32px); letter-spacing:.2px; margin-bottom:14px; line-height:1.3; }
+  .stack-card-text p{ font-size:15px; color:var(--muted); line-height:1.7; }
+  @media (max-width:760px){
+    .stack-card{ grid-template-columns:1fr; position:relative !important; top:auto !important; padding:32px 28px; }
+    .stack-card-visual{ aspect-ratio:16/9; }
+  }
+</style>
+<script>
+/* Set before first paint so the reveal animation has no flash of visible content. The
+   watchdog is the safety net: if main.js has not confirmed the observer is running within
+   3s - blocked, errored, or never arrived - the hiding is dropped so the page is readable. */
+(function(){var d=document.documentElement;d.className+=' js-reveal';
+setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.className.replace(' js-reveal','');},3000);})();
+</script>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand"><img class="brand-mark" src="favicon.png" alt="Nervexus">Nervexus</div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="about.html" class="nav-link active">About Us</a>
+      <a href="ultra-x.html" class="nav-link">Ultra X</a>
+    </nav>
+    <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mobileNav"><span></span><span></span><span></span></button>
+    <a class="nav-login" href="https://nervexus.vercel.app">Log In</a>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html">Home</a>
+    <a href="about.html" class="is-here">About Us</a>
+    <a href="ultra-x.html">Ultra X</a>
+  </div>
+</header>
+
+<div class="morph-hero-scroll" id="morphHeroScroll">
+  <section class="morph-hero" id="morphHero">
+    <div class="morph-intro-text mh-show" id="morphIntroText">
+      <div class="eyebrow"><span class="eyebrow-dot"></span>OUR STORY</div>
+      <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+      <h1>Your life shouldn't run<br>on <span class="accent">six different apps.</span></h1>
+      <p>Nervexus is a private, self-improvement command centre — one system built to run and improve every part of your life, not just track it.</p>
+      <div class="mh-hint">SCROLL TO EXPLORE</div>
+    </div>
+    <div class="morph-arc-text" id="morphArcText">
+      <h2>Every part of it, real and connected.</h2>
+      <p>The actual AI and data providers running underneath Nervexus — not filler, not a mockup.</p>
+    </div>
+    <div class="morph-cards" id="morphCards"></div>
+  </section>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="section-label reveal">◆ WHY IT EXISTS</div>
+    <div class="section-title reveal">Built out of necessity, not ambition.</div>
+    <div class="section-sub reveal">Six different apps, none of them talking to each other — so it got built instead.</div>
+  </div>
+
+  <div class="stack-cards">
+    <div class="stack-card">
+      <div class="stack-card-visual">
+        <div class="glow" style="background:radial-gradient(circle,#8B2A2A,transparent 70%);"></div>
+        <span class="glyph">◇</span>
+      </div>
+      <div class="stack-card-text">
+        <div class="kicker">THE PROBLEM</div>
+        <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+        <h3>Managing life one app at a time</h3>
+        <p>Daily briefings in one place, learning progress in another, training logged somewhere else entirely, money tracked nowhere consistent. Nothing carried over.</p>
+      </div>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-visual">
+        <div class="glow" style="background:radial-gradient(circle,#6B2D4A,transparent 70%);"></div>
+        <span class="glyph">⬡</span>
+      </div>
+      <div class="stack-card-text">
+        <div class="kicker">THE BREAKING POINT</div>
+        <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+        <h3>Nothing talked to each other</h3>
+        <p>Six different apps, six different logins, six separate silos of data — none of them aware the others existed. Every part of life managed in isolation.</p>
+      </div>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-visual">
+        <div class="glow" style="background:radial-gradient(circle,#C9A55C,transparent 70%);"></div>
+        <span class="glyph">✦</span>
+      </div>
+      <div class="stack-card-text">
+        <div class="kicker">THE BUILD</div>
+        <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+        <h3>Built out of necessity</h3>
+        <p>Not a startup pitch, not a product to sell — just one person building the system they actually needed, one page at a time.</p>
+      </div>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-visual">
+        <div class="glow" style="background:radial-gradient(circle,#5B1A1A,transparent 70%);"></div>
+        <span class="glyph">◆</span>
+      </div>
+      <div class="stack-card-text">
+        <div class="kicker">NOW</div>
+        <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+        <h3>One platform, everything included</h3>
+        <p>Daily briefings, self-improvement lessons, a fitness centre, finance tracking, and more — all under one system, so the whole picture is always there, not scattered.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="statement reveal">
+    <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+    <p>Most apps manage one part of your life.<br>Nervexus connects them.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label reveal">◆ WHO IT'S FOR</div>
+    <div class="section-title reveal">Built for people who take their life seriously.</div>
+    <div class="section-sub reveal">Not everyone needs a system like this. If any of the below sounds like you, it probably does.</div>
+    <div class="values">
+      <div class="value-card reveal" style="--vc1:rgba(91,26,26,0.09); --vc2:rgba(91,26,26,0.02);">
+        <div class="num">( 01 )</div>
+        <div class="glyph">◆</div>
+        <h3>Better organisation</h3>
+        <p>Everything that matters, tracked in one place instead of scattered across a dozen apps and notebooks.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(201,165,92,0.16); --vc2:rgba(201,165,92,0.03);">
+        <div class="num">( 02 )</div>
+        <div class="glyph">◈</div>
+        <h3>Ambitious people</h3>
+        <p>Built for people pushing toward something specific, not just getting through the day.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(139,42,42,0.10); --vc2:rgba(139,42,42,0.02);">
+        <div class="num">( 03 )</div>
+        <div class="glyph">✦</div>
+        <h3>Fitness-focused people</h3>
+        <p>Real training volume, recovery, and nutrition tracking — not a step counter.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(107,45,74,0.10); --vc2:rgba(107,45,74,0.02);">
+        <div class="num">( 04 )</div>
+        <div class="glyph">◇</div>
+        <h3>Everything in one system</h3>
+        <p>If switching between apps to run your life sounds exhausting, this is built for exactly that problem.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-label reveal">◆ THE PHILOSOPHY</div>
+    <div class="section-title reveal">Five principles, no exceptions.</div>
+    <div class="section-sub reveal">What Nervexus is actually built around.</div>
+    <div class="values values-5">
+      <div class="value-card reveal" style="--vc1:rgba(91,26,26,0.09); --vc2:rgba(91,26,26,0.02);">
+        <div class="num">( 01 )</div>
+        <div class="glyph">◆</div>
+        <h3>Privacy</h3>
+        <p>A personal system, not a product sold to advertisers. What goes in stays yours.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(201,165,92,0.16); --vc2:rgba(201,165,92,0.03);">
+        <div class="num">( 02 )</div>
+        <div class="glyph">◈</div>
+        <h3>Ownership</h3>
+        <p>Your data, your progress, your history — none of it belongs to anyone else.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(139,42,42,0.10); --vc2:rgba(139,42,42,0.02);">
+        <div class="num">( 03 )</div>
+        <div class="glyph">✦</div>
+        <h3>Discipline</h3>
+        <p>Performance Terminal exists to hold you to what you actually said you'd do — not just log it.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(107,45,74,0.10); --vc2:rgba(107,45,74,0.02);">
+        <div class="num">( 04 )</div>
+        <div class="glyph">◇</div>
+        <h3>Simplicity</h3>
+        <p>Built one page at a time. No unnecessary features, no half-finished corners.</p>
+      </div>
+      <div class="value-card reveal" style="--vc1:rgba(74,46,38,0.09); --vc2:rgba(74,46,38,0.02);">
+        <div class="num">( 05 )</div>
+        <div class="glyph">❦</div>
+        <h3>Everything connected</h3>
+        <p>Every module feeds the others — nothing lives on its own island.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="statement reveal">
+    <div class="section-label reveal" style="margin-bottom:20px;">◆ WHERE THIS IS GOING</div>
+    <p>Eventually, Nervexus becomes the one system a life actually runs through — not a dashboard you check, but the thing that quietly knows what's happening in every part of your day and helps you act on it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="cta-band reveal">
+    <div class="crest-divider"><span></span><i>❦</i><span></span></div>
+    <h2>See it for yourself.</h2>
+    <p>Nervexus is a private system — log in to pick up where you left off.</p>
+    <a class="btn btn-primary" href="https://nervexus.vercel.app">Log In to Nervexus →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="brand"><img class="brand-mark" src="favicon.png" alt="Nervexus">Nervexus</div>
+    <div class="foot-note">Personal project · Built and run by one person</div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="morph-hero.js"></script>
+
+</body>
+</html>

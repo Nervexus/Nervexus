@@ -23,19 +23,37 @@
 (function (root) {
   'use strict';
 
-  // Simplified down to two supported providers per product decision — Claude for everything
-  // (chat, tutors, briefings, voice assistant) and Gemini specifically for live search (real-time
-  // travel data, safety checks) since it's the only one with a genuine free tier. No routing/
-  // failover/backup complexity. The other 8 adapters (OpenAI, xAI, Mistral, DeepSeek, OpenRouter,
-  // Together, Perplexity, Cohere) stay removed from this list for now, not deleted from the
-  // codebase — re-add an entry here to bring one back.
+  // Claude is the primary provider for everything (chat, tutors, briefings, voice assistant),
+  // Gemini adds live search (real-time travel data, safety checks) and a genuine free tier,
+  // and OpenAI is here specifically as a real backup — set it as your Backup provider and
+  // turn on Failover (Settings -> AI Providers -> Routing) so a Gemini outage/quota error
+  // falls through to it automatically instead of the assistant just failing. The remaining
+  // 7 adapters (xAI, Mistral, DeepSeek, OpenRouter, Together, Perplexity, Cohere) stay removed
+  // from this list for now, not deleted from the codebase — re-add an entry here to bring one back.
   var AI_PROVIDERS = [
     { id:'anthropic', name:'Anthropic (Claude)', mark:'AN', color:'#d97757', endpoint:'https://api.anthropic.com/v1',
       auth:'apikey', keyRe:'^sk-ant-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-ant-…', docs:'docs.anthropic.com',
-      usage:true, models:['claude-opus-4.5','claude-sonnet-4.5','claude-haiku-4.5'], defaultModel:'claude-sonnet-4.5' },
+      // Real, currently-live Anthropic model IDs (not the old placeholder-style "4.5" names
+      // with dots, which aren't valid API model slugs and would 404 if ever actually sent).
+      usage:true, models:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5-20251001'], defaultModel:'claude-sonnet-5',
+      freeTier:false, freeTierNote:'No free tier — billed per token from your first request. A new key gets a small one-time trial credit, then it’s pay-as-you-go.' },
     { id:'google', name:'Google Gemini', mark:'GE', color:'#4285f4', endpoint:'https://generativelanguage.googleapis.com/v1',
-      auth:'apikey', keyRe:'^AIza[A-Za-z0-9_\\-]{30,}$', keyHint:'AIza…', docs:'ai.google.dev',
-      usage:true, live:true, freeTier:true, models:['gemini-2.5-pro','gemini-2.5-flash','gemini-2.0-flash'], defaultModel:'gemini-2.5-flash' }
+      // Google now issues two live key formats — the older "AIza..." keys and newer ones
+      // starting "AQ." (seen from AI Studio in Aug 2026) — so this only sanity-checks length
+      // and character set instead of pinning to one prefix. The real check happens
+      // server-side against Google's own API when you hit Connect.
+      auth:'apikey', keyRe:'^[A-Za-z0-9_.\\-]{20,}$', keyHint:'AIza… or AQ….', docs:'ai.google.dev',
+      usage:true, live:true, freeTier:true, freeTierNote:'Free within Google’s generous daily rate limits — no card required to start. Also the only provider here with live web search built in.',
+      // Google retired the 2.5 line for new API keys in Aug 2026 ("no longer available to new
+      // users") — moved to the current Gemini 3 stable, no-billing-required Flash tier. Pro is
+      // deliberately left out: gemini-3.1-pro is preview-only and requires a paid Blaze plan,
+      // which would break the same way for anyone on the free tier this provider exists for.
+      models:['gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash-lite'], defaultModel:'gemini-3.6-flash' },
+    { id:'openai', name:'OpenAI (ChatGPT)', mark:'AI', color:'#10a37f', endpoint:'https://api.openai.com/v1',
+      // Covers both classic "sk-..." keys and newer project-scoped "sk-proj-..." keys.
+      auth:'apikey', keyRe:'^sk-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-… or sk-proj-…', docs:'platform.openai.com/docs',
+      usage:true, freeTier:false, freeTierNote:'No free tier — billed per token from your first request. Best used as a Backup provider (Routing below) so it only spends anything if your Default provider fails.',
+      models:['gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna'], defaultModel:'gpt-5.6-luna' }
   ];
 
   // category: News | Markets | Economic | Crypto | Government | Business | Tech

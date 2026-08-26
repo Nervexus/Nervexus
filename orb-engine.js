@@ -1,162 +1,61 @@
-/* orb-engine.js — vanilla-JS WebGL orb (OGL), adapted from a React/OGL component.
-   Exposes window.OrbEngine.mount(container, opts) -> { setHue, setForceHover, setHoverIntensity, destroy } */
+/* orb-engine.js — vanilla-JS Canvas2D "liquid metal" particle-sphere orb.
+   Inspired by the Transformers: Age of Extinction "transformium" effect — a mass
+   of small metallic shard particles that churns/swirls across the sphere's
+   surface, glints as facets catch the light, and has individual shards
+   periodically break free and re-settle, rather than a rigid cloud of static
+   dots. No external dependencies — renders immediately, nothing to fail to load.
+
+   Exposes window.OrbEngine.mount(container, opts) -> {
+     setHue, setSatMul, setDimMul, setSpecMul, setOverrideMix,
+     setForceHover, setHoverIntensity, destroy
+   }
+   opts: hue, satMul, dimMul, specMul, overrideMix, overrideColor1/2/3 ([r,g,b] 0..1),
+         hoverIntensity, rotateOnHover, forceHoverState */
 (function (root) {
   'use strict';
 
-  var VERT = [
-    'precision highp float;',
-    'attribute vec2 position;',
-    'attribute vec2 uv;',
-    'varying vec2 vUv;',
-    'void main() {',
-    '  vUv = uv;',
-    '  gl_Position = vec4(position, 0.0, 1.0);',
-    '}'
-  ].join('\n');
+  function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
 
-  var FRAG = [
-    'precision highp float;',
-    'uniform float iTime;',
-    'uniform vec3 iResolution;',
-    'uniform float hue;',
-    'uniform float hover;',
-    'uniform float rot;',
-    'uniform float hoverIntensity;',
-    'uniform float satMul;',
-    'uniform float dimMul;',
-    'uniform float specMul;',
-    'uniform float overrideMix;',
-    'uniform vec3 overrideColor1;',
-    'uniform vec3 overrideColor2;',
-    'uniform vec3 overrideColor3;',
-    'varying vec2 vUv;',
-    'vec3 rgb2yiq(vec3 c) {',
-    '  float y = dot(c, vec3(0.299, 0.587, 0.114));',
-    '  float i = dot(c, vec3(0.596, -0.274, -0.322));',
-    '  float q = dot(c, vec3(0.211, -0.523, 0.312));',
-    '  return vec3(y, i, q);',
-    '}',
-    'vec3 yiq2rgb(vec3 c) {',
-    '  float r = c.x + 0.956 * c.y + 0.621 * c.z;',
-    '  float g = c.x - 0.272 * c.y - 0.647 * c.z;',
-    '  float b = c.x - 1.106 * c.y + 1.703 * c.z;',
-    '  return vec3(r, g, b);',
-    '}',
-    'vec3 adjustHue(vec3 color, float hueDeg) {',
-    '  float hueRad = hueDeg * 3.14159265 / 180.0;',
-    '  vec3 yiq = rgb2yiq(color);',
-    '  float cosA = cos(hueRad);',
-    '  float sinA = sin(hueRad);',
-    '  float i = yiq.y * cosA - yiq.z * sinA;',
-    '  float q = yiq.y * sinA + yiq.z * cosA;',
-    '  yiq.y = i;',
-    '  yiq.z = q;',
-    '  return yiq2rgb(yiq);',
-    '}',
-    'vec3 hash33(vec3 p3) {',
-    '  p3 = fract(p3 * vec3(0.1031, 0.11369, 0.13787));',
-    '  p3 += dot(p3, p3.yxz + 19.19);',
-    '  return -1.0 + 2.0 * fract(vec3(',
-    '    p3.x + p3.y,',
-    '    p3.x + p3.z,',
-    '    p3.y + p3.z',
-    '  ) * p3.zyx);',
-    '}',
-    'float snoise3(vec3 p) {',
-    '  const float K1 = 0.333333333;',
-    '  const float K2 = 0.166666667;',
-    '  vec3 i = floor(p + (p.x + p.y + p.z) * K1);',
-    '  vec3 d0 = p - (i - (i.x + i.y + i.z) * K2);',
-    '  vec3 e = step(vec3(0.0), d0 - d0.yzx);',
-    '  vec3 i1 = e * (1.0 - e.zxy);',
-    '  vec3 i2 = 1.0 - e.zxy * (1.0 - e);',
-    '  vec3 d1 = d0 - (i1 - K2);',
-    '  vec3 d2 = d0 - (i2 - K1);',
-    '  vec3 d3 = d0 - 0.5;',
-    '  vec4 h = max(0.6 - vec4(',
-    '    dot(d0, d0),',
-    '    dot(d1, d1),',
-    '    dot(d2, d2),',
-    '    dot(d3, d3)',
-    '  ), 0.0);',
-    '  vec4 n = h * h * h * h * vec4(',
-    '    dot(d0, hash33(i)),',
-    '    dot(d1, hash33(i + i1)),',
-    '    dot(d2, hash33(i + i2)),',
-    '    dot(d3, hash33(i + 1.0))',
-    '  );',
-    '  return dot(vec4(31.316), n);',
-    '}',
-    'vec4 extractAlpha(vec3 colorIn) {',
-    '  float a = max(max(colorIn.r, colorIn.g), colorIn.b);',
-    '  return vec4(colorIn.rgb / (a + 1e-5), a);',
-    '}',
-    'const vec3 baseColor1 = vec3(0.611765, 0.262745, 0.996078);',
-    'const vec3 baseColor2 = vec3(0.298039, 0.760784, 0.913725);',
-    'const vec3 baseColor3 = vec3(0.062745, 0.078431, 0.600000);',
-    'const float innerRadius = 0.92;',
-    'const float noiseScale = 0.65;',
-    'float light1(float intensity, float attenuation, float dist) {',
-    '  return intensity / (1.0 + dist * attenuation);',
-    '}',
-    'float light2(float intensity, float attenuation, float dist) {',
-    '  return intensity / (1.0 + dist * dist * attenuation);',
-    '}',
-    'vec4 draw(vec2 uv) {',
-    '  vec3 color1 = mix(adjustHue(baseColor1, hue), overrideColor1, overrideMix);',
-    '  vec3 color2 = mix(adjustHue(baseColor2, hue), overrideColor2, overrideMix);',
-    '  vec3 color3 = mix(adjustHue(baseColor3, hue), overrideColor3, overrideMix);',
-    '  float ang = atan(uv.y, uv.x);',
-    '  float len = length(uv);',
-    '  float invLen = len > 0.0 ? 1.0 / len : 0.0;',
-    '  float n0 = snoise3(vec3(uv * noiseScale, iTime * 0.5)) * 0.5 + 0.5;',
-    '  float pulse = sin(iTime * 1.5) * 0.02;',
-    '  float r0 = mix(mix(innerRadius + pulse, 1.0, 0.4), mix(innerRadius + pulse, 1.0, 0.6), n0);',
-    '  float d0 = distance(uv, (r0 * invLen) * uv);',
-    '  float v0 = light1(1.0, 10.0, d0);',
-    '  v0 *= smoothstep(r0 * 1.05, r0, len);',
-    '  float cl = cos(ang + iTime * 2.0) * 0.5 + 0.5;',
-    '  float a = iTime * -1.0;',
-    '  vec2 pos = vec2(cos(a), sin(a)) * r0;',
-    '  float d = distance(uv, pos);',
-    '  float v1 = light2(1.5, 5.0, d);',
-    '  v1 *= light1(1.0, 50.0, d0);',
-    '  v1 *= specMul;',
-    '  vec3 hlTint = mix(vec3(1.0), color1, overrideMix);',
-    '  float v2 = smoothstep(1.0, mix(innerRadius, 1.0, n0 * 0.5), len);',
-    '  float v3 = smoothstep(innerRadius, mix(innerRadius, 1.0, 0.5), len);',
-    '  vec3 col = mix(color1, color2, cl);',
-    '  col = mix(color3, col, v0);',
-    '  col = col + v1 * hlTint;',
-    '  if (overrideMix > 0.5) {',
-    '    float ringA = smoothstep(0.76, 0.80, len) * (1.0 - smoothstep(0.86, 0.90, len));',
-    '    ringA = clamp(ringA, 0.0, 1.0);',
-    '    return vec4(clamp(col, 0.0, 1.0), ringA);',
-    '  }',
-    '  col = col * v2 * v3;',
-    '  float gray = dot(col, vec3(0.299, 0.587, 0.114));',
-    '  col = mix(vec3(gray), col, satMul) * dimMul;',
-    '  col = clamp(col, 0.0, 1.0);',
-    '  return extractAlpha(col);',
-    '}',
-    'vec4 mainImage(vec2 fragCoord) {',
-    '  vec2 center = iResolution.xy * 0.5;',
-    '  float size = min(iResolution.x, iResolution.y);',
-    '  vec2 uv = (fragCoord - center) / size * 2.0;',
-    '  float angle = rot;',
-    '  float s = sin(angle);',
-    '  float c = cos(angle);',
-    '  uv = vec2(c * uv.x - s * uv.y, s * uv.x + c * uv.y);',
-    '  uv.x += hover * hoverIntensity * 0.1 * sin(uv.y * 10.0 + iTime);',
-    '  uv.y += hover * hoverIntensity * 0.1 * sin(uv.x * 10.0 + iTime);',
-    '  return draw(uv);',
-    '}',
-    'void main() {',
-    '  vec2 fragCoord = vUv * iResolution.xy;',
-    '  vec4 col = mainImage(fragCoord);',
-    '  gl_FragColor = vec4(col.rgb * col.a, col.a);',
-    '}'
-  ].join('\n');
+  // Evenly distribute n points on a unit sphere (golden-angle spiral), each with
+  // its own churn/glint/detach timing so the surface reads as alive, not synced.
+  function fibonacciSphere(n) {
+    var pts = [];
+    var golden = Math.PI * (3 - Math.sqrt(5));
+    for (var i = 0; i < n; i++) {
+      var y = 1 - (i / Math.max(1, n - 1)) * 2;
+      var r = Math.sqrt(Math.max(0, 1 - y * y));
+      var theta = golden * i;
+      pts.push({
+        x: Math.cos(theta) * r, y: y, z: Math.sin(theta) * r,
+        phase: Math.random() * Math.PI * 2,
+        tw: 0.6 + Math.random() * 0.8,
+        // Swirl/churn: 3 independent low-freq wobble waves per particle so the
+        // surface roils instead of rotating as one rigid shell.
+        swA: Math.random() * Math.PI * 2, swB: Math.random() * Math.PI * 2, swC: Math.random() * Math.PI * 2,
+        swFA: 0.00025 + Math.random() * 0.00035, swFB: 0.0003 + Math.random() * 0.0004, swFC: 0.0002 + Math.random() * 0.0003,
+        // Glint: sharp, brief specular flashes as a "facet" catches the light.
+        glintPhase: Math.random() * Math.PI * 2, glintSpeed: 0.0009 + Math.random() * 0.0018,
+        // Detach: rare, brief outward pulses — a shard breaks free and re-settles.
+        detachPhase: Math.random() * Math.PI * 2, detachSpeed: 0.00018 + Math.random() * 0.00022,
+        // Spikes point radially outward from the cluster core (like the reference —
+        // a bristling ball of wire-thin metal spikes), with a per-spike angular kink
+        // and length so the silhouette is tufted/irregular, not a perfect sea urchin.
+        // Kink/wobble are kept small — this is a fixed kink, not a live wiggle, so
+        // the cluster holds its shape instead of looking like it's swimming.
+        spikeKink: (Math.random() - 0.5) * 0.5, spikeLenMul: 0.45 + Math.random() * 1.9,
+        spikeWob: Math.random() * Math.PI * 2, spikeWobSpeed: 0.00015 + Math.random() * 0.0003
+      });
+    }
+    return pts;
+  }
+
+  function hueToRgb01(hueDeg) {
+    var h = ((hueDeg % 360) + 360) % 360 / 360;
+    function f(p, q, t) { if (t < 0) t += 1; if (t > 1) t -= 1; if (t < 1 / 6) return p + (q - p) * 6 * t; if (t < 1 / 2) return q; if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6; return p; }
+    var q = 0.65, p = 0.25;
+    return [f(p, q, h + 1 / 3), f(p, q, h), f(p, q, h - 1 / 3)];
+  }
 
   function mount(container, opts) {
     opts = opts || {};
@@ -165,123 +64,302 @@
     var dimMul = opts.dimMul != null ? opts.dimMul : 1;
     var specMul = opts.specMul != null ? opts.specMul : 1;
     var overrideMix = opts.overrideMix != null ? opts.overrideMix : 0;
-    var overrideColor1 = opts.overrideColor1 || [0, 0, 0];
-    var overrideColor2 = opts.overrideColor2 || [0, 0, 0];
-    var overrideColor3 = opts.overrideColor3 || [0, 0, 0];
+    var col1 = opts.overrideColor1 || hueToRgb01(hue);
+    var col2 = opts.overrideColor2 || hueToRgb01(hue + 24);
+    var col3 = opts.overrideColor3 || [0.05, 0.05, 0.08];
+    // Chrome/liquid-metal base — near-white hot highlight, cool dark shadow — with
+    // the theme hue applied as a thin tint rather than fully saturating every shard.
+    var metalHi = [0.93, 0.95, 0.99];
+    var metalLo = [0.05, 0.06, 0.09];
     var hoverIntensity = opts.hoverIntensity != null ? opts.hoverIntensity : 0.3;
     var rotateOnHover = opts.rotateOnHover !== false;
     var forceHoverState = !!opts.forceHoverState;
     var destroyed = false;
-    var cleanupFns = [];
 
-    var api = {
-      setHue: function (v) { hue = v; },
+    var canvas = document.createElement('canvas');
+    canvas.style.display = 'block';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    if (container.firstChild) container.removeChild(container.firstChild);
+    container.appendChild(canvas);
+    var ctx = canvas.getContext('2d');
+
+    var points = [];
+    function rebuildPoints() {
+      var size = Math.max(container.clientWidth, container.clientHeight) || 200;
+      var n = Math.round(clamp(size / 460 * 220, 80, 260));
+      points = fibonacciSphere(n);
+    }
+    rebuildPoints();
+
+    var dpr = 1, cw = 0, ch = 0;
+    function resize() {
+      if (destroyed) return;
+      dpr = Math.min(2, root.devicePixelRatio || 1);
+      cw = container.clientWidth; ch = container.clientHeight;
+      if (!cw || !ch) return;
+      canvas.width = Math.max(1, cw * dpr);
+      canvas.height = Math.max(1, ch * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      rebuildPoints();
+    }
+    root.addEventListener('resize', resize);
+    resize();
+
+    var targetHover = 0, hoverAmt = 0;
+    // Current drifted centre (updated every frame below) so hover detection tracks
+    // the cluster's actual on-screen position, not the container's fixed centre.
+    var curOcx = 0, curOcy = 0;
+    function onMove(e) {
+      var rect = container.getBoundingClientRect();
+      var x = e.clientX - rect.left, y = e.clientY - rect.top;
+      var size = Math.min(rect.width, rect.height) || 1;
+      var ux = (x - curOcx) / size, uy = (y - curOcy) / size;
+      targetHover = Math.sqrt(ux * ux + uy * uy) < 0.9 ? 1 : 0;
+    }
+    function onLeave() { targetHover = 0; }
+    container.addEventListener('mousemove', onMove);
+    container.addEventListener('mouseleave', onLeave);
+
+    function mixCol(a, b, t) { return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; }
+    function toCss(rgb01, alpha) {
+      var gray = rgb01[0] * 0.299 + rgb01[1] * 0.587 + rgb01[2] * 0.114;
+      var r = lerp(gray, rgb01[0], satMul) * dimMul, g = lerp(gray, rgb01[1], satMul) * dimMul, b = lerp(gray, rgb01[2], satMul) * dimMul;
+      r = clamp(r, 0, 1); g = clamp(g, 0, 1); b = clamp(b, 0, 1);
+      return 'rgba(' + (r * 255 | 0) + ',' + (g * 255 | 0) + ',' + (b * 255 | 0) + ',' + alpha + ')';
+    }
+
+    var rotY = 0, lastT = 0, breathePhase = Math.random() * Math.PI * 2;
+    // Snake drift: the cluster advances at a steady speed while its heading
+    // undulates side-to-side (a sine wave on the turn rate, not the heading
+    // itself, so the path curves smoothly instead of snapping), bouncing off
+    // the content-area edges like a fish turning back into the tank.
+    var driftEnabled = opts.driftEnabled !== false;
+    // Home: where the cluster eases back to when stopped — the page's own
+    // "resting spot" above the controls — instead of just freezing wherever
+    // it happened to be swimming. Null until the host explicitly sets one
+    // (via setHome), so it falls back to dead-centre.
+    var homeX = null, homeY = null;
+    var snakeInit = false, snakeX = 0, snakeY = 0, snakeHeading = Math.random() * Math.PI * 2;
+    var snakeTurnPhase = Math.random() * Math.PI * 2, snakeTurnFreq = 0.00035 + Math.random() * 0.00015;
+    var snakeTurnAmp = 0.0001 + Math.random() * 0.00006, snakeSpeed = 0.032 + Math.random() * 0.014;
+    var squashSmooth = 0;
+    var rafId;
+    function frame(t) {
+      rafId = root.requestAnimationFrame(frame);
+      if (!cw || !ch) return;
+      var dt = lastT ? (t - lastT) / 1000 : 0.016;
+      lastT = t;
+
+      var eff = forceHoverState ? 1 : (rotateOnHover ? targetHover : 0);
+      hoverAmt += (eff - hoverAmt) * 0.08;
+      var speed = 0.22 + hoverAmt * 0.55 * clamp(hoverIntensity + 1, 0.3, 2) + (forceHoverState ? 0.35 : 0);
+      rotY += dt * speed;
+      var tiltX = Math.sin(t * 0.00035) * 0.14;
+      var cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+      var cosX = Math.cos(tiltX), sinX = Math.sin(tiltX);
+      // Churn scales up a little with hover/listening, like the mass agitating.
+      // Kept small — this is surface texture, not the cluster drifting around.
+      var churnAmt = 0.02 + hoverAmt * 0.018 + (forceHoverState ? 0.012 : 0);
+
+      // Compact core radius — the spike cluster floats in open space like the
+      // reference (a fist-sized bristling clump), not a shape filling the frame.
+      // Capped in absolute pixels so a full-viewport mount doesn't blow the
+      // cluster up to fill the screen — it should look the same size it did
+      // in the original 460px container, just free to roam a much bigger area.
+      var R = Math.min(Math.min(cw, ch) * 0.3, 140) * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
+      var focal = R * 2.6;
+
+      // Reserve enough edge margin for the cluster's full visual reach, not
+      // just its core radius — shell points can pulse out to ~1.22x R (detach)
+      // and spikes tip further still, so a small margin let the silhouette
+      // clip off the edge of the container at the far end of the path.
+      var edgeMargin = R * 1.3 + 80;
+      // On a small mount (the 66px floating badge, say) edgeMargin can exceed
+      // the container itself — Math.max(edgeMargin, cw-edgeMargin) would then
+      // collapse both bounds to edgeMargin, a point that sits entirely outside
+      // the canvas and renders nothing. Pin to dead-centre instead in that case.
+      var boundL, boundR, boundT, boundB;
+      if (cw <= edgeMargin * 2) { boundL = boundR = cw / 2; }
+      else { boundL = edgeMargin; boundR = cw - edgeMargin; }
+      if (ch <= edgeMargin * 2) { boundT = boundB = ch / 2; }
+      else { boundT = edgeMargin; boundB = ch - edgeMargin; }
+      if (!snakeInit) { snakeInit = true; snakeX = clamp(cw / 2, boundL, boundR); snakeY = clamp(ch / 2, boundT, boundB); }
+
+      var dtMs = dt * 1000;
+      if (driftEnabled) {
+        // Snake drift: advance at a steady speed while the heading itself
+        // undulates (sine on the turn RATE, not the angle) so the path
+        // curves smoothly back and forth like a snake/fish swimming, then
+        // bounces off the content-area edges instead of wrapping or freezing.
+        var turnRate = Math.sin(t * snakeTurnFreq + snakeTurnPhase) * snakeTurnAmp;
+        snakeHeading += turnRate * dtMs;
+        snakeX += Math.cos(snakeHeading) * snakeSpeed * dtMs;
+        snakeY += Math.sin(snakeHeading) * snakeSpeed * dtMs;
+        if (snakeX < boundL) { snakeX = boundL; snakeHeading = Math.PI - snakeHeading; }
+        else if (snakeX > boundR) { snakeX = boundR; snakeHeading = Math.PI - snakeHeading; }
+        if (snakeY < boundT) { snakeY = boundT; snakeHeading = -snakeHeading; }
+        else if (snakeY > boundB) { snakeY = boundB; snakeHeading = -snakeHeading; }
+      } else {
+        // Stopped: glide back to the resting spot (set via setHome, or
+        // dead-centre if none was given) instead of just freezing wherever
+        // the cluster happened to be swimming.
+        var hx = homeX != null ? homeX : cw / 2, hy = homeY != null ? homeY : ch / 2;
+        var homeEase = 1 - Math.pow(0.001, dt);
+        snakeX += (hx - snakeX) * homeEase;
+        snakeY += (hy - snakeY) * homeEase;
+      }
+      var ocx = snakeX, ocy = snakeY;
+      // Ease toward the target instead of snapping to it — a squared-off
+      // silhouette while stopped, relaxing into the cluster's natural round
+      // form once it's actually swimming, rather than snapping instantly.
+      squashSmooth += ((driftEnabled ? 0 : 1) - squashSmooth) * 0.015;
+      var squareAmt = squashSmooth;
+      curOcx = ocx; curOcy = ocy;
+
+      ctx.clearRect(0, 0, cw, ch);
+
+      // Soft ambient glow behind the sphere, using the mid-tone palette color.
+      var g = ctx.createRadialGradient(ocx, ocy, 0, ocx, ocy, R * 1.35);
+      g.addColorStop(0, toCss(col2, 0.16 * dimMul + hoverAmt * 0.08));
+      g.addColorStop(1, toCss(col2, 0));
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, cw, ch);
+      // Faint core mass glow so the shard cloud reads as one dense, cohesive
+      // object rather than scattered dust — a soft chrome sphere underneath.
+      var core = ctx.createRadialGradient(ocx, ocy, 0, ocx, ocy, R * 0.92);
+      core.addColorStop(0, toCss(mixCol(col3, col1, 0.5), 0.1 * dimMul + hoverAmt * 0.05));
+      core.addColorStop(0.75, toCss(col3, 0.06 * dimMul));
+      core.addColorStop(1, toCss(col3, 0));
+      ctx.fillStyle = core;
+      ctx.fillRect(0, 0, cw, ch);
+
+      var proj = [];
+      for (var i = 0; i < points.length; i++) {
+        var p = points[i];
+        // Per-shard churn: nudge the base sphere position along a slowly-drifting
+        // offset so the surface roils instead of rotating as one rigid shell.
+        var swx = Math.sin(t * p.swFA + p.swA) * churnAmt;
+        var swy = Math.sin(t * p.swFB + p.swB) * churnAmt;
+        var swz = Math.sin(t * p.swFC + p.swC) * churnAmt;
+        var px = p.x + swx, py = p.y + swy, pz = p.z + swz;
+        var plen = Math.sqrt(px * px + py * py + pz * pz) || 1;
+        // Detach: a rare, brief outward pulse — the shard breaks free and re-settles.
+        var detach = Math.pow(Math.max(0, Math.sin(t * p.detachSpeed + p.detachPhase)), 28);
+        var radialMul = 1 + detach * 0.22;
+        px = (px / plen) * radialMul; py = (py / plen) * radialMul; pz = (pz / plen) * radialMul;
+
+        // rotate around Y then tilt around X
+        var x1 = px * cosY + pz * sinY, z1 = -px * sinY + pz * cosY;
+        var y1 = py * cosX - z1 * sinX, z2 = py * sinX + z1 * cosX;
+        var persp = focal / (focal + z2 * R);
+        var glint = Math.pow(Math.max(0, Math.sin(t * p.glintSpeed + p.glintPhase)), 9);
+        // Morph the silhouette between its natural circle (squareAmt 0) and a
+        // rounded square (squareAmt 1): push each point out to where a square
+        // boundary would sit along that same angle from centre, blended by
+        // squareAmt, instead of just stretching into an oval.
+        var offx = x1 * R * persp, offy = y1 * R * persp;
+        var offMag = Math.sqrt(offx * offx + offy * offy) || 1;
+        var squareScale = offMag / Math.max(Math.abs(offx), Math.abs(offy));
+        var shapeMul = 1 + (squareScale - 1) * squareAmt;
+        var fx = offx * shapeMul, fy = offy * shapeMul;
+        proj.push({
+          sx: ocx + fx, sy: ocy + fy,
+          depth: (z2 + 1) / 2, persp: persp, tw: p.tw, phase: p.phase,
+          glint: glint, detach: detach,
+          kink: p.spikeKink + Math.sin(t * p.spikeWobSpeed + p.spikeWob) * 0.1, lenMul: p.spikeLenMul
+        });
+      }
+      proj.sort(function (a, b) { return a.depth - b.depth; });
+
+      for (var j = 0; j < proj.length; j++) {
+        var q = proj[j];
+        var twinkle = 0.85 + Math.sin(t * 0.0022 * q.tw + q.phase) * 0.15;
+        var alpha = clamp(0.46 + q.depth * 0.62, 0, 1) * twinkle * (1 - q.detach * 0.3);
+        var rad = (1.15 + q.depth * 2) * (cw < 120 ? 0.6 : 1) * (1 + hoverAmt * 0.2 + q.detach * 0.4);
+
+        // Base shard tone: cool dark metal -> bright chrome by depth, tinted by
+        // the theme hue; a sharp glint spikes it towards near-white — the
+        // "facet catching the light" flash.
+        var depthCol = mixCol(metalLo, metalHi, clamp(q.depth * 1.1 + 0.15, 0, 1));
+        var tinted = mixCol(depthCol, col1, 0.22 + overrideMix * 0.18);
+        var shardCol = mixCol(tinted, [1, 1, 1], q.glint * 0.92);
+        var glowCol = mixCol(col1, [1, 1, 1], q.glint * 0.7);
+
+        // ctx.shadowBlur is a full blur pass per draw call — very expensive on
+        // canvas2d. Only pay for it on the handful of particles actually glinting
+        // this frame (most sit at glint≈0 most of the time); everything else
+        // renders flat. This is the single biggest lag fix.
+        if (q.glint > 0.15) {
+          var glow = clamp(specMul * (0.6 + q.depth * 0.6 + q.glint * 2.2) * (1 + hoverAmt * 0.6 + (forceHoverState ? 0.4 : 0)), 0, 4.5);
+          ctx.shadowBlur = rad * (2 + glow * 2.6); ctx.shadowColor = toCss(glowCol, Math.min(1, 0.55 * glow));
+        } else if (ctx.shadowBlur !== 0) { ctx.shadowBlur = 0; }
+
+        // Thin wire spike radiating outward from the cluster core (screen-space
+        // direction from the orb's centre through this point), kinked and
+        // length-varied per spike so the silhouette bristles/tufts unevenly —
+        // like the reference — instead of a smooth uniform sea-urchin.
+        var dx = q.sx - ocx, dy = q.sy - ocy, dlen = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ndx = dx / dlen, ndy = dy / dlen;
+        var ca = Math.cos(q.kink), sa = Math.sin(q.kink);
+        var rdx = ndx * ca - ndy * sa, rdy = ndx * sa + ndy * ca;
+        var perpx = -rdy, perpy = rdx;
+        var baseIn = rad * 0.5;
+        var bx = q.sx - rdx * baseIn, by = q.sy - rdy * baseIn;
+        var spikeLen = rad * (3.4 + q.glint * 1.8) * q.lenMul;
+        var tx = q.sx + rdx * spikeLen, ty = q.sy + rdy * spikeLen;
+        var wid = Math.max(0.5, rad * 0.5);
+        ctx.fillStyle = toCss(shardCol, alpha);
+        ctx.beginPath();
+        ctx.moveTo(bx + perpx * wid, by + perpy * wid);
+        ctx.lineTo(bx - perpx * wid, by - perpy * wid);
+        ctx.lineTo(tx, ty);
+        ctx.closePath();
+        ctx.fill();
+        // A bright glint spark right at the tip — the sharpest highlight in the
+        // reference, where a facet flashes as it catches the light.
+        if (q.glint > 0.35) {
+          ctx.fillStyle = toCss([1, 1, 1], alpha * q.glint);
+          ctx.beginPath();
+          ctx.arc(tx, ty, Math.max(0.5, rad * 0.35 * q.glint), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.shadowBlur = 0;
+
+      // Listening ring — a soft pulsing halo just outside the sphere silhouette.
+      if (forceHoverState) {
+        var pulse = (Math.sin(t * 0.0026) + 1) / 2;
+        ctx.beginPath();
+        ctx.arc(ocx, ocy, R * (1.06 + pulse * 0.07), 0, Math.PI * 2);
+        ctx.strokeStyle = toCss(col1, 0.16 + pulse * 0.14);
+        ctx.lineWidth = Math.max(1, R * 0.012);
+        ctx.stroke();
+      }
+    }
+    rafId = root.requestAnimationFrame(frame);
+
+    return {
+      setHue: function (v) { hue = v; col1 = hueToRgb01(hue); col2 = hueToRgb01(hue + 24); },
       setSatMul: function (v) { satMul = v; },
       setDimMul: function (v) { dimMul = v; },
       setSpecMul: function (v) { specMul = v; },
       setOverrideMix: function (v) { overrideMix = v; },
       setForceHover: function (v) { forceHoverState = !!v; },
       setHoverIntensity: function (v) { hoverIntensity = v; },
+      setDriftEnabled: function (v) { driftEnabled = !!v; },
+      setHome: function (x, y) { homeX = x; homeY = y; },
+      resize: resize,
       destroy: function () {
         if (destroyed) return;
         destroyed = true;
-        cleanupFns.forEach(function (fn) { try { fn(); } catch (e) {} });
-        cleanupFns = [];
+        root.cancelAnimationFrame(rafId);
+        root.removeEventListener('resize', resize);
+        container.removeEventListener('mousemove', onMove);
+        container.removeEventListener('mouseleave', onLeave);
+        try { if (canvas.parentNode === container) container.removeChild(canvas); } catch (e) {}
       }
     };
-
-    import('https://esm.sh/ogl@1.0.11').then(function (OGL) {
-      if (destroyed) return;
-      var Renderer = OGL.Renderer, Program = OGL.Program, Mesh = OGL.Mesh, Triangle = OGL.Triangle, Vec3 = OGL.Vec3;
-      try {
-        var renderer = new Renderer({ alpha: true, premultipliedAlpha: false, antialias: true, preserveDrawingBuffer: true, dpr: root.devicePixelRatio || 1 });
-        var gl = renderer.gl;
-        gl.clearColor(0, 0, 0, 0);
-        if (container.firstChild) container.removeChild(container.firstChild);
-        gl.canvas.style.display = 'block';
-        container.appendChild(gl.canvas);
-
-        var geometry = new Triangle(gl);
-        var program = new Program(gl, {
-          vertex: VERT,
-          fragment: FRAG,
-          uniforms: {
-            iTime: { value: 0 },
-            iResolution: { value: new Vec3(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height) },
-            hue: { value: hue },
-            satMul: { value: satMul },
-            dimMul: { value: dimMul },
-            specMul: { value: specMul },
-            overrideMix: { value: overrideMix },
-            overrideColor1: { value: new Vec3(overrideColor1[0], overrideColor1[1], overrideColor1[2]) },
-            overrideColor2: { value: new Vec3(overrideColor2[0], overrideColor2[1], overrideColor2[2]) },
-            overrideColor3: { value: new Vec3(overrideColor3[0], overrideColor3[1], overrideColor3[2]) },
-            hover: { value: 0 },
-            rot: { value: 0 },
-            hoverIntensity: { value: hoverIntensity }
-          }
-        });
-        var mesh = new Mesh(gl, { geometry: geometry, program: program });
-
-        function resize() {
-          if (destroyed) return;
-          var dpr = root.devicePixelRatio || 1;
-          var w = container.clientWidth, h = container.clientHeight;
-          if (!w || !h) return;
-          renderer.setSize(w * dpr, h * dpr);
-          gl.canvas.style.width = w + 'px';
-          gl.canvas.style.height = h + 'px';
-          program.uniforms.iResolution.value.set(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height);
-        }
-        root.addEventListener('resize', resize);
-        cleanupFns.push(function () { root.removeEventListener('resize', resize); });
-        resize();
-
-        var targetHover = 0, lastTime = 0, currentRot = 0, rotationSpeed = 0.3;
-        function onMove(e) {
-          var rect = container.getBoundingClientRect();
-          var x = e.clientX - rect.left, y = e.clientY - rect.top;
-          var size = Math.min(rect.width, rect.height) || 1;
-          var uvX = ((x - rect.width / 2) / size) * 2.0;
-          var uvY = ((y - rect.height / 2) / size) * 2.0;
-          targetHover = Math.sqrt(uvX * uvX + uvY * uvY) < 0.8 ? 1 : 0;
-        }
-        function onLeave() { targetHover = 0; }
-        container.addEventListener('mousemove', onMove);
-        container.addEventListener('mouseleave', onLeave);
-        cleanupFns.push(function () {
-          container.removeEventListener('mousemove', onMove);
-          container.removeEventListener('mouseleave', onLeave);
-        });
-
-        var rafId;
-        function update(t) {
-          rafId = root.requestAnimationFrame(update);
-          var dt = (t - lastTime) * 0.001;
-          lastTime = t;
-          program.uniforms.iTime.value = t * 0.001;
-          program.uniforms.hue.value = hue;
-          program.uniforms.satMul.value = satMul;
-          program.uniforms.dimMul.value = dimMul;
-          program.uniforms.specMul.value = specMul;
-          program.uniforms.overrideMix.value = overrideMix;
-          program.uniforms.hoverIntensity.value = hoverIntensity;
-          var eff = forceHoverState ? 1 : targetHover;
-          program.uniforms.hover.value += (eff - program.uniforms.hover.value) * 0.1;
-          currentRot += dt * (rotateOnHover && eff > 0.5 ? rotationSpeed : rotationSpeed * 0.12);
-          program.uniforms.rot.value = currentRot;
-          renderer.render({ scene: mesh });
-        }
-        rafId = root.requestAnimationFrame(update);
-        cleanupFns.push(function () { root.cancelAnimationFrame(rafId); });
-        cleanupFns.push(function () {
-          try { if (gl.canvas.parentNode === container) container.removeChild(gl.canvas); } catch (e) {}
-          try { var ext = gl.getExtension('WEBGL_lose_context'); ext && ext.loseContext(); } catch (e) {}
-        });
-      } catch (err) { console.error('OrbEngine mount failed:', err); }
-    }).catch(function (err) { console.error('OrbEngine: failed to load OGL:', err); });
-
-    return api;
   }
 
   root.OrbEngine = { mount: mount };

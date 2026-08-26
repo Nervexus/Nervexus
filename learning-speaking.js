@@ -10,6 +10,10 @@
 (function (root) {
   'use strict';
 
+  function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+  function pick(arr) { return arr[ri(0, arr.length - 1)]; }
+  function shuffle(arr) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = ri(0, i); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
   var TIERS = {
     Basic: [
       { text: 'Hello, how are you?', phonetic: 'heh-LOH, how ar YOO?', tip: 'Rising pitch on "you" — it\u2019s a genuine question, so let your voice lift at the end.' },
@@ -21,7 +25,27 @@
       { text: 'Thank you very much.', phonetic: 'THANK yoo VER-ee much.', tip: 'Give equal weight to "thank you" and "very much" — don\u2019t rush the ending.' },
       { text: 'I don\u2019t understand.', phonetic: 'eye DOHNT un-der-STAND.', tip: 'Stress "don\u2019t" clearly so the negative isn\u2019t missed in fast speech.' },
       { text: 'Can you help me, please?', phonetic: 'kan yoo HELP mee, pleez?', tip: 'Rising tone on "help me" — a genuine request for assistance.' },
-      { text: 'See you tomorrow!', phonetic: 'SEE yoo tuh-MOR-oh!', tip: 'Bright, upbeat tone — this is a friendly, casual goodbye.' }
+      { text: 'See you tomorrow!', phonetic: 'SEE yoo tuh-MOR-oh!', tip: 'Bright, upbeat tone — this is a friendly, casual goodbye.' },
+      { text: 'What’s your name?', phonetic: 'wots yor NAYM?', tip: 'Rising tone — a friendly, genuine question when meeting someone new.' },
+      { text: 'Nice to meet you.', phonetic: 'nys too MEET yoo.', tip: 'Warm, falling tone — a simple, sincere statement, not a question.' },
+      { text: 'How much does this cost?', phonetic: 'how much duz this KOST?', tip: 'Stress "much" and "cost" — the two words carrying the real information.' },
+      { text: 'I’m looking for the bathroom.', phonetic: 'eyem LOOK-ing for thuh BATH-room.', tip: 'Keep it casual and quick — this is a simple, practical request.' },
+      { text: 'Could you repeat that, please?', phonetic: 'kood yoo ree-PEET that, pleez?', tip: 'Slow down on "repeat" — you’re asking for clarity, so speak clearly yourself.' },
+      { text: 'I’ll have the same, please.', phonetic: 'eyel hav thuh SAYM, pleez.', tip: 'Falling tone — a simple, confident order.' },
+      { text: 'Is this seat taken?', phonetic: 'iz this SEET TAY-ken?', tip: 'Rising tone at the end — a polite yes/no question.' },
+      { text: 'What do you do for a living?', phonetic: 'wot doo yoo doo for a LIV-ing?', tip: 'Falls at the end — a common, friendly wh-question.' },
+      { text: 'I’m from London.', phonetic: 'eyem from LUN-dun.', tip: 'Stress the place name — that’s the new information you’re sharing.' },
+      { text: 'Do you speak English?', phonetic: 'doo yoo speek ING-glish?', tip: 'Rising tone — a genuine yes/no question, keep it light.' },
+      { text: 'Can you write that down for me?', phonetic: 'kan yoo RYTE that down for mee?', tip: 'Stress "write" and "down" — you need the specific action done.' },
+      { text: 'I need a receipt, please.', phonetic: 'eye need a ree-SEET, pleez.', tip: 'Stress "receipt" clearly — it’s an easy word to mumble.' },
+      { text: 'What’s the weather like today?', phonetic: 'wots thuh WETH-er lyke tuh-DAY?', tip: 'Casual falling tone — a light small-talk question.' },
+      { text: 'I’m sorry, I’m running late.', phonetic: 'eyem SOR-ee, eyem RUN-ing LAYT.', tip: 'A genuine, slightly rushed tone fits the apology naturally.' },
+      { text: 'Excuse me, is this the right platform?', phonetic: 'ek-SKYOOZ mee, iz this thuh RYTE PLAT-form?', tip: 'Say "excuse me" softly, then ask the rest with a clear rising tone.' },
+      { text: 'How do I get to the airport?', phonetic: 'how doo eye GET too thee AIR-port?', tip: 'Falls at the end — stress "get" and "airport" as the key words.' },
+      { text: 'I’ll call you later.', phonetic: 'eyel KAWL yoo LAY-ter.', tip: 'Confident, falling tone — a simple promise.' },
+      { text: 'Have a nice day!', phonetic: 'hav a NYSE DAY!', tip: 'Bright and upbeat — a warm, friendly send-off.' },
+      { text: 'Could I get the bill, please?', phonetic: 'kood eye get thuh BILL, pleez?', tip: 'Polite rising tone — a standard, courteous request.' },
+      { text: 'It was lovely to meet you.', phonetic: 'it wuz LUV-lee too MEET yoo.', tip: 'Warm, sincere falling tone — a genuine closing remark.' }
     ],
     Mid: [
       { text: 'I\u2019ve been meaning to ask you something.', phonetic: 'eyev bin MEE-ning too ask yoo SUM-thing.', tip: 'Pause slightly before "something" — it builds anticipation for what follows.' },
@@ -33,7 +57,27 @@
       { text: 'That\u2019s a really good point, actually.', phonetic: 'thats a REE-lee good POYNT, AK-shoo-uh-lee.', tip: 'Stress "really" and "point" — "actually" trails off quietly at the end.' },
       { text: 'I appreciate you taking the time.', phonetic: 'eye uh-PREE-shee-ayt yoo TAY-king thuh TYME.', tip: 'Warm, sincere tone — slow down slightly on "appreciate".' },
       { text: 'Let me know if that works for you.', phonetic: 'let mee NOH if that WERKS for yoo.', tip: 'Falling tone at the end — a friendly statement, not really a question.' },
-      { text: 'I think we should look at this differently.', phonetic: 'eye think wee shood LOOK at this DIF-er-ent-lee.', tip: 'Stress "differently" — it\u2019s the key new idea you\u2019re proposing.' }
+      { text: 'I think we should look at this differently.', phonetic: 'eye think wee shood LOOK at this DIF-er-ent-lee.', tip: 'Stress "differently" — it\u2019s the key new idea you\u2019re proposing.' },
+      { text: 'I was hoping you might be able to help.', phonetic: 'eye wuz HOH-ping yoo myt bee AY-bul too HELP.', tip: 'Soft, hopeful tone throughout — an indirect, polite request for help.' },
+      { text: 'To be honest, I hadn’t thought of it that way.', phonetic: 'too bee ON-ist, eye HAD-ent thawt ov it that WAY.', tip: 'Slight pause after "honest" — signals a candid, reflective admission.' },
+      { text: 'It depends on how you look at it.', phonetic: 'it dee-PENDZ on how yoo LOOK at it.', tip: 'Even, thoughtful tone — a balanced, non-committal answer.' },
+      { text: 'I’ll get back to you as soon as possible.', phonetic: 'eyel get BAK too yoo az SOON az POS-ih-bul.', tip: 'Reassuring, steady tone — stress "back" and "soon".' },
+      { text: 'Sorry to interrupt, but could I ask something?', phonetic: 'SOR-ee too in-ter-RUPT, but kood eye ASK SUM-thing?', tip: 'Quick, apologetic start, then a clear, polite question.' },
+      { text: 'I completely forgot to mention that earlier.', phonetic: 'eye kum-PLEET-lee for-GOT too MEN-shun that EER-lee-er.', tip: 'Stress "completely" — it emphasises the honest admission.' },
+      { text: 'As far as I know, the meeting’s still on.', phonetic: 'az FAR az eye NOH, thuh MEE-tingz still ON.', tip: 'Say the hedge "as far as I know" lightly before the confident main point.' },
+      { text: 'That reminds me of something similar that happened to me.', phonetic: 'that ree-MYNDZ mee ov SUM-thing SIM-uh-lar that HAP-end too mee.', tip: 'Conversational, easy pace — you’re building a connection, not rushing.' },
+      { text: 'I’d love to, but I already have plans.', phonetic: 'eyed LUV too, but eye awl-RED-ee hav PLANZ.', tip: 'Warm on "love to", then firm and clear on "already have plans".' },
+      { text: 'Do you mind if I ask you a personal question?', phonetic: 'doo yoo MYND if eye ASK yoo a PER-son-ul KWES-chun?', tip: 'Gentle, cautious tone — you’re asking permission first.' },
+      { text: 'I’m afraid I won’t be able to make it.', phonetic: 'eyem uh-FRAYD eye WOHNT bee AY-bul too MAYK it.', tip: '"I’m afraid" softens the refusal — keep your tone genuinely apologetic.' },
+      { text: 'It’s been a while since we last spoke.', phonetic: 'its bin a WYLE sins wee last SPOHK.', tip: 'Reflective, slightly slower pace — acknowledging time has passed.' },
+      { text: 'I really don’t mind either way.', phonetic: 'eye REE-lee dohnt MYND EE-ther WAY.', tip: 'Stress "really" to sound genuinely relaxed, not just polite.' },
+      { text: 'Let’s just say things didn’t go as planned.', phonetic: 'lets just SAY things DID-ent goh az PLANND.', tip: 'Dry, understated tone — a diplomatic way of describing a problem.' },
+      { text: 'I’ll try my best, but I can’t promise anything.', phonetic: 'eyel TRY my BEST, but eye kant PROM-iss EN-ee-thing.', tip: 'Confident on "try my best", softer and honest on "can’t promise".' },
+      { text: 'Could you give me a rough idea of the cost?', phonetic: 'kood yoo GIV mee a RUF eye-DEE-uh ov thuh KOST?', tip: 'Stress "rough" — you’re asking for an estimate, not an exact figure.' },
+      { text: 'I was under the impression it was already sorted.', phonetic: 'eye wuz UN-der thee im-PRESH-un it wuz awl-RED-ee SOR-ted.', tip: 'A slightly surprised undertone — you believed something different.' },
+      { text: 'There’s no need to apologise, honestly.', phonetic: 'thairz noh NEED too uh-POL-uh-jyze, ON-ist-lee.', tip: 'Reassuring, warm tone — put the other person at ease.' },
+      { text: 'I might be wrong, but I think that’s incorrect.', phonetic: 'eye myt bee RONG, but eye think thats in-kuh-REKT.', tip: 'Soften disagreement with "I might be wrong" before the direct point.' },
+      { text: 'We should probably touch base again next week.', phonetic: 'wee shood PROB-uh-blee TUCH BAYS uh-GEN nekst WEEK.', tip: 'Casual, forward-looking tone — a light, friendly suggestion.' }
     ],
     High: [
       { text: 'I would really appreciate it if you could clarify that point.', phonetic: 'eye wood REE-lee uh-PREE-shee-ayt it if yoo kood KLAIR-if-eye that POYNT.', tip: 'Formal register — keep pace measured and even; stress "appreciate" and "clarify".' },
@@ -45,7 +89,27 @@
       { text: 'I\u2019d rather you didn\u2019t mention this to anyone else.', phonetic: 'eyed RATH-er yoo DID-ent MEN-shun this too EN-ee-wun ELS.', tip: 'Stress "rather" and "anyone else" — a firm but polite preference.' },
       { text: 'Frankly speaking, the results speak for themselves.', phonetic: 'FRANK-lee SPEE-king, thuh ree-ZULTS speek for them-SELVZ.', tip: 'Confident, direct tone — "frankly" signals you\u2019re being candid.' },
       { text: 'Given the circumstances, I think we handled it well.', phonetic: 'GIV-en thuh SER-kum-stan-siz, eye think wee HAN-dld it WELL.', tip: 'Slight rise then fall — acknowledging difficulty, then a confident conclusion.' },
-      { text: 'It goes without saying that preparation is essential.', phonetic: 'it gohz with-OUT SAY-ing that prep-uh-RAY-shun iz ih-SEN-shul.', tip: 'Stress "essential" strongly — it\u2019s the emphatic point of the whole sentence.' }
+      { text: 'It goes without saying that preparation is essential.', phonetic: 'it gohz with-OUT SAY-ing that prep-uh-RAY-shun iz ih-SEN-shul.', tip: 'Stress "essential" strongly — it\u2019s the emphatic point of the whole sentence.' },
+      { text: 'With all due respect, I have to disagree.', phonetic: 'with awl doo ree-SPEKT, eye hav too dis-uh-GREE.', tip: 'Calm, measured tone — the phrase softens a direct disagreement.' },
+      { text: 'It’s a moot point at this stage.', phonetic: 'its a MOOT POYNT at this STAYJ.', tip: 'Even, slightly dismissive tone — signals the issue no longer matters.' },
+      { text: 'I’d be lying if I said I wasn’t disappointed.', phonetic: 'eyed bee LY-ing if eye SED eye WUZ-ent dis-uh-POYN-ted.', tip: 'Honest, restrained tone — admitting disappointment without overstating it.' },
+      { text: 'That’s a rather sweeping generalisation, don’t you think?', phonetic: 'thats a RATH-er SWEE-ping jen-er-uh-ly-ZAY-shun, dohnt yoo THINK?', tip: 'A light challenge — rising slightly on "think" invites a response.' },
+      { text: 'By and large, the feedback has been positive.', phonetic: 'by and LARJ, thuh FEED-bak haz bin POZ-ih-tiv.', tip: 'Confident, summarising tone — "by and large" sets up a broad conclusion.' },
+      { text: 'I stand corrected — you were right after all.', phonetic: 'eye stand kuh-REK-ted — yoo wer RYTE AF-ter awl.', tip: 'Gracious, genuine tone — a clean, unreserved concession.' },
+      { text: 'It’s easier said than done, unfortunately.', phonetic: 'its EE-zee-er SED than DUN, un-FOR-chuh-nut-lee.', tip: 'A slight sigh in the tone — acknowledging real difficulty.' },
+      { text: 'There’s more to this than meets the eye.', phonetic: 'thairz MOR too this than MEETS thee EYE.', tip: 'Intriguing, measured delivery — you’re hinting at hidden complexity.' },
+      { text: 'We’ll cross that bridge when we come to it.', phonetic: 'weel KROS that BRIJ wen wee KUM too it.', tip: 'Relaxed, unhurried tone — deferring a problem calmly.' },
+      { text: 'In light of recent events, we’ve reconsidered our approach.', phonetic: 'in LYTE ov REE-sent ee-VENTS, weev ree-kun-SID-erd our uh-PROHCH.', tip: 'Formal, measured pace — typical of a considered, official statement.' },
+      { text: 'It’s a double-edged sword, if I’m honest.', phonetic: 'its a DUB-ul-EJD SORD, if eyem ON-ist.', tip: 'Thoughtful tone — weighing both good and bad sides evenly.' },
+      { text: 'I take your point, but I still have reservations.', phonetic: 'eye TAYK yor POYNT, but eye still hav rez-er-VAY-shunz.', tip: 'Acknowledge first, then hold firm — balanced but not fully convinced.' },
+      { text: 'That’s neither here nor there, as far as I’m concerned.', phonetic: 'thats NY-ther heer nor THAIR, az far az eyem kun-SERND.', tip: 'Dismissive but polite — signals the point isn’t relevant to you.' },
+      { text: 'Suffice it to say, the outcome wasn’t ideal.', phonetic: 'suh-FYSE it too SAY, thee OUT-kum WUZ-ent eye-DEE-ul.', tip: 'Understated, controlled tone — a diplomatic way of admitting failure.' },
+      { text: 'It’s not the end of the world, but it’s a setback.', phonetic: 'its not thee END ov thuh WERLD, but its a SET-bak.', tip: 'Reassuring first half, honest second half — balance the tone accordingly.' },
+      { text: 'I’d sooner resign than compromise my principles.', phonetic: 'eyed SOON-er ree-ZYNE than KOM-pruh-myze my PRIN-sih-pulz.', tip: 'Firm, resolute tone — stress "sooner" and "principles" strongly.' },
+      { text: 'The proof of the pudding is in the eating.', phonetic: 'thuh PROOF ov thuh PUD-ing iz in thee EE-ting.', tip: 'Playful, confident idiom — deliver it with a slight smile in your voice.' },
+      { text: 'All things considered, I think we made the right call.', phonetic: 'awl THINGZ kun-SID-erd, eye think wee mayd thuh RYTE KAWL.', tip: 'Confident summary tone — "all things considered" wraps up a judgement.' },
+      { text: 'It goes against my better judgement, but I’ll allow it.', phonetic: 'it gohz uh-GENST my BET-er JUJ-ment, but eyel uh-LOW it.', tip: 'Reluctant but decisive — soften "against my better judgement", firm up "I’ll allow it".' },
+      { text: 'There’s a fine line between confidence and arrogance.', phonetic: 'thairz a FYNE LYNE bee-TWEEN KON-fih-dens and AIR-uh-gens.', tip: 'Careful, precise delivery — the sentence itself is drawing a subtle distinction.' }
     ]
   };
 

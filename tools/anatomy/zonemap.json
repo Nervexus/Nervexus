@@ -1,0 +1,624 @@
+{
+ "chest": [
+  [
+   "FMA13375",
+   "right pectoralis minor"
+  ],
+  [
+   "FMA13376",
+   "left pectoralis minor"
+  ],
+  [
+   "FMA34690",
+   "clavicular part of right pectoralis major"
+  ],
+  [
+   "FMA34691",
+   "clavicular part of left pectoralis major"
+  ],
+  [
+   "FMA45874",
+   "abdominal part of right pectoralis major"
+  ],
+  [
+   "FMA45875",
+   "abdominal part of left pectoralis major"
+  ],
+  [
+   "FMA79979",
+   "sternocostal part of right pectoralis major"
+  ],
+  [
+   "FMA79980",
+   "sternocostal part of left pectoralis major"
+  ]
+ ],
+ "lats": [
+  [
+   "FMA13358",
+   "right latissimus dorsi"
+  ],
+  [
+   "FMA13359",
+   "left latissimus dorsi"
+  ],
+  [
+   "FMA32551",
+   "right teres major"
+  ],
+  [
+   "FMA32552",
+   "left teres major"
+  ]
+ ],
+ "delts": [
+  [
+   "FMA34680",
+   "clavicular part of right deltoid"
+  ],
+  [
+   "FMA34681",
+   "clavicular part of left deltoid"
+  ],
+  [
+   "FMA34682",
+   "acromial part of right deltoid"
+  ],
+  [
+   "FMA34683",
+   "acromial part of left deltoid"
+  ],
+  [
+   "FMA34684",
+   "spinal part of right deltoid"
+  ],
+  [
+   "FMA34685",
+   "spinal part of left deltoid"
+  ]
+ ],
+ "biceps": [
+  [
+   "FMA37665",
+   "right coracobrachialis"
+  ],
+  [
+   "FMA37666",
+   "left coracobrachialis"
+  ],
+  [
+   "FMA37668",
+   "right brachialis"
+  ],
+  [
+   "FMA37669",
+   "left brachialis"
+  ],
+  [
+   "FMA37684",
+   "short head of right biceps brachii"
+  ],
+  [
+   "FMA37685",
+   "short head of left biceps brachii"
+  ],
+  [
+   "FMA37686",
+   "long head of right biceps brachii"
+  ],
+  [
+   "FMA37687",
+   "long head of left biceps brachii"
+  ]
+ ],
+ "triceps": [
+  [
+   "FMA37695",
+   "medial head of right triceps brachii"
+  ],
+  [
+   "FMA37696",
+   "medial head of left triceps brachii"
+  ],
+  [
+   "FMA37697",
+   "lateral head of right triceps brachii"
+  ],
+  [
+   "FMA37698",
+   "lateral head of left triceps brachii"
+  ],
+  [
+   "FMA37699",
+   "long head of right triceps brachii"
+  ],
+  [
+   "FMA37700",
+   "long head of left triceps brachii"
+  ],
+  [
+   "FMA37705",
+   "right anconeus"
+  ],
+  [
+   "FMA37706",
+   "left anconeus"
+  ]
+ ],
+ "forearms": [
+  [
+   "BP44",
+   "humeral head of left extensor carpi ulnaris"
+  ],
+  [
+   "BP45",
+   "humeral head of right extensor carpi ulnaris"
+  ],
+  [
+   "BP46",
+   "ulnar head of left extensor carpi ulnaris"
+  ],
+  [
+   "BP47",
+   "ulnar head of right extensor carpi ulnaris"
+  ],
+  [
+   "FMA38460",
+   "right flexor carpi radialis"
+  ],
+  [
+   "FMA38461",
+   "left flexor carpi radialis"
+  ],
+  [
+   "FMA38486",
+   "right brachioradialis"
+  ],
+  [
+   "FMA38487",
+   "left brachioradialis"
+  ],
+  [
+   "FMA38495",
+   "right extensor carpi radialis longus"
+  ],
+  [
+   "FMA38496",
+   "left extensor carpi radialis longus"
+  ],
+  [
+   "FMA38498",
+   "right extensor carpi radialis brevis"
+  ],
+  [
+   "FMA38499",
+   "left extensor carpi radialis brevis"
+  ],
+  [
+   "FMA38507",
+   "right extensor carpi ulnaris"
+  ],
+  [
+   "FMA38508",
+   "left extensor carpi ulnaris"
+  ],
+  [
+   "FMA38617",
+   "humeral head of right flexor carpi ulnaris"
+  ],
+  [
+   "FMA38618",
+   "humeral head of left flexor carpi ulnaris"
+  ],
+  [
+   "FMA38619",
+   "ulnar head of right flexor carpi ulnaris"
+  ],
+  [
+   "FMA38620",
+   "ulnar head of left flexor carpi ulnaris"
+  ]
+ ],
+ "traps": [
+  [
+   "FMA13381",
+   "right rhomboid major"
+  ],
+  [
+   "FMA13382",
+   "left rhomboid major"
+  ],
+  [
+   "FMA13383",
+   "right rhomboid minor"
+  ],
+  [
+   "FMA13384",
+   "left rhomboid minor"
+  ],
+  [
+   "FMA32540",
+   "right levator scapulae"
+  ],
+  [
+   "FMA32541",
+   "left levator scapulae"
+  ],
+  [
+   "FMA33581",
+   "ascending part of right trapezius"
+  ],
+  [
+   "FMA33583",
+   "ascending part of left trapezius"
+  ],
+  [
+   "FMA33584",
+   "transverse part of right trapezius"
+  ],
+  [
+   "FMA33585",
+   "transverse part of left trapezius"
+  ],
+  [
+   "FMA33586",
+   "descending part of right trapezius"
+  ],
+  [
+   "FMA33587",
+   "descending part of left trapezius"
+  ],
+  [
+   "FMA13408",
+   "right sternocleidomastoid"
+  ],
+  [
+   "FMA13409",
+   "left sternocleidomastoid"
+  ]
+ ],
+ "abs": [
+  [
+   "FMA13377",
+   "right rectus abdominis"
+  ],
+  [
+   "FMA13378",
+   "left rectus abdominis"
+  ]
+ ],
+ "obliques": [
+  [
+   "FMA13336",
+   "right external oblique"
+  ],
+  [
+   "FMA13337",
+   "left external oblique"
+  ],
+  [
+   "FMA13892",
+   "right internal oblique"
+  ],
+  [
+   "FMA13893",
+   "left internal oblique"
+  ],
+  [
+   "FMA22344",
+   "right transversus abdominis"
+  ],
+  [
+   "FMA22345",
+   "left transversus abdominis"
+  ]
+ ],
+ "lower_back": [
+  [
+   "FMA22348",
+   "right quadratus lumborum"
+  ],
+  [
+   "FMA22349",
+   "left quadratus lumborum"
+  ],
+  [
+   "FMA22740",
+   "right iliocostalis lumborum"
+  ],
+  [
+   "FMA22741",
+   "left iliocostalis lumborum"
+  ],
+  [
+   "FMA22742",
+   "right iliocostalis thoracis"
+  ],
+  [
+   "FMA22743",
+   "left iliocostalis thoracis"
+  ],
+  [
+   "FMA22744",
+   "right iliocostalis cervicis"
+  ],
+  [
+   "FMA22745",
+   "left iliocostalis cervicis"
+  ],
+  [
+   "FMA22751",
+   "right longissimus thoracis"
+  ],
+  [
+   "FMA22753",
+   "left longissimus thoracis"
+  ],
+  [
+   "FMA22779",
+   "right spinalis thoracis"
+  ],
+  [
+   "FMA22780",
+   "left spinalis thoracis"
+  ],
+  [
+   "FMA22781",
+   "right spinalis cervicis"
+  ],
+  [
+   "FMA22782",
+   "left spinalis cervicis"
+  ],
+  [
+   "FMA22872",
+   "right semispinalis thoracis"
+  ],
+  [
+   "FMA22873",
+   "left semispinalis thoracis"
+  ],
+  [
+   "FMA22874",
+   "right semispinalis cervicis"
+  ],
+  [
+   "FMA22875",
+   "left semispinalis cervicis"
+  ],
+  [
+   "FMA22876",
+   "right semispinalis capitis"
+  ],
+  [
+   "FMA22877",
+   "left semispinalis capitis"
+  ],
+  [
+   "FMA32547",
+   "right infraspinatus muscle"
+  ],
+  [
+   "FMA32548",
+   "left infraspinatus muscle"
+  ],
+  [
+   "FMA32553",
+   "right teres minor"
+  ],
+  [
+   "FMA32554",
+   "left teres minor"
+  ]
+ ],
+ "glutes": [
+  [
+   "FMA22328",
+   "right gluteus maximus"
+  ],
+  [
+   "FMA22329",
+   "left gluteus maximus"
+  ],
+  [
+   "FMA22330",
+   "right gluteus medius"
+  ],
+  [
+   "FMA22331",
+   "left gluteus medius"
+  ],
+  [
+   "FMA22332",
+   "right gluteus minimus"
+  ],
+  [
+   "FMA22333",
+   "left gluteus minimus"
+  ]
+ ],
+ "quads": [
+  [
+   "FMA22354",
+   "right sartorius"
+  ],
+  [
+   "FMA22355",
+   "left sartorius"
+  ],
+  [
+   "FMA38928",
+   "right rectus femoris"
+  ],
+  [
+   "FMA38929",
+   "left rectus femoris"
+  ],
+  [
+   "FMA38930",
+   "right vastus lateralis"
+  ],
+  [
+   "FMA38931",
+   "left vastus lateralis"
+  ],
+  [
+   "FMA38932",
+   "right vastus medialis"
+  ],
+  [
+   "FMA38933",
+   "left vastus medialis"
+  ],
+  [
+   "FMA38934",
+   "right vastus intermedius"
+  ],
+  [
+   "FMA38935",
+   "left vastus intermedius"
+  ]
+ ],
+ "hamstrings": [
+  [
+   "FMA22358",
+   "right semitendinosus"
+  ],
+  [
+   "FMA22359",
+   "left semitendinosus"
+  ],
+  [
+   "FMA22448",
+   "right semimembranosus"
+  ],
+  [
+   "FMA22449",
+   "left semimembranosus"
+  ],
+  [
+   "FMA45888",
+   "long head of right biceps femoris"
+  ],
+  [
+   "FMA45889",
+   "long head of left biceps femoris"
+  ],
+  [
+   "FMA45891",
+   "short head of right biceps femoris"
+  ],
+  [
+   "FMA45892",
+   "short head of left biceps femoris"
+  ]
+ ],
+ "calves": [
+  [
+   "FMA22544",
+   "right tibialis anterior"
+  ],
+  [
+   "FMA22545",
+   "left tibialis anterior"
+  ],
+  [
+   "FMA22550",
+   "right fibularis tertius"
+  ],
+  [
+   "FMA22551",
+   "left fibularis tertius"
+  ],
+  [
+   "FMA22552",
+   "right fibularis longus"
+  ],
+  [
+   "FMA22553",
+   "left fibularis longus"
+  ],
+  [
+   "FMA22554",
+   "right fibularis brevis"
+  ],
+  [
+   "FMA22555",
+   "left fibularis brevis"
+  ],
+  [
+   "FMA22558",
+   "right soleus"
+  ],
+  [
+   "FMA22559",
+   "left soleus"
+  ],
+  [
+   "FMA45957",
+   "medial head of right gastrocnemius"
+  ],
+  [
+   "FMA45958",
+   "medial head of left gastrocnemius"
+  ],
+  [
+   "FMA45960",
+   "lateral head of right gastrocnemius"
+  ],
+  [
+   "FMA45961",
+   "lateral head of left gastrocnemius"
+  ]
+ ],
+ "adductors": [
+  [
+   "FMA22450",
+   "right pectineus"
+  ],
+  [
+   "FMA22451",
+   "left pectineus"
+  ],
+  [
+   "FMA22452",
+   "right adductor brevis"
+  ],
+  [
+   "FMA22454",
+   "left adductor brevis"
+  ],
+  [
+   "FMA22456",
+   "right adductor longus"
+  ],
+  [
+   "FMA22457",
+   "left adductor longus"
+  ],
+  [
+   "FMA22459",
+   "right adductor magnus"
+  ],
+  [
+   "FMA22460",
+   "left adductor magnus"
+  ],
+  [
+   "FMA43883",
+   "right gracilis"
+  ],
+  [
+   "FMA43884",
+   "left gracilis"
+  ],
+  [
+   "FMA43886",
+   "right adductor minimus"
+  ],
+  [
+   "FMA43887",
+   "left adductor minimus"
+  ]
+ ]
+}
