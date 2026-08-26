@@ -9012,7 +9012,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-149 · v11.149 worklog-to-command';
+const NOTIF_BUILD_VERSION = '2026.08.26-150 · v11.150 import-units';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12984,6 +12984,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.150', date:'Aug 26, 2026', major:true, notes:[
+      'Bulk import was reading pounds as kilograms. It recognised lb, lbs and pounds well enough to accept the line, then threw the unit away and filed everything as kg \u2014 so \u201cBench 225 lbs x3\u201d was stored as 225 kg. That is a 2.2x overstatement, and it fed straight into your training volume, the Physical Strength attribute and Power Level. All three places that build a row now keep the unit you typed.',
+      'A bare set line under an exercise heading, like \u201c8x135 lbs\u201d, was worse: its unit was not even read. That is fixed too, and kilograms, kilogram spellings and bodyweight all still work.',
+      'Worth checking any training you bulk-imported in pounds \u2014 those rows are still filed as kg and will need re-entering or editing.',
+    ]},
     {version:'v11.149', date:'Aug 26, 2026', notes:[
       'Moved the activity log \u2014 the card headed \u201cWork Log \u00b7 Week\u201d when it is filtered to work \u2014 from Productivity to the Command Center, where it sits full width under Daily Missions. The category and range chips move with it, so it still covers every kind of log, not just work.',
       'Productivity\u2019s Suggested Tasks card was left alone in a two-column row by that move, so it would have rendered at half width next to an empty column. That row is a single column now.',
@@ -14903,11 +14908,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _localParseWorkoutText(text){
     const guessPart=(name)=>this._guessBodyPart(name);
     // "Name  30kg x10reps" / "Name 3x10 @60kg" / "Name 30 x10" — name + weight[+unit] + x + reps.
+    // Every branch below used to hand pushRow a hardcoded 'kg'. The unit was matched by the
+    // regexes and then thrown away, so "Bench 225 lbs x3" stored 225 kg — a 2.2x overstatement
+    // that flowed straight into training volume, the Physical Strength attribute and Power
+    // Level. Normalised to the two canonical values the unit chips use ('kg' / 'lb'), plus BW.
+    const normUnit=(u)=>{ const t=String(u||'').trim().toLowerCase();
+      if(/^(bw|bodyweight)$/.test(t)) return 'BW';
+      if(/^(lb|lbs|pound|pounds)$/.test(t)) return 'lb';
+      return 'kg'; };
     const combinedRe=/^(.+?)\s+(\d+(?:\.\d+)?)\s*(kg|kgs|kilograms|lb|lbs|pounds|bw|bodyweight)?\s*[x×]\s*(\d+(?:\.\d+)?)\s*(?:reps?|rep|sets?)?\s*$/i;
     // "Push ups x20" / "Burpees x 15 reps" — name + reps only, no weight (bodyweight).
     const bwRe=/^(.+?)\s+[x×]\s*(\d+(?:\.\d+)?)\s*(?:reps?|rep)?\s*$/i;
     // A bare data line under an existing header, e.g. "10x30kg" (reps x weight kg).
-    const setLineRe=/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(?:kg|kgs|lb|lbs)?\s*$/i;
+    const setLineRe=/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(kg|kgs|lb|lbs|pounds)?\s*$/i;
     const minsRe=/^(\d+(?:\.\d+)?)\s*(?:min|mins|minutes)\b/i;
     const rows=[]; let curNames=[];
     const pushRow=(names,weight,unit,sets,reps,minutes)=>{
@@ -14919,14 +14932,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       let m;
       if((m=stripped.match(combinedRe))){
         const names=this._splitExerciseNames(m[1].replace(/[:\-]+$/,'').trim());
-        if(names.length){ const isBW=/bw|bodyweight/i.test(m[3]||''); pushRow(names, isBW?0:(+m[2]||0), isBW?'BW':'kg', 1, +m[4]||0, 0); return; }
+        if(names.length){ const u=normUnit(m[3]); pushRow(names, u==='BW'?0:(+m[2]||0), u, 1, +m[4]||0, 0); return; }
       }
       if((m=stripped.match(bwRe))){
         const names=this._splitExerciseNames(m[1].replace(/[:\-]+$/,'').trim());
         if(names.length){ pushRow(names, 0, 'BW', 1, +m[2]||0, 0); return; }
       }
       if((m=stripped.match(setLineRe))){
-        if(curNames.length) pushRow(curNames, +m[2]||0, 'kg', 1, +m[1]||0, 0);
+        if(curNames.length) pushRow(curNames, +m[2]||0, normUnit(m[3]), 1, +m[1]||0, 0);
         return;
       }
       const mm=stripped.match(minsRe);
@@ -14952,7 +14965,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             if(durM){ const perSet=(/sec/i.test(durM[2])?+durM[1]:+durM[1]*60); minutes=Math.round(perSet*(setsM?+setsM[1]:1)/60*10)/10; }
             const weight=wtM?+wtM[1]:0;
             const reps=repsM?+repsM[1]:(repsAltM?+repsAltM[1]:0);
-            pushRow(names, weight, wtM?'kg':'BW', setsM?+setsM[1]:0, reps, minutes);
+            pushRow(names, weight, wtM?normUnit(wtM[2]):'BW', setsM?+setsM[1]:0, reps, minutes);
             return;
           }
         }
