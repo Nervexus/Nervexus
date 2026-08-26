@@ -371,7 +371,15 @@
   .cc-dash [style*="margin-bottom:18px"]{ margin-bottom:10px !important; }
   .cc-dash [style*="padding:20px"]{ padding:12px !important; }
   .cc-dash [style*="gap:16px"]{ gap:8px !important; }
-  .cc-home-hero{ padding:20px 16px !important; min-height:calc(100vh - 220px) !important; }
+  /* The hero's decorative border sits at inset:18px, and Maison Élysée adds a second line at
+     26px — but mobile padding was 16px, so the greeting, the date line, the Noir divider and
+     the Focus Mode chip were all laid out OUTSIDE those lines and cut straight through them.
+     Measured at 390px wide: chip and date line 16px from the edge, greeting 19px, and the Noir
+     divider overflowing the card by 9px a side. Padding now clears the innermost line. */
+  .cc-home-hero{ padding:26px 34px !important; min-height:calc(100vh - 220px) !important; }
+  .cc-home-focus{ display:none !important; }
+  .cc-home-hero svg{ max-width:100% !important; height:auto !important; }
+  .cc-home-sysline{ font-size:8.5px !important; letter-spacing:1.4px !important; line-height:1.8 !important; max-width:100% !important; white-space:normal !important; }
   .cc-home-toprow{ justify-content:flex-start !important; flex-direction:column !important; align-items:flex-start !important; gap:12px !important; }
   .cc-home-navlinks{ gap:14px !important; width:100%; }
   .cc-mobhamburger{ display:flex !important; }
@@ -1056,7 +1064,7 @@
               </sc-for>
             </div>
             </sc-if>
-            <span onClick="{{ toggleFocus }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#dcdce0; border:1px solid rgba(255,255,255,0.3); border-radius:9px; padding:8px 14px; cursor:pointer; white-space:nowrap;" style-hover="{ background:'rgba(255,255,255,0.1)', borderColor:'rgba(255,255,255,0.6)' }">{{ focusBtnLabel }}</span>
+            <span onClick="{{ toggleFocus }}" class="cc-home-focus" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#dcdce0; border:1px solid rgba(255,255,255,0.3); border-radius:9px; padding:8px 14px; cursor:pointer; white-space:nowrap;" style-hover="{ background:'rgba(255,255,255,0.1)', borderColor:'rgba(255,255,255,0.6)' }">{{ focusBtnLabel }}</span>
           </div>
         </div>
         <div style="position:relative; z-index:1; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:14px; padding:20px 0;">
@@ -1086,7 +1094,7 @@
                 <rect x="296" y="2" width="8" height="8" fill="#C4BDB0" transform="rotate(45 300 6)"/>
               </svg>
             </div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#968F82; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#968F82; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
@@ -1100,19 +1108,19 @@
               <div style="width:6px; height:6px; background:#F6F0E4; transform:rotate(45deg);"></div>
               <div style="width:120px; height:1px; background:rgba(246,240,228,0.55);"></div>
             </div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3.4px; color:rgba(253,250,244,0.78); text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3.4px; color:rgba(253,250,244,0.78); text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:14px; display:inline-flex; align-items:center; gap:10px; padding:13px 36px; border-radius:2px; border:1px solid rgba(246,240,228,0.7); color:#FDFAF4; font-size:10.5px; letter-spacing:2.6px; text-transform:uppercase; cursor:pointer;" style-hover="{ background:'rgba(253,250,244,0.14)', borderColor:'#FDFAF4' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
         </div>
@@ -8966,7 +8974,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-140 · v11.140 reachable-curve';
+const NOTIF_BUILD_VERSION = '2026.08.26-141 · v11.141 mobile-home-hero';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12924,6 +12932,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.141', date:'Aug 26, 2026', notes:[
+      'Fixed the home screen on a phone. The decorative border is drawn 18px in from the card edge (Maison \u00c9lys\u00e9e has a second line at 26px), but the content only had 16px of padding \u2014 so the greeting, the date line and Noir\u2019s divider were all positioned outside those lines and cut straight through them. Measured on a 390px screen: the date line sat 16px from the edge, the greeting 19px, and Noir\u2019s divider overhung the whole card by 9px a side. Padding now clears the innermost line on every style, the divider is capped to the card width, and the date line is sized to fit on one row.',
+      'Removed the Focus Mode chip on phones. It sat in the top-left corner right on top of the border and was the worst of the clashes. It is unchanged on desktop.',
+    ]},
     {version:'v11.140', date:'Aug 26, 2026', major:true, notes:[
       'The level curve is reachable now. Each level used to cost 100 XP more than the last one did, compounding, so Titan at level 1000 wanted 49,950,000 XP \u2014 on the order of two centuries at any realistic rate. Elite I at level 200 alone wanted 1,990,000. The whole top two thirds of the ladder was decoration. Levels now cost 105 at the bottom rising to about 5,095 at the very top: the early climb costs what it always did, and the full run to Titan is 2,597,400 XP, on the order of a decade of consistent logging.',
       'Because levels are cheaper, this morning\u2019s carry-over is gone \u2014 deleted, not reduced. The account reaches level 113 on genuinely earned XP alone, well above the level 62 the carry-over was propping up, so there is nothing left to prop. Every point on the Power Level card is now something you logged. Attribute levels use the same curve and rise with it.',
