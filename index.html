@@ -1115,10 +1115,24 @@
             <div class="cc-home-logo" style="border-color:rgba(246,240,228,0.8);"><img src="favicon.png" alt="Nervexus"></div>
             <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#F6F0E4;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:500; letter-spacing:0; line-height:1.12; color:#FDFAF4; margin:2px 0 0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
-            <div style="display:flex; align-items:center; gap:12px; margin:34px 0 6px;">
-              <div style="width:120px; height:1px; background:rgba(246,240,228,0.55);"></div>
-              <div style="width:6px; height:6px; background:#F6F0E4; transform:rotate(45deg);"></div>
-              <div style="width:120px; height:1px; background:rgba(246,240,228,0.55);"></div>
+            <div style="margin:34px 0 6px;">
+              <svg width="300" height="26" viewBox="0 0 600 28" style="display:block;">
+                <g fill="none" stroke="#F6F0E4" stroke-width="1.2" stroke-linecap="round" opacity="0.75">
+                  <line x1="12" y1="14" x2="240" y2="14"/>
+                  <line x1="360" y1="14" x2="588" y2="14"/>
+                </g>
+                <g fill="#F6F0E4" opacity="0.75">
+                  <circle cx="12" cy="14" r="1.8"/>
+                  <circle cx="588" cy="14" r="1.8"/>
+                  <circle cx="252" cy="14" r="1.5"/>
+                  <circle cx="348" cy="14" r="1.5"/>
+                </g>
+                <g fill="none" stroke="#F6F0E4" stroke-width="1.2" stroke-linejoin="round">
+                  <path d="M294,14 C284,6 272,8 268,14 C272,20 284,22 294,14 Z"/>
+                  <path d="M306,14 C316,6 328,8 332,14 C328,20 316,22 306,14 Z"/>
+                  <path d="M300,4 L306,14 L300,24 L294,14 Z"/>
+                </g>
+              </svg>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3.4px; color:rgba(253,250,244,0.78); text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:14px; display:inline-flex; align-items:center; gap:10px; padding:13px 36px; border-radius:2px; border:1px solid rgba(246,240,228,0.7); color:#FDFAF4; font-size:10.5px; letter-spacing:2.6px; text-transform:uppercase; cursor:pointer;" style-hover="{ background:'rgba(253,250,244,0.14)', borderColor:'#FDFAF4' }">{{ powerOnLabel }}</span>
@@ -1127,7 +1141,11 @@
             <div class="cc-home-logo" style="border-color:rgba(91,26,26,0.45);"><img src="favicon.png" alt="Nervexus"></div>
             <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-size:22px; font-weight:800; letter-spacing:6px; text-transform:uppercase; color:#fff;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
-            <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
+            <div style="display:flex; align-items:center; gap:12px; margin:6px 0 2px;">
+              <div style="width:120px; height:1px; background:rgba(91,26,26,0.32);"></div>
+              <div style="width:6px; height:6px; background:#5B1A1A; transform:rotate(45deg);"></div>
+              <div style="width:120px; height:1px; background:rgba(91,26,26,0.32);"></div>
+            </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
@@ -1135,7 +1153,11 @@
             <div class="cc-home-logo" style="border-color:rgba(255,255,255,0.55);"><img src="favicon.png" alt="Nervexus"></div>
             <p class="cc-home-wordmark cc-home-wordmark-caps" style="font-size:22px; font-weight:800; letter-spacing:6px; text-transform:uppercase; color:#fff;">{{ homeWordmark }}</p>
             <h1 class="cc-home-greeting" style="font-size:{{ homeGreetingSize }}; font-weight:800; letter-spacing:-1px; line-height:1.15; color:#fff; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
-            <div style="width:64px; height:1px; background:rgba(255,255,255,0.3);"></div>
+            <div style="display:flex; align-items:center; gap:12px; margin:6px 0 2px;">
+              <div style="width:120px; height:1px; background:rgba(255,255,255,0.42);"></div>
+              <div style="width:6px; height:6px; background:#fff; transform:rotate(45deg);"></div>
+              <div style="width:120px; height:1px; background:rgba(255,255,255,0.42);"></div>
+            </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
@@ -8990,7 +9012,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-142 · v11.142 universal-home-logo';
+const NOTIF_BUILD_VERSION = '2026.08.26-143 · v11.143 maison-fleuron';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12948,6 +12970,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.143', date:'Aug 26, 2026', notes:[
+      'Swapped the home screen dividers over. The plain rule\u2013diamond\u2013rule that Maison \u00c9lys\u00e9e was using has moved to Ultra X, where it belonged, and Maison now has an ornament of its own: a leaf fleuron with a lozenge at its centre, sitting between two fine rules. Ultra X had only a bare 64px line before.',
+      'Ultra X\u2019s divider is drawn in its deep red rather than white \u2014 that style always renders on a light card, where white rules and a white diamond simply disappear. The base theme keeps the white version on its dark card.',
+    ]},
     {version:'v11.142', date:'Aug 26, 2026', notes:[
       'One logo layout across every raiment. The mark used to be drawn differently in each style \u2014 Noir had a 60px ring with a 28px emblem, Maison \u00c9lys\u00e9e a 104px ring with a 56px one, and Ultra X and the base theme had no mark at all. Every style now shares the same ring, the same emblem size and the same spacing, on desktop and on mobile; colour is the only thing each style still sets for itself.',
       'The emblem also reads properly now. favicon.png is a 1024px square but the laurel only fills the middle half of it and sits high in the frame, so dropped in at face value it showed up as a small smudge inside the ring. It is scaled and re-centred so it fills the ring the way it should.',
