@@ -309,7 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=5"></script>
+<script src="voice-assistant-engine.js?v=6"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=2"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9137,7 +9137,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-172 · v11.172 loura';
+const NOTIF_BUILD_VERSION = '2026.08.27-173 · v11.173 loura-acknowledges';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10647,6 +10647,8 @@ activities: this._mergeShipLog(s.activities),
   // order — each one is awaited to completion before the next starts. _ttsStreamId lets
   // a barge-in (new voice command) invalidate an in-flight queue without racing it.
   _ttsStreamReset(){ this._ttsQueue=[]; this._ttsStreamId=(this._ttsStreamId||0)+1; }
+  // Speak without interrupting whatever is already speaking. Same logging as speak().
+  _speakQueued(text){ if(!text) return; if(this.state.scene==='voice') this._logConvo('assistant',text); this._ttsStreamPush(text); }
   // Enqueue one finished sentence and make sure the drain loop is running. Kicking
   // _ttsDrain on every push is safe: it returns the in-flight promise if already going.
   _ttsStreamPush(text){ if(!text||!text.trim()) return; (this._ttsQueue=this._ttsQueue||[]).push(text); this._ttsDrain(); }
@@ -11039,7 +11041,12 @@ activities: this._mergeShipLog(s.activities),
       firstName:()=>((this.state.account&&this.state.account.name)||'').trim().split(/\s+/)[0]||'there',
       say:(text)=>this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})),
       replaceLast:(text)=>this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text}]})),
-      speak:(text)=>{ this._lastAIReply=text; this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this.speak(text); },
+      // ack() then speak() are two utterances in a row. this.speak() routes to
+      // _speakEleven, which pauses whatever is already playing — so back-to-back calls
+      // would talk over themselves and you would only ever hear the second one. Both go
+      // through the TTS queue instead, which plays them in order.
+      ack:(text)=>{ this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this._speakQueued(text); },
+      speak:(text)=>{ this._lastAIReply=text; this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this._speakQueued(text); },
       hasAI:()=>!!(window.AIGateway && window.AIGateway.isConfigured() && window.AIGateway.available()),
       ask:async(prompt)=>{
         const res=await window.AIGateway.ask('voice', this._personaPrefix()+' '+prompt, {});
@@ -13184,6 +13191,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.173', date:'Aug 27, 2026', notes:[
+      'Loura answers you twice now when you ask her to do something \u2014 \u201cOkay, doing that now\u201d, then \u201cI\u2019ve logged 30 minutes of running for you\u201d once it is actually saved. Questions still get one straight answer.',
+      'Fixed the orb vanishing the moment you gave her a command.',
+    ]},
     {version:'v11.172', date:'Aug 27, 2026', major:true, notes:[
       'Your assistant has a name: Loura. Say \u201cLoura\u201d to start a command, or ask her what her name is.',
     ]},
@@ -16264,7 +16275,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // third of it.
   _mountVoiceOrb(el){
     if(!el || !window.VoidOrb || !window.VoidOrb.supported()) return;
-    if(this._orbEl===el && this._voiceCoreApi) return;
+    // The canvas is appended by us, not by the template, so a re-render diffs it away
+    // while leaving the mount div itself in place. Checking only for the API meant the
+    // guard short-circuited and the orb never came back — it disappeared the moment the
+    // first command triggered a setState.
+    if(this._orbEl===el && this._voiceCoreApi && this._voiceCoreHost && this._voiceCoreHost.isConnected) return;
     this._unmountVoiceOrb();
     this._orbEl=el;
     const host=document.createElement('div');

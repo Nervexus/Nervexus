@@ -16,7 +16,7 @@ function host(hasAI=false, aiReply='AI says hi'){
   const rec=(n)=>(...a)=>{ calls.push([n,...a]); return undefined; };
   return {
     firstName:()=>'Sam',
-    say:t=>spoken.push(t), speak:t=>spoken.push(t), replaceLast:t=>{spoken[spoken.length-1]=t;},
+    say:t=>spoken.push(t), speak:t=>spoken.push(t), ack:t=>spoken.push(t), replaceLast:t=>{spoken[spoken.length-1]=t;},
     hasAI:()=>hasAI,
     ask:async()=>({text:aiReply}),
     tools:{
@@ -46,6 +46,9 @@ const T=[]; const t=(n,f)=>T.push([n,f]);
 const eq=(a,b,m)=>{ if(JSON.stringify(a)!==JSON.stringify(b)) throw new Error((m||'')+' got '+JSON.stringify(a)+' want '+JSON.stringify(b)); };
 const has=(s,sub,m)=>{ if(!String(s).toLowerCase().includes(sub.toLowerCase())) throw new Error((m||'')+' "'+s+'" lacks "'+sub+'"'); };
 const call=(n)=>calls.find(c=>c[0]===n);
+// Action rules speak twice — acknowledgement then confirmation — so assertions about
+// the outcome read the LAST line, not the first.
+const last=()=>spoken[spoken.length-1];
 
 // ---- LOCAL tier: no provider connected at all ----
 t('opens a page', async()=>{ const h=host(); await VA.handle('Open my fitness centre',h);
@@ -93,12 +96,12 @@ t('turns itself off', async()=>{ const h=host(); await VA.handle('That will be a
 
 // ---- completion ----
 t('ticks a task off', async()=>{ const h=host(); await VA.handle('Mark call the accountant as done',h);
-  const c=call('completeTask'); has(c[1],'call the accountant'); has(spoken[0],'Ticked off'); });
+  const c=call('completeTask'); has(c[1],'call the accountant'); has(last(),'ticked off'); });
 t('an unknown task falls through instead of lying', async()=>{ const h=host(false);
   await VA.handle('Mark buy a yacht as done',h);
-  has(spoken[0],'AI centre','should reach the no-key AI message, not claim success'); });
+  has(last(),'AI centre','should reach the no-key AI message, not claim success'); });
 t('completes a mission', async()=>{ const h=host(); await VA.handle('Complete my cold shower mission',h);
-  has(spoken[0],'Cold shower'); });
+  has(last(),'Cold shower'); });
 
 // ---- queries ----
 t('water today with goal percentage', async()=>{ const h=host(); await VA.handle('How much water have I had?',h);
@@ -128,6 +131,24 @@ t('strips a wake word and politeness', async()=>{ const h=host();
 t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
+
+// ---- acknowledge, then confirm ----
+t('an action is acknowledged before it runs, then confirmed', async()=>{ const h=host();
+  await VA.handle('Log 30 minutes of running',h);
+  if(spoken.length!==2) throw new Error('expected ack + confirmation, got '+JSON.stringify(spoken));
+  has(spoken[1],'I’ve logged'); has(spoken[1],'Running'); has(spoken[1],'30 min'); });
+t('the acknowledgement comes first, before the tool is called', async()=>{ const h=host();
+  const order=[]; const realAck=h.ack; h.ack=(t)=>{ order.push('ack'); realAck(t); };
+  const realLog=h.tools.logWorkout; h.tools.logWorkout=(...a)=>{ order.push('log'); return realLog(...a); };
+  await VA.handle('Log 30 minutes of running',h);
+  eq(order,['ack','log']); });
+t('a question is answered in one beat, not acknowledged first', async()=>{ const h=host();
+  await VA.handle('How much water have I had?',h);
+  if(spoken.length!==1) throw new Error('a query should not be acknowledged: '+JSON.stringify(spoken)); });
+t('acknowledgements rotate rather than repeating', async()=>{ const h=host();
+  await VA.handle('Log 500 ml of water',h); const first=spoken[0];
+  await VA.handle('Log 500 ml of water',h); const second=spoken[2];
+  if(first===second) throw new Error('same acknowledgement twice running: '+first); });
 
 // ---- Loura ----
 t('answers to her name', async()=>{ const h=host(); await VA.handle('What is your name?',h);
@@ -165,7 +186,7 @@ t('local rules still run when a key IS connected', async()=>{ const h=host(true)
 t('a throwing tool is reported, not swallowed', async()=>{ const h=host();
   h.tools.addTask=()=>{ throw new Error('database offline'); };
   await VA.handle('Add a task to call the accountant',h);
-  has(spoken[0],'database offline'); });
+  has(last(),'database offline'); });
 
 // ---- manifest ----
 t('manifest declares both tiers with needsKey set', async()=>{

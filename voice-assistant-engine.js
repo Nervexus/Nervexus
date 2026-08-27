@@ -74,7 +74,7 @@
   // swallows them: "log my weight at 82 kilos" parsed as a workout called "weight"
   // lifting 82kg. The test suite pins each of those collisions.
   var LOCAL = [
-    { id:'nav', label:'Open a page', say:'"Open my fitness centre"',
+    { id:'nav', acts:true, label:'Open a page', say:'"Open my fitness centre"',
       re:/^(?:open|go to|show|take me to|switch to)\s+(?:the\s+|my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         // People name pages loosely — "fitness", "fitness centre", "the fitness page". Strip
@@ -84,12 +84,12 @@
         var scene = SCENES[want] || SCENES[want.split(/\s+/)[0]];
         if (!scene) return null;                       // not a page — let another rule or the AI tier take it
         host.tools.nav(scene);
-        return 'Opening ' + want + '.';
+        return 'Opening your ' + want + ' now.';
       } },
 
-    { id:'addTask', label:'Add a task', say:'"Add a task to call the accountant"',
+    { id:'addTask', acts:true, label:'Add a task', say:'"Add a task to call the accountant"',
       re:/^(?:add|create|make)\s+(?:a\s+)?(?:new\s+)?task(?:\s+(?:to|for|called|named))?\s+(.+?)[.?!]*$/i,
-      run:function (m, host) { host.tools.addTask(cap(m[1].trim())); return 'Added “' + m[1].trim() + '” to your tasks.'; } },
+      run:function (m, host) { host.tools.addTask(cap(m[1].trim())); return 'I’ve added “' + m[1].trim() + '” to your tasks.'; } },
 
     { id:'openTasks', label:'What is still open', say:'"What tasks do I have left?"',
       re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$/i,
@@ -115,36 +115,36 @@
         return d.length ? 'Today: ' + list(d) + '.' : 'No training logged today yet.';
       } },
 
-    { id:'addMission', label:'Add a mission', say:'"Add a mission called cold shower"',
+    { id:'addMission', acts:true, label:'Add a mission', say:'"Add a mission called cold shower"',
       re:/^(?:add|create|start)\s+(?:a\s+)?(?:new\s+)?mission(?:\s+(?:called|named|for|to))?\s+(.+?)[.?!]*$/i,
-      run:function (m, host) { host.tools.addMission(cap(m[1].trim())); return 'Mission added: ' + m[1].trim() + '.'; } },
+      run:function (m, host) { host.tools.addMission(cap(m[1].trim())); return 'I’ve added the mission “' + m[1].trim() + '” for you.'; } },
 
-    { id:'remember', label:'Remember a fact', say:'"Remember that my gym closes at ten"',
+    { id:'remember', acts:true, label:'Remember a fact', say:'"Remember that my gym closes at ten"',
       re:/^(?:remember|note|keep in mind)\s+(?:that\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) { host.tools.addMemory(m[1].trim()); return 'Noted — I’ll remember that ' + m[1].trim() + '.'; } },
 
-    { id:'schedule', label:'Schedule an event', say:'"Schedule a dentist appointment on Friday at 3pm"',
+    { id:'schedule', acts:true, label:'Schedule an event', say:'"Schedule a dentist appointment on Friday at 3pm"',
       re:/^(?:schedule|book|put in|add)\s+(?:a\s+|an\s+)?(.+?)\s+(?:on|for|at)\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
         var r = host.tools.scheduleEvent(cap(m[1].trim()), m[2].trim());
-        return 'Scheduled “' + m[1].trim() + '” for ' + r.date + (r.time ? ' at ' + r.time : '') + '.';
+        return 'I’ve scheduled “' + m[1].trim() + '” for ' + r.date + (r.time ? ' at ' + r.time : '') + '.';
       } },
 
-    { id:'completeTask', label:'Tick a task off', say:'"Mark call the accountant as done"',
+    { id:'completeTask', acts:true, label:'Tick a task off', say:'"Mark call the accountant as done"',
       re:/^(?:mark|tick|check)\s+(?:off\s+)?(?:the\s+)?(?:task\s+)?(.+?)(?:\s+(?:as\s+)?(?:done|off|complete[d]?))?[.?!]*$|^(?:i(?:’|')?ve\s+)?(?:done|finished|completed)\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
         var want = (m[1] || m[2] || '').trim(); if (!want) return null;
         var hit = host.tools.completeTask(want);
         if (hit === null) return null;                 // no such open task — let the AI tier try
-        return 'Ticked off “' + hit + '”.';
+        return 'I’ve ticked off “' + hit + '” for you.';
       } },
 
-    { id:'completeMission', label:'Complete a mission', say:'"Complete my cold shower mission"',
+    { id:'completeMission', acts:true, label:'Complete a mission', say:'"Complete my cold shower mission"',
       re:/^(?:complete|finish|did)\s+(?:my\s+|the\s+)?(.+?)\s*mission[.?!]*$|^(?:complete|finish)\s+mission\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
         var want = (m[1] || m[2] || '').trim(); if (!want) return null;
         var hit = host.tools.completeMission(want);
-        return hit === null ? 'I couldn’t find an open mission matching “' + want + '”.' : 'Marked “' + hit + '” complete.';
+        return hit === null ? 'I couldn’t find an open mission matching “' + want + '”.' : 'I’ve marked “' + hit + '” complete for you.';
       } },
 
     { id:'askWater', label:'Water so far today', say:'"How much water have I had?"',
@@ -207,7 +207,7 @@
         return left.length ? plural(left.length, 'mission') + ' left: ' + list(left) + '.' : 'All missions done for today.';
       } },
 
-    { id:'logWater', label:'Log water', say:'"Log 500 ml of water"',
+    { id:'logWater', acts:true, label:'Log water', say:'"Log 500 ml of water"',
       re:/^(?:log|add|drank|had)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
       run:function (m, host) {
         var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?)?/i.exec(spoken(m[1] || m[2] || ''));
@@ -217,17 +217,17 @@
           ml = /^(l|litre|liter)/.test(u) ? v * 1000 : /glass|cup/.test(u) ? v * 250 : v;
         }
         host.tools.logHydration(ml);
-        return 'Logged ' + ml + ' ml of water.';
+        return 'I’ve logged ' + ml + ' ml of water for you.';
       } },
 
-    { id:'logWeight', label:'Log body weight', say:'"Log my weight at 82 kilos"',
+    { id:'logWeight', acts:true, label:'Log body weight', say:'"Log my weight at 82 kilos"',
       re:/^(?:log|record|set)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$/i,
       run:function (m, host) {
         var kg = num(spoken(m[1])); if (!kg) return null;
-        host.tools.logWeight(kg); return 'Logged your weight at ' + kg + ' kg.';
+        host.tools.logWeight(kg); return 'I’ve logged your weight at ' + kg + ' kg.';
       } },
 
-    { id:'logSleep', label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',
+    { id:'logSleep', acts:true, label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',
       re:/^(?:log|record)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep[.?!]*$|^(?:i\s+)?slept\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1] || m[2] || '');
@@ -235,10 +235,10 @@
         var mi = /(\d+)\s*(?:m|mins?|minutes?)/i.exec(t);
         if (!h && !mi) return null;
         host.tools.logSleep(h ? num(h[1]) : 0, mi ? num(mi[1]) : 0);
-        return 'Logged ' + (h ? plural(num(h[1]), 'hour') : '') + (mi ? (h ? ' ' : '') + mi[1] + ' min' : '') + ' of sleep.';
+        return 'I’ve logged ' + (h ? plural(num(h[1]), 'hour') : '') + (mi ? (h ? ' ' : '') + mi[1] + ' min' : '') + ' of sleep for you.';
       } },
 
-    { id:'logMoney', label:'Log income or an expense', say:'"Log an expense of 40 pounds for fuel"',
+    { id:'logMoney', acts:true, label:'Log income or an expense', say:'"Log an expense of 40 pounds for fuel"',
       re:/^(?:log|record|add)\s+(?:an?\s+)?(income|expense|payment|spend|cost)\s*(?:of\s*)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[2]);
@@ -247,10 +247,10 @@
         var isIncome = /income|payment/i.test(m[1]);
         if (isIncome) host.tools.logIncome(cap(label), num(amt[1]));
         else host.tools.logExpense(cap(label), num(amt[1]));
-        return 'Logged ' + (isIncome ? 'income' : 'expense') + ': ' + label + ', ' + num(amt[1]) + '.';
+        return 'I’ve logged that ' + (isIncome ? 'income' : 'expense') + ' — ' + label + ', ' + num(amt[1]) + '.';
       } },
 
-    { id:'logMeal', label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
+    { id:'logMeal', acts:true, label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
       re:/^(?:log|ate|had)\s+(?:a\s+|some\s+)?(.+?)(?:\s+(?:at|with)\s+(.+))?[.?!]*$/i,
       run:function (m, host) {
         var extra = spoken(m[2] || '');
@@ -258,10 +258,10 @@
         var pro  = /(\d+(?:\.\d+)?)\s*g?\s*(?:of\s+)?protein/i.exec(extra);
         if (!kcal && !pro) return null;                // no nutrition figures — not a meal log
         host.tools.logMeal(cap(m[1].trim()), kcal ? num(kcal[1]) : 0, pro ? num(pro[1]) : 0);
-        return 'Logged ' + m[1].trim() + (kcal ? ' at ' + num(kcal[1]) + ' kcal' : '') + '.';
+        return 'I’ve logged ' + m[1].trim() + (kcal ? ' at ' + num(kcal[1]) + ' kcal' : '') + ' for you.';
       } },
 
-    { id:'logWorkout', label:'Log a workout', say:'"Log 30 minutes of running" · "Log bench press 3 sets of 8 at 60 kilos"',
+    { id:'logWorkout', acts:true, label:'Log a workout', say:'"Log 30 minutes of running" · "Log bench press 3 sets of 8 at 60 kilos"',
       re:/^log\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1]);
@@ -285,12 +285,12 @@
         if (sets) bits.push(sets[1] + '×' + (reps ? reps[1] : '?'));
         if (wt) bits.push(wt[1] + (/lb|pound/i.test(wt[2]) ? 'lb' : 'kg'));
         if (mins) bits.push(mins[1] + ' min');
-        return 'Logged ' + name + (bits.length ? ' — ' + bits.join(', ') : '') + '.';
+        return 'I’ve logged ' + name + (bits.length ? ' — ' + bits.join(', ') : '') + ' for you.';
       } },
 
-    { id:'addNote', label:'Save a note', say:'"Make a note called ideas — buy the domain"',
+    { id:'addNote', acts:true, label:'Save a note', say:'"Make a note called ideas — buy the domain"',
       re:/^(?:make|add|save|write)\s+(?:a\s+)?note(?:\s+(?:called|titled|named))?\s+(.+?)(?:\s*[—–:-]\s*(.+))?[.?!]*$/i,
-      run:function (m, host) { host.tools.addNote(cap(m[1].trim()), (m[2] || '').trim()); return 'Note saved.'; } },
+      run:function (m, host) { host.tools.addNote(cap(m[1].trim()), (m[2] || '').trim()); return 'I’ve saved that note for you.'; } },
 
     { id:'time', label:'Time and date', say:'"What is the date?"',
       re:/^(?:what(?:’s| is)?\s+(?:the\s+)?)?(time|date|day)(?:\s+is\s+it)?[.?!]*$/i,
@@ -316,7 +316,7 @@
                              : 'Open questions need an AI provider connected in the AI centre.');
       } },
 
-    { id:'stop', label:'Turn the assistant off', say:'"That will be all"',
+    { id:'stop', acts:true, label:'Turn the assistant off', say:'"That will be all"',
       re:/^(?:that(?:’|')?(?:ll| will) be all|stop listening|go to sleep|shut (?:up|down)|turn off)[.?!]*$/i,
       run:function (m, host) { host.tools.disableAssistant(); return 'Going quiet. Tap Hold to talk when you need me.'; } }
 
@@ -330,6 +330,16 @@
     { id:'summary',  label:'Summarise your data', say:'"How has my training gone this month?"' }
   ];
 
+  /* Two-beat replies for anything that changes something: acknowledge first, act, then
+     confirm what actually happened. The gap is real work — a Supabase write and a state
+     update — and silence across it reads as the assistant having missed you.
+
+     Queries are single-beat on purpose: "let me check" in front of an answer we already
+     have is theatre. */
+  var ACKS = ['Okay, doing that now.', 'Sure — one moment.', 'On it.', 'Right, let me get that.'];
+  var ackAt = 0;
+  function nextAck() { var a = ACKS[ackAt % ACKS.length]; ackAt++; return a; }
+
   function noAIReply(host) {
     var examples = LOCAL.slice(0, 4).map(function (r) { return r.say.split(' · ')[0]; });
     return 'I can’t answer that one without an AI provider connected — add a key in the AI centre. '
@@ -337,6 +347,16 @@
   }
 
   // ---- dispatch -----------------------------------------------------------------
+  /* Which rule would claim this utterance, without running it. Only the regex is
+     consulted — a rule that matches but then declines (returns null) is still reported
+     here, which is why the acknowledgement can occasionally precede a fall-through to
+     the AI tier. That is the right trade: a stray "one moment" is far cheaper than
+     silence on every real command. */
+  function matchRule(text) {
+    for (var i = 0; i < LOCAL.length; i++) if (LOCAL[i].re.test(text)) return LOCAL[i];
+    return null;
+  }
+
   function runLocal(text, host) {
     for (var i = 0; i < LOCAL.length; i++) {
       var m = LOCAL[i].re.exec(text);
@@ -345,7 +365,7 @@
       try { out = LOCAL[i].run(m, host); }
       catch (e) { return { handled:true, reply:'I understood that but couldn’t save it — ' + ((e && e.message) || 'something went wrong') + '.' }; }
       if (out === null || out === undefined) continue;   // rule declined — keep looking
-      return { handled:true, reply:out, id:LOCAL[i].id };
+      return { handled:true, reply:out, id:LOCAL[i].id, acts:!!LOCAL[i].acts };
     }
     return { handled:false };
   }
@@ -365,6 +385,10 @@
   function handle(text, host) {
     var t = tidy(String(text || '').trim());
     if (!t) return Promise.resolve();
+
+    // Peek first so the acknowledgement lands BEFORE the work, not after it.
+    var rule = matchRule(t);
+    if (rule && rule.acts && host.ack) host.ack(nextAck());
 
     var local = runLocal(t, host);
     if (local.handled) { host.speak(local.reply); return Promise.resolve(local.reply); }
@@ -392,10 +416,7 @@
       };
     },
     /* Exposed for tests: run the rules without a host doing any speaking. */
-    _matchLocal: function (text) {
-      for (var i = 0; i < LOCAL.length; i++) if (LOCAL[i].re.test(text)) return LOCAL[i].id;
-      return null;
-    }
+    _matchLocal: function (text) { var r = matchRule(text); return r ? r.id : null; }
   };
 
 }(window));
