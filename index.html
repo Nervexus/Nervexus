@@ -293,7 +293,7 @@
 <script src="countries-data.js"></script>
 <script src="notif-engine.js"></script>
 <script src="voice-engine.js"></script>
-<script src="providers-data.js"></script>
+<script src="providers-data.js?v=2"></script>
 <script src="health-tracker.js"></script>
 <script src="learning-maths.js"></script>
 <script src="learning-english.js?v=4"></script>
@@ -9179,6 +9179,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 // so the orb covers ~82% of the box rather than ~94% — PX grew from 440 to 500 to keep the
 // orb the same size on screen (0.94x220 and 0.823x250 are both ~207px of visible radius).
 // LIFT raises its centre above the [data-orb-home] marker.
+// Reached only when the voice library is empty — see _defaultVoiceId().
+const VOICE_FALLBACK_ID = '21m00Tcm4TlvDq8ikWAM';
 const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 /* Speech recognition marks a result "final" at the first real pause, which cuts people off
    mid-sentence: "I did 100kg bench press today" lands while they are still saying "can you
@@ -9192,7 +9194,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-194 · v11.194 tts-cache-per-voice';
+const NOTIF_BUILD_VERSION = '2026.08.27-195 · v11.195 dynamic-voice-library';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10706,7 +10708,25 @@ activities: this._mergeShipLog(s.activities),
   // Cache key is voice + text, not text alone: a line rendered ahead of time in the old
   // voice would otherwise be played back after switching, so one reply in the middle of a
   // conversation would come out in the previous voice.
-  _ttsVoiceId(){ return (this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM'; }
+  /* The voice library and the default, in one place. There are no stock voices any more:
+     the library is what you have added by ID, so the "default" cannot be a literal — it is
+     simply the first voice you have. VOICE_FALLBACK_ID is only reached when the library is
+     empty, so speech still works before the first voice is added; the moment one exists it
+     takes over, and swapping it swaps the active model with it. */
+  _voiceLibrary(){
+    const PD=this._pd();
+    const built=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0]&&PD.TTS_PROVIDERS[0].voices)||[];
+    const custom=(this.state.prefs&&this.state.prefs.customElevenVoices)||[];
+    return [...built,...custom];
+  }
+  _defaultVoiceId(){ const lib=this._voiceLibrary(); return (lib[0]&&lib[0].id)||VOICE_FALLBACK_ID; }
+  // The stored preference, but never a voice that has since been removed from the library.
+  _ttsVoiceId(){
+    const cur=this.state.prefs&&this.state.prefs.elevenVoiceId;
+    const lib=this._voiceLibrary();
+    if(cur && (!lib.length || lib.some(v=>v.id===cur))) return cur;
+    return this._defaultVoiceId();
+  }
   _ttsKey(voiceId,text){ return voiceId+'\u0000'+text; }
   _prefetchEleven(text){ if(!text||!text.trim()) return; this._ttsCache=this._ttsCache||new Map(); if(!this._sbOn()) return;
     const voiceId=this._ttsVoiceId(), key=this._ttsKey(voiceId,text);
@@ -10779,7 +10799,14 @@ activities: this._mergeShipLog(s.activities),
     this.mut(s=>{ const cur=s.prefs.customElevenVoices||[]; if(cur.find(v=>v.id===id)) return {}; return { prefs:{...s.prefs, customElevenVoices:[...cur,{id,name,custom:true}], elevenVoiceId:id} }; });
     this.setState({customVoiceIdDraft:'', customVoiceNameDraft:''});
   }
-  removeCustomElevenVoice(id){ this.mut(s=>({ prefs:{...s.prefs, customElevenVoices:(s.prefs.customElevenVoices||[]).filter(v=>v.id!==id), elevenVoiceId:s.prefs.elevenVoiceId===id?'21m00Tcm4TlvDq8ikWAM':s.prefs.elevenVoiceId} })); }
+  removeCustomElevenVoice(id){
+    this.mut(s=>{
+      const left=(s.prefs.customElevenVoices||[]).filter(v=>v.id!==id);
+      const wasActive=s.prefs.elevenVoiceId===id;
+      const next=wasActive ? ((left[0]&&left[0].id)||VOICE_FALLBACK_ID) : s.prefs.elevenVoiceId;
+      return { prefs:{...s.prefs, customElevenVoices:left, elevenVoiceId:next} };
+    });
+  }
   async previewElevenVoice(voiceId){
     const c=this._provCfg('elevenlabs');
     if(!c.saved){ this._setProv('elevenlabs',{err:'Connect your ElevenLabs key above first'}); return; }
@@ -15909,9 +15936,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     try{ const res=await window.SB.ttsSpeak('elevenlabs', text, voiceId); if(res && !res.error && res.audioBase64){ this.setState({voiceFallbackErr:''}); if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } if(window.speechSynthesis) window.speechSynthesis.cancel(); const audio=new Audio('data:'+(res.mime||'audio/mpeg')+';base64,'+res.audioBase64); this._elevenAudio=audio; audio.play().catch(()=>{}); return; } this.setState({voiceFallbackErr:(res&&res.error)||'ElevenLabs call failed'}); }
     catch(e){ this.setState({voiceFallbackErr:'ElevenLabs error: '+((e&&e.message)||e)}); }
   }
-  spkPlay(){ const SP=window.LearningSpeaking; if(!SP) return; const S=this.state; const sentence=SP.getSentence(S.spkTier,S.spkIdx||0); const vid=(S.prefs&&S.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
+  spkPlay(){ const SP=window.LearningSpeaking; if(!SP) return; const S=this.state; const sentence=SP.getSentence(S.spkTier,S.spkIdx||0); const vid=this._ttsVoiceId();
     this._elOrLocalSpeak(sentence.text||sentence, vid, ()=>{ this._initVoice(); this._ve&&this._ve.speakWith('pro_f', sentence.text||sentence); }); }
-  spkCoachPlay(){ const S=this.state; const text=(S.spkCoachInput||'').trim(); if(!text) return; const vid=(S.prefs&&S.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
+  spkCoachPlay(){ const S=this.state; const text=(S.spkCoachInput||'').trim(); if(!text) return; const vid=this._ttsVoiceId();
     this._elOrLocalSpeak(text, vid, ()=>{ this._initVoice(); this._ve&&this._ve.speakWith('pro_f', text); }); }
   spkListen(){ try{ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR){ this.setState({spkResult:{verdict:'retry',label:'Speech recognition isn\u2019t supported in this browser.'}}); return; }
     const r=this._spkRecog=new SR(); r.lang='en-US'; r.interimResults=false;
@@ -16039,7 +16066,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   phyOpenTutor(){ this._phyStopTicker(); this.setState({phyMode:'tutor'}); }
   setPhyTutorInput(e){ this.setState({phyTutorInput:e.target.value}); }
   phyTutorSetVoice(id){ this.setState({phyTutorVoiceId:id}); }
-  phyTutorSpeak(text){ const vid=(this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
+  phyTutorSpeak(text){ const vid=this._ttsVoiceId();
     this._elOrLocalSpeak(text, vid, ()=>{ this._initVoice(); this._ve&&this._ve.speakWith('pro_f', text); }); }
   phyTutorListen(){ try{ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
     const r=this._phyRecog=new SR(); r.lang='en-US'; r.interimResults=false;
@@ -16431,7 +16458,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   closeTutor(){ this.setState({tutorOpen:false}); }
   setTutorInput(e){ this.setState({tutorInput:e.target.value}); }
   tutorSetVoice(id){ this.setState({tutorVoiceId:id}); }
-  tutorSpeak(text){ const vid=(this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
+  tutorSpeak(text){ const vid=this._ttsVoiceId();
     this._elOrLocalSpeak(text, vid, ()=>{ this._initVoice(); this._ve&&this._ve.speakWith('pro_f', text); }); }
   tutorListen(){ try{ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR) return;
     const r=this._tutorRecog=new SR(); r.lang='en-US'; r.interimResults=false;
@@ -17084,7 +17111,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           elSaved:!!c.saved, elNotSaved:!c.saved, elMasked:c.masked||'',
           elDraft:(S.provDraft||{}).elevenlabs||'', onElDraft:(e)=>this.setProvDraft('elevenlabs',e), elSave:()=>this.saveProvKey('elevenlabs'), elReplace:()=>this.replaceProvKey('elevenlabs'),
           elTest:()=>this.testProvider('elevenlabs'), elErr:c.err||'',
-          elVoiceId:(S.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM', setElVoiceId:(e)=>this.setPref('elevenVoiceId', e.target.value),
+          elVoiceId:this._ttsVoiceId(), setElVoiceId:(e)=>this.setPref('elevenVoiceId', e.target.value),
           toggleReadAloud:()=>this.toggleReadAloud(), readAloudBg:(S.prefs.readAloudEnabled!==false)?'#FFFFFF':'rgba(255,255,255,0.14)', readAloudPos:(S.prefs.readAloudEnabled!==false)?'18px':'2px',
           elVoiceOptions:tts.voices||[],
         }; })(),
@@ -17358,10 +17385,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
       emailProvider:S.prefs.emailProvider||'resend', setEmailProvider:(e)=>this.setPref('emailProvider',e.target.value),
       speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?vTok.vInk:vTok.vMuted2, b:(S.prefs.voiceRate||1)===o?vTok.vAccent:vTok.vLine, bg:(S.prefs.voiceRate||1)===o?vTok.vLine2:'transparent'})),
-      voiceModelName:(()=>{ const PD=this._pd(); const built=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0].voices)||[]; const custom=S.prefs.customElevenVoices||[]; const cur=S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'; const match=[...built,...custom].find(p=>p.id===cur); return (match&&match.name)||'ElevenLabs voice'; })(),
+      voiceModelName:(()=>{ const lib=this._voiceLibrary(); if(!lib.length) return 'No voice added yet'; const cur=this._ttsVoiceId(); const match=lib.find(p=>p.id===cur); return (match&&match.name)||'ElevenLabs voice'; })(),
       voiceDeviceName:this._provCfg('elevenlabs').saved?'ElevenLabs (cloud)':'Browser voice (fallback — connect ElevenLabs above)',
       voiceFallbackErr:S.voiceFallbackErr||'',
-      testVoice:()=>this.previewElevenVoice(S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'),
+      testVoice:()=>this.previewElevenVoice(this._ttsVoiceId()),
       adminUsers:(S.perfTeamProfiles||[]).filter(p=>p.id!==S.authUserId).map(p=>{ const nm=p.name||p.email||'User'; const suspended=p.account_status==='suspended'; return {
         name:nm, email:p.email, role:(p.role||'member').toUpperCase(), roleC:'#9a9aa2',
         status:suspended?'SUSPENDED':'ACTIVE', statusCol:suspended?'#ff5563':'#6cffba', isActive:!suspended, isSuspended:suspended,
@@ -18176,7 +18203,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const prog={Basic:[],Mid:[],High:[], ...((S.learning&&S.learning.speakingProgress)||{})};
         const tierCards=(SP?SP.TIERS:[]).map(t=>{ const cnt=SP.tierCount(t); const done=(prog[t]||[]).length; return { key:t, label:t, doneCount:done, total:cnt, pct: cnt?Math.round(done/cnt*100):0, go:()=>this.spkStartPractice(t) }; });
         const doneSet=new Set(prog[tier]||[]);
-        const voiceOptions=((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ id:p.id, label:p.name, go:()=>this.spkSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.spkVoiceId||'21m00Tcm4TlvDq8ikWAM')===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.spkVoiceId||'pro_f')===p.id?'#0a0a0b':'#c5c5ca' }));
+        const voiceOptions=this._voiceLibrary().map(p=>({ id:p.id, label:p.name, go:()=>this.spkSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.spkVoiceId||this._ttsVoiceId())===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.spkVoiceId||this._ttsVoiceId())===p.id?'#0a0a0b':'#c5c5ca' }));
         const totalDone=Object.keys(prog).reduce((a,k)=>a+(prog[k]?prog[k].length:0),0);
         const totalAll=(SP?SP.TIERS:[]).reduce((a,t)=>a+SP.tierCount(t),0);
         const verdictColors={excellent:'#4ADE80',good:'#4ADE80',close:'#e8b45a',retry:'#ff5563'};
@@ -18314,7 +18341,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const phyQtOverallAccuracyVal=phyQtOverallTotals.total?Math.round(phyQtOverallTotals.ok/phyQtOverallTotals.total*100):0;
         const phyQtTodayXPVal=(qtPhy.xpByDate||{})[phyQtToday]||0;
         const r4=S.phyLastResult;
-        const phyTutorVoiceOptions=((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ id:p.id, label:p.name, go:()=>this.phyTutorSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.phyTutorVoiceId||'21m00Tcm4TlvDq8ikWAM')===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.phyTutorVoiceId||'pro_f')===p.id?'#0a0a0b':'#c5c5ca' }));
+        const phyTutorVoiceOptions=this._voiceLibrary().map(p=>({ id:p.id, label:p.name, go:()=>this.phyTutorSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.phyTutorVoiceId||this._ttsVoiceId())===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.phyTutorVoiceId||this._ttsVoiceId())===p.id?'#0a0a0b':'#c5c5ca' }));
         const phyTutorMsgs=(S.phyTutorMessages||[]).map((m,i)=>({ idx:i, isUser:m.role==='user', text:m.text, bubbleBg:m.role==='user'?'#1e1e21':'#141416', align:m.role==='user'?'flex-end':'flex-start', speak:()=>this.phyTutorSpeak(m.text) }));
         return {
           isPhysiologySubject:S.learningTab==='Human Physiology',
@@ -18629,7 +18656,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ...this._safe(()=>{
         const subj=S.tutorSubject||'maths';
         const msgs=((S.tutorMessages&&S.tutorMessages[subj])||[]).map((m,i)=>({ idx:i, isUser:m.role==='user', text:m.text, bubbleBg:m.role==='user'?'#1e1e21':'#141416', align:m.role==='user'?'flex-end':'flex-start', speak:()=>this.tutorSpeak(m.text) }));
-        const voiceOptions=((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ id:p.id, label:p.name, go:()=>this.tutorSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.tutorVoiceId||'21m00Tcm4TlvDq8ikWAM')===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.tutorVoiceId||'pro_f')===p.id?'#0a0a0b':'#c5c5ca' }));
+        const voiceOptions=this._voiceLibrary().map(p=>({ id:p.id, label:p.name, go:()=>this.tutorSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.tutorVoiceId||this._ttsVoiceId())===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.tutorVoiceId||this._ttsVoiceId())===p.id?'#0a0a0b':'#c5c5ca' }));
         return {
           isTutorOpen:!!S.tutorOpen, tutorTitle:this._tutorTitle(subj), closeTutor:()=>this.closeTutor(),
           openMathsTutor:()=>this.openTutor('maths'), openEnglishTutor:()=>this.openTutor('english'), openScienceTutor:()=>this.openTutor('science'),
@@ -18972,7 +18999,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       customVoiceNameDraft:S.customVoiceNameDraft||'', onCustomVoiceNameDraft:(e)=>this.setState({customVoiceNameDraft:e.target.value}),
       addCustomVoice:()=>this.addCustomElevenVoice(), addCustomVoiceKey:enterKey(()=>this.addCustomElevenVoice()),
 
-      voices:(()=>{ const PD=this._pd(); const tts=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0])||{voices:[]}; const custom=S.prefs.customElevenVoices||[]; const all=[...tts.voices,...custom]; const cur=S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM';
+      voices:(()=>{ const all=this._voiceLibrary(); const custom=S.prefs.customElevenVoices||[]; const cur=this._ttsVoiceId();
         return all.map(v=>({ id:v.id, name:v.name, custom:!!v.custom, pick:()=>this.setPref('elevenVoiceId',v.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(v.id); },
           bg:cur===v.id?'rgba(255,255,255,0.14)':'transparent', b:cur===v.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', c:cur===v.id?'#F4F4F5':'#c8c8ce',
           starColor:'transparent', starIcon:'', star:()=>{}, remove:custom.find(cv=>cv.id===v.id)?()=>this.removeCustomElevenVoice(v.id):()=>{} })); })(),
