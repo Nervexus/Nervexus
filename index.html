@@ -309,6 +309,7 @@
 <script src="voice-assistant-engine.js"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
+<script src="ai-gateway.js"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=2"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9098,7 +9099,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 // sphere covers ~94% of it, so the orb draws ~355px across. LIFT raises it above the
 // [data-orb-home] marker the old shard cluster centred on.
 const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
-const NOTIF_BUILD_VERSION = '2026.08.27-164 · v11.164 float-orb-swap';
+const NOTIF_BUILD_VERSION = '2026.08.27-165 · v11.165 ai-gateway-cutover';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9323,7 +9324,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -9488,7 +9489,7 @@ activities: this._mergeShipLog(s.activities),
     this.setState({quoteGenLoading:true, quoteGenErr:''});
     const sys='You write short, brutal, militant self-discipline quotes. No softness, no comfort, no hedging, no sympathy. Harsh truths only. Use commanding, advanced vocabulary. The agenda is total, pure success through an iron mind — relentless standards, zero excuses, contempt for weakness and comfort-seeking. Match the exact voice, rhythm and intensity of the example quotes given — same themes, same register. When real personal data is given, use it as a weapon: call the person out directly and mercilessly by name for the exact numbers that show weakness (a broken streak, a skipped gym day, unfinished tasks, money bleeding out) — make it personal, specific and cutting, never generic. Output ONLY minified JSON, no markdown fences.';
     const prompt='Here are the '+existing.length+' quotes currently saved — match this exact voice, themes and intensity:\n'+existing.map((q,i)=>(i+1)+'. '+q).join('\n')+'\n\nHere is real data on this person right now — use it to make quotes hit harder by calling out their actual numbers directly, without mercy, exactly like: "You think missing the gym is okay?" when a streak is broken:\n'+this._quoteUserContext()+'\n\nWrite 20 NEW quotes (never repeat the examples). At least half must directly reference the real data above (call out broken streaks, unfinished tasks, skipped workouts, bleeding money) in that same harsh militant voice. The rest continue the same themes as the saved quotes. Return JSON exactly as: {"quotes":["quote one","quote two", ...]}';
-    window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:2000}).then(raw=>{
+    window.claude.complete({role:'writing', system:sys, messages:[{role:'user',content:prompt}], max_tokens:2000}).then(raw=>{
       const j=this._extractJSON(raw);
       if(j && Array.isArray(j.quotes) && j.quotes.length){
         const now=Date.now(); const fresh=j.quotes.map((text,i)=>({id:'q'+now+'_g'+i, text:String(text).trim()})).filter(q=>q.text.length>3);
@@ -9513,7 +9514,7 @@ activities: this._mergeShipLog(s.activities),
       '\n\nReturn ONLY minified JSON, no markdown fences, exactly as: {"notifs":["text one","text two", ...]}';
     try{
       let raw;
-      if(providerId==='claude-native'){ raw=await window.claude.complete({system:'Output only JSON.', messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:2000}); }
+      if(providerId==='claude-native'){ raw=await window.claude.complete({role:'writing', system:'Output only JSON.', messages:[{role:'user',content:prompt}], max_tokens:2000}); }
       else { const res=await window.SB.callAI(providerId,prompt,this._provModel(providerId)); if(res.error) throw new Error(res.error); raw=res.result; }
       const j=this._extractJSON(raw);
       if(j && Array.isArray(j.notifs) && j.notifs.length){
@@ -9757,7 +9758,7 @@ activities: this._mergeShipLog(s.activities),
     if(!window.claude){ this.setState({searchWebErr:'No AI provider connected \u2014 add one in Settings \u2192 AI Providers to enable web answers.'}); return; }
     this.setState({searchWebLoading:true, searchWebErr:'', searchWebResult:''});
     try{
-      const text=await window.claude.complete({system:'Answer the question directly and simply, in plain everyday words, in 3-6 short sentences. If it needs current information you are not certain of, say so plainly.', messages:[{role:'user',content:q}], max_tokens:400});
+      const text=await window.claude.complete({role:'market', live:true, system:'Answer the question directly and simply, in plain everyday words, in 3-6 short sentences. If it needs current information you are not certain of, say so plainly.', messages:[{role:'user',content:q}], max_tokens:400});
       this.setState({searchWebLoading:false, searchWebResult:(text||'').trim()||'No answer found.'});
     }catch(e){ this.setState({searchWebLoading:false, searchWebErr:'Search failed \u2014 try again.'}); }
   }
@@ -9901,49 +9902,42 @@ activities: this._mergeShipLog(s.activities),
   // keyless Intel toggle themselves; nothing here fabricates a fake connection.
   _provInit(){ if(!window.PROVIDERS_DATA){ if(!this._provWait){ this._provWait=setInterval(()=>{ if(window.PROVIDERS_DATA){ clearInterval(this._provWait); this._provWait=null; this._provInit(); } },150); } return; }
     this._clearFakeSeedProviders();
+    this._initAIGateway();
     this._initClaudeShim();
     if((this.state.prefs||{})._provReady) return;
     this.mut(s=>({prefs:{...s.prefs, prov:s.prefs.prov||{}, intel:s.prefs.intel||{}, routing:{...window.PROVIDERS_DATA.DEFAULT_ROUTING, ...(s.prefs.routing||{})}, aiDefault:s.prefs.aiDefault||'', aiBackup:s.prefs.aiBackup||'', failover:s.prefs.failover||false, _provReady:true }})); }
   // Dozens of features across the app (quiz hints, Speaking Coach, Business/Fitness AI
   // chat, English writing analysis, calendar AI-import, quote generation, web-search
-  // quick-answers, the Executive Intelligence Briefing) were all written against a
-  // `window.claude.complete()` global that was never actually defined anywhere in the
-  // shipped app — every one of those features silently fell back to "AI unavailable in
-  // this environment" for every real user, forever, regardless of what was connected in
-  // Settings -> AI Providers. This gives that global a real implementation: it picks
-  // whichever AI provider the user has actually connected (their default, or the first
-  // connected+on one) and routes through the same ai-provider-proxy 'call' action the
-  // rest of the app already uses for real completions. One fix here repairs every site
-  // that calls window.claude.complete(...) without touching any of them individually.
+  // quick-answers, the Executive Intelligence Briefing) were written against a
+  // `window.claude.complete()` global that was never defined in the shipped app — every
+  // one silently fell back to "AI unavailable in this environment" for every real user.
+  //
+  // It has a real implementation now, and as of the gateway rebuild it is a thin adapter
+  // over window.AIGateway rather than a second routing path. That means these features
+  // get the same per-role Routing, failover and health handling as everything else;
+  // previously they had none of it and would keep hammering a provider the rest of the
+  // app had already benched.
+  //
+  // opts.role picks the Routing entry (PROVIDERS_DATA.AI_FEATURES id). opts.model is
+  // accepted and ignored: the model is whatever you chose for that provider in the AI
+  // centre, not whatever a call site hard-coded years ago.
   _initClaudeShim(){
     if(window.claude && window.claude.__nervexusReal) return;
     const self=this;
     window.claude = { __nervexusReal:true,
       async complete(opts){
         opts=opts||{};
-        if(!self._sbOn()) throw new Error('Not connected to Supabase — cannot reach an AI provider.');
-        const pref=self.state.prefs.aiDefault;
-        const prefCfg=pref&&self._provCfg(pref);
-        let providerId=(prefCfg&&prefCfg.saved&&prefCfg.on!==false) ? pref : null;
-        if(!providerId){
-          const PD=self._pd();
-          const found=PD&&PD.AI_PROVIDERS.find(p=>{ const c=self._provCfg(p.id); return c.saved && c.on!==false; });
-          providerId=found&&found.id;
-        }
-        if(!providerId) throw new Error('No AI provider connected — add one in Settings → AI Providers.');
         const sys=(opts.system||'').trim();
         const convo=Array.isArray(opts.messages) ? opts.messages.map(m=>(m.role==='assistant'?'Assistant: ':'User: ')+(typeof m.content==='string'?m.content:JSON.stringify(m.content))).join('\n\n') : '';
         const prompt=(sys?sys+'\n\n':'')+convo;
-        const res=await window.SB.callAI(providerId, prompt, self._provModel(providerId));
-        if(res && res.error){ const PD=self._pd(); const pname=(PD&&PD.byId(providerId)||{}).name||providerId; throw new Error(pname+': '+res.error); }
-        return (res && res.result) || '';
+        const res=await window.AIGateway.ask(opts.role||'writing', prompt, {live:!!opts.live});
+        // These call sites are written around try/catch, so a failure has to throw
+        // rather than resolve to an error object.
+        if(res.error) throw new Error(res.error);
+        return res.text||'';
       }
     };
   }
-  // One-time cleanup for accounts created before the fake demo seed above was removed —
-  // strips the exact fabricated openai/anthropic/google keys and the fabricated intel
-  // entries (real intel toggles never set .saved, so any intel entry carrying .saved
-  // is provably from the old fake seed, not a real user action).
   _clearFakeSeedProviders(){ const S=this.state; if((S.prefs||{})._fakeSeedCleared) return;
     const fakeMasked={openai:'sk-\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u20224f9a', anthropic:'sk-ant-\u2022\u2022\u2022\u2022\u2022\u20227c22', google:'AIza\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022b1'};
     this.mut(s=>{ const prov={...(s.prefs.prov||{})}; Object.keys(fakeMasked).forEach(id=>{ if(prov[id]&&prov[id].masked===fakeMasked[id]) delete prov[id]; });
@@ -10028,7 +10022,7 @@ activities: this._mergeShipLog(s.activities),
   setIntelCat(c){ this.setState({intelCat:c}); }
   _extractJSON(t){ try{ const a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a<0||b<0) return null; return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
   _extractJSONArray(t){ try{ const a=t.indexOf('['), b=t.lastIndexOf(']'); if(a<0||b<0) return null; return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
-  async generateBriefingAI(){ const PD=this._pd(); if(!PD||!window.claude){ this.setState({aiBriefErr:'AI provider unavailable in this environment'}); return; } this.setState({aiBriefLoading:true,aiBriefErr:''}); const enabled=PD.INTEL_SOURCES.filter(s=>this._intelCfg(s.id).on).map(s=>s.name); const provId=(this.state.prefs.routing&&this.state.prefs.routing.briefings)||this.state.prefs.aiDefault||'anthropic'; const provName=(PD.byId(provId)||{}).name||provId; const nm=((this.state.account&&this.state.account.name)||'').trim()||'the principal'; const sys='You are an elite executive intelligence analyst preparing a private daily briefing for a CEO, investor and entrepreneur. Concise, factual, non-sensational, premium tone. Return ONLY valid minified JSON, no markdown fences.'; const shape='{"outlook":"1-2 sentence global outlook","sentiment":"Bullish|Neutral|Bearish","summary":{"bigStory":"","moneyMoving":"","risk":"","opportunity":""},"sections":[{"title":"Global Money News","items":[{"tag":"EQUITIES","head":"headline","sum":"1-2 sentence analysis"}]}],"takeaways":["",""]}'; const prompt='Generate the Executive Intelligence Briefing for '+nm+'. Enabled intelligence sources: '+(enabled.join(', ')||'general knowledge')+'. Cover where relevant: '+PD.BRIEFING_CATEGORIES.join(', ')+'. Produce 4 to 6 sections, each with 2 to 4 items and short uppercase tags, plus 3 to 5 key takeaways. Return JSON exactly matching this shape: '+shape; try{ const raw=await window.claude.complete({system:sys,messages:[{role:'user',content:prompt}],model:'claude-sonnet-4-5',max_tokens:4000}); const j=this._extractJSON(raw); if(j&&j.sections){ this.setState({aiBrief:j,aiBriefLoading:false,aiBriefProvider:(window.claude?'Claude · live':provName),aiBriefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),briefTab:'exec',scene:'briefing'}); } else this.setState({aiBriefLoading:false,aiBriefErr:'Could not parse the AI response — try again.'}); }catch(e){ this.setState({aiBriefLoading:false,aiBriefErr:(e&&e.message)||'Generation failed'}); } }
+  async generateBriefingAI(){ const PD=this._pd(); if(!PD||!window.claude){ this.setState({aiBriefErr:'AI provider unavailable in this environment'}); return; } this.setState({aiBriefLoading:true,aiBriefErr:''}); const enabled=PD.INTEL_SOURCES.filter(s=>this._intelCfg(s.id).on).map(s=>s.name); const provId=(this.state.prefs.routing&&this.state.prefs.routing.briefings)||this.state.prefs.aiDefault||'anthropic'; const provName=(PD.byId(provId)||{}).name||provId; const nm=((this.state.account&&this.state.account.name)||'').trim()||'the principal'; const sys='You are an elite executive intelligence analyst preparing a private daily briefing for a CEO, investor and entrepreneur. Concise, factual, non-sensational, premium tone. Return ONLY valid minified JSON, no markdown fences.'; const shape='{"outlook":"1-2 sentence global outlook","sentiment":"Bullish|Neutral|Bearish","summary":{"bigStory":"","moneyMoving":"","risk":"","opportunity":""},"sections":[{"title":"Global Money News","items":[{"tag":"EQUITIES","head":"headline","sum":"1-2 sentence analysis"}]}],"takeaways":["",""]}'; const prompt='Generate the Executive Intelligence Briefing for '+nm+'. Enabled intelligence sources: '+(enabled.join(', ')||'general knowledge')+'. Cover where relevant: '+PD.BRIEFING_CATEGORIES.join(', ')+'. Produce 4 to 6 sections, each with 2 to 4 items and short uppercase tags, plus 3 to 5 key takeaways. Return JSON exactly matching this shape: '+shape; try{ const raw=await window.claude.complete({role:'briefings',system:sys,messages:[{role:'user',content:prompt}],max_tokens:4000}); const j=this._extractJSON(raw); if(j&&j.sections){ this.setState({aiBrief:j,aiBriefLoading:false,aiBriefProvider:(window.claude?'Claude · live':provName),aiBriefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),briefTab:'exec',scene:'briefing'}); } else this.setState({aiBriefLoading:false,aiBriefErr:'Could not parse the AI response — try again.'}); }catch(e){ this.setState({aiBriefLoading:false,aiBriefErr:(e&&e.message)||'Generation failed'}); } }
   clearAIBrief(){ this.setState({aiBrief:null,aiBriefErr:''}); }
   _providerVals(){ const PD=this._pd(); const S=this.state; if(!PD) return { aiProviderCards:[], intelCards:[], intelCatChips:[], routingRows:[], failoverProviders:[], provStats:[], isProvAI:true, isProvIntel:false, provSearch:'', aiDefaultName:'—', aiBackupName:'—', failoverOn:false, setProvViewAI:()=>{}, setProvViewIntel:()=>{}, onProvSearch:()=>{}, toggleFailover:()=>{}, genBriefing:()=>{}, aiBriefLoading:false, aiBriefErr:'', hasAIBrief:false, clearAIBrief:()=>{}, failBg:'rgba(255,255,255,0.14)', failPos:'2px' };
     const q=(S.provSearch||'').trim().toLowerCase();
@@ -10427,7 +10421,7 @@ activities: this._mergeShipLog(s.activities),
     const shape='{"gradeEstimate":"e.g. Grade 6","ao5":"1-2 sentences on content, organisation and how well it matches the task’s purpose/audience/form","ao6":"1-2 sentences on technical accuracy","correctedText":"the corrected/improved version","strengths":["short praise point"],"feedback":[{"issue":"short label","explanation":"clear, kind explanation of the mistake and the fix"}]}';
     const taskLine=task ? ('The task set was: "'+task.prompt+'"'+(task.form?(' (form: '+task.form+', audience: '+task.audience+', purpose: '+task.purpose+')'):'')+'. As part of AO5, judge whether the response actually fulfils this purpose/audience/form, not just whether the writing is technically correct.') : 'No specific task was set — mark this as free writing practice.';
     const prompt='Mark this student writing for GCSE English Language standard. '+taskLine+' Correct grammar, spelling and punctuation; improve vocabulary and sentence flow where helpful, but keep their voice and meaning. List 3-6 concrete pieces of feedback, and 1-3 genuine strengths. Estimate a GCSE grade (1-9). Student text:\n\n'+text+'\n\nReturn JSON exactly matching this shape: '+shape;
-    try{ const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:2000}); const j=this._extractJSON(raw);
+    try{ const raw=await window.claude.complete({role:'writing', system:sys, messages:[{role:'user',content:prompt}], max_tokens:2000}); const j=this._extractJSON(raw);
       if(j && j.correctedText){ this.setState({enWritingResult:j, enWritingLoading:false}); } else this.setState({enWritingLoading:false, enWritingErr:'Could not parse the AI response — try again.'});
     }catch(e){ this.setState({enWritingLoading:false, enWritingErr:(e&&e.message)||'Analysis failed'}); }
   }
@@ -10667,7 +10661,7 @@ activities: this._mergeShipLog(s.activities),
         this._ttsDrain();
       }
     };
-    const res=kind==='live' ? await this._apiAskLiveStream(query,onDelta) : await this._apiAskStream(query,{},onDelta);
+    const res=kind==='live' ? await this._apiAskLiveStream(query,onDelta,{role:'voice'}) : await this._apiAskStream(query,{role:'voice'},onDelta);
     const text=res.error ? (full ? (full.trim()+' — '+res.error) : res.error) : (res.text||full||'No answer returned.');
     this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text}]}));
     if(res.error){ if(!full) this._ttsQueue.push(res.error); /* else: partial reply already queued/spoken — transcript shows the error, skip reading it out */ }
@@ -10890,10 +10884,8 @@ activities: this._mergeShipLog(s.activities),
     if(!this._sbOn()) return null;
     const pulled=await this._pullConnectedNewsData('top headlines today');
     if(!pulled) return null;
-    const id=this._pickLiveProvider(); if(!id) return null;
-    try{ const res=await window.SB.callAI(id, this._personaPrefix()+' In ONE short spoken sentence, give the single most important headline from this data (no preamble):\n'+pulled, this._provModel(id));
-      if(res && !res.error && res.text) return {topic:'news', text:res.text.trim()};
-    }catch(e){}
+    const res=await window.AIGateway.ask('briefings', this._personaPrefix()+' In ONE short spoken sentence, give the single most important headline from this data (no preamble):\n'+pulled, {live:true});
+    if(!res.error && res.text) return {topic:'news', text:res.text.trim()};
     return null;
   }
   async maybeProactiveCoach(){
@@ -11017,13 +11009,13 @@ activities: this._mergeShipLog(s.activities),
       say:(text)=>this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})),
       replaceLast:(text)=>this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text}]})),
       speak:(text)=>{ this._lastAIReply=text; this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this.speak(text); },
-      ask:(prompt,opts)=>this._apiAsk(prompt,opts),
-      askLive:(query)=>this._apiAskLive(query),
+      ask:(prompt,opts)=>this._apiAsk(prompt,{...(opts||{}), role:'voice'}),
+      askLive:(query)=>this._apiAskLive(query,{role:'voice'}),
       // Streaming variants: speak sentence-by-sentence as the reply generates instead of
       // waiting for the whole thing. Each resolves the final text (already spoken/shown).
       askStreamAndSpeak:(query)=>this._streamAskAndSpeak('general',query),
       askLiveStreamAndSpeak:(query)=>this._streamAskAndSpeak('live',query),
-      hasGeneralProvider:()=>!!this._pickAutoProvider('general'),
+      hasGeneralProvider:()=>window.AIGateway.available(),
       tools:{
         nav:(scene)=>{ if(this.state.focusMode && scene!=='home') return; setTimeout(()=>this.setState({scene}),650); },
         addTask:(label)=>{ const id=this._uuid(); this.mut(s=>({checklist:[...s.checklist,{id,label,tag:'TASK',done:false}]})); if(this._sbOn()) window.SB.insert('checklist',{id,user_id:this.state.authUserId,label,tag:'TASK',done:false}); },
@@ -11232,105 +11224,92 @@ activities: this._mergeShipLog(s.activities),
     this.setState({missionsTestResult:body});
   }
   // ===== Provider health tracking (Auto-mode failover) =====
-  // Runtime-only per-provider {okStreak, errStreak, lastLatencyMs, lastErr, lastTs}. Feeds
-  // provider choice on top of the Settings → Routing & Failover default/backup order; three
-  // consecutive errors takes a provider out of rotation for 10 minutes.
-  _health(){ return this._provHealth || (this._provHealth = {}); }
-  _recordHealth(id,ok,latencyMs,err){
-    const H=this._health(), h=H[id]||(H[id]={okStreak:0,errStreak:0});
-    if(ok){ h.okStreak++; h.errStreak=0; h.lastLatencyMs=latencyMs; h.lastErr=''; } else { h.errStreak++; h.okStreak=0; h.lastErr=err||'error'; }
-    h.lastTs=Date.now();
+  // ===== AI gateway wiring =====
+  // Provider choice, failover, health and per-role routing all live in ai-gateway.js.
+  // This hands it the accessors it needs and nothing else — the gateway never reaches
+  // into app state, so it stays testable outside the browser (ai-gateway.test.mjs).
+  //
+  // Replaced _pickAutoProvider / _pickLiveProvider / _health / _recordHealth /
+  // _isHealthy, which were one of three competing routing paths in the app.
+  _initAIGateway(){
+    if(!window.AIGateway || this._aiGatewayReady) return;
+    this._aiGatewayReady=true;
+    const self=this;
+    window.AIGateway.configure({
+      providers:()=>{ const PD=self._pd(); return (PD&&PD.AI_PROVIDERS)||[]; },
+      cfg:(id)=>self._provCfg(id),
+      model:(id)=>self._provModel(id),
+      routing:()=>self.state.prefs.routing||{},
+      defaultId:()=>self.state.prefs.aiDefault||'',
+      backupId:()=>self.state.prefs.aiBackup||'',
+      failover:()=>!!self.state.prefs.failover,
+      online:()=>self._sbOn(),
+      call:(id,prompt,model)=>{
+        if(!window.SB || !window.SB.callAI) return Promise.resolve({error:'Backend client is not loaded yet.'});
+        return window.SB.callAI(id,prompt,model);
+      },
+      // Resolved per call, not once at configure time. supabase-client.js can still be
+      // loading when this runs, and capturing `window.SB.callAIStream` here would pin
+      // streaming to off for the rest of the session — the voice assistant would
+      // silently fall back to whole-response replies and never recover.
+      //
+      // Returning null tells the gateway streaming is unavailable for this call and to
+      // retry the same provider whole, rather than counting it as a provider failure.
+      stream:(id,prompt,onDelta,model)=>{
+        if(!window.SB || !window.SB.callAIStream) return Promise.resolve(null);
+        return window.SB.callAIStream(id,prompt,onDelta,model);
+      }
+    });
   }
-  _isHealthy(id){ const h=this._health()[id]; if(!h) return true; return !(h.errStreak>=3 && Date.now()-h.lastTs<10*60000); }
-  // Ordered candidate list: preferred default -> backup -> any other connected+enabled AI
-  // provider, skipping unhealthy ones when Auto Mode/failover is on.
-  _pickAutoProvider(kind){
-    const PD=this._pd(); if(!PD) return null;
-    const pool=kind==='live' ? PD.AI_PROVIDERS.filter(p=>p.live) : PD.AI_PROVIDERS;
-    const failoverOn=!!this.state.prefs.failover;
-    const order=[]; const def=this.state.prefs.aiDefault, bk=this.state.prefs.aiBackup;
-    if(def && pool.some(p=>p.id===def)) order.push(def);
-    if(bk && pool.some(p=>p.id===bk) && order.indexOf(bk)<0) order.push(bk);
-    pool.forEach(p=>{ if(order.indexOf(p.id)<0) order.push(p.id); });
-    for(const id of order){ const c=this._provCfg(id); if(!c.on||!c.saved) continue; if(failoverOn && !this._isHealthy(id)) continue; return id; }
-    // nothing healthy — if failover is on, fall back to any connected provider rather than fail outright
-    if(failoverOn) for(const id of order){ const c=this._provCfg(id); if(c.on&&c.saved) return id; }
-    return null;
-  }
+  // Roles come from PROVIDERS_DATA.AI_FEATURES — the same eight the AI centre's Routing
+  // panel sets. Passing one here is what makes that panel do something.
+  _aiRole(role){ return role||'voice'; }
+
+  // ===== AI request surface =====
+  // Four thin shapes over one gateway call. Everything that used to live here —
+  // candidate ordering, retry, health recording, live-provider filtering — is in
+  // ai-gateway.js now, so these cannot drift apart from the rest of the app again.
+  //
+  // `role` is a PROVIDERS_DATA.AI_FEATURES id and decides which Routing entry applies.
+  // `opts.raw` skips the assistant persona prefix, for prompts that are already fully
+  // specified (JSON extraction, imports) and would be damaged by it.
+  _aiText(res){ return (res && res.text) ? res.text : ''; }
   async _apiAsk(query,opts){
     opts=opts||{};
-    const attempted=[]; let lastErr='';
-    for(let i=0;i<2;i++){
-      const id=this._pickAutoProvider('general'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
-      const t0=Date.now(); let res; try{ res=await window.SB.callAI(id, opts.raw?query:(this._personaPrefix()+' '+query), this._provModel(id)); }catch(e){ res={error:(e&&e.message)||'Request failed'}; }
-      if(res && !res.error){ this._recordHealth(id,true,Date.now()-t0); return {text:res.result||'No answer returned.'}; }
-      lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
-      if(!this.state.prefs.failover) break; // no retry unless failover is enabled
-    }
-    if(!attempted.length) return {error:'I don\u2019t have an AI provider connected to help with that yet — add one in Settings \u2192 AI Providers.'};
-    return {error:'I couldn\u2019t complete that — '+lastErr+'.'};
+    const prompt=opts.raw?query:(this._personaPrefix()+' '+query);
+    const res=await window.AIGateway.ask(this._aiRole(opts.role), prompt, {});
+    if(res.error) return {error:res.error};
+    return {text:this._aiText(res)||'No answer returned.'};
   }
-  async _apiAskLive(query){
-    const attempted=[]; let lastErr='';
+  // Live questions get real data pulled from the connected news sources first, handed
+  // to the model as context so it answers from today rather than from training data.
+  async _liveQuery(query){
     const pulled=await this._pullConnectedNewsData(query);
-    const q2=this._personaPrefix()+' '+query+(pulled?'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+pulled+')':'');
-    for(let i=0;i<2;i++){
-      const id=this._pickAutoProvider('live'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
-      const t0=Date.now(); let res; try{ res=await window.SB.callAI(id,q2,this._provModel(id)); }catch(e){ res={error:(e&&e.message)||'Live search failed'}; }
-      if(res && !res.error){ this._recordHealth(id,true,Date.now()-t0); let text=res.result||'No answer returned.'; if(res.citations&&res.citations.length) text+='\n\nSources: '+res.citations.slice(0,3).join(', '); return {text}; }
-      lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
-      if(!this.state.prefs.failover) break;
-    }
-    if(!attempted.length) return {error:'I need a live-search provider connected to answer that — add a Perplexity or xAI (Grok) API key in Settings → AI Providers, then ask again.'};
-    return {error:'Live search failed: '+lastErr};
+    return this._personaPrefix()+' '+query+(pulled?'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+pulled+')':'');
   }
-  // Streaming counterparts of _apiAsk/_apiAskLive — onDelta(text) fires per token chunk.
-  // Same provider/failover selection, but only retries the next provider if the failed
-  // one hadn't started streaming yet (anyDelta) — once a reply is partway spoken, a silent
-  // provider swap mid-answer would blend two different completions together.
+  _withCitations(res){
+    let text=this._aiText(res)||'No answer returned.';
+    if(res.citations && res.citations.length) text+='\n\nSources: '+res.citations.slice(0,3).join(', ');
+    return text;
+  }
+  async _apiAskLive(query,opts){
+    opts=opts||{};
+    const res=await window.AIGateway.ask(this._aiRole(opts.role), await this._liveQuery(query), {live:true});
+    if(res.error) return {error:res.error};
+    return {text:this._withCitations(res)};
+  }
   async _apiAskStream(query,opts,onDelta){
     opts=opts||{};
-    const attempted=[]; let lastErr=''; let anyDelta=false;
-    const wrapDelta=(d)=>{ anyDelta=true; if(onDelta) onDelta(d); };
-    for(let i=0;i<2;i++){
-      const id=this._pickAutoProvider('general'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
-      const t0=Date.now(); let res; anyDelta=false;
-      try{
-        if(window.SB.callAIStream) res=await window.SB.callAIStream(id, opts.raw?query:(this._personaPrefix()+' '+query), wrapDelta, this._provModel(id));
-        else { res=await window.SB.callAI(id, opts.raw?query:(this._personaPrefix()+' '+query), this._provModel(id)); if(res&&!res.error) wrapDelta(res.result||''); }
-      }catch(e){ res={error:(e&&e.message)||'Request failed'}; }
-      if(res && !res.error){ this._recordHealth(id,true,Date.now()-t0); return {text:res.result||'No answer returned.'}; }
-      lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
-      if(anyDelta) break;
-      if(!this.state.prefs.failover) break;
-    }
-    if(!attempted.length) return {error:'I don\u2019t have an AI provider connected to help with that yet — add one in Settings \u2192 AI Providers.'};
-    return {error:'I couldn\u2019t complete that — '+lastErr+'.'};
+    const prompt=opts.raw?query:(this._personaPrefix()+' '+query);
+    const res=await window.AIGateway.stream(this._aiRole(opts.role), prompt, onDelta, {});
+    if(res.error) return {error:res.error};
+    return {text:this._aiText(res)};
   }
-  async _apiAskLiveStream(query,onDelta){
-    const attempted=[]; let lastErr=''; let anyDelta=false;
-    const wrapDelta=(d)=>{ anyDelta=true; if(onDelta) onDelta(d); };
-    const pulled=await this._pullConnectedNewsData(query);
-    const q2=this._personaPrefix()+' '+query+(pulled?'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+pulled+')':'');
-    for(let i=0;i<2;i++){
-      const id=this._pickAutoProvider('live'); if(!id || attempted.indexOf(id)>=0) break; attempted.push(id);
-      const t0=Date.now(); let res; anyDelta=false;
-      try{
-        if(window.SB.callAIStream) res=await window.SB.callAIStream(id,q2,wrapDelta,this._provModel(id));
-        else { res=await window.SB.callAI(id,q2,this._provModel(id)); if(res&&!res.error) wrapDelta(res.result||''); }
-      }catch(e){ res={error:(e&&e.message)||'Live search failed'}; }
-      if(res && !res.error){
-        this._recordHealth(id,true,Date.now()-t0);
-        let text=res.result||'No answer returned.';
-        if(res.citations&&res.citations.length){ const extra='\n\nSources: '+res.citations.slice(0,3).join(', '); text+=extra; if(onDelta) onDelta(extra); }
-        return {text};
-      }
-      lastErr=(res&&res.error)||'unknown error'; this._recordHealth(id,false,Date.now()-t0,lastErr);
-      if(anyDelta) break;
-      if(!this.state.prefs.failover) break;
-    }
-    if(!attempted.length) return {error:'I need a live-search provider connected to answer that — add a Perplexity or xAI (Grok) API key in Settings \u2192 AI Providers, then ask again.'};
-    return {error:'Live search failed: '+lastErr};
+  async _apiAskLiveStream(query,onDelta,opts){
+    opts=opts||{};
+    const res=await window.AIGateway.stream(this._aiRole(opts.role), await this._liveQuery(query), onDelta, {live:true});
+    if(res.error) return {error:res.error};
+    return {text:this._withCitations(res)};
   }
   _parseVoiceDate(text){ const low=(text||'').toLowerCase(); const now=new Date(); const fmt=(d)=>{ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } };
     if(/\btoday\b/.test(low)) return fmt(now);
@@ -11350,24 +11329,22 @@ activities: this._mergeShipLog(s.activities),
     return '09:00'; }
   // Any connected+enabled provider that can do a plain 'call' — kept for non-voice callers
   // (proactive coaching, elsewhere in the app). The voice assistant itself uses the
-  // health-aware _pickAutoProvider() above so it benefits from Auto-mode failover.
-  _pickLiveProvider(){ const PD=this._pd(); if(!PD) return null; const live=PD.AI_PROVIDERS.filter(p=>p.live);
-    const preferred=this.state.prefs.liveProvider; if(preferred && live.some(p=>p.id===preferred) && this._provCfg(preferred).saved) return preferred;
-    return this._pickAutoProvider('live'); }
+  // gateway above, so it benefits from per-role routing, failover and health.
+  // Which provider a live query will actually use, for labelling only — the gateway
+  // does the choosing, so the label cannot disagree with the call any more.
+  _pickLiveProvider(){ return window.AIGateway.resolve('market',{live:true}); }
   setLiveProvider(id){ this.setPref('liveProvider',id); }
   setSafetyQuery(e){ this.setState({safetyQuery:e.target.value}); }
   async runSafetyCheck(){ const q=(this.state.safetyQuery||'').trim(); if(!q) return; await this._safetyLookup(q); }
   async _safetyLookup(query){
-    const id=this._pickLiveProvider();
-    if(!id){ this.setState({safetyErr:'Add a Perplexity or xAI (Grok) key in Settings → AI Providers to run live safety checks.'}); return; }
     this.setState({safetyLoading:true, safetyErr:'', safetyResult:''});
     const _pulled=await this._pullConnectedNewsData(query);
     if(_pulled) query=query+'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+_pulled+')';
     const prompt='You are a location safety analyst. Using multiple current, reputable news and public-safety sources, give a concise safety assessment for: "'+query+'". Cover: 1) Overall safety level (Low/Moderate/High risk). 2) Types of crime reported recently in the area. 3) Any specific recent incidents you can find, with rough dates. 4) Practical safety advice for a visitor. Name the distinct sources you drew from.';
-    let res; try{ res=await window.SB.callAI(id,prompt,this._provModel(id)); }catch(e){ res={error:(e&&e.message)||'Safety check failed'}; }
-    if(res && res.error){ this.setState({safetyLoading:false, safetyErr:res.error}); return; }
-    let text=(res && res.result) || 'No answer returned.';
-    if(res && res.citations && res.citations.length) text+='\n\nSources: '+res.citations.slice(0,4).join(', ');
+    const res=await window.AIGateway.ask('market', prompt, {live:true});
+    if(res.error){ this.setState({safetyLoading:false, safetyErr:res.error}); return; }
+    let text=res.text || 'No answer returned.';
+    if(res.citations && res.citations.length) text+='\n\nSources: '+res.citations.slice(0,4).join(', ');
     this.setState({safetyLoading:false, safetyResult:text});
     return text;
   }
@@ -12076,10 +12053,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const res=await window.SB.providerStatus();
       // The server reports a saved key as {saved, masked, enabled} — never `on`, which is
       // the field every "is this provider usable" check in this file actually reads
-      // (_pickAutoProvider, the executive-brief/news-pull provider picks, the connection
+      // (the AI gateway's provider choice, the executive-brief/news-pull picks, the connection
       // counts). On a fresh page load that left `on` undefined, so a genuinely-saved,
       // genuinely-enabled key was silently invisible to the voice assistant and everything
-      // else that calls _pickAutoProvider — it would only start working again once you
+      // else that asks the gateway for a provider — it would only start working again once you
       // manually flipped the toggle off and back on in that browser tab. Mapping enabled
       // straight onto `on` here fixes every one of those checks at the single point they
       // all trace back to, instead of patching each call site.
@@ -13160,6 +13137,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.165', date:'Aug 27, 2026', major:true, notes:[
+      'Every AI feature now goes through one router. The AI centre\u2019s Routing panel actually works \u2014 set Briefings to a different provider and briefings really use it. Failover and provider health now cover every feature, not just the voice assistant.',
+    ]},
     {version:'v11.164', date:'Aug 27, 2026', notes:[
       'The floating assistant button in the corner now uses the new orb too, so the old one is gone everywhere.',
     ]},
@@ -14457,7 +14437,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const wk=this.weekMin(); const recent=[...s.workouts].sort((a,b)=>b.ts-a.ts).slice(0,8).map(w=>w.part+(w.ex?' - '+w.ex:'')+(w.weight?' '+w.weight+'kg x'+(w.sets||1)+'x'+(w.reps||0):(w.min?' '+w.min+'m':''))).join('; ')||'none logged';
     const sys='You are an AI fitness coach embedded in a command-center app. Be concise (2-5 sentences), direct, encouraging but honest, and give genuinely useful, specific training/recovery/nutrition advice — no filler, no disclaimers, no "consult a doctor" hedging unless something sounds genuinely unsafe. Ground answers in these real logged numbers when relevant: this week '+wk+' total minutes trained. Muscle groups trained in last 7 days: '+trained+'. Untrained in 7 days: '+untr+'. Recent sessions: '+recent+'.';
     const history=(s.fitChat||[]).slice(-10).map(m=>({role:m.who==='you'?'user':'assistant', content:m.text}));
-    try{ const text=await window.claude.complete({system:sys, messages:[...history,{role:'user',content:v}], max_tokens:400});
+    try{ const text=await window.claude.complete({role:'workout', system:sys, messages:[...history,{role:'user',content:v}], max_tokens:400});
       this.setState(st=>({fitChat:[...st.fitChat,{who:'ai',text:(text||'').trim()||this.fitReply(v)}], fitLoading:false}));
     }catch(e){ this.setState(st=>({fitChat:[...st.fitChat,{who:'ai',text:this.fitReply(v)}], fitLoading:false})); } }
   fitReply(text){ const t=text.toLowerCase(); const pm=this.partMinutes(); const trained=Object.keys(pm).filter(k=>pm[k]>0); const untr=['Chest','Back','Shoulders','Arms','Legs','Core'].filter(k=>!pm[k]); const wk=this.weekMin();
@@ -14605,7 +14585,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     ].join('\n');
     const history=(this.state.bizChat||[]).slice(-10).map(m=>({role:m.who==='you'?'user':'assistant', content:m.text}));
     try{
-      const raw=await window.claude.complete({system:sys, messages:[...history,{role:'user',content:v}], max_tokens:700});
+      const raw=await window.claude.complete({role:'business', system:sys, messages:[...history,{role:'user',content:v}], max_tokens:700});
       const res=this._adviserRunActions(raw);
       let reply=(res.text||'').trim() || this.bizReply(v);
       if(res.done.length) reply += '\n\n' + res.done.map(d=>'✓ '+d).join('\n');
@@ -14621,7 +14601,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(!window.claude){ this.setState({calImportLoading:false, calImportErr:'AI unavailable in this environment'}); return; }
       const nowY=new Date().getFullYear();
       const sys='You read screenshots of calendars, schedules, or itineraries and extract every event into structured data. Return ONLY a JSON array, no prose, no markdown fences: [{"title":"...","date":"YYYY-MM-DD","time":"HH:MM"}]. Use 24-hour time. If a year is not visible, assume '+nowY+'. If a specific time is not visible, use "09:00". Skip anything that is not a dated event.';
-      const text=await window.claude.complete({ system:sys, messages:[{role:'user', content:[
+      const text=await window.claude.complete({ role:'image', system:sys, messages:[{role:'user', content:[
         {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
         {type:'text', text:'Extract every event from this calendar screenshot as the JSON array described.'}
       ]}], max_tokens:1500});
@@ -15792,7 +15772,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({phyTutorMessages:history, phyTutorInput:'', phyTutorLoading:true, phyTutorErr:''});
     const sys='You are a world-class, highly experienced Human Psychology professor and tutor, covering persuasion, cognitive bias, habits and behaviour change, emotion, social psychology and motivation. Explain concepts clearly and precisely, at a level appropriate for a motivated student, citing real researchers/studies where relevant while remaining easy to follow. Use short paragraphs. Never refuse a genuine psychology question. Keep answers focused — 3-6 sentences unless the student asks for more depth.';
     const convo=history.slice(-8).map(m=>({role: m.role==='user'?'user':'assistant', content:m.text}));
-    try{ const raw=await window.claude.complete({system:sys, messages:convo, model:'claude-sonnet-4-5', max_tokens:700});
+    try{ const raw=await window.claude.complete({role:'writing', system:sys, messages:convo, max_tokens:700});
       const reply=(raw||'').trim();
       this.setState(s=>({ phyTutorMessages:[...s.phyTutorMessages, {role:'assistant', text:reply}], phyTutorLoading:false }));
       this.phyTutorSpeak(reply);
@@ -16184,7 +16164,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState(s=>({ tutorMessages:{...(s.tutorMessages||{}), [subj]:history}, tutorInput:'', tutorLoading:true, tutorErr:'' }));
     const sys=this._tutorSystemPrompt(subj)+' Use short paragraphs, correct terminology, and keep answers focused (3-6 sentences unless asked for more depth). Never refuse a genuine subject question.';
     const convo=history.slice(-8).map(m=>({role:'user', content:m.text}));
-    try{ const raw=await window.claude.complete({system:sys, messages:convo, model:'claude-sonnet-4-5', max_tokens:700}); const reply=(raw||'').trim();
+    try{ const raw=await window.claude.complete({role:'writing', system:sys, messages:convo, max_tokens:700}); const reply=(raw||'').trim();
       this.setState(s=>({ tutorMessages:{...s.tutorMessages, [subj]:[...(s.tutorMessages[subj]||[]), {role:'assistant', text:reply}]}, tutorLoading:false }));
       this.tutorSpeak(reply);
     }catch(e){ this.setState({tutorLoading:false, tutorErr:(e&&e.message)||'The tutor could not respond — try again.'}); }
