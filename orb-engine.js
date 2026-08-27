@@ -109,7 +109,7 @@
     var targetHover = 0, hoverAmt = 0;
     // Current drifted centre (updated every frame below) so hover detection tracks
     // the cluster's actual on-screen position, not the container's fixed centre.
-    var curOcx = 0, curOcy = 0;
+    var curOcx = 0, curOcy = 0, curR = 0;
     function onMove(e) {
       var rect = container.getBoundingClientRect();
       var x = e.clientX - rect.left, y = e.clientY - rect.top;
@@ -168,6 +168,7 @@
       // cluster up to fill the screen — it should look the same size it did
       // in the original 460px container, just free to roam a much bigger area.
       var R = Math.min(Math.min(cw, ch) * 0.3, 140) * (1 + Math.sin(t * 0.0011 + breathePhase) * 0.02 + hoverAmt * 0.035);
+      curR = R;   // published via getCenter() so a second layer can sit inside the cluster
       var focal = R * 2.6;
 
       // Reserve enough edge margin for the cluster's full visual reach, not
@@ -349,6 +350,10 @@
       setHoverIntensity: function (v) { hoverIntensity = v; },
       setDriftEnabled: function (v) { driftEnabled = !!v; },
       setHome: function (x, y) { homeX = x; homeY = y; },
+      // Where the cluster actually is this frame, in container pixels, plus its
+      // breathing core radius. The cluster roams, so anything meant to sit inside
+      // it has to follow rather than assume the container's centre.
+      getCenter: function () { return { x: curOcx, y: curOcy, r: curR }; },
       resize: resize,
       destroy: function () {
         if (destroyed) return;

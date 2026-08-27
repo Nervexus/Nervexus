@@ -305,7 +305,7 @@
 <script src="learning-money.js?v=3"></script>
 <script src="learning-gentleman.js?v=1"></script>
 <script src="gentleman-blackbook.js?v=1"></script>
-<script src="orb-engine.js?v=4"></script>
+<script src="orb-engine.js?v=5"></script>
 <script src="voice-assistant-engine.js"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
@@ -9098,7 +9098,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.27-159 · v11.159 void-orb';
+const NOTIF_BUILD_VERSION = '2026.08.27-160 · v11.160 voice-core-orb';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13160,6 +13160,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.160', date:'Aug 27, 2026', notes:[
+      'The voice assistant orb now has the same 3D wireframe core at its centre, and it follows the cluster as it drifts.',
+    ]},
     {version:'v11.159', date:'Aug 27, 2026', notes:[
       'Connection Map core is now a 3D wireframe orb that flexes and turns as the map moves.',
     ]},
@@ -16195,8 +16198,50 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _safe(fn,fallback){ try{ return fn(); }catch(e){ console.error('[renderVals] section failed, using fallback:', e); return fallback||{}; } }
   _mountVoiceOrb(el){ if(!el || !window.OrbEngine) return; const themeKey=this.state.prefs.theme+'|'+this.state.prefs.ultraStyle; if(this._orbEl===el && this._orbTheme===themeKey) return; this._orbEl=el; this._orbTheme=themeKey; if(this._orbApi){ this._orbApi.destroy(); this._orbApi=null; }
     const pal=this._orbPalette();
-    this._orbApi=window.OrbEngine.mount(el, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, satMul:1, dimMul:1, hoverIntensity:0, rotateOnHover:true, forceHoverState:!!this.state.listening, driftEnabled:this.state.prefs.orbDrift!==false}); }
-  _unmountVoiceOrb(){ if(this._orbApi){ this._orbApi.destroy(); this._orbApi=null; } this._orbEl=null; }
+    this._orbApi=window.OrbEngine.mount(el, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, satMul:1, dimMul:1, hoverIntensity:0, rotateOnHover:true, forceHoverState:!!this.state.listening, driftEnabled:this.state.prefs.orbDrift!==false});
+    this._mountVoiceCore(el); }
+  // The void orb sits inside the shard cluster as its core. The cluster roams the whole
+  // viewport and breathes, so the core follows getCenter() every frame rather than
+  // parking at the container's centre.
+  //
+  // The canvas is a fixed CORE_PX square scaled by CSS transform instead of being resized
+  // each frame: resizing a WebGL drawing buffer at 60fps reallocates it every time, and the
+  // core is small enough on screen that the resample is invisible.
+  _mountVoiceCore(el){
+    this._unmountVoiceCore();
+    if(!window.VoidOrb || !window.VoidOrb.supported() || !this._orbApi || !this._orbApi.getCenter) return;
+    const CORE_PX=240;
+    // The shader's sphere (radius 1.8 + 0.15 displacement) fills ~94% of the frame height
+    // at the ported camera, so a CORE_PX host draws an orb ~0.94*CORE_PX across. TARGET is
+    // the core's diameter as a multiple of the cluster's core radius: at 1.5 the core
+    // swallows the cluster and only the spikes still read, so it sits at 1.15, which leaves
+    // a ring of shards and glow around it.
+    const FILL=0.94, TARGET=1.15;
+    const host=document.createElement('div');
+    host.setAttribute('data-voice-core','1');
+    host.style.cssText='position:absolute; left:0; top:0; width:'+CORE_PX+'px; height:'+CORE_PX+'px; pointer-events:none; z-index:0; transform-origin:50% 50%; opacity:0;';
+    el.appendChild(host);
+    this._voiceCoreHost=host;
+    this._voiceCoreApi=window.VoidOrb.mount(host, {detail:48, pointer:false});
+    const follow=()=>{
+      if(!this._voiceCoreApi || !this._orbApi || !this._orbApi.getCenter){ this._voiceCoreRaf=null; return; }
+      const c=this._orbApi.getCenter();
+      if(c.r>0){
+        const k=(c.r*TARGET)/(CORE_PX*FILL);
+        host.style.transform='translate('+(c.x-CORE_PX/2).toFixed(1)+'px,'+(c.y-CORE_PX/2).toFixed(1)+'px) scale('+k.toFixed(4)+')';
+        host.style.opacity='1';
+      }
+      this._voiceCoreRaf=requestAnimationFrame(follow);
+    };
+    this._voiceCoreRaf=requestAnimationFrame(follow);
+  }
+  _unmountVoiceCore(){
+    if(this._voiceCoreRaf){ cancelAnimationFrame(this._voiceCoreRaf); this._voiceCoreRaf=null; }
+    if(this._voiceCoreApi){ try{ this._voiceCoreApi.destroy(); }catch(e){} this._voiceCoreApi=null; }
+    if(this._voiceCoreHost && this._voiceCoreHost.parentNode) this._voiceCoreHost.parentNode.removeChild(this._voiceCoreHost);
+    this._voiceCoreHost=null;
+  }
+  _unmountVoiceOrb(){ this._unmountVoiceCore(); if(this._orbApi){ this._orbApi.destroy(); this._orbApi=null; } this._orbEl=null; }
   toggleOrbDrift(){ const next=this.state.prefs.orbDrift===false; this.mut(s=>({prefs:{...s.prefs, orbDrift:next}})); if(this._orbApi && this._orbApi.setDriftEnabled) this._orbApi.setDriftEnabled(next); }
   // Keeps the fixed-position voice orb mount clipped to the real content
   // area — right of the sidebar, below the top bar — instead of the whole
