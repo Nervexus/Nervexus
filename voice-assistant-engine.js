@@ -108,19 +108,25 @@
     if (!t) return null;
     var sets = /(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/i.exec(t);
     var reps = /(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/i.exec(t);
-    var wt   = /(?:at|with|@)\s*(\d+(?:\.\d+)?)\s*(kg|kilos?|kilograms?|lbs?|pounds?)\b/i.exec(t);
+    /* The unit alone identifies a weight, so no preposition is required: "I did 100 kg
+       bench press" is as valid as "bench press at 100 kg". Requiring at/with/@ meant the
+       first form parsed as having no weight at all, and Loura asked for sets she had
+       already been given. Nothing else in an utterance is measured in kg or lbs, so this
+       cannot be confused with a duration or a rep count. */
+    var wt   = /(?:(?:at|with|@)\s*)?(\d+(?:\.\d+)?)\s*(kgs?|kilos?|kilograms?|lbs?|pounds?)\b/i.exec(t);
     var mins = /(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/i.exec(t);
     var name = t
       .replace(/(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/ig,'')
       .replace(/(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/ig,'')
-      .replace(/(?:at|with|@)\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)\b/ig,'')
+      .replace(/(?:(?:at|with|@)\s*)?(\d+(?:\.\d+)?)\s*(?:kgs?|kilos?|kilograms?|lbs?|pounds?)\b/ig,'')
       .replace(/(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/ig,'')
       .replace(/\b(?:of|doing|did)\b/ig,' ')
       .replace(/\s+/g,' ').trim();
     /* stripDest FIRST — it matches on "on my training", so removing "on"/"my" as filler
        beforehand leaves it nothing to find and the destination survives into the name. */
     name = stripDest(name);
-    name = name.replace(/\b(?:for|on|in|the|my)\b/ig,' ').replace(/\s+/g,' ').trim();
+    name = name.replace(/\b(?:for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
+               .replace(/\s+/g,' ').trim();
     if (!name) return null;
     var known = host.tools.exerciseName ? host.tools.exerciseName(name) : null;
     return {

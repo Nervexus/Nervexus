@@ -136,6 +136,24 @@ t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
 
+// ---- a weight needs no preposition ----
+t('"I did 100 kg bench press today" logs, it does not ask', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('I did 100 kg bench press today',h);
+  const c=call('logWorkout'); if(!c) throw new Error('did not log: '+last());
+  eq([c[1],c[3]],['Bench Press',100]);
+  if(VA._pending()) throw new Error('asked for sets it already had'); });
+t('bare weight in any position', async()=>{
+  for(const say of ['log bench press 100kg','log 100 kg bench press','i did bench press 100 kilos']){
+    const h=host(); VA._clearPending(); await VA.handle(say,h);
+    const c=call('logWorkout'); if(!c) throw new Error('"'+say+'" did not log: '+last());
+    eq(c[3],100,'weight from "'+say+'"'); } });
+t('"today" is not part of the exercise name', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('I did 100 kg bench press today',h);
+  if(/today/i.test(call('logWorkout')[1])) throw new Error('name kept "today": '+call('logWorkout')[1]); });
+t('minutes are still minutes, not a weight', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('log 30 minutes of running',h);
+  const c=call('logWorkout'); eq([c[2],c[3]],[30,0],'30 must be duration, weight zero'); });
+
 // ---- asking instead of guessing ----
 t('a verb dropped by a noisy room becomes a question, not a refusal', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('3 minutes run',h);
