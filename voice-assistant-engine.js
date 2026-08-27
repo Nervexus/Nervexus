@@ -163,6 +163,10 @@
   // bare `log <anything>`, so water, weight, sleep, money and meals all precede it or it
   // swallows them: "log my weight at 82 kilos" parsed as a workout called "weight"
   // lifting 82kg. The test suite pins each of those collisions.
+  /* Shared by the sign-off rule and by the raw-text fallback in handle(), which has to
+     match what was actually said rather than what tidy() left behind. */
+  var SIGN_OFF_RE = /(?:^|\b)(?:no(?:pe)?|nah|not (?:right )?now|that.?s (?:all|it|everything|the lot|enough|fine|great|lovely|perfect)|that.?(?:s|.?ll| will) do|nothing(?: else| more| for now)?|i.?m (?:good|fine|done|okay|ok|off|set)|all (?:good|done|set|sorted)|we.?re (?:done|good|finished|sorted)|(?:done|finished) for (?:today|now|the day)|that.?s me (?:done|off)|signing off|logging off|good ?night|night night|goodbye|bye(?: bye)?|see (?:you|ya)(?: later| tomorrow)?|catch (?:you|ya) later|(?:speak|talk|chat)(?: to you)? (?:later|tomorrow)|leave it (?:there|at that)|thanks?(?: you)?|cheers|ta|much appreciated|appreciate (?:it|that)|nice one|well done|good (?:job|work))\b/i;
+
   var LOCAL = [
     { id:'nav', acts:true, label:'Open a page', say:'"Open my fitness centre"',
       re:/^(?:open|go to|show|take me to|switch to)\s+(?:the\s+|my\s+)?(.+?)[.?!]*$/i,
@@ -330,7 +334,7 @@
       } },
 
     { id:'logSleep', acts:true, label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',
-      re:/^(?:log|record)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep[.?!]*$|^(?:i\s+)?slept\s+(.+?)[.?!]*$/i,
+      re:/^(?:log|record)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:i\s+)?slept\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1] || m[2] || '');
         var h = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)/i.exec(t);
@@ -412,9 +416,44 @@
 
     { id:'stop', acts:true, label:'Turn the assistant off', say:'"That will be all"',
       re:/^(?:that(?:’|')?(?:ll| will) be all|stop listening|go to sleep|shut (?:up|down)|turn off)[.?!]*$/i,
-      run:function (m, host) { host.tools.disableAssistant(); return 'Going quiet. Tap Hold to talk when you need me.'; } }
+      run:function (m, host) { host.tools.disableAssistant(); return 'Going quiet. Tap Hold to talk when you need me.'; } },
+
+    /* Conversation enders. These used to be recognised only in the one beat straight after
+       "is that all I can do for you today?", and only anchored at the start of the
+       utterance — so "I said thanks", "that's everything for today" and "no that's
+       everything for today" all landed on "Sorry, I didn't catch that", which is a rude way
+       to end a conversation she started herself. They are a standing rule now: matched
+       anywhere in the utterance, at any point in the conversation.
+
+       It is deliberately the LAST rule in the list. Every ender is a common English word
+       that can appear inside a real instruction ("log 8 hours of sleep last night", "note
+       down that we're done with the flat"), so it only ever gets the utterances no actual
+       command wanted. Unlike 'stop' it does not turn the mic off — it just ends the
+       exchange politely and leaves her listening. */
+    { id:'signOff', acts:false, label:'End the conversation', say:'"No, that\u2019s everything" \u00b7 "Thanks, goodbye"',
+      re:SIGN_OFF_RE,
+      run:function (m, host) { return signOffReply(m[0]); } }
 
   ];
+
+  /* Gratitude on its own is not the end of a conversation — "thanks" mid-flow deserves
+     "any time", not "I'll leave you to it". Night gets its own line because "I'm here
+     whenever you need me" at bedtime reads as a machine that missed the point. */
+  var THANKS_ONLY = /^(?:thanks?(?: you)?|cheers|ta|much appreciated|appreciate (?:it|that)|nice one|well done|good (?:job|work))$/i;
+  var NIGHT = /^(?:good ?night|night night)$/i;
+  var SIGN_OFFS = [
+    'Alright \u2014 I\u2019m here whenever you need me.',
+    'Of course, sir. I\u2019ll be here.',
+    'Understood \u2014 I\u2019ll leave you to it.',
+    'Any time. Just say the word.'
+  ];
+  var signOffAt = 0;
+  function signOffReply(matched) {
+    var m = String(matched || '').trim();
+    if (NIGHT.test(m)) return 'Good night, sir.';
+    if (THANKS_ONLY.test(m)) return 'Any time, sir.';
+    var out = SIGN_OFFS[signOffAt % SIGN_OFFS.length]; signOffAt++; return out;
+  }
 
   // ---- AI tier ------------------------------------------------------------------
   var AI_TASKS = [
@@ -438,7 +477,6 @@
      that". Anything that isn't a yes/no is treated as the next command, which is what
      someone who ignores the question and just keeps going actually means. */
   var AWAIT_CLOSE = false;
-  var CLOSE_NO = /^(?:no|nope|nah|not (?:right )?now|nothing(?: else)?|that.?s (?:all|it|everything|the lot)|i.?m (?:good|fine|done)|all good|we.?re done|done|cheers|thanks?(?: you)?)\b/i;
   var CLOSE_YES = /^(?:yes|yeah|yep|yup|sure|ok(?:ay)?|please|actually|one more|there is|hold on|wait)\b/i;
   function closeOut(host) {
     if (!host.followUp) return;
@@ -554,15 +592,29 @@
   }
 
   function handle(text, host) {
-    var t = fixVerb(tidy(String(text || '').trim()));
-    if (!t) return Promise.resolve();
+    var raw = String(text || '').trim();
+    var t = fixVerb(tidy(raw));
 
-    // "Is that all I can do for you today?" is outstanding. A yes/no answers it; anything
-    // else is the next command and falls straight through.
-    if (AWAIT_CLOSE) {
+    /* tidy() strips trailing politeness so rule patterns can stay about the command — but
+       for an ender the politeness IS the utterance. "thanks" tidies to nothing at all and
+       "I said thanks" to "I said", so both fell straight through to "Sorry, I didn't catch
+       that". Enders are therefore matched against what was actually said. This runs before
+       the empty-text guard for exactly that reason, and after nothing else, so a real
+       command never reaches it. */
+    if (!t) {
+      if (SIGN_OFF_RE.test(raw)) { AWAIT_CLOSE = false; host.speak(signOffReply(SIGN_OFF_RE.exec(raw)[0])); }
+      return Promise.resolve();
+    }
+
+    // "Is that all I can do for you today?" is outstanding. A short yes hands the turn back;
+    // a no or any other ender is caught by the sign-off rule further down, and anything else
+    // is simply the next command. The flag is NOT burned here — clearing it on a miss was
+    // what left her answering "Sorry, I didn't catch that" to every attempt to end the
+    // conversation after the first one.
+    if (AWAIT_CLOSE && CLOSE_YES.test(t) && t.split(/\s+/).length <= 3) {
       AWAIT_CLOSE = false;
-      if (CLOSE_NO.test(t)) { host.speak('Alright — I’m here whenever you need me.'); return Promise.resolve(); }
-      if (CLOSE_YES.test(t) && t.split(/\s+/).length <= 3) { host.speak('Go ahead, I’m listening.'); return Promise.resolve(); }
+      host.speak('Go ahead, I’m listening.');
+      return Promise.resolve();
     }
 
     // A question is outstanding. Take it or leave it, then clear it either way.
@@ -583,13 +635,20 @@
 
     var local = runLocal(t, host);
     if (local.handled) {
+      AWAIT_CLOSE = false;
       host.speak(local.reply);
-      // Only after something was actually saved, and never after being told to shut up.
+      // Only after something was actually saved, and never on the way out of the conversation.
       if (local.acts && local.id !== 'stop') closeOut(host);
       return Promise.resolve(local.reply);
     }
 
-    // Nothing matched. Before giving up — or spending a provider call — see whether this
+    // Nothing matched the tidied text — but tidy() strips politeness, and "I said thanks"
+    // tidies down to "I said". Give the enders one more look at what was actually said,
+    // ahead of the workout guess so an ender is never turned into "shall I log that?".
+    var off = SIGN_OFF_RE.exec(raw);
+    if (off) { AWAIT_CLOSE = false; host.speak(signOffReply(off[0])); return Promise.resolve(); }
+
+    // Before giving up — or spending a provider call — see whether this
     // is a workout with a word missing, and ask.
     var proposal = proposeWorkout(t, host);
     if (proposal) { PENDING = proposal; host.speak(proposal.question); return Promise.resolve(); }

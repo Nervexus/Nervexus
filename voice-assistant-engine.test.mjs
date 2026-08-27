@@ -52,6 +52,10 @@ const call=(n)=>calls.find(c=>c[0]===n);
 // Action rules speak twice — acknowledgement then confirmation — so assertions about
 // the outcome read the LAST line, not the first.
 const last=()=>spoken[spoken.length-1];
+// Sign-off replies rotate, so assert the shape rather than one line: warm, and never the
+// "didn't catch that" dead end the screenshot caught.
+const GRACEFUL=/here whenever you need me|i.?ll be here|leave you to it|just say the word|any time|good night/i;
+const signedOff=(m)=>{ const l=last(); if(!GRACEFUL.test(l)) throw new Error((m||'')+' not a sign-off: "'+l+'"'); };
 
 // ---- LOCAL tier: no provider connected at all ----
 t('opens a page', async()=>{ const h=host(); await VA.handle('Open my fitness centre',h);
@@ -387,12 +391,55 @@ t('"no" to the close-out ends politely instead of falling through', async()=>{ c
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
   if(!VA._awaitingClose()) throw new Error('close-out not armed');
   await VA.handle('no thanks',h);
-  has(last(),'here whenever you need me');
+  signedOff('"no thanks"');
   if(VA._awaitingClose()) throw new Error('close-out stayed armed'); });
 t('"that\u2019s all" also ends politely', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
   await VA.handle('that\u2019s all',h);
-  has(last(),'here whenever you need me'); });
+  signedOff('"that\u2019s all"'); });
+
+// ---- regression: the enders that dead-ended on the live app ----
+// She asked "is that all I can do for you today?" and then answered "Sorry, I didn't catch
+// that" to three consecutive attempts to say no, because the match was anchored at the start
+// of the utterance and the flag was burned on the first miss.
+t('"I said thanks" after the close-out does not dead-end', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 100 kg bench press',h);
+  await VA.handle('I said thanks',h);
+  signedOff('"I said thanks"'); });
+t('"that\u2019s everything for today" ends the conversation', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 100 kg bench press',h);
+  await VA.handle('that\u2019s everything for today',h);
+  signedOff('"that\u2019s everything for today"'); });
+t('a missed ender does not disarm the next attempt', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  await VA.handle('erm hang on a second',h);
+  await VA.handle('no that\u2019s everything for today',h);
+  signedOff('second attempt'); });
+t('enders work with no close-out outstanding at all', async()=>{ const h=host();
+  VA._clearPending();
+  await VA.handle('thanks',h); signedOff('bare thanks');
+  await VA.handle('goodbye',h); signedOff('goodbye');
+  await VA.handle('cheers, see you later',h); signedOff('see you later'); });
+t('good night gets its own line', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('good night',h);
+  has(last(),'good night'); });
+t('signing off does not turn the assistant off', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('no that\u2019s everything',h);
+  if(call('disableAssistant')) throw new Error('an ender must not kill the mic'); });
+t('an ender never gets the close-out question back', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  followUps=[];
+  await VA.handle('no that\u2019s everything',h);
+  eq(followUps,[],'do not ask again on the way out'); });
+// The enders are common words; every one of these contains one and must still be the command.
+t('enders never steal a real command', async()=>{ const h=host();
+  VA._clearPending();
+  await VA.handle('Log 8 hours of sleep last night',h);
+  if(!call('logSleep')) throw new Error('"night" ate a sleep log');
+  await VA.handle('Log 30 minutes of running',h);
+  if(!call('logWorkout')) throw new Error('a workout was read as an ender');
+  await VA.handle('Add a task to thank the accountant',h);
+  if(!call('addTask')) throw new Error('"thank" ate a task'); });
 t('"yes" to the close-out hands the turn back', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
   await VA.handle('yes',h);
