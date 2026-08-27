@@ -176,7 +176,12 @@
       speed: opts.speed != null ? opts.speed : 1,
       spin: opts.spin != null ? opts.spin : 0.05,
       tilt: opts.tilt != null ? opts.tilt : 0.2,
-      pointer: opts.pointer !== false
+      pointer: opts.pointer !== false,
+      /* Active state: the voice page used to swap the old orb into a livelier mode while
+         the mic was listening. Same idea here — the surface churns harder and turns faster.
+         Eased rather than switched so it swells and settles instead of snapping. */
+      act: 0, actTarget: 0,
+      baseAmp: opts.amplitude != null ? opts.amplitude : 0.15
     };
 
     try { S.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
@@ -209,9 +214,11 @@
       var delta = S.last ? Math.min(0.1, (now - S.last) / 1000) : 0;
       S.last = now;
 
+      S.act += (S.actTarget - S.act) * (1 - Math.pow(0.004, delta));
+      S.uniforms.uAmp.value = S.baseAmp * (1 + S.act * 0.9);
       if (!S.reduced) {
-        S.uniforms.uTime.value += delta * S.speed;
-        S.mesh.rotation.y += delta * S.spin;
+        S.uniforms.uTime.value += delta * S.speed * (1 + S.act * 1.6);
+        S.mesh.rotation.y += delta * S.spin * (1 + S.act * 2.2);
       }
       S.uniforms.uMouse.value[0] = S.ptr.x;
       S.uniforms.uMouse.value[1] = S.ptr.y;
@@ -278,6 +285,7 @@
       setColor: function (rgb) {
         if (S.uniforms && rgb) S.uniforms.uColor.value.set(rgb[0], rgb[1], rgb[2]);
       },
+      setActive: function (on) { S.actTarget = on ? 1 : 0; },
       destroy: function () {
         if (S.dead) return;
         S.dead = true;
