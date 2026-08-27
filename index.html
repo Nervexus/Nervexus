@@ -9098,7 +9098,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 // sphere covers ~94% of it, so the orb draws ~355px across. LIFT raises it above the
 // [data-orb-home] marker the old shard cluster centred on.
 const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
-const NOTIF_BUILD_VERSION = '2026.08.27-163 · v11.163 voice-orb-size';
+const NOTIF_BUILD_VERSION = '2026.08.27-164 · v11.164 float-orb-swap';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13160,6 +13160,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.164', date:'Aug 27, 2026', notes:[
+      'The floating assistant button in the corner now uses the new orb too, so the old one is gone everywhere.',
+    ]},
     {version:'v11.162', date:'Aug 27, 2026', notes:[
       'The voice page now shows only the new 3D orb \u2014 the old shard cluster is gone \u2014 and it sits higher up the page. It still reacts while the mic is listening.',
     ]},
@@ -16352,7 +16355,23 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(P.ultraStyle==='Maison Élysée') return {c1:[0.306,0.431,0.588], c2:[0.235,0.353,0.490], c3:[0.102,0.145,0.188], glow:'rgba(78,110,150,0.5)'};
     return {c1:[0.62,0.14,0.14], c2:[0.42,0.07,0.07], c3:[0.18,0.03,0.03], glow:'rgba(91,26,26,0.5)'};
   }
-  _mountFloatOrb(el){ if(!el || !window.OrbEngine) return; const themeKey=this.state.prefs.theme+'|'+this.state.prefs.ultraStyle; if(this._floatOrbEl===el && this._floatOrbTheme===themeKey) return; this._floatOrbEl=el; this._floatOrbTheme=themeKey; if(this._floatOrbApi){ this._floatOrbApi.destroy(); this._floatOrbApi=null; }
+  // The floating launcher in the bottom-right corner. Uses the void orb so no page still
+  // shows the old shard cluster; OrbEngine stays as the fallback without WebGL.
+  //
+  // Brightened well past 1.0. The shader's greyscale peaks around 0.6 and it draws at
+  // alpha 0.6, which reads fine as a 440px centrepiece and disappears at 66px against a
+  // dark shell — uColor multiplies that intensity, so this lifts it back to a button.
+  _mountFloatOrb(el){
+    if(!el) return;
+    const themeKey=this.state.prefs.theme+'|'+this.state.prefs.ultraStyle;
+    if(this._floatOrbEl===el && this._floatOrbTheme===themeKey) return;
+    this._floatOrbEl=el; this._floatOrbTheme=themeKey;
+    if(this._floatOrbApi){ this._floatOrbApi.destroy(); this._floatOrbApi=null; }
+    if(window.VoidOrb && window.VoidOrb.supported()){
+      this._floatOrbApi=window.VoidOrb.mount(el, {detail:24, pointer:false, color:[2.7,2.7,2.7], spin:0.22});
+      return;
+    }
+    if(!window.OrbEngine) return;
     const pal=this._orbPalette();
     this._floatOrbApi=window.OrbEngine.mount(el, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, dimMul:1, hoverIntensity:0, rotateOnHover:true, forceHoverState:false}); }
   _unmountFloatOrb(){ if(this._floatOrbApi){ this._floatOrbApi.destroy(); this._floatOrbApi=null; } this._floatOrbEl=null; }
