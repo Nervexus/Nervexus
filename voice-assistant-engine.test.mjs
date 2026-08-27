@@ -129,6 +129,15 @@ t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
 
+// ---- Loura ----
+t('answers to her name', async()=>{ const h=host(); await VA.handle('What is your name?',h);
+  has(spoken[0],'Loura'); has(spoken[0],'Sam'); });
+t('her name works as a wake word', async()=>{ const h=host(); await VA.handle('Loura, log 500 ml of water',h);
+  eq(call('logHydration'),['logHydration',500]); });
+t('common mis-hearings of her name are stripped too', async()=>{ const h=host();
+  await VA.handle('Laura log 500 ml of water',h);
+  eq(call('logHydration'),['logHydration',500]); });
+
 // ---- rule ordering: utterances more than one rule could claim ----
 t('"log 30 minutes of running" is a workout, not a meal', async()=>{ const h=host();
   await VA.handle('Log 30 minutes of running',h);

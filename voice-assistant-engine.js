@@ -1,4 +1,9 @@
-/* voice-assistant-engine.js — the assistant's command layer.
+/* voice-assistant-engine.js — Loura's command layer.
+
+   Loura is the app's voice assistant. Her name is also a wake word: LEAD strips it, so
+   "Loura, log 500 ml of water" runs the same rule as the bare command. Common
+   mis-hearings (Laura, Lora) are stripped too — the browser recogniser gets it wrong
+   often enough that not covering them would swallow real commands.
 
    Two tiers, declared explicitly rather than discovered at runtime:
 
@@ -295,7 +300,13 @@
         return 'It’s ' + d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }) + '.';
       } },
 
-    { id:'capabilities', label:'Ask what it can do', say:'"What can you do?"',
+    { id:'whoAreYou', label:'Ask who she is', say:'"What is your name?"',
+      re:/^(?:what(?:(?:’|')s| is)\s+your\s+name|who\s+are\s+you|what\s+(?:are\s+you\s+)?called)[.?!]*$/i,
+      run:function (m, host) {
+        return 'I’m Loura, ' + host.firstName() + ' — your assistant in here.';
+      } },
+
+    { id:'capabilities', label:'Ask what she can do', say:'"What can you do?"',
       re:/^(?:what\s+can\s+you\s+do|help|what\s+are\s+your\s+(?:commands|abilities))[.?!]*$/i,
       run:function (m, host) {
         var n = LOCAL.length;
@@ -342,7 +353,7 @@
   /* Dictated speech arrives wrapped in politeness and wake words. Stripping it here means
      every rule's pattern stays about the command itself rather than each one having to
      tolerate "hey, could you please ... for me, thanks". */
-  var LEAD = /^(?:hey|ok(?:ay)?|hi|hello|yo|nervexus|assistant|please|now)\b[,\s]*/i;
+  var LEAD = /^(?:hey|ok(?:ay)?|hi|hello|yo|loura|laura|lora|nervexus|assistant|please|now)\b[,\s]*/i;
   var POLITE = /^(?:(?:can|could|would|will)\s+you\s+)?(?:please\s+)?/i;
   var TRAIL = /[,\s]*(?:please|for me|thanks|thank you|mate|now)[.?!]*$/i;
   function tidy(t) {

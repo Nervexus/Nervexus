@@ -309,7 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=4"></script>
+<script src="voice-assistant-engine.js?v=5"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=2"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -3476,7 +3476,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div data-orb-home style="width:1px; height:1px;"></div>
             <canvas data-chart="wave" style="width:100%; max-width:560px; height:60px; display:block; margin:2px 0 20px;"></canvas>
             <div style="display:flex; align-items:center; gap:9px; margin-bottom:16px;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:{{ vMuted }};">VOICE ASSISTANT</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:{{ vMuted }};">LOURA</span>
               <div onClick="{{ toggleAssistantEnabled }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ assistantEnabledBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ assistantEnabledPos }}; width:16px; height:16px; border-radius:50%; background:#0a0a0b; transition:left .15s;"></div></div>
             </div>
             <div onClick="{{ toggleListen }}" style="display:inline-flex; align-items:center; gap:10px; padding:13px 26px; border-radius:40px; cursor:pointer; border:1px solid {{ listenBdr }}; background:{{ listenBg }}; color:{{ vInk }}; font-size:14px; font-weight:600; opacity:{{ listenOpacity }}; pointer-events:{{ listenPointerEvents }};" style-hover="{ transform:'scale(1.03)' }">
@@ -9137,7 +9137,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-171 · v11.171 voice-query-fixes';
+const NOTIF_BUILD_VERSION = '2026.08.27-172 · v11.172 loura';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10940,7 +10940,7 @@ activities: this._mergeShipLog(s.activities),
   }
   async removeMemory(id){ this.mut(s=>({memories:(s.memories||[]).filter(m=>m.id!==id)})); if(this._sbOn()) try{ await window.SB.remove('memories',id); }catch(e){} }
   _memoryContext(){ const m=this._memories(); if(!m.length) return ''; return 'Known facts/preferences about the user: '+m.map(x=>x.fact).join('; ')+'.'; }
-  _personaPrefix(){ return 'You are a warm, professional executive-assistant AI — confident, concise, a little personality, never robotic or repetitive. '+this._memoryContext(); }
+  _personaPrefix(){ return 'You are Loura, a warm, professional executive-assistant AI — confident, concise, a little personality, never robotic or repetitive. If asked your name, you are Loura. '+this._memoryContext(); }
   _convoSessionId(){ if(!this._convoSid) this._convoSid=this._uuid(); return this._convoSid; }
   _logConvo(role,content){ if(!this._sbOn()||!content) return; try{ window.SB.insert('ai_conversations',{user_id:this.state.authUserId,session_id:this._convoSessionId(),role,content:String(content).slice(0,4000)}); }catch(e){} }
   async loadConvoHistory(){
@@ -13184,12 +13184,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.172', date:'Aug 27, 2026', major:true, notes:[
+      'Your assistant has a name: Loura. Say \u201cLoura\u201d to start a command, or ask her what her name is.',
+    ]},
     {version:'v11.171', date:'Aug 27, 2026', notes:[
       'Asking the assistant your weight now works \u2014 it was reading the wrong place and always said you had never logged one. Asking about calories no longer calls the total \u201ctoday\u201d, because meal entries are not dated.',
     ]},
     {version:'v11.170', date:'Aug 27, 2026', major:true, notes:[
       'Tasks you added by voice were never saved \u2014 they showed up, then vanished on reload. Fixed, and any task you add by voice from now on persists properly.',
-      'The no-key half of the assistant is much bigger: 31 commands. It can now tick tasks off, complete missions, and answer questions about your own data \u2014 water, weight, sleep, calories, money, what\u2019s on today or tomorrow, missions left. It also copes with how people actually talk (\u201chey, could you log 500ml of water for me\u201d).',
+      'The no-key half of the assistant is much bigger: 28 commands. It can now tick tasks off, complete missions, and answer questions about your own data \u2014 water, weight, sleep, calories, money, what\u2019s on today or tomorrow, missions left. It also copes with how people actually talk (\u201chey, could you log 500ml of water for me\u201d).',
     ]},
     {version:'v11.169', date:'Aug 27, 2026', major:true, notes:[
       'The voice assistant is back, and split in two. Eighteen commands \u2014 logging training, food, sleep, water, weight, money and notes, adding tasks and missions, scheduling, opening pages, reading your day back \u2014 run on this device and need no API key at all. Open questions go to your AI provider. The voice page now lists both, so you can see exactly what works with nothing connected.',
