@@ -311,7 +311,7 @@
 <script src="ai-gateway.js"></script>
 <script src="voice-assistant-engine.js?v=6"></script>
 <script src="constellation-engine.js"></script>
-<script src="void-orb-engine.js?v=2"></script>
+<script src="void-orb-engine.js?v=3"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -9124,15 +9124,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-// Voice page orb geometry. PX is the host square the WebGL canvas fills; the shader's
-// sphere covers ~94% of it, so the orb draws ~355px across. LIFT raises it above the
-// [data-orb-home] marker the old shard cluster centred on.
-const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
+// Voice page orb geometry. PX is the host square the WebGL canvas fills. The engine now
+// leaves headroom inside that square for the surface to swell into while she is listening,
+// so the orb covers ~82% of the box rather than ~94% — PX grew from 440 to 500 to keep the
+// orb the same size on screen (0.94x220 and 0.823x250 are both ~207px of visible radius).
+// LIFT raises its centre above the [data-orb-home] marker.
+const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // What the assistant says while it has no brain. The engine and its tools were removed
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-175 · v11.175 drop-auto-briefing';
+const NOTIF_BUILD_VERSION = '2026.08.27-176 · v11.176 orb-unclipped';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13181,6 +13183,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.176', date:'Aug 27, 2026', notes:[
+      'The orb is no longer cut off by an invisible square when Loura is listening \u2014 it had been growing past the edge of its own canvas.',
+    ]},
     {version:'v11.175', date:'Aug 27, 2026', notes:[
       'Removed \u201cSpeak my daily briefing automatically\u201d from the voice page.',
     ]},

@@ -51,6 +51,15 @@
     return bundleP;
   }
 
+  /* How far the active state pushes the surface out. Used twice — once to actually swell
+     it, once to work out how far back the camera has to sit for the swollen orb to still
+     fit. Keeping it as one constant is the point: when these two drifted apart the orb
+     grew past the frustum and rendered flat against the canvas edge, which reads as it
+     being trapped in an invisible box. */
+  var ACTIVE_AMP_MUL = 1.9;
+  var FRUSTUM_FILL = 0.88;   // headroom left around the orb at full swell
+  var FOV = 45;
+
   function supported() {
     try {
       var c = document.createElement('canvas');
@@ -215,7 +224,7 @@
       S.last = now;
 
       S.act += (S.actTarget - S.act) * (1 - Math.pow(0.004, delta));
-      S.uniforms.uAmp.value = S.baseAmp * (1 + S.act * 0.9);
+      S.uniforms.uAmp.value = S.baseAmp * (1 + S.act * (ACTIVE_AMP_MUL - 1));
       if (!S.reduced) {
         S.uniforms.uTime.value += delta * S.speed * (1 + S.act * 1.6);
         S.mesh.rotation.y += delta * S.spin * (1 + S.act * 2.2);
@@ -246,8 +255,14 @@
       el.appendChild(S.renderer.domElement);
 
       S.scene = new THREE.Scene();
-      S.camera = new THREE.PerspectiveCamera(45, s.w / s.h, 0.1, 100);
-      S.camera.position.set(0, 0, 5);
+      // The source hard-coded z = 5, which fits the orb at rest (94% of frame height) and
+      // clips it the moment the active state swells the surface. Derive the distance from
+      // the largest the orb can get instead.
+      var halfAt1 = Math.tan(FOV / 2 * Math.PI / 180);
+      var maxExtent = S.radius + S.baseAmp * ACTIVE_AMP_MUL;
+      var dist = maxExtent / (halfAt1 * FRUSTUM_FILL);
+      S.camera = new THREE.PerspectiveCamera(FOV, s.w / s.h, 0.1, 100);
+      S.camera.position.set(0, 0, dist);
 
       var c = opts.color || [1, 1, 1];
       S.uniforms = {
