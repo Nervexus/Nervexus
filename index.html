@@ -648,6 +648,51 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     </div>
   </sc-if>
 
+  <!-- Stale build / missing engine notice. The load-status line at the foot of the voice page
+       reports a file that never arrived, but only if you happen to be looking at it — and a
+       half-downloaded build looks identical to a broken app. So it gets the V-log treatment:
+       a full-screen panel that cannot be scrolled past, with the refresh as the only real
+       action. Dismissal is per-session only; the next load checks again. -->
+  <sc-if value="{{ staleOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:999; background:{{ wnBackdrop }}; display:flex; align-items:center; justify-content:center; padding:24px;">
+      <sc-if value="{{ wnIsUltra }}" hint-placeholder-val="{{ false }}">
+        <div style="width:100%; max-width:560px; max-height:86vh; overflow-y:auto; border-radius:2px; background:{{ wnModalBg }}; padding:16px; box-shadow:0 50px 100px rgba(58,42,32,0.28);">
+        <div style="border:1px solid {{ perfUAccent35 }}; border-radius:2px; padding:40px 40px 44px; font-family:'Cormorant Garamond',Georgia,serif;">
+          <img src="favicon.png" alt="" style="display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 20px; opacity:0.9;">
+          <div style="text-align:center; font-size:16px; letter-spacing:4px; color:{{ perfUMuted }};">REFRESH REQUIRED</div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:18px auto 22px;">
+            <div style="width:56px; height:1px; background:{{ perfUAccent }};"></div>
+            <span style="color:{{ perfUAccent }}; font-size:13px;">&#10086;</span>
+            <div style="width:56px; height:1px; background:{{ perfUAccent }};"></div>
+          </div>
+          <h1 style="font-style:normal; font-weight:500; letter-spacing:2px; font-size:26px; color:{{ perfUInk }}; text-align:center; margin:0 0 6px;">{{ staleTitle }}</h1>
+          <div style="font-size:13px; color:{{ perfUMuted }}; text-align:center; letter-spacing:0.5px; margin-bottom:22px;">{{ staleBuildLine }}</div>
+          <div style="font-size:15px; color:{{ perfUInk }}; line-height:1.7; text-align:center; margin-bottom:8px;">{{ staleReason }}</div>
+          <div style="font-size:15px; color:{{ perfUMuted }}; line-height:1.7; text-align:center;">{{ staleAdvice }}</div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:22px auto 22px;">
+            <div style="width:56px; height:1px; background:{{ perfUAccent30 }};"></div>
+            <span style="color:{{ perfUAccent50 }}; font-size:11px;">&#10086;</span>
+            <div style="width:56px; height:1px; background:{{ perfUAccent30 }};"></div>
+          </div>
+          <div onClick="{{ refreshStaleBuild }}" style="text-align:center; padding:16px; cursor:pointer; background:{{ perfUAccent }}; color:{{ perfUBtnText }}; font-size:11px; letter-spacing:3px; font-weight:500;" style-hover="{ background:'{{ perfUAccentHover }}' }">REFRESH NOW</div>
+          <div onClick="{{ dismissStaleBuild }}" style="text-align:center; padding:16px 16px 0; cursor:pointer; color:{{ perfUMuted }}; font-size:11px; letter-spacing:2px;">NOT NOW</div>
+        </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ wnIsNotUltra }}" hint-placeholder-val="{{ true }}">
+      <div class="cc-glowcard" style="width:100%; max-width:440px; max-height:80vh; overflow-y:auto; border-radius:20px; background:{{ wnModalBg }}; padding:28px; box-shadow:0 30px 70px rgba(0,0,0,0.55); border:1px solid rgba(255,214,107,0.35);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#ffd66b; margin-bottom:6px;">&#9888; REFRESH REQUIRED</div>
+        <h1 style="font-size:20px; font-weight:700; margin-bottom:4px; color:#eef0f2;">{{ staleTitle }}</h1>
+        <div style="font-size:11px; color:#6f6f78; margin-bottom:18px;">{{ staleBuildLine }}</div>
+        <div style="display:flex; gap:8px; font-size:12.5px; color:#c8c8ce; line-height:1.55; margin-bottom:9px;"><span style="color:#ffd66b;">&middot;</span><span>{{ staleReason }}</span></div>
+        <div style="display:flex; gap:8px; font-size:12.5px; color:#b8b8c0; line-height:1.55;"><span style="color:#6f6f78;">&middot;</span><span>{{ staleAdvice }}</span></div>
+        <div onClick="{{ refreshStaleBuild }}" style="margin-top:18px; text-align:center; padding:13px; border-radius:13px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0a0a0b; font-size:13.5px; font-weight:700;" style-hover="{ transform:'translateY(-1px)' }">REFRESH NOW</div>
+        <div onClick="{{ dismissStaleBuild }}" style="margin-top:8px; text-align:center; padding:10px; cursor:pointer; color:#6f6f78; font-size:11.5px;">Not now</div>
+      </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
   <!-- 2FA set/change warning — same V-log/Update Terminal visual language, deliberately
        serious tone: there is no recovery path for a lost 2FA code, by design. -->
   <sc-if value="{{ twoFAWarnOpen }}" hint-placeholder-val="{{ false }}">
@@ -9139,7 +9184,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-187 · v11.187 load-status';
+const NOTIF_BUILD_VERSION = '2026.08.27-188 · v11.188 refresh-panel';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9233,6 +9278,7 @@ activities: this._mergeShipLog(s.activities),
       notesPw: s.notesPw || '', notesUnlocked:false, notesPwInput:'', notesErr:false, noteTitle:'', noteBody:'',
       acctUnlocked:false, acctPwInput:'', acctErr:false, acctPwErr:'', acctUnlockBusy:false, notesPwDraft:'',
       twoFAWarnOpen:false, twoFAWarnMode:'', twoFAWarnAck:false,
+      staleOpen:false, staleReason:'', staleTitle:'',
       briefTab:'exec', briefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),
       refreshing:false, refreshPct:0,
       notifs:[], notifOpen:false, toasts:[], notifPreview:[],
@@ -9330,8 +9376,8 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
-  _wireUpdateAvailable(){ const notify=()=>this.showToast('system','Update available','A new version is ready — tap the refresh button in the top bar to load it.'); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  _wireUpdateAvailable(){ const notify=()=>{ this.showToast('system','Update available','A new version is ready — tap the refresh button in the top bar to load it.'); this._checkStaleBuild(); }; window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
   // WebViews (Google app, Instagram, Facebook, etc.) block both entirely. Detecting which
@@ -9374,7 +9420,7 @@ activities: this._mergeShipLog(s.activities),
   }
   async installApp(){ const evt=window.__installPromptEvt; if(!evt){ this.setState({pwaManualHelp:true}); return; } evt.prompt(); try{ const choice=await evt.userChoice; if(choice && choice.outcome==='accepted') this.setState({pwaDisplayStandalone:true}); }catch(e){} window.__installPromptEvt=null; this.setState({pwaInstallAvailable:false}); }
   // This is the single "Enable notifications" button users actually see in Settings.
-  logout(){ if(window.SB && window.SB.ready()){ window.SB.signOut(); } this.setState({loggedIn:false, currentEmail:'', authUserId:'', profile:null, loginEmail:'', loginPass:'', login2FAInput:'', pendingAuthEmail:'', loginStage:'creds', loginErr:'', authMode:'login', scene:'home', whatsNewOpen:false, whatsNewSigned:false, perfCheckinOpen:false},()=>this.save()); }
+  logout(){ if(window.SB && window.SB.ready()){ window.SB.signOut(); } this.setState({loggedIn:false, currentEmail:'', authUserId:'', profile:null, loginEmail:'', loginPass:'', login2FAInput:'', pendingAuthEmail:'', loginStage:'creds', loginErr:'', authMode:'login', scene:'home', whatsNewOpen:false, whatsNewSigned:false, perfCheckinOpen:false, staleOpen:false},()=>this.save()); }
   // Account Settings' password field used to be pure local decoration — saveAccount()
   // only ever pushed name/avatar/greeting/timezone to Supabase, never the password, so
   // typing a new one here did nothing to your real login (which goes through real
@@ -11037,6 +11083,25 @@ activities: this._mergeShipLog(s.activities),
       vaMissingC: missing.length ? '#ffb3ba' : '#6f6f78',
     };
   }
+  // Same information as the voice-page load-status line, escalated to something you cannot
+  // miss. Two triggers: a script that never arrived (the app is running on a partial build),
+  // or the service worker reporting a newer build than the one in this tab. Both are fixed by
+  // the same action, so the panel offers exactly one: a cache-clearing reload.
+  _checkStaleBuild(){
+    if(this._staleDismissed || this.state.staleOpen || !this.state.loggedIn) return;
+    // Don't stack on the other full-screen panels; the 60s tick will bring it back.
+    if(this.state.whatsNewOpen || this.state.perfCheckinOpen || this.state.twoFAWarnOpen) return;
+    const h=this._vaHealth();
+    const updated=!!window.__nvxUpdateAvailable;
+    if(h.vaAllLoaded && !updated) return;
+    const title = h.vaAllLoaded ? 'A newer version is ready' : 'This page did not load fully';
+    const reason = h.vaAllLoaded
+      ? 'A new build of Nervexus has downloaded in the background. This tab is still running the old one.'
+      : ('Part of this build never arrived — '+h.vaMissing.replace(/ — force refresh$/,'')+'. Anything that depends on it will look broken or silently do nothing.');
+    this.setState({staleOpen:true, staleTitle:title, staleReason:reason});
+  }
+  refreshStaleBuild(){ this.setState({staleOpen:false}, ()=>this._hardReload()); }
+  dismissStaleBuild(){ this._staleDismissed=true; this.setState({staleOpen:false}); }
   _vaTiers(){
     const M=window.VoiceAssistant ? window.VoiceAssistant.manifest() : {local:[],ai:[]};
     const on=!!(window.AIGateway && window.AIGateway.isConfigured() && window.AIGateway.available());
@@ -17203,6 +17268,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // Gate rendering on S.loggedIn directly, on top of clearing both flags in logout() itself.
       whatsNewOpen:!!S.whatsNewOpen && !!S.loggedIn, closeWhatsNew:()=>{ if(S.prefs.theme==='Ultra' || S.whatsNewSigned) this.dismissWhatsNew(); }, openWhatsNewBtn:()=>this.openWhatsNew(),
       perfCheckinOpen:!!S.perfCheckinOpen && !!S.loggedIn,
+      staleOpen:!!S.staleOpen && !!S.loggedIn,
+      staleTitle:S.staleTitle||'', staleReason:S.staleReason||'',
+      staleBuildLine:'Running '+(NOTIF_BUILD_VERSION.split(' · ')[1]||NOTIF_BUILD_VERSION),
+      staleAdvice:'Refreshing clears the cached copy and pulls the current build. Nothing you have logged is lost.',
+      refreshStaleBuild:()=>this.refreshStaleBuild(), dismissStaleBuild:()=>this.dismissStaleBuild(),
       openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
