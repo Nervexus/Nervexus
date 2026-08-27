@@ -247,11 +247,33 @@
       var s = size();
       var detail = S.detail || autoDetail(Math.max(s.w, s.h));
 
-      S.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      try {
+        S.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      } catch (err) {
+        // Past the browser's live-context cap this throws rather than returning null.
+        if (window.console) console.warn('[VoidOrb] could not create a WebGL context: '
+          + ((err && err.message) || err) + ' — too many 3D canvases are live.');
+        S.lost = true;
+        return false;
+      }
       S.renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));  // dpr={[1,2]}
       S.renderer.setSize(s.w, s.h, false);
       S.renderer.setClearColor(0x000000, 0);
       S.renderer.domElement.style.cssText = 'display:block; width:100%; height:100%;';
+
+      /* A WebGL context can be taken away — the browser caps how many are live at once
+         (around sixteen) and will drop the oldest, and a GPU driver reset kills all of
+         them. Either way the canvas goes blank and stays blank, with nothing thrown.
+         Flagging it lets the host rebuild instead of staring at a dead canvas, and the
+         console line is there so this is diagnosable from a screenshot rather than a
+         guess. */
+      S.renderer.domElement.addEventListener('webglcontextlost', function (e) {
+        e.preventDefault();
+        S.lost = true;
+        if (window.console) console.warn('[VoidOrb] WebGL context lost — the orb will be rebuilt. '
+          + 'If this repeats, too many 3D canvases are being created.');
+      }, false);
+
       el.appendChild(S.renderer.domElement);
 
       S.scene = new THREE.Scene();
@@ -297,6 +319,10 @@
     return {
       ready: ready,
       resize: resize,
+      /* True once the GPU has taken the context away. The host polls this and rebuilds —
+         a lost context has already freed its slot, so rebuilding is safe and is the only
+         way back. */
+      isLost: function () { return !!S.dead || !!S.lost; },
       setColor: function (rgb) {
         if (S.uniforms && rgb) S.uniforms.uColor.value.set(rgb[0], rgb[1], rgb[2]);
       },

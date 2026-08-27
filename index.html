@@ -311,7 +311,7 @@
 <script src="ai-gateway.js"></script>
 <script src="voice-assistant-engine.js?v=8"></script>
 <script src="constellation-engine.js"></script>
-<script src="void-orb-engine.js?v=3"></script>
+<script src="void-orb-engine.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -9134,7 +9134,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-179 · v11.179 orb-one-context';
+const NOTIF_BUILD_VERSION = '2026.08.27-180 · v11.180 orb-self-heals';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13190,6 +13190,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.180', date:'Aug 27, 2026', notes:[
+      'If the orb ever does go blank, it now notices and rebuilds itself instead of staying gone.',
+    ]},
     {version:'v11.179', date:'Aug 27, 2026', notes:[
       'A run logged by voice now files under Cardio instead of whichever muscle group tab you happened to have open.',
       'Cycling, jogging, sprints and treadmill work are recognised as cardio, and lateral raises count as shoulders rather than back \u2014 everywhere, including bulk import.',
@@ -16310,10 +16313,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // One context for the life of the page: if we hold a host, re-parent it wherever the
     // mount div is now and carry on.
     if(this._voiceCoreApi && this._voiceCoreHost){
-      if(this._voiceCoreHost.parentNode!==el) el.appendChild(this._voiceCoreHost);
-      this._orbEl=el;
-      this._syncVoiceOrbBounds();
-      return;
+      // A context the GPU took away cannot be re-parented back to life — it has to be
+      // rebuilt. Falls through to the fresh mount below.
+      if(!(this._voiceCoreApi.isLost && this._voiceCoreApi.isLost())){
+        if(this._voiceCoreHost.parentNode!==el) el.appendChild(this._voiceCoreHost);
+        this._orbEl=el;
+        this._syncVoiceOrbBounds();
+        return;
+      }
+      this._unmountVoiceOrb();
     }
     this._unmountVoiceOrb();
     this._orbEl=el;
