@@ -9108,7 +9108,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-167 · v11.167 ai-centre-panels';
+const NOTIF_BUILD_VERSION = '2026.08.27-168 · v11.168 voice-fully-detached';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10881,22 +10881,16 @@ activities: this._mergeShipLog(s.activities),
     }
     return out;
   }
-  async _newsDigestCandidate(){
-    if(!this._sbOn()) return null;
-    const pulled=await this._pullConnectedNewsData('top headlines today');
-    if(!pulled) return null;
-    const res=await window.AIGateway.ask('briefings', this._personaPrefix()+' In ONE short spoken sentence, give the single most important headline from this data (no preamble):\n'+pulled, {live:true});
-    if(!res.error && res.text) return {topic:'news', text:res.text.trim()};
-    return null;
-  }
-  async maybeProactiveCoach(){
+  // Check-ins are generated locally from your own logged data — see
+  // _generateCoachingCandidates. The AI-written news digest that used to lead this list
+  // was removed: it was the last thing that could put AI text into the voice transcript
+  // and speak it, and the voice assistant is meant to have no AI connection at all right
+  // now. Nothing here calls a provider.
+  maybeProactiveCoach(){
     const cfg=this._coachCfg();
     if(cfg.silent || cfg.vacation || !this._withinWorkingHours()) return;
     const log=this.state.prefs.coachLog||{}, cd=this._cooldownMs(), now=Date.now();
     let candidates=this._generateCoachingCandidates().filter(c=>!(log[c.topic] && now-log[c.topic]<cd));
-    if(cfg.newsDigest && !this._isMuted('news') && !(log.news && now-log.news<cd)){
-      const nd=await this._newsDigestCandidate(); if(nd) candidates=[nd,...candidates];
-    }
     if(!candidates.length) return;
     const pick=candidates[0];
     this._lastCoachTopic=pick.topic;
@@ -13048,6 +13042,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.168', date:'Aug 27, 2026', notes:[
+      'The voice assistant is now fully disconnected from the AI providers \u2014 the daily news digest that used to be read out to you is gone with it. Check-ins still come from your own logged data.',
+    ]},
     {version:'v11.167', date:'Aug 27, 2026', notes:[
       'The AI centre now shows which provider each feature will really use, warns you when a pick is unavailable, and marks a provider paused after repeated errors instead of dropping it from the list.',
     ]},
@@ -16789,7 +16786,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         {key:'checkins',label:'Wellbeing check-ins',desc:'Notices if you\u2019ve been away for a few days'},
         {key:'spendingAlerts',label:'Spending alerts',desc:'Flags unusual or above-average spend'},
         {key:'motivational',label:'Motivational messages',desc:'Gentle nudges about open tasks & goals'},
-        {key:'newsDigest',label:'Daily news digest',desc:'One key headline from your connected sources'},
         {key:'silent',label:'Silent mode',desc:'Assistant never speaks up first'},
         {key:'vacation',label:'Vacation mode',desc:'Pause all proactive coaching temporarily'},
       ].map(t=>{ const on=!!(S.prefs.coaching||{})[t.key]; return {label:t.label, desc:t.desc, bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setCoach(t.key,!on)}; }),
