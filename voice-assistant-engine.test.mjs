@@ -133,6 +133,35 @@ t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
 
+// ---- every line from the 21:22 transcript, verbatim ----
+t('"add 30 minutes of cycling to my fitness log"', async()=>{ const h=host();
+  await VA.handle('add 30 minutes of cycling to my fitness log',h);
+  const c=call('logWorkout'); if(!c) throw new Error('no tool called: '+last());
+  eq([c[1],c[2]],['Cycling',30]); });
+t('"Laura at 30 minutes of cycling to my fitness" — name, misheard add, bare destination', async()=>{ const h=host();
+  await VA.handle('Laura at 30 minutes of cycling to my fitness',h);
+  const c=call('logWorkout'); if(!c) throw new Error('no tool called: '+last());
+  eq([c[1],c[2]],['Cycling',30]); });
+t('"hello at 30 minutes of cycling to my fitness log"', async()=>{ const h=host();
+  await VA.handle('hello at 30 minutes of cycling to my fitness log',h);
+  const c=call('logWorkout'); if(!c) throw new Error('no tool called: '+last());
+  eq([c[1],c[2]],['Cycling',30]); });
+t('"to myfitness log" — recogniser ran the words together', async()=>{ const h=host();
+  await VA.handle('add 30 minutes of cycling to myfitness log',h);
+  const c=call('logWorkout'); eq([c[1],c[2]],['Cycling',30]); });
+t('"soil" is still refused rather than guessed at', async()=>{ const h=host();
+  await VA.handle('soil',h);
+  if(call('logWorkout')) throw new Error('logged something from noise');
+  has(last(),'didn’t catch that'); });
+t('"add a task ..." still beats the workout rule', async()=>{ const h=host();
+  await VA.handle('Add a task to call the accountant',h);
+  eq(call('addTask'),['addTask','Call the accountant']);
+  if(call('logWorkout')) throw new Error('workout rule stole a task'); });
+t('"had chicken and rice at 600 calories" is still a meal, not an add', async()=>{ const h=host();
+  await VA.handle('had chicken and rice at 600 calories',h);
+  const c=call('logMeal'); if(!c) throw new Error('meal lost to the add normaliser: '+last());
+  eq([c[1],c[2]],['Chicken and rice',600]); });
+
 // ---- the recogniser mishears "log" constantly ----
 t('the exact mishearing from the test run: "look 30 minutes of running"', async()=>{ const h=host();
   await VA.handle('hello can you look 30 minutes of running on my training log',h);

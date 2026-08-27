@@ -309,7 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=8"></script>
+<script src="voice-assistant-engine.js?v=9"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9134,7 +9134,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-181 · v11.181 orb-retries';
+const NOTIF_BUILD_VERSION = '2026.08.27-182 · v11.182 loura-hears-add';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13190,6 +13190,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.182', date:'Aug 27, 2026', notes:[
+      '\u201cAdd 30 minutes of cycling to my fitness log\u201d works now. Only \u201clog\u2026\u201d did before \u2014 saying \u201cadd\u201d, \u201crecord\u201d or \u201cput down\u201d matched nothing at all.',
+    ]},
     {version:'v11.181', date:'Aug 27, 2026', notes:[
       'If the orb fails to start \u2014 usually its 3D library not finishing its download \u2014 it now tries again instead of staying gone for the rest of the session.',
     ]},

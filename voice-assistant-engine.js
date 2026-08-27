@@ -50,8 +50,12 @@
      of those silently loses a real command, so they are normalised to "log" before any
      rule sees the text. Only at the very start of an utterance, where it can only be the
      verb: "look at my log" must stay a question, not become "log at my log". */
-  var MISHEARD_LOG = /^(?:look|lock|logged|blog|vlog|lo|dog)\b(?=\s+(?:\d|my\s|a\s|an\s|some\s|twenty|thirty|forty|fifty|ten|five|two|three|four|six|seven|eight|nine|half))/i;
-  function fixVerb(t) { return t.replace(MISHEARD_LOG, 'log'); }
+  var QTY = '(?:\\d|my\\s|a\\s|an\\s|some\\s|twenty|thirty|forty|fifty|ten|five|two|three|four|six|seven|eight|nine|half)';
+  var MISHEARD_LOG = new RegExp('^(?:look|lock|logged|blog|vlog|lo|dog)\\b(?=\\s+' + QTY + ')', 'i');
+  /* "add" comes back as "at" or "ad" constantly. Deliberately excludes "had", which is a
+     real meal verb — "had chicken and rice at 600 calories" must stay a meal. */
+  var MISHEARD_ADD = new RegExp('^(?:at|ad|and)\\b(?=\\s+' + QTY + ')', 'i');
+  function fixVerb(t) { return t.replace(MISHEARD_LOG, 'log').replace(MISHEARD_ADD, 'add'); }
 
   /* People name the destination as well as the thing: "log 30 minutes of running ON MY
      TRAINING", "add a task to call the accountant TO MY LIST". The destination is already
@@ -60,7 +64,8 @@
      English. Stripped from every name a rule pulls out, not just the workout one. */
   // (?:^|\s+) not just \s+ — a name that is ONLY a destination ("log 20 minutes to my
   // log") has nothing before it to match, and would otherwise log an unnamed workout.
-  var DEST = /(?:^|\s+)(?:on|in|to|into|onto|from|for)\s+(?:my|the|your)\s+(?:training|fitness|workout|exercise|gym|health|log|logs|tracker|diary|journal|list|checklist|task|tasks|note|notes|calendar|schedule|mission|missions|record|records|app|account)(?:\s+(?:log|list|tracker|diary|journal|centre|center))?$/i;
+  // (?:my|the|your)\s* not \s+ — the recogniser returns "to myfitness log" as one token.
+  var DEST = /(?:^|\s+)(?:on|in|to|into|onto|from|for)\s+(?:my|the|your)\s*(?:training|fitness|workout|exercise|gym|health|log|logs|tracker|diary|journal|list|checklist|task|tasks|note|notes|calendar|schedule|mission|missions|record|records|app|account)(?:\s+(?:log|list|tracker|diary|journal|centre|center))?$/i;
   function stripDest(t) {
     var prev; t = String(t || '').trim();
     do { prev = t; t = t.replace(DEST, '').trim(); } while (t !== prev);
@@ -283,8 +288,12 @@
         return 'I’ve logged ' + m[1].trim() + (kcal ? ' at ' + num(kcal[1]) + ' kcal' : '') + ' for you.';
       } },
 
-    { id:'logWorkout', acts:true, label:'Log a workout', say:'"Log 30 minutes of running" · "Log bench press 3 sets of 8 at 60 kilos"',
-      re:/^log\s+(?:my\s+)?(.+?)[.?!]*$/i,
+    { id:'logWorkout', acts:true, label:'Log a workout', say:'"Log 30 minutes of running" · "Add bench press 3 sets of 8 at 60 kilos"',
+      /* "add"/"record"/"put down" as well as "log" — people say "add 30 minutes of cycling
+         to my fitness log" at least as often, and it matched nothing at all. Safe here
+         because every specific "add X" rule (task, mission, note, water) sits above this
+         one and claims its own utterance first. */
+      re:/^(?:log|add|record|put down|put)\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1]);
         // "<exercise> N sets of M at W kg" | "N minutes of <exercise>" | "<exercise> for N minutes"
