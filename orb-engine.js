@@ -130,20 +130,12 @@
     }
 
     var rotY = 0, lastT = 0, breathePhase = Math.random() * Math.PI * 2;
-    // Snake drift: the cluster advances at a steady speed while its heading
-    // undulates side-to-side (a sine wave on the turn rate, not the heading
-    // itself, so the path curves smoothly instead of snapping), bouncing off
-    // the content-area edges like a fish turning back into the tank.
-    var driftEnabled = opts.driftEnabled !== false;
-    // Home: where the cluster eases back to when stopped — the page's own
-    // "resting spot" above the controls — instead of just freezing wherever
-    // it happened to be swimming. Null until the host explicitly sets one
-    // (via setHome), so it falls back to dead-centre.
+    // The cluster used to swim around the whole content area on a snaking path,
+    // with a toggle to stop it. That is gone: it holds its resting spot and spins
+    // in place. Home is where that spot is — set by the host via setHome, which
+    // points at the page's own marker above the controls; dead-centre until then.
     var homeX = null, homeY = null;
-    var snakeInit = false, snakeX = 0, snakeY = 0, snakeHeading = Math.random() * Math.PI * 2;
-    var snakeTurnPhase = Math.random() * Math.PI * 2, snakeTurnFreq = 0.00035 + Math.random() * 0.00015;
-    var snakeTurnAmp = 0.0001 + Math.random() * 0.00006, snakeSpeed = 0.032 + Math.random() * 0.014;
-    var squashSmooth = 0;
+    var posInit = false, posX = 0, posY = 0;
     var rafId;
     function frame(t) {
       rafId = root.requestAnimationFrame(frame);
@@ -185,37 +177,20 @@
       else { boundL = edgeMargin; boundR = cw - edgeMargin; }
       if (ch <= edgeMargin * 2) { boundT = boundB = ch / 2; }
       else { boundT = edgeMargin; boundB = ch - edgeMargin; }
-      if (!snakeInit) { snakeInit = true; snakeX = clamp(cw / 2, boundL, boundR); snakeY = clamp(ch / 2, boundT, boundB); }
+      if (!posInit) { posInit = true; posX = clamp(cw / 2, boundL, boundR); posY = clamp(ch / 2, boundT, boundB); }
 
-      var dtMs = dt * 1000;
-      if (driftEnabled) {
-        // Snake drift: advance at a steady speed while the heading itself
-        // undulates (sine on the turn RATE, not the angle) so the path
-        // curves smoothly back and forth like a snake/fish swimming, then
-        // bounces off the content-area edges instead of wrapping or freezing.
-        var turnRate = Math.sin(t * snakeTurnFreq + snakeTurnPhase) * snakeTurnAmp;
-        snakeHeading += turnRate * dtMs;
-        snakeX += Math.cos(snakeHeading) * snakeSpeed * dtMs;
-        snakeY += Math.sin(snakeHeading) * snakeSpeed * dtMs;
-        if (snakeX < boundL) { snakeX = boundL; snakeHeading = Math.PI - snakeHeading; }
-        else if (snakeX > boundR) { snakeX = boundR; snakeHeading = Math.PI - snakeHeading; }
-        if (snakeY < boundT) { snakeY = boundT; snakeHeading = -snakeHeading; }
-        else if (snakeY > boundB) { snakeY = boundB; snakeHeading = -snakeHeading; }
-      } else {
-        // Stopped: glide back to the resting spot (set via setHome, or
-        // dead-centre if none was given) instead of just freezing wherever
-        // the cluster happened to be swimming.
-        var hx = homeX != null ? homeX : cw / 2, hy = homeY != null ? homeY : ch / 2;
-        var homeEase = 1 - Math.pow(0.001, dt);
-        snakeX += (hx - snakeX) * homeEase;
-        snakeY += (hy - snakeY) * homeEase;
-      }
-      var ocx = snakeX, ocy = snakeY;
-      // Ease toward the target instead of snapping to it — a squared-off
-      // silhouette while stopped, relaxing into the cluster's natural round
-      // form once it's actually swimming, rather than snapping instantly.
-      squashSmooth += ((driftEnabled ? 0 : 1) - squashSmooth) * 0.015;
-      var squareAmt = squashSmooth;
+      // Hold the resting spot. Still eased rather than assigned, so the cluster
+      // glides when home moves — the host updates it on resize and when the nav
+      // rail or header changes the content area.
+      var hx = homeX != null ? homeX : cw / 2, hy = homeY != null ? homeY : ch / 2;
+      var homeEase = 1 - Math.pow(0.001, dt);
+      posX += (hx - posX) * homeEase;
+      posY += (hy - posY) * homeEase;
+      var ocx = posX, ocy = posY;
+      // The silhouette used to square off while stopped and relax round while
+      // swimming. With the swimming gone, that would have left it permanently
+      // squared — so it stays at its natural round form.
+      var squareAmt = 0;
       curOcx = ocx; curOcy = ocy;
 
       ctx.clearRect(0, 0, cw, ch);
@@ -348,7 +323,6 @@
       setOverrideMix: function (v) { overrideMix = v; },
       setForceHover: function (v) { forceHoverState = !!v; },
       setHoverIntensity: function (v) { hoverIntensity = v; },
-      setDriftEnabled: function (v) { driftEnabled = !!v; },
       setHome: function (x, y) { homeX = x; homeY = y; },
       // Where the cluster actually is this frame, in container pixels, plus its
       // breathing core radius. The cluster roams, so anything meant to sit inside
