@@ -310,7 +310,7 @@
 <script src="anatomy-3d.js"></script>
 <script src="exercise-index.js?v=2"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=17"></script>
+<script src="voice-assistant-engine.js?v=18"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9192,7 +9192,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-192 · v11.192 fifty-enders';
+const NOTIF_BUILD_VERSION = '2026.08.27-193 · v11.193 sign-off-closes-mic';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11239,6 +11239,16 @@ activities: this._mergeShipLog(s.activities),
         logIncome:(label,amount)=>{ this.setState({incLabel:label,incAmt:String(amount||'')},()=>this.addIncome()); },
         logExpense:(label,amount)=>{ this.setState({expLabel:label,expAmt:String(amount||'')},()=>this.addExpense()); },
         disableAssistant:()=>{ setTimeout(()=>this.toggleAssistantEnabled(),1200); },
+        /* Signing off closes the mic but leaves the assistant switched on — "goodbye" ends
+           the conversation, it does not ask to be turned off in settings. Deliberately not a
+           fixed delay: the tool is called from inside the rule, before its own line has been
+           queued, so it waits a tick for that and then rides the TTS drain, closing the mic
+           the moment she has finished speaking however long the line took. */
+        stopListening:()=>{ setTimeout(()=>{
+          const close=()=>{ if(this.state.listening) this.toggleListen(); };
+          const d=this._ttsDrainPromise;
+          if(d && d.then) d.then(close, close); else close();
+        },0); },
       },
     };
   }

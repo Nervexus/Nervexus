@@ -482,11 +482,18 @@
        It is deliberately the LAST rule in the list. Every ender is a common English word
        that can appear inside a real instruction ("log 8 hours of sleep last night", "note
        down that we're done with the flat"), so it only ever gets the utterances no actual
-       command wanted. Unlike 'stop' it does not turn the mic off — it just ends the
-       exchange politely and leaves her listening. */
+       command wanted.
+
+       Ending the conversation closes the mic: leaving it open after "goodbye" means she
+       carries on listening to a room that has finished talking to her. This is lighter than
+       'stop' — that flips the assistant's master switch, this only stops the current listen,
+       so the mic button brings her straight back. */
     { id:'signOff', acts:false, label:'End the conversation', say:'"No, that\u2019s everything" \u00b7 "Thanks, goodbye"',
       re:new RegExp('(?:^|\\b)(?:' + SIGN_OFF_PARTS.join('|') + ')\\b|' + SIGN_OFF_BARE.source, 'i'),
-      run:function (m, host) { return signOffReply(m[0]); } }
+      run:function (m, host) {
+        if (host.tools.stopListening) host.tools.stopListening();
+        return signOffReply(m[0]);
+      } }
 
   ];
 
@@ -659,7 +666,7 @@
        command never reaches it. */
     if (!t) {
       var bare = signOffMatch(raw);
-      if (bare) { AWAIT_CLOSE = false; host.speak(signOffReply(bare)); }
+      if (bare) { AWAIT_CLOSE = false; host.speak(signOffReply(bare)); if (host.tools.stopListening) host.tools.stopListening(); }
       return Promise.resolve();
     }
 
@@ -703,7 +710,12 @@
     // tidies down to "I said". Give the enders one more look at what was actually said,
     // ahead of the workout guess so an ender is never turned into "shall I log that?".
     var off = signOffMatch(raw);
-    if (off) { AWAIT_CLOSE = false; host.speak(signOffReply(off)); return Promise.resolve(); }
+    if (off) {
+      AWAIT_CLOSE = false;
+      host.speak(signOffReply(off));
+      if (host.tools.stopListening) host.tools.stopListening();
+      return Promise.resolve();
+    }
 
     // Before giving up — or spending a provider call — see whether this
     // is a workout with a word missing, and ask.

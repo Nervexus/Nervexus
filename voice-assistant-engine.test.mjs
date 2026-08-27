@@ -29,6 +29,7 @@ function host(hasAI=false, aiReply='AI says hi'){
       logWorkout:rec('logWorkout'), logHydration:rec('logHydration'), logWeight:rec('logWeight'),
       logSleep:rec('logSleep'), logMeal:rec('logMeal'), addNote:rec('addNote'),
       logIncome:rec('logIncome'), logExpense:rec('logExpense'), disableAssistant:rec('disableAssistant'),
+      stopListening:rec('stopListening'),
       // stands in for exercise-index.js
       exerciseName:(n)=>({'on the stairmaster':'Stairmaster','hammer curls':'Hammer Curl','running':'Running','run':'Running','bench press':'Bench Press','cycling':'Cycling'}[String(n).toLowerCase()]||null),
       completeTask:(l)=>{ calls.push(['completeTask',l]); return /accountant/i.test(l)?'Call accountant':null; },
@@ -423,9 +424,25 @@ t('enders work with no close-out outstanding at all', async()=>{ const h=host();
 t('good night gets its own line', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('good night',h);
   has(last(),'good night'); });
-t('signing off does not turn the assistant off', async()=>{ const h=host();
+t('signing off closes the mic without flipping the master switch', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('no that\u2019s everything',h);
-  if(call('disableAssistant')) throw new Error('an ender must not kill the mic'); });
+  if(!call('stopListening')) throw new Error('an ender must stop the listen');
+  if(call('disableAssistant')) throw new Error('an ender must not disable the assistant'); });
+t('enders that only survive as raw text still close the mic', async()=>{ const h=host();
+  // "thanks" tidies to nothing; "I said thanks" tidies to "I said" — both take the raw path.
+  VA._clearPending(); calls=[]; await VA.handle('thanks',h);
+  if(!call('stopListening')) throw new Error('bare gratitude left the mic open');
+  VA._clearPending(); calls=[]; await VA.handle('I said thanks',h);
+  if(!call('stopListening')) throw new Error('"I said thanks" left the mic open'); });
+t('all fifty enders close the mic', async()=>{ const h=host();
+  const open=[];
+  for(const line of ENDERS){ VA._clearPending(); calls=[]; await VA.handle(line,h);
+    if(!call('stopListening')) open.push(line); }
+  if(open.length) throw new Error(open.length+' left the mic open:\n  '+open.join('\n  ')); });
+t('a command never closes the mic', async()=>{ const h=host();
+  for(const say of ['Log 30 minutes of running','What tasks do I have left?','Open my fitness centre']){
+    VA._clearPending(); calls=[]; await VA.handle(say,h);
+    if(call('stopListening')) throw new Error(JSON.stringify(say)+' closed the mic'); } });
 t('an ender never gets the close-out question back', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
   followUps=[];
