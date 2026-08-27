@@ -310,6 +310,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="constellation-engine.js"></script>
+<script src="void-orb-engine.js"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -9097,7 +9098,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.27-158 · v11.158 maison-api-cards';
+const NOTIF_BUILD_VERSION = '2026.08.27-159 · v11.159 void-orb';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9322,7 +9323,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','constellation-engine.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -11585,10 +11586,18 @@ activities: this._mergeShipLog(s.activities),
       const follow=()=>{ if(!C.isMounted()){ this._constOrbRaf=null; return; } this._placeConstellationOrb(); this._constOrbRaf=requestAnimationFrame(follow); };
       if(!this._constOrbRaf) this._constOrbRaf=requestAnimationFrame(follow);
     }
+    // Core of the map is the void orb — a noise-displaced wireframe icosahedron on
+    // WebGL. VoidOrb falls back to nothing if WebGL is missing or the three.js bundle
+    // fails to load; the map reads fine without it, so OrbEngine (Canvas2D) still runs
+    // wherever WebGL is not available.
     const orbEl=this.root.querySelector('[data-constellation-orb]');
-    if(orbEl && window.OrbEngine && !this._constOrbApi){
-      const pal=this._orbPalette();
-      this._constOrbApi=window.OrbEngine.mount(orbEl, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, dimMul:1, hoverIntensity:0, rotateOnHover:false, forceHoverState:false});
+    if(orbEl && !this._constOrbApi){
+      if(window.VoidOrb && window.VoidOrb.supported()){
+        this._constOrbApi=window.VoidOrb.mount(orbEl, {detail:48});
+      } else if(window.OrbEngine){
+        const pal=this._orbPalette();
+        this._constOrbApi=window.OrbEngine.mount(orbEl, {overrideMix:1, overrideColor1:pal.c1, overrideColor2:pal.c2, overrideColor3:pal.c3, specMul:0.18, dimMul:1, hoverIntensity:0, rotateOnHover:false, forceHoverState:false});
+      }
     }
     C.setNodes(nodes);
     C.resize();
@@ -13151,6 +13160,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.159', date:'Aug 27, 2026', notes:[
+      'Connection Map core is now a 3D wireframe orb that flexes and turns as the map moves.',
+    ]},
     {version:'v11.157', date:'Aug 27, 2026', notes:[
       'Connection Map and the API page now sit on jet black instead of the slightly purple near-black they had before.',
     ]},
