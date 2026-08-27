@@ -168,12 +168,14 @@
         return bits.length ? 'You logged ' + bits.join(' ') + '.' : 'No sleep logged yet.';
       } },
 
-    { id:'askFood', label:'Calories and protein today', say:'"How many calories have I had?"',
+    { id:'askFood', label:'Calories and protein logged', say:'"How many calories have I had?"',
       re:/^how\s+many\s+(?:calories|kcal)\s+(?:have\s+)?i\s+(?:had|eaten)\s*(?:today)?[.?!]*$|^what\s+have\s+i\s+eaten\s*(?:today)?[.?!]*$/i,
       run:function (m, host) {
-        var f = host.tools.foodToday();
-        if (!f.count) return 'Nothing logged yet today.';
-        return plural(f.count, 'meal') + ', ' + f.kcal + ' kcal and ' + f.protein + ' g of protein so far.';
+        // Deliberately says "on your meal list" rather than "today": meal entries carry no
+        // date, so a daily figure would be invented.
+        var f = host.tools.foodLogged();
+        if (!f.count) return 'Nothing on your meal list yet.';
+        return plural(f.count, 'meal') + ' on your list — ' + f.kcal + ' kcal and ' + f.protein + ' g of protein.';
       } },
 
     { id:'askMoney', label:'Money in and out today', say:'"How much have I spent today?"',

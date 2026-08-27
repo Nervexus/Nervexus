@@ -33,7 +33,7 @@ function host(hasAI=false, aiReply='AI says hi'){
       waterToday:()=>({ml:1500, goalMl:2000}),
       latestWeight:()=>({kg:82, date:'2026-08-27'}),
       lastSleep:()=>({hours:7, minutes:30, date:'2026-08-27'}),
-      foodToday:()=>({count:2, kcal:1060, protein:70}),
+      foodLogged:()=>({count:2, kcal:1060, protein:70}),
       moneyToday:()=>({income:1200, expenses:40}),
       eventsOn:(d)=>d==='TOMORROW'?['Dentist at 15:00']:[],
       missionsLeft:()=>['Cold shower'],
@@ -107,8 +107,9 @@ t('latest weight', async()=>{ const h=host(); await VA.handle('What is my weight
   has(spoken[0],'82 kg'); });
 t('last night sleep', async()=>{ const h=host(); await VA.handle('How did I sleep?',h);
   has(spoken[0],'7 hours'); has(spoken[0],'30 min'); });
-t('calories and protein today', async()=>{ const h=host(); await VA.handle('How many calories have I had?',h);
-  has(spoken[0],'1060'); has(spoken[0],'70 g'); });
+t('calories and protein, without claiming a day', async()=>{ const h=host(); await VA.handle('How many calories have I had?',h);
+  has(spoken[0],'1060'); has(spoken[0],'70 g');
+  if(/today/i.test(spoken[0])) throw new Error('meals have no date — must not claim a daily total'); });
 t('spend today', async()=>{ const h=host(); await VA.handle('How much have I spent today?',h);
   has(spoken[0],'40'); has(spoken[0],'expenses'); });
 t('earned today is not the same as spent', async()=>{ const h=host(); await VA.handle('How much have I earned today?',h);

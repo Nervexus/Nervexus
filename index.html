@@ -309,7 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=3"></script>
+<script src="voice-assistant-engine.js?v=4"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=2"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9137,7 +9137,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-170 · v11.170 voice-local-tier';
+const NOTIF_BUILD_VERSION = '2026.08.27-171 · v11.171 voice-query-fixes';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11076,11 +11076,18 @@ activities: this._mergeShipLog(s.activities),
         // ---- read-only queries. Every one reads live app state; none invents a number. ----
         waterToday:()=>{ const K=window.HealthKit, H=this.state.health; if(!K||!H) return null;
           return { ml:Math.round(K.dayHydration(H,K.today())||0), goalMl:H.hydrationGoalMl||2000 }; },
-        latestWeight:()=>{ const w=(this.state.health&&this.state.health.weights)||[]; if(!w.length) return null;
-          const last=w[w.length-1]; return { kg:last.kg!=null?last.kg:last.value, date:last.date }; },
+        latestWeight:()=>{
+          const log=((this.state.health&&this.state.health.bodyLog)||[]).filter(x=>x && x.weightKg>0);
+          if(!log.length) return null;
+          const last=log.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).pop();
+          return { kg:Math.round(last.weightKg*10)/10, date:last.date };
+        },
         lastSleep:()=>{ const sl=(this.state.health&&this.state.health.sleepLog)||[]; if(!sl.length) return null;
           const last=sl[sl.length-1]; return { hours:last.hours||0, minutes:last.minutes||0, date:last.date }; },
-        foodToday:()=>{ const meals=(this.state.health&&this.state.health.meals)||[];
+        // Meal entries have no date field and nothing clears them daily, so this is the
+        // current meal list, not a day's total. Named accordingly — a "today" label here
+        // would be a number the data cannot support.
+        foodLogged:()=>{ const meals=(this.state.health&&this.state.health.meals)||[];
           return { count:meals.length, kcal:meals.reduce((a,m)=>a+(+m.kcal||0),0), protein:meals.reduce((a,m)=>a+(+m.protein||0),0) }; },
         moneyToday:()=>{ const d=new Date(); d.setHours(0,0,0,0); const from=d.getTime();
           const sum=(rows)=>(rows||[]).filter(r=>r.ts>=from).reduce((a,r)=>a+(+r.amt||0),0);
@@ -13177,6 +13184,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.171', date:'Aug 27, 2026', notes:[
+      'Asking the assistant your weight now works \u2014 it was reading the wrong place and always said you had never logged one. Asking about calories no longer calls the total \u201ctoday\u201d, because meal entries are not dated.',
+    ]},
     {version:'v11.170', date:'Aug 27, 2026', major:true, notes:[
       'Tasks you added by voice were never saved \u2014 they showed up, then vanished on reload. Fixed, and any task you add by voice from now on persists properly.',
       'The no-key half of the assistant is much bigger: 31 commands. It can now tick tasks off, complete missions, and answer questions about your own data \u2014 water, weight, sleep, calories, money, what\u2019s on today or tomorrow, missions left. It also copes with how people actually talk (\u201chey, could you log 500ml of water for me\u201d).',
