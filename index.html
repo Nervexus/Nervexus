@@ -308,9 +308,9 @@
 <script src="orb-engine.js?v=7"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
-<script src="exercise-index.js"></script>
+<script src="exercise-index.js?v=2"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=11"></script>
+<script src="voice-assistant-engine.js?v=12"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9135,7 +9135,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-184 · v11.184 exercise-index';
+const NOTIF_BUILD_VERSION = '2026.08.27-185 · v11.185 loura-asks-first';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13194,6 +13194,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.185', date:'Aug 27, 2026', major:true, notes:[
+      'Loura asks instead of giving up. If a noisy room eats a word \u2014 \u201c3 minutes run\u201d instead of \u201clog 3 minutes of running\u201d \u2014 she says \u201cDid you want me to log 3 minutes of running for you?\u201d and waits. Nothing is written until you say yes.',
+      'Say just \u201cbench press\u201d and she asks how many sets, then logs it when you tell her.',
+    ]},
     {version:'v11.184', date:'Aug 27, 2026', major:true, notes:[
       '258 named exercises now file themselves correctly \u2014 by voice, by hand, and through bulk import. Say \u201clog 3 sets of 12 hammer curls\u201d and it lands under Arms as Hammer Curl, not wherever the open tab happened to be.',
     ]},

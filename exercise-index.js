@@ -287,6 +287,27 @@
     'kickboxing':                            ['Cardio',     'Cardio',    'Kickboxing'],
   };
 
+  /* Spoken short forms of entries ALREADY on the list — the verb where the list has the
+     noun. Not new exercises: every target below is a name from the supplied list.
+
+     "3 minutes run" is what a noisy room does to "3 minutes of running", and without
+     these it logs an exercise called "Run" that classifies as nothing.
+
+     Deliberately excludes "row" and "squat". Bare "row" would send "3 sets of 10 rows"
+     to the Rowing machine when a lifter means Barbell Row, and "squat" could be any of
+     six listed variants — both are better left to the fallback patterns than guessed. */
+  var ALIAS = {
+    'run':'running', 'runs':'running', 'ran':'running',
+    'jog':'jogging', 'jogs':'jogging',
+    'cycle':'cycling', 'cycles':'cycling', 'bike':'cycling', 'bikes':'cycling', 'biking':'cycling',
+    'swim':'swimming', 'swims':'swimming', 'swam':'swimming',
+    'walk':'walking', 'walks':'walking', 'walked':'walking',
+    'sprint':'sprinting', 'sprints':'sprinting',
+    'hike':'hiking', 'hikes':'hiking', 'hiked':'hiking',
+    'skipping':'jump rope', 'skip rope':'jump rope', 'rope':'jump rope',
+    'treadmill run':'treadmill', 'cross-trainer':'cross trainer'
+  };
+
   var GROUPS = ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
 
   function norm(s) {
@@ -317,13 +338,25 @@
     return new RegExp('(^| )' + needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '( |$)').test(hay);
   }
 
+  function resolveAlias(k) { return (ALIAS[k] && MAP[ALIAS[k]]) ? ALIAS[k] : k; }
+
   function lookup(text) {
     var t = norm(text);
     if (!t) return null;
-    if (MAP[t]) return entry(t, MAP[t]);
+    var a = resolveAlias(t);
+    if (MAP[a]) return entry(a, MAP[a]);
 
     var lt = loose(t), i, k;
     if (LOOSE[lt]) { k = LOOSE[lt]; return entry(k, MAP[k]); }
+
+    // an alias sitting inside a longer phrase — "30 minutes run", "went for a jog"
+    var words = t.split(' ');
+    for (i = words.length; i > 0; i--) {
+      for (var j = 0; j + i <= words.length; j++) {
+        var seg = words.slice(j, j + i).join(' ');
+        if (ALIAS[seg] && MAP[ALIAS[seg]]) return entry(ALIAS[seg], MAP[ALIAS[seg]]);
+      }
+    }
 
     // exact wording first, then the loose form — so a precise name is never beaten by a
     // sloppier match on a different exercise

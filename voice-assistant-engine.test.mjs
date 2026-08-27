@@ -29,7 +29,7 @@ function host(hasAI=false, aiReply='AI says hi'){
       logSleep:rec('logSleep'), logMeal:rec('logMeal'), addNote:rec('addNote'),
       logIncome:rec('logIncome'), logExpense:rec('logExpense'), disableAssistant:rec('disableAssistant'),
       // stands in for exercise-index.js
-      exerciseName:(n)=>({'on the stairmaster':'Stairmaster','hammer curls':'Hammer Curl','running':'Running'}[String(n).toLowerCase()]||null),
+      exerciseName:(n)=>({'on the stairmaster':'Stairmaster','hammer curls':'Hammer Curl','running':'Running','run':'Running','bench press':'Bench Press','cycling':'Cycling'}[String(n).toLowerCase()]||null),
       completeTask:(l)=>{ calls.push(['completeTask',l]); return /accountant/i.test(l)?'Call accountant':null; },
       completeMission:(n)=>{ calls.push(['completeMission',n]); return /cold/i.test(n)?'Cold shower':null; },
       waterToday:()=>({ml:1500, goalMl:2000}),
@@ -71,8 +71,9 @@ t('schedules an event', async()=>{ const h=host(); await VA.handle('Schedule a d
   const c=call('scheduleEvent'); if(!c) throw new Error('not scheduled'); has(c[1],'dentist'); });
 t('logs a timed workout', async()=>{ const h=host(); await VA.handle('Log 30 minutes of running',h);
   const c=call('logWorkout'); eq([c[1],c[2]],['Running',30]); });
-t('logs sets, reps and weight', async()=>{ const h=host(); await VA.handle('Log bench press 3 sets of 8 at 60 kilos',h);
-  const c=call('logWorkout'); eq([c[1],c[4],c[5],c[3]],['Bench press',3,8,60]); });
+t('logs sets, reps and weight, under the canonical name', async()=>{ const h=host();
+  await VA.handle('Log bench press 3 sets of 8 at 60 kilos',h);
+  const c=call('logWorkout'); eq([c[1],c[4],c[5],c[3]],['Bench Press',3,8,60]); });
 t('handles spoken numbers', async()=>{ const h=host(); await VA.handle('Log twenty minutes of cycling',h);
   const c=call('logWorkout'); eq([c[1],c[2]],['Cycling',20]); });
 t('logs water in ml', async()=>{ const h=host(); await VA.handle('Log 500 ml of water',h);
@@ -134,6 +135,48 @@ t('strips a wake word and politeness', async()=>{ const h=host();
 t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
+
+// ---- asking instead of guessing ----
+t('a verb dropped by a noisy room becomes a question, not a refusal', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('3 minutes run',h);
+  has(last(),'Did you want me to log'); has(last(),'3 minutes of running');
+  if(call('logWorkout')) throw new Error('wrote before asking'); });
+t('yes completes it', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('3 minutes run',h); await VA.handle('yes',h);
+  const c=call('logWorkout'); if(!c) throw new Error('not logged after yes: '+last());
+  eq([c[1],c[2]],['Running',3]); });
+t('no leaves it alone', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('3 minutes run',h); await VA.handle('no',h);
+  if(call('logWorkout')) throw new Error('logged despite being told no');
+  has(last(),'left it'); });
+t('a phrase counts as yes', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('30 minutes cycling',h); await VA.handle('log it',h);
+  if(!call('logWorkout')) throw new Error('"log it" was not taken as confirmation'); });
+t('an exercise with no numbers asks for them, then completes', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('bench press',h);
+  has(last(),'how many sets');
+  if(call('logWorkout')) throw new Error('wrote before asking');
+  await VA.handle('3 sets of 8 at 60 kilos',h);
+  const c=call('logWorkout'); if(!c) throw new Error('not logged after the answer: '+last());
+  eq([c[1],c[4],c[5],c[3]],['Bench Press',3,8,60]); });
+t('a new command drops the pending question rather than swallowing it', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('30 minutes cycling',h);
+  await VA.handle('What tasks do I have left?',h);
+  has(last(),'task'); 
+  if(call('logWorkout')) throw new Error('logged the abandoned proposal'); });
+t('the question does not outlive one turn', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('30 minutes cycling',h);
+  await VA.handle('What is the date?',h);
+  await VA.handle('yes',h);
+  if(call('logWorkout')) throw new Error('a stale question was still live'); });
+t('noise proposes nothing', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('soil',h);
+  has(last(),'didn’t catch that');
+  if(VA._pending()) throw new Error('proposed something from noise'); });
+t('a complete command never asks', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('log 30 minutes of running',h);
+  if(VA._pending()) throw new Error('asked when it did not need to');
+  if(!call('logWorkout')) throw new Error('did not log'); });
 
 // ---- the exercise index supplies the proper name ----
 t('a known exercise is logged under its canonical name', async()=>{ const h=host();

@@ -95,6 +95,63 @@
     news:'intel', world:'intel', productivity:'productivity', tasks:'productivity'
   };
 
+  /* ---- workout parsing, shared ----------------------------------------------------
+     Pulled out of the rule so the confirmation path can reuse it. It has to work on text
+     with no command verb at all ("3 minutes run"), because that is exactly the case where
+     the recogniser has dropped the verb and Loura needs to ask rather than give up.
+
+     `quantified` is the honest signal: true only when a duration, set count or weight was
+     actually found. The rule requires it; the confirmation path uses its absence to decide
+     whether to ask "how long?" instead of "shall I log this?". */
+  function parseWorkout(raw, host) {
+    var t = spoken(String(raw || '').trim());
+    if (!t) return null;
+    var sets = /(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/i.exec(t);
+    var reps = /(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/i.exec(t);
+    var wt   = /(?:at|with|@)\s*(\d+(?:\.\d+)?)\s*(kg|kilos?|kilograms?|lbs?|pounds?)\b/i.exec(t);
+    var mins = /(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/i.exec(t);
+    var name = t
+      .replace(/(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/ig,'')
+      .replace(/(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/ig,'')
+      .replace(/(?:at|with|@)\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)\b/ig,'')
+      .replace(/(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/ig,'')
+      .replace(/\b(?:of|doing|did)\b/ig,' ')
+      .replace(/\s+/g,' ').trim();
+    /* stripDest FIRST — it matches on "on my training", so removing "on"/"my" as filler
+       beforehand leaves it nothing to find and the destination survives into the name. */
+    name = stripDest(name);
+    name = name.replace(/\b(?:for|on|in|the|my)\b/ig,' ').replace(/\s+/g,' ').trim();
+    if (!name) return null;
+    var known = host.tools.exerciseName ? host.tools.exerciseName(name) : null;
+    return {
+      name: known || cap(name), known: !!known,
+      mins: mins ? num(mins[1]) : 0,
+      sets: sets ? num(sets[1]) : 0,
+      reps: reps ? num(reps[1]) : 0,
+      wt:   wt ? num(wt[1]) : 0,
+      unit: wt && /lb|pound/i.test(wt[2]) ? 'lb' : 'kg',
+      quantified: !!(sets || mins || wt)
+    };
+  }
+
+  /* Read it back as a sentence, not as fields. "running — 30 min" is how the data is
+     shaped; "30 minutes of running" is how it was said to us. */
+  function describeWorkout(w) {
+    if (w.mins && !w.sets) return plural(w.mins, 'minute') + ' of ' + w.name.toLowerCase();
+    if (w.sets) {
+      return w.name + ', ' + w.sets + ' set' + (w.sets === 1 ? '' : 's')
+           + (w.reps ? ' of ' + w.reps : '')
+           + (w.wt ? ' at ' + w.wt + ' ' + w.unit : '')
+           + (w.mins ? ' over ' + plural(w.mins, 'minute') : '');
+    }
+    return w.name + (w.wt ? ' at ' + w.wt + ' ' + w.unit : '');
+  }
+
+  function logWorkout(w, host) {
+    host.tools.logWorkout(w.name, w.mins, w.wt, w.sets, w.reps);
+    return 'I’ve logged ' + describeWorkout(w) + ' on your fitness log for you.';
+  }
+
   // ORDER IS LOAD-BEARING — first match wins. Every rule whose trigger word is shared
   // with a broader one must sit above it. In particular the workout rule opens with a
   // bare `log <anything>`, so water, weight, sleep, money and meals all precede it or it
@@ -301,61 +358,22 @@
       } },
 
     { id:'logWorkout', acts:true, label:'Log a workout', say:'"Log 30 minutes of running" · "Add bench press 3 sets of 8 at 60 kilos"',
-      /* "add"/"record"/"put down" as well as "log" — people say "add 30 minutes of cycling
-         to my fitness log" at least as often, and it matched nothing at all. Safe here
-         because every specific "add X" rule (task, mission, note, water) sits above this
-         one and claims its own utterance first. */
       /* Every way of saying "record this" that people actually use. Started as "log" only,
          which missed "add 30 minutes of cycling" entirely.
 
          Safe despite the breadth, for two reasons. Every specific rule — add a task, add a
          mission, add a note, log water — sits above this one and claims its own utterance
-         first. And this rule declines unless it finds a duration, a set count or a weight,
-         so "put the kettle on" falls through rather than logging nonsense.
+         first. And this rule declines unless parseWorkout finds a duration, a set count or
+         a weight, so "put the kettle on" falls through rather than logging nonsense.
 
          The past-tense forms overlap with completeTask ("finished the shopping"), which is
          also above this rule and declines when no such task exists — so "finished 30
          minutes of cycling" tries the task list, misses, and lands here. */
       re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i\s+)?(?:just\s+)?(?:did|done|finished|completed))\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var t = spoken(m[1]);
-        // "<exercise> N sets of M at W kg" | "N minutes of <exercise>" | "<exercise> for N minutes"
-        var sets = /(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/i.exec(t);
-        var reps = /(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/i.exec(t);
-        var wt   = /(?:at|with|@)\s*(\d+(?:\.\d+)?)\s*(kg|kilos?|kilograms?|lbs?|pounds?)\b/i.exec(t);
-        var mins = /(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/i.exec(t);
-        if (!sets && !mins && !wt) return null;        // not a workout shape — fall through
-        var name = t
-          .replace(/(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/ig,'')
-          .replace(/(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/ig,'')
-          .replace(/(?:at|with|@)\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)\b/ig,'')
-          .replace(/(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/ig,'')
-          .replace(/\b(?:of|for|doing|did)\b/ig,' ')
-          .replace(/\s+/g,' ').trim();
-        name = stripDest(name);
-        if (!name) return null;
-        /* If the exercise is one the app knows, use its proper name rather than whatever
-           survived the parse. Turns "on the stairmaster" into "Stairmaster" and
-           "hammer curls" into "Hammer Curl", so the log reads consistently however it was
-           said, and so does the reply. */
-        if (host.tools.exerciseName) name = host.tools.exerciseName(name) || name;
-        host.tools.logWorkout(cap(name), mins ? num(mins[1]) : 0, wt ? num(wt[1]) : 0,
-                              sets ? num(sets[1]) : 0, reps ? num(reps[1]) : 0);
-        /* Read it back as a sentence, not as fields. "running — 30 min" is how the data
-           is shaped; "30 minutes of running" is how it was said to us. */
-        var unit = wt && /lb|pound/i.test(wt[2]) ? 'lb' : 'kg';
-        var what;
-        if (mins && !sets) {
-          what = plural(num(mins[1]), 'minute') + ' of ' + name.toLowerCase();
-        } else if (sets) {
-          what = name + ', ' + sets[1] + ' set' + (num(sets[1]) === 1 ? '' : 's')
-               + (reps ? ' of ' + reps[1] : '')
-               + (wt ? ' at ' + wt[1] + ' ' + unit : '')
-               + (mins ? ' over ' + plural(num(mins[1]), 'minute') : '');
-        } else {
-          what = name + (wt ? ' at ' + wt[1] + ' ' + unit : '');
-        }
-        return 'I’ve logged ' + what + ' on your fitness log for you.';
+        var w = parseWorkout(m[1], host);
+        if (!w || !w.quantified) return null;          // not a workout shape — fall through
+        return logWorkout(w, host);
       } },
 
     { id:'addNote', acts:true, label:'Save a note', say:'"Make a note called ideas — buy the domain"',
@@ -409,6 +427,56 @@
   var ACKS = ['Okay, doing that now.', 'Sure — one moment.', 'On it.', 'Right, let me get that.'];
   var ackAt = 0;
   function nextAck() { var a = ACKS[ackAt % ACKS.length]; ackAt++; return a; }
+
+  /* ---- asking instead of guessing --------------------------------------------------
+     A noisy room drops words. "Log 3 minutes of running" comes back as "3 minutes run" —
+     everything needed is there except the verb, and the old behaviour was to give up with
+     "Sorry, I didn't catch that", which throws away a perfectly good utterance.
+
+     So: before falling through, see whether the text still looks like something loggable.
+     If it does, propose it and wait. Nothing is written until you say yes.
+
+     Two shapes of pending question:
+       confirm   we have the whole thing, just not the instruction — "Did you want me to
+                 log 3 minutes of running?" -> yes/no
+       quantity  we have the exercise but no numbers — "How long, or how many sets?"
+                 -> the next utterance is read for a quantity and the log completes
+
+     Pending state lives for exactly one utterance. Anything that is not a yes, a no, or
+     the missing quantity is treated as a fresh command and the question is dropped — so a
+     forgotten question can never swallow the next real thing you say. */
+  var PENDING = null;
+
+  var YES = /^(?:yes|yeah|yep|yup|yup|sure|ok(?:ay)?|go on|go ahead|do it|please do|please|correct|that.?s right|right|confirm|log it|save it|add it|affirmative)\b/i;
+  var NO  = /^(?:no|nope|nah|cancel|forget it|don.?t|do not|stop|wrong|leave it|never ?mind|scrap that)\b/i;
+
+  /* Does this look like a workout even though no rule claimed it? Only proposes when
+     there is something real to propose: a quantity, or an exercise the app actually
+     knows. Random noise — "soil" — produces nothing and still gets an honest miss. */
+  function proposeWorkout(text, host) {
+    var w = parseWorkout(text, host);
+    if (!w) return null;
+    if (w.quantified && (w.known || w.name.split(' ').length <= 4)) {
+      return { kind:'confirm',
+        question: 'Did you want me to log ' + describeWorkout(w) + ' for you?',
+        run: function () { return logWorkout(w, host); } };
+    }
+    // A known exercise with no numbers attached is worth finishing rather than refusing.
+    if (!w.quantified && w.known) {
+      return { kind:'quantity', base: w,
+        question: 'How long was that, or how many sets? I\u2019ll log ' + w.name + ' once you tell me.',
+        run: function () { return logWorkout(w, host); } };
+    }
+    return null;
+  }
+
+  /* The reply to a "how many?" question — "30 minutes", "3 sets of 8 at 60 kilos". Parsed
+     against the exercise we already have rather than as a fresh command. */
+  function applyQuantity(text, pending, host) {
+    var w = parseWorkout(pending.base.name + ' ' + text, host);
+    if (!w || !w.quantified) return null;
+    return logWorkout(w, host);
+  }
 
   /* An utterance that opens like a question is genuinely something only a model can
      answer; anything else that failed to match is far more likely to be a command she
@@ -466,12 +534,29 @@
     var t = fixVerb(tidy(String(text || '').trim()));
     if (!t) return Promise.resolve();
 
+    // A question is outstanding. Take it or leave it, then clear it either way.
+    if (PENDING) {
+      var q = PENDING; PENDING = null;
+      if (YES.test(t)) { var done = q.run(); host.speak(done); return Promise.resolve(done); }
+      if (NO.test(t))  { host.speak('Okay, I’ve left it.'); return Promise.resolve(); }
+      if (q.kind === 'quantity') {
+        var filled = applyQuantity(t, q, host);
+        if (filled) { host.speak(filled); return Promise.resolve(filled); }
+      }
+      // Neither — fall through and treat this as a new command.
+    }
+
     // Peek first so the acknowledgement lands BEFORE the work, not after it.
     var rule = matchRule(t);
     if (rule && rule.acts && host.ack) host.ack(nextAck());
 
     var local = runLocal(t, host);
     if (local.handled) { host.speak(local.reply); return Promise.resolve(local.reply); }
+
+    // Nothing matched. Before giving up — or spending a provider call — see whether this
+    // is a workout with a word missing, and ask.
+    var proposal = proposeWorkout(t, host);
+    if (proposal) { PENDING = proposal; host.speak(proposal.question); return Promise.resolve(); }
 
     if (!host.hasAI()) { host.speak(unmatchedReply(t, host)); return Promise.resolve(); }
 
@@ -496,7 +581,9 @@
       };
     },
     /* Exposed for tests: run the rules without a host doing any speaking. */
-    _matchLocal: function (text) { var r = matchRule(text); return r ? r.id : null; }
+    _matchLocal: function (text) { var r = matchRule(text); return r ? r.id : null; },
+    _pending: function () { return PENDING ? PENDING.kind : null; },
+    _clearPending: function () { PENDING = null; }
   };
 
 }(window));
