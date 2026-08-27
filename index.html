@@ -3524,7 +3524,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
           </sc-for>
           <div style="display:flex; gap:9px; margin-top:8px; border-top:1px solid {{ vLine3 }}; padding-top:14px;">
-            <input value="{{ vInput }}" onInput="{{ setVInput }}" onKeyDown="{{ sendVoiceKey }}" placeholder="Type a command… e.g. open finance, add gym to my checklist" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid {{ vLine }}; background:{{ vInputBg }}; color:{{ vInk }}; font-size:13px; outline:none;">
+            <input value="{{ vInput }}" onInput="{{ setVInput }}" onKeyDown="{{ sendVoiceKey }}" placeholder="Type a command… e.g. log 30 minutes of running, what is on tomorrow" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid {{ vLine }}; background:{{ vInputBg }}; color:{{ vInk }}; font-size:13px; outline:none;">
             <span onClick="{{ sendVoice }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:{{ vBtnBg }}; box-shadow:{{ vBtnShadow }}; color:{{ vBtnText }}; font-size:13px; font-weight:700; cursor:pointer;">Send</span>
           </div>
         </div>
@@ -9137,7 +9137,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-173 · v11.173 loura-acknowledges';
+const NOTIF_BUILD_VERSION = '2026.08.27-174 · v11.174 orb-persists';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10694,16 +10694,23 @@ activities: this._mergeShipLog(s.activities),
     });
   }
   async _speakChunkAwait(text){ if(!text||!text.trim()) return; const ok=await this._speakElevenAwait(text); if(!ok) await this._speakLocalAwait(text); }
+  // Deafen the mic for as long as we are talking. _speakEleven does this for one-shot
+  // speech, but the awaitable variants the queue uses do not — so anything spoken through
+  // the queue was picked up by the recogniser and fed straight back in as a command. Her
+  // own "Okay, doing that now." was landing in the transcript as if you had said it.
   _ttsDrain(){
     if(this._ttsPlaying) return this._ttsDrainPromise;
     this._ttsPlaying=true;
     const myId=this._ttsStreamId;
+    this._pauseForSpeech=true; this.stopRecog();
     this._ttsDrainPromise=(async()=>{
       while(this._ttsQueue.length){
         if(myId!==this._ttsStreamId) break;
         await this._speakChunkAwait(this._ttsQueue.shift());
       }
       this._ttsPlaying=false;
+      this._pauseForSpeech=false;
+      if(this.state.listening) this.startRecog();
     })();
     return this._ttsDrainPromise;
   }
@@ -13191,6 +13198,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.174', date:'Aug 27, 2026', notes:[
+      'The orb stays put while you and Loura are talking \u2014 it was being rebuilt on every reply.',
+      'Loura no longer hears herself. Her own \u201cOkay, doing that now\u201d was being picked up by the microphone and treated as a new command from you.',
+    ]},
     {version:'v11.173', date:'Aug 27, 2026', notes:[
       'Loura answers you twice now when you ask her to do something \u2014 \u201cOkay, doing that now\u201d, then \u201cI\u2019ve logged 30 minutes of running for you\u201d once it is actually saved. Questions still get one straight answer.',
       'Fixed the orb vanishing the moment you gave her a command.',
@@ -16275,11 +16286,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // third of it.
   _mountVoiceOrb(el){
     if(!el || !window.VoidOrb || !window.VoidOrb.supported()) return;
-    // The canvas is appended by us, not by the template, so a re-render diffs it away
-    // while leaving the mount div itself in place. Checking only for the API meant the
-    // guard short-circuited and the orb never came back — it disappeared the moment the
-    // first command triggered a setState.
-    if(this._orbEl===el && this._voiceCoreApi && this._voiceCoreHost && this._voiceCoreHost.isConnected) return;
+    // The canvas is appended by us, not by the template, so every re-render diffs it away
+    // while leaving the mount div itself in place — and talking to Loura re-renders
+    // constantly. Tearing the orb down and rebuilding it each time meant a new WebGL
+    // context per utterance and a visible gap where the orb simply was not there.
+    //
+    // So: if only the child was removed, put the same host back. Same context, same
+    // canvas, no gap. A full rebuild happens only when the mount element itself changes.
+    if(this._orbEl===el && this._voiceCoreApi && this._voiceCoreHost){
+      if(!this._voiceCoreHost.isConnected){ el.appendChild(this._voiceCoreHost); this._syncVoiceOrbBounds(); }
+      return;
+    }
     this._unmountVoiceOrb();
     this._orbEl=el;
     const host=document.createElement('div');
