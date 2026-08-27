@@ -323,6 +323,10 @@
          a lost context has already freed its slot, so rebuilding is safe and is the only
          way back. */
       isLost: function () { return !!S.dead || !!S.lost; },
+      /* The canvas itself, so a host whose DOM was rebuilt underneath it can put the same
+         one back rather than building a second context. Contexts are capped at around
+         sixteen per page; re-attaching costs nothing, rebuilding spends one. */
+      canvas: function () { return (S.renderer && S.renderer.domElement) || null; },
       setColor: function (rgb) {
         if (S.uniforms && rgb) S.uniforms.uColor.value.set(rgb[0], rgb[1], rgb[2]);
       },

@@ -312,7 +312,7 @@
 <script src="ai-gateway.js"></script>
 <script src="voice-assistant-engine.js?v=19"></script>
 <script src="constellation-engine.js"></script>
-<script src="void-orb-engine.js?v=4"></script>
+<script src="void-orb-engine.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3532,37 +3532,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <sc-if value="{{ hasLiveTranscript }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ vMuted }}; letter-spacing:.3px; max-width:520px; text-align:center;">“{{ vLiveTranscript }}”</div></sc-if>
           </div>
         </div>
-        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:{{ vMuted }};">&#9670; WITHOUT AN API KEY</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#7ec9a0;">{{ vaLocalCount }} &middot; always on</span>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:7px;">
-            <sc-for list="{{ vaLocal }}" as="c" hint-placeholder-count="6">
-              <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;">
-                <span style="width:170px; flex:0 0 170px; font-size:12.5px; color:{{ vInk2 }}; font-weight:600;">{{ c.label }}</span>
-                <span style="flex:1; min-width:0; font-size:11.5px; color:{{ vMuted }};">{{ c.example }}</span>
-              </div>
-            </sc-for>
-          </div>
-          <div style="height:1px; background:{{ vLine2 }}; margin:16px 0 14px;"></div>
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:{{ vMuted }};">&#9670; NEEDS AN API KEY</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ vaAIStatusC }};">{{ vaAIStatus }}</span>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:7px; opacity:{{ vaAIRowOpacity }};">
-            <sc-for list="{{ vaAI }}" as="c" hint-placeholder-count="4">
-              <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;">
-                <span style="width:170px; flex:0 0 170px; font-size:12.5px; color:{{ vInk2 }}; font-weight:600;">{{ c.label }}</span>
-                <span style="flex:1; min-width:0; font-size:11.5px; color:{{ vMuted }};">{{ c.example }}</span>
-              </div>
-            </sc-for>
-          </div>
-          <div style="margin-top:12px; font-size:11px; color:{{ vMuted3 }}; line-height:1.5;">Everything above the line runs on this device against your own logged data. Below the line goes to whichever provider the AI centre routes Voice Assistant to.</div>
-          <div style="margin-top:10px; padding-top:10px; border-top:1px solid {{ vLine2 }}; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px;">
-            <span style="color:{{ vMuted3 }};">{{ vaBuild }}</span>
-            <span style="color:{{ vaMissingC }};">{{ vaMissing }}</span>
-          </div>
+        <!-- The two command tables that lived here were built for testing and have served
+             their purpose; only the load status stays, because a screenshot of it is still
+             the fastest way to tell a broken build from a broken feature. -->
+        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:12px 20px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px;">
+          <span style="color:{{ vMuted3 }};">{{ vaBuild }}</span>
+          <span style="color:{{ vaMissingC }};">{{ vaMissing }}</span>
         </div>
         <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ vMuted2 }};">LIVE TRANSCRIPT</span><span onClick="{{ openConvoHistory }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ vMuted }}; cursor:pointer; border:1px solid {{ vLine2 }}; border-radius:8px; padding:5px 10px;" style-hover="{ color:'{{ vAccent }}' }">HISTORY</span></div>
@@ -9192,7 +9167,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-197 · v11.197 verified-update';
+const NOTIF_BUILD_VERSION = '2026.08.27-198 · v11.198 orb-reattach';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -16521,9 +16496,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // rebuilt. Falls through to the fresh mount below.
       if(!(this._voiceCoreApi.isLost && this._voiceCoreApi.isLost())){
         if(this._voiceCoreHost.parentNode!==el) el.appendChild(this._voiceCoreHost);
-        this._orbEl=el;
-        this._syncVoiceOrbBounds();
-        return;
+        // The remaining way to lose the orb: the canvas gets diffed out of the host while
+        // the host itself survives. Nothing is lost or thrown — the context is alive and
+        // still rendering, into a canvas no longer in the document. isLost() is false, so
+        // this path used to return happily and the orb stayed invisible for the rest of the
+        // page's life. Put the same canvas back; it keeps the context rather than spending
+        // one of the ~16 the browser allows.
+        const cv=this._voiceCoreApi.canvas && this._voiceCoreApi.canvas();
+        if(cv && cv.parentNode!==this._voiceCoreHost) this._voiceCoreHost.appendChild(cv);
+        if(this._voiceCoreHost.querySelector('canvas')){
+          this._orbEl=el;
+          this._syncVoiceOrbBounds();
+          return;
+        }
+        // No canvas and none to recover — the renderer never finished. Rebuild.
       }
       this._unmountVoiceOrb();
     }
