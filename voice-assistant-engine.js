@@ -45,6 +45,20 @@
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
+  /* People name the destination as well as the thing: "log 30 minutes of running ON MY
+     TRAINING", "add a task to call the accountant TO MY LIST". The destination is already
+     implied by the command, so in the extracted name it is noise — and left in, it comes
+     straight back out of her mouth: "I've logged running on my training", which is not
+     English. Stripped from every name a rule pulls out, not just the workout one. */
+  // (?:^|\s+) not just \s+ — a name that is ONLY a destination ("log 20 minutes to my
+  // log") has nothing before it to match, and would otherwise log an unnamed workout.
+  var DEST = /(?:^|\s+)(?:on|in|to|into|onto|from|for)\s+(?:my|the|your)\s+(?:training|fitness|workout|exercise|gym|health|log|logs|tracker|diary|journal|list|checklist|task|tasks|note|notes|calendar|schedule|mission|missions|record|records|app|account)(?:\s+(?:log|list|tracker|diary|journal|centre|center))?$/i;
+  function stripDest(t) {
+    var prev; t = String(t || '').trim();
+    do { prev = t; t = t.replace(DEST, '').trim(); } while (t !== prev);
+    return t;
+  }
+
   /* Spoken numbers show up constantly in dictation ("log twenty minutes"), and the
      browser's recogniser is inconsistent about which it returns. Cheap to cover. */
   var WORDS = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10,
@@ -89,7 +103,7 @@
 
     { id:'addTask', acts:true, label:'Add a task', say:'"Add a task to call the accountant"',
       re:/^(?:add|create|make)\s+(?:a\s+)?(?:new\s+)?task(?:\s+(?:to|for|called|named))?\s+(.+?)[.?!]*$/i,
-      run:function (m, host) { host.tools.addTask(cap(m[1].trim())); return 'I’ve added “' + m[1].trim() + '” to your tasks.'; } },
+      run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addTask(cap(t)); return 'I’ve added “' + t + '” to your tasks.'; } },
 
     { id:'openTasks', label:'What is still open', say:'"What tasks do I have left?"',
       re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$/i,
@@ -117,7 +131,7 @@
 
     { id:'addMission', acts:true, label:'Add a mission', say:'"Add a mission called cold shower"',
       re:/^(?:add|create|start)\s+(?:a\s+)?(?:new\s+)?mission(?:\s+(?:called|named|for|to))?\s+(.+?)[.?!]*$/i,
-      run:function (m, host) { host.tools.addMission(cap(m[1].trim())); return 'I’ve added the mission “' + m[1].trim() + '” for you.'; } },
+      run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addMission(cap(t)); return 'I’ve added the mission “' + t + '” for you.'; } },
 
     { id:'remember', acts:true, label:'Remember a fact', say:'"Remember that my gym closes at ten"',
       re:/^(?:remember|note|keep in mind)\s+(?:that\s+)?(.+?)[.?!]*$/i,
@@ -133,7 +147,7 @@
     { id:'completeTask', acts:true, label:'Tick a task off', say:'"Mark call the accountant as done"',
       re:/^(?:mark|tick|check)\s+(?:off\s+)?(?:the\s+)?(?:task\s+)?(.+?)(?:\s+(?:as\s+)?(?:done|off|complete[d]?))?[.?!]*$|^(?:i(?:’|')?ve\s+)?(?:done|finished|completed)\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var want = (m[1] || m[2] || '').trim(); if (!want) return null;
+        var want = stripDest(m[1] || m[2] || ''); if (!want) return null;
         var hit = host.tools.completeTask(want);
         if (hit === null) return null;                 // no such open task — let the AI tier try
         return 'I’ve ticked off “' + hit + '” for you.';
@@ -278,19 +292,30 @@
           .replace(/(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/ig,'')
           .replace(/\b(?:of|for|doing|did)\b/ig,' ')
           .replace(/\s+/g,' ').trim();
+        name = stripDest(name);
         if (!name) return null;
         host.tools.logWorkout(cap(name), mins ? num(mins[1]) : 0, wt ? num(wt[1]) : 0,
                               sets ? num(sets[1]) : 0, reps ? num(reps[1]) : 0);
-        var bits = [];
-        if (sets) bits.push(sets[1] + '×' + (reps ? reps[1] : '?'));
-        if (wt) bits.push(wt[1] + (/lb|pound/i.test(wt[2]) ? 'lb' : 'kg'));
-        if (mins) bits.push(mins[1] + ' min');
-        return 'I’ve logged ' + name + (bits.length ? ' — ' + bits.join(', ') : '') + ' for you.';
+        /* Read it back as a sentence, not as fields. "running — 30 min" is how the data
+           is shaped; "30 minutes of running" is how it was said to us. */
+        var unit = wt && /lb|pound/i.test(wt[2]) ? 'lb' : 'kg';
+        var what;
+        if (mins && !sets) {
+          what = plural(num(mins[1]), 'minute') + ' of ' + name.toLowerCase();
+        } else if (sets) {
+          what = name + ', ' + sets[1] + ' set' + (num(sets[1]) === 1 ? '' : 's')
+               + (reps ? ' of ' + reps[1] : '')
+               + (wt ? ' at ' + wt[1] + ' ' + unit : '')
+               + (mins ? ' over ' + plural(num(mins[1]), 'minute') : '');
+        } else {
+          what = name + (wt ? ' at ' + wt[1] + ' ' + unit : '');
+        }
+        return 'I’ve logged ' + what + ' on your fitness log for you.';
       } },
 
     { id:'addNote', acts:true, label:'Save a note', say:'"Make a note called ideas — buy the domain"',
       re:/^(?:make|add|save|write)\s+(?:a\s+)?note(?:\s+(?:called|titled|named))?\s+(.+?)(?:\s*[—–:-]\s*(.+))?[.?!]*$/i,
-      run:function (m, host) { host.tools.addNote(cap(m[1].trim()), (m[2] || '').trim()); return 'I’ve saved that note for you.'; } },
+      run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addNote(cap(t), (m[2] || '').trim()); return 'I’ve saved that note for you.'; } },
 
     { id:'time', label:'Time and date', say:'"What is the date?"',
       re:/^(?:what(?:’s| is)?\s+(?:the\s+)?)?(time|date|day)(?:\s+is\s+it)?[.?!]*$/i,

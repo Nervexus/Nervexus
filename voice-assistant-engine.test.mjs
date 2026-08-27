@@ -132,6 +132,31 @@ t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
 
+// ---- people name the destination as well as the thing ----
+t('the exact sentence that produced "logged running on my training"', async()=>{ const h=host();
+  await VA.handle('hello please can you log 30 minutes of running on my training',h);
+  const c=call('logWorkout'); eq([c[1],c[2]],['Running',30],'exercise name must not absorb "on my training"');
+  has(last(),'30 minutes of running'); has(last(),'fitness log');
+  if(/on my training/i.test(last())) throw new Error('destination leaked into the reply: '+last()); });
+t('reads a timed workout back as a sentence, not as fields', async()=>{ const h=host();
+  await VA.handle('Log 30 minutes of running',h);
+  has(last(),'I’ve logged 30 minutes of running'); });
+t('reads sets and weight back naturally', async()=>{ const h=host();
+  await VA.handle('Log bench press 3 sets of 8 at 60 kilos',h);
+  has(last(),'Bench press'); has(last(),'3 sets of 8'); has(last(),'60 kg'); });
+t('a task keeps its own words but drops the destination', async()=>{ const h=host();
+  await VA.handle('Add a task to call the accountant to my list',h);
+  eq(call('addTask'),['addTask','Call the accountant']); });
+t('a mission drops the destination too', async()=>{ const h=host();
+  await VA.handle('Add a mission called cold shower to my missions',h);
+  eq(call('addMission'),['addMission','Cold shower']); });
+t('"to" inside the task itself is not mistaken for a destination', async()=>{ const h=host();
+  await VA.handle('Add a task to talk to the bank',h);
+  eq(call('addTask'),['addTask','Talk to the bank']); });
+t('an exercise that is only a destination phrase is refused, not logged empty', async()=>{ const h=host(false);
+  await VA.handle('log 20 minutes to my log',h);
+  if(call('logWorkout')) throw new Error('logged a workout with no exercise name'); });
+
 // ---- acknowledge, then confirm ----
 t('an action is acknowledged before it runs, then confirmed', async()=>{ const h=host();
   await VA.handle('Log 30 minutes of running',h);
