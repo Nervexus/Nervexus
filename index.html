@@ -3514,6 +3514,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </sc-for>
           </div>
           <div style="margin-top:12px; font-size:11px; color:{{ vMuted3 }}; line-height:1.5;">Everything above the line runs on this device against your own logged data. Below the line goes to whichever provider the AI centre routes Voice Assistant to.</div>
+          <div style="margin-top:10px; padding-top:10px; border-top:1px solid {{ vLine2 }}; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px;">
+            <span style="color:{{ vMuted3 }};">{{ vaBuild }}</span>
+            <span style="color:{{ vaMissingC }};">{{ vaMissing }}</span>
+          </div>
         </div>
         <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ vMuted2 }};">LIVE TRANSCRIPT</span><span onClick="{{ openConvoHistory }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ vMuted }}; cursor:pointer; border:1px solid {{ vLine2 }}; border-radius:8px; padding:5px 10px;" style-hover="{ color:'{{ vAccent }}' }">HISTORY</span></div>
@@ -9135,7 +9139,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-186 · v11.186 bare-weight';
+const NOTIF_BUILD_VERSION = '2026.08.27-187 · v11.187 load-status';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9327,7 +9331,7 @@ activities: this._mergeShipLog(s.activities),
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
   componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
-  _wireUpdateAvailable(){ const notify=()=>this.showToast('system','Update available','A new version is ready — please close and reopen the app to update.'); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); }
+  _wireUpdateAvailable(){ const notify=()=>this.showToast('system','Update available','A new version is ready — tap the refresh button in the top bar to load it.'); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
   // WebViews (Google app, Instagram, Facebook, etc.) block both entirely. Detecting which
@@ -11011,6 +11015,27 @@ activities: this._mergeShipLog(s.activities),
     this.setState(s=>({vtx:[...s.vtx,{who:'YOU',text:t}],vInput:''}));
     if(!window.VoiceAssistant){ this.speak('My command engine didn\u2019t load \u2014 try a full refresh.'); return; }
     window.VoiceAssistant.handle(t, this._vaHost());
+  }
+  /* What is actually loaded, in one line on the voice page. Every failure this session
+     that looked like "Loura is broken" was really a file that had not arrived — the orb
+     bundle, the command engine, the exercise index — and none of them said so. A missing
+     engine degrades silently and looks identical to a bug in the code that IS loaded.
+     Now it is visible, along with the build, so a screenshot of the voice page is enough
+     to tell whether the problem is the code or the delivery. */
+  _vaHealth(){
+    const need=[
+      ['Command engine', !!window.VoiceAssistant],
+      ['Exercise index', !!window.EXERCISE_INDEX],
+      ['Orb', !!window.VoidOrb],
+      ['AI routing', !!window.AIGateway],
+    ];
+    const missing=need.filter(x=>!x[1]).map(x=>x[0]);
+    return {
+      vaBuild: NOTIF_BUILD_VERSION.split(' · ')[1] || NOTIF_BUILD_VERSION,
+      vaAllLoaded: missing.length===0,
+      vaMissing: missing.length ? ('not loaded: '+missing.join(', ')+' — force refresh') : 'all engines loaded',
+      vaMissingC: missing.length ? '#ffb3ba' : '#6f6f78',
+    };
   }
   _vaTiers(){
     const M=window.VoiceAssistant ? window.VoiceAssistant.manifest() : {local:[],ai:[]};
@@ -13194,6 +13219,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.187', date:'Aug 27, 2026', notes:[
+      'The voice page now shows which build you are running and flags anything that failed to load. If Loura goes odd, that line says whether it is a bug or a file that did not arrive.',
+      'The update prompt now points at the refresh button instead of telling you to close the app.',
+    ]},
     {version:'v11.186', date:'Aug 27, 2026', notes:[
       '\u201cI did 100 kg bench press today\u201d logs properly. A weight no longer needs an \u201cat\u201d in front of it, and \u201ctoday\u201d is no longer treated as part of the exercise name.',
     ]},
@@ -18833,7 +18862,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       toggleListen:()=>this.toggleListen(),
       // The two tiers come from the engine's manifest, not a second hand-written list here —
       // a capability the engine gains shows up in the UI without anyone remembering to add it.
-      ...this._vaTiers(),
+      ...this._vaTiers(), ...this._vaHealth(),
       vInput:S.vInput, setVInput:(e)=>this.setState({vInput:e.target.value}), sendVoice:()=>this.voiceCommand(this.state.vInput), sendVoiceKey:enterKey(()=>this.voiceCommand(this.state.vInput)),
       toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?vTok.vAccent:vTok.vLine2, assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
       listenOpacity:(S.prefs.assistantEnabled!==false)?1:0.4, listenPointerEvents:(S.prefs.assistantEnabled!==false)?'auto':'none',
