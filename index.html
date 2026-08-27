@@ -310,7 +310,7 @@
 <script src="anatomy-3d.js"></script>
 <script src="exercise-index.js?v=2"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=13"></script>
+<script src="voice-assistant-engine.js?v=14"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9180,11 +9180,19 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 // orb the same size on screen (0.94x220 and 0.823x250 are both ~207px of visible radius).
 // LIFT raises its centre above the [data-orb-home] marker.
 const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
+/* Speech recognition marks a result "final" at the first real pause, which cuts people off
+   mid-sentence: "I did 100kg bench press today" lands while they are still saying "can you
+   log it". So finals are buffered rather than dispatched — the utterance only goes to Loura
+   after UTTER_GAP_MS of actual silence, and any further speech inside that window pushes the
+   deadline back. A sentence left hanging on a conjunction, preposition or filler is someone
+   mid-thought — taking a drink, finding the word — and waits UTTER_HOLD_MS instead. */
+const UTTER_GAP_MS = 2000, UTTER_HOLD_MS = 5000;
+const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|to|into|onto|in|on|my|the|a|an|i|can|could|would|should|please|about|from|like|um+|uh+|er+|erm+|hmm+))$/i;
 // What the assistant says while it has no brain. The engine and its tools were removed
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-188 · v11.188 refresh-panel';
+const NOTIF_BUILD_VERSION = '2026.08.27-189 · v11.189 utterance-hold';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10892,8 +10900,8 @@ activities: this._mergeShipLog(s.activities),
     this._manualStop=false; this._recogErrStreak=0;
     const r=this._recog=new SR(); r.lang='en-US'; r.interimResults=true; r.maxAlternatives=1;
     r.onresult=(e)=>{ let finalT='', liveT=''; for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i]; if(res.isFinal) finalT+=res[0].transcript; else liveT+=res[0].transcript; }
-      if(liveT) this.setState({vLiveTranscript:liveT.trim()});
-      if(finalT){ this._recogErrStreak=0; this.setState({vLiveTranscript:''}); this.voiceCommand(finalT); } };
+      if(liveT){ this.setState({vLiveTranscript:((this._utterBuf?this._utterBuf+' ':'')+liveT).trim()}); this._holdUtterance(); }
+      if(finalT){ this._recogErrStreak=0; this._pushUtterance(finalT); } };
     r.onerror=(e)=>{ const code=e&&e.error;
       if(code==='not-allowed'||code==='service-not-allowed'){ this._manualStop=true; this._setVoiceOrbActive(false); this.setState({listening:false,vLiveTranscript:'',voiceFallbackErr:'Microphone access is blocked — allow microphone access for this site in your browser settings, then turn the assistant back on.'}); return; }
       if(code==='audio-capture'){ this._manualStop=true; this._setVoiceOrbActive(false); this.setState({listening:false,vLiveTranscript:'',voiceFallbackErr:'No microphone was found on this device.'}); return; }
@@ -10901,11 +10909,31 @@ activities: this._mergeShipLog(s.activities),
       this._recogErrStreak=(this._recogErrStreak||0)+1;
       if(this._recogErrStreak>=4){ this._manualStop=true; this._setVoiceOrbActive(false); this.setState({listening:false,vLiveTranscript:'',voiceFallbackErr:'Voice recognition kept failing ('+code+') — tap Hold to talk to try again.'}); }
     };
-    r.onend=()=>{ this.setState({vLiveTranscript:''}); if(this._manualStop||this._pauseForSpeech) return; if(this.state.listening){ const delay=this._recogErrStreak?400*this._recogErrStreak:0; setTimeout(()=>{ if(!this._manualStop&&!this._pauseForSpeech&&this.state.listening){ try{r.start();}catch(e){} } },delay); } };
+    r.onend=()=>{ if(!this._utterBuf) this.setState({vLiveTranscript:''}); if(this._manualStop||this._pauseForSpeech) return; if(this.state.listening){ const delay=this._recogErrStreak?400*this._recogErrStreak:0; setTimeout(()=>{ if(!this._manualStop&&!this._pauseForSpeech&&this.state.listening){ try{r.start();}catch(e){} } },delay); } };
     r.start(); }catch(e){ this.setState({voiceFallbackErr:'Could not start the microphone: '+((e&&e.message)||e)}); } }
   stopRecog(){ try{ this._recog&&this._recog.stop(); }catch(e){} }
+  _pushUtterance(text){
+    const piece=(text||'').trim(); if(!piece) return;
+    this._utterBuf=(this._utterBuf?this._utterBuf+' ':'')+piece;
+    this.setState({vLiveTranscript:this._utterBuf});
+    this._holdUtterance();
+  }
+  _holdUtterance(){
+    clearTimeout(this._utterTimer);
+    const wait=UTTER_UNFINISHED.test((this._utterBuf||'').trim()) ? UTTER_HOLD_MS : UTTER_GAP_MS;
+    this._utterTimer=setTimeout(()=>this._flushUtterance(), wait);
+  }
+  _flushUtterance(){
+    clearTimeout(this._utterTimer); this._utterTimer=null;
+    const t=(this._utterBuf||'').trim(); this._utterBuf='';
+    if(!t) return;
+    this.setState({vLiveTranscript:''});
+    this.voiceCommand(t);
+  }
+  // Turning the mic off mid-sentence discards what was held — it was never sent.
+  _dropUtterance(){ clearTimeout(this._utterTimer); this._utterTimer=null; this._utterBuf=''; this.setState({vLiveTranscript:''}); }
   toggleAssistantEnabled(){ const curOn=this.state.prefs.assistantEnabled!==false; const next=!curOn; this.setPref('assistantEnabled',next);
-    if(!next){ this._manualStop=true; this.stopRecog(); this._ttsStreamStop&&this._ttsStreamStop(); if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } speechSynthesis&&speechSynthesis.cancel(); this._setVoiceOrbActive(false); this.setState({listening:false}); } }
+    if(!next){ this._manualStop=true; this.stopRecog(); this._dropUtterance(); this._ttsStreamStop&&this._ttsStreamStop(); if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } speechSynthesis&&speechSynthesis.cancel(); this._setVoiceOrbActive(false); this.setState({listening:false}); } }
   toggleListen(){ if(this.state.prefs.assistantEnabled===false) return; const on=!this.state.listening; const wasSpeaking=on && this._elevenAudio && !this._elevenAudio.paused;
     this.setState({listening:on, voiceFallbackErr:on?'':this.state.voiceFallbackErr}); this._setVoiceOrbActive(on);
     if(on){
@@ -10915,7 +10943,7 @@ activities: this._mergeShipLog(s.activities),
         this.speak(prompt);
       } else { if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } speechSynthesis&&speechSynthesis.cancel(); }
       this.startRecog();
-    } else { this._manualStop=true; this.stopRecog(); if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } speechSynthesis&&speechSynthesis.cancel(); } }
+    } else { this._manualStop=true; this.stopRecog(); this._dropUtterance(); if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} } speechSynthesis&&speechSynthesis.cancel(); } }
   // ===== PROACTIVE COACHING =====
   _coachCfg(){ return this.state.prefs.coaching||{}; }
   _isMuted(topic){ return (this.state.prefs.mutedTopics||[]).includes(topic); }
@@ -11129,6 +11157,9 @@ activities: this._mergeShipLog(s.activities),
       // would talk over themselves and you would only ever hear the second one. Both go
       // through the TTS queue instead, which plays them in order.
       ack:(text)=>{ this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this._speakQueued(text); },
+      // Spoken after a confirmation, as its own turn — the TTS queue keeps the mic deafened
+      // across both, so she never hears herself ask it.
+      followUp:(text)=>{ this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this._speakQueued(text); },
       speak:(text)=>{ this._lastAIReply=text; this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this._speakQueued(text); },
       hasAI:()=>!!(window.AIGateway && window.AIGateway.isConfigured() && window.AIGateway.available()),
       ask:async(prompt)=>{

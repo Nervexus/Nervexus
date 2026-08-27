@@ -10,13 +10,14 @@ import fs from 'fs';
 const root={}; new Function('window', fs.readFileSync(new URL('./voice-assistant-engine.js', import.meta.url),'utf8'))(root);
 const VA=root.VoiceAssistant;
 
-let calls, spoken;
+let calls, spoken, followUps;
 function host(hasAI=false, aiReply='AI says hi'){
-  calls=[]; spoken=[];
+  calls=[]; spoken=[]; followUps=[];
   const rec=(n)=>(...a)=>{ calls.push([n,...a]); return undefined; };
   return {
     firstName:()=>'Sam',
     say:t=>spoken.push(t), speak:t=>spoken.push(t), ack:t=>spoken.push(t), replaceLast:t=>{spoken[spoken.length-1]=t;},
+    followUp:t=>followUps.push(t),
     hasAI:()=>hasAI,
     ask:async()=>({text:aiReply}),
     tools:{
@@ -365,6 +366,55 @@ t('manifest declares both tiers with needsKey set', async()=>{
   if(m.ai.some(x=>!x.needsKey)) throw new Error('an AI task claims it does not need a key');
   if(m.local.some(x=>!x.example)) throw new Error('a local task has no example');
 });
+
+// ---- close-out follow-up ----
+// Every action rule ends by asking whether there is anything else, by name; queries and
+// the off switch must not. The follow-up rides its own host channel, so `last()` still
+// reads the confirmation.
+t('a logged action is followed by the close-out question, by name', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 30 minutes of running',h);
+  if(followUps.length!==1) throw new Error('expected one follow-up, got '+JSON.stringify(followUps));
+  has(followUps[0],'is that all i can do for you today');
+  has(followUps[0],'Sam');
+  has(last(),'Running'); });
+t('a query is not followed by the close-out question', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('What tasks do I have left?',h);
+  eq(followUps,[],'a read-back is not an action'); });
+t('being told to stop does not ask for more work', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('That will be all',h);
+  if(!call('disableAssistant')) throw new Error('did not turn off');
+  eq(followUps,[],'do not ask again on the way out'); });
+t('"no" to the close-out ends politely instead of falling through', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  if(!VA._awaitingClose()) throw new Error('close-out not armed');
+  await VA.handle('no thanks',h);
+  has(last(),'here whenever you need me');
+  if(VA._awaitingClose()) throw new Error('close-out stayed armed'); });
+t('"that\u2019s all" also ends politely', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  await VA.handle('that\u2019s all',h);
+  has(last(),'here whenever you need me'); });
+t('"yes" to the close-out hands the turn back', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  await VA.handle('yes',h);
+  has(last(),'go ahead'); });
+t('a real command after the close-out runs instead of being read as an answer', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  await VA.handle('Log 30 minutes of running',h);
+  if(!call('logWorkout')) throw new Error('the next command was swallowed by the close-out'); });
+t('confirming a guessed workout also gets the close-out', async()=>{ const h=host();
+  VA._clearPending(); followUps=[];
+  await VA.handle('3 minutes run',h);
+  if(!VA._pending()) throw new Error('expected a confirmation question');
+  eq(followUps,[],'do not ask for more while a question is open');
+  await VA.handle('yes',h);
+  if(!call('logWorkout')) throw new Error('confirmation did not log');
+  if(followUps.length!==1) throw new Error('expected the close-out after confirming'); });
+t('the close-out drops the name when none is set', async()=>{ const h=host();
+  h.firstName=()=>'there';
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  if(/there/i.test(followUps[0])) throw new Error('said "there" as a name: '+followUps[0]);
+  has(followUps[0],'is that all i can do for you today?'); });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }

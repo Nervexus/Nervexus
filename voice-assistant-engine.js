@@ -431,6 +431,24 @@
      Queries are single-beat on purpose: "let me check" in front of an answer we already
      have is theatre. */
   var ACKS = ['Okay, doing that now.', 'Sure — one moment.', 'On it.', 'Right, let me get that.'];
+
+  /* After a confirmed action Loura asks whether there is anything else, by name. That turns
+     the next utterance into an answer to a question, not a fresh command — so a bare "no"
+     has to close the conversation politely instead of falling through to "I didn't catch
+     that". Anything that isn't a yes/no is treated as the next command, which is what
+     someone who ignores the question and just keeps going actually means. */
+  var AWAIT_CLOSE = false;
+  var CLOSE_NO = /^(?:no|nope|nah|not (?:right )?now|nothing(?: else)?|that.?s (?:all|it|everything|the lot)|i.?m (?:good|fine|done)|all good|we.?re done|done|cheers|thanks?(?: you)?)\b/i;
+  var CLOSE_YES = /^(?:yes|yeah|yep|yup|sure|ok(?:ay)?|please|actually|one more|there is|hold on|wait)\b/i;
+  function closeOut(host) {
+    if (!host.followUp) return;
+    // firstName() falls back to "there" when no name is set — fine mid-sentence, but
+    // "anything else today, there?" is not a thing anyone says. Drop it instead.
+    var n = host.firstName && host.firstName();
+    if (!n || /^there$/i.test(n)) n = '';
+    AWAIT_CLOSE = true;
+    host.followUp('Is that all I can do for you today' + (n ? ', ' + n : '') + '?');
+  }
   var ackAt = 0;
   function nextAck() { var a = ACKS[ackAt % ACKS.length]; ackAt++; return a; }
 
@@ -540,14 +558,22 @@
     var t = fixVerb(tidy(String(text || '').trim()));
     if (!t) return Promise.resolve();
 
+    // "Is that all I can do for you today?" is outstanding. A yes/no answers it; anything
+    // else is the next command and falls straight through.
+    if (AWAIT_CLOSE) {
+      AWAIT_CLOSE = false;
+      if (CLOSE_NO.test(t)) { host.speak('Alright — I’m here whenever you need me.'); return Promise.resolve(); }
+      if (CLOSE_YES.test(t) && t.split(/\s+/).length <= 3) { host.speak('Go ahead, I’m listening.'); return Promise.resolve(); }
+    }
+
     // A question is outstanding. Take it or leave it, then clear it either way.
     if (PENDING) {
       var q = PENDING; PENDING = null;
-      if (YES.test(t)) { var done = q.run(); host.speak(done); return Promise.resolve(done); }
+      if (YES.test(t)) { var done = q.run(); host.speak(done); closeOut(host); return Promise.resolve(done); }
       if (NO.test(t))  { host.speak('Okay, I’ve left it.'); return Promise.resolve(); }
       if (q.kind === 'quantity') {
         var filled = applyQuantity(t, q, host);
-        if (filled) { host.speak(filled); return Promise.resolve(filled); }
+        if (filled) { host.speak(filled); closeOut(host); return Promise.resolve(filled); }
       }
       // Neither — fall through and treat this as a new command.
     }
@@ -557,7 +583,12 @@
     if (rule && rule.acts && host.ack) host.ack(nextAck());
 
     var local = runLocal(t, host);
-    if (local.handled) { host.speak(local.reply); return Promise.resolve(local.reply); }
+    if (local.handled) {
+      host.speak(local.reply);
+      // Only after something was actually saved, and never after being told to shut up.
+      if (local.acts && local.id !== 'stop') closeOut(host);
+      return Promise.resolve(local.reply);
+    }
 
     // Nothing matched. Before giving up — or spending a provider call — see whether this
     // is a workout with a word missing, and ask.
@@ -589,7 +620,8 @@
     /* Exposed for tests: run the rules without a host doing any speaking. */
     _matchLocal: function (text) { var r = matchRule(text); return r ? r.id : null; },
     _pending: function () { return PENDING ? PENDING.kind : null; },
-    _clearPending: function () { PENDING = null; }
+    _clearPending: function () { PENDING = null; AWAIT_CLOSE = false; },
+    _awaitingClose: function () { return AWAIT_CLOSE; }
   };
 
 }(window));
