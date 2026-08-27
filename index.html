@@ -9167,7 +9167,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-198 · v11.198 orb-reattach';
+const NOTIF_BUILD_VERSION = '2026.08.27-199 · v11.199 loura';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13336,6 +13336,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.199', date:'Aug 27, 2026', major:true, notes:[
+      'She has a name. Loura.',
+      'Two seconds of quiet is not the end of a sentence. She waits \u2014 for the rest of the thought, for the drink, for the word you are still reaching for.',
+      'Two hundred and fifty-eight movements. She knows where every one of them belongs.',
+      'She will not write down something she is unsure of. She asks, and waits for a yes.',
+      'When it is done she asks whether there is anything else. Say no and she answers in kind, then goes quiet. She does not hover.',
+      'What she does alone, she does here \u2014 against your own logs, asking nothing of anyone.',
+      'The core holds steady.',
+    ]},
     {version:'v11.187', date:'Aug 27, 2026', notes:[
       'The voice page now shows which build you are running and flags anything that failed to load. If Loura goes odd, that line says whether it is a bug or a file that did not arrive.',
       'The update prompt now points at the refresh button instead of telling you to close the app.',
