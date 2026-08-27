@@ -9192,7 +9192,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-196 · v11.196 trailing-request';
+const NOTIF_BUILD_VERSION = '2026.08.27-197 · v11.197 verified-update';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9385,7 +9385,7 @@ activities: this._mergeShipLog(s.activities),
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
   componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
-  _wireUpdateAvailable(){ const notify=()=>{ this.showToast('system','Update available','A new version is ready — tap the refresh button in the top bar to load it.'); this._checkStaleBuild(); }; window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
+  _wireUpdateAvailable(){ const notify=()=>this._checkStaleBuild(); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
   // WebViews (Google app, Instagram, Facebook, etc.) block both entirely. Detecting which
@@ -11121,18 +11121,48 @@ activities: this._mergeShipLog(s.activities),
   // miss. Two triggers: a script that never arrived (the app is running on a partial build),
   // or the service worker reporting a newer build than the one in this tab. Both are fixed by
   // the same action, so the panel offers exactly one: a cache-clearing reload.
-  _checkStaleBuild(){
+  /* What the server is actually serving right now. service-worker.js carries the same build
+     string as this page and is a few KB rather than the whole app, so it is cheap to ask. */
+  async _servedBuild(){
+    try{
+      const r=await fetch('./service-worker.js?v='+Date.now(), {cache:'no-store'});
+      if(!r.ok) return null;
+      const m=/BUILD_VERSION\s*=\s*'([^']+)'/.exec(await r.text());
+      return m ? m[1] : null;
+    }catch(e){ return null; }
+  }
+  /* The service worker's "an update is installing" signal cannot tell a build that is waiting
+     from one that has just installed and auto-applied — it was a four-second guess against the
+     reload, and it lost, so the panel fired on an update the user already had. A missing engine
+     is checked locally and is certain; a version claim is now confirmed against what the server
+     serves before anyone is interrupted, and silence is the answer when the check itself fails.
+     Crying wolf about a refresh is worse than saying nothing: it teaches you to dismiss the one
+     that matters. */
+  async _checkStaleBuild(){
     if(this._staleDismissed || this.state.staleOpen || !this.state.loggedIn) return;
     // Don't stack on the other full-screen panels; the 60s tick will bring it back.
     if(this.state.whatsNewOpen || this.state.perfCheckinOpen || this.state.twoFAWarnOpen) return;
+
     const h=this._vaHealth();
-    const updated=!!window.__nvxUpdateAvailable;
-    if(h.vaAllLoaded && !updated) return;
-    const title = h.vaAllLoaded ? 'A newer version is ready' : 'This page did not load fully';
-    const reason = h.vaAllLoaded
-      ? 'A new build of Nervexus has downloaded in the background. This tab is still running the old one.'
-      : ('Part of this build never arrived — '+h.vaMissing.replace(/ — force refresh$/,'')+'. Anything that depends on it will look broken or silently do nothing.');
-    this.setState({staleOpen:true, staleTitle:title, staleReason:reason});
+    if(!h.vaAllLoaded){
+      this.setState({staleOpen:true, staleTitle:'This page did not load fully',
+        staleReason:'Part of this build never arrived — '+h.vaMissing.replace(/ — force refresh$/,'')+'. Anything that depends on it will look broken or silently do nothing.'});
+      return;
+    }
+
+    if(!window.__nvxUpdateAvailable || this._verifyingBuild) return;
+    this._verifyingBuild=true;
+    let served=null;
+    try{ served=await this._servedBuild(); } finally { this._verifyingBuild=false; }
+    if(!served) return;                                   // couldn't check — don't guess
+    if(served===NOTIF_BUILD_VERSION){                     // already on it; the alarm was stale
+      window.__nvxUpdateAvailable=false;
+      return;
+    }
+    if(this._staleDismissed || this.state.staleOpen) return;   // may have changed while awaiting
+    this.showToast('system','Update available','A new version is ready — tap the refresh button in the top bar to load it.');
+    this.setState({staleOpen:true, staleTitle:'A newer version is ready',
+      staleReason:'This tab is running '+NOTIF_BUILD_VERSION.split(' · ')[0]+'; the server is serving '+served.split(' · ')[0]+'.'});
   }
   refreshStaleBuild(){ this.setState({staleOpen:false}, ()=>this._hardReload()); }
   dismissStaleBuild(){ this._staleDismissed=true; this.setState({staleOpen:false}); }
