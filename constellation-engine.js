@@ -205,7 +205,7 @@
       placed.push({ x: px, y: py, w: pw, h: ph });
 
       ctx.globalAlpha = (hov ? 0.96 : 0.72) * fade;
-      ctx.fillStyle = 'rgba(6,4,12,0.72)';
+      ctx.fillStyle = 'rgba(0,0,0,0.78)';
       ctx.strokeStyle = hov ? c.c : 'rgba(255,255,255,0.22)';
       ctx.lineWidth = 1;
       roundRect(ctx, px, py, pw, ph, 5);
