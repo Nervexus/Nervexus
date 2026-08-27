@@ -9044,7 +9044,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.27-154 · v11.154 system-view';
+const NOTIF_BUILD_VERSION = '2026.08.27-155 · v11.155 quieter-log';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13087,88 +13087,76 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     return out;
   }
   // ===== What's New =====
-  // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
+  // Newest entry first. Each {version, date, notes:[]}.
+  //
+  // Keep notes SHORT — a line or two, plain, user-facing. Entries here had drifted to
+  // 100-160 words each, which is an essay per release and nobody reads it.
+  //
+  // `major:true` opens the What's New panel on next launch. It is an interruption, so it is
+  // reserved for: something that changes your numbers (XP, levels, logged data), something
+  // that fixes data that was wrong, or a feature you would not otherwise find. Fixes,
+  // polish, layout and copy changes are NOT major — they belong in the log for whenever
+  // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
-    {version:'v11.154', date:'Aug 27, 2026', major:true, notes:[
-      'The Connection Map is a place now, not a picture. Providers sit at real depths around the core, so dragging orbits the camera and the wheel flies you in and out rather than scaling a flat diagram. The whole field drifts slowly on its own and every provider creeps along its own orbit, so nothing is ever still.',
-      'Providers are orbs with label pills, and each AI provider carries its own usage \u2014 requests, tokens and estimated cost for the last 24 hours, the same figures the card below shows. Orb size is driven by request volume, so the keys doing real work are visibly the largest objects in the field. A provider with no usage has no usage line rather than a made-up one.',
-      'Labels resolve by depth: the map names what is in front of you and lets whatever sits behind it stay an orb until you move. Pushing labels apart would never settle in a field that is always drifting.',
+    {version:'v11.155', date:'Aug 27, 2026', notes:[
+      'Quieter update log. Entries are a line or two instead of several paragraphs, and the What\u2019s New panel now only interrupts you for things that change your numbers, fix wrong data, or add something you would not otherwise find. Everything else just lands in the log.',
     ]},
-    {version:'v11.153', date:'Aug 26, 2026', major:true, notes:[
-      'You can move around inside the Connection Map now. Drag to pan, scroll to zoom \u2014 zoom holds whatever is under the pointer in place, so you can lean into a cluster rather than watching it slide away \u2014 and double-click to snap back. A drag that happens to finish on a node no longer counts as clicking it.',
-      'The core is the real voice-assistant orb, not a lookalike. The same object from the voice screen sits at the centre of the map and moves and scales with everything else, in whatever colours your current raiment uses.',
-      'The black now carries through the whole API page rather than stopping at the edge of the map, so the map is no longer a dark rectangle on a lighter page. Cards sit just off that ground so they still read as cards.',
+    {version:'v11.154', date:'Aug 27, 2026', major:true, notes:[
+      'Connection Map is now a 3D field you fly through \u2014 drag to orbit, scroll to move in and out. Each AI provider is an orb showing its last 24h of requests, tokens and cost, sized by how much it is being used.',
+    ]},
+    {version:'v11.153', date:'Aug 26, 2026', notes:[
+      'Connection Map: pan and zoom, the real voice orb at the centre, and the black carried through the whole API page.',
     ]},
     {version:'v11.152', date:'Aug 26, 2026', notes:[
-      'Connection Map is now the API page rather than a panel on it \u2014 full width, and as tall as the window allows, so opening the page opens the map. The cards are still there, one scroll down.',
-      'Colours corrected. The first pass was muted gold, steel and sage, which had the right shape in the wrong key. Sampling the reference \u2014 cropping to the core and sorting saturated pixels by hue \u2014 gave roughly 40% warm red and orange, 40% rose through magenta, a thin seam of blue, all over a near-black ground. The core now runs on that palette and the ground is the same near-black.',
+      'Connection Map fills the page, with colours matched to the reference.',
     ]},
-    {version:'v11.151', date:'Aug 26, 2026', major:true, notes:[
-      'New Connection Map on the API page: every provider you have registered, drawn as a constellation around the app. It is not decoration \u2014 a provider that is saved and switched on gets a lit node and a solid line, one you have never touched gets a dim dot and a dashed one, and the colour says whether it is AI, intel or news. Click any node to jump to the card that controls it.',
-      'Desktop only, deliberately. Forty-odd labelled nodes cannot be read on a phone without pinching around, and the cards underneath already tell you the same thing in a form that works at that width.',
-      'The provider cards are untouched \u2014 the map is for seeing what is connected, the cards are still where you paste a key and switch things on.',
+    {version:'v11.151', date:'Aug 26, 2026', notes:[
+      'New Connection Map on the API page: every provider drawn around the app, lit if it is connected. Click one to jump to its card. Desktop only.',
     ]},
     {version:'v11.150', date:'Aug 26, 2026', major:true, notes:[
-      'Bulk import was reading pounds as kilograms. It recognised lb, lbs and pounds well enough to accept the line, then threw the unit away and filed everything as kg \u2014 so \u201cBench 225 lbs x3\u201d was stored as 225 kg. That is a 2.2x overstatement, and it fed straight into your training volume, the Physical Strength attribute and Power Level. All three places that build a row now keep the unit you typed.',
-      'A bare set line under an exercise heading, like \u201c8x135 lbs\u201d, was worse: its unit was not even read. That is fixed too, and kilograms, kilogram spellings and bodyweight all still work.',
-      'Worth checking any training you bulk-imported in pounds \u2014 those rows are still filed as kg and will need re-entering or editing.',
+      'Bulk import was reading pounds as kilograms \u2014 \u201c225 lbs\u201d was stored as 225 kg. Fixed. Anything you imported in pounds before today will need re-entering.',
     ]},
     {version:'v11.149', date:'Aug 26, 2026', notes:[
-      'Moved the activity log \u2014 the card headed \u201cWork Log \u00b7 Week\u201d when it is filtered to work \u2014 from Productivity to the Command Center, where it sits full width under Daily Missions. The category and range chips move with it, so it still covers every kind of log, not just work.',
-      'Productivity\u2019s Suggested Tasks card was left alone in a two-column row by that move, so it would have rendered at half width next to an empty column. That row is a single column now.',
+      'Work Log moved from Productivity to the Command Center.',
     ]},
     {version:'v11.148', date:'Aug 26, 2026', notes:[
-      'The globe button goes to the Nervexus website now. It was pointing at nervexus.vercel.app \u2014 which is this app \u2014 so pressing it just opened the thing you were already in, and looked like a reload. It now opens the actual site.',
+      'The globe button opens the Nervexus website rather than the app you are already in.',
     ]},
     {version:'v11.147', date:'Aug 26, 2026', notes:[
-      'New icon on the open-in-browser button. The old one was a box with an arrow leaving it, which reads as \u201cthis opens somewhere else\u201d rather than \u201cthis is the website\u201d \u2014 it is now a globe, which is the shape everyone recognises for the web.',
+      'Globe icon for the website button.',
     ]},
     {version:'v11.146', date:'Aug 26, 2026', major:true, notes:[
-      'The refresh button now actually refreshes. It re-pulled your data and pinged the service worker, but it never reloaded the page \u2014 so the build already running stayed exactly where it was, and \u201cForce refresh now\u201d in Settings could not pick up a new version no matter how often you pressed it. That is why the app could sit several updates behind. It now clears the cache and reloads properly.',
-      'The reload deliberately keeps the app registered for notifications. Wiping that too would have been the simpler way to force a clean start, but it throws away the push subscription and silently stops reminders arriving.',
-      'The open-in-browser button is a real link now. It used a scripted pop-up, which an installed app is free to ignore \u2014 and does, opening in the same window, which looked like the page simply reloading.',
+      'The refresh button never actually reloaded, so no update could reach you no matter how often you pressed it. It works now \u2014 this is the last time you will need to refresh by hand.',
     ]},
     {version:'v11.145', date:'Aug 26, 2026', notes:[
-      'Tightened yesterday\u2019s font change so it only touches the home screen wordmark. To let the script face through, Noir had to make an exception to the rule that puts its own lettering on everything \u2014 but the exception was written loosely enough that it also caught the \u201cDark Psychology\u201d and \u201cThe Black Book\u201d headings, which would have quietly changed face in Noir. The exception now names the wordmark and nothing else; those headings keep Noir\u2019s lettering exactly as before.',
+      'Kept the wordmark font change to the wordmark, so the Black Book and Dark Psychology headings are untouched.',
     ]},
     {version:'v11.144', date:'Aug 26, 2026', notes:[
-      'Noir and Ultra X now use Maison \u00c9lys\u00e9e\u2019s Pinyon Script for the home screen wordmark, set the way a script face wants it \u2014 in title case, without the wide letter-spacing the caps versions carried. Maison\u2019s own wordmark is untouched; it was already Pinyon Script and still is.',
-      'Noir needed a small change underneath to allow it. That style forces its own display face onto everything on the page, so an inline script font was simply overridden. It now makes the same exception for Pinyon Script that Maison \u00c9lys\u00e9e already did.',
+      'Noir and Ultra X use the same script wordmark as Maison \u00c9lys\u00e9e.',
     ]},
     {version:'v11.143', date:'Aug 26, 2026', notes:[
-      'Swapped the home screen dividers over. The plain rule\u2013diamond\u2013rule that Maison \u00c9lys\u00e9e was using has moved to Ultra X, where it belonged, and Maison now has an ornament of its own: a leaf fleuron with a lozenge at its centre, sitting between two fine rules. Ultra X had only a bare 64px line before.',
-      'Ultra X\u2019s divider is drawn in its deep red rather than white \u2014 that style always renders on a light card, where white rules and a white diamond simply disappear. The base theme keeps the white version on its dark card.',
+      'Maison \u00c9lys\u00e9e has its own divider ornament; Ultra X takes the old one.',
     ]},
     {version:'v11.142', date:'Aug 26, 2026', notes:[
-      'One logo layout across every raiment. The mark used to be drawn differently in each style \u2014 Noir had a 60px ring with a 28px emblem, Maison \u00c9lys\u00e9e a 104px ring with a 56px one, and Ultra X and the base theme had no mark at all. Every style now shares the same ring, the same emblem size and the same spacing, on desktop and on mobile; colour is the only thing each style still sets for itself.',
-      'The emblem also reads properly now. favicon.png is a 1024px square but the laurel only fills the middle half of it and sits high in the frame, so dropped in at face value it showed up as a small smudge inside the ring. It is scaled and re-centred so it fills the ring the way it should.',
-      'Noir and Ultra X now carry a wordmark on the home screen, the way Maison \u00c9lys\u00e9e always has \u2014 each set in its own style\u2019s lettering. The name follows the raiment you have on, so Maison \u00c9verpine reads as itself rather than borrowing Ultra X\u2019s.',
+      'One logo layout across all four raiments, and the emblem now fills its ring properly.',
     ]},
     {version:'v11.141', date:'Aug 26, 2026', notes:[
-      'Fixed the home screen on a phone. The decorative border is drawn 18px in from the card edge (Maison \u00c9lys\u00e9e has a second line at 26px), but the content only had 16px of padding \u2014 so the greeting, the date line and Noir\u2019s divider were all positioned outside those lines and cut straight through them. Measured on a 390px screen: the date line sat 16px from the edge, the greeting 19px, and Noir\u2019s divider overhung the whole card by 9px a side. Padding now clears the innermost line on every style, the divider is capped to the card width, and the date line is sized to fit on one row.',
-      'Removed the Focus Mode chip on phones. It sat in the top-left corner right on top of the border and was the worst of the clashes. It is unchanged on desktop.',
+      'Fixed the home screen overflowing its border on a phone. Focus Mode is hidden there.',
     ]},
     {version:'v11.140', date:'Aug 26, 2026', major:true, notes:[
-      'The level curve is reachable now. Each level used to cost 100 XP more than the last one did, compounding, so Titan at level 1000 wanted 49,950,000 XP \u2014 on the order of two centuries at any realistic rate. Elite I at level 200 alone wanted 1,990,000. The whole top two thirds of the ladder was decoration. Levels now cost 105 at the bottom rising to about 5,095 at the very top: the early climb costs what it always did, and the full run to Titan is 2,597,400 XP, on the order of a decade of consistent logging.',
-      'Because levels are cheaper, this morning\u2019s carry-over is gone \u2014 deleted, not reduced. The account reaches level 113 on genuinely earned XP alone, well above the level 62 the carry-over was propping up, so there is nothing left to prop. Every point on the Power Level card is now something you logged. Attribute levels use the same curve and rise with it.',
-      'Fixed a daily-login bug found while checking the figures: the account was awarded login XP 37 times on 6 August and 37 more on 7 August, and twice a day on nine other days. The once-a-day check read a value that had not always finished loading, so repeat calls slipped through. There are now two further guards, one for repeats within a session and one that checks the awards already recorded for today. The duplicate entries already in your history have been left alone \u2014 say the word and they can be cleaned up.',
+      'Levels are reachable. Titan wanted 49,950,000 XP \u2014 about two centuries; it now wants 2,597,400. Yesterday\u2019s carry-over is gone, and your level is earned outright.',
     ]},
-    {version:'v11.139', date:'Aug 26, 2026', major:true, notes:[
-      'Shipped-update XP repriced. Updates from this one onward are worth 500 XP; everything already in this changelog is worth 50. Paying the whole history at 500 made shipped updates 86% of the account total \u2014 190,348 XP, of which 164,500 was changelog \u2014 which buried every workout, mission and login underneath it. They are now 8.6% of the total, and the logs you actually keep are what move the number.',
-      'Repricing the history on its own would have dropped the account from level 62 to level 29, so the difference is granted once as a carry-over and the level is held exactly where it was: level 62, Recruit IV, 20% of the way to level 63. The carry-over is a fixed starting balance, not a floor \u2014 it never grows, it is left out of the today / this week / this month figures, and every level above 62 still has to be earned.',
+    {version:'v11.139', date:'Aug 26, 2026', notes:[
+      'Shipped updates are worth 500 XP going forward, 50 for the existing history.',
     ]},
-    {version:'v11.138', date:'Aug 26, 2026', major:true, notes:[
-      'Rank ladder re-spaced and the cap raised to level 1000. Ranks come every 20 levels through the early climb \u2014 Recruit I\u2013V at 1/20/40/60/80, Specialist I\u2013V at 100/120/140/160/180 \u2014 and then every 100 from there: Elite I\u2013III at 200/300/400, Commander I\u2013III at 500/600/700, Master I\u2013II at 800/900, and Titan alone at 1000 as the max rank. 19 ranks in total.',
-      'Swept every level from 1 to 1060 against the live code: the rank you hold is always the highest band at or below your level, the rank named as next is always the band directly above it, and Titan correctly reports nothing above it.',
+    {version:'v11.138', date:'Aug 26, 2026', notes:[
+      'Rank ladder: every 20 levels to 180, then every 100, up to Titan at 1000.',
     ]},
-    {version:'v11.137', date:'Aug 26, 2026', major:true, notes:[
-      'Rank ladder rebuilt: 26 ranks, one every 20 levels, topping out at level 500. Five families of five \u2014 Recruit I\u2013V, Specialist I\u2013V, Elite I\u2013V, Commander I\u2013V, Master I\u2013V \u2014 and then Titan on its own as the max rank. Recruit I covers levels 1\u201319, Recruit II starts at 20, and every band after that is exactly 20 levels wide.',
-      'Checked the whole ladder rather than the top of it: across levels 1 to 540 the rank you hold and the rank named as next are always adjacent, and Titan correctly reports no rank above it.',
+    {version:'v11.137', date:'Aug 26, 2026', notes:[
+      'Rank ladder rebuilt to 26 evenly spaced ranks.',
     ]},
-    {version:'v11.136', date:'Aug 26, 2026', major:true, notes:[
-      'The rank shown next to your Power Level and the \u201cnext rank\u201d line underneath it were reading from two different places. The next-rank line was hardcoded to answer \u201cSpecialist at level 5\u201d for anything below level 100, so a Commander was being told the next rank was one they had passed long ago. Both now walk the same ladder, so the rank you hold and the rank you are climbing towards always line up.',
-      'The daily XP figure was wildly inflated \u2014 around 9,000 on a normal day. Every shipped-update entry in this changelog awards XP, and the dates on those entries carry no clock time, so the code fell back to \u201cright now\u201d for all of them. That meant the entire history of the app counted as earned today, every day. Those entries now land on their real dates, and today\u2019s number reflects what you actually did today.',
-      'Owner account XP values set as asked: 250 XP for a daily login (was 200), and 500 XP for each new app update logged (was 100). Every other log keeps the XP it already gave.',
+    {version:'v11.136', date:'Aug 26, 2026', notes:[
+      'Rank, next rank and XP now agree. Daily XP was counting the whole update history as earned today.',
     ]},
     {version:'v11.135', date:'Aug 25, 2026', major:true, notes:[
       'Found where the 12 came from. Every attribute had a hidden 6,600 XP added to it, and 6,600 is exactly the threshold for level 12 \u2014 so all twelve attributes sat at level 12 on a brand new account and needed another 1,200 XP just to reach 13. Nothing you logged was visible underneath it. That padding is gone; attributes now start at 1 and are earned.',
