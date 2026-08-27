@@ -87,15 +87,8 @@
   /* One logo layout for every raiment, so the home screen reads as the same brand whichever
      style is on: same ring, same mark, same spacing. Each style sets only the colour, inline.
      Noir used to draw a 60px ring with a 28px mark and the light styles had no mark at all. */
-  /* API page runs on the constellation's ground rather than the app's usual grey, so the map
-     is not a black rectangle sitting on a lighter page. Ground is jet black (#000) — the
-     earlier #05030A carried a purple cast that read as navy next to the header strip.
-     Cards are lifted just enough off that black to read as cards, and stay neutral grey:
-     any hue in them shows badly against pure black. */
-  .cc-api-dark{ background:#000000; border-radius:18px; padding:14px 14px 6px; margin:-6px -6px 0; }
-  .cc-api-dark .cc-glowcard{ background:#0A0A0B !important; border-color:rgba(255,255,255,0.075) !important; }
-  .cc-api-dark .cc-glowcard[data-api-ground]{ background:#000000 !important; }
-  .cc-api-dark input, .cc-api-dark select, .cc-api-dark textarea{ background:rgba(255,255,255,0.035) !important; }
+  /* API page ground/cards: see the .cc-api-dark block at the END of the next stylesheet.
+     It has to live there to outrank the theme and scene overrides. */
   .cc-home-logo{ width:96px; height:96px; margin:0 auto 12px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; flex:0 0 auto; overflow:hidden; }
   /* favicon.png is 1024px square but the visible laurel only fills the middle 50% of it, and
      sits high — its centre is at 42% of the height, not 50%. Dropped in at its natural size
@@ -445,6 +438,48 @@
 /* Dark Psychology / The Black Book are private pages — hide the mobile bottom nav too
    while either is open (sidebar/top bar are handled via showChrome/asideDisplay/shellCols). */
 .cc-private-open .cc-mobnav{ display:none !important; }
+
+/* ===== API page: jet black ground =====
+   The API page runs on the constellation's own ground rather than the app's usual grey,
+   so the Connection Map is not a black rectangle sitting on a lighter page.
+
+   This block has to sit at the END of the stylesheet, and at this specificity, because a
+   .cc-glowcard is claimed by half a dozen later rules that all outrank a plain
+   `.cc-api-dark .cc-glowcard` (0,2,0):
+
+     .spline-active .cc-glowcard.cc-glowcard          (0,3,0, later in the sheet)
+     .blackhole-active .cc-glowcard.cc-glowcard       (0,3,0, later in the sheet)
+     .theme-ultra .cc-glowcard.cc-glowcard            (0,3,0, later in the sheet)
+     .theme-ultra.theme-noir  .cc-glowcard.cc-glowcard   (0,4,0)
+     .theme-ultra.theme-maison .cc-glowcard.cc-glowcard  (0,4,0)
+
+   Every one of those also sets a translucent fill plus backdrop-filter, so the live
+   scene behind the page bleeds through the panel — which is what put a purple cast on a
+   map that was already set to #000. Killing the blur matters as much as the colour here.
+
+   `html body` plus a doubled .cc-api-dark takes the card rule to (0,4,2) and the map rule
+   to (0,5,2), clear of all of the above. The Maison/Noir card colours are deliberately
+   overridden too: the ground is jet black under every theme, so a cream or grey card on it
+   would read as a light patch floating on black rather than as part of the page. */
+html body .cc-api-dark{ background:#000000; border-radius:18px; padding:14px 14px 6px; margin:-6px -6px 0; }
+html body .cc-api-dark.cc-api-dark .cc-glowcard.cc-glowcard{
+  background:#0A0A0B !important;                 /* lifted just off the black, neutral grey —
+                                                    any hue reads as a cast against #000 */
+  border-color:rgba(255,255,255,0.075) !important;
+  color:#eef0f2 !important;
+  backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+}
+html body .cc-api-dark.cc-api-dark .cc-glowcard.cc-glowcard[data-api-ground]{
+  background:#000000 !important;
+  backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+}
+html body .cc-api-dark input, html body .cc-api-dark select, html body .cc-api-dark textarea{
+  background:rgba(255,255,255,0.035) !important; color:#eef0f2 !important;
+}
+/* The canvas itself paints nothing but orbs and stars (clearRect, no fill), so the panel's
+   black is what you actually see behind the map. Pin it here too in case anything upstream
+   hands the mount a background. */
+html body .cc-api-dark [data-constellation]{ background:transparent !important; }
 </style>
 </helmet>
 <div ref="{{ rootRef }}" class="cc-shell {{ splineClass }} {{ themeClass }} {{ privateClass }}" style="position:relative; isolation:isolate; height:100vh; min-height:640px; width:100%; overflow:hidden; background:#0a0b0d; color:#eef0f2; font-family:'Space Grotesk',-apple-system,system-ui,sans-serif;">
@@ -9046,7 +9081,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.27-156 · v11.156 jet-black-map';
+const NOTIF_BUILD_VERSION = '2026.08.27-157 · v11.157 jet-black-map-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13100,7 +13135,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
-    {version:'v11.156', date:'Aug 27, 2026', notes:[
+    {version:'v11.157', date:'Aug 27, 2026', notes:[
       'Connection Map and the API page now sit on jet black instead of the slightly purple near-black they had before.',
     ]},
     {version:'v11.155', date:'Aug 27, 2026', notes:[
