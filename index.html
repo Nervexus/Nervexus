@@ -9192,7 +9192,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-193 · v11.193 sign-off-closes-mic';
+const NOTIF_BUILD_VERSION = '2026.08.27-194 · v11.194 tts-cache-per-voice';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10665,8 +10665,7 @@ activities: this._mergeShipLog(s.activities),
   async _speakEleven(text){
     if(!this._sbOn()){ this.setState({voiceFallbackErr:'Not connected to Supabase'}); return false; }
     try{
-      const voiceId=(this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
-      const res=await window.SB.ttsSpeak('elevenlabs', text, voiceId);
+      const res=await window.SB.ttsSpeak('elevenlabs', text, this._ttsVoiceId());
       if(!res || res.error || !res.audioBase64){ this.setState({voiceFallbackErr:(res&&res.error)||'ElevenLabs call failed — using browser voice'}); return false; }
       this.setState({voiceFallbackErr:''});
       if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} }
@@ -10704,16 +10703,23 @@ activities: this._mergeShipLog(s.activities),
   // Fires the network call for a chunk's audio without waiting/playing — used to warm
   // the NEXT sentence's audio while the current one is still speaking, so there's no
   // round-trip gap between chunks (the "long pause" between sentences).
-  _prefetchEleven(text){ if(!text||!text.trim()) return; this._ttsCache=this._ttsCache||new Map(); if(this._ttsCache.has(text)) return; if(!this._sbOn()) return;
-    const voiceId=(this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM';
-    this._ttsCache.set(text, window.SB.ttsSpeak('elevenlabs', text, voiceId).catch(()=>null)); }
+  // Cache key is voice + text, not text alone: a line rendered ahead of time in the old
+  // voice would otherwise be played back after switching, so one reply in the middle of a
+  // conversation would come out in the previous voice.
+  _ttsVoiceId(){ return (this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM'; }
+  _ttsKey(voiceId,text){ return voiceId+'\u0000'+text; }
+  _prefetchEleven(text){ if(!text||!text.trim()) return; this._ttsCache=this._ttsCache||new Map(); if(!this._sbOn()) return;
+    const voiceId=this._ttsVoiceId(), key=this._ttsKey(voiceId,text);
+    if(this._ttsCache.has(key)) return;
+    this._ttsCache.set(key, window.SB.ttsSpeak('elevenlabs', text, voiceId).catch(()=>null)); }
   _speakElevenAwait(text){
     return new Promise(async(resolve)=>{
       if(!this._sbOn()){ resolve(false); return; }
       try{
         this._ttsCache=this._ttsCache||new Map();
-        let pending=this._ttsCache.get(text); this._ttsCache.delete(text);
-        if(!pending){ const voiceId=(this.state.prefs&&this.state.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM'; pending=window.SB.ttsSpeak('elevenlabs', text, voiceId); }
+        const voiceId=this._ttsVoiceId(), key=this._ttsKey(voiceId,text);
+        let pending=this._ttsCache.get(key); this._ttsCache.delete(key);
+        if(!pending) pending=window.SB.ttsSpeak('elevenlabs', text, voiceId);
         const res=await pending;
         if(!res || res.error || !res.audioBase64){ resolve(false); return; }
         const audio=new Audio('data:'+(res.mime||'audio/mpeg')+';base64,'+res.audioBase64);
