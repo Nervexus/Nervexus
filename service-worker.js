@@ -5,11 +5,11 @@
    clicks back into the app (or relaunches it with a deep link if nothing's open).
    Bump CACHE on every shell change so activate() purges the old cache and clients
    pick up fresh assets. */
-const CACHE = 'cc-v49';
+const CACHE = 'cc-v50';
 const SHELL = [
   './', './AI Command Center.dc.html', './manifest.json', './favicon.png',
   './support.js', './countries-data.js', './notif-engine.js', './notification-engine.js', './voice-engine.js',
-  './voice-assistant-engine.js', './providers-data.js', './health-tracker.js', './learning-maths.js', './learning-english.js',
+  './providers-data.js', './health-tracker.js', './learning-maths.js', './learning-english.js',
   './learning-science.js', './learning-grammar.js', './learning-history.js', './learning-speaking.js',
   './learning-physiology.js', './learning-money.js', './learning-gentleman.js', './gentleman-blackbook.js', './orb-engine.js',
   './anatomy-3d.js', './constellation-engine.js', './void-orb-engine.js', './ai-gateway.js',

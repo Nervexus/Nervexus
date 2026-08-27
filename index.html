@@ -306,7 +306,6 @@
 <script src="learning-gentleman.js?v=1"></script>
 <script src="gentleman-blackbook.js?v=1"></script>
 <script src="orb-engine.js?v=7"></script>
-<script src="voice-assistant-engine.js"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
@@ -9099,7 +9098,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 // sphere covers ~94% of it, so the orb draws ~355px across. LIFT raises it above the
 // [data-orb-home] marker the old shard cluster centred on.
 const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
-const NOTIF_BUILD_VERSION = '2026.08.27-165 · v11.165 ai-gateway-cutover';
+// What the assistant says while it has no brain. The engine and its tools were removed
+// for the rebuild; the mic, the transcript and the speech pipeline are all still live,
+// so it answers honestly instead of sitting mute or faking a canned reply.
+const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
+const NOTIF_BUILD_VERSION = '2026.08.27-166 · v11.166 voice-stripped';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9324,7 +9327,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -10580,7 +10583,8 @@ activities: this._mergeShipLog(s.activities),
     this._speakEleven(text);
   }
   // ===== Streaming TTS queue =====
-  // Used when a reply arrives as token deltas (see _apiAskStream/_apiAskLiveStream below)
+  // Used when a reply arrives as token deltas. Nothing feeds it while the assistant
+  // engine is out for rebuild; kept because Read Aloud and the new engine will both need it.
   // so the assistant can start speaking a finished sentence while later ones are still
   // being generated, instead of waiting for the whole reply. Chunks play strictly in
   // order — each one is awaited to completion before the next starts. _ttsStreamId lets
@@ -10640,37 +10644,6 @@ activities: this._mergeShipLog(s.activities),
       this._ttsPlaying=false;
     })();
     return this._ttsDrainPromise;
-  }
-  // Streams a general or live-search reply, pushing a growing AI bubble and queueing
-  // each finished sentence for speech as soon as it's complete — this is what lets the
-  // voice assistant start talking before generation finishes (see voice-assistant-engine.js
-  // TOOLS 'chat'/'live_question'/'travel_brief', which call host.askStreamAndSpeak /
-  // host.askLiveStreamAndSpeak when available).
-  async _streamAskAndSpeak(kind,query){
-    this.setState(s=>({vtx:[...s.vtx,{who:'AI',text:'…'}]}));
-    this._ttsStreamReset();
-    this._pauseForSpeech=true; this.stopRecog();
-    let full='', sentBuf='';
-    const onDelta=(delta)=>{
-      full+=delta; sentBuf+=delta;
-      this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text:full}]}));
-      const parts=sentBuf.split(/(?<=[.!?\n])\s+/);
-      if(parts.length>1){
-        for(let i=0;i<parts.length-1;i++){ const s=parts[i].trim(); if(s) this._ttsQueue.push(s); }
-        sentBuf=parts[parts.length-1];
-        this._ttsDrain();
-      }
-    };
-    const res=kind==='live' ? await this._apiAskLiveStream(query,onDelta,{role:'voice'}) : await this._apiAskStream(query,{role:'voice'},onDelta);
-    const text=res.error ? (full ? (full.trim()+' — '+res.error) : res.error) : (res.text||full||'No answer returned.');
-    this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text}]}));
-    if(res.error){ if(!full) this._ttsQueue.push(res.error); /* else: partial reply already queued/spoken — transcript shows the error, skip reading it out */ }
-    else { const rest=sentBuf.trim(); if(rest) this._ttsQueue.push(rest); }
-    this._lastAIReply=text;
-    if(this.state.scene==='voice') this._logConvo('assistant',text);
-    await this._ttsDrain();
-    this._pauseForSpeech=false; if(this.state.listening) this.startRecog();
-    return text;
   }
   _initVoice(){ if(this._ve) return; if(!window.VoiceEngine){ if(!this._veWait){ this._veWait=setInterval(()=>{ if(window.VoiceEngine){ clearInterval(this._veWait); this._veWait=null; this._initVoice(); } },140); } return; } this._ve=new window.VoiceEngine({ onUpdate:(st)=>{ this.setState({vp:st}); },
       // Read Aloud (briefings/reports/pasted text) speaks through the same connected
@@ -10978,71 +10951,28 @@ activities: this._mergeShipLog(s.activities),
     if(this.state.dashboardRowId) window.SB.update('custom_dashboards', this.state.dashboardRowId, {layout, updated_at:new Date().toISOString()});
     else window.SB.insert('custom_dashboards',{user_id:this.state.authUserId,name:'Default',layout}).then(r=>{ if(r&&r.data) this.setState({dashboardRowId:r.data.id}); });
   }
-  // The orb's own conversation/command backend lives in voice-assistant-engine.js as an
-  // independent module — this method is just the bridge: mic transcript in, host callbacks
-  // out. All intent parsing and command execution happens in that file, not here.
+  // ===== Voice input =====
+  // The assistant has no brain right now, on purpose. voice-assistant-engine.js and its
+  // 17 tools were removed for the rebuild, so this page is the design plus microphone and
+  // speech only: your words are transcribed, logged to the conversation history, and
+  // answered with a spoken placeholder.
+  //
+  // It says so out loud rather than sitting silent — a mute orb reads as broken, and
+  // inventing a canned answer would be worse. Replace VOICE_NO_BRAIN when the new engine
+  // lands; nothing else here needs to change.
   voiceCommand(raw){ if(this.state.prefs.assistantEnabled===false) return; const t=(raw||'').trim(); if(!t) return;
     if(/^(?:ok(?:ay)?[, ]+)?(?:you can |please )?(?:turn|switch) ?off(?: the)?(?: voice)?(?: assistant)?\.?$|^(?:stop listening|go to sleep|that.?ll be all|shut (?:up|down))\.?$/i.test(t)){
       this._logConvo('user',t); this.toggleAssistantEnabled(); return;
     }
-    // Also reachable via the LLM planner's stop_assistant tool (host.tools.disableAssistant) for
-    // less literal phrasings, when a provider is connected to do the routing.
     this._logConvo('user',t);
-    // Barge-in: if the assistant is mid-speech, a new utterance always interrupts first —
-    // including a streaming reply still queuing up more sentences to speak.
+    // Barge-in: a new utterance always interrupts whatever is being spoken.
     this._ttsStreamStop();
     if(this._elevenAudio && !this._elevenAudio.paused){ try{ this._elevenAudio.pause(); }catch(e){} }
-    if(this._awaitingContinue){
-      this._awaitingContinue=false;
-      if(/^(yes|yeah|yep|sure|go on|continue|please do)\b/i.test(t)){ this.setState(s=>({vtx:[...s.vtx,{who:'YOU',text:t}]})); if(this._lastAIReply) this.speak(this._lastAIReply); return; }
-      // anything else falls through and is treated as a fresh command below
-    }
     this.setState(s=>({vtx:[...s.vtx,{who:'YOU',text:t}],vInput:''}));
-    window.VoiceAssistant.handle(t, this._vaHost());
-  }
-  // ===== API Manager bridge (host contract for voice-assistant-engine.js) =====
-  // host.tools.* are the ONLY app mutations the voice engine can trigger — every one calls
-  // an existing app service (or its exact persistence pattern), never a parallel system.
-  _vaHost(){
-    return {
-      firstName:()=>((this.state.account&&this.state.account.name)||'').trim().split(/\s+/)[0]||'there',
-      say:(text)=>this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})),
-      replaceLast:(text)=>this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text}]})),
-      speak:(text)=>{ this._lastAIReply=text; this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this.speak(text); },
-      ask:(prompt,opts)=>this._apiAsk(prompt,{...(opts||{}), role:'voice'}),
-      askLive:(query)=>this._apiAskLive(query,{role:'voice'}),
-      // Streaming variants: speak sentence-by-sentence as the reply generates instead of
-      // waiting for the whole thing. Each resolves the final text (already spoken/shown).
-      askStreamAndSpeak:(query)=>this._streamAskAndSpeak('general',query),
-      askLiveStreamAndSpeak:(query)=>this._streamAskAndSpeak('live',query),
-      hasGeneralProvider:()=>window.AIGateway.available(),
-      tools:{
-        nav:(scene)=>{ if(this.state.focusMode && scene!=='home') return; setTimeout(()=>this.setState({scene}),650); },
-        addTask:(label)=>{ const id=this._uuid(); this.mut(s=>({checklist:[...s.checklist,{id,label,tag:'TASK',done:false}]})); if(this._sbOn()) window.SB.insert('checklist',{id,user_id:this.state.authUserId,label,tag:'TASK',done:false}); },
-        addMission:(name)=>{ const id=this._uuid(); const today=this._todayStr(); this.mut(s=>({missions:[...(s.missions||[]),{id,name,recurring:false,dayKey:today,xp:20,streak:0,completedAt:null,note:''}]})); if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name,recurring:false,day_key:today,xp:20,streak:0}); },
-        addMemory:(fact)=>this.addMemory(fact),
-        scheduleEvent:(title,whenText)=>{ const low=(whenText||'').toLowerCase(); const date=this._parseVoiceDate(low), time=this._parseVoiceTime(low); const id=this._uuid(); this.mut(s=>({events:[...s.events,{id,title,date,time,repeat:[]}]})); if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title,event_date:date,event_time:time,repeat_days:[]}); return {date:this._niceDate(date),time}; },
-        openTasks:()=>(this.state.checklist||[]).filter(c=>!c.done).map(c=>c.label),
-        doneToday:()=>{ const todayStr=this._todayStr(); return { tasks:(this.state.checklist||[]).filter(c=>c.done).map(c=>c.label), missions:(this.state.missionHistory||[]).filter(m=>m.date===todayStr).map(m=>m.name) }; },
-        trainingToday:()=>{ const todayStr=this._todayStr(); return (this.state.workouts||[]).filter(w=>{ try{ return new Date(w.ts).toLocaleDateString('en-CA')===todayStr; }catch(e){ return false; } }).map(w=>w.exercise+(w.min?' ('+w.min+'m)':'')); },
-        readSource:(id,title)=>{ this.readCoreSource(id,title); },
-        safety:(query)=>this._safetyLookup(query),
-        // All of the following call real class methods directly (see addWorkout/addWeight/
-        // addMeal/addNote near removeBody, and addIncome/addExpense near _moneyLogDay) —
-        // every one of these previously only existed as a renderVals closure, which meant
-        // this.addWorkout/addWeight/addMeal/addNote were undefined and calling them here
-        // threw, silently breaking voice-triggered logging while still speaking "Logged."
-        logWorkout:(exercise,minutes,weight,sets,reps,part)=>this.addWorkout({exercise,minutes,weight,sets,reps,part}),
-        logHydration:(ml)=>this.addHydMl(ml),
-        logWeight:(kg)=>this.addWeight(kg),
-        logSleep:(hours,minutes)=>{ this.setState(s=>({slp:{...s.slp,h:String(hours||0),m:String(minutes||0)}}),()=>this.saveSleep()); },
-        logMeal:(name,kcal,protein)=>this.addMeal({name,kcal,protein}),
-        addNote:(title,body)=>this.addNote(title,body),
-        logIncome:(label,amount)=>{ this.setState({incLabel:label,incAmt:String(amount||'')},()=>this.addIncome()); },
-        logExpense:(label,amount)=>{ this.setState({expLabel:label,expAmt:String(amount||'')},()=>this.addExpense()); },
-        disableAssistant:()=>{ setTimeout(()=>this.toggleAssistantEnabled(),1200); },
-      },
-    };
+    const reply=VOICE_NO_BRAIN;
+    this._lastAIReply=reply;
+    this.setState(s=>({vtx:[...s.vtx,{who:'AI',text:reply}]}));
+    this.speak(reply);   // speak() logs the assistant turn itself — do not log it here too
   }
   // ===== Notification Manager bridge (host contract for notification-engine.js) =====
   // The ONLY door into notifications. Every feature calls
@@ -11265,52 +11195,6 @@ activities: this._mergeShipLog(s.activities),
   // panel sets. Passing one here is what makes that panel do something.
   _aiRole(role){ return role||'voice'; }
 
-  // ===== AI request surface =====
-  // Four thin shapes over one gateway call. Everything that used to live here —
-  // candidate ordering, retry, health recording, live-provider filtering — is in
-  // ai-gateway.js now, so these cannot drift apart from the rest of the app again.
-  //
-  // `role` is a PROVIDERS_DATA.AI_FEATURES id and decides which Routing entry applies.
-  // `opts.raw` skips the assistant persona prefix, for prompts that are already fully
-  // specified (JSON extraction, imports) and would be damaged by it.
-  _aiText(res){ return (res && res.text) ? res.text : ''; }
-  async _apiAsk(query,opts){
-    opts=opts||{};
-    const prompt=opts.raw?query:(this._personaPrefix()+' '+query);
-    const res=await window.AIGateway.ask(this._aiRole(opts.role), prompt, {});
-    if(res.error) return {error:res.error};
-    return {text:this._aiText(res)||'No answer returned.'};
-  }
-  // Live questions get real data pulled from the connected news sources first, handed
-  // to the model as context so it answers from today rather than from training data.
-  async _liveQuery(query){
-    const pulled=await this._pullConnectedNewsData(query);
-    return this._personaPrefix()+' '+query+(pulled?'\n\n(Real data just pulled from connected sources — use it and cite by name:\n'+pulled+')':'');
-  }
-  _withCitations(res){
-    let text=this._aiText(res)||'No answer returned.';
-    if(res.citations && res.citations.length) text+='\n\nSources: '+res.citations.slice(0,3).join(', ');
-    return text;
-  }
-  async _apiAskLive(query,opts){
-    opts=opts||{};
-    const res=await window.AIGateway.ask(this._aiRole(opts.role), await this._liveQuery(query), {live:true});
-    if(res.error) return {error:res.error};
-    return {text:this._withCitations(res)};
-  }
-  async _apiAskStream(query,opts,onDelta){
-    opts=opts||{};
-    const prompt=opts.raw?query:(this._personaPrefix()+' '+query);
-    const res=await window.AIGateway.stream(this._aiRole(opts.role), prompt, onDelta, {});
-    if(res.error) return {error:res.error};
-    return {text:this._aiText(res)};
-  }
-  async _apiAskLiveStream(query,onDelta,opts){
-    opts=opts||{};
-    const res=await window.AIGateway.stream(this._aiRole(opts.role), await this._liveQuery(query), onDelta, {live:true});
-    if(res.error) return {error:res.error};
-    return {text:this._withCitations(res)};
-  }
   _parseVoiceDate(text){ const low=(text||'').toLowerCase(); const now=new Date(); const fmt=(d)=>{ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } };
     if(/\btoday\b/.test(low)) return fmt(now);
     if(/\btomorrow\b/.test(low)) return fmt(new Date(now.getTime()+86400000));
@@ -13137,6 +13021,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.166', date:'Aug 27, 2026', major:true, notes:[
+      'The voice assistant is down to the orb, the microphone and the speech for now \u2014 its engine has been removed and is being rebuilt. It will hear you and reply out loud, but it cannot log, open or schedule anything yet.',
+    ]},
     {version:'v11.165', date:'Aug 27, 2026', major:true, notes:[
       'Every AI feature now goes through one router. The AI centre\u2019s Routing panel actually works \u2014 set Briefings to a different provider and briefings really use it. Failover and provider health now cover every feature, not just the voice assistant.',
     ]},
