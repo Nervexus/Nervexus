@@ -458,9 +458,12 @@
    map that was already set to #000. Killing the blur matters as much as the colour here.
 
    `html body` plus a doubled .cc-api-dark takes the card rule to (0,4,2) and the map rule
-   to (0,5,2), clear of all of the above. The Maison/Noir card colours are deliberately
-   overridden too: the ground is jet black under every theme, so a cream or grey card on it
-   would read as a light patch floating on black rather than as part of the page. */
+   to (0,5,2), clear of all of the above.
+
+   Maison Elysee is then carved back out below: it is a light theme and keeps its own cards
+   here, as it did before this page went dark. The map panel is excluded from that carve-out
+   via :not([data-api-ground]) — jet black behind the constellation is the point of all this
+   and holds under every theme. */
 html body .cc-api-dark{ background:#000000; border-radius:18px; padding:14px 14px 6px; margin:-6px -6px 0; }
 html body .cc-api-dark.cc-api-dark .cc-glowcard.cc-glowcard{
   background:#0A0A0B !important;                 /* lifted just off the black, neutral grey —
@@ -480,6 +483,19 @@ html body .cc-api-dark input, html body .cc-api-dark select, html body .cc-api-d
    black is what you actually see behind the map. Pin it here too in case anything upstream
    hands the mount a background. */
 html body .cc-api-dark [data-constellation]{ background:transparent !important; }
+
+/* Maison Elysee opt-out. Theme classes live on .cc-shell, an ancestor of .cc-api-dark, so a
+   descendant combinator reaches them. (0,6,2) — above the (0,4,2) card rule it undoes. */
+html body .theme-maison .cc-api-dark.cc-api-dark .cc-glowcard.cc-glowcard:not([data-api-ground]){
+  background:var(--u-card) !important;
+  border-color:var(--u-line) !important;
+  color:var(--u-ink) !important;
+}
+html body .theme-maison .cc-api-dark.cc-api-dark input,
+html body .theme-maison .cc-api-dark.cc-api-dark select,
+html body .theme-maison .cc-api-dark.cc-api-dark textarea{
+  background:rgba(255,255,255,0.9) !important; color:var(--u-ink) !important;
+}
 </style>
 </helmet>
 <div ref="{{ rootRef }}" class="cc-shell {{ splineClass }} {{ themeClass }} {{ privateClass }}" style="position:relative; isolation:isolate; height:100vh; min-height:640px; width:100%; overflow:hidden; background:#0a0b0d; color:#eef0f2; font-family:'Space Grotesk',-apple-system,system-ui,sans-serif;">
@@ -9081,7 +9097,7 @@ html body .cc-api-dark [data-constellation]{ background:transparent !important; 
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.27-157 · v11.157 jet-black-map-fix';
+const NOTIF_BUILD_VERSION = '2026.08.27-158 · v11.158 maison-api-cards';
 class Component extends DCLogic {
   constructor(props){
     super(props);
