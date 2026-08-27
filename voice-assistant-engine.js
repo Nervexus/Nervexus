@@ -334,6 +334,11 @@
           .replace(/\s+/g,' ').trim();
         name = stripDest(name);
         if (!name) return null;
+        /* If the exercise is one the app knows, use its proper name rather than whatever
+           survived the parse. Turns "on the stairmaster" into "Stairmaster" and
+           "hammer curls" into "Hammer Curl", so the log reads consistently however it was
+           said, and so does the reply. */
+        if (host.tools.exerciseName) name = host.tools.exerciseName(name) || name;
         host.tools.logWorkout(cap(name), mins ? num(mins[1]) : 0, wt ? num(wt[1]) : 0,
                               sets ? num(sets[1]) : 0, reps ? num(reps[1]) : 0);
         /* Read it back as a sentence, not as fields. "running — 30 min" is how the data

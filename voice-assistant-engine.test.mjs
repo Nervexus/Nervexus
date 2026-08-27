@@ -28,6 +28,8 @@ function host(hasAI=false, aiReply='AI says hi'){
       logWorkout:rec('logWorkout'), logHydration:rec('logHydration'), logWeight:rec('logWeight'),
       logSleep:rec('logSleep'), logMeal:rec('logMeal'), addNote:rec('addNote'),
       logIncome:rec('logIncome'), logExpense:rec('logExpense'), disableAssistant:rec('disableAssistant'),
+      // stands in for exercise-index.js
+      exerciseName:(n)=>({'on the stairmaster':'Stairmaster','hammer curls':'Hammer Curl','running':'Running'}[String(n).toLowerCase()]||null),
       completeTask:(l)=>{ calls.push(['completeTask',l]); return /accountant/i.test(l)?'Call accountant':null; },
       completeMission:(n)=>{ calls.push(['completeMission',n]); return /cold/i.test(n)?'Cold shower':null; },
       waterToday:()=>({ml:1500, goalMl:2000}),
@@ -132,6 +134,17 @@ t('strips a wake word and politeness', async()=>{ const h=host();
 t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
+
+// ---- the exercise index supplies the proper name ----
+t('a known exercise is logged under its canonical name', async()=>{ const h=host();
+  await VA.handle('log 3 sets of 12 hammer curls',h);
+  eq(call('logWorkout')[1],'Hammer Curl','should not log the raw parse "Hammer curls"'); });
+t('"on the stairmaster" logs as Stairmaster, not "On the stairmaster"', async()=>{ const h=host();
+  await VA.handle('log 20 minutes on the stairmaster',h);
+  eq(call('logWorkout')[1],'Stairmaster'); });
+t('an exercise the index does not know keeps what was said', async()=>{ const h=host();
+  await VA.handle('log 30 minutes of underwater basket weaving',h);
+  eq(call('logWorkout')[1],'Underwater basket weaving'); });
 
 // ---- every way of saying "record this" ----
 t('all eighteen verb forms log a workout', async()=>{

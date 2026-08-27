@@ -308,8 +308,9 @@
 <script src="orb-engine.js?v=7"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
+<script src="exercise-index.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=10"></script>
+<script src="voice-assistant-engine.js?v=11"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9134,7 +9135,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-183 · v11.183 loura-verbs';
+const NOTIF_BUILD_VERSION = '2026.08.27-184 · v11.184 exercise-index';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9347,7 +9348,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','exercise-index.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -11105,6 +11106,9 @@ activities: this._mergeShipLog(s.activities),
         // over the guess — and with none passed it falls back to whichever tab happens to be
         // open. A run logged by voice was landing under Chest because Chest was on screen.
         // The visible tab is irrelevant to something logged by voice, so classify explicitly.
+        // The proper name for an exercise the index knows, so "on the stairmaster" and
+        // "hammer curls" both land as the canonical entry rather than as parse leftovers.
+        exerciseName:(name)=>(window.EXERCISE_INDEX ? window.EXERCISE_INDEX.nameOf(name) : null),
         logWorkout:(exercise,minutes,weight,sets,reps)=>this.addWorkout({exercise,minutes,weight,sets,reps,part:this._guessBodyPart(exercise)}),
         logHydration:(ml)=>this.addHydMl(ml),
         logWeight:(kg)=>this.addWeight(kg),
@@ -13190,6 +13194,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.184', date:'Aug 27, 2026', major:true, notes:[
+      '258 named exercises now file themselves correctly \u2014 by voice, by hand, and through bulk import. Say \u201clog 3 sets of 12 hammer curls\u201d and it lands under Arms as Hammer Curl, not wherever the open tab happened to be.',
+    ]},
     {version:'v11.183', date:'Aug 27, 2026', notes:[
       'Eighteen ways of telling Loura to record something now work \u2014 log, add, record, track, enter, mark, put down, chuck in, \u201ci just did\u201d, \u201cfinished\u201d and more.',
       'Fixed \u201cnote down 30 minutes of cycling\u201d being saved as a note to self instead of logged as training.',
@@ -14790,7 +14797,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // actions — same fix already applied to addIncome/addExpense. Each renderVals binding
   // below (Fitness/Health/Productivity/Notes) now just calls the method here, so both the
   // UI button AND host.tools.log*/addNote (voice dispatcher) hit the exact same code path.
-  _guessBodyPart(exercise){ const t=(exercise||'').toLowerCase();
+  // Named exercises come from exercise-index.js — 258 of them, classified by the owner.
+  // Consulted first so an explicit classification always beats the keyword patterns below,
+  // which stay as the fallback for anything not on the list. Used by voice, by manual
+  // entry and by bulk import alike, so all three agree.
+  _guessBodyPart(exercise){
+    if(window.EXERCISE_INDEX){ const hit=window.EXERCISE_INDEX.lookup(exercise); if(hit) return hit.group; }
+    const t=(exercise||'').toLowerCase();
     if(/bench|chest|push.?up|fly|dip/.test(t)) return 'Chest';
     // 'lat' bare also matched "lateral raise", and Back is tested before Shoulders — so
     // every lateral raise was filed as a back exercise. Anchored to the actual lat names.
@@ -14806,6 +14819,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // "Squats & Push Ups", "Squats x Push Ups", "Bench Press/Overhead Press" — split a combined
   // exercise name into its real individual exercises so each gets its own honest muscle-group
   // classification instead of an opaque catch-all 'Mixed' bucket.
+  // The finer classification behind the group — Biceps rather than Arms, Quads rather
+  // than Legs. Null for anything not on the list; nothing renders it yet.
+  _muscleOf(exercise){ return window.EXERCISE_INDEX ? window.EXERCISE_INDEX.muscleOf(exercise) : null; }
   _splitExerciseNames(name){
     return (name||'').split(/\s*&\s*|\s*\+\s*|\s*\/\s*|\s+and\s+|\s+x\s+/i).map(s=>s.trim()).filter(Boolean).slice(0,4);
   }
