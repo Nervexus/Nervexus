@@ -433,7 +433,7 @@
          The past-tense forms overlap with completeTask ("finished the shopping"), which is
          also above this rule and declines when no such task exists — so "finished 30
          minutes of cycling" tries the task list, misses, and lands here. */
-      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i\s+)?(?:just\s+)?(?:did|done|finished|completed))\s+(?:my\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do)\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var w = parseWorkout(m[1], host);
         if (!w || !w.quantified) return null;          // not a workout shape — fall through
@@ -648,9 +648,27 @@
   var LEAD = /^(?:hey|ok(?:ay)?|hi|hello|yo|loura|laura|lora|nervexus|assistant|please|now)\b[,\s]*/i;
   var POLITE = /^(?:(?:can|could|would|will)\s+you\s+)?(?:please\s+)?/i;
   var TRAIL = /[,\s]*(?:please|for me|thanks|thank you|mate|now)[.?!]*$/i;
+
+  /* People put the instruction at the END as often as the start: "I did 30 minutes of cardio
+     today, can you log it". That tail is a request, not part of what was done — left in place
+     it became the exercise name, and the fitness log ended up with an entry called "Cardio can
+     you log". Recognition also hears "log it" as "log in", "log on" and "log out", so the
+     particles are all accepted.
+
+     Two shapes only: an explicit "can you log…", or a log-verb with an object after it
+     ("…of running, log it"). A bare trailing verb is deliberately NOT stripped, so a genuine
+     "add a task to log" keeps its last word. */
+  var TRAIL_REQ = /[,\s]*(?:(?:can|could|would|will)\s+(?:you|u)\s+(?:please\s+)?(?:log|add|save|record|put|note)(?:\s+(?:it|that|this|them|in|on|out|up|down))*|(?:log|add|save|record|put)\s+(?:it|that|this|them|in|on|out|up|down)(?:\s+(?:in|on|down|for me))?)[.?!]*$/i;
+
   function tidy(t) {
     var prev;
-    do { prev = t; t = t.replace(LEAD, '').replace(TRAIL, ''); } while (t !== prev);
+    do {
+      prev = t;
+      t = t.replace(LEAD, '').replace(TRAIL, '');
+      // Never strip the whole utterance: "log it" on its own is an answer, not a tail.
+      var cut = t.replace(TRAIL_REQ, '').trim();
+      if (cut) t = cut;
+    } while (t !== prev);
     return t.replace(POLITE, '').trim();
   }
 

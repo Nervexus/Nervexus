@@ -536,6 +536,46 @@ t('the widened ender list still loses to every real command', async()=>{ const h
 t('well-wishes are returned, not farewelled', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('take care',h); has(last(),'you too');
   VA._clearPending(); await VA.handle('enjoy the rest of your day',h); has(last(),'you too'); });
+// ---- regression: the instruction arriving at the END ----
+// "I did 30 minutes of cardio today, can you log it" wrote an exercise called
+// "Cardio can you log" into the fitness log — the trailing request was being read as part
+// of what was done. Recognition also hears "log it" as "log in", "log on" and "log out".
+t('a trailing "can you log it" is a request, not the exercise name', async()=>{ const h=host();
+  for(const line of [
+    'I did 30 minutes of running today can you log it',
+    'I did 30 minutes of running today can you log in',
+    'I did 30 minutes of running today can you log out',
+    'I did 30 minutes of running today can you log on',
+    'I have done 30 minutes of running, log it',
+    'log 30 minutes of running can you log it for me',
+  ]){
+    VA._clearPending(); calls=[];
+    await VA.handle(line,h);
+    const w=call('logWorkout');
+    if(!w) throw new Error(JSON.stringify(line)+' did not log');
+    eq([w[1],w[2]],['Running',30],JSON.stringify(line)); } });
+t('"I do" and "I have done" are workout verbs', async()=>{ const h=host();
+  for(const line of ['I do 30 mins of running today','I have done 30 minutes of running',
+                     'I\u2019ve just done 30 minutes of running','I did 30 minutes of running']){
+    VA._clearPending(); calls=[];
+    await VA.handle(line,h);
+    const w=call('logWorkout');
+    if(!w) throw new Error(JSON.stringify(line)+' was not understood as a workout');
+    eq([w[1],w[2]],['Running',30],JSON.stringify(line)); } });
+// The tail strip must not reach into commands that legitimately end on a log-ish word.
+t('a bare trailing verb is left alone', async()=>{ const h=host();
+  VA._clearPending(); calls=[];
+  await VA.handle('Add a task to log the invoices',h);
+  eq(call('addTask'),['addTask','Log the invoices']);
+  VA._clearPending(); calls=[];
+  await VA.handle('Log 500 ml of water',h);
+  eq(call('logHydration'),['logHydration',500]); });
+t('"log it" on its own is still an answer, not an empty utterance', async()=>{ const h=host();
+  VA._clearPending();
+  await VA.handle('3 minutes run',h);
+  if(!VA._pending()) throw new Error('expected a confirmation question');
+  calls=[]; await VA.handle('log it',h);
+  if(!call('logWorkout')) throw new Error('"log it" was stripped to nothing'); });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }

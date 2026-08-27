@@ -159,12 +159,16 @@
   var TTS_PROVIDERS = [
     { id:'elevenlabs', name:'ElevenLabs', mark:'EL', color:'#111114', endpoint:'https://api.elevenlabs.io/v1',
       auth:'apikey', keyHint:'32+ chars', docs:'elevenlabs.io/docs', tier:'freemium', tierNote:'Free tier: 10k chars/mo',
-      /* No stock voices. The library is whatever you have added by ID in Settings -> Voice,
-         so the list is yours rather than eight defaults you have to scroll past. Anything
-         that needs "the" voice asks the library for its first entry instead of naming an id
-         here — see _defaultVoiceId() — so removing or replacing a voice moves the active
-         model with it. */
-      voices:[] }
+      voices:[
+        { id:'21m00Tcm4TlvDq8ikWAM', name:'Rachel — calm, professional (f)' },
+        { id:'AZnzlk1XvdvUeBnXmlld', name:'Domi — confident, strong (f)' },
+        { id:'EXAVITQu4vr4xnSDxMaL', name:'Bella — warm, friendly (f)' },
+        { id:'ErXwobaYiN019PkySvjV', name:'Antoni — well-rounded (m)' },
+        { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh — deep, casual (m)' },
+        { id:'VR6AewLTigWG4xSOukaG', name:'Arnold — crisp, authoritative (m)' },
+        { id:'pNInz6obpgDQGcFmaJgB', name:'Adam — deep, narration (m)' },
+        { id:'yoZ06aMxZJJ28mfd3POQ', name:'Sam — raspy, energetic (m)' }
+      ] }
   ];
 
   var NEWS_CATEGORIES = [
