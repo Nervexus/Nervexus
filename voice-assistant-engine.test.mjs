@@ -28,6 +28,17 @@ function host(hasAI=false, aiReply='AI says hi'){
       logWorkout:rec('logWorkout'), logHydration:rec('logHydration'), logWeight:rec('logWeight'),
       logSleep:rec('logSleep'), logMeal:rec('logMeal'), addNote:rec('addNote'),
       logIncome:rec('logIncome'), logExpense:rec('logExpense'), disableAssistant:rec('disableAssistant'),
+      completeTask:(l)=>{ calls.push(['completeTask',l]); return /accountant/i.test(l)?'Call accountant':null; },
+      completeMission:(n)=>{ calls.push(['completeMission',n]); return /cold/i.test(n)?'Cold shower':null; },
+      waterToday:()=>({ml:1500, goalMl:2000}),
+      latestWeight:()=>({kg:82, date:'2026-08-27'}),
+      lastSleep:()=>({hours:7, minutes:30, date:'2026-08-27'}),
+      foodToday:()=>({count:2, kcal:1060, protein:70}),
+      moneyToday:()=>({income:1200, expenses:40}),
+      eventsOn:(d)=>d==='TOMORROW'?['Dentist at 15:00']:[],
+      missionsLeft:()=>['Cold shower'],
+      noteCount:()=>3,
+      todayStr:()=>'TODAY', dateStrIn:(n)=>n===1?'TOMORROW':'TODAY',
     }
   };
 }
@@ -79,6 +90,43 @@ t('tells the date', async()=>{ const h=host(); await VA.handle('What is the date
   if(!spoken[0].startsWith('It’s')) throw new Error(spoken[0]); });
 t('turns itself off', async()=>{ const h=host(); await VA.handle('That will be all',h);
   if(!call('disableAssistant')) throw new Error('did not disable'); });
+
+// ---- completion ----
+t('ticks a task off', async()=>{ const h=host(); await VA.handle('Mark call the accountant as done',h);
+  const c=call('completeTask'); has(c[1],'call the accountant'); has(spoken[0],'Ticked off'); });
+t('an unknown task falls through instead of lying', async()=>{ const h=host(false);
+  await VA.handle('Mark buy a yacht as done',h);
+  has(spoken[0],'AI centre','should reach the no-key AI message, not claim success'); });
+t('completes a mission', async()=>{ const h=host(); await VA.handle('Complete my cold shower mission',h);
+  has(spoken[0],'Cold shower'); });
+
+// ---- queries ----
+t('water today with goal percentage', async()=>{ const h=host(); await VA.handle('How much water have I had?',h);
+  has(spoken[0],'1500 ml'); has(spoken[0],'75%'); });
+t('latest weight', async()=>{ const h=host(); await VA.handle('What is my weight?',h);
+  has(spoken[0],'82 kg'); });
+t('last night sleep', async()=>{ const h=host(); await VA.handle('How did I sleep?',h);
+  has(spoken[0],'7 hours'); has(spoken[0],'30 min'); });
+t('calories and protein today', async()=>{ const h=host(); await VA.handle('How many calories have I had?',h);
+  has(spoken[0],'1060'); has(spoken[0],'70 g'); });
+t('spend today', async()=>{ const h=host(); await VA.handle('How much have I spent today?',h);
+  has(spoken[0],'40'); has(spoken[0],'expenses'); });
+t('earned today is not the same as spent', async()=>{ const h=host(); await VA.handle('How much have I earned today?',h);
+  has(spoken[0],'1200'); has(spoken[0],'income'); });
+t('agenda for tomorrow', async()=>{ const h=host(); await VA.handle('What is on tomorrow?',h);
+  has(spoken[0],'Dentist'); });
+t('agenda defaults to today', async()=>{ const h=host(); await VA.handle('What is on?',h);
+  has(spoken[0],'Nothing in the calendar for today'); });
+t('missions left', async()=>{ const h=host(); await VA.handle('What missions do I have left?',h);
+  has(spoken[0],'1 mission'); has(spoken[0],'Cold shower'); });
+
+// ---- filler tolerance ----
+t('strips a wake word and politeness', async()=>{ const h=host();
+  await VA.handle('Hey Nervexus, could you please log 500 ml of water for me, thanks',h);
+  eq(call('logHydration'),['logHydration',500]); });
+t('strips a bare please', async()=>{ const h=host();
+  await VA.handle('Please open my fitness centre',h);
+  eq(call('nav'),['nav','health']); });
 
 // ---- rule ordering: utterances more than one rule could claim ----
 t('"log 30 minutes of running" is a workout, not a meal', async()=>{ const h=host();

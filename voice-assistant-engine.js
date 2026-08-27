@@ -125,6 +125,81 @@
         return 'Scheduled “' + m[1].trim() + '” for ' + r.date + (r.time ? ' at ' + r.time : '') + '.';
       } },
 
+    { id:'completeTask', label:'Tick a task off', say:'"Mark call the accountant as done"',
+      re:/^(?:mark|tick|check)\s+(?:off\s+)?(?:the\s+)?(?:task\s+)?(.+?)(?:\s+(?:as\s+)?(?:done|off|complete[d]?))?[.?!]*$|^(?:i(?:’|')?ve\s+)?(?:done|finished|completed)\s+(.+?)[.?!]*$/i,
+      run:function (m, host) {
+        var want = (m[1] || m[2] || '').trim(); if (!want) return null;
+        var hit = host.tools.completeTask(want);
+        if (hit === null) return null;                 // no such open task — let the AI tier try
+        return 'Ticked off “' + hit + '”.';
+      } },
+
+    { id:'completeMission', label:'Complete a mission', say:'"Complete my cold shower mission"',
+      re:/^(?:complete|finish|did)\s+(?:my\s+|the\s+)?(.+?)\s*mission[.?!]*$|^(?:complete|finish)\s+mission\s+(.+?)[.?!]*$/i,
+      run:function (m, host) {
+        var want = (m[1] || m[2] || '').trim(); if (!want) return null;
+        var hit = host.tools.completeMission(want);
+        return hit === null ? 'I couldn’t find an open mission matching “' + want + '”.' : 'Marked “' + hit + '” complete.';
+      } },
+
+    { id:'askWater', label:'Water so far today', say:'"How much water have I had?"',
+      re:/^how\s+much\s+water\s+(?:have\s+)?i\s+(?:had|drunk|drank)\s*(?:today)?[.?!]*$|^water\s+(?:today|so far)[.?!]*$/i,
+      run:function (m, host) {
+        var w = host.tools.waterToday(); if (!w) return 'I can’t read your hydration log right now.';
+        if (!w.ml) return 'No water logged yet today.';
+        var pct = w.goalMl ? Math.round(w.ml / w.goalMl * 100) : 0;
+        return w.ml + ' ml so far' + (w.goalMl ? ' — ' + pct + '% of your ' + w.goalMl + ' ml goal.' : '.');
+      } },
+
+    { id:'askWeight', label:'Latest body weight', say:'"What is my weight?"',
+      re:/^(?:what(?:’|')?s|what is|how much do i weigh)\s*(?:my\s+)?(?:current\s+|latest\s+)?(?:body\s*)?weight[.?!]*$|^how much do i weigh[.?!]*$/i,
+      run:function (m, host) {
+        var w = host.tools.latestWeight();
+        return w ? 'Your last logged weight is ' + w.kg + ' kg.' : 'You haven’t logged a weight yet.';
+      } },
+
+    { id:'askSleep', label:'Last night’s sleep', say:'"How did I sleep?"',
+      re:/^how\s+(?:did\s+i\s+sleep|much\s+sleep\s+did\s+i\s+get)\s*(?:last night)?[.?!]*$/i,
+      run:function (m, host) {
+        var sl = host.tools.lastSleep(); if (!sl) return 'No sleep logged yet.';
+        var bits = [];
+        if (sl.hours) bits.push(plural(sl.hours, 'hour'));
+        if (sl.minutes) bits.push(sl.minutes + ' min');
+        return bits.length ? 'You logged ' + bits.join(' ') + '.' : 'No sleep logged yet.';
+      } },
+
+    { id:'askFood', label:'Calories and protein today', say:'"How many calories have I had?"',
+      re:/^how\s+many\s+(?:calories|kcal)\s+(?:have\s+)?i\s+(?:had|eaten)\s*(?:today)?[.?!]*$|^what\s+have\s+i\s+eaten\s*(?:today)?[.?!]*$/i,
+      run:function (m, host) {
+        var f = host.tools.foodToday();
+        if (!f.count) return 'Nothing logged yet today.';
+        return plural(f.count, 'meal') + ', ' + f.kcal + ' kcal and ' + f.protein + ' g of protein so far.';
+      } },
+
+    { id:'askMoney', label:'Money in and out today', say:'"How much have I spent today?"',
+      re:/^how\s+much\s+(?:have\s+)?i\s+(spent|earned|made)\s*(?:today)?[.?!]*$/i,
+      run:function (m, host) {
+        var mo = host.tools.moneyToday();
+        if (/spent/i.test(m[1])) return mo.expenses ? 'You’ve logged ' + mo.expenses + ' in expenses today.' : 'No expenses logged today.';
+        return mo.income ? 'You’ve logged ' + mo.income + ' in income today.' : 'No income logged today.';
+      } },
+
+    { id:'askAgenda', label:'What is on today or tomorrow', say:'"What is on tomorrow?"',
+      re:/^what(?:(?:’|')s| is)?\s+(?:on|happening|scheduled)\s*(today|tomorrow)?[.?!]*$|^(?:what(?:(?:’|')s| is)\s+)?(?:my\s+)?(?:agenda|schedule|diary)\s*(?:for\s+)?(today|tomorrow)?[.?!]*$/i,
+      run:function (m, host) {
+        var when = (m[1] || m[2] || 'today').toLowerCase();
+        var date = when === 'tomorrow' ? host.tools.dateStrIn(1) : host.tools.todayStr();
+        var ev = host.tools.eventsOn(date);
+        return ev.length ? cap(when) + ': ' + list(ev) + '.' : 'Nothing in the calendar for ' + when + '.';
+      } },
+
+    { id:'askMissions', label:'Missions left today', say:'"What missions do I have left?"',
+      re:/^(?:what|which|how many)\s+missions?\s*(?:do\s+i\s+have\s+)?(?:left|open|remaining|outstanding)?[.?!]*$/i,
+      run:function (m, host) {
+        var left = host.tools.missionsLeft();
+        return left.length ? plural(left.length, 'mission') + ' left: ' + list(left) + '.' : 'All missions done for today.';
+      } },
+
     { id:'logWater', label:'Log water', say:'"Log 500 ml of water"',
       re:/^(?:log|add|drank|had)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
       run:function (m, host) {
@@ -262,8 +337,20 @@
     return { handled:false };
   }
 
+  /* Dictated speech arrives wrapped in politeness and wake words. Stripping it here means
+     every rule's pattern stays about the command itself rather than each one having to
+     tolerate "hey, could you please ... for me, thanks". */
+  var LEAD = /^(?:hey|ok(?:ay)?|hi|hello|yo|nervexus|assistant|please|now)\b[,\s]*/i;
+  var POLITE = /^(?:(?:can|could|would|will)\s+you\s+)?(?:please\s+)?/i;
+  var TRAIL = /[,\s]*(?:please|for me|thanks|thank you|mate|now)[.?!]*$/i;
+  function tidy(t) {
+    var prev;
+    do { prev = t; t = t.replace(LEAD, '').replace(TRAIL, ''); } while (t !== prev);
+    return t.replace(POLITE, '').trim();
+  }
+
   function handle(text, host) {
-    var t = String(text || '').trim();
+    var t = tidy(String(text || '').trim());
     if (!t) return Promise.resolve();
 
     var local = runLocal(t, host);

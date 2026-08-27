@@ -309,7 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=2"></script>
+<script src="voice-assistant-engine.js?v=3"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=2"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9137,7 +9137,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-169 · v11.169 voice-assistant-rebuilt';
+const NOTIF_BUILD_VERSION = '2026.08.27-170 · v11.170 voice-local-tier';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11048,7 +11048,47 @@ activities: this._mergeShipLog(s.activities),
       askStreamAndSpeak:(query)=>this._streamAskAndSpeak(query),
       tools:{
         nav:(scene)=>{ if(this.state.focusMode && scene!=='home') return; setTimeout(()=>this.setState({scene}),650); },
-        addTask:(label)=>{ const id=this._uuid(); this.mut(s=>({checklist:[...s.checklist,{id,label,tag:'TASK',done:false}]})); if(this._sbOn()) window.SB.insert('checklist',{id,user_id:this.state.authUserId,label,tag:'TASK',done:false}); },
+        // Persists to `tasks`, the table the loader and the rest of the UI use. This
+        // wrote to a `checklist` table until v11.170 — nothing has ever read that, so
+        // every task added by voice survived the session and vanished on reload.
+        addTask:(label)=>{ const id=this._uuid(); this.mut(s=>({checklist:[...s.checklist,{id,label,tag:'TASK',done:false,xpAwarded:false}]})); if(this._sbOn()){ try{ window.SB.upsert('tasks',{id,user_id:this.state.authUserId,label,tag:'TASK',done:false},'id'); }catch(e){} } },
+        // Mirrors the checklist row's own toggle, XP award included, so a task ticked by
+        // voice counts exactly the same as one ticked by hand.
+        completeTask:(label)=>{
+          const want=String(label||'').toLowerCase().trim();
+          const list=this.state.checklist||[];
+          let i=list.findIndex(c=>!c.done && c.label.toLowerCase()===want);
+          if(i<0) i=list.findIndex(c=>!c.done && c.label.toLowerCase().includes(want));
+          if(i<0) return null;
+          const c=list[i], firstAward=!c.xpAwarded;
+          this.mut(s=>{ const a=[...s.checklist]; a[i]={...a[i],done:true,xpAwarded:a[i].xpAwarded||firstAward}; return {checklist:a}; });
+          if(this._sbOn() && c.id) window.SB.update('tasks',c.id,{done:true});
+          return c.label;
+        },
+        completeMission:(name)=>{
+          const want=String(name||'').toLowerCase().trim(), today=this._todayStr();
+          const list=(this.state.missions||[]).filter(m=>m.lastCompleted!==today);
+          const m=list.find(x=>x.name.toLowerCase()===want) || list.find(x=>x.name.toLowerCase().includes(want));
+          if(!m) return null;
+          this.completeMission(m.id);
+          return m.name;
+        },
+        // ---- read-only queries. Every one reads live app state; none invents a number. ----
+        waterToday:()=>{ const K=window.HealthKit, H=this.state.health; if(!K||!H) return null;
+          return { ml:Math.round(K.dayHydration(H,K.today())||0), goalMl:H.hydrationGoalMl||2000 }; },
+        latestWeight:()=>{ const w=(this.state.health&&this.state.health.weights)||[]; if(!w.length) return null;
+          const last=w[w.length-1]; return { kg:last.kg!=null?last.kg:last.value, date:last.date }; },
+        lastSleep:()=>{ const sl=(this.state.health&&this.state.health.sleepLog)||[]; if(!sl.length) return null;
+          const last=sl[sl.length-1]; return { hours:last.hours||0, minutes:last.minutes||0, date:last.date }; },
+        foodToday:()=>{ const meals=(this.state.health&&this.state.health.meals)||[];
+          return { count:meals.length, kcal:meals.reduce((a,m)=>a+(+m.kcal||0),0), protein:meals.reduce((a,m)=>a+(+m.protein||0),0) }; },
+        moneyToday:()=>{ const d=new Date(); d.setHours(0,0,0,0); const from=d.getTime();
+          const sum=(rows)=>(rows||[]).filter(r=>r.ts>=from).reduce((a,r)=>a+(+r.amt||0),0);
+          return { income:sum(this.state.income), expenses:sum(this.state.expenses) }; },
+        eventsOn:(dateStr)=>(this.state.events||[]).filter(e=>e.date===dateStr).map(e=>e.title+(e.time?' at '+e.time:'')),
+        missionsLeft:()=>{ const today=this._todayStr(); return (this.state.missions||[]).filter(m=>m.lastCompleted!==today).map(m=>m.name); },
+        todayStr:()=>this._todayStr(),
+        dateStrIn:(days)=>{ const d=new Date(); d.setDate(d.getDate()+(days||0)); return d.toLocaleDateString('en-CA'); },
         addMission:(name)=>{ const id=this._uuid(); const today=this._todayStr(); this.mut(s=>({missions:[...(s.missions||[]),{id,name,recurring:false,dayKey:today,xp:20,streak:0,completedAt:null,note:''}]})); if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name,recurring:false,day_key:today,xp:20,streak:0}); },
         addMemory:(fact)=>this.addMemory(fact),
         scheduleEvent:(title,whenText)=>{ const low=(whenText||'').toLowerCase(); const date=this._parseVoiceDate(low), time=this._parseVoiceTime(low); const id=this._uuid(); this.mut(s=>({events:[...s.events,{id,title,date,time,repeat:[]}]})); if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title,event_date:date,event_time:time,repeat_days:[]}); return {date:this._niceDate(date),time}; },
@@ -13137,6 +13177,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.170', date:'Aug 27, 2026', major:true, notes:[
+      'Tasks you added by voice were never saved \u2014 they showed up, then vanished on reload. Fixed, and any task you add by voice from now on persists properly.',
+      'The no-key half of the assistant is much bigger: 31 commands. It can now tick tasks off, complete missions, and answer questions about your own data \u2014 water, weight, sleep, calories, money, what\u2019s on today or tomorrow, missions left. It also copes with how people actually talk (\u201chey, could you log 500ml of water for me\u201d).',
+    ]},
     {version:'v11.169', date:'Aug 27, 2026', major:true, notes:[
       'The voice assistant is back, and split in two. Eighteen commands \u2014 logging training, food, sleep, water, weight, money and notes, adding tasks and missions, scheduling, opening pages, reading your day back \u2014 run on this device and need no API key at all. Open questions go to your AI provider. The voice page now lists both, so you can see exactly what works with nothing connected.',
     ]},
