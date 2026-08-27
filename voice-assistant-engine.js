@@ -442,12 +442,11 @@
   var CLOSE_YES = /^(?:yes|yeah|yep|yup|sure|ok(?:ay)?|please|actually|one more|there is|hold on|wait)\b/i;
   function closeOut(host) {
     if (!host.followUp) return;
-    // firstName() falls back to "there" when no name is set — fine mid-sentence, but
-    // "anything else today, there?" is not a thing anyone says. Drop it instead.
-    var n = host.firstName && host.firstName();
-    if (!n || /^there$/i.test(n)) n = '';
+    // Deliberately not firstName(): it takes the first word of the account name, which is
+    // a title ("Mr") as often as it is a name, and hearing your own name said wrong is worse
+    // than not hearing it at all. A fixed address can't be got wrong.
     AWAIT_CLOSE = true;
-    host.followUp('Is that all I can do for you today' + (n ? ', ' + n : '') + '?');
+    host.followUp('Is that all I can do for you today, sir?');
   }
   var ackAt = 0;
   function nextAck() { var a = ACKS[ackAt % ACKS.length]; ackAt++; return a; }

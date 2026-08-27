@@ -371,11 +371,10 @@ t('manifest declares both tiers with needsKey set', async()=>{
 // Every action rule ends by asking whether there is anything else, by name; queries and
 // the off switch must not. The follow-up rides its own host channel, so `last()` still
 // reads the confirmation.
-t('a logged action is followed by the close-out question, by name', async()=>{ const h=host();
+t('a logged action is followed by the close-out question', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 30 minutes of running',h);
   if(followUps.length!==1) throw new Error('expected one follow-up, got '+JSON.stringify(followUps));
-  has(followUps[0],'is that all i can do for you today');
-  has(followUps[0],'Sam');
+  has(followUps[0],'is that all i can do for you today, sir?');
   has(last(),'Running'); });
 t('a query is not followed by the close-out question', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('What tasks do I have left?',h);
@@ -410,11 +409,11 @@ t('confirming a guessed workout also gets the close-out', async()=>{ const h=hos
   await VA.handle('yes',h);
   if(!call('logWorkout')) throw new Error('confirmation did not log');
   if(followUps.length!==1) throw new Error('expected the close-out after confirming'); });
-t('the close-out drops the name when none is set', async()=>{ const h=host();
-  h.firstName=()=>'there';
+t('the close-out never uses the account name', async()=>{ const h=host();
+  h.firstName=()=>'Mr';
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
-  if(/there/i.test(followUps[0])) throw new Error('said "there" as a name: '+followUps[0]);
-  has(followUps[0],'is that all i can do for you today?'); });
+  if(/\bMr\b|\bSam\b|\bthere\b/i.test(followUps[0])) throw new Error('used the account name: '+followUps[0]);
+  has(followUps[0],'is that all i can do for you today, sir?'); });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
