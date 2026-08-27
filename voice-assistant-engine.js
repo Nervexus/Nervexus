@@ -147,8 +147,20 @@
       run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addMission(cap(t)); return 'I’ve added the mission “' + t + '” for you.'; } },
 
     { id:'remember', acts:true, label:'Remember a fact', say:'"Remember that my gym closes at ten"',
-      re:/^(?:remember|note|keep in mind)\s+(?:that\s+)?(.+?)[.?!]*$/i,
-      run:function (m, host) { host.tools.addMemory(m[1].trim()); return 'Noted — I’ll remember that ' + m[1].trim() + '.'; } },
+      /* "down" is part of the verb — without it "note down my thoughts" stored the fact as
+         "down my thoughts". */
+      re:/^(?:remember|note down|note|jot down|write down|keep in mind)\s+(?:that\s+)?(.+?)[.?!]*$/i,
+      run:function (m, host) {
+        var fact = m[1].trim(); if (!fact) return null;
+        /* This rule sits above the workout one, so "note down 30 minutes of cycling" was
+           being filed as a memory rather than logged. A quantity with a unit attached is a
+           log, not a fact worth remembering — decline and let the right rule have it. */
+        if (/\d+\s*(?:mins?|minutes?|hrs?|hours?|kgs?|kilos?|kilograms?|lbs?|pounds?|ml|l\b|litres?|liters?|sets?|reps?|k?cals?|calories)\b/i.test(fact)) return null;
+        host.tools.addMemory(fact);
+        // Colon, not "remember that" — the latter only reads correctly for facts phrased as
+        // a clause, and comes out as "I'll remember that my thoughts" for anything else.
+        return 'Noted — I’ll remember: ' + fact + '.';
+      } },
 
     { id:'schedule', acts:true, label:'Schedule an event', say:'"Schedule a dentist appointment on Friday at 3pm"',
       re:/^(?:schedule|book|put in|add)\s+(?:a\s+|an\s+)?(.+?)\s+(?:on|for|at)\s+(.+?)[.?!]*$/i,
@@ -293,7 +305,18 @@
          to my fitness log" at least as often, and it matched nothing at all. Safe here
          because every specific "add X" rule (task, mission, note, water) sits above this
          one and claims its own utterance first. */
-      re:/^(?:log|add|record|put down|put)\s+(?:my\s+)?(.+?)[.?!]*$/i,
+      /* Every way of saying "record this" that people actually use. Started as "log" only,
+         which missed "add 30 minutes of cycling" entirely.
+
+         Safe despite the breadth, for two reasons. Every specific rule — add a task, add a
+         mission, add a note, log water — sits above this one and claims its own utterance
+         first. And this rule declines unless it finds a duration, a set count or a weight,
+         so "put the kettle on" falls through rather than logging nonsense.
+
+         The past-tense forms overlap with completeTask ("finished the shopping"), which is
+         also above this rule and declines when no such task exists — so "finished 30
+         minutes of cycling" tries the task list, misses, and lands here. */
+      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i\s+)?(?:just\s+)?(?:did|done|finished|completed))\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1]);
         // "<exercise> N sets of M at W kg" | "N minutes of <exercise>" | "<exercise> for N minutes"

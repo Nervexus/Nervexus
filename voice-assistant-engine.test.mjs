@@ -133,6 +133,29 @@ t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
 
+// ---- every way of saying "record this" ----
+t('all eighteen verb forms log a workout', async()=>{
+  const forms=['log','logged','logging','add','added','record','recorded','put down','put in','put',
+               'track','tracked','enter','mark','chuck in','stick in','i did','i just did'];
+  for(const v of forms){ const h=host();
+    await VA.handle(v+' 30 minutes of cycling',h);
+    const c=call('logWorkout');
+    if(!c) throw new Error('"'+v+'" did not log: '+last());
+    eq([c[1],c[2]],['Cycling',30],'verb "'+v+'"'); } });
+t('the broad verbs still decline when there is nothing to log', async()=>{
+  for(const say of ['put the kettle on','did you see that','mark this as important']){
+    const h=host(); await VA.handle(say,h);
+    if(call('logWorkout')) throw new Error('"'+say+'" logged a workout'); } });
+t('"note down 30 minutes of cycling" is a workout, not a memory', async()=>{ const h=host();
+  await VA.handle('note down 30 minutes of cycling',h);
+  const c=call('logWorkout'); if(!c) throw new Error('not logged: '+last());
+  eq([c[1],c[2]],['Cycling',30]);
+  if(call('addMemory')) throw new Error('stored it as a memory instead'); });
+t('"note down my thoughts" keeps the fact clean and reads properly', async()=>{ const h=host();
+  await VA.handle('note down my thoughts',h);
+  eq(call('addMemory'),['addMemory','my thoughts'],'"down" must not end up in the fact');
+  if(/remember that my thoughts/i.test(last())) throw new Error('ungrammatical reply: '+last()); });
+
 // ---- every line from the 21:22 transcript, verbatim ----
 t('"add 30 minutes of cycling to my fitness log"', async()=>{ const h=host();
   await VA.handle('add 30 minutes of cycling to my fitness log',h);
