@@ -8499,7 +8499,7 @@
                      the same pan/zoom transform the constellation uses. pointer-events:none so
                      dragging still grabs the map underneath it. -->
                 <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
-                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO PAN · SCROLL TO ZOOM · DOUBLE-CLICK TO RESET</div>
+                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO ORBIT · SCROLL TO FLY · DOUBLE-CLICK TO RESET</div>
               </div>
               <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
@@ -9044,7 +9044,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
-const NOTIF_BUILD_VERSION = '2026.08.26-153 · v11.153 map-navigable';
+const NOTIF_BUILD_VERSION = '2026.08.27-154 · v11.154 system-view';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11513,7 +11513,15 @@ activities: this._mergeShipLog(s.activities),
     if(!mount || !mount.clientWidth){ if(C.isMounted()) this._unmountConstellation(); return; }
     const PD=this._pd(); if(!PD) return;
     const nodes=[];
-    (PD.AI_PROVIDERS||[]).forEach(p=>{ const c=this._provCfg(p.id); nodes.push({id:p.id, label:p.name, cat:'ai', on:!!(c.on && c.saved)}); });
+    // Usage is the same 24h figure the provider cards show, formatted here once and passed
+    // through, so the orb can never disagree with the card below it. Request count also
+    // drives orb size, which is why it goes across as a number as well as a string.
+    (PD.AI_PROVIDERS||[]).forEach(p=>{
+      const c=this._provCfg(p.id); const u=this._usage(p.id);
+      nodes.push({ id:p.id, label:p.name, cat:'ai', on:!!(c.on && c.saved),
+        reqs:u.hasData?(this.state.usageLog||[]).filter(r=>r.provider===p.id && r.ts>=Date.now()-86400000).length:0,
+        usage:u.hasData?(u.reqs+' req · '+u.tokens+' tok · '+u.cost):'' });
+    });
     (PD.INTEL_SOURCES||[]).forEach(x=>{ nodes.push({id:'intel:'+x.id, label:x.name, cat:'intel', on:!!this._intelCfg(x.id).on}); });
     (PD.NEWS_SOURCES||[]).forEach(x=>{ const c=this._provCfg(x.id); nodes.push({id:'news:'+x.id, label:x.name, cat:'news', on:!!(c.on && c.saved)}); });
     if(!C.isMounted()){
@@ -11541,8 +11549,14 @@ activities: this._mergeShipLog(s.activities),
   _placeConstellationOrb(){
     const C=window.ProviderConstellation, el=this.root && this.root.querySelector('[data-constellation-orb]');
     if(!C || !el || !C.isMounted()) return;
-    const v=C.getView();
-    el.style.transform='translate('+v.x+'px,'+v.y+'px) scale('+v.k+')';
+    // getView reports where the world origin projects to this frame; the element is anchored
+    // at the panel centre, so we offset by the difference and scale by the perspective factor.
+    const v=C.getView(), host=el.parentElement;
+    if(!host) return;
+    const dx=v.x-host.clientWidth/2, dy=v.y-host.clientHeight/2;
+    const sc=Math.max(0.05, v.k * 0.78);
+    el.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+sc.toFixed(3)+')';
+    el.style.opacity = v.k>0 ? '1' : '0';
   }
   _unmountConstellation(){
     if(this._constOrbRaf){ cancelAnimationFrame(this._constOrbRaf); this._constOrbRaf=null; }
@@ -13075,6 +13089,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]} — notes are short, plain, user-facing.
   _changelog(){ return [
+    {version:'v11.154', date:'Aug 27, 2026', major:true, notes:[
+      'The Connection Map is a place now, not a picture. Providers sit at real depths around the core, so dragging orbits the camera and the wheel flies you in and out rather than scaling a flat diagram. The whole field drifts slowly on its own and every provider creeps along its own orbit, so nothing is ever still.',
+      'Providers are orbs with label pills, and each AI provider carries its own usage \u2014 requests, tokens and estimated cost for the last 24 hours, the same figures the card below shows. Orb size is driven by request volume, so the keys doing real work are visibly the largest objects in the field. A provider with no usage has no usage line rather than a made-up one.',
+      'Labels resolve by depth: the map names what is in front of you and lets whatever sits behind it stay an orb until you move. Pushing labels apart would never settle in a field that is always drifting.',
+    ]},
     {version:'v11.153', date:'Aug 26, 2026', major:true, notes:[
       'You can move around inside the Connection Map now. Drag to pan, scroll to zoom \u2014 zoom holds whatever is under the pointer in place, so you can lean into a cluster rather than watching it slide away \u2014 and double-click to snap back. A drag that happens to finish on a node no longer counts as clicking it.',
       'The core is the real voice-assistant orb, not a lookalike. The same object from the voice screen sits at the centre of the map and moves and scales with everything else, in whatever colours your current raiment uses.',
