@@ -8707,18 +8707,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-if value="{{ isProvRoute }}" hint-placeholder-val="{{ false }}">
               <div>
                 <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-                  <div><div style="font-size:14px; font-weight:700; color:#eef0f2;">AI Routing &amp; Failover</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">Default <b style="color:#F4F4F5;">{{ aiDefaultName }}</b> &middot; Backup <b style="color:#e8b45a;">{{ aiBackupName }}</b></div></div>
+                  <div><div style="font-size:14px; font-weight:700; color:#eef0f2;">AI Routing &amp; Failover</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">Default <b style="color:#F4F4F5;">{{ aiDefaultName }}</b> &middot; Backup <b style="color:#e8b45a;">{{ aiBackupName }}</b> &middot; each feature below can override both</div></div>
                   <div style="display:flex; align-items:center; gap:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce;">AUTOMATIC FAILOVER</span><div onClick="{{ toggleFailover }}" style="width:44px; height:24px; border-radius:14px; background:{{ failBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ failPos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:8px;">
                   <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:11px 12px; border:1px solid rgba(255,255,255,0.18); border-radius:12px; background:rgba(255,255,255,0.04); margin-bottom:2px;">
                     <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#FFFFFF; width:100%; margin-bottom:2px;">FAILOVER PRIORITY &middot; auto-switch on outage</span>
-                    <sc-for list="{{ failChain }}" as="f" hint-placeholder-count="3"><span style="display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(255,255,255,0.1); border-radius:9px; padding:5px 9px; background:rgba(255,255,255,0.03);"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78;">{{ f.rank }}</span><span style="width:20px; height:20px; border-radius:6px; background:{{ f.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:7.5px; font-weight:700;">{{ f.mark }}</span><span style="font-size:11.5px; color:#dcdce0; font-weight:600;">{{ f.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:{{ f.roleColor }};">{{ f.role }}</span></span></sc-for>
+                    <sc-for list="{{ failChain }}" as="f" hint-placeholder-count="3"><span style="display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(255,255,255,0.1); border-radius:9px; padding:5px 9px; background:rgba(255,255,255,0.03);"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78;">{{ f.rank }}</span><span style="width:20px; height:20px; border-radius:6px; background:{{ f.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:7.5px; font-weight:700;">{{ f.mark }}</span><span style="font-size:11.5px; color:#dcdce0; font-weight:600;">{{ f.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:{{ f.roleColor }};">{{ f.role }}</span><sc-if value="{{ f.note }}" hint-placeholder-val="{{ false }}"><span title="{{ f.note }}" style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#ffb3ba;">&#9888; PAUSED</span></sc-if></span></sc-for>
                   </div>
                   <sc-for list="{{ routingRows }}" as="r" hint-placeholder-count="8">
                     <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 12px; border:1px solid rgba(255,255,255,0.07); border-radius:12px; background:rgba(255,255,255,0.02);">
-                      <span style="width:150px; flex:0 0 150px; display:flex; align-items:center; gap:8px; font-size:12.5px; color:#dcdce0; font-weight:600;"><span style="color:#FFFFFF;">{{ r.glyph }}</span>{{ r.label }}</span>
-                      <div style="flex:1; display:flex; gap:6px; flex-wrap:wrap; min-width:0;"><sc-for list="{{ r.options }}" as="o" hint-placeholder-count="3"><span onClick="{{ o.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ o.oc }}; border:1px solid {{ o.ob }}; background:{{ o.obg }}; border-radius:7px; padding:5px 9px; cursor:pointer;">{{ o.name }}</span></sc-for></div>
+                      <span style="width:150px; flex:0 0 150px; display:flex; flex-direction:column; gap:2px; font-size:12.5px; color:#dcdce0; font-weight:600;">
+                        <span style="display:flex; align-items:center; gap:8px;"><span style="color:#FFFFFF;">{{ r.glyph }}</span>{{ r.label }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; font-weight:400; color:#6f6f78;">&rarr; {{ r.currentName }}</span>
+                      </span>
+                      <div style="flex:1; display:flex; flex-direction:column; gap:5px; min-width:0;">
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;"><sc-for list="{{ r.options }}" as="o" hint-placeholder-count="3"><span onClick="{{ o.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ o.oc }}; border:1px solid {{ o.ob }}; background:{{ o.obg }}; border-radius:7px; padding:5px 9px; cursor:pointer;">{{ o.name }}</span></sc-for></div>
+                        <sc-if value="{{ r.overridden }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#ffd66b;">&#9888; {{ r.overrideNote }}</span></sc-if>
+                      </div>
                     </div>
                   </sc-for>
                 </div>
@@ -9102,7 +9108,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-166 · v11.166 voice-stripped';
+const NOTIF_BUILD_VERSION = '2026.08.27-167 · v11.167 ai-centre-panels';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10027,7 +10033,7 @@ activities: this._mergeShipLog(s.activities),
   _extractJSONArray(t){ try{ const a=t.indexOf('['), b=t.lastIndexOf(']'); if(a<0||b<0) return null; return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
   async generateBriefingAI(){ const PD=this._pd(); if(!PD||!window.claude){ this.setState({aiBriefErr:'AI provider unavailable in this environment'}); return; } this.setState({aiBriefLoading:true,aiBriefErr:''}); const enabled=PD.INTEL_SOURCES.filter(s=>this._intelCfg(s.id).on).map(s=>s.name); const provId=(this.state.prefs.routing&&this.state.prefs.routing.briefings)||this.state.prefs.aiDefault||'anthropic'; const provName=(PD.byId(provId)||{}).name||provId; const nm=((this.state.account&&this.state.account.name)||'').trim()||'the principal'; const sys='You are an elite executive intelligence analyst preparing a private daily briefing for a CEO, investor and entrepreneur. Concise, factual, non-sensational, premium tone. Return ONLY valid minified JSON, no markdown fences.'; const shape='{"outlook":"1-2 sentence global outlook","sentiment":"Bullish|Neutral|Bearish","summary":{"bigStory":"","moneyMoving":"","risk":"","opportunity":""},"sections":[{"title":"Global Money News","items":[{"tag":"EQUITIES","head":"headline","sum":"1-2 sentence analysis"}]}],"takeaways":["",""]}'; const prompt='Generate the Executive Intelligence Briefing for '+nm+'. Enabled intelligence sources: '+(enabled.join(', ')||'general knowledge')+'. Cover where relevant: '+PD.BRIEFING_CATEGORIES.join(', ')+'. Produce 4 to 6 sections, each with 2 to 4 items and short uppercase tags, plus 3 to 5 key takeaways. Return JSON exactly matching this shape: '+shape; try{ const raw=await window.claude.complete({role:'briefings',system:sys,messages:[{role:'user',content:prompt}],max_tokens:4000}); const j=this._extractJSON(raw); if(j&&j.sections){ this.setState({aiBrief:j,aiBriefLoading:false,aiBriefProvider:(window.claude?'Claude · live':provName),aiBriefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),briefTab:'exec',scene:'briefing'}); } else this.setState({aiBriefLoading:false,aiBriefErr:'Could not parse the AI response — try again.'}); }catch(e){ this.setState({aiBriefLoading:false,aiBriefErr:(e&&e.message)||'Generation failed'}); } }
   clearAIBrief(){ this.setState({aiBrief:null,aiBriefErr:''}); }
-  _providerVals(){ const PD=this._pd(); const S=this.state; if(!PD) return { aiProviderCards:[], intelCards:[], intelCatChips:[], routingRows:[], failoverProviders:[], provStats:[], isProvAI:true, isProvIntel:false, provSearch:'', aiDefaultName:'—', aiBackupName:'—', failoverOn:false, setProvViewAI:()=>{}, setProvViewIntel:()=>{}, onProvSearch:()=>{}, toggleFailover:()=>{}, genBriefing:()=>{}, aiBriefLoading:false, aiBriefErr:'', hasAIBrief:false, clearAIBrief:()=>{}, failBg:'rgba(255,255,255,0.14)', failPos:'2px' };
+  _providerVals(){ const PD=this._pd(); const S=this.state; if(!PD || !window.AIGateway || !window.AIGateway.isConfigured()) return { aiProviderCards:[], intelCards:[], intelCatChips:[], routingRows:[], failChain:[], provStats:[], isProvAI:true, isProvIntel:false, provSearch:'', aiDefaultName:'—', aiBackupName:'—', failoverOn:false, setProvViewAI:()=>{}, setProvViewIntel:()=>{}, onProvSearch:()=>{}, toggleFailover:()=>{}, genBriefing:()=>{}, aiBriefLoading:false, aiBriefErr:'', hasAIBrief:false, clearAIBrief:()=>{}, failBg:'rgba(255,255,255,0.14)', failPos:'2px' };
     const q=(S.provSearch||'').trim().toLowerCase();
     const stColor=(st)=> st==='ok'?'#2fce86': (st==='testing'||st==='connecting'||st==='saving')?'#e8b45a': st==='error'?'#ff5563':'#6f6f78';
     const stLabel=(st,saved)=> st==='ok'?'CONNECTED': (st==='testing'||st==='connecting'||st==='saving')?'CONNECTING\u2026': st==='error'?'ERROR': saved?'READY':'NOT CONNECTED';
@@ -10066,14 +10072,37 @@ activities: this._mergeShipLog(s.activities),
     }; });
     const intelCatChips=(PD.INTEL_CATEGORIES||[]).map(c=>({ id:c.id, label:c.label, set:()=>this.setIntelCat(c.id), cc:curIntelCat===c.id?'#111114':'#c8c8ce', cb:curIntelCat===c.id?'#FFFFFF':'rgba(255,255,255,0.14)', cbg:curIntelCat===c.id?'#FFFFFF':'rgba(255,255,255,0.03)' }));
     const provsOn=PD.AI_PROVIDERS.filter(p=>this._provCfg(p.id).on);
-    const liveAll=PD.AI_PROVIDERS.filter(p=>p.live);
-    const curLive=this._pickLiveProvider();
-    const liveProviderChips=liveAll.map(p=>{ const has=this._provCfg(p.id).saved; const active=curLive===p.id; return { label:p.name+(p.freeTier?' (Free)':''), set:()=>{ if(has) this.setLiveProvider(p.id); }, c:active?'#F4F4F5':(has?'#9a9aa2':'#54545c'), b:active?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:active?'rgba(255,255,255,0.16)':'transparent', op:has?'1':'0.45' }; });
-    const noLiveProviders=!liveAll.some(p=>this._provCfg(p.id).saved);
-    const routingRows=PD.AI_FEATURES.map(f=>{ const cur=(S.prefs.routing||{})[f.id]||S.prefs.aiDefault; return { id:f.id, label:f.label, glyph:f.glyph, currentName:(PD.byId(cur)||{}).name||cur, options:provsOn.map(p=>({ id:p.id, name:p.name, active:p.id===cur, set:()=>this.setRouting(f.id,p.id), oc:p.id===cur?'#F4F4F5':'#9a9aa2', ob:p.id===cur?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', obg:p.id===cur?'rgba(255,255,255,0.16)':'transparent' })) }; });
-    const failoverProviders=provsOn.map((p,i)=>({ name:p.name, mark:p.mark, color:p.color, rank:i+1, isDefault:S.prefs.aiDefault===p.id, isBackup:S.prefs.aiBackup===p.id }));
-    const _order=[]; if(S.prefs.aiDefault&&provsOn.some(p=>p.id===S.prefs.aiDefault)) _order.push(S.prefs.aiDefault); if(S.prefs.aiBackup&&provsOn.some(p=>p.id===S.prefs.aiBackup)&&_order.indexOf(S.prefs.aiBackup)<0) _order.push(S.prefs.aiBackup); provsOn.forEach(p=>{ if(_order.indexOf(p.id)<0) _order.push(p.id); });
-    const failChain=_order.map((id,i)=>{ const p=PD.byId(id)||{}; return { name:p.name, mark:p.mark, color:p.color, rank:'#'+(i+1), role:i===0?'PRIMARY':i===1?'BACKUP':'TIER '+(i+1), roleColor:i===0?'#F4F4F5':i===1?'#e8b45a':'#8a8a92' }; });
+    // Both panels below read the router itself rather than re-deriving what it "should"
+    // do from the raw preferences. That re-derivation is exactly how the old Routing panel
+    // came to label a feature with a provider it was not using.
+    //
+    // `currentName` is the provider that will actually serve the role right now.
+    // `overridden` marks the case where you picked one and something else will run anyway
+    // — the pick is disconnected, switched off, or benched after repeated failures —
+    // so the panel can say so instead of quietly showing your pick as if it were live.
+    const G=window.AIGateway;
+    const nameOf=(id)=>(PD.byId(id)||{}).name||id||'—';
+    const routingRows=PD.AI_FEATURES.map(f=>{
+      const picked=(S.prefs.routing||{})[f.id]||'';
+      const eff=G.resolve(f.id);
+      return { id:f.id, label:f.label, glyph:f.glyph,
+        currentName: eff?nameOf(eff):'None connected',
+        overridden: !!(picked && eff && picked!==eff),
+        overrideNote: (picked && eff && picked!==eff) ? ('you picked '+nameOf(picked)+' — unavailable, using '+nameOf(eff)) : '',
+        options:provsOn.map(p=>({ id:p.id, name:p.name, active:p.id===(picked||eff), set:()=>this.setRouting(f.id,p.id),
+          oc:p.id===(picked||eff)?'#F4F4F5':'#9a9aa2', ob:p.id===(picked||eff)?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
+          obg:p.id===(picked||eff)?'rgba(255,255,255,0.16)':'transparent' })) };
+    });
+    // The chain is the router's own candidate order, benched providers included at the
+    // end, so what is drawn is what would actually be tried.
+    const failChain=G.chain('voice',{includeBenched:true}).map((id,i)=>{
+      const p=PD.byId(id)||{}; const h=G.health(id);
+      return { name:p.name, mark:p.mark, color:p.color, rank:'#'+(i+1),
+        role:i===0?'PRIMARY':i===1?'BACKUP':'TIER '+(i+1),
+        roleColor:i===0?'#F4F4F5':i===1?'#e8b45a':'#8a8a92',
+        healthy:h.healthy,
+        note:h.healthy?'':'paused after repeated errors' };
+    });
     const nAI=PD.AI_PROVIDERS.filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length, nNews=(PD.NEWS_SOURCES||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length;
     const view=S.provView||'ai';
     return {
@@ -10087,11 +10116,10 @@ activities: this._mergeShipLog(s.activities),
       provViewRTc:view==='route'?'#F4F4F5':'#9a9aa2', provViewRTbg:view==='route'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewRTbd:view==='route'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provViewINc:view==='intel'?'#F4F4F5':'#9a9aa2', provViewINbg:view==='intel'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewINbd:view==='intel'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provSearch:S.provSearch||'', onProvSearch:(e)=>this.setProvSearch(e),
-      aiProviderCards:aiCards, routingRows:routingRows, failoverProviders:failoverProviders, failChain:failChain,
+      aiProviderCards:aiCards, routingRows:routingRows, failChain:failChain,
       intelCards, intelCatChips, intelCatActive:curIntelCat,
       aiDefaultName:(PD.byId(S.prefs.aiDefault)||{}).name||'—', aiBackupName:(PD.byId(S.prefs.aiBackup)||{}).name||'—',
       failoverOn:!!S.prefs.failover, toggleFailover:()=>this.toggleFailover(), failBg:S.prefs.failover?'#FFFFFF':'rgba(255,255,255,0.14)', failPos:S.prefs.failover?'22px':'2px',
-      liveProviderChips, noLiveProviders,
       newsCatChips:(PD.NEWS_CATEGORIES||[]).map(c=>{ const active=(S.newsCat||'all')===c.id; return { label:c.label, set:()=>this.setState({newsCat:c.id}), cc:active?'#111114':'#c8c8ce', cb:active?'#FFFFFF':'rgba(255,255,255,0.14)', cbg:active?'#FFFFFF':'rgba(255,255,255,0.03)' }; }),
       newsSourceCards:(PD.NEWS_SOURCES||[]).filter(p=>(!q||p.name.toLowerCase().indexOf(q)>=0||p.id.indexOf(q)>=0) && ((S.newsCat||'all')==='all'||p.category===(S.newsCat||'all'))).map(p=>{ const c=this._provCfg(p.id); const st=c.status||'idle'; const exp=!!(S.provExpanded||{})[p.id];
         const tierColor=p.tier==='free'?'#2fce86':p.tier==='freemium'?'#e8b45a':'#ff5563';
@@ -11217,7 +11245,6 @@ activities: this._mergeShipLog(s.activities),
   // Which provider a live query will actually use, for labelling only — the gateway
   // does the choosing, so the label cannot disagree with the call any more.
   _pickLiveProvider(){ return window.AIGateway.resolve('market',{live:true}); }
-  setLiveProvider(id){ this.setPref('liveProvider',id); }
   setSafetyQuery(e){ this.setState({safetyQuery:e.target.value}); }
   async runSafetyCheck(){ const q=(this.state.safetyQuery||'').trim(); if(!q) return; await this._safetyLookup(q); }
   async _safetyLookup(query){
@@ -13021,6 +13048,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.167', date:'Aug 27, 2026', notes:[
+      'The AI centre now shows which provider each feature will really use, warns you when a pick is unavailable, and marks a provider paused after repeated errors instead of dropping it from the list.',
+    ]},
     {version:'v11.166', date:'Aug 27, 2026', major:true, notes:[
       'The voice assistant is down to the orb, the microphone and the speech for now \u2014 its engine has been removed and is being rebuilt. It will hear you and reply out loud, but it cannot log, open or schedule anything yet.',
     ]},

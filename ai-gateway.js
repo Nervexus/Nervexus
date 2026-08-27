@@ -76,22 +76,27 @@
 
   /* Ordered candidate ids for a role. `live` narrows to providers that can search the
      web. Returns [] when nothing qualifies — the caller decides what to say about it. */
-  function candidates(role, live) {
+  /* Preference order for a role, before any connected/healthy filtering. */
+  function order(role, live) {
     if (!H) return [];
     var all = H.providers() || [];
     var pool = live ? all.filter(function (p) { return !!p.live; }) : all;
     var has = function (id) { return !!id && pool.some(function (p) { return p.id === id; }); };
 
-    var order = [];
+    var out = [];
     var roleId = (H.routing() || {})[role];
-    if (has(roleId)) order.push(roleId);
+    if (has(roleId)) out.push(roleId);
     var def = H.defaultId();
-    if (has(def) && order.indexOf(def) < 0) order.push(def);
+    if (has(def) && out.indexOf(def) < 0) out.push(def);
     var bk = H.backupId();
-    if (has(bk) && order.indexOf(bk) < 0) order.push(bk);
-    pool.forEach(function (p) { if (order.indexOf(p.id) < 0) order.push(p.id); });
+    if (has(bk) && out.indexOf(bk) < 0) out.push(bk);
+    pool.forEach(function (p) { if (out.indexOf(p.id) < 0) out.push(p.id); });
+    return out;
+  }
 
-    var open = order.filter(connected);
+  function candidates(role, live) {
+    if (!H) return [];
+    var open = order(role, live).filter(connected);
     var fit = open.filter(healthy);
     // Benched providers are a last resort, never a reason to report nothing connected.
     return fit.length ? fit : open;
@@ -202,6 +207,23 @@
     resolve: function (role, opts) {
       var list = candidates(role, !!(opts && opts.live));
       return list.length ? list[0] : null;
+    },
+
+    /* The ordered fallback chain for a role — what the AI centre's failover panel shows.
+       Without this the panel could only guess from default/backup, which is how it came
+       to display an order the router did not actually use.
+
+       opts.includeBenched keeps providers that are currently sidelined for repeated
+       failures, so the panel can show them greyed and labelled rather than having them
+       silently disappear from the list with no explanation. Display only — it does not
+       change what ask() will try. */
+    chain: function (role, opts) {
+      var live = !!(opts && opts.live);
+      if (!(opts && opts.includeBenched)) return candidates(role, live).slice();
+      var fit = candidates(role, live);
+      var all = order(role, live).filter(connected);
+      // Healthy ones first, in routing order, then the benched ones behind them.
+      return fit.concat(all.filter(function (id) { return fit.indexOf(id) < 0; }));
     },
     available: function (opts) { return candidates('', !!(opts && opts.live)).length > 0; },
 

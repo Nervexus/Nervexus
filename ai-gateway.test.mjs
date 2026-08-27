@@ -98,6 +98,28 @@ t('resolve() names the provider a role will use', async()=>{
   G.clearHealth(); G.configure(host({routing:{market:'openai'}, def:'anthropic'}));
   eq(G.resolve('market'),'openai'); eq(G.resolve('voice'),'anthropic'); eq(G.resolve('voice',{live:true}),'google');
 });
+t('chain() is the real fallback order, role first', async()=>{
+  G.clearHealth(); G.configure(host({routing:{market:'openai'}, def:'anthropic', bk:'google'}));
+  eq(G.chain('market'),['openai','anthropic','google']);
+  eq(G.chain('voice'),['anthropic','google','openai']);
+});
+t('chain() omits disconnected and narrows on live', async()=>{
+  G.clearHealth(); G.configure(host({def:'anthropic', cfg:{anthropic:{saved:1,on:true},google:{saved:1,on:true},openai:{saved:0}}}));
+  eq(G.chain('voice'),['anthropic','google']);
+  eq(G.chain('voice',{live:true}),['google']);
+});
+t('chain() drops a benched provider to last resort', async()=>{
+  calls=[]; G.clearHealth(); G.configure(host({def:'anthropic', bk:'openai', fail:['anthropic']}));
+  for(let i=0;i<3;i++) await G.ask('voice','x');
+  if(G.chain('voice')[0]==='anthropic') throw new Error('benched provider still leads the chain');
+});
+t('chain({includeBenched}) keeps a paused provider, behind the healthy ones', async()=>{
+  calls=[]; G.clearHealth(); G.configure(host({def:'anthropic', bk:'openai', fail:['anthropic']}));
+  for(let i=0;i<3;i++) await G.ask('voice','x');
+  eq(G.chain('voice'),['openai','google'],'routing chain excludes the benched one');
+  const shown=G.chain('voice',{includeBenched:true});
+  eq(shown,['openai','google','anthropic'],'display chain shows it last');
+});
 t('unconfigured gateway does not throw', async()=>{
   const g2={}; new Function('window', fs.readFileSync('/home/user/Nervexus/ai-gateway.js','utf8'))(g2);
   eq((await g2.AIGateway.ask('voice','hi')).code,'unconfigured');
