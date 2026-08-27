@@ -45,6 +45,14 @@
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
+  /* Browser speech recognition mishears "log" more than any other word in these
+     commands — "look", "lock", "logged", "blog", "vlog" all come back for it. Every one
+     of those silently loses a real command, so they are normalised to "log" before any
+     rule sees the text. Only at the very start of an utterance, where it can only be the
+     verb: "look at my log" must stay a question, not become "log at my log". */
+  var MISHEARD_LOG = /^(?:look|lock|logged|blog|vlog|lo|dog)\b(?=\s+(?:\d|my\s|a\s|an\s|some\s|twenty|thirty|forty|fifty|ten|five|two|three|four|six|seven|eight|nine|half))/i;
+  function fixVerb(t) { return t.replace(MISHEARD_LOG, 'log'); }
+
   /* People name the destination as well as the thing: "log 30 minutes of running ON MY
      TRAINING", "add a task to call the accountant TO MY LIST". The destination is already
      implied by the command, so in the extracted name it is noise — and left in, it comes
@@ -365,10 +373,20 @@
   var ackAt = 0;
   function nextAck() { var a = ACKS[ackAt % ACKS.length]; ackAt++; return a; }
 
-  function noAIReply(host) {
-    var examples = LOCAL.slice(0, 4).map(function (r) { return r.say.split(' · ')[0]; });
-    return 'I can’t answer that one without an AI provider connected — add a key in the AI centre. '
-         + 'I can still log, schedule and read things back to you: try ' + examples.slice(0, 2).join(' or ') + '.';
+  /* An utterance that opens like a question is genuinely something only a model can
+     answer; anything else that failed to match is far more likely to be a command she
+     misheard or a phrasing she does not know. Telling someone to go and buy an API key
+     because their microphone dropped a consonant is the wrong answer to the wrong
+     problem — and it was what she said to everything she could not parse. */
+  var QUESTIONY = /^(?:why|how|what|when|who|where|which|should|could|can|do|does|is|are|explain|tell me|help me|draft|write|summar|plan)\b/i;
+
+  function unmatchedReply(text, host) {
+    if (QUESTIONY.test(text)) {
+      return host.hasAI()
+        ? 'I couldn’t get an answer to that one just now.'
+        : 'That one needs an AI provider — there isn’t one connected yet. Everything I do on my own still works.';
+    }
+    return 'Sorry, I didn’t catch that. Say it again?';
   }
 
   // ---- dispatch -----------------------------------------------------------------
@@ -408,7 +426,7 @@
   }
 
   function handle(text, host) {
-    var t = tidy(String(text || '').trim());
+    var t = fixVerb(tidy(String(text || '').trim()));
     if (!t) return Promise.resolve();
 
     // Peek first so the acknowledgement lands BEFORE the work, not after it.
@@ -418,7 +436,7 @@
     var local = runLocal(t, host);
     if (local.handled) { host.speak(local.reply); return Promise.resolve(local.reply); }
 
-    if (!host.hasAI()) { host.speak(noAIReply(host)); return Promise.resolve(); }
+    if (!host.hasAI()) { host.speak(unmatchedReply(t, host)); return Promise.resolve(); }
 
     if (host.askStreamAndSpeak) return host.askStreamAndSpeak(t);
     host.say('…');

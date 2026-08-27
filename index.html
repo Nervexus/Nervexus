@@ -309,7 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
-<script src="voice-assistant-engine.js?v=7"></script>
+<script src="voice-assistant-engine.js?v=8"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=3"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9134,7 +9134,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-177 · v11.177 loura-reads-back-properly';
+const NOTIF_BUILD_VERSION = '2026.08.27-178 · v11.178 loura-hears-log';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13183,6 +13183,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.178', date:'Aug 27, 2026', notes:[
+      'Loura no longer loses commands when your microphone hears \u201clook\u201d or \u201clock\u201d instead of \u201clog\u201d.',
+      'She also stops telling you to buy an API key every time she simply mishears you \u2014 that answer is now saved for real questions, and a command she did not catch just gets \u201cSorry, I didn\u2019t catch that.\u201d',
+    ]},
     {version:'v11.177', date:'Aug 27, 2026', notes:[
       'Loura reads things back properly. Saying \u201clog 30 minutes of running on my training\u201d used to come back as \u201cI\u2019ve logged running on my training \u2014 30 min\u201d; it is now \u201cI\u2019ve logged 30 minutes of running on your fitness log for you.\u201d She also stops naming where something goes as if it were part of the thing itself.',
     ]},

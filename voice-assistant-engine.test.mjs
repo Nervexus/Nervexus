@@ -99,7 +99,8 @@ t('ticks a task off', async()=>{ const h=host(); await VA.handle('Mark call the 
   const c=call('completeTask'); has(c[1],'call the accountant'); has(last(),'ticked off'); });
 t('an unknown task falls through instead of lying', async()=>{ const h=host(false);
   await VA.handle('Mark buy a yacht as done',h);
-  has(last(),'AI centre','should reach the no-key AI message, not claim success'); });
+  has(last(),'didn’t catch that','a command she cannot fulfil is a miss, not a missing API key');
+  if(/ticked off|provider|API/i.test(last())) throw new Error('claimed success or blamed the key: '+last()); });
 t('completes a mission', async()=>{ const h=host(); await VA.handle('Complete my cold shower mission',h);
   has(last(),'Cold shower'); });
 
@@ -131,6 +132,19 @@ t('strips a wake word and politeness', async()=>{ const h=host();
 t('strips a bare please', async()=>{ const h=host();
   await VA.handle('Please open my fitness centre',h);
   eq(call('nav'),['nav','health']); });
+
+// ---- the recogniser mishears "log" constantly ----
+t('the exact mishearing from the test run: "look 30 minutes of running"', async()=>{ const h=host();
+  await VA.handle('hello can you look 30 minutes of running on my training log',h);
+  const c=call('logWorkout'); if(!c) throw new Error('still not recognised: '+last());
+  eq([c[1],c[2]],['Running',30]); });
+t('"lock" and "logged" are corrected too', async()=>{ let h=host();
+  await VA.handle('lock 500 ml of water',h); eq(call('logHydration'),['logHydration',500]);
+  h=host(); await VA.handle('logged 30 minutes of running',h);
+  const c=call('logWorkout'); eq([c[1],c[2]],['Running',30]); });
+t('"look at my training log" stays a question, not a log command', async()=>{ const h=host(false);
+  await VA.handle('look at my training log',h);
+  if(call('logWorkout')) throw new Error('turned a question into a workout'); });
 
 // ---- people name the destination as well as the thing ----
 t('the exact sentence that produced "logged running on my training"', async()=>{ const h=host();
@@ -199,9 +213,13 @@ t('"open the pod bay doors" is not a page and falls through', async()=>{ const h
   if(call('nav')) throw new Error('navigated somewhere invented'); });
 
 // ---- AI tier ----
-t('unmatched utterance with no key explains itself and does not throw', async()=>{ const h=host(false);
+t('a real question with no key names the provider as the reason', async()=>{ const h=host(false);
   await VA.handle('Why do my knees hurt after squats?',h);
-  has(spoken[0],'AI centre'); has(spoken[0],'still log'); });
+  has(last(),'AI provider'); });
+t('a misheard command is not blamed on the missing key', async()=>{ const h=host(false);
+  await VA.handle('flurgle the widget',h);
+  has(last(),'didn’t catch that');
+  if(/provider|API|key/i.test(last())) throw new Error('blamed the key for a parse miss: '+last()); });
 t('unmatched utterance with a key goes to the model', async()=>{ const h=host(true,'Because of load.');
   await VA.handle('Why do my knees hurt after squats?',h);
   has(spoken.join(' '),'Because of load.'); });
