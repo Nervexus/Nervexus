@@ -59,6 +59,21 @@
   .glare-card p{ font-size:15px; color:rgba(245,241,232,0.72); line-height:1.7; max-width:420px; margin:0 auto; }
   @media (max-width:640px){ .glare-card{ padding:48px 26px; } }
 
+  /* Loura — the voice core's own colours: black ground, cold white filament light, no gold
+     and no blue. Forces its own display because .glare-card is display:none until .active,
+     and that class belongs to the tab script. */
+  .loura-card{
+    display:flex !important; max-width:640px; margin:22px auto 0; min-height:280px;
+    border:1px solid rgba(238,240,242,0.16);
+    background:
+      radial-gradient(120% 90% at 50% 18%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 62%),
+      linear-gradient(160deg,#0A0A0B 0%,#000000 100%);
+  }
+  .loura-card .kicker{ color:rgba(238,240,242,0.5); }
+  .loura-card .glare-sheen{
+    background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.10) 48%, rgba(255,255,255,0.03) 58%, transparent 72%);
+  }
+
   /* Maison Élysée's real in-app theme is light cream + deep blue, not dark */
   /* Maison Éverpine — off-the-record, deep evergreen + ivory, ornate frame */
   .glare-card.everpine{ border:1px solid rgba(240,235,220,0.28); }
@@ -175,6 +190,18 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
           <h3>Maison Éverpine</h3>
           <p>Not documented.</p>
         </div>
+      </div>
+    </div>
+
+    <!-- Deliberately outside .raiment-panel: she is not a fourth raiment, and the tab script
+         only ever swaps .active between .raiment-card, so this is never hidden. -->
+    <div class="glare-card loura-card reveal">
+      <div class="glare-sheen"></div>
+      <div class="glare-card-body">
+        <span class="glare-glyph" style="color:#EEF0F2;">◉</span>
+        <div class="kicker">THE VOICE ITSELF</div>
+        <h3 style="color:#EEF0F2;">Loura</h3>
+        <p style="color:rgba(238,240,242,0.72);">The three above are how the Voice is dressed. Loura is the Voice. She listens, she waits, and she does not hover.</p>
       </div>
     </div>
   </div>

@@ -176,6 +176,42 @@ section{ position:relative; padding:120px 0; }
   font-size:17px; color:var(--muted); text-align:center; max-width:560px; margin:0 auto 80px; line-height:1.6;
 }
 
+/* ---- Loura band ----
+   A dark inset between the cream hero and the rest of the page. Its own colours rather than
+   the page tokens, which are all tuned for dark ink on light paper and invert badly. */
+.loura-band{ position:relative; overflow:hidden; background:#201C1A; padding:120px 0; }
+.loura-glow{
+  position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
+  width:760px; height:760px; border-radius:50%;
+  background:radial-gradient(circle, rgba(201,165,92,0.13) 0%, transparent 68%);
+  pointer-events:none;
+}
+.loura-inner{ position:relative; z-index:1; text-align:center; max-width:660px; margin:0 auto; }
+.loura-eyebrow{
+  font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px;
+  color:rgba(201,165,92,0.75); margin-bottom:22px;
+}
+.loura-name{
+  font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300;
+  font-size:clamp(52px,8vw,104px); line-height:1; letter-spacing:2px;
+  color:#F1EBE0; margin-bottom:26px;
+}
+.loura-band .crest-divider span{ background:rgba(201,165,92,0.55); }
+.loura-band .crest-divider i{ color:rgba(201,165,92,0.85); }
+.loura-lede{
+  font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
+  font-size:clamp(20px,2.6vw,27px); color:#DCD3C6; margin-bottom:38px;
+}
+.loura-lines p{ font-size:16px; line-height:2; color:rgba(228,220,208,0.62); }
+.loura-foot{
+  margin-top:38px; font-family:'JetBrains Mono',monospace;
+  font-size:11px; letter-spacing:3px; color:rgba(201,165,92,0.6);
+}
+@media (max-width:760px){
+  .loura-band{ padding:88px 0; }
+  .loura-lines p{ font-size:15px; line-height:1.9; }
+}
+
 /* ---- feature stack (sticky scroll-stacking cards) ---- */
 .stack-wrap{ position:relative; padding-bottom:24px; }
 .feature{
