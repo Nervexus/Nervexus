@@ -309,6 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="ai-gateway.js"></script>
+<script src="voice-assistant-engine.js?v=2"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=2"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -3484,6 +3485,34 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
             <sc-if value="{{ hasLiveTranscript }}" hint-placeholder-val="{{ false }}"><div style="margin-top:12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ vMuted }}; letter-spacing:.3px; max-width:520px; text-align:center;">“{{ vLiveTranscript }}”</div></sc-if>
           </div>
+        </div>
+        <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:{{ vMuted }};">&#9670; WITHOUT AN API KEY</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#7ec9a0;">{{ vaLocalCount }} &middot; always on</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:7px;">
+            <sc-for list="{{ vaLocal }}" as="c" hint-placeholder-count="6">
+              <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;">
+                <span style="width:170px; flex:0 0 170px; font-size:12.5px; color:{{ vInk2 }}; font-weight:600;">{{ c.label }}</span>
+                <span style="flex:1; min-width:0; font-size:11.5px; color:{{ vMuted }};">{{ c.example }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height:1px; background:{{ vLine2 }}; margin:16px 0 14px;"></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:{{ vMuted }};">&#9670; NEEDS AN API KEY</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ vaAIStatusC }};">{{ vaAIStatus }}</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:7px; opacity:{{ vaAIRowOpacity }};">
+            <sc-for list="{{ vaAI }}" as="c" hint-placeholder-count="4">
+              <div style="display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;">
+                <span style="width:170px; flex:0 0 170px; font-size:12.5px; color:{{ vInk2 }}; font-weight:600;">{{ c.label }}</span>
+                <span style="flex:1; min-width:0; font-size:11.5px; color:{{ vMuted }};">{{ c.example }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:12px; font-size:11px; color:{{ vMuted3 }}; line-height:1.5;">Everything above the line runs on this device against your own logged data. Below the line goes to whichever provider the AI centre routes Voice Assistant to.</div>
         </div>
         <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ vMuted2 }};">LIVE TRANSCRIPT</span><span onClick="{{ openConvoHistory }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ vMuted }}; cursor:pointer; border:1px solid {{ vLine2 }}; border-radius:8px; padding:5px 10px;" style-hover="{ color:'{{ vAccent }}' }">HISTORY</span></div>
@@ -9108,7 +9137,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-168 · v11.168 voice-fully-detached';
+const NOTIF_BUILD_VERSION = '2026.08.27-169 · v11.169 voice-assistant-rebuilt';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9333,7 +9362,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -10618,6 +10647,9 @@ activities: this._mergeShipLog(s.activities),
   // order — each one is awaited to completion before the next starts. _ttsStreamId lets
   // a barge-in (new voice command) invalidate an in-flight queue without racing it.
   _ttsStreamReset(){ this._ttsQueue=[]; this._ttsStreamId=(this._ttsStreamId||0)+1; }
+  // Enqueue one finished sentence and make sure the drain loop is running. Kicking
+  // _ttsDrain on every push is safe: it returns the in-flight promise if already going.
+  _ttsStreamPush(text){ if(!text||!text.trim()) return; (this._ttsQueue=this._ttsQueue||[]).push(text); this._ttsDrain(); }
   _ttsStreamStop(){
     this._ttsQueue=[]; this._ttsStreamId=(this._ttsStreamId||0)+1;
     if(this._elevenAudio){ try{ this._elevenAudio.pause(); }catch(e){} }
@@ -10974,27 +11006,90 @@ activities: this._mergeShipLog(s.activities),
     else window.SB.insert('custom_dashboards',{user_id:this.state.authUserId,name:'Default',layout}).then(r=>{ if(r&&r.data) this.setState({dashboardRowId:r.data.id}); });
   }
   // ===== Voice input =====
-  // The assistant has no brain right now, on purpose. voice-assistant-engine.js and its
-  // 17 tools were removed for the rebuild, so this page is the design plus microphone and
-  // speech only: your words are transcribed, logged to the conversation history, and
-  // answered with a spoken placeholder.
-  //
-  // It says so out loud rather than sitting silent — a mute orb reads as broken, and
-  // inventing a canned answer would be worse. Replace VOICE_NO_BRAIN when the new engine
-  // lands; nothing else here needs to change.
+  // Parsing and dispatch live in voice-assistant-engine.js. This is only the bridge:
+  // transcript in, host callbacks out.
   voiceCommand(raw){ if(this.state.prefs.assistantEnabled===false) return; const t=(raw||'').trim(); if(!t) return;
-    if(/^(?:ok(?:ay)?[, ]+)?(?:you can |please )?(?:turn|switch) ?off(?: the)?(?: voice)?(?: assistant)?\.?$|^(?:stop listening|go to sleep|that.?ll be all|shut (?:up|down))\.?$/i.test(t)){
-      this._logConvo('user',t); this.toggleAssistantEnabled(); return;
-    }
     this._logConvo('user',t);
     // Barge-in: a new utterance always interrupts whatever is being spoken.
     this._ttsStreamStop();
     if(this._elevenAudio && !this._elevenAudio.paused){ try{ this._elevenAudio.pause(); }catch(e){} }
     this.setState(s=>({vtx:[...s.vtx,{who:'YOU',text:t}],vInput:''}));
-    const reply=VOICE_NO_BRAIN;
-    this._lastAIReply=reply;
-    this.setState(s=>({vtx:[...s.vtx,{who:'AI',text:reply}]}));
-    this.speak(reply);   // speak() logs the assistant turn itself — do not log it here too
+    if(!window.VoiceAssistant){ this.speak('My command engine didn\u2019t load \u2014 try a full refresh.'); return; }
+    window.VoiceAssistant.handle(t, this._vaHost());
+  }
+  _vaTiers(){
+    const M=window.VoiceAssistant ? window.VoiceAssistant.manifest() : {local:[],ai:[]};
+    const on=!!(window.AIGateway && window.AIGateway.isConfigured() && window.AIGateway.available());
+    return {
+      vaLocal:M.local, vaAI:M.ai,
+      vaLocalCount:M.local.length+' commands', vaAICount:M.ai.length+' kinds of request',
+      vaAIOn:on,
+      vaAIStatus: on?'Provider connected':'No provider connected',
+      vaAIStatusC: on?'#7ec9a0':'#ffd66b',
+      vaAIRowOpacity: on?'1':'0.55',
+    };
+  }
+  // ===== Voice assistant bridge (host contract for voice-assistant-engine.js) =====
+  // host.tools.* are the ONLY app mutations the engine can trigger, and every one calls an
+  // existing app method rather than a parallel path. The engine never sees app state, a
+  // provider id, or a key: hasAI() is a yes/no, and ask() is already routed by the gateway
+  // under the 'voice' role.
+  _vaHost(){
+    return {
+      firstName:()=>((this.state.account&&this.state.account.name)||'').trim().split(/\s+/)[0]||'there',
+      say:(text)=>this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})),
+      replaceLast:(text)=>this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text}]})),
+      speak:(text)=>{ this._lastAIReply=text; this.setState(s=>({vtx:[...s.vtx,{who:'AI',text}]})); this.speak(text); },
+      hasAI:()=>!!(window.AIGateway && window.AIGateway.isConfigured() && window.AIGateway.available()),
+      ask:async(prompt)=>{
+        const res=await window.AIGateway.ask('voice', this._personaPrefix()+' '+prompt, {});
+        return res.error ? {error:res.error} : {text:res.text};
+      },
+      askStreamAndSpeak:(query)=>this._streamAskAndSpeak(query),
+      tools:{
+        nav:(scene)=>{ if(this.state.focusMode && scene!=='home') return; setTimeout(()=>this.setState({scene}),650); },
+        addTask:(label)=>{ const id=this._uuid(); this.mut(s=>({checklist:[...s.checklist,{id,label,tag:'TASK',done:false}]})); if(this._sbOn()) window.SB.insert('checklist',{id,user_id:this.state.authUserId,label,tag:'TASK',done:false}); },
+        addMission:(name)=>{ const id=this._uuid(); const today=this._todayStr(); this.mut(s=>({missions:[...(s.missions||[]),{id,name,recurring:false,dayKey:today,xp:20,streak:0,completedAt:null,note:''}]})); if(this._sbOn()) window.SB.insert('missions',{id,user_id:this.state.authUserId,name,recurring:false,day_key:today,xp:20,streak:0}); },
+        addMemory:(fact)=>this.addMemory(fact),
+        scheduleEvent:(title,whenText)=>{ const low=(whenText||'').toLowerCase(); const date=this._parseVoiceDate(low), time=this._parseVoiceTime(low); const id=this._uuid(); this.mut(s=>({events:[...s.events,{id,title,date,time,repeat:[]}]})); if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title,event_date:date,event_time:time,repeat_days:[]}); return {date:this._niceDate(date),time}; },
+        openTasks:()=>(this.state.checklist||[]).filter(c=>!c.done).map(c=>c.label),
+        doneToday:()=>{ const todayStr=this._todayStr(); return { tasks:(this.state.checklist||[]).filter(c=>c.done).map(c=>c.label), missions:(this.state.missionHistory||[]).filter(m=>m.date===todayStr).map(m=>m.name) }; },
+        trainingToday:()=>{ const todayStr=this._todayStr(); return (this.state.workouts||[]).filter(w=>{ try{ return new Date(w.ts).toLocaleDateString('en-CA')===todayStr; }catch(e){ return false; } }).map(w=>w.exercise+(w.min?' ('+w.min+'m)':'')); },
+        logWorkout:(exercise,minutes,weight,sets,reps)=>this.addWorkout({exercise,minutes,weight,sets,reps}),
+        logHydration:(ml)=>this.addHydMl(ml),
+        logWeight:(kg)=>this.addWeight(kg),
+        logSleep:(hours,minutes)=>{ this.setState(s=>({slp:{...s.slp,h:String(hours||0),m:String(minutes||0)}}),()=>this.saveSleep()); },
+        logMeal:(name,kcal,protein)=>this.addMeal({name,kcal,protein}),
+        addNote:(title,body)=>this.addNote(title,body),
+        logIncome:(label,amount)=>{ this.setState({incLabel:label,incAmt:String(amount||'')},()=>this.addIncome()); },
+        logExpense:(label,amount)=>{ this.setState({expLabel:label,expAmt:String(amount||'')},()=>this.addExpense()); },
+        disableAssistant:()=>{ setTimeout(()=>this.toggleAssistantEnabled(),1200); },
+      },
+    };
+  }
+  // Streams a reply, growing the AI bubble and queueing each finished sentence for speech
+  // as it completes, so the assistant starts talking before generation finishes.
+  async _streamAskAndSpeak(query){
+    this.setState(s=>({vtx:[...s.vtx,{who:'AI',text:'…'}]}));
+    this._ttsStreamReset();
+    this._pauseForSpeech=true; this.stopRecog();
+    let full='', sentBuf='';
+    const onDelta=(delta)=>{
+      full+=delta; sentBuf+=delta;
+      this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text:full}]}));
+      let cut;
+      while((cut=sentBuf.search(/[.!?](\s|$)/))>=0){
+        const sentence=sentBuf.slice(0,cut+1).trim();
+        sentBuf=sentBuf.slice(cut+1);
+        if(sentence) this._ttsStreamPush(sentence);
+      }
+    };
+    const res=await window.AIGateway.stream('voice', this._personaPrefix()+' '+query, onDelta, {});
+    if(sentBuf.trim()) this._ttsStreamPush(sentBuf.trim());
+    if(res.error && !full){ this.setState(s=>({vtx:[...s.vtx.slice(0,-1),{who:'AI',text:res.error}]})); this.speak(res.error); return res.error; }
+    this._lastAIReply=full;
+    this._logConvo('assistant',full);
+    return full;
   }
   // ===== Notification Manager bridge (host contract for notification-engine.js) =====
   // The ONLY door into notifications. Every feature calls
@@ -13042,6 +13137,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.169', date:'Aug 27, 2026', major:true, notes:[
+      'The voice assistant is back, and split in two. Eighteen commands \u2014 logging training, food, sleep, water, weight, money and notes, adding tasks and missions, scheduling, opening pages, reading your day back \u2014 run on this device and need no API key at all. Open questions go to your AI provider. The voice page now lists both, so you can see exactly what works with nothing connected.',
+    ]},
     {version:'v11.168', date:'Aug 27, 2026', notes:[
       'The voice assistant is now fully disconnected from the AI providers \u2014 the daily news digest that used to be read out to you is gone with it. Check-ins still come from your own logged data.',
     ]},
@@ -18571,6 +18669,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bg:cur===v.id?'rgba(255,255,255,0.14)':'transparent', b:cur===v.id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', c:cur===v.id?'#F4F4F5':'#c8c8ce',
           starColor:'transparent', starIcon:'', star:()=>{}, remove:custom.find(cv=>cv.id===v.id)?()=>this.removeCustomElevenVoice(v.id):()=>{} })); })(),
       toggleListen:()=>this.toggleListen(),
+      // The two tiers come from the engine's manifest, not a second hand-written list here —
+      // a capability the engine gains shows up in the UI without anyone remembering to add it.
+      ...this._vaTiers(),
       vInput:S.vInput, setVInput:(e)=>this.setState({vInput:e.target.value}), sendVoice:()=>this.voiceCommand(this.state.vInput), sendVoiceKey:enterKey(()=>this.voiceCommand(this.state.vInput)),
       toggleAssistantEnabled:()=>this.toggleAssistantEnabled(), assistantEnabledBg:(S.prefs.assistantEnabled!==false)?vTok.vAccent:vTok.vLine2, assistantEnabledPos:(S.prefs.assistantEnabled!==false)?'18px':'2px',
       listenOpacity:(S.prefs.assistantEnabled!==false)?1:0.4, listenPointerEvents:(S.prefs.assistantEnabled!==false)?'auto':'none',
