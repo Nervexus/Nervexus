@@ -163,9 +163,63 @@
   // bare `log <anything>`, so water, weight, sleep, money and meals all precede it or it
   // swallows them: "log my weight at 82 kilos" parsed as a workout called "weight"
   // lifting 82kg. The test suite pins each of those collisions.
-  /* Shared by the sign-off rule and by the raw-text fallback in handle(), which has to
-     match what was actually said rather than what tidy() left behind. */
-  var SIGN_OFF_RE = /(?:^|\b)(?:no(?:pe)?|nah|not (?:right )?now|that.?s (?:all|it|everything|the lot|enough|fine|great|lovely|perfect)|that.?(?:s|.?ll| will) do|nothing(?: else| more| for now)?|i.?m (?:good|fine|done|okay|ok|off|set)|all (?:good|done|set|sorted)|we.?re (?:done|good|finished|sorted)|(?:done|finished) for (?:today|now|the day)|that.?s me (?:done|off)|signing off|logging off|good ?night|night night|goodbye|bye(?: bye)?|see (?:you|ya)(?: later| tomorrow)?|catch (?:you|ya) later|(?:speak|talk|chat)(?: to you)? (?:later|tomorrow)|leave it (?:there|at that)|thanks?(?: you)?|cheers|ta|much appreciated|appreciate (?:it|that)|nice one|well done|good (?:job|work))\b/i;
+  /* Conversation enders, from a list of fifty real sign-offs. Grouped by shape rather than
+     written as one unreadable alternation, and compiled once. Every fragment is either
+     multi-word or a distinctive idiom: the rule is the LAST thing tried, but that is a
+     backstop, not a licence to match "good" or "done" on their own.
+
+     Shared by the sign-off rule and by the raw-text fallback in handle(), which has to match
+     what was actually said rather than what tidy() left behind. */
+  var SIGN_OFF_PARTS = [
+    // plain refusals — "no", "no thanks", "nope", "nah", "not right now"
+    'no(?:pe)?', 'nah', 'not (?:right )?now',
+    // that's-all family — "that's everything for today", "that'll do", "that's me done"
+    'that.?s (?:all|it|everything|the lot|enough|fine|great|lovely|perfect)',
+    'that.?(?:s|.?ll| will) do', 'that.?s me (?:done|off)',
+    'nothing(?: else| more| for now)?',
+    // covered-it family — "I think that covers everything", "we've covered it"
+    '(?:that|this) covers (?:it|everything)', '(?:we.?ve|i.?ve) covered (?:it|everything|that)',
+    // sorted / good / done — "all good", "we're all sorted", "glad we got that sorted"
+    'i.?m (?:good|fine|done|okay|ok|off|set|sorted)',
+    'all (?:good|done|set|sorted)', 'we.?re (?:all )?(?:done|good|finished|sorted|set)',
+    '(?:got|get) (?:that|it) sorted', 'sounds good', 'we.?re good for now',
+    '(?:done|finished) for (?:today|now|the day)', 'signing off', 'logging off',
+    // leaving — "I'm gonna head off", "I should probably get going", "right, I'm off"
+    'i.?m (?:gonna|going to|gunna) (?:go|head off|shoot off|get going|call it)',
+    'i.?(?:ve| have)? ?(?:got|need) to (?:go|get going|head off|shoot)',
+    'i should (?:probably )?(?:go|get going|head off)',
+    '(?:gonna|going to) call it (?:here|a day|a night)',
+    // leave-it — "I'll leave it there", "I'll leave you to it for now"
+    'leave (?:it|things|that) (?:there|at that|here)', 'leave you to it',
+    // let-you-get-on — "I'll let you crack on", "I'll let you get back to your day"
+    'let you (?:get on|crack on|go|get back to (?:it|your day|work))',
+    'won.?t keep you', 'stop bothering you',
+    // farewells — "see you around", "until next time", "catch you next time"
+    'good ?night', 'night night', 'goodbye', 'bye(?: bye)?',
+    'see (?:you|ya)(?: later| around| soon| tomorrow| next time)?',
+    'catch (?:you|ya)(?: up with (?:you|ya))?(?: later| soon| next time| tomorrow)',
+    'catch up with (?:you|ya)(?: later| soon)?',
+    '(?:speak|talk|chat)(?: to you)? (?:later|soon|tomorrow|next time)',
+    'until next time', 'take care', 'take it easy',
+    'have a good (?:one|day|evening|night)', 'enjoy the rest of your (?:day|evening)',
+    // pleasantries that end a conversation
+    'good (?:chat|chatting)(?: with you)?', 'was good (?:chat|chatting|talking)',
+    'thanks for the (?:chat|help)',
+    // gratitude
+    'thanks?(?: you)?', 'cheers', 'ta', 'much appreciated', 'appreciate (?:it|that)',
+    'nice one', 'well done', 'good (?:job|work)'
+  ];
+  /* "later" on its own is only an ender when it IS the utterance ("alright, later") —
+     anywhere else it is a time, as in "remind me later". Kept apart from the list above,
+     which matches mid-sentence by design. */
+  var SIGN_OFF_BARE = /^(?:alright|ok(?:ay)?|cool|right|sweet|nice|awesome|perfect|yep|yeah)?[,\s]*(?:later|laters)[.!]*$/i;
+  var SIGN_OFF_RE = new RegExp('(?:^|\\b)(?:' + SIGN_OFF_PARTS.join('|') + ')\\b', 'i');
+  function signOffMatch(text) {
+    var t = String(text || '').trim();
+    var m = SIGN_OFF_RE.exec(t);
+    if (m) return m[0];
+    return SIGN_OFF_BARE.test(t) ? t : null;
+  }
 
   var LOCAL = [
     { id:'nav', acts:true, label:'Open a page', say:'"Open my fitness centre"',
@@ -431,7 +485,7 @@
        command wanted. Unlike 'stop' it does not turn the mic off — it just ends the
        exchange politely and leaves her listening. */
     { id:'signOff', acts:false, label:'End the conversation', say:'"No, that\u2019s everything" \u00b7 "Thanks, goodbye"',
-      re:SIGN_OFF_RE,
+      re:new RegExp('(?:^|\\b)(?:' + SIGN_OFF_PARTS.join('|') + ')\\b|' + SIGN_OFF_BARE.source, 'i'),
       run:function (m, host) { return signOffReply(m[0]); } }
 
   ];
@@ -441,6 +495,7 @@
      whenever you need me" at bedtime reads as a machine that missed the point. */
   var THANKS_ONLY = /^(?:thanks?(?: you)?|cheers|ta|much appreciated|appreciate (?:it|that)|nice one|well done|good (?:job|work))$/i;
   var NIGHT = /^(?:good ?night|night night)$/i;
+  var WELL_WISH = /^(?:take care|take it easy|have a good (?:one|day|evening|night)|enjoy the rest of your (?:day|evening))$/i;
   var SIGN_OFFS = [
     'Alright \u2014 I\u2019m here whenever you need me.',
     'Of course, sir. I\u2019ll be here.',
@@ -451,6 +506,7 @@
   function signOffReply(matched) {
     var m = String(matched || '').trim();
     if (NIGHT.test(m)) return 'Good night, sir.';
+    if (WELL_WISH.test(m)) return 'You too, sir.';
     if (THANKS_ONLY.test(m)) return 'Any time, sir.';
     var out = SIGN_OFFS[signOffAt % SIGN_OFFS.length]; signOffAt++; return out;
   }
@@ -602,7 +658,8 @@
        the empty-text guard for exactly that reason, and after nothing else, so a real
        command never reaches it. */
     if (!t) {
-      if (SIGN_OFF_RE.test(raw)) { AWAIT_CLOSE = false; host.speak(signOffReply(SIGN_OFF_RE.exec(raw)[0])); }
+      var bare = signOffMatch(raw);
+      if (bare) { AWAIT_CLOSE = false; host.speak(signOffReply(bare)); }
       return Promise.resolve();
     }
 
@@ -645,8 +702,8 @@
     // Nothing matched the tidied text — but tidy() strips politeness, and "I said thanks"
     // tidies down to "I said". Give the enders one more look at what was actually said,
     // ahead of the workout guess so an ender is never turned into "shall I log that?".
-    var off = SIGN_OFF_RE.exec(raw);
-    if (off) { AWAIT_CLOSE = false; host.speak(signOffReply(off[0])); return Promise.resolve(); }
+    var off = signOffMatch(raw);
+    if (off) { AWAIT_CLOSE = false; host.speak(signOffReply(off)); return Promise.resolve(); }
 
     // Before giving up — or spending a provider call — see whether this
     // is a workout with a word missing, and ask.

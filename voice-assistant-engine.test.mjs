@@ -461,6 +461,64 @@ t('the close-out never uses the account name', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
   if(/\bMr\b|\bSam\b|\bthere\b/i.test(followUps[0])) throw new Error('used the account name: '+followUps[0]);
   has(followUps[0],'is that all i can do for you today, sir?'); });
+// ---- the fifty enders, verbatim ----
+// Every line from the supplied list, driven through the engine exactly as written. The bar
+// is that none of them reaches "Sorry, I didn't catch that" — the dead end that started this.
+const ENDERS=[
+  'Alright, I\u2019m off.','Catch you later.','Speak soon.','I\u2019ll leave it there.',
+  'Alright, I\u2019m gonna go.','I\u2019ll catch you later.','See you around.','I\u2019m gonna head off.',
+  'Alright, take care.','Talk soon.','I\u2019ll let you get on.','I should probably get going.',
+  'I\u2019m gonna call it here.','Alright, I\u2019ll leave you to it.','I\u2019ll catch up with you later.',
+  'It was good chatting with you.','Anyway, I\u2019ll let you get back to your day.',
+  'I think that covers everything.','I\u2019ll speak to you soon.','Alright, I think we\u2019re all sorted.',
+  'Glad we got that sorted.','I\u2019ll leave you to it for now.','I think that\u2019s everything we needed.',
+  'Thanks for the chat.','I\u2019ll catch you next time.','Alright, have a good one.',
+  'Enjoy the rest of your day.','I\u2019ll talk to you later.','Take it easy.','Right, I\u2019m off.',
+  'Cool, that\u2019s me done.','Sweet, speak soon.','Perfect, cheers.','Nice one.','Sounds good.',
+  'Alright, later.','Cool, catch you later.','Perfect, we\u2019re sorted.','Awesome, talk soon.','Yep, all good.',
+  'Anyway, I won\u2019t keep you.','I\u2019ll stop bothering you now.','I think we\u2019ve covered it.',
+  'Right, I\u2019ll let you crack on.','I\u2019ve got to get going, but speak soon.','I think we\u2019re good for now.',
+  'I\u2019ll leave things there.','Alright, I think that\u2019s everything from me.',
+  'I\u2019ll let you get back to it.','Alright then, until next time.'
+];
+t('all fifty enders get a graceful close, none dead-ends', async()=>{ const h=host();
+  const bad=[];
+  for(const line of ENDERS){
+    VA._clearPending(); spoken=[];
+    await VA.handle(line,h);
+    const l=spoken[spoken.length-1];
+    if(!l || /didn.t catch|couldn.t|provider|API|key/i.test(l)) bad.push(line+' -> '+l);
+  }
+  if(bad.length) throw new Error(bad.length+'/'+ENDERS.length+' dead-ended:\n  '+bad.join('\n  ')); });
+t('an ender is never mistaken for something to log', async()=>{ const h=host();
+  for(const line of ENDERS){
+    VA._clearPending(); calls=[];
+    await VA.handle(line,h);
+    const wrote=calls.find(c=>/^(log|add|schedule|complete|nav)/.test(c[0]));
+    if(wrote) throw new Error(JSON.stringify(line)+' triggered '+wrote[0]);
+    if(VA._pending()) throw new Error(JSON.stringify(line)+' opened a confirmation question');
+  } });
+// The widened list must not start eating instructions. These all contain an ender word.
+t('the widened ender list still loses to every real command', async()=>{ const h=host();
+  const cmds=[
+    ['Log 30 minutes of running','logWorkout'],
+    ['Log 8 hours of sleep last night','logSleep'],
+    ['Log 500 ml of water','logHydration'],
+    ['Log my weight at 82 kilos','logWeight'],
+    ['Add a task to thank the accountant','addTask'],
+    ['Add a task to take care of the insurance','addTask'],
+    ['Remember that the gym is good on a Sunday','addMemory'],
+    ['Log an expense of 40 pounds for fuel','logExpense'],
+    ['Open my fitness centre','nav'],
+  ];
+  for(const [say,want] of cmds){
+    VA._clearPending(); calls=[];
+    await VA.handle(say,h);
+    if(!call(want)) throw new Error(JSON.stringify(say)+' was eaten by the ender rule (wanted '+want+')');
+  } });
+t('well-wishes are returned, not farewelled', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('take care',h); has(last(),'you too');
+  VA._clearPending(); await VA.handle('enjoy the rest of your day',h); has(last(),'you too'); });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
