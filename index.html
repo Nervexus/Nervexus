@@ -9134,7 +9134,7 @@ const VOICE_ORB_PX = 500, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-180 · v11.180 orb-self-heals';
+const NOTIF_BUILD_VERSION = '2026.08.27-181 · v11.181 orb-retries';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13190,6 +13190,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.181', date:'Aug 27, 2026', notes:[
+      'If the orb fails to start \u2014 usually its 3D library not finishing its download \u2014 it now tries again instead of staying gone for the rest of the session.',
+    ]},
     {version:'v11.180', date:'Aug 27, 2026', notes:[
       'If the orb ever does go blank, it now notices and rebuilds itself instead of staying gone.',
     ]},
@@ -16323,16 +16326,33 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }
       this._unmountVoiceOrb();
     }
-    this._unmountVoiceOrb();
     this._orbEl=el;
     const host=document.createElement('div');
     host.setAttribute('data-voice-core','1');
     host.style.cssText='position:absolute; left:0; top:0; width:'+VOICE_ORB_PX+'px; height:'+VOICE_ORB_PX+'px; pointer-events:none; z-index:0;';
     el.appendChild(host);
     this._voiceCoreHost=host;
-    this._voiceCoreApi=window.VoidOrb.mount(host, {detail:64, pointer:false});
+    const api=this._voiceCoreApi=window.VoidOrb.mount(host, {detail:64, pointer:false});
     this._setVoiceOrbActive(this.state.listening);   // remounts mid-session pick up the live state
     this._syncVoiceOrbBounds();
+
+    // mount() hands back an API synchronously, but the renderer is only built once the
+    // three.js bundle has loaded — 731KB, and a fresh fetch after every cache bump. If
+    // that load fails, or WebGL refuses the context, ready resolves false while
+    // _voiceCoreApi stays truthy — and the guard at the top of this method then
+    // short-circuits forever. The orb was dead for the rest of the page's life with
+    // nothing logged and nothing retrying.
+    //
+    // Dropping the handle on failure lets the next sync tick mount it again.
+    if(api && api.ready && api.ready.then){
+      api.ready.then((ok)=>{
+        if(this._voiceCoreApi!==api) return;               // already replaced or torn down
+        const drew=ok && host.querySelector('canvas');
+        if(drew) return;
+        if(window.console) console.warn('[VoidOrb] voice orb failed to start (bundle or WebGL) — will retry on the next tick.');
+        this._unmountVoiceOrb();
+      });
+    }
   }
   // Listening state. The old cluster took setForceHover; the void orb churns and spins
   // harder instead. Guarded because the orb is absent without WebGL and on other pages.
