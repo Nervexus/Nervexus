@@ -3529,11 +3529,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
         <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
-            <div onClick="{{ toggleAutoBriefing }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ autoBriefBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ autoBriefPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-            <span style="font-size:12.5px; color:{{ vInk2 }};">Speak my daily briefing automatically at</span>
-            <input type="time" value="{{ autoBriefTime }}" onInput="{{ setAutoBriefTime }}" style="padding:7px 10px; border-radius:9px; border:1px solid {{ vLine }}; background:{{ vInputBg }}; color:{{ vInk }}; font-size:12px;">
-          </div>
           <div style="font-size:11px; color:{{ vMuted3 }};">Manage remembered facts in Settings → Memory.</div>
         </div>
         <div class="cc-glowcard" style="width:100%; max-width:720px; border-radius:18px; background:{{ vCard }}; padding:20px; margin-bottom:18px;">
@@ -9137,7 +9132,7 @@ const VOICE_ORB_PX = 440, VOICE_ORB_LIFT = 185;
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-174 · v11.174 orb-persists';
+const NOTIF_BUILD_VERSION = '2026.08.27-175 · v11.175 drop-auto-briefing';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9323,24 +9318,12 @@ activities: this._mergeShipLog(s.activities),
     const ec=this._provCfg('elevenlabs');
     if(ec.saved && ec.on===false && !ec._onCorrected) this._setProv('elevenlabs',{on:true,_onCorrected:true});
   }
-  // Scheduled daily briefing: checks once a minute; when the clock hits the saved time and it
-  // hasn't already spoken today, it reads the real briefing text aloud via ElevenLabs.
-  _checkScheduledBriefing(){
-    const p=this.state.prefs||{}; if(!p.autoBriefingEnabled || !p.autoBriefingTime) return;
-    const now=new Date(); const hhmm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-    const today=this._todayStr ? this._todayStr() : now.toLocaleDateString('en-CA');
-    if(hhmm===p.autoBriefingTime && p.autoBriefingLastSpoken!==today){
-      this.setPref('autoBriefingLastSpoken', today);
-      const txt=this._execBriefingText ? this._execBriefingText() : this._briefingText();
-      this.readAloud(txt, 'Daily Briefing', this.state.voice);
-    }
-  }
   _bootSeq(){
     const lines=['LOADING WORKSPACE…','CONNECTING SERVICES…','SYNCING DATA…','READY'];
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._briefingTimer=setInterval(()=>this._checkScheduledBriefing(),60000); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this.showToast('system','Update available','A new version is ready — please close and reopen the app to update.'); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -13198,6 +13181,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.175', date:'Aug 27, 2026', notes:[
+      'Removed \u201cSpeak my daily briefing automatically\u201d from the voice page.',
+    ]},
     {version:'v11.174', date:'Aug 27, 2026', notes:[
       'The orb stays put while you and Loura are talking \u2014 it was being rebuilt on every reply.',
       'Loura no longer hears herself. Her own \u201cOkay, doing that now\u201d was being picked up by the microphone and treated as a new command from you.',
@@ -17135,9 +17121,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       dashboardWidgets:[['missions','Daily & Diet Checklists'],['training','Training Checklist'],['news','Money / News & Law News']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
       emailProvider:S.prefs.emailProvider||'resend', setEmailProvider:(e)=>this.setPref('emailProvider',e.target.value),
-      autoBriefBg:S.prefs.autoBriefingEnabled?vTok.vAccent:vTok.vLine2, autoBriefPos:S.prefs.autoBriefingEnabled?'20px':'2px',
-      toggleAutoBriefing:()=>this.setPref('autoBriefingEnabled',!S.prefs.autoBriefingEnabled),
-      autoBriefTime:S.prefs.autoBriefingTime||'08:00', setAutoBriefTime:(e)=>this.setPref('autoBriefingTime',e.target.value),
       speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?vTok.vInk:vTok.vMuted2, b:(S.prefs.voiceRate||1)===o?vTok.vAccent:vTok.vLine, bg:(S.prefs.voiceRate||1)===o?vTok.vLine2:'transparent'})),
       voiceModelName:(()=>{ const PD=this._pd(); const built=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0].voices)||[]; const custom=S.prefs.customElevenVoices||[]; const cur=S.prefs.elevenVoiceId||'21m00Tcm4TlvDq8ikWAM'; const match=[...built,...custom].find(p=>p.id===cur); return (match&&match.name)||'ElevenLabs voice'; })(),
       voiceDeviceName:this._provCfg('elevenlabs').saved?'ElevenLabs (cloud)':'Browser voice (fallback — connect ElevenLabs above)',
