@@ -45,6 +45,16 @@
    applied health checks when failover happened to be switched on.
 */
 (function (root) {
+  /* Idempotent on purpose. Every engine <script> in index.html lives inside <helmet>, which
+     the framework relocates into <head> at runtime — and moving a script element makes the
+     browser run it a second time. Without this guard the second pass rebuilt AIGateway with
+     a fresh closure whose H was undefined, silently throwing away the host the app had
+     already installed via configure(). isConfigured() then answered false forever, so
+     _providerVals() returned its empty fallback and the AI Command Center rendered with no
+     provider cards at all — and therefore no way to connect a first key, and no error to
+     explain any of it. Keep the first instance; it is the configured one. */
+  if (root.AIGateway) return;
+
   'use strict';
 
   var H = null;                      // host accessors, set by configure()
