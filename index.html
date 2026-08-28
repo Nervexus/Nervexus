@@ -8172,6 +8172,226 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
       </sc-if>
 
+      <!-- ===== AI COMMAND CENTER =====
+           Was a tab inside Settings, which buried the routing, the keys and the live
+           usage three clicks deep behind a page about preferences. It is a place you
+           work in, not a setting you flip, so it gets the rail like every other one. -->
+      <sc-if value="{{ isAI }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:rise .5s ease both;">
+        <div style="margin-bottom:20px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">&#9670; AI COMMAND CENTER</div>
+          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Intelligence Hub</h1>
+          <div style="font-size:12.5px; color:#8a8a92; margin-top:6px; line-height:1.5; max-width:620px;">Connect every service that powers briefings, voice &amp; analysis. Modular adapters &mdash; register a provider to add it, no core changes.</div>
+        </div>
+              <div class="cc-api-dark">
+
+              <!-- Provider constellation. Desktop only via cc-hide-mobile: 45 labelled nodes
+                   cannot be read on a phone, and the cards below carry the same information
+                   in a form that works there. Full-bleed and viewport-tall: this is the page's
+                   main view, not a widget sitting on top of one. Ground is jet black so the map
+                   and the page behind it are one surface. -->
+              <div class="cc-glowcard cc-hide-mobile" data-api-ground="1" style="position:relative; border-radius:18px; background:#000000; border:1px solid rgba(255,255,255,0.07); padding:0; margin-bottom:18px; overflow:hidden;">
+                <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
+                </div>
+                <div style="position:absolute; top:14px; right:18px; z-index:2; display:flex; gap:12px; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#c9a24a;">● AI</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5b8dd6;">● INTEL</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7ec9a0;">● NEWS</span>
+                </div>
+                <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
+                <!-- The real voice-assistant orb, parked over the canvas centre and moved by
+                     the same pan/zoom transform the constellation uses. pointer-events:none so
+                     dragging still grabs the map underneath it. -->
+                <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
+                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO ORBIT · SCROLL TO FLY · DOUBLE-CLICK TO RESET</div>
+              </div>
+              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
+                <sc-if value="{{ noConnections }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing connected yet — save a key and switch it on above.</div></sc-if>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <sc-for list="{{ activeConnections }}" as="c" hint-placeholder-count="4">
+                    <div style="display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);">
+                      <span style="width:6px; height:6px; border-radius:50%; background:{{ c.dotColor }};"></span>
+                      <span style="font-size:11.5px; color:#dbdbe0;">{{ c.name }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:#6f6f78;">{{ c.kind }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div class="cc-stat4" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;">
+                <sc-for list="{{ provStats }}" as="s" hint-placeholder-count="4"><div style="border-radius:12px; padding:12px; background:rgba(23,25,29,0.9);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:19px; color:#eef0f2; margin-top:4px;">{{ s.v }}</div></div></sc-for>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:8px; padding:10px 13px; border-radius:11px; border:1px solid rgba(47,206,134,0.25); background:rgba(47,206,134,0.06); margin-bottom:14px;">
+                <span style="color:#2fce86; font-size:12px;">&#10003;</span>
+                <span style="font-size:11px; color:#a9d9c2; line-height:1.5;">Vetted connections only — every provider &amp; source below has been reviewed and is a trusted, established company. There is no way to connect an unlisted or unverified provider inside the app.</span>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <span onClick="{{ setProvViewAI }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewAIc }}; border:1px solid {{ provViewAIbd }}; background:{{ provViewAIbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">AI PROVIDERS</span>
+                  <span onClick="{{ setProvViewIntel }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewINc }}; border:1px solid {{ provViewINbd }}; background:{{ provViewINbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">INTEL SOURCES</span>
+                  <span onClick="{{ setProvViewNews }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewNEc }}; border:1px solid {{ provViewNEbd }}; background:{{ provViewNEbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">NEWS SOURCE APIS</span>
+                </div>
+                <div style="flex:1; min-width:180px; display:flex; align-items:center; gap:8px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);">
+                  <span style="color:#FFFFFF; font-size:12px;">&#9906;</span>
+                  <input value="{{ provSearch }}" onInput="{{ onProvSearch }}" placeholder="Search providers, sources&hellip;" style="flex:1; border:none; background:transparent; color:#eef0f2; font-size:12.5px; outline:none;">
+                </div>
+              </div>
+
+              <sc-if value="{{ isProvAI }}" hint-placeholder-val="{{ true }}">
+                <div style="display:grid; grid-template-columns:1fr; max-width:460px; gap:12px;">
+                  <sc-for list="{{ aiProviderCards }}" as="p" hint-placeholder-count="1">
+                    <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
+                      <div style="display:flex; align-items:center; gap:11px;">
+                        <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
+                        <div style="flex:1; min-width:0;">
+                          <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><sc-if value="{{ p.live }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#2fce86; border:1px solid rgba(47,206,134,0.4); border-radius:5px; padding:1px 5px;">LIVE SEARCH</span></sc-if><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.freePaidC }}; background:{{ p.freePaidBg }}; border-radius:5px; padding:1px 5px;">{{ p.freePaid }}</span></div>
+                          <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.statusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.statusColor }};">{{ p.statusLabel }}</span></div>
+                        </div>
+                        <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                      </div>
+                      <div style="font-size:10.5px; line-height:1.4; color:#75757d; margin-top:8px;">{{ p.freePaidNote }}</div>
+                      <div onClick="{{ p.toggleExpand }}" style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9a9aa2;"><span>{{ p.expandIcon }} CONFIGURE</span><span style="color:#6f6f78;">{{ p.sync }}</span></div>
+                      <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
+                          <sc-if value="{{ p.saved }}" hint-placeholder-val="{{ false }}">
+                            <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.masked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.test }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ p.replace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
+                            <div style="margin-top:12px;">
+                              <div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">{{ p.poolCaption }}</div>
+                              <sc-for list="{{ p.poolKeys }}" as="k" hint-placeholder-count="0">
+                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+                                  <input value="{{ k.masked }}" readonly style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8a92; font-size:11.5px; font-family:'JetBrains Mono',monospace; outline:none;">
+                                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ k.coolC }}; white-space:nowrap;">{{ k.coolLabel }}</span>
+                                  <span onClick="{{ k.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 10px; cursor:pointer; white-space:nowrap;">REMOVE</span>
+                                </div>
+                              </sc-for>
+                              <div style="display:flex; gap:8px; align-items:center;">
+                                <input value="{{ p.poolDraft }}" onInput="{{ p.onPoolDraft }}" placeholder="Paste another key" style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#eef0f2; font-size:11.5px; font-family:'JetBrains Mono',monospace; outline:none;">
+                                <span onClick="{{ p.addPoolKey }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 12px; cursor:pointer; white-space:nowrap;">{{ p.poolAddLabel }}</span>
+                              </div>
+                              <sc-if value="{{ p.poolErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#ff3b4a; margin-top:5px;">{{ p.poolErr }}</div></sc-if>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{ p.notSaved }}" hint-placeholder-val="{{ true }}">
+                            <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.draft }}" onInput="{{ p.onDraft }}" placeholder="Paste API key ({{ p.keyHint }})" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
+                          </sc-if>
+                          <sc-if value="{{ p.err }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ p.err }}</div></sc-if>
+                          <div>
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">MODEL</div>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;"><sc-for list="{{ p.models }}" as="m" hint-placeholder-count="3"><span onClick="{{ m.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:{{ m.mc }}; border:1px solid {{ m.mb }}; background:{{ m.mbg }}; border-radius:8px; padding:5px 9px; cursor:pointer;">{{ m.name }}</span></sc-for></div>
+                          </div>
+                          <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                            <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.endpoint }}</span>
+                          </div>
+                          <sc-if value="{{ p.showUsage }}" hint-placeholder-val="{{ false }}">
+                            <div>
+                              <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">USAGE &middot; LAST 24H <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ true }}"><span style="color:#4a4a52;">&middot; from your real logged calls</span></sc-if></div>
+                              <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ true }}">
+                                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
+                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">REQUESTS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uReqs }}</div></div>
+                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">TOKENS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uTokens }}</div></div>
+                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">EST. COST</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#7fe6b0; margin-top:2px;">{{ p.uCost }}</div></div>
+                                </div>
+                              </sc-if>
+                              <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#5a5a62;">No calls to this provider in the last 24 hours.</div></sc-if>
+                            </div>
+                          </sc-if>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isProvNews }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ newsCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.cc }}; border:1px solid {{ c.cb }}; background:{{ c.cbg }}; border-radius:8px; padding:6px 11px; cursor:pointer;">{{ c.label }}</span></sc-for></div>
+              <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">Connected &amp; enabled sources are named to the live assistant so its answers cite and prioritize them.</div>
+              <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <sc-for list="{{ newsSourceCards }}" as="p" hint-placeholder-count="6">
+                  <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
+                    <div style="display:flex; align-items:center; gap:11px;">
+                      <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
+                      <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.tierColor }}; border:1px solid {{ p.tierBorder }}; border-radius:5px; padding:1px 5px;">{{ p.tierLabel }}</span></div>
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.statusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.statusColor }};">{{ p.statusLabel }}</span></div>
+                      </div>
+                      <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                    </div>
+                    <div onClick="{{ p.toggleExpand }}" style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9a9aa2;"><span>{{ p.expandIcon }} CONFIGURE</span><span style="color:#6f6f78;">{{ p.tierNote }}</span></div>
+                    <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
+                        <sc-if value="{{ p.saved }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.masked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.replace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer;">REPLACE</span></div>
+                        </sc-if>
+                        <sc-if value="{{ p.notSaved }}" hint-placeholder-val="{{ true }}">
+                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.draft }}" onInput="{{ p.onDraft }}" placeholder="Paste API key ({{ p.keyHint }})" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">SAVE</span></div>
+                        </sc-if>
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                          <span onClick="{{ p.test }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 12px; cursor:pointer;" style-hover="{ borderColor:'rgba(255,255,255,0.45)', color:'#fff' }">&#9889; TEST CONNECTION</span>
+                          <sc-if value="{{ p.err }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ p.err }}</span></sc-if>
+                        </div>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.docs }}</span>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+
+              <sc-if value="{{ isProvIntel }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ intelCatChips }}" as="c" hint-placeholder-count="8"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.cc }}; border:1px solid {{ c.cb }}; background:{{ c.cbg }}; border-radius:8px; padding:6px 11px; cursor:pointer;">{{ c.label }}</span></sc-for></div>
+              <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">A reference directory by category — News, Markets, Economic, Crypto, Government, Business, Tech. This is not a live connection to any of these (most require enterprise licensing this app can't offer); toggling a source on just tells your AI Briefing to lean into that category. For a real, live-fetched connection, use News Source APIs below.</div>
+              <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <sc-for list="{{ intelCards }}" as="p" hint-placeholder-count="6">
+                  <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
+                    <div style="display:flex; align-items:center; gap:11px;">
+                      <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:{{ p.markText }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
+                      <div style="flex:1; min-width:0;">
+                        <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.trustColor }}; border:1px solid {{ p.trustColor }}; border-radius:5px; padding:1px 5px; opacity:0.85;">{{ p.trustLabel }}</span></div>
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.enabledColor }};">{{ p.enabledLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#54545c;">&middot; {{ p.category }} &middot; {{ p.region }}</span></div>
+                      </div>
+                      <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+
+              <sc-if value="{{ isProvRoute }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+                  <div><div style="font-size:14px; font-weight:700; color:#eef0f2;">AI Routing &amp; Failover</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">Default <b style="color:#F4F4F5;">{{ aiDefaultName }}</b> &middot; Backup <b style="color:#e8b45a;">{{ aiBackupName }}</b> &middot; each feature below can override both</div></div>
+                  <div style="display:flex; align-items:center; gap:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce;">AUTOMATIC FAILOVER</span><div onClick="{{ toggleFailover }}" style="width:44px; height:24px; border-radius:14px; background:{{ failBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ failPos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:11px 12px; border:1px solid rgba(255,255,255,0.18); border-radius:12px; background:rgba(255,255,255,0.04); margin-bottom:2px;">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#FFFFFF; width:100%; margin-bottom:2px;">FAILOVER PRIORITY &middot; auto-switch on outage</span>
+                    <sc-for list="{{ failChain }}" as="f" hint-placeholder-count="3"><span style="display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(255,255,255,0.1); border-radius:9px; padding:5px 9px; background:rgba(255,255,255,0.03);"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78;">{{ f.rank }}</span><span style="width:20px; height:20px; border-radius:6px; background:{{ f.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:7.5px; font-weight:700;">{{ f.mark }}</span><span style="font-size:11.5px; color:#dcdce0; font-weight:600;">{{ f.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:{{ f.roleColor }};">{{ f.role }}</span><sc-if value="{{ f.note }}" hint-placeholder-val="{{ false }}"><span title="{{ f.note }}" style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#ffb3ba;">&#9888; PAUSED</span></sc-if></span></sc-for>
+                  </div>
+                  <sc-for list="{{ routingRows }}" as="r" hint-placeholder-count="8">
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 12px; border:1px solid rgba(255,255,255,0.07); border-radius:12px; background:rgba(255,255,255,0.02);">
+                      <span style="width:150px; flex:0 0 150px; display:flex; flex-direction:column; gap:2px; font-size:12.5px; color:#dcdce0; font-weight:600;">
+                        <span style="display:flex; align-items:center; gap:8px;"><span style="color:#FFFFFF;">{{ r.glyph }}</span>{{ r.label }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; font-weight:400; color:#6f6f78;">&rarr; {{ r.currentName }}</span>
+                      </span>
+                      <div style="flex:1; display:flex; flex-direction:column; gap:5px; min-width:0;">
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;"><sc-for list="{{ r.options }}" as="o" hint-placeholder-count="3"><span onClick="{{ o.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ o.oc }}; border:1px solid {{ o.ob }}; background:{{ o.obg }}; border-radius:7px; padding:5px 9px; cursor:pointer;">{{ o.name }}</span></sc-for></div>
+                        <sc-if value="{{ r.overridden }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#ffd66b;">&#9888; {{ r.overrideNote }}</span></sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              </sc-if>
+
+              <div style="margin-top:16px; font-size:11px; color:#6f6f78; display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><span style="color:#ffd66b;">&#9888;</span><span>Paste a key and hit Connect &mdash; it's validated against the real provider and saved server-side in one step. Keys are masked here and never shown again.</span></div>
+              </div>
+      </div>
+      </sc-if>
+
       <!-- ===== SETTINGS ===== -->
       <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
@@ -8571,218 +8791,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-if value="{{ backupMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:{{ backupMsgColor }};">{{ backupMsg }}</div></sc-if>
             </sc-if>
 
-            <sc-if value="{{ tabAI }}" hint-placeholder-val="{{ false }}">
-              <div class="cc-api-dark">
-              <div style="margin-bottom:16px;">
-                <div style="font-size:16px; font-weight:700; color:#eef0f2;">AI &amp; Intelligence Hub</div>
-                <div style="font-size:12px; color:#8a8a92; margin-top:3px; line-height:1.5;">Connect every service that powers briefings, voice &amp; analysis. Modular adapters &mdash; register a provider to add it, no core changes.</div>
-              </div>
-
-              <!-- Provider constellation. Desktop only via cc-hide-mobile: 45 labelled nodes
-                   cannot be read on a phone, and the cards below carry the same information
-                   in a form that works there. Full-bleed and viewport-tall: this is the page's
-                   main view, not a widget sitting on top of one. Ground is jet black so the map
-                   and the page behind it are one surface. -->
-              <div class="cc-glowcard cc-hide-mobile" data-api-ground="1" style="position:relative; border-radius:18px; background:#000000; border:1px solid rgba(255,255,255,0.07); padding:0; margin-bottom:18px; overflow:hidden;">
-                <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
-                </div>
-                <div style="position:absolute; top:14px; right:18px; z-index:2; display:flex; gap:12px; pointer-events:none;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#c9a24a;">● AI</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5b8dd6;">● INTEL</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7ec9a0;">● NEWS</span>
-                </div>
-                <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
-                <!-- The real voice-assistant orb, parked over the canvas centre and moved by
-                     the same pan/zoom transform the constellation uses. pointer-events:none so
-                     dragging still grabs the map underneath it. -->
-                <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
-                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO ORBIT · SCROLL TO FLY · DOUBLE-CLICK TO RESET</div>
-              </div>
-              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
-                <sc-if value="{{ noConnections }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing connected yet — save a key and switch it on above.</div></sc-if>
-                <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                  <sc-for list="{{ activeConnections }}" as="c" hint-placeholder-count="4">
-                    <div style="display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);">
-                      <span style="width:6px; height:6px; border-radius:50%; background:{{ c.dotColor }};"></span>
-                      <span style="font-size:11.5px; color:#dbdbe0;">{{ c.name }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:#6f6f78;">{{ c.kind }}</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-              <div class="cc-stat4" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;">
-                <sc-for list="{{ provStats }}" as="s" hint-placeholder-count="4"><div style="border-radius:12px; padding:12px; background:rgba(23,25,29,0.9);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:19px; color:#eef0f2; margin-top:4px;">{{ s.v }}</div></div></sc-for>
-              </div>
-
-              <div style="display:flex; align-items:center; gap:8px; padding:10px 13px; border-radius:11px; border:1px solid rgba(47,206,134,0.25); background:rgba(47,206,134,0.06); margin-bottom:14px;">
-                <span style="color:#2fce86; font-size:12px;">&#10003;</span>
-                <span style="font-size:11px; color:#a9d9c2; line-height:1.5;">Vetted connections only — every provider &amp; source below has been reviewed and is a trusted, established company. There is no way to connect an unlisted or unverified provider inside the app.</span>
-              </div>
-
-              <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;">
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <span onClick="{{ setProvViewAI }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewAIc }}; border:1px solid {{ provViewAIbd }}; background:{{ provViewAIbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">AI PROVIDERS</span>
-                  <span onClick="{{ setProvViewIntel }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewINc }}; border:1px solid {{ provViewINbd }}; background:{{ provViewINbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">INTEL SOURCES</span>
-                  <span onClick="{{ setProvViewNews }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewNEc }}; border:1px solid {{ provViewNEbd }}; background:{{ provViewNEbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">NEWS SOURCE APIS</span>
-                </div>
-                <div style="flex:1; min-width:180px; display:flex; align-items:center; gap:8px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);">
-                  <span style="color:#FFFFFF; font-size:12px;">&#9906;</span>
-                  <input value="{{ provSearch }}" onInput="{{ onProvSearch }}" placeholder="Search providers, sources&hellip;" style="flex:1; border:none; background:transparent; color:#eef0f2; font-size:12.5px; outline:none;">
-                </div>
-              </div>
-
-              <sc-if value="{{ isProvAI }}" hint-placeholder-val="{{ true }}">
-                <div style="display:grid; grid-template-columns:1fr; max-width:460px; gap:12px;">
-                  <sc-for list="{{ aiProviderCards }}" as="p" hint-placeholder-count="1">
-                    <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
-                      <div style="display:flex; align-items:center; gap:11px;">
-                        <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
-                        <div style="flex:1; min-width:0;">
-                          <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><sc-if value="{{ p.live }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#2fce86; border:1px solid rgba(47,206,134,0.4); border-radius:5px; padding:1px 5px;">LIVE SEARCH</span></sc-if><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.freePaidC }}; background:{{ p.freePaidBg }}; border-radius:5px; padding:1px 5px;">{{ p.freePaid }}</span></div>
-                          <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.statusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.statusColor }};">{{ p.statusLabel }}</span></div>
-                        </div>
-                        <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                      </div>
-                      <div style="font-size:10.5px; line-height:1.4; color:#75757d; margin-top:8px;">{{ p.freePaidNote }}</div>
-                      <div onClick="{{ p.toggleExpand }}" style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9a9aa2;"><span>{{ p.expandIcon }} CONFIGURE</span><span style="color:#6f6f78;">{{ p.sync }}</span></div>
-                      <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
-                        <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
-                          <sc-if value="{{ p.saved }}" hint-placeholder-val="{{ false }}">
-                            <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.masked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.test }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ p.replace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
-                            <div style="margin-top:12px;">
-                              <div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">{{ p.poolCaption }}</div>
-                              <sc-for list="{{ p.poolKeys }}" as="k" hint-placeholder-count="0">
-                                <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-                                  <input value="{{ k.masked }}" readonly style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#8a8a92; font-size:11.5px; font-family:'JetBrains Mono',monospace; outline:none;">
-                                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ k.coolC }}; white-space:nowrap;">{{ k.coolLabel }}</span>
-                                  <span onClick="{{ k.remove }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 10px; cursor:pointer; white-space:nowrap;">REMOVE</span>
-                                </div>
-                              </sc-for>
-                              <div style="display:flex; gap:8px; align-items:center;">
-                                <input value="{{ p.poolDraft }}" onInput="{{ p.onPoolDraft }}" placeholder="Paste another key" style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); color:#eef0f2; font-size:11.5px; font-family:'JetBrains Mono',monospace; outline:none;">
-                                <span onClick="{{ p.addPoolKey }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 12px; cursor:pointer; white-space:nowrap;">{{ p.poolAddLabel }}</span>
-                              </div>
-                              <sc-if value="{{ p.poolErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#ff3b4a; margin-top:5px;">{{ p.poolErr }}</div></sc-if>
-                            </div>
-                          </sc-if>
-                          <sc-if value="{{ p.notSaved }}" hint-placeholder-val="{{ true }}">
-                            <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.draft }}" onInput="{{ p.onDraft }}" placeholder="Paste API key ({{ p.keyHint }})" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
-                          </sc-if>
-                          <sc-if value="{{ p.err }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ p.err }}</div></sc-if>
-                          <div>
-                            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">MODEL</div>
-                            <div style="display:flex; flex-wrap:wrap; gap:6px;"><sc-for list="{{ p.models }}" as="m" hint-placeholder-count="3"><span onClick="{{ m.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:{{ m.mc }}; border:1px solid {{ m.mb }}; background:{{ m.mbg }}; border-radius:8px; padding:5px 9px; cursor:pointer;">{{ m.name }}</span></sc-for></div>
-                          </div>
-                          <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
-                            <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.endpoint }}</span>
-                          </div>
-                          <sc-if value="{{ p.showUsage }}" hint-placeholder-val="{{ false }}">
-                            <div>
-                              <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">USAGE &middot; LAST 24H <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ true }}"><span style="color:#4a4a52;">&middot; from your real logged calls</span></sc-if></div>
-                              <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ true }}">
-                                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px;">
-                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">REQUESTS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uReqs }}</div></div>
-                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">TOKENS</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#dcdce0; margin-top:2px;">{{ p.uTokens }}</div></div>
-                                  <div style="border:1px solid rgba(255,255,255,0.07); border-radius:9px; padding:7px 8px; background:rgba(255,255,255,0.02);"><div style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#75757d;">EST. COST</div><div style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#7fe6b0; margin-top:2px;">{{ p.uCost }}</div></div>
-                                </div>
-                              </sc-if>
-                              <sc-if value="{{ p.uHasData }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#5a5a62;">No calls to this provider in the last 24 hours.</div></sc-if>
-                            </div>
-                          </sc-if>
-                        </div>
-                      </sc-if>
-                    </div>
-                  </sc-for>
-                </div>
-              </sc-if>
-
-              <sc-if value="{{ isProvNews }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ newsCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.cc }}; border:1px solid {{ c.cb }}; background:{{ c.cbg }}; border-radius:8px; padding:6px 11px; cursor:pointer;">{{ c.label }}</span></sc-for></div>
-              <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">Connected &amp; enabled sources are named to the live assistant so its answers cite and prioritize them.</div>
-              <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                <sc-for list="{{ newsSourceCards }}" as="p" hint-placeholder-count="6">
-                  <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
-                    <div style="display:flex; align-items:center; gap:11px;">
-                      <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
-                      <div style="flex:1; min-width:0;">
-                        <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.tierColor }}; border:1px solid {{ p.tierBorder }}; border-radius:5px; padding:1px 5px;">{{ p.tierLabel }}</span></div>
-                        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ p.statusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.statusColor }};">{{ p.statusLabel }}</span></div>
-                      </div>
-                      <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                    </div>
-                    <div onClick="{{ p.toggleExpand }}" style="display:flex; align-items:center; justify-content:space-between; margin-top:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9a9aa2;"><span>{{ p.expandIcon }} CONFIGURE</span><span style="color:#6f6f78;">{{ p.tierNote }}</span></div>
-                    <sc-if value="{{ p.expanded }}" hint-placeholder-val="{{ false }}">
-                      <div style="margin-top:11px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px; display:flex; flex-direction:column; gap:11px;">
-                        <sc-if value="{{ p.saved }}" hint-placeholder-val="{{ false }}">
-                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.masked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.replace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer;">REPLACE</span></div>
-                        </sc-if>
-                        <sc-if value="{{ p.notSaved }}" hint-placeholder-val="{{ true }}">
-                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ p.draft }}" onInput="{{ p.onDraft }}" placeholder="Paste API key ({{ p.keyHint }})" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ p.save }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">SAVE</span></div>
-                        </sc-if>
-                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                          <span onClick="{{ p.test }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:8px 12px; cursor:pointer;" style-hover="{ borderColor:'rgba(255,255,255,0.45)', color:'#fff' }">&#9889; TEST CONNECTION</span>
-                          <sc-if value="{{ p.err }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ p.err }}</span></sc-if>
-                        </div>
-                        <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:#6f6f78; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.docs }}</span>
-                      </div>
-                    </sc-if>
-                  </div>
-                </sc-for>
-              </div>
-              </sc-if>
-
-              <sc-if value="{{ isProvIntel }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ intelCatChips }}" as="c" hint-placeholder-count="8"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.cc }}; border:1px solid {{ c.cb }}; background:{{ c.cbg }}; border-radius:8px; padding:6px 11px; cursor:pointer;">{{ c.label }}</span></sc-for></div>
-              <div style="font-size:11px; color:#6f6f78; margin-bottom:12px; line-height:1.5;">A reference directory by category — News, Markets, Economic, Crypto, Government, Business, Tech. This is not a live connection to any of these (most require enterprise licensing this app can't offer); toggling a source on just tells your AI Briefing to lean into that category. For a real, live-fetched connection, use News Source APIs below.</div>
-              <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                <sc-for list="{{ intelCards }}" as="p" hint-placeholder-count="6">
-                  <div class="cc-glowcard" data-prov-id="{{ p.id }}" style="border-radius:15px; background:#16181c; padding:14px;">
-                    <div style="display:flex; align-items:center; gap:11px;">
-                      <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ p.color }}; color:{{ p.markText }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">{{ p.mark }}</span>
-                      <div style="flex:1; min-width:0;">
-                        <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ p.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:{{ p.trustColor }}; border:1px solid {{ p.trustColor }}; border-radius:5px; padding:1px 5px; opacity:0.85;">{{ p.trustLabel }}</span></div>
-                        <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ p.enabledColor }};">{{ p.enabledLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#54545c;">&middot; {{ p.category }} &middot; {{ p.region }}</span></div>
-                      </div>
-                      <div onClick="{{ p.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ p.toggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ p.togglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                    </div>
-                  </div>
-                </sc-for>
-              </div>
-              </sc-if>
-
-              <sc-if value="{{ isProvRoute }}" hint-placeholder-val="{{ false }}">
-              <div>
-                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
-                  <div><div style="font-size:14px; font-weight:700; color:#eef0f2;">AI Routing &amp; Failover</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">Default <b style="color:#F4F4F5;">{{ aiDefaultName }}</b> &middot; Backup <b style="color:#e8b45a;">{{ aiBackupName }}</b> &middot; each feature below can override both</div></div>
-                  <div style="display:flex; align-items:center; gap:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce;">AUTOMATIC FAILOVER</span><div onClick="{{ toggleFailover }}" style="width:44px; height:24px; border-radius:14px; background:{{ failBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ failPos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:11px 12px; border:1px solid rgba(255,255,255,0.18); border-radius:12px; background:rgba(255,255,255,0.04); margin-bottom:2px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#FFFFFF; width:100%; margin-bottom:2px;">FAILOVER PRIORITY &middot; auto-switch on outage</span>
-                    <sc-for list="{{ failChain }}" as="f" hint-placeholder-count="3"><span style="display:inline-flex; align-items:center; gap:7px; border:1px solid rgba(255,255,255,0.1); border-radius:9px; padding:5px 9px; background:rgba(255,255,255,0.03);"><span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78;">{{ f.rank }}</span><span style="width:20px; height:20px; border-radius:6px; background:{{ f.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:7.5px; font-weight:700;">{{ f.mark }}</span><span style="font-size:11.5px; color:#dcdce0; font-weight:600;">{{ f.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:{{ f.roleColor }};">{{ f.role }}</span><sc-if value="{{ f.note }}" hint-placeholder-val="{{ false }}"><span title="{{ f.note }}" style="font-family:'JetBrains Mono',monospace; font-size:7px; letter-spacing:.5px; color:#ffb3ba;">&#9888; PAUSED</span></sc-if></span></sc-for>
-                  </div>
-                  <sc-for list="{{ routingRows }}" as="r" hint-placeholder-count="8">
-                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:10px 12px; border:1px solid rgba(255,255,255,0.07); border-radius:12px; background:rgba(255,255,255,0.02);">
-                      <span style="width:150px; flex:0 0 150px; display:flex; flex-direction:column; gap:2px; font-size:12.5px; color:#dcdce0; font-weight:600;">
-                        <span style="display:flex; align-items:center; gap:8px;"><span style="color:#FFFFFF;">{{ r.glyph }}</span>{{ r.label }}</span>
-                        <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; font-weight:400; color:#6f6f78;">&rarr; {{ r.currentName }}</span>
-                      </span>
-                      <div style="flex:1; display:flex; flex-direction:column; gap:5px; min-width:0;">
-                        <div style="display:flex; gap:6px; flex-wrap:wrap;"><sc-for list="{{ r.options }}" as="o" hint-placeholder-count="3"><span onClick="{{ o.set }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ o.oc }}; border:1px solid {{ o.ob }}; background:{{ o.obg }}; border-radius:7px; padding:5px 9px; cursor:pointer;">{{ o.name }}</span></sc-for></div>
-                        <sc-if value="{{ r.overridden }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#ffd66b;">&#9888; {{ r.overrideNote }}</span></sc-if>
-                      </div>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-              </sc-if>
-
-              <div style="margin-top:16px; font-size:11px; color:#6f6f78; display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><span style="color:#ffd66b;">&#9888;</span><span>Paste a key and hit Connect &mdash; it's validated against the real provider and saved server-side in one step. Keys are masked here and never shown again.</span></div>
-              </div>
-            </sc-if>
 
             <sc-if value="{{ tabPerf }}" hint-placeholder-val="{{ false }}">
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">◆ MANDATORY</div>
@@ -9167,7 +9175,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.27-199 · v11.199 loura';
+const NOTIF_BUILD_VERSION = '2026.08.28-200 · v11.200 ai-command-page';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9328,7 +9336,7 @@ activities: this._mergeShipLog(s.activities),
 
   navDefs=[
     {id:'home',label:'Home'},
-    {id:'dashboard',label:'Command'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
+    {id:'dashboard',label:'Command'},{id:'ai',label:'AI Command Center'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
     {id:'globe',label:'World Intel'},
     {id:'fitness',label:'Fitness'},
     {id:'calendar',label:'Calendar'},
@@ -9562,7 +9570,7 @@ activities: this._mergeShipLog(s.activities),
     let providerId=null;
     if(window.claude) providerId='claude-native';
     else { const cands=['anthropic','openai','google','xai','perplexity']; providerId=cands.find(p=>{ const c=this._provCfg(p); return c.on && c.saved; }); }
-    if(!providerId){ this.setState({customNotifGenErr:'Connect an AI provider first — Settings → AI Providers (Anthropic or OpenAI work best).'}); return; }
+    if(!providerId){ this.setState({customNotifGenErr:'Connect an AI provider first — open the AI Command Center (Anthropic or OpenAI work best).'}); return; }
     this.setState({customNotifGenLoading:true, customNotifGenErr:''});
     const seedLines=seed?seed.split(/\r?\n/).map(l=>l.trim()).filter(Boolean):existing;
     const prompt='You write short push-notification copy for a personal AI command-center app called Nervexus. Each one is a single short sentence (under 140 characters), punchy and specific, no emoji, no hashtags.\n\n'+
@@ -9812,7 +9820,7 @@ activities: this._mergeShipLog(s.activities),
   searchGoogle(){ const q=(this.state.searchQuery||'').trim(); if(!q) return; window.open('https://www.google.com/search?q='+encodeURIComponent(q), '_blank', 'noopener'); }
   async runWebSearch(){
     const q=(this.state.searchQuery||'').trim(); if(!q||this.state.searchWebLoading) return;
-    if(!window.claude){ this.setState({searchWebErr:'No AI provider connected \u2014 add one in Settings \u2192 AI Providers to enable web answers.'}); return; }
+    if(!window.claude){ this.setState({searchWebErr:'No AI provider connected \u2014 add one in the AI Command Center to enable web answers.'}); return; }
     this.setState({searchWebLoading:true, searchWebErr:'', searchWebResult:''});
     try{
       const text=await window.claude.complete({role:'market', live:true, system:'Answer the question directly and simply, in plain everyday words, in 3-6 short sentences. If it needs current information you are not certain of, say so plainly.', messages:[{role:'user',content:q}], max_tokens:400});
@@ -10001,7 +10009,7 @@ activities: this._mergeShipLog(s.activities),
       const intel={...(s.prefs.intel||{})}; Object.keys(intel).forEach(id=>{ if(intel[id]&&intel[id].saved) delete intel[id]; });
       return {prefs:{...s.prefs, prov, intel, _fakeSeedCleared:true}}; }); }
   _provCfg(id){ return (this.state.prefs.prov&&this.state.prefs.prov[id])||{}; }
-  // The model the user picked for this provider in Settings -> AI Providers, or its
+  // The model the user picked for this provider in the AI Command Center, or its
   // default — threaded into every callAI/callAIStream so the picker actually does
   // something (it used to be collected and never sent anywhere).
   _provModel(id){ const PD=this._pd(); const p=PD&&PD.byId(id); return this._provCfg(id).model || (p&&p.defaultModel) || ''; }
@@ -13091,6 +13099,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       briefing:'<circle cx="9" cy="9" r="7"/><circle cx="6.9" cy="8.2" r="0.9" fill="currentColor" stroke="none"/><circle cx="11.1" cy="8.2" r="0.9" fill="currentColor" stroke="none"/>',
             globe:'<circle cx="9" cy="9" r="6.2"/><path d="M2.8 9h12.4M9 2.8v12.4" opacity="0.3"/><path d="M4 5.4c1.7 1.6 8.3 1.6 10 0M4 12.6c1.7-1.6 8.3-1.6 10 0" opacity="0.55"/><circle cx="14.6" cy="5.6" r="1.6"/><circle cx="14.6" cy="5.6" r="0.5" fill="currentColor" stroke="none"/>',
       fitness:'<rect x="1.5" y="6.5" width="2.4" height="5" rx="0.6"/><rect x="14.1" y="6.5" width="2.4" height="5" rx="0.6"/><path d="M3.9 9h10.2"/><rect x="3.3" y="7.6" width="1.4" height="2.8" rx="0.4" fill="currentColor" stroke="none"/><rect x="13.3" y="7.6" width="1.4" height="2.8" rx="0.4" fill="currentColor" stroke="none"/>', health:'<path d="M9 15.5C5 12.8 2.5 10.4 2.5 7.4A3.4 3.4 0 0 1 9 6a3.4 3.4 0 0 1 6.5 1.4c0 3-2.5 5.4-6.5 8.1z"/>', business:'<path d="M9 2.5v13"/><path d="M12.5 5.3c-.7-.9-2-1.4-3.5-1.4-2.1 0-3.8 1.1-3.8 2.9 0 1.8 1.7 2.4 3.8 2.7 2.1.3 3.8 1 3.8 2.8 0 1.8-1.7 2.9-3.8 2.9-1.5 0-2.8-.5-3.5-1.4"/>', finance:'<path d="M9 2.5v13"/><path d="M12.5 5.3c-.7-.9-2-1.4-3.5-1.4-2.1 0-3.8 1.1-3.8 2.9 0 1.8 1.7 2.4 3.8 2.7 2.1.3 3.8 1 3.8 2.8 0 1.8-1.7 2.9-3.8 2.9-1.5 0-2.8-.5-3.5-1.4"/>',
+      ai:'<rect x="4.6" y="4.6" width="8.8" height="8.8" rx="2.4"/><circle cx="9" cy="9" r="1.9"/><path d="M7 1.7v2.9M11 1.7v2.9M7 13.4v2.9M11 13.4v2.9M1.7 7h2.9M1.7 11h2.9M13.4 7h2.9M13.4 11h2.9"/>',
       productivity:'<rect x="2.5" y="2.5" width="13" height="13" rx="2.5"/><path d="M5.5 9l2.5 2.5 5-5.5"/>', calendar:'<rect x="2.5" y="3.5" width="13" height="12" rx="2"/><path d="M2.5 7h13M6 2v3M12 2v3"/><circle cx="5.8" cy="10.2" r="0.55" fill="currentColor" stroke="none"/><circle cx="9" cy="10.2" r="0.55" fill="currentColor" stroke="none"/><circle cx="12.2" cy="10.2" r="0.55" fill="currentColor" stroke="none"/><circle cx="5.8" cy="13" r="0.55" fill="currentColor" stroke="none"/><circle cx="9" cy="13" r="0.55" fill="currentColor" stroke="none"/><circle cx="12.2" cy="13" r="0.55" fill="currentColor" stroke="none"/>',
       learning:'<path d="M2 6l7-3.2 7 3.2-7 3.2z"/><path d="M4.5 7.6v3.8c0 1.4 2 2.6 4.5 2.6s4.5-1.2 4.5-2.6V7.6"/><path d="M16 6v4.5"/>',
       power:'<path d="M9 1.6l6.2 2.3v4.6c0 4-2.7 6.9-6.2 8.1-3.5-1.2-6.2-4.1-6.2-8.1V3.9z"/><path d="M9.9 5.2L6.7 9.9h2.5l-.7 3.1 3.4-4.9H9.4z" fill="currentColor" stroke="none"/>',
@@ -17033,6 +17042,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           ...this._healthExtra(H,S),
           ...(window.HealthKit?this._energyExtra(H,S,window.HealthKit,(()=>{ try{ return window.HealthKit.today(); }catch(e){ return ''; } })()):{}),
         }; }, {}),
+      isAI:scene==='ai',
       isSettings:scene==='settings',
       acctLocked:!S.acctUnlocked, acctUnlocked:S.acctUnlocked,
       acctPwInput:S.acctPwInput, setAcctPwInput:(e)=>this.setState({acctPwInput:e.target.value, acctErr:false}),
@@ -17099,8 +17109,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           anatomyFrontCount: nF?(' \u25cf'+nF):'', anatomyBackCount: nB?(' \u25cf'+nB):'',
           anatomyActive:active, noAnatomyActive:!active.length };
       })(),
-      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','AI Providers','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'#F4F4F5':'#9a9aa2', bg:n===S.settingsTab?'rgba(255,255,255,0.14)':'transparent', bd:n===S.settingsTab?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.08)', soon:''})),
-      settingsTab:S.settingsTab,
+      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'#F4F4F5':'#9a9aa2', bg:n===S.settingsTab?'rgba(255,255,255,0.14)':'transparent', bd:n===S.settingsTab?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.08)', soon:''})),
+      // 'AI Providers' is a page of its own now; a state still naming it would render an empty panel.
+      settingsTab:S.settingsTab==='AI Providers'?'Account':S.settingsTab,
       ...(()=>{ const c=this._provCfg('elevenlabs'); const PD=this._pd(); const tts=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0])||{voices:[]};
         const st=c.status||'idle';
         return {
@@ -17118,7 +17129,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       memDraft:S.memDraft||'', setMemDraft:(e)=>this.setState({memDraft:e.target.value}),
       addMemBtn:()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } },
       addMemKey:enterKey(()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } }),
-      tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security', tabAI:S.settingsTab==='AI Providers', tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabTrouble:S.settingsTab==='Troubleshooting', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
+      tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security',  tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabTrouble:S.settingsTab==='Troubleshooting', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
@@ -17139,7 +17150,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           { q:'My data isn’t showing up on another device', a:'Sync only runs while signed in with a working connection — check "Account sync" above reads Connected on both devices. If either shows Local only, sign out and back in there; it’ll pull everything fresh from your account.' },
           { q:'I’m not getting notifications', a:'Check "Notifications" above first — most misses come down to the browser permission being Blocked or never asked. Some browsers (iOS Safari outside "Add to Home Screen", most in-app browsers) don’t support push at all. Settings → Notifications has a "Send test reminder now" button to confirm delivery once permission is granted.' },
           { q:'Performance Terminal banned my account', a:'7 consecutive missed daily check-ins triggers an automatic ban. Submit an appeal from Settings → Performance Terminal — the owner reviews it from their own Admin tab. Holidays logged in advance are exempt, up to the yearly cap shown there.' },
-          { q:'AI features (chat, briefings, suggestions) aren’t responding', a:'Check "AI (Claude)" above — it needs a saved, connected key. Settings → AI Providers lets you paste and test one; ERROR usually means the key was revoked or the account’s out of credit, not a bug in the app.' },
+          { q:'AI features (chat, briefings, suggestions) aren’t responding', a:'Check "AI (Claude)" above — it needs a saved, connected key. The AI Command Center lets you paste and test one; ERROR usually means the key was revoked or the account’s out of credit, not a bug in the app.' },
           { q:'My theme (Ultra / Noir / Maison Élysée) didn’t change', a:'Settings → Appearance → Theme applies immediately, but a stale cached build can hold the old look. Tap the refresh icon top-right (or Settings → Update Terminal) to force the latest version, then re-check.' },
           { q:'The voice assistant isn’t responding to the mic', a:'The browser needs microphone permission for this site — if it was denied once, it won’t ask again automatically. Check the site permissions in your browser’s address-bar icon and allow microphone access, then reload.' },
           { q:'A feature I was told about seems to be missing', a:'Tap the refresh icon top-right to force-pull the latest build, then compare the app version above against the newest entry in Settings → Update Terminal — if they don’t match you’re still on a cached older version.' },
