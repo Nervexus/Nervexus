@@ -8,8 +8,8 @@
 // Mirrors NOTIF_BUILD_VERSION in index.html — the page fetches this file to confirm whether
 // an "update available" signal is real before interrupting anyone. The two must move together;
 // the release check asserts they match.
-const BUILD_VERSION = '2026.08.28-200 · v11.200 ai-command-page';
-const CACHE = 'cc-v84';
+const BUILD_VERSION = '2026.08.28-201 · v11.201 voice-api-moved';
+const CACHE = 'cc-v85';
 const SHELL = [
   './', './AI Command Center.dc.html', './manifest.json', './favicon.png',
   './support.js', './countries-data.js', './notif-engine.js', './notification-engine.js', './voice-engine.js',

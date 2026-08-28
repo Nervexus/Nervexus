@@ -8234,6 +8234,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <span onClick="{{ setProvViewAI }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewAIc }}; border:1px solid {{ provViewAIbd }}; background:{{ provViewAIbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">AI PROVIDERS</span>
                   <span onClick="{{ setProvViewIntel }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewINc }}; border:1px solid {{ provViewINbd }}; background:{{ provViewINbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">INTEL SOURCES</span>
                   <span onClick="{{ setProvViewNews }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewNEc }}; border:1px solid {{ provViewNEbd }}; background:{{ provViewNEbg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">NEWS SOURCE APIS</span>
+                  <span onClick="{{ setProvViewVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ provViewVOc }}; border:1px solid {{ provViewVObd }}; background:{{ provViewVObg }}; border-radius:10px; padding:9px 14px; cursor:pointer;">VOICE APIS</span>
                 </div>
                 <div style="flex:1; min-width:180px; display:flex; align-items:center; gap:8px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03);">
                   <span style="color:#FFFFFF; font-size:12px;">&#9906;</span>
@@ -8360,6 +8361,34 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </div>
               </sc-if>
 
+              <!-- The voice provider is an API like any other; only the connection lives here.
+                   Which voice actually speaks stays in Settings -> Voice, next to the library it
+                   feeds and the rate/pitch controls it belongs with. -->
+              <sc-if value="{{ isProvVoice }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid; grid-template-columns:1fr; max-width:460px; gap:12px;">
+                    <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px; margin-bottom:20px;">
+                      <div style="display:flex; align-items:center; gap:11px;">
+                        <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ elColor }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">EL</span>
+                        <div style="flex:1; min-width:0;">
+                          <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">ElevenLabs — realistic AI voice</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.4); border-radius:5px; padding:1px 5px;">FREEMIUM</span></div>
+                          <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ elStatusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ elStatusColor }};">{{ elStatusLabel }}</span></div>
+                        </div>
+                        <div onClick="{{ elToggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ elToggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ elTogglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                      </div>
+                      <div style="margin-top:11px; display:flex; flex-direction:column; gap:11px;">
+                        <sc-if value="{{ elSaved }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ elMasked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elTest }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ elReplace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
+                        </sc-if>
+                        <sc-if value="{{ elNotSaved }}" hint-placeholder-val="{{ true }}">
+                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ elDraft }}" onInput="{{ onElDraft }}" placeholder="Paste ElevenLabs API key" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elSave }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
+                        </sc-if>
+                        <sc-if value="{{ elErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ elErr }}</div></sc-if>
+                        <div style="font-size:11px; color:#8a8a92; line-height:1.5;">When connected &amp; enabled, the assistant speaks with your chosen voice below instead of your browser's built-in voice. Falls back automatically if unavailable.</div>
+                      </div>
+                    </div>
+                </div>
+                <div style="margin-top:12px; font-size:11px; color:#6f6f78; line-height:1.5;">Choosing which voice she speaks with, and the rate, pitch and volume, live in Settings &rarr; Voice.</div>
+              </sc-if>
               <sc-if value="{{ isProvRoute }}" hint-placeholder-val="{{ false }}">
               <div>
                 <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
@@ -8526,28 +8555,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
             <sc-if value="{{ tabVoiceSet }}" hint-placeholder-val="{{ false }}">
               <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px; margin-bottom:20px;">
-                <div style="display:flex; align-items:center; gap:11px;">
-                  <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ elColor }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">EL</span>
-                  <div style="flex:1; min-width:0;">
-                    <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">ElevenLabs — realistic AI voice</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.4); border-radius:5px; padding:1px 5px;">FREEMIUM</span></div>
-                    <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ elStatusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ elStatusColor }};">{{ elStatusLabel }}</span></div>
-                  </div>
-                  <div onClick="{{ elToggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ elToggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ elTogglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                </div>
-                <div style="margin-top:11px; display:flex; flex-direction:column; gap:11px;">
-                  <sc-if value="{{ elSaved }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex; gap:8px; align-items:center;"><input value="{{ elMasked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elTest }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ elReplace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
-                  </sc-if>
-                  <sc-if value="{{ elNotSaved }}" hint-placeholder-val="{{ true }}">
-                    <div style="display:flex; gap:8px; align-items:center;"><input value="{{ elDraft }}" onInput="{{ onElDraft }}" placeholder="Paste ElevenLabs API key" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elSave }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
-                  </sc-if>
-                  <sc-if value="{{ elErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ elErr }}</div></sc-if>
-                  <div style="font-size:11px; color:#8a8a92; line-height:1.5;">When connected &amp; enabled, the assistant speaks with your chosen voice below instead of your browser's built-in voice. Falls back automatically if unavailable.</div>
-                  <div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-bottom:8px;">ADD A VOICE BY ID (elevenlabs.io/app/voice-lab)</div>
-                    <div style="display:flex; gap:8px; align-items:center;"><input value="{{ customVoiceIdDraft }}" onInput="{{ onCustomVoiceIdDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Paste ElevenLabs voice ID" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><input value="{{ customVoiceNameDraft }}" onInput="{{ onCustomVoiceNameDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Name" style="width:110px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"><span onClick="{{ addCustomVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600; white-space:nowrap;">ADD</span></div>
-                  </div>
-                </div>
+                <div style="font-size:11px; color:#8a8a92; line-height:1.5; margin-bottom:12px;">The ElevenLabs connection lives in the <strong style="color:#c8c8ce;">AI Command Center</strong> now, with every other provider. This page is what she sounds like.</div>
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-bottom:8px;">ADD A VOICE BY ID (elevenlabs.io/app/voice-lab)</div>
+                      <div style="display:flex; gap:8px; align-items:center;"><input value="{{ customVoiceIdDraft }}" onInput="{{ onCustomVoiceIdDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Paste ElevenLabs voice ID" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><input value="{{ customVoiceNameDraft }}" onInput="{{ onCustomVoiceNameDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Name" style="width:110px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"><span onClick="{{ addCustomVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600; white-space:nowrap;">ADD</span></div>
               </div>
               <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:13px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06); margin-bottom:8px;">
                 <div><div style="font-size:11px; color:#7c7c84; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">ACTIVE VOICE MODEL</div><div style="font-size:17px; font-weight:700; margin-top:3px;">{{ voiceModelName }}</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">{{ voiceDeviceName }}</div></div>
@@ -9175,7 +9185,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.28-200 · v11.200 ai-command-page';
+const NOTIF_BUILD_VERSION = '2026.08.28-201 · v11.201 voice-api-moved';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10089,7 +10099,7 @@ activities: this._mergeShipLog(s.activities),
   _extractJSONArray(t){ try{ const a=t.indexOf('['), b=t.lastIndexOf(']'); if(a<0||b<0) return null; return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
   async generateBriefingAI(){ const PD=this._pd(); if(!PD||!window.claude){ this.setState({aiBriefErr:'AI provider unavailable in this environment'}); return; } this.setState({aiBriefLoading:true,aiBriefErr:''}); const enabled=PD.INTEL_SOURCES.filter(s=>this._intelCfg(s.id).on).map(s=>s.name); const provId=(this.state.prefs.routing&&this.state.prefs.routing.briefings)||this.state.prefs.aiDefault||'anthropic'; const provName=(PD.byId(provId)||{}).name||provId; const nm=((this.state.account&&this.state.account.name)||'').trim()||'the principal'; const sys='You are an elite executive intelligence analyst preparing a private daily briefing for a CEO, investor and entrepreneur. Concise, factual, non-sensational, premium tone. Return ONLY valid minified JSON, no markdown fences.'; const shape='{"outlook":"1-2 sentence global outlook","sentiment":"Bullish|Neutral|Bearish","summary":{"bigStory":"","moneyMoving":"","risk":"","opportunity":""},"sections":[{"title":"Global Money News","items":[{"tag":"EQUITIES","head":"headline","sum":"1-2 sentence analysis"}]}],"takeaways":["",""]}'; const prompt='Generate the Executive Intelligence Briefing for '+nm+'. Enabled intelligence sources: '+(enabled.join(', ')||'general knowledge')+'. Cover where relevant: '+PD.BRIEFING_CATEGORIES.join(', ')+'. Produce 4 to 6 sections, each with 2 to 4 items and short uppercase tags, plus 3 to 5 key takeaways. Return JSON exactly matching this shape: '+shape; try{ const raw=await window.claude.complete({role:'briefings',system:sys,messages:[{role:'user',content:prompt}],max_tokens:4000}); const j=this._extractJSON(raw); if(j&&j.sections){ this.setState({aiBrief:j,aiBriefLoading:false,aiBriefProvider:(window.claude?'Claude · live':provName),aiBriefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),briefTab:'exec',scene:'briefing'}); } else this.setState({aiBriefLoading:false,aiBriefErr:'Could not parse the AI response — try again.'}); }catch(e){ this.setState({aiBriefLoading:false,aiBriefErr:(e&&e.message)||'Generation failed'}); } }
   clearAIBrief(){ this.setState({aiBrief:null,aiBriefErr:''}); }
-  _providerVals(){ const PD=this._pd(); const S=this.state; if(!PD || !window.AIGateway || !window.AIGateway.isConfigured()) return { aiProviderCards:[], intelCards:[], intelCatChips:[], routingRows:[], failChain:[], provStats:[], isProvAI:true, isProvIntel:false, provSearch:'', aiDefaultName:'—', aiBackupName:'—', failoverOn:false, setProvViewAI:()=>{}, setProvViewIntel:()=>{}, onProvSearch:()=>{}, toggleFailover:()=>{}, genBriefing:()=>{}, aiBriefLoading:false, aiBriefErr:'', hasAIBrief:false, clearAIBrief:()=>{}, failBg:'rgba(255,255,255,0.14)', failPos:'2px' };
+  _providerVals(){ const PD=this._pd(); const S=this.state; if(!PD || !window.AIGateway || !window.AIGateway.isConfigured()) return { aiProviderCards:[], intelCards:[], intelCatChips:[], routingRows:[], failChain:[], provStats:[], isProvAI:true, isProvIntel:false, isProvVoice:false, setProvViewVoice:()=>{}, provSearch:'', aiDefaultName:'—', aiBackupName:'—', failoverOn:false, setProvViewAI:()=>{}, setProvViewIntel:()=>{}, onProvSearch:()=>{}, toggleFailover:()=>{}, genBriefing:()=>{}, aiBriefLoading:false, aiBriefErr:'', hasAIBrief:false, clearAIBrief:()=>{}, failBg:'rgba(255,255,255,0.14)', failPos:'2px' };
     const q=(S.provSearch||'').trim().toLowerCase();
     const stColor=(st)=> st==='ok'?'#2fce86': (st==='testing'||st==='connecting'||st==='saving')?'#e8b45a': st==='error'?'#ff5563':'#6f6f78';
     const stLabel=(st,saved)=> st==='ok'?'CONNECTED': (st==='testing'||st==='connecting'||st==='saving')?'CONNECTING\u2026': st==='error'?'ERROR': saved?'READY':'NOT CONNECTED';
@@ -10162,13 +10172,14 @@ activities: this._mergeShipLog(s.activities),
     const nAI=PD.AI_PROVIDERS.filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length, nNews=(PD.NEWS_SOURCES||[]).filter(p=>{const c=this._provCfg(p.id);return c.on&&c.saved;}).length;
     const view=S.provView||'ai';
     return {
-      isProvAI:view==='ai', isProvNews:view==='news', isProvRoute:view==='route', isProvIntel:view==='intel',
+      isProvAI:view==='ai', isProvNews:view==='news', isProvRoute:view==='route', isProvIntel:view==='intel', isProvVoice:view==='voice',
       // Counts come from the same pass that built the constellation nodes, so the caption
       // can never disagree with what the map is drawing.
       constellationCaption:((this._constOnCount||0)+' LIVE / '+(this._constNodeCount||0)+' REGISTERED'),
-      setProvViewAI:()=>this.setProvView('ai'), setProvViewNews:()=>this.setProvView('news'), setProvViewRoute:()=>this.setProvView('route'), setProvViewIntel:()=>this.setProvView('intel'),
+      setProvViewAI:()=>this.setProvView('ai'), setProvViewNews:()=>this.setProvView('news'), setProvViewRoute:()=>this.setProvView('route'), setProvViewIntel:()=>this.setProvView('intel'), setProvViewVoice:()=>this.setProvView('voice'),
       provViewAIc:view==='ai'?'#F4F4F5':'#9a9aa2', provViewAIbg:view==='ai'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewAIbd:view==='ai'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provViewNEc:view==='news'?'#F4F4F5':'#9a9aa2', provViewNEbg:view==='news'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewNEbd:view==='news'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
+      provViewVOc:view==='voice'?'#F4F4F5':'#9a9aa2', provViewVObg:view==='voice'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewVObd:view==='voice'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provViewRTc:view==='route'?'#F4F4F5':'#9a9aa2', provViewRTbg:view==='route'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewRTbd:view==='route'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provViewINc:view==='intel'?'#F4F4F5':'#9a9aa2', provViewINbg:view==='intel'?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.03)', provViewINbd:view==='intel'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       provSearch:S.provSearch||'', onProvSearch:(e)=>this.setProvSearch(e),
