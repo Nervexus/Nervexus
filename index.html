@@ -309,6 +309,7 @@
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
 <script src="exercise-index.js?v=2"></script>
+<script src="finance-import.js?v=1"></script>
 <script src="ai-gateway.js?v=2"></script>
 <script src="voice-assistant-engine.js?v=19"></script>
 <script src="constellation-engine.js"></script>
@@ -1987,6 +1988,59 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
 
+        <!-- Finance bulk import. Same shape as the workout importer, with one addition that is
+             the whole point of it: every row carries its own date, so a week entered on Sunday
+             lands on the days it actually happened instead of all on Sunday. -->
+        <sc-if value="{{ finImpOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeFinImport }}" style="position:fixed; inset:0; z-index:70; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
+            <div onClick="{{ stopFinImpClick }}" class="cc-glowcard" style="width:100%; max-width:620px; max-height:86vh; overflow-y:auto; border-radius:20px; background:#101012; padding:24px; box-shadow:0 30px 70px rgba(0,0,0,0.55);">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                <span style="font-size:16px; font-weight:700;">Bulk import</span>
+                <span onClick="{{ closeFinImport }}" style="cursor:pointer; color:#6f6f78; font-size:18px;" style-hover="{ color:'#fff' }">&times;</span>
+              </div>
+              <div style="font-size:12px; color:#8a8a92; line-height:1.5; margin-bottom:14px;">One entry per line, name then amount. Write a day in front of it &mdash; &ldquo;yesterday&rdquo;, &ldquo;Mon&rdquo;, &ldquo;12 Aug&rdquo;, &ldquo;3 days ago&rdquo; &mdash; or leave it off and it uses the day below. Lines starting <strong style="color:#c8c8ce;">+</strong> are income; everything else is an expense.</div>
+
+              <sc-if value="{{ finImpNoRows }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">DAY FOR LINES WITH NO DATE</div>
+                <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
+                  <sc-for list="{{ finImpDayChips }}" as="d" hint-placeholder-count="8">
+                    <span onClick="{{ d.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ d.c }}; border:1px solid {{ d.b }}; background:{{ d.bg }}; border-radius:8px; padding:6px 10px; cursor:pointer; white-space:nowrap;">{{ d.l }}</span>
+                  </sc-for>
+                </div>
+                <textarea value="{{ finImpText }}" onInput="{{ setFinImpText }}" placeholder="e.g.&#10;Mon  Tesco 42.50&#10;Tue  Shell petrol 60&#10;Netflix 12.99&#10;yesterday lunch 8.40&#10;+2400 Salary" style="width:100%; min-height:170px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:inherit;"></textarea>
+                <sc-if value="{{ hasFinImpErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-top:10px;">&#9888; {{ finImpErr }}</div></sc-if>
+                <div onClick="{{ parseFinImport }}" class="cc-glowbtn" style="margin-top:14px; display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">&#9889; Read lines</div>
+              </sc-if>
+
+              <sc-if value="{{ finImpHasRows }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:10px;">{{ finImpRowCount }} FOUND &mdash; CHECK THE DATES AND AMOUNTS BEFORE ADDING</div>
+                <div style="display:flex; flex-direction:column; gap:8px; max-height:44vh; overflow-y:auto;">
+                  <sc-for list="{{ finImpRows }}" as="r" hint-placeholder-count="4">
+                    <div style="border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); padding:10px 12px;">
+                      <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                        <span onClick="{{ r.toggleType }}" title="Switch between money in and money out" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; color:{{ r.typeColor }}; border:1px solid {{ r.typeBorder }}; border-radius:7px; padding:4px 8px; cursor:pointer; white-space:nowrap;">{{ r.typeLabel }}</span>
+                        <input value="{{ r.label }}" onInput="{{ r.setLabel }}" style="flex:1; min-width:90px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+                        <input value="{{ r.amount }}" onInput="{{ r.setAmount }}" type="number" step="0.01" style="width:78px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+                        <span onClick="{{ r.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#ff5563' }">&times;</span>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap;">
+                        <input value="{{ r.date }}" onInput="{{ r.setDate }}" type="date" min="{{ finImpMinDate }}" max="{{ finImpMaxDate }}" style="padding:5px 8px; border-radius:8px; border:1px solid {{ r.dateBorder }}; background:rgba(255,255,255,0.03); color:{{ r.dateColor }}; font-size:11.5px; outline:none; font-family:'JetBrains Mono',monospace;">
+                        <input value="{{ r.cat }}" onInput="{{ r.setCat }}" list="finImpCatList" style="width:118px; padding:5px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#c8c8ce; font-size:11.5px; outline:none;">
+                        <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#ffd66b;">{{ r.note }}</span></sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <datalist id="finImpCatList"><sc-for list="{{ finImpAllCats }}" as="c" hint-placeholder-count="9"><option value="{{ c }}"></option></sc-for></datalist>
+                <div style="display:flex; gap:9px; margin-top:14px;">
+                  <span onClick="{{ finImpBack }}" style="padding:12px 16px; border-radius:11px; cursor:pointer; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.05); color:#c8c8ce; font-size:13px; white-space:nowrap;">Back</span>
+                  <span onClick="{{ confirmFinImport }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">Add All ({{ finImpRowCount }})</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
         <sc-if value="{{ woImportOpen }}" hint-placeholder-val="{{ false }}">
           <div onClick="{{ closeWoImport }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
             <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:85vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:24px;">
@@ -2509,7 +2563,13 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="height:1px; background:rgba(255,255,255,0.08); margin:16px 0 14px;"></div>
 
               <!-- income log -->
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span style="font-size:12px; font-weight:600;">Log Income</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ incTotal }}</span></div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
+                <span style="font-size:12px; font-weight:600;">Log Income</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span onClick="{{ openFinImport }}" title="Paste a week of entries at once, any day in the last 30" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:4px 9px; cursor:pointer; white-space:nowrap;" style-hover="{ borderColor:'rgba(255,255,255,0.4)', color:'#fff' }">&#8593; BULK IMPORT</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ incTotal }}</span>
+                </div>
+              </div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
                 <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
               </div>
@@ -9024,7 +9084,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.28-204 · v11.204 orb-back-one-node';
+const NOTIF_BUILD_VERSION = '2026.08.29-205 · v11.205 finance-bulk-import';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9100,6 +9160,7 @@ class Component extends DCLogic {
       incLabel:'', incAmt:'', incCat:'Salary', incRecurring:false, incSaveAmt:'', savingsAddAmt:'', newExpenseCat:'',
       expLabel:'', expAmt:'', expCat:'Food', expRecurring:false,
       moneyCalY:new Date().getFullYear(), moneyCalM:new Date().getMonth(), moneySel:'',
+      finImpOpen:false, finImpText:'', finImpErr:'', finImpRows:[], finImpDay:'',
 activities: this._mergeShipLog(s.activities),
       actText:'', actCat:'Work', actRange:'Week', actMin:'', actHr:'',
       whType:'Deep Work', whText:'', whHr:'', whMin:'', whTaskDraft:'',
@@ -10084,6 +10145,54 @@ activities: this._mergeShipLog(s.activities),
     const id=this._uuid(), cat=S.expCat||'Food', recurring=!!S.expRecurring, ts=new Date(this._moneyLogDay()+'T12:00:00').getTime();
     this.mut(s=>({expenses:[...s.expenses,{id,label:l,amt:a,cat,recurring,ts}],expLabel:'',expAmt:'',expRecurring:false}));
     if(this._sbOn()) window.SB.insert('expenses',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,category:cat,recurring,occurred_at:new Date(ts).toISOString()});
+  }
+  /* ---- Bulk import (finance) ------------------------------------------------------------
+     The parsing lives in finance-import.js so it can be tested outside the browser; this half
+     is only the plumbing. Rows are always reviewed before anything is written — a misread
+     amount in a money log is worse than one in a workout log. */
+  openFinImport(){ this.setState({finImpOpen:true, finImpText:'', finImpErr:'', finImpRows:[], finImpDay:this._moneyLogDay()}); }
+  closeFinImport(){ this.setState({finImpOpen:false, finImpRows:[], finImpText:'', finImpErr:''}); }
+  setFinImpText(e){ this.setState({finImpText:e.target.value, finImpErr:''}); }
+  setFinImpDay(d){
+    // Re-parse so rows that took the batch default follow the new day; rows that carried their
+    // own date on the line keep it.
+    this.setState({finImpDay:d}, ()=>{ if((this.state.finImpRows||[]).length) this.parseFinImport(); });
+  }
+  parseFinImport(){
+    if(!window.FinanceImport){ this.setState({finImpErr:'The import parser didn\u2019t load — force refresh and try again.'}); return; }
+    const rows=window.FinanceImport.parse(this.state.finImpText||'', {
+      defaultDate:this.state.finImpDay||this._moneyLogDay(),
+      categories:this._expenseCats()
+    });
+    if(!rows.length){ this.setState({finImpRows:[], finImpErr:'Couldn\u2019t find anything to log — each line needs a name and an amount, like \u201cTesco 42.50\u201d.'}); return; }
+    this.setState({finImpRows:rows, finImpErr:''});
+  }
+  setFinImpRowField(idx,field,value){ this.mut(s=>{ const rows=[...s.finImpRows]; rows[idx]={...rows[idx],[field]:value, note:''}; return {finImpRows:rows}; }); }
+  toggleFinImpRowType(idx){ this.mut(s=>{ const rows=[...s.finImpRows]; const r=rows[idx];
+    const isInc=r.type!=='income';
+    rows[idx]={...r, type:isInc?'income':'expense', cat:isInc?'Salary':(this._expenseCats()[0]||'Other')};
+    return {finImpRows:rows}; }); }
+  removeFinImpRow(idx){ this.mut(s=>({finImpRows:s.finImpRows.filter((_,i)=>i!==idx)})); }
+  confirmFinImport(){
+    const rows=(this.state.finImpRows||[]).filter(r=>(r.label||'').trim() && +r.amount>0);
+    if(!rows.length) return;
+    const inc=[], exp=[];
+    rows.forEach((r,i)=>{
+      // Noon local, matching addIncome/addExpense — a midnight timestamp lands on the wrong day
+      // for anyone behind UTC. The +i seconds only keeps same-day rows in the order pasted.
+      const ts=new Date(r.date+'T12:00:00').getTime()+i*1000;
+      const rec={ id:this._uuid(), label:r.label.trim(), amt:Math.round((+r.amount)*100)/100, cat:r.cat, recurring:false, ts };
+      (r.type==='income'?inc:exp).push(rec);
+    });
+    this.mut(s=>({ income:[...s.income,...inc], expenses:[...s.expenses,...exp] }));
+    if(this._sbOn()){
+      const uid=this.state.authUserId;
+      inc.forEach(e=>window.SB.insert('income',{id:e.id,user_id:uid,domain:'business',label:e.label,amount:e.amt,category:e.cat,recurring:false,occurred_at:new Date(e.ts).toISOString()}));
+      exp.forEach(e=>window.SB.insert('expenses',{id:e.id,user_id:uid,domain:'business',label:e.label,amount:e.amt,category:e.cat,recurring:false,occurred_at:new Date(e.ts).toISOString()}));
+    }
+    const n=inc.length+exp.length;
+    this.showToast('system','Finance imported', n+' entr'+(n===1?'y':'ies')+' added \u2014 '+inc.length+' in, '+exp.length+' out.');
+    this.setState({finImpOpen:false, finImpRows:[], finImpText:'', finImpErr:''});
   }
   // Savings is a protected pool: it only grows via an explicit contribution (either set aside
   // when logging income, or a standalone top-up) and is never reduced by logging an expense —
@@ -18713,6 +18822,45 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       setIncLabel:(e)=>this.setState({incLabel:e.target.value}), setIncAmt:(e)=>this.setState({incAmt:e.target.value}), setExpLabel:(e)=>this.setState({expLabel:e.target.value}), setExpAmt:(e)=>this.setState({expAmt:e.target.value}),
       incRecurringColor: S.incRecurring?'#F4F4F5':'#8a8a92', incRecurringBg: S.incRecurring?'#FFFFFF':'transparent', toggleIncRecurring:()=>this.setState({incRecurring:!S.incRecurring}),
       expRecurringColor: S.expRecurring?'#F4F4F5':'#8a8a92', expRecurringBg: S.expRecurring?'#FFFFFF':'transparent', toggleExpRecurring:()=>this.setState({expRecurring:!S.expRecurring}),
+      ...(()=>{
+        const FI=window.FinanceImport;
+        const today=FI?FI._toKey(new Date()):new Date().toLocaleDateString('en-CA');
+        const day=S.finImpDay||this._moneyLogDay();
+        const rows=S.finImpRows||[];
+        const fmt=(k)=>{ const d=new Date(k+'T12:00:00'); return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); };
+        const dayList=FI?FI.days(today):[today];
+        return {
+          finImpOpen:!!S.finImpOpen, openFinImport:()=>this.openFinImport(), closeFinImport:()=>this.closeFinImport(),
+          stopFinImpClick:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); },
+          finImpText:S.finImpText||'', setFinImpText:(e)=>this.setFinImpText(e),
+          finImpErr:S.finImpErr||'', hasFinImpErr:!!S.finImpErr,
+          parseFinImport:()=>this.parseFinImport(), confirmFinImport:()=>this.confirmFinImport(),
+          finImpBack:()=>this.setState({finImpRows:[]}),
+          finImpHasRows:rows.length>0, finImpNoRows:rows.length===0, finImpRowCount:rows.length,
+          // The window is one definition in finance-import.js; the date inputs take their
+          // bounds from it rather than repeating "30" here.
+          finImpMinDate:dayList[dayList.length-1], finImpMaxDate:today,
+          finImpAllCats:[...this._expenseCats(), ...this._incomeCats()].filter((c,i,a)=>a.indexOf(c)===i),
+          finImpDayChips:dayList.map(k=>({ l:k===today?'Today':fmt(k), set:()=>this.setFinImpDay(k),
+            c:day===k?'#F4F4F5':'#9a9aa2', b:day===k?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:day===k?'rgba(255,255,255,0.16)':'transparent' })),
+          finImpRows:rows.map((r,i)=>({
+            label:r.label, amount:String(r.amount), cat:r.cat, date:r.date,
+            note:r.note||'', hasNote:!!r.note,
+            typeLabel:r.type==='income'?'IN':'OUT',
+            typeColor:r.type==='income'?'#7ec9a0':'#ff8a5b',
+            typeBorder:r.type==='income'?'rgba(126,201,160,0.45)':'rgba(255,138,91,0.45)',
+            // A date the line carried is worth showing as deliberate; one that fell back to the
+            // batch default is the one worth a second look.
+            dateColor:r.dated?'#c8c8ce':'#8a8a92', dateBorder:r.dated?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.1)',
+            toggleType:()=>this.toggleFinImpRowType(i),
+            setLabel:(e)=>this.setFinImpRowField(i,'label',e.target.value),
+            setAmount:(e)=>this.setFinImpRowField(i,'amount',e.target.value),
+            setCat:(e)=>this.setFinImpRowField(i,'cat',e.target.value),
+            setDate:(e)=>this.setFinImpRowField(i,'date',e.target.value),
+            remove:()=>this.removeFinImpRow(i)
+          }))
+        };
+      })(),
       incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       expCatChips: this._expenseCats().map(c=>({ l:c, set:()=>this.setState({expCat:c}), c:S.expCat===c?'#F4F4F5':'#9a9aa2', b:S.expCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.expCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       addIncome:()=>this.addIncome(), addIncKey:enterKey(()=>this.addIncome()), addExpense:()=>this.addExpense(), addExpKey:enterKey(()=>this.addExpense()),
