@@ -109,6 +109,35 @@ t('a future date is pulled back to today', () => {
   if (r.date > TODAY) throw new Error('future date survived: ' + r.date);
 });
 
+// ---- dates as an existing log actually writes them ----
+t('ISO dates, the format an export uses', () => {
+  eq(one('2026-08-12 Tesco 42.50').date, '2026-08-12');
+  eq(one('2026-08-12,Tesco,42.50').date, '2026-08-12');
+  eq(one('2026-08-12 Tesco 42.50').label, 'Tesco', 'the date must not survive in the label');
+});
+t('dash-separated day-first dates', () => {
+  eq(one('12-08-2026 Tesco 42.50').date, '2026-08-12');
+  eq(one('12-08 Tesco 42.50').date, '2026-08-12');
+});
+t('a date at the END of the line is found too', () => {
+  eq(one('Tesco 42.50 12/08').date, '2026-08-12');
+  eq(one('Tesco 42.50 yesterday').date, '2026-08-27');
+  eq(one('Tesco 42.50 12 Aug').date, '2026-08-12');
+  eq(one('Tesco 42.50 12/08').amount, 42.5, 'the amount must survive a trailing date');
+  eq(one('Tesco 42.50 12/08').label, 'Tesco');
+});
+// The reason '.' is not a date separator: it is a decimal point far more often.
+t('a decimal amount is never mistaken for a date', () => {
+  const r = one('42.50 Tesco');
+  eq([r.label, r.amount], ['Tesco', 42.5], '"42.50 Tesco" was being dropped entirely');
+  eq(one('Lunch 12.08').amount, 12.08, '12.08 is twelve pounds eight, not 12 August');
+  eq(one('Lunch 12.08').dated, false);
+});
+t('an impossible day or month is not a date', () => {
+  eq(one('Thing 45/99 20').amount, 20);
+  if (one('Thing 45/99 20').dated) throw new Error('45/99 was accepted as a date');
+});
+
 // ---- categories ----
 t('a category the user actually has, named in the line, wins', () => {
   eq(one('Cinema tickets Entertainment 24').cat, 'Entertainment');

@@ -60,47 +60,63 @@
   function fromKey(key) { var p = String(key).split('-'); return new Date(+p[0], +p[1] - 1, +p[2], 12, 0, 0); }
   function shift(base, days) { var d = fromKey(base); d.setDate(d.getDate() - days); return toKey(d); }
 
-  /* Pull a date off the line and hand back the rest of it. Recognises the forms people actually
-     write when catching up on a week: "12 Aug", "12/08", "yesterday", "3 days ago", "Mon".
-     Returns null for `date` when the line carries none, so the batch default applies. */
+  /* Try to read a date out of one end of the line and hand back the rest of it.
+
+     Anchored deliberately: a date leads the line or trails it, and nothing in between is
+     treated as one — otherwise every stray number in a description becomes a candidate.
+
+     '.' is NOT a separator here even though "12.08.2026" is a real convention, because in a
+     money log a dot is a decimal point far more often than a date separator: it was reading
+     "42.50 Tesco" as day 42 of month 50, producing an invalid date, eating the amount and
+     dropping the row entirely. '/' and '-' cover how people actually type dates in a log. */
+  function dateAt(text, todayKey, atEnd) {
+    var today = fromKey(todayKey);
+    // Each entry: [regex without anchors, resolver]. `\s*` padding is added per anchor below.
+    var pats = [
+      [/(today)/i,                                    function () { return todayKey; }],
+      [/(yesterday|yday)/i,                           function () { return shift(todayKey, 1); }],
+      [/(\d{1,2})\s*(?:days?|d)\s*ago/i,              function (m) { return shift(todayKey, +m[1]); }],
+      // ISO first — an export writes 2026-08-12, and it must not be read as day 20.
+      [/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/,        function (m) { return ymd(+m[1], +m[2], +m[3]); }],
+      [/(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})/i,   function (m) { var mo = MONTHS[m[2].toLowerCase()]; return mo == null ? null : resolveMonthDay(+m[1], mo, today); }],
+      [/([a-z]{3,9})\s+(\d{1,2})(?:st|nd|rd|th)?/i,   function (m) { var mo = MONTHS[m[1].toLowerCase()]; return mo == null ? null : resolveMonthDay(+m[2], mo, today); }],
+      [/(\d{1,2})[-\/](\d{1,2})(?:[-\/](\d{2,4}))?/,  function (m) {
+        var day = +m[1], mon = +m[2];
+        if (day < 1 || day > 31 || mon < 1 || mon > 12) return null;   // "45/99" is not a date
+        if (m[3]) return ymd(+m[3] < 100 ? 2000 + +m[3] : +m[3], mon, day);
+        var d = new Date(today.getFullYear(), mon - 1, day, 12, 0, 0);
+        if (d.getTime() > today.getTime()) d.setFullYear(today.getFullYear() - 1);
+        return toKey(d);
+      }],
+      [/([a-z]{3,9})/i, function (m) {
+        var w = DOW[m[1].toLowerCase()];
+        if (w == null) return null;
+        var back = (today.getDay() - w + 7) % 7;
+        return shift(todayKey, back === 0 ? 7 : back);
+      }]
+    ];
+    for (var i = 0; i < pats.length; i++) {
+      var re = atEnd ? new RegExp('[\\s,:-]+(?:' + pats[i][0].source + ')\\s*$', pats[i][0].flags)
+                     : new RegExp('^\\s*(?:' + pats[i][0].source + ')\\b[\\s,:-]*', pats[i][0].flags);
+      var m = re.exec(text);
+      if (!m) continue;
+      var key = pats[i][1](m);
+      if (!key) continue;                              // matched the shape but not a real date
+      var rest = atEnd ? text.slice(0, m.index) : text.slice(m[0].length);
+      return { date: key, rest: rest };
+    }
+    return null;
+  }
+
+  /* A date leads the line or trails it. Leading is tried first because that is how a log is
+     usually written; trailing catches the exports and notes that put it last. */
   function extractDate(line, todayKey) {
-    var today = fromKey(todayKey), m, rest = line;
+    return dateAt(line, todayKey, false) || dateAt(line, todayKey, true) || { date: null, rest: line };
+  }
 
-    m = /^\s*(today)\b[\s,:-]*/i.exec(rest);
-    if (m) return { date: todayKey, rest: rest.slice(m[0].length) };
-
-    m = /^\s*(yesterday|yday)\b[\s,:-]*/i.exec(rest);
-    if (m) return { date: shift(todayKey, 1), rest: rest.slice(m[0].length) };
-
-    m = /^\s*(\d{1,2})\s*(?:days?|d)\s*ago\b[\s,:-]*/i.exec(rest);
-    if (m) return { date: shift(todayKey, +m[1]), rest: rest.slice(m[0].length) };
-
-    // "12 Aug" / "12 August" / "Aug 12"
-    m = /^\s*(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})\b[\s,:-]*/i.exec(rest);
-    if (m && MONTHS[m[2].toLowerCase()] != null) {
-      return { date: resolveMonthDay(+m[1], MONTHS[m[2].toLowerCase()], today), rest: rest.slice(m[0].length) };
-    }
-    m = /^\s*([a-z]{3,9})\s+(\d{1,2})(?:st|nd|rd|th)?\b[\s,:-]*/i.exec(rest);
-    if (m && MONTHS[m[1].toLowerCase()] != null) {
-      return { date: resolveMonthDay(+m[2], MONTHS[m[1].toLowerCase()], today), rest: rest.slice(m[0].length) };
-    }
-
-    // "12/08" or "12/08/2026" — day first, which is what a UK user writing this by hand means.
-    m = /^\s*(\d{1,2})[\/.](\d{1,2})(?:[\/.](\d{2,4}))?\b[\s,:-]*/i.exec(rest);
-    if (m) {
-      var yr = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : today.getFullYear();
-      var d = new Date(yr, +m[2] - 1, +m[1], 12, 0, 0);
-      if (!m[3] && d.getTime() > today.getTime()) d.setFullYear(yr - 1);
-      return { date: toKey(d), rest: rest.slice(m[0].length) };
-    }
-
-    // A bare weekday means the most recent one that has already happened.
-    m = /^\s*([a-z]{3,9})\b[\s,:-]+/i.exec(rest);
-    if (m && DOW[m[1].toLowerCase()] != null) {
-      var want = DOW[m[1].toLowerCase()], back = (today.getDay() - want + 7) % 7;
-      return { date: shift(todayKey, back === 0 ? 7 : back), rest: rest.slice(m[0].length) };
-    }
-    return { date: null, rest: rest };
+  function ymd(y, mo, d) {
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    return toKey(new Date(y, mo - 1, d, 12, 0, 0));
   }
 
   /* A month/day with no year is the most recent one that has already happened — "12 Aug" typed
