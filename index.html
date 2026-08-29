@@ -1988,59 +1988,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
 
-        <!-- Finance bulk import. Same shape as the workout importer, with one addition that is
-             the whole point of it: every row carries its own date, so a week entered on Sunday
-             lands on the days it actually happened instead of all on Sunday. -->
-        <sc-if value="{{ finImpOpen }}" hint-placeholder-val="{{ false }}">
-          <div onClick="{{ closeFinImport }}" style="position:fixed; inset:0; z-index:70; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
-            <div onClick="{{ stopFinImpClick }}" class="cc-glowcard" style="width:100%; max-width:620px; max-height:86vh; overflow-y:auto; border-radius:20px; background:#101012; padding:24px; box-shadow:0 30px 70px rgba(0,0,0,0.55);">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-                <span style="font-size:16px; font-weight:700;">Bulk import</span>
-                <span onClick="{{ closeFinImport }}" style="cursor:pointer; color:#6f6f78; font-size:18px;" style-hover="{ color:'#fff' }">&times;</span>
-              </div>
-              <div style="font-size:12px; color:#8a8a92; line-height:1.5; margin-bottom:14px;">One entry per line, name then amount. Write a day in front of it &mdash; &ldquo;yesterday&rdquo;, &ldquo;Mon&rdquo;, &ldquo;12 Aug&rdquo;, &ldquo;3 days ago&rdquo; &mdash; or leave it off and it uses the day below. Lines starting <strong style="color:#c8c8ce;">+</strong> are income; everything else is an expense.</div>
-
-              <sc-if value="{{ finImpNoRows }}" hint-placeholder-val="{{ true }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">DAY FOR LINES WITH NO DATE</div>
-                <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
-                  <sc-for list="{{ finImpDayChips }}" as="d" hint-placeholder-count="8">
-                    <span onClick="{{ d.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ d.c }}; border:1px solid {{ d.b }}; background:{{ d.bg }}; border-radius:8px; padding:6px 10px; cursor:pointer; white-space:nowrap;">{{ d.l }}</span>
-                  </sc-for>
-                </div>
-                <textarea value="{{ finImpText }}" onInput="{{ setFinImpText }}" placeholder="e.g.&#10;Mon  Tesco 42.50&#10;Tue  Shell petrol 60&#10;Netflix 12.99&#10;yesterday lunch 8.40&#10;+2400 Salary" style="width:100%; min-height:170px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:inherit;"></textarea>
-                <sc-if value="{{ hasFinImpErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-top:10px;">&#9888; {{ finImpErr }}</div></sc-if>
-                <div onClick="{{ parseFinImport }}" class="cc-glowbtn" style="margin-top:14px; display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">&#9889; Read lines</div>
-              </sc-if>
-
-              <sc-if value="{{ finImpHasRows }}" hint-placeholder-val="{{ false }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:10px;">{{ finImpRowCount }} FOUND &mdash; CHECK THE DATES AND AMOUNTS BEFORE ADDING</div>
-                <div style="display:flex; flex-direction:column; gap:8px; max-height:44vh; overflow-y:auto;">
-                  <sc-for list="{{ finImpRows }}" as="r" hint-placeholder-count="4">
-                    <div style="border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); padding:10px 12px;">
-                      <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
-                        <span onClick="{{ r.toggleType }}" title="Switch between money in and money out" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; color:{{ r.typeColor }}; border:1px solid {{ r.typeBorder }}; border-radius:7px; padding:4px 8px; cursor:pointer; white-space:nowrap;">{{ r.typeLabel }}</span>
-                        <input value="{{ r.label }}" onInput="{{ r.setLabel }}" style="flex:1; min-width:90px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-                        <input value="{{ r.amount }}" onInput="{{ r.setAmount }}" type="number" step="0.01" style="width:78px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-                        <span onClick="{{ r.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#ff5563' }">&times;</span>
-                      </div>
-                      <div style="display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap;">
-                        <input value="{{ r.date }}" onInput="{{ r.setDate }}" type="date" min="{{ finImpMinDate }}" max="{{ finImpMaxDate }}" style="padding:5px 8px; border-radius:8px; border:1px solid {{ r.dateBorder }}; background:rgba(255,255,255,0.03); color:{{ r.dateColor }}; font-size:11.5px; outline:none; font-family:'JetBrains Mono',monospace;">
-                        <input value="{{ r.cat }}" onInput="{{ r.setCat }}" list="finImpCatList" style="width:118px; padding:5px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#c8c8ce; font-size:11.5px; outline:none;">
-                        <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#ffd66b;">{{ r.note }}</span></sc-if>
-                      </div>
-                    </div>
-                  </sc-for>
-                </div>
-                <datalist id="finImpCatList"><sc-for list="{{ finImpAllCats }}" as="c" hint-placeholder-count="9"><option value="{{ c }}"></option></sc-for></datalist>
-                <div style="display:flex; gap:9px; margin-top:14px;">
-                  <span onClick="{{ finImpBack }}" style="padding:12px 16px; border-radius:11px; cursor:pointer; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.05); color:#c8c8ce; font-size:13px; white-space:nowrap;">Back</span>
-                  <span onClick="{{ confirmFinImport }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">Add All ({{ finImpRowCount }})</span>
-                </div>
-              </sc-if>
-            </div>
-          </div>
-        </sc-if>
-
         <sc-if value="{{ woImportOpen }}" hint-placeholder-val="{{ false }}">
           <div onClick="{{ closeWoImport }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
             <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:85vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:24px;">
@@ -2486,6 +2433,59 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <!-- ===== FINANCE TERMINAL ===== -->
       <sc-if value="{{ isBiz }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
+        <!-- Finance bulk import. Same shape as the workout importer, with one addition that is
+             the whole point of it: every row carries its own date, so a week entered on Sunday
+             lands on the days it actually happened instead of all on Sunday. -->
+        <sc-if value="{{ finImpOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closeFinImport }}" style="position:fixed; inset:0; z-index:70; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
+            <div onClick="{{ stopFinImpClick }}" class="cc-glowcard" style="width:100%; max-width:620px; max-height:86vh; overflow-y:auto; border-radius:20px; background:#101012; padding:24px; box-shadow:0 30px 70px rgba(0,0,0,0.55);">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                <span style="font-size:16px; font-weight:700;">Bulk import</span>
+                <span onClick="{{ closeFinImport }}" style="cursor:pointer; color:#6f6f78; font-size:18px;" style-hover="{ color:'#fff' }">&times;</span>
+              </div>
+              <div style="font-size:12px; color:#8a8a92; line-height:1.5; margin-bottom:14px;">One entry per line, name then amount. Write a day in front of it &mdash; &ldquo;yesterday&rdquo;, &ldquo;Mon&rdquo;, &ldquo;12 Aug&rdquo;, &ldquo;3 days ago&rdquo; &mdash; or leave it off and it uses the day below. Lines starting <strong style="color:#c8c8ce;">+</strong> are income; everything else is an expense.</div>
+
+              <sc-if value="{{ finImpNoRows }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px;">DAY FOR LINES WITH NO DATE</div>
+                <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;">
+                  <sc-for list="{{ finImpDayChips }}" as="d" hint-placeholder-count="8">
+                    <span onClick="{{ d.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ d.c }}; border:1px solid {{ d.b }}; background:{{ d.bg }}; border-radius:8px; padding:6px 10px; cursor:pointer; white-space:nowrap;">{{ d.l }}</span>
+                  </sc-for>
+                </div>
+                <textarea value="{{ finImpText }}" onInput="{{ setFinImpText }}" placeholder="e.g.&#10;Mon  Tesco 42.50&#10;Tue  Shell petrol 60&#10;Netflix 12.99&#10;yesterday lunch 8.40&#10;+2400 Salary" style="width:100%; min-height:170px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:inherit;"></textarea>
+                <sc-if value="{{ hasFinImpErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-top:10px;">&#9888; {{ finImpErr }}</div></sc-if>
+                <div onClick="{{ parseFinImport }}" class="cc-glowbtn" style="margin-top:14px; display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">&#9889; Read lines</div>
+              </sc-if>
+
+              <sc-if value="{{ finImpHasRows }}" hint-placeholder-val="{{ false }}">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:10px;">{{ finImpRowCount }} FOUND &mdash; CHECK THE DATES AND AMOUNTS BEFORE ADDING</div>
+                <div style="display:flex; flex-direction:column; gap:8px; max-height:44vh; overflow-y:auto;">
+                  <sc-for list="{{ finImpRows }}" as="r" hint-placeholder-count="4">
+                    <div style="border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); padding:10px 12px;">
+                      <div style="display:flex; align-items:center; gap:7px; flex-wrap:wrap;">
+                        <span onClick="{{ r.toggleType }}" title="Switch between money in and money out" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; color:{{ r.typeColor }}; border:1px solid {{ r.typeBorder }}; border-radius:7px; padding:4px 8px; cursor:pointer; white-space:nowrap;">{{ r.typeLabel }}</span>
+                        <input value="{{ r.label }}" onInput="{{ r.setLabel }}" style="flex:1; min-width:90px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+                        <input value="{{ r.amount }}" onInput="{{ r.setAmount }}" type="number" step="0.01" style="width:78px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+                        <span onClick="{{ r.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#ff5563' }">&times;</span>
+                      </div>
+                      <div style="display:flex; align-items:center; gap:7px; margin-top:7px; flex-wrap:wrap;">
+                        <input value="{{ r.date }}" onInput="{{ r.setDate }}" type="date" min="{{ finImpMinDate }}" max="{{ finImpMaxDate }}" style="padding:5px 8px; border-radius:8px; border:1px solid {{ r.dateBorder }}; background:rgba(255,255,255,0.03); color:{{ r.dateColor }}; font-size:11.5px; outline:none; font-family:'JetBrains Mono',monospace;">
+                        <input value="{{ r.cat }}" onInput="{{ r.setCat }}" list="finImpCatList" style="width:118px; padding:5px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:#c8c8ce; font-size:11.5px; outline:none;">
+                        <sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#ffd66b;">{{ r.note }}</span></sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <datalist id="finImpCatList"><sc-for list="{{ finImpAllCats }}" as="c" hint-placeholder-count="9"><option value="{{ c }}"></option></sc-for></datalist>
+                <div style="display:flex; gap:9px; margin-top:14px;">
+                  <span onClick="{{ finImpBack }}" style="padding:12px 16px; border-radius:11px; cursor:pointer; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.05); color:#c8c8ce; font-size:13px; white-space:nowrap;">Back</span>
+                  <span onClick="{{ confirmFinImport }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">Add All ({{ finImpRowCount }})</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
         <div style="margin-bottom:20px;">
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ FINANCE TERMINAL</div>
           <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Finance Terminal</h1>
@@ -9084,7 +9084,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.29-205 · v11.205 finance-bulk-import';
+const NOTIF_BUILD_VERSION = '2026.08.29-206 · v11.206 import-modal-scene';
 class Component extends DCLogic {
   constructor(props){
     super(props);

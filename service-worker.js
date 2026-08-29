@@ -8,8 +8,8 @@
 // Mirrors NOTIF_BUILD_VERSION in index.html — the page fetches this file to confirm whether
 // an "update available" signal is real before interrupting anyone. The two must move together;
 // the release check asserts they match.
-const BUILD_VERSION = '2026.08.29-205 · v11.205 finance-bulk-import';
-const CACHE = 'cc-v89';
+const BUILD_VERSION = '2026.08.29-206 · v11.206 import-modal-scene';
+const CACHE = 'cc-v90';
 const SHELL = [
   './', './AI Command Center.dc.html', './manifest.json', './favicon.png',
   './support.js', './countries-data.js', './notif-engine.js', './notification-engine.js', './voice-engine.js',
