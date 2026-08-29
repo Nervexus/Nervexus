@@ -2490,12 +2490,19 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ FINANCE TERMINAL</div>
           <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Finance Terminal</h1>
         </div>
-        <div class="cc-stat4 cc-fin-kpi-wrap" style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:18px;">
-          <sc-for list="{{ bizKpis }}" as="k" hint-placeholder-count="4">
-            <div class="cc-glowcard cc-fin-kpi-item" style="border-radius:18px; background:#16181c; padding:18px;">
-              <div style="font-size:11px; letter-spacing:1px; color:#7c7c84;">{{ k.label }}</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; margin:8px 0 2px; color:{{ k.vc }};">{{ k.value }}</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ k.dc }};">{{ k.delta }}</div>
+        <!-- The tiles follow the calendar's month, and the calendar sits BELOW them, so without
+             this caption the four figures would silently change month with no visible cause. -->
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:{{ finTileLabel }}; margin-bottom:9px;">{{ finTileMonth }}</div>
+        <div class="cc-stat4" style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px;">
+          <sc-for list="{{ finTiles }}" as="t" hint-placeholder-count="4">
+            <div class="cc-glowcard" style="position:relative; overflow:hidden; border-radius:16px; background:{{ finTileCard }}; border:1px solid {{ finTileLine }}; box-shadow:{{ finTileShadow }}; padding:20px;">
+              <span style="position:absolute; top:-10px; right:-6px; font-size:82px; line-height:1; opacity:0.03; pointer-events:none; color:{{ finTileInk }};">{{ t.glyph }}</span>
+              <div style="position:relative; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:{{ finTileLabel }}; margin-bottom:10px;">{{ t.label }}</div>
+              <div style="position:relative; font-family:'JetBrains Mono',monospace; font-size:30px; font-weight:700; letter-spacing:-0.03em; line-height:1; color:{{ finTileInk }};">{{ t.value }}</div>
+              <div style="position:relative; display:flex; align-items:center; gap:6px; margin-top:12px; flex-wrap:wrap;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; color:{{ t.chipC }}; background:{{ t.chipBg }}; border-radius:6px; padding:2px 6px; white-space:nowrap;">{{ t.chip }}</span>
+                <span style="font-size:10px; color:{{ finTileNote }};">{{ t.note }}</span>
+              </div>
             </div>
           </sc-for>
         </div>
@@ -9084,7 +9091,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.29-208 · v11.208 income-expense-chart';
+const NOTIF_BUILD_VERSION = '2026.08.29-209 · v11.209 finance-stat-tiles';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12818,6 +12825,90 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      Blue and orange rather than the conventional green and red: green/red on this surface
      scores 6.5 for protanopia — the classic pair that vanishes for red-green colour blindness.
      Blue/orange scores 26.8 for the same viewer. */
+  /* The four figures that say whether a month went well, for whichever month the calendar
+     above is showing — same y/m the Budget Planner follows, so paging the calendar moves all
+     three together rather than leaving the tiles stuck on today.
+
+     Layout is lifted from a v0 finance dashboard (small spaced label, oversized mono figure,
+     a delta pill), rebuilt in this app's own markup and theme tokens rather than imported —
+     its stack is React and Tailwind, this one is a single file with its own binding syntax.
+     Only the metrics that exist here are shown: no balance, no P&L, no dividend yield. */
+  _finTiles(){
+    const S=this.state, y=S.moneyCalY, m=S.moneyCalM;
+    const pm = m===0 ? {y:y-1,m:11} : {y,m:m-1};
+    const sum=(rows,yy,mm)=>(rows||[]).reduce((a,r)=>{ const d=new Date(r.ts); return d.getFullYear()===yy&&d.getMonth()===mm ? a+(+r.amt||0) : a; },0);
+
+    const inNow=sum(S.income,y,m),    inPrev=sum(S.income,pm.y,pm.m);
+    const outNow=sum(S.expenses,y,m), outPrev=sum(S.expenses,pm.y,pm.m);
+    const netNow=inNow-outNow,        netPrev=inPrev-outPrev;
+    const savNow=sum(S.savings,y,m);
+
+    const money=(v)=>'$'+Math.abs(v).toLocaleString('en-GB',{minimumFractionDigits:(Math.abs(v)%1?2:0),maximumFractionDigits:2});
+    /* A delta needs a previous month to be a delta. With nothing to compare against the pill
+       says so instead of showing "+100%", which is what a divide-by-zero guard would produce
+       for a first month and would read as real growth. */
+    const pct=(now,prev)=>{
+      if(!prev) return { txt: now? 'first month' : 'nothing logged', dir:0 };
+      const raw=(now-prev)/Math.abs(prev)*100;
+      /* Round FIRST, then take the direction from the rounded figure — otherwise a 0.04%
+         change prints "+0.0%" beside a green up-arrow, a pill disagreeing with itself. */
+      const dp=Math.abs(raw)<10?1:0, d=+raw.toFixed(dp);
+      if(d===0) return { txt:'no change', dir:0 };
+      return { txt:(d>0?'+':'\u2212')+Math.abs(d).toFixed(dp)+'%', dir:d>0?1:-1 };
+    };
+    const dIn=pct(inNow,inPrev), dOut=pct(outNow,outPrev), dNet=pct(netNow,netPrev);
+    const rate = inNow>0 ? Math.round(savNow/inNow*100) : null;
+
+    // Direction of GOOD, not direction of the arrow: expenses rising is the bad case even
+    // though the number went up.
+    const T=this._finTileTokens();
+    const tone=(dir,goodIsUp)=> dir===0 ? T.flat : ((dir>0)===goodIsUp ? T.good : T.bad);
+    const arrow=(dir)=> dir>0?'\u2197':dir<0?'\u2198':'\u2192';
+    const tile=(label,value,d,goodIsUp,note,glyph)=>({
+      label, value, glyph,
+      chip:(d.dir!==0||/%$/.test(d.txt)) ? (arrow(d.dir)+' '+d.txt) : d.txt,
+      chipC:tone(d.dir,goodIsUp).c, chipBg:tone(d.dir,goodIsUp).bg, note
+    });
+
+    return { finTiles:[
+      tile('MONEY IN',  money(inNow),  dIn,  true,  'vs last month', '\u2193'),
+      tile('MONEY OUT', money(outNow), dOut, false, 'vs last month', '\u2191'),
+      tile('NET',       (netNow<0?'\u2212':'')+money(netNow), dNet, true, 'vs last month', '\u003D'),
+      { label:'SAVED', value:money(savNow),
+        chip: rate==null ? 'no income yet' : rate+'% of income',
+        chipC:(rate!=null&&rate>=10?T.good:T.flat).c, chipBg:(rate!=null&&rate>=10?T.good:T.flat).bg,
+        note:'set aside this month', glyph:'\u25CE' }
+    ], finTileMonth:new Date(y,m,1).toLocaleString('en-GB',{month:'long',year:'numeric'}) };
+  }
+  /* Card and pill values taken from the v0 template's own source rather than read off a
+     screenshot: 16px radius, 20px padding, an 11px 0.08em uppercase label, a 30px bold mono
+     figure at -0.03em, and a 12px mono pill at 10% of its own colour. Its surface is a 145deg
+     gradient between oklch(0.165 0.01 260) and oklch(0.145 0.008 260) with a 1px oklch(0.26
+     0.012 260 / 0.6) border and a six-layer shadow — converted to hex here, since this app has
+     no Tailwind or oklch pipeline to hand them to.
+
+     Its gain/loss are oklch(0.76 0.16 162) and oklch(0.62 0.22 18) — #23d091 and #ed3151.
+     Kept for the base theme; Ultra and Noir get their own, because dropping a mint green onto
+     cream parchment or into black-and-gold would look like a different app had leaked in.
+
+     These are status colours, not series colours: a rising-cost pill is a state, and it ships
+     with an arrow and a caption so the meaning never rests on colour alone. */
+  _finTileTokens(){
+    const isU=this.state.prefs.theme==='Ultra';
+    const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
+    const shadow='rgba(0,0,0,0.10) 0px 0px 0px 1px, rgba(0,0,0,0.10) 0px 1px 1px -0.5px, rgba(0,0,0,0.10) 0px 3px 3px -1.5px, rgba(0,0,0,0.10) 0px 6px 6px -3px, rgba(0,0,0,0.10) 0px 12px 12px -6px, rgba(0,0,0,0.10) 0px 24px 24px -12px';
+    if(isNoir) return {
+      good:{c:'#D8B979', bg:'rgba(216,185,121,0.10)'}, bad:{c:'#9C8F7A', bg:'rgba(156,143,122,0.10)'}, flat:{c:'#8A8375', bg:'rgba(138,131,117,0.10)'},
+      card:'linear-gradient(145deg,#171614,#111010)', line:'rgba(227,220,204,0.14)', label:'rgba(227,220,204,0.55)', ink:'#E3DCCC', note:'rgba(227,220,204,0.42)', shadow };
+    if(isU) return {
+      good:{c:'#2F6B3A', bg:'rgba(47,107,58,0.10)'}, bad:{c:'#B3261E', bg:'rgba(179,38,30,0.10)'}, flat:{c:'#8a6a5a', bg:'rgba(138,106,90,0.10)'},
+      card:'linear-gradient(145deg,#FDFAF4,#F6F1E7)', line:'rgba(58,42,32,0.14)', label:'rgba(58,42,32,0.62)', ink:'#3A2A20', note:'rgba(58,42,32,0.5)',
+      shadow:'rgba(58,42,32,0.05) 0px 0px 0px 1px, rgba(58,42,32,0.04) 0px 3px 3px -1.5px, rgba(58,42,32,0.04) 0px 12px 12px -6px' };
+    return {
+      good:{c:'#23d091', bg:'rgba(35,208,145,0.10)'}, bad:{c:'#ed3151', bg:'rgba(237,49,81,0.10)'}, flat:{c:'#8a8a92', bg:'rgba(255,255,255,0.06)'},
+      card:'linear-gradient(145deg,#0c0e13,#080a0e)', line:'rgba(33,36,42,0.6)', label:'#7c7c84', ink:'#eef0f2', note:'rgba(124,124,132,0.7)', shadow };
+  }
+
   _bizPalette(){
     const isU=this.state.prefs.theme==='Ultra';
     const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
@@ -16897,7 +16988,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
     // business derived
     const totalInc=S.income.reduce((a,i)=>a+(+i.amt||0),0), totalExp=S.expenses.reduce((a,e)=>a+(+e.amt||0),0); const net=totalInc-totalExp; const margin=totalInc>0?Math.round(net/totalInc*100):0;
-    const bizKpis=[ {label:'INCOME LOGGED',value:this.fmtK(totalInc),vc:'#eef0f2',delta:'▲ this month',dc:'#FFFFFF'}, {label:'EXPENSES LOGGED',value:this.fmtK(totalExp),vc:'#eef0f2',delta:S.expenses.length+' entries',dc:'#9a9aa2'}, {label:'NET PROFIT',value:this.fmtK(net),vc:net>=0?'#FFFFFF':'#ff3b4a',delta:(net>=0?'▲ positive':'▼ negative'),dc:net>=0?'#FFFFFF':'#ff3b4a'}, {label:'MARGIN',value:margin+'%',vc:'#eef0f2',delta:'of income',dc:'#9a9aa2'} ];
+    /* The old KPI row lived here: all-time INCOME LOGGED / EXPENSES LOGGED / NET PROFIT /
+       MARGIN, with the first one captioned "this month" when it was nothing of the sort. It is
+       replaced by _finTiles(), scoped to the month the calendar is showing, compared against
+       the previous one, and reporting what was set aside — the number that actually says
+       whether the month went well. */
 
     // productivity derived
     const actColor={Work:'#FFFFFF',Health:'#e8e8ec',Gym:'#e8e8ec',Learning:'#FFFFFF',Business:'#ff5563',Personal:'#9a9aa2'};
@@ -18941,7 +19036,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }, {}),
 
       // business
-      bizKpis, bizChartYearLabel:S.moneyCalY, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp),
+      bizChartYearLabel:S.moneyCalY, incLabel:S.incLabel, incAmt:S.incAmt, expLabel:S.expLabel, expAmt:S.expAmt, incTotal:this.fmtK(totalInc), expTotal:this.fmtK(totalExp),
       setIncLabel:(e)=>this.setState({incLabel:e.target.value}), setIncAmt:(e)=>this.setState({incAmt:e.target.value}), setExpLabel:(e)=>this.setState({expLabel:e.target.value}), setExpAmt:(e)=>this.setState({expAmt:e.target.value}),
       incRecurringColor: S.incRecurring?'#F4F4F5':'#8a8a92', incRecurringBg: S.incRecurring?'#FFFFFF':'transparent', toggleIncRecurring:()=>this.setState({incRecurring:!S.incRecurring}),
       expRecurringColor: S.expRecurring?'#F4F4F5':'#8a8a92', expRecurringBg: S.expRecurring?'#FFFFFF':'transparent', toggleExpRecurring:()=>this.setState({expRecurring:!S.expRecurring}),
@@ -18987,6 +19082,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // Legend swatches come from the chart's own palette so the key can never again
       // name a colour the bars are not drawn in.
       bizIncColor:this._bizPalette().inc, bizExpColor:this._bizPalette().exp,
+      ...this._finTiles(),
+      ...(()=>{ const T=this._finTileTokens(); return { finTileCard:T.card, finTileLine:T.line, finTileLabel:T.label, finTileInk:T.ink, finTileNote:T.note, finTileShadow:T.shadow }; })(),
       incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       expCatChips: this._expenseCats().map(c=>({ l:c, set:()=>this.setState({expCat:c}), c:S.expCat===c?'#F4F4F5':'#9a9aa2', b:S.expCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.expCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       addIncome:()=>this.addIncome(), addIncKey:enterKey(()=>this.addIncome()), addExpense:()=>this.addExpense(), addExpKey:enterKey(()=>this.addExpense()),
