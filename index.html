@@ -2604,7 +2604,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
         <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-bottom:18px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;"><span style="font-size:15px; font-weight:700;">Income vs Expenses · {{ bizChartYearLabel }}</span>
-            <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:10px;"><span style="color:#8a8a92;"><span style="color:#FFFFFF;">■</span> Income</span><span style="color:#8a8a92;"><span style="color:#ff5563;">■</span> Expenses</span></div>
+            <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:10px;"><span style="color:#8a8a92;"><span style="color:{{ bizIncColor }};">■</span> Income</span><span style="color:#8a8a92;"><span style="color:{{ bizExpColor }};">■</span> Expenses</span></div>
           </div>
           <canvas data-chart="bizChart" style="width:100%; height:250px; display:block; margin-top:10px;"></canvas>
         </div>
@@ -9084,7 +9084,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.29-207 · v11.207 import-date-formats';
+const NOTIF_BUILD_VERSION = '2026.08.29-208 · v11.208 income-expense-chart';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12801,19 +12801,142 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     });
   }
 
-  startBiz(cv,inc,exp){ const {ctx,w,h}=this.prep(cv); const n=12; const realMax=Math.max(...inc,...exp); const mx=realMax||1; const gp=w/n*0.4; const bw=(w/n-gp)/2; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
+  /* Series colours live here, once, and the legend reads the same object — they used to be
+     written out separately and had drifted: the legend drew expenses in red #ff5563 while the
+     bars drew #7A2626 maroon, so the key was describing a colour that was not on the chart.
+
+     Every pair below was checked rather than chosen by eye. The Noir pair in particular was a
+     measured failure, not a matter of taste: bone #C4BDB0 against warm grey #968F82 scored a
+     normal-vision Delta E of 14.8, under the 15 floor — "hard to tell apart even with full
+     colour vision", which is exactly how it read. Bone against deep gold scores 33.7 and stays
+     inside Noir's black-and-gold identity.
+
+       base dark  #3987e5 / #d95926   Delta E 26.8 normal, 26.8 protan
+       Noir       #E3DCCC / #9C6B2E   Delta E 33.7 normal, 33.0 deutan
+       Ultra/light#2a78d6 / #d95926   Delta E 32.3 normal, 25.4 protan
+
+     Blue and orange rather than the conventional green and red: green/red on this surface
+     scores 6.5 for protanopia — the classic pair that vanishes for red-green colour blindness.
+     Blue/orange scores 26.8 for the same viewer. */
+  _bizPalette(){
+    const isU=this.state.prefs.theme==='Ultra';
+    const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
+    if(isNoir)  return { inc:'#E3DCCC', exp:'#9C6B2E', grid:'rgba(196,189,176,0.10)', axis:'rgba(150,143,130,0.75)', ink:'#E3DCCC', panel:'rgba(18,18,18,0.95)', panelLine:'rgba(196,189,176,0.25)' };
+    if(isU)     return { inc:'#2a78d6', exp:'#d95926', grid:'rgba(58,42,32,0.12)',    axis:'rgba(58,42,32,0.6)',    ink:'#3A2A20', panel:'rgba(245,241,232,0.97)', panelLine:'rgba(58,42,32,0.25)' };
+    return             { inc:'#3987e5', exp:'#d95926', grid:'rgba(255,255,255,0.06)', axis:'#8a8a92',               ink:'#eef0f2', panel:'rgba(16,16,18,0.95)', panelLine:'rgba(255,255,255,0.16)' };
+  }
+
+  startBiz(cv,inc,exp){
+    const {ctx,w,h}=this.prep(cv);
+    const n=12, P=this._bizPalette();
     const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const axisColor = isNoir?'rgba(150,143,130,0.6)':isU?'rgba(58,42,32,0.55)':'#75757d';
-    const labelH=18, chartH=h-labelH;
-    this.loop((ts)=>{ const prog=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h);
-      ctx.strokeStyle='rgba(255,255,255,0.04)'; for(let g=0;g<4;g++){ const y=(g/3)*(chartH-12)+2; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-      for(let i=0;i<n;i++){ const bx=i*(w/n)+gp/2;
-        const ih=(inc[i]/mx)*(chartH-16)*prog; const g1=ctx.createLinearGradient(0,chartH-ih,0,chartH); g1.addColorStop(0, isNoir?'#C4BDB0':isU?'#292524':'#FFFFFF'); g1.addColorStop(1, isNoir?'rgba(196,189,176,0.3)':isU?'rgba(41,37,36,0.35)':'rgba(255,255,255,0.25)'); ctx.fillStyle=g1; ctx.fillRect(bx, chartH-ih, bw, ih);
-        const eh=(exp[i]/mx)*(chartH-16)*prog; const g2=ctx.createLinearGradient(0,chartH-eh,0,chartH); g2.addColorStop(0,isNoir?'#968F82':'#7A2626'); g2.addColorStop(1,isNoir?'rgba(150,143,130,0.25)':'rgba(122,38,38,0.25)'); ctx.fillStyle=g2; ctx.fillRect(bx+bw+2, chartH-eh, bw, eh);
+    const realMax=Math.max(...inc,...exp);
+
+    /* Pick a round STEP and let the top follow, rather than rounding the max and dividing it
+       into quarters — that produced ticks like 2500 / 1875 / 1250 / 625, which fmtK then
+       rendered as "$3K / $2K / $1K / $625": two labels reading the same and one that is not
+       round at all. A round step means every gridline is a number you can read off. */
+    const TICKS=4;
+    const niceStep=(v)=>{ if(v<=0) return 1; const p=Math.pow(10,Math.floor(Math.log10(v))); const r=v/p;
+      return (r<=1?1:r<=2?2:r<=5?5:10)*p; };
+    const step = realMax>0 ? niceStep(realMax/TICKS) : 1;
+    const mx = realMax>0 ? step*Math.ceil(realMax/step) : 1;
+    /* Axis ticks need their own formatter. fmtK rounds to whole thousands, so a 500 step gave
+       "$2K" for both 1,500 and 2,000 — two gridlines carrying the same label. Keep a decimal
+       when the value is not a round thousand. */
+    const fmtAxis=(v)=>{
+      if(v>=1000000) return '$'+(v/1000000).toFixed(v%1000000?2:0)+'M';
+      if(v>=1000)    return '$'+(v/1000).toFixed(v%1000?1:0)+'K';
+      return '$'+Math.round(v);
+    };
+
+    // Room above the top gridline so its label is not drawn over the card's title.
+    const labelH=20, padT=16;
+    const chartH=h-labelH;
+    const slot=w/n;
+    // Thin marks: a bar is capped at 24px however wide the card gets, with a 2px surface gap
+    // between the pair, and the leftover in the slot is left as air rather than filled.
+    const GAP=2, bw=Math.min(24,(slot*0.62-GAP)/2);
+    const pairW=bw*2+GAP;
+    const xOf=(i)=>i*slot+(slot-pairW)/2;
+
+    // Hover: bar charts get a per-mark tooltip. Attached once per canvas.
+    if(!cv._bizHoverBound){
+      cv._bizHoverBound=true;
+      cv.style.cursor='default';
+      cv.addEventListener('mousemove',(e)=>{ const r=cv.getBoundingClientRect();
+        const x=e.clientX-r.left, y=e.clientY-r.top;
+        const idx=(y<=r.height-labelH) ? Math.floor(x/(r.width/12)) : -1;
+        this._bizHover=(idx>=0&&idx<12)?idx:-1;
+        cv.style.cursor=this._bizHover>=0?'pointer':'default';
+      });
+      cv.addEventListener('mouseleave',()=>{ this._bizHover=-1; });
+    }
+
+    this.loop((ts)=>{
+      const prog=Math.min(1,ts*0.0009);
+      ctx.clearRect(0,0,w,h);
+
+      // Recessive hairline grid, with a value on each line — the old chart had four unlabelled
+      // lines and a single number in the corner, so a bar's height meant nothing.
+      ctx.font='9px JetBrains Mono, monospace';
+      ctx.textBaseline='middle';
+      const lines=Math.max(1,Math.round(mx/step));
+      for(let g=0;g<=lines;g++){
+        const v=step*g, y=chartH-(v/mx)*(chartH-padT-6);
+        ctx.strokeStyle=P.grid; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(0,y+0.5); ctx.lineTo(w,y+0.5); ctx.stroke();
+        // Label sits above its line, except the top one, which would leave the canvas.
+        if(realMax>0){ ctx.fillStyle=P.axis; ctx.textAlign='left'; ctx.fillText(fmtAxis(v), 2, g===lines ? y+7 : y-6); }
       }
-      ctx.font='9px JetBrains Mono, monospace'; ctx.fillStyle=axisColor;
-      if(realMax>0){ ctx.textAlign='left'; ctx.fillText(this.fmtK(mx), 4, 11); }
-      ctx.textAlign='center'; for(let i=0;i<n;i++){ const bx=i*(w/n)+gp/2; ctx.fillText(months[i], bx+bw+1, h-5); }
+
+      const barH=(v)=>(v/mx)*(chartH-padT-6)*prog;
+      // 4px rounded data-end, square at the baseline.
+      const bar=(x,v,color)=>{ const bh=barH(v); if(bh<=0.5) return;
+        const y=chartH-bh, r=Math.min(4,bw/2,bh);
+        ctx.fillStyle=color; ctx.beginPath();
+        ctx.moveTo(x,chartH); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+        ctx.lineTo(x+bw-r,y); ctx.quadraticCurveTo(x+bw,y,x+bw,y+r);
+        ctx.lineTo(x+bw,chartH); ctx.closePath(); ctx.fill();
+      };
+
+      for(let i=0;i<n;i++){
+        const x=xOf(i);
+        const dim=(this._bizHover>=0 && this._bizHover!==i) ? 0.35 : 1;
+        ctx.globalAlpha=dim;
+        bar(x, inc[i], P.inc);
+        bar(x+bw+GAP, exp[i], P.exp);
+        ctx.globalAlpha=1;
+      }
+
+      // Month labels, with the hovered one brought forward.
+      ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+      for(let i=0;i<n;i++){
+        ctx.fillStyle=(this._bizHover===i)?P.ink:P.axis;
+        ctx.fillText(months[i], xOf(i)+pairW/2, h-6);
+      }
+
+      // Tooltip. Values are text-token ink; the two swatches carry identity, so the numbers
+      // never have to be colour-coded to be read.
+      const hi=this._bizHover;
+      if(hi>=0 && realMax>0){
+        const rows=[['Income',inc[hi],P.inc],['Expenses',exp[hi],P.exp]];
+        const bwid=158, bhgt=52, bx=Math.max(4,Math.min(w-bwid-4, xOf(hi)+pairW/2-bwid/2)), by=padT+4;
+        ctx.fillStyle=P.panel; ctx.strokeStyle=P.panelLine; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.roundRect ? ctx.roundRect(bx,by,bwid,bhgt,8) : ctx.rect(bx,by,bwid,bhgt);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle=P.ink; ctx.textAlign='left'; ctx.font='10px JetBrains Mono, monospace';
+        ctx.fillText(months[hi], bx+9, by+15);
+        rows.forEach((r,k)=>{
+          const y=by+29+k*14;
+          ctx.fillStyle=r[2]; ctx.fillRect(bx+9,y-6,7,7);
+          ctx.fillStyle=P.axis; ctx.fillText(r[0], bx+21, y);
+          // Exact, not fmtK: rounded to the nearest thousand, 2,100 and 1,500 both read "$2K"
+          // and the tooltip contradicts the bars it is describing.
+          const exact='$'+(+r[1]).toLocaleString('en-GB',{minimumFractionDigits:(r[1]%1?2:0),maximumFractionDigits:2});
+          ctx.fillStyle=P.ink; ctx.textAlign='right'; ctx.fillText(exact, bx+bwid-9, y); ctx.textAlign='left';
+        });
+      }
     });
   }
 
@@ -18861,6 +18984,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           }))
         };
       })(),
+      // Legend swatches come from the chart's own palette so the key can never again
+      // name a colour the bars are not drawn in.
+      bizIncColor:this._bizPalette().inc, bizExpColor:this._bizPalette().exp,
       incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       expCatChips: this._expenseCats().map(c=>({ l:c, set:()=>this.setState({expCat:c}), c:S.expCat===c?'#F4F4F5':'#9a9aa2', b:S.expCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.expCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       addIncome:()=>this.addIncome(), addIncKey:enterKey(()=>this.addIncome()), addExpense:()=>this.addExpense(), addExpKey:enterKey(()=>this.addExpense()),
