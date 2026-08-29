@@ -8185,6 +8185,26 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
               <div class="cc-api-dark">
 
+              <!-- Provider constellation. Desktop only via cc-hide-mobile: a labelled node
+                   cannot be read on a phone, and the card below carries the same information
+                   in a form that works there. Full-bleed and viewport-tall: this is the page's
+                   main view, not a widget sitting on top of one. Ground is jet black so the map
+                   and the page behind it are one surface. -->
+              <div class="cc-glowcard cc-hide-mobile" data-api-ground="1" style="position:relative; border-radius:18px; background:#000000; border:1px solid rgba(255,255,255,0.07); padding:0; margin-bottom:18px; overflow:hidden;">
+                <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
+                </div>
+                <div style="position:absolute; top:14px; right:18px; z-index:2; display:flex; gap:12px; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#FFB347;">&#9679; VOICE</span>
+                </div>
+                <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
+                <!-- The real voice-assistant orb, parked over the canvas centre and moved by
+                     the same pan/zoom transform the constellation uses. pointer-events:none so
+                     dragging still grabs the map underneath it. -->
+                <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
+                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO ORBIT · SCROLL TO FLY · DOUBLE-CLICK TO RESET</div>
+              </div>
               <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
                 <sc-if value="{{ noConnections }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing connected yet — save a key and switch it on above.</div></sc-if>
@@ -9004,7 +9024,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.28-203 · v11.203 elevenlabs-only';
+const NOTIF_BUILD_VERSION = '2026.08.28-204 · v11.204 orb-back-one-node';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11577,18 +11597,15 @@ activities: this._mergeShipLog(s.activities),
     if(!C) return;
     if(!mount || !mount.clientWidth){ if(C.isMounted()) this._unmountConstellation(); return; }
     const PD=this._pd(); if(!PD) return;
+    /* One node, because there is one connection. The map used to draw AI_PROVIDERS plus
+       INTEL_SOURCES plus NEWS_SOURCES — 45 of them — none of which this page lists any more,
+       so it was showing a network the rest of the page denied. It draws what is really wired
+       up: the voice provider. 'ai' is the innermost shell, which keeps it close to the orb. */
     const nodes=[];
-    // Usage is the same 24h figure the provider cards show, formatted here once and passed
-    // through, so the orb can never disagree with the card below it. Request count also
-    // drives orb size, which is why it goes across as a number as well as a string.
-    (PD.AI_PROVIDERS||[]).forEach(p=>{
-      const c=this._provCfg(p.id); const u=this._usage(p.id);
-      nodes.push({ id:p.id, label:p.name, cat:'ai', on:!!(c.on && c.saved),
-        reqs:u.hasData?(this.state.usageLog||[]).filter(r=>r.provider===p.id && r.ts>=Date.now()-86400000).length:0,
-        usage:u.hasData?(u.reqs+' req · '+u.tokens+' tok · '+u.cost):'' });
+    (PD.TTS_PROVIDERS||[]).forEach(p=>{
+      const c=this._provCfg(p.id);
+      nodes.push({ id:p.id, label:p.name, cat:'ai', on:!!(c.on!==false && c.saved), reqs:0, usage:'' });
     });
-    (PD.INTEL_SOURCES||[]).forEach(x=>{ nodes.push({id:'intel:'+x.id, label:x.name, cat:'intel', on:!!this._intelCfg(x.id).on}); });
-    (PD.NEWS_SOURCES||[]).forEach(x=>{ const c=this._provCfg(x.id); nodes.push({id:'news:'+x.id, label:x.name, cat:'news', on:!!(c.on && c.saved)}); });
     if(!C.isMounted()){
       C.mount(mount, { onPick:(id)=>this._constellationPick(id) });
       C.onViewChange(()=>this._placeConstellationOrb());
