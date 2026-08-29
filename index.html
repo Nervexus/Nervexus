@@ -2549,11 +2549,18 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
                 </sc-for>
               </div>
-            </div>
-            <div style="min-width:0;">
-              <div style="font-size:13px; font-weight:600; margin-bottom:2px;">{{ moneySelDayLabel }}</div>
-              <sc-if value="{{ moneySelDayNetLabel }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ moneySelDayNetColor }}; margin-bottom:10px;">{{ moneySelDayNetLabel }}</div></sc-if>
-              <div style="display:flex; flex-direction:column; gap:2px; max-height:130px; overflow-y:auto;">
+
+              <!-- The day's entries belong under the grid, not in the 260px column beside it:
+                   that column runs three times the calendar's height once both log forms are
+                   in it, which left this much dead space below the grid while the entries were
+                   squeezed into a 130px scroller. Rows flow into as many columns as the width
+                   allows, so a busy day is read at a glance instead of scrolled through. -->
+              <div style="height:1px; background:rgba(255,255,255,0.08); margin:18px 0 14px;"></div>
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+                <span style="font-size:14px; font-weight:600;">{{ moneySelDayLabel }}</span>
+                <sc-if value="{{ moneySelDayNetLabel }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ moneySelDayNetColor }};">{{ moneySelDayNetLabel }}</span></sc-if>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(228px,1fr)); gap:0 20px; max-height:238px; overflow-y:auto;">
                 <sc-for list="{{ moneySelDayEntries }}" as="e" hint-placeholder-count="2">
                   <div style="display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                     <div style="flex:1; min-width:0;">
@@ -2566,8 +2573,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </sc-for>
               </div>
               <sc-if value="{{ noMoneySelDayEntries }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78; padding:8px 0;">Nothing logged this day.</div></sc-if>
-
-              <div style="height:1px; background:rgba(255,255,255,0.08); margin:16px 0 14px;"></div>
+            </div>
+            <div style="min-width:0;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#7c7c84; margin-bottom:12px;">LOGGING TO {{ moneySelDayShort }}</div>
 
               <!-- income log -->
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
@@ -9091,7 +9099,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.29-209 · v11.209 finance-stat-tiles';
+const NOTIF_BUILD_VERSION = '2026.08.29-210 · v11.210 day-entries-under-calendar';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -19107,16 +19115,29 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         }
         const dayLabel=new Date(selDay+'T00:00:00').toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric'});
         const dayIncRaw=incByDay[selDay]||[], dayExpRaw=expByDay[selDay]||[];
-        const dayInc=dayIncRaw.map(i=>{ const idx=S.income.indexOf(i); return { label:i.label, cat:i.cat||'Other', amtLabel:'+'+this.fmtK(+i.amt||0), amtColor:'#FFFFFF', recurring:!!i.recurring, remove:()=>{ this.mut(s=>({income:s.income.filter((_,j)=>j!==idx)})); if(this._sbOn() && i.id) window.SB.remove('income',i.id); } }; });
-        const dayExp=dayExpRaw.map(e=>{ const idx=S.expenses.indexOf(e); return { label:e.label, cat:e.cat||'Other', amtLabel:'-'+this.fmtK(+e.amt||0), amtColor:'#ff5563', recurring:!!e.recurring, remove:()=>{ this.mut(s=>({expenses:s.expenses.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('expenses',e.id); } }; });
+        /* fmtK is built for axis ticks, and below a thousand it just stringifies: 42.5 rather
+           than 42.50, which reads as an error sitting in a column beside 12.99. Entries get
+           exact pennies; only the thousands keep the compact form. */
+        const money=(v)=>{ const n=Math.abs(+v||0); return n>=1000 ? this.fmtK(n)
+          : '$'+n.toLocaleString('en-GB',{minimumFractionDigits:(n%1?2:0),maximumFractionDigits:2}); };
+        const dayInc=dayIncRaw.map(i=>{ const idx=S.income.indexOf(i); return { label:i.label, cat:i.cat||'Other', amtLabel:'+'+money(i.amt), amtColor:'#FFFFFF', recurring:!!i.recurring, remove:()=>{ this.mut(s=>({income:s.income.filter((_,j)=>j!==idx)})); if(this._sbOn() && i.id) window.SB.remove('income',i.id); } }; });
+        const dayExp=dayExpRaw.map(e=>{ const idx=S.expenses.indexOf(e); return { label:e.label, cat:e.cat||'Other', amtLabel:'-'+money(e.amt), amtColor:'#ff5563', recurring:!!e.recurring, remove:()=>{ this.mut(s=>({expenses:s.expenses.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('expenses',e.id); } }; });
         const dayEntries=[...dayInc,...dayExp];
         const dayNet=dayIncRaw.reduce((a,i)=>a+(+i.amt||0),0) - dayExpRaw.reduce((a,e)=>a+(+e.amt||0),0);
+        /* Paging the month used to leave the selection behind, so the day panel could read
+           "Saturday, August 29" under a July grid — and a new entry would file itself into
+           August. The selection follows the month: today when today is in it, else the 1st. */
+        const jump=(yy,mm)=>{ const t=new Date(); const sel=(t.getFullYear()===yy&&t.getMonth()===mm)
+          ? t.toLocaleDateString('en-CA')
+          : `${yy}-${String(mm+1).padStart(2,'0')}-01`;
+          this.setState({moneyCalY:yy, moneyCalM:mm, moneySel:sel}); };
         return { moneyMonthLabel, moneyCalCells, moneyDows:['MON','TUE','WED','THU','FRI','SAT','SUN'],
           moneySelDayLabel:dayLabel, moneySelDayEntries:dayEntries, noMoneySelDayEntries:!dayEntries.length,
+          moneySelDayShort:new Date(selDay+'T00:00:00').toLocaleString('en-US',{month:'short',day:'numeric'}).toUpperCase(),
           moneySelDayNetLabel: dayEntries.length ? ((dayNet>=0?'+':'-')+'$'+Math.abs(dayNet).toLocaleString()+' net') : '',
           moneySelDayNetColor: dayNet>=0?'#FFFFFF':'#ff5563',
-          prevMoneyMonth:()=>this.setState(s=>{ let mm=s.moneyCalM-1,yy=s.moneyCalY; if(mm<0){mm=11;yy--;} return {moneyCalM:mm,moneyCalY:yy}; }),
-          nextMoneyMonth:()=>this.setState(s=>{ let mm=s.moneyCalM+1,yy=s.moneyCalY; if(mm>11){mm=0;yy++;} return {moneyCalM:mm,moneyCalY:yy}; }),
+          prevMoneyMonth:()=>{ let mm=m-1,yy=y; if(mm<0){mm=11;yy--;} jump(yy,mm); },
+          nextMoneyMonth:()=>{ let mm=m+1,yy=y; if(mm>11){mm=0;yy++;} jump(yy,mm); },
         };
       })(),
 
