@@ -473,11 +473,19 @@
         return 'I’ve logged ' + ml + ' ml of water for you.';
       } },
 
-    { id:'logWeight', acts:true, label:'Log body weight', say:'"Log my weight at 82 kilos"',
-      re:/^(?:log|record|set)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$/i,
+    /* "My weight is 82 kilos" used to miss this rule entirely and fall through to the workout
+       parser, which found "82 kg", could not find an exercise, and logged a chest set called
+       "Weight is". So the rule no longer insists on a command verb: a sentence that names your
+       weight and a figure IS the instruction. "I weighed in at 82.5" is the same statement in
+       the past tense and lands here too. */
+    { id:'logWeight', acts:true, label:'Log body weight', say:'"Log my weight at 82 kilos" · "My weight is 82 kilos"',
+      re:/^(?:log|record|set|update)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?(?:body\s*)?weight(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s+(?:weigh|weighed)(?:\s+in)?(?:\s+at)?\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var kg = num(spoken(m[1])); if (!kg) return null;
-        host.tools.logWeight(kg); return 'I’ve logged your weight at ' + kg + ' kg.';
+        var kg = num(spoken(m[1] || m[2] || m[3] || ''));
+        /* A body weight, not any number that happened to be in the sentence. Outside this
+           range it is a misheard word, and a wrong weight is worse than no weight. */
+        if (!(kg > 20 && kg < 400)) return null;
+        host.tools.logWeight(kg); return 'I’ve logged your weight at ' + kg + ' kg in your body metrics.';
       } },
 
     { id:'logSleep', acts:true, label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',

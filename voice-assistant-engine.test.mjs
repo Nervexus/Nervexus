@@ -623,6 +623,35 @@ t('and so is a mission, a note and an appointment', async()=>{
   h=host(); await VA.handle('Make a note called ideas — buy the domain',h); if(!call('addNote')) throw new Error('note lost');
   h=host(); await VA.handle('Schedule a dentist appointment on Friday at 3pm',h); if(!call('scheduleEvent')) throw new Error('event lost'); });
 
+// ---- weight as a statement, not a command ----
+/* Caught in real use: "hey Loura my weight is 82 kilos can you log out" never reached the
+   weight rule, fell through to the workout parser, and was filed as a CHEST SET called
+   "Weight is" at 82kg. The number was right; the destination was invented. */
+t('the exact utterance that was logged as a chest exercise', async()=>{ const h=host();
+  await VA.handle('hey Laura my weight is 82 kilos can you log out',h);
+  eq(call('logWeight'),['logWeight',82]);
+  if(call('logWorkout')) throw new Error('still logged as a workout'); });
+t('weight stated plainly', async()=>{ let h=host();
+  await VA.handle('My weight is 82 kilos',h); eq(call('logWeight'),['logWeight',82]);
+  h=host(); await VA.handle('My weight today is 82.5',h); eq(call('logWeight'),['logWeight',82.5]); });
+t('weight in the past tense', async()=>{ let h=host();
+  await VA.handle('I weighed in at 82.5 this morning',h); eq(call('logWeight'),['logWeight',82.5]);
+  h=host(); await VA.handle('I weigh 82 kilos',h); eq(call('logWeight'),['logWeight',82]); });
+t('a weight sentence with no figure logs nothing', async()=>{ const h=host();
+  await VA.handle('My weight is great today',h);
+  if(call('logWeight')) throw new Error('logged a weight from a sentence with no number in it'); });
+t('an implausible figure is refused rather than stored', async()=>{ let h=host();
+  await VA.handle('My weight is 8 kilos',h);
+  if(call('logWeight')) throw new Error('stored 8 kg as a body weight'); });
+/* The rule sits above logWorkout, so the guard that matters is that it does not start
+   claiming the lifts — every one of these carries a weight in kg too. */
+t('lifting weights still go to the workout log', async()=>{ let h=host();
+  await VA.handle('Log 100kg bench press',h);
+  eq(call('logWorkout').slice(0,2),['logWorkout','Bench Press']);
+  if(call('logWeight')) throw new Error('a bench press became a body weight');
+  h=host(); await VA.handle('Log 3 sets of 10 squats at 80 kilos',h);
+  if(call('logWeight')) throw new Error('a squat became a body weight'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

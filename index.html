@@ -311,7 +311,7 @@
 <script src="exercise-index.js?v=2"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
-<script src="voice-assistant-engine.js?v=20"></script>
+<script src="voice-assistant-engine.js?v=21"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -2121,6 +2121,31 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </sc-if>
 
         </sc-if>
+        <!-- ============ BODY METRICS ============ -->
+        <!-- Sits directly under the training log rather than far down the page, because this is
+             where Loura files a spoken weight and you need to see that it landed. Stripped to the
+             three figures that actually get kept up: the fifteen tape measurements that used to
+             follow made a snapshot feel like it needed a full measuring session first. -->
+        <sc-if value="{{ hBody }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+              <div><div style="font-size:13px; font-weight:600; color:#eef0f2;">Body metrics</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:3px;">{{ bodyFormTitle }}</div></div>
+              <div style="display:flex; gap:14px; align-items:center;">
+                <div style="display:flex; gap:5px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">MASS</span><sc-for list="{{ massUnitChips }}" as="u" hint-placeholder-count="2"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:4px 8px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div>
+                <div style="display:flex; gap:5px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HEIGHT</span><sc-for list="{{ lenUnitChips }}" as="u" hint-placeholder-count="2"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:4px 8px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:14px; border:1px solid rgba(255,255,255,0.15); border-radius:14px; background:rgba(255,255,255,0.03); margin-bottom:14px;">
+              <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">BMI (auto)</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#6cffba;">{{ bmiLive }}</div></div>
+              <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">LEAN MASS (auto)</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#eef0f2;">{{ leanLive }}</div></div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
+              <sc-for list="{{ bodyBasic }}" as="f" hint-placeholder-count="3"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ f.label }}</div><input value="{{ f.val }}" onInput="{{ f.set }}" placeholder="{{ f.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
+            </div>
+            <div style="display:flex; gap:9px; margin-top:18px;"><span onClick="{{ saveBody }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer; border:none;">{{ bodySaveLabel }}</span><sc-if value="{{ bodyEditing }}" hint-placeholder-val="{{ false }}"><span onClick="{{ cancelBodyEdit }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Cancel edit</span></sc-if><span onClick="{{ clearBodyDraft }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Clear</span></div>
+          </div>
+        </sc-if>
+
 
         <!-- ============ DIET ============ -->
         <sc-if value="{{ hDiet }}" hint-placeholder-val="{{ false }}">
@@ -2303,39 +2328,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </sc-if>
 
-        <!-- ============ BODY METRICS ============ -->
-        <sc-if value="{{ hBody }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-              <span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ bodyFormTitle }}</span>
-              <div style="display:flex; gap:14px; align-items:center;">
-                <div style="display:flex; gap:5px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">MASS</span><sc-for list="{{ massUnitChips }}" as="u" hint-placeholder-count="2"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:4px 8px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div>
-                <div style="display:flex; gap:5px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LENGTH</span><sc-for list="{{ lenUnitChips }}" as="u" hint-placeholder-count="2"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:4px 8px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div>
-              </div>
-            </div>
-            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:14px; border:1px solid rgba(255,255,255,0.15); border-radius:14px; background:rgba(255,255,255,0.03); margin-bottom:8px;">
-              <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">BMI (auto)</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#6cffba;">{{ bmiLive }}</div></div>
-              <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">LEAN MASS (auto)</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#eef0f2;">{{ leanLive }}</div></div>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin:16px 0 8px;">BASIC</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;">
-              <sc-for list="{{ bodyBasic }}" as="f" hint-placeholder-count="4"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ f.label }}</div><input value="{{ f.val }}" onInput="{{ f.set }}" placeholder="{{ f.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin:18px 0 8px;">UPPER BODY · {{ lenUnit }}</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px;">
-              <sc-for list="{{ mUpper }}" as="f" hint-placeholder-count="7"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ f.label }}</div><input value="{{ f.val }}" onInput="{{ f.set }}" placeholder="{{ f.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin:18px 0 8px;">CORE · {{ lenUnit }}</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px;">
-              <sc-for list="{{ mCore }}" as="f" hint-placeholder-count="2"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ f.label }}</div><input value="{{ f.val }}" onInput="{{ f.set }}" placeholder="{{ f.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
-            </div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin:18px 0 8px;">LOWER BODY · {{ lenUnit }}</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px;">
-              <sc-for list="{{ mLower }}" as="f" hint-placeholder-count="6"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ f.label }}</div><input value="{{ f.val }}" onInput="{{ f.set }}" placeholder="{{ f.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
-            </div>
-            <div style="display:flex; gap:9px; margin-top:18px;"><span onClick="{{ saveBody }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer; border:none;">{{ bodySaveLabel }}</span><sc-if value="{{ bodyEditing }}" hint-placeholder-val="{{ false }}"><span onClick="{{ cancelBodyEdit }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Cancel edit</span></sc-if><span onClick="{{ clearBodyDraft }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Clear</span></div>
-          </div>
-        </sc-if>
 
         <!-- ============ PROGRESS ============ -->
         <sc-if value="{{ hProgress }}" hint-placeholder-val="{{ false }}">
@@ -9099,7 +9091,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.30-211 · v11.211 loura-spoken-numbers';
+const NOTIF_BUILD_VERSION = '2026.08.30-212 · v11.212 body-metrics';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15338,7 +15330,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const statToggles=K.STATS.map(s=>({ label:s.label, check:statPrefs.includes(s.key)?'☑':'☐', c:statPrefs.includes(s.key)?'#F4F4F5':'#8a8a92', bg:statPrefs.includes(s.key)?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.02)', bd:statPrefs.includes(s.key)?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.1)', toggle:()=>this.toggleStat(s.key) }));
       const bd=S.bodyDraft||{};
       const bodyEditing=!!S.bodyEditDate;
-      const bodyFormTitle= bodyEditing? ('Edit snapshot · '+S.bodyEditDate) : 'New measurement · today';
+      const bodyFormTitle= bodyEditing? ('EDITING · '+S.bodyEditDate) : 'TODAY';
       const bodySaveLabel= bodyEditing? 'Update snapshot' : 'Save snapshot';
       const draftWeightKg = (bd.weight!==undefined&&bd.weight!=='') ? K.toCanonical('mass',bd.weight,mu) : snap.weightKg;
       const draftHeightCm = (bd.height!==undefined&&bd.height!=='') ? K.toCanonical('length',bd.height,lu) : H.heightCm;
@@ -15346,11 +15338,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const bmiLive = (draftWeightKg&&draftHeightCm) ? K.bmi({heightCm:draftHeightCm}, draftWeightKg).toFixed(1) : '—';
       const leanLive = (draftWeightKg!=null&&draftBF!=null) ? K.fmtMass(K.leanMass(draftWeightKg,draftBF),mu) : '—';
       const mkField=(key,label,ph)=>({ key, label, ph:(ph==null?'':ph)+'', val: bd[key]!=null?bd[key]:'', set:(e)=>this.setBodyDraft(key,(e.target.value||'').replace(/[^0-9.]/g,'')) });
-      const bodyBasic=[ mkField('height','Height ('+lu+')', H.heightCm!=null?K.round(K.toDisplay('length',H.heightCm,lu),1):''), mkField('weight','Weight ('+mu+')', snap.weightKg!=null?K.round(K.toDisplay('mass',snap.weightKg,mu),1):''), mkField('bodyFatPct','Body Fat %', snap.bodyFatPct!=null?snap.bodyFatPct:''), mkField('muscleKg','Muscle Mass ('+mu+')', snap.muscleKg!=null?K.round(K.toDisplay('mass',snap.muscleKg,mu),1):'') ];
-      const mField=(m)=> mkField(m.key, m.label, snap[m.key]!=null? K.round(K.toDisplay('length',snap[m.key],lu),1) : '');
-      const mUpper=K.MEASURES.filter(m=>m.group==='Upper').map(mField);
-      const mCore=K.MEASURES.filter(m=>m.group==='Core').map(mField);
-      const mLower=K.MEASURES.filter(m=>m.group==='Lower').map(mField);
+      /* Height, weight and body fat only. Muscle mass and the fifteen tape measurements that
+         used to sit under them are gone from the form: they were the reason a snapshot felt
+         like it needed a tape measure and half an hour, so weight — the one figure that gets
+         logged daily, and the one Loura writes — never got entered. Nothing is deleted from
+         existing snapshots; the Progress chart still reads whatever was recorded before. */
+      const bodyBasic=[ mkField('height','Height ('+lu+')', H.heightCm!=null?K.round(K.toDisplay('length',H.heightCm,lu),1):''), mkField('weight','Weight ('+mu+')', snap.weightKg!=null?K.round(K.toDisplay('mass',snap.weightKg,mu),1):''), mkField('bodyFatPct','Body Fat %', snap.bodyFatPct!=null?snap.bodyFatPct:'') ];
       const unitChip=(val,cur,fn)=>({ label:val, set:()=>fn(val), c:cur===val?'#F4F4F5':'#9a9aa2', bd:cur===val?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)', bg:cur===val?'rgba(255,255,255,0.12)':'transparent' });
       const massUnitChips=['kg','lb'].map(u=>unitChip(u,mu,(v)=>this.setHUnit('mass',v)));
       const lenUnitChips=['cm','in'].map(u=>unitChip(u,lu,(v)=>this.setHUnit('length',v)));
@@ -15425,7 +15418,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         hydGoalInput:S.hydGoalInput||'', setHydGoalInput:(e)=>this.setState({hydGoalInput:(e.target.value||'').replace(/[^0-9.]/g,'')}), hydGoalPh, saveHydGoal:()=>this.saveHydGoal(),
         hydEntries, hydEmpty,
         bodyFormTitle, bodySaveLabel, bodyEditing, cancelBodyEdit:()=>this.cancelBodyEdit(), clearBodyDraft:()=>this.clearBodyDraft(), saveBody:()=>this.saveBody(),
-        bmiLive, leanLive, bodyBasic, mUpper, mCore, mLower, lenUnit:lu, massUnitChips, lenUnitChips,
+        bmiLive, leanLive, bodyBasic, lenUnit:lu, massUnitChips, lenUnitChips,
         progMetrics, progRanges, progDeltas,
         cmpA, cmpB, setCmpA:(e)=>this.setCmp('cmpA',e.target.value), setCmpB:(e)=>this.setCmp('cmpB',e.target.value), dateOptions, cmpRows, bodyHistory,
         photoViewChips, photoView, photoViewCap, photoViewUpper, photoTimeline, photoEmpty,
