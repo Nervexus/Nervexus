@@ -883,6 +883,31 @@ t('direction comes from whichever marker is first', async()=>{ const h=host();
   await VA.handle('I spent my salary of 400',h);
   if(!call('logExpense')) throw new Error('"spent my salary" should be money going out'); });
 
+// ---- several transactions in one breath ----
+/* Verbatim from a real session, and the worst kind of failure: it did not refuse, it logged
+   ONE entry of £120 labelled "job 950 rent but coffee 3.50 2,400" — the first figure kept and
+   every other figure swept into the label. */
+t('four transactions in one sentence become four entries', async()=>{ const h=host();
+  await VA.handle('hey I charged 120 for the job paid $950 in rent but a coffee for £3.50 and got paid 2,400 today',h);
+  const exp=calls.filter(c=>c[0]==='logExpense'), inc=calls.filter(c=>c[0]==='logIncome');
+  eq(exp.map(c=>[c[1],c[2]]),[['Job',120],['Rent',950],['Coffee',3.5]]);
+  eq(inc.length,1,'the "got paid" clause is income');
+  eq(inc[0][2],2400); });
+t('a clause with no verb inherits the direction of the one before it', async()=>{ const h=host();
+  await VA.handle('I spent 12.99 on netflix and 40 on petrol',h);
+  eq(calls.filter(c=>c[0]==='logExpense').map(c=>[c[1],c[2]]),[['Netflix',12.99],['Petrol',40]]); });
+/* The cut only happens where a DIRECTION word separates two figures. Two figures without one
+   is a single transaction whose label contains a number — "an expense of 1 pound for demo 1"
+   was being cut into "…for demo" plus a phantom second entry of 1. */
+t('a number inside a label does not become a second entry', async()=>{ const h=host();
+  await VA.handle('log an expense of 1 pound for demo one',h);
+  eq(calls.filter(c=>/^log(Expense|Income)$/.test(c[0])).length,1,'logged a phantom second entry');
+  eq(call('logExpense'),['logExpense','Demo 1',1]); });
+t('"lbs" is currency in a money sentence, not a weight', async()=>{ const h=host();
+  await VA.handle("hey I've just been 45 lbs on my phone bill as a demo can you lock this",h);
+  eq(call('logExpense').slice(0,1),['logExpense']);
+  eq(call('logExpense')[2],45,'"45 lbs" was thrown away as a measurement'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

@@ -145,9 +145,11 @@
 
   /* Units that make a figure a MEASUREMENT rather than money. Without this, "I spent 30
      minutes running" logs a £30 expense — "spent" is a direction word and 30 is a number.
-     Deliberately omits "pounds", which in a money sentence is currency, not weight; a body
-     weight in pounds is claimed by the weight rule further up. */
-  var NOT_MONEY_UNIT = /^(?:mins?|minutes?|hours?|hrs?|h|secs?|seconds?|kgs?|kg|kilos?|kilograms?|lbs?|lb|stones?|ml|mls|l|litres?|liters?|kms?|km|miles?|mi|cals?|kcals?|calories|reps?|sets?|steps?|percent|degrees?|times?|days?|weeks?|months?|years?)$/i;
+     Deliberately omits "pounds" AND "lbs", which in a money sentence are currency, not
+     weight — the recogniser writes "45 pounds" as "45 lbs", and the figure was being thrown
+     away as a measurement. A body weight in pounds is claimed by the weight rule, which runs
+     before this one. */
+  var NOT_MONEY_UNIT = /^(?:mins?|minutes?|hours?|hrs?|h|secs?|seconds?|kgs?|kg|kilos?|kilograms?|stones?|ml|mls|l|litres?|liters?|kms?|km|miles?|mi|cals?|kcals?|calories|reps?|sets?|steps?|percent|degrees?|times?|days?|weeks?|months?|years?)$/i;
   var MONEY_MULT = /^(?:k|grand|thousand)$/i;
 
   /* Returns the first figure in the text that reads as money, with the exact substring it
@@ -165,6 +167,38 @@
       return { value: Math.round(v * 100) / 100, text: consumed };
     }
     return null;
+  }
+
+  /* One breath can carry several transactions: "I charged 120 for the job, paid £950 in rent,
+     a coffee for £3.50 and got paid 2,400 today". That was read as ONE entry — £120, labelled
+     "job 950 rent but coffee 3.50 2,400" — the first figure kept and every other figure swept
+     into the label. Silent, partial and wrong, which is the worst of the three.
+
+     So the utterance is cut into pieces carrying one figure each: first at the conjunctions,
+     then, for a piece still holding two, immediately before the direction word that introduces
+     the later one — falling back to the figure itself when there is no such word. */
+  function moneyChunks(text) {
+    var AMT_G = /([£$€])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)/g;
+    var count = function (x) { AMT_G.lastIndex = 0; var n = 0; while (AMT_G.exec(x)) n++; return n; };
+    var parts = String(text || '').split(/\b(?:and|but|then|also|plus)\b|,(?=\s)/i)
+                  .filter(function (x) { return x && x.trim(); });
+    var out = [], guard = 0;
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      while (count(p) > 1 && guard++ < 20) {
+        AMT_G.lastIndex = 0; var first = AMT_G.exec(p);
+        var after = first.index + first[0].length;
+        var anyRe = new RegExp(MONEY_ANY.source, 'ig'); anyRe.lastIndex = after;
+        var nxt = anyRe.exec(p);
+        if (nxt && nxt.index > after) { out.push(p.slice(0, nxt.index)); p = p.slice(nxt.index); continue; }
+        /* Two figures and no direction word between them is not two transactions — it is one
+           transaction whose LABEL contains a number. "An expense of 1 pound for demo 1" was
+           being cut into "…for demo" plus a phantom second entry of 1. Leave it whole. */
+        break;
+      }
+      out.push(p);
+    }
+    return out.map(function (x) { return x.trim(); }).filter(Boolean);
   }
 
   function spoken(t) {
@@ -652,29 +686,50 @@
         /* This rule's pattern is a WORD, not a sentence, so m[0] is just the direction word.
            The slots are read from the whole utterance, which exec puts on .input. */
         var raw = m.input || m[0];
-        var money = moneyAmount(spoken(raw));
-        // shape matched but no figure — try once more with the recogniser's number slips
-        if (!money) money = moneyAmount(spoken(fixNums(raw)));
-        if (!money) return null;
 
-        /* Direction from whichever marker appears FIRST, so "I spent my salary" reads as
-           money going out rather than coming in. */
-        var t = spoken(raw);
-        var iOut = t.search(MONEY_OUT), iIn = t.search(MONEY_IN);
-        if (iOut < 0 && iIn < 0) return null;
-        var isIncome = iOut < 0 ? true : (iIn < 0 ? false : iIn < iOut);
+        /* One reading of one chunk: a figure, a direction, and whatever is left as a label.
+           Direction is inherited from the previous chunk when this one names none — "a coffee
+           for £3.50" carries no verb, but it follows "paid £950 in rent" and means the same. */
+        function read(chunk, inherit) {
+          var t = spoken(chunk);
+          var money = moneyAmount(t);
+          if (!money) { t = spoken(fixNums(chunk)); money = moneyAmount(t); }
+          if (!money) return null;
+          var iOut = t.search(MONEY_OUT), iIn = t.search(MONEY_IN);
+          var income;
+          if (iOut < 0 && iIn < 0) { if (inherit === null) return null; income = inherit; }
+          else income = iOut < 0 ? true : (iIn < 0 ? false : iIn < iOut);
+          var label = t.replace(money.text, ' ')
+                       .replace(MONEY_META, ' ')
+                       .replace(/[£$€]/g, ' ')
+                       .replace(/\b(?:pounds?|lbs?|quid|dollars?|euros?|pence|gbp|usd|eur)\b/gi, ' ')
+                       .replace(/\bi(?:['’]ve|ve)?\b/gi, ' ')
+                       .replace(/\b(?:just|have|has|had|as|a|an|the|on|for|from|to|of|in|out|me|my|that|this|it|and|log|logged|record|put|down|today|yesterday|please|was|were|been|about|around)\b/gi, ' ')
+                       .replace(/\s+/g, ' ').trim() || 'Unlabelled';
+          return { income: income, value: money.value, label: label };
+        }
 
-        var label = t.replace(money.text, ' ')
-                     .replace(MONEY_META, ' ')
-                     .replace(/[£$€]/g, ' ')
-                     .replace(/\b(?:pounds?|quid|dollars?|euros?|pence|gbp|usd|eur)\b/gi, ' ')
-                     .replace(/\bi(?:['’]ve|ve)?\b/gi, ' ')
-                     .replace(/\b(?:just|have|has|had|as|a|an|the|on|for|from|to|of|in|out|me|my|that|this|it|and|log|logged|record|put|down|today|yesterday|please|was|were|been|about|around)\b/gi, ' ')
-                     .replace(/\s+/g, ' ').trim() || 'Unlabelled';
+        var chunks = moneyChunks(spoken(raw));
+        var entries = [], inherit = null;
+        for (var i = 0; i < chunks.length; i++) {
+          var e = read(chunks[i], inherit);
+          if (e) { entries.push(e); inherit = e.income; }
+        }
+        // A single figure never needed cutting up — read the whole utterance as one.
+        if (!entries.length) { var one = read(raw, null); if (one) entries.push(one); }
+        if (!entries.length) return null;
 
-        if (isIncome) host.tools.logIncome(cap(label), money.value);
-        else host.tools.logExpense(cap(label), money.value);
-        return 'I’ve logged that ' + (isIncome ? 'income' : 'expense') + ' — ' + label + ', ' + money.value + '.';
+        entries.forEach(function (e) {
+          if (e.income) host.tools.logIncome(cap(e.label), e.value);
+          else host.tools.logExpense(cap(e.label), e.value);
+        });
+        if (entries.length === 1) {
+          var o = entries[0];
+          return 'I’ve logged that ' + (o.income ? 'income' : 'expense') + ' — ' + o.label + ', ' + o.value + '.';
+        }
+        return 'I’ve logged ' + entries.length + ' entries — ' + entries.map(function (e) {
+          return cap(e.label) + ' ' + e.value + ' ' + (e.income ? 'in' : 'out');
+        }).join(', ') + '.';
       } },
 
     { id:'logMeal', acts:true, label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
@@ -951,7 +1006,7 @@
      Two shapes only: an explicit "can you log…", or a log-verb with an object after it
      ("…of running, log it"). A bare trailing verb is deliberately NOT stripped, so a genuine
      "add a task to log" keeps its last word. */
-  var TRAIL_REQ = /[,\s]*(?:(?:can|could|would|will)\s+(?:you|u)\s+(?:please\s+)?(?:log|add|save|record|put|note)(?:\s+(?:it|that|this|them|in|on|out|up|down))*|(?:log|add|save|record|put)\s+(?:it|that|this|them|in|on|out|up|down)(?:\s+(?:in|on|down|for me))?)[.?!]*$/i;
+  var TRAIL_REQ = /[,\s]*(?:(?:can|could|would|will)\s+(?:you|u)\s+(?:please\s+)?(?:log|lock|add|save|record|put|note)(?:\s+(?:it|that|this|them|in|on|out|up|down))*|(?:log|add|save|record|put)\s+(?:it|that|this|them|in|on|out|up|down)(?:\s+(?:in|on|down|for me))?)[.?!]*$/i;
 
   function tidy(t) {
     var prev;
