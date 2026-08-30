@@ -62,7 +62,18 @@
   /* "add" comes back as "at" or "ad" constantly. Deliberately excludes "had", which is a
      real meal verb — "had chicken and rice at 600 calories" must stay a meal. */
   var MISHEARD_ADD = new RegExp('^(?:at|ad|and)\\b(?=\\s+' + QTY + ')', 'i');
-  function fixVerb(t) { return t.replace(MISHEARD_LOG, 'log').replace(MISHEARD_ADD, 'add'); }
+  /* Caught in real use: "Loura, log an expense of £1" came back as "Logan expense of £1".
+     The wake word and the verb collapse into a name, and no amount of widening the money
+     rule helps because the verb is simply not there any more.
+
+     Rewritten ONLY in front of a word a rule is already waiting for, so someone genuinely
+     called Logan can still be a task, a note or a calendar entry. Same for the "log on" /
+     "log in" / "login" family, which is what the recogniser does with "log an" the rest of
+     the time — and which the trailing-request handler already has to cope with. */
+  var MISHEARD_LOGAN = /^(?:logan|logon|login|log\s+(?:on|in))\b(?=\s+(?:an?\s+)?(?:expense|income|payment|spend|cost|entry|amount)\b)/i;
+  function fixVerb(t) {
+    return t.replace(MISHEARD_LOGAN, 'log an').replace(MISHEARD_LOG, 'log').replace(MISHEARD_ADD, 'add');
+  }
 
   /* People name the destination as well as the thing: "log 30 minutes of running ON MY
      TRAINING", "add a task to call the accountant TO MY LIST". The destination is already

@@ -799,6 +799,27 @@ t('widening did not let one rule swallow another', async()=>{
   ]) { const h=host(); await VA.handle(say,h);
        if(!call(tool)) throw new Error(JSON.stringify(say)+' was claimed by the wrong rule'); } });
 
+// ---- "Loura, log an expense" comes back as "Logan expense" ----
+/* Verbatim from a real session. The wake word and the verb collapse into a name, so the
+   command verb is simply gone and no widening of the money rule can reach it. */
+t('"Logan expense" is "log an expense"', async()=>{ let h=host();
+  await VA.handle('Logan expense of £1 for demo one',h);
+  eq(call('logExpense'),['logExpense','Demo 1',1]);
+  h=host(); await VA.handle('hello Logan expense of 1 pound for demo one',h);
+  eq(call('logExpense'),['logExpense','Demo 1',1]);
+  h=host(); await VA.handle('logan income of 3 from demo three',h);
+  eq(call('logIncome'),['logIncome','Demo 3',3]); });
+t('the log-on / log-in family too', async()=>{ const h=host();
+  await VA.handle('log in expense of 2 for demo two',h);
+  eq(call('logExpense'),['logExpense','Demo 2',2]); });
+/* The repair only fires in front of a word a rule is waiting for, so a person named Logan
+   is still a person. */
+t('a person called Logan is left alone', async()=>{ let h=host();
+  await VA.handle('add a task to call Logan',h);
+  eq(call('addTask'),['addTask','Call Logan']);
+  h=host(); await VA.handle('Logan is coming to dinner',h);
+  if(call('logExpense')||call('logIncome')) throw new Error('logged a person as money'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');
