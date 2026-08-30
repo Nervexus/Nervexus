@@ -191,6 +191,24 @@
      `quantified` is the honest signal: true only when a duration, set count or weight was
      actually found. The rule requires it; the confirmation path uses its absence to decide
      whether to ask "how long?" instead of "shall I log this?". */
+  /* Is this string plausibly the name of an exercise, or is it the wreckage the recogniser
+     leaves behind? "I now weigh 82 kilos" came through as "I know where 82 kilos", and the
+     old test — any unknown name of four words or fewer — happily accepted "I know where" as
+     an exercise and logged a chest set.
+
+     The test is not a dictionary of exercises; the app already has one of those, and an
+     exercise it does not know still has to be loggable. It is the opposite: a name whose
+     every word is a pronoun, an auxiliary or a filler word is not the name of anything. */
+  var NOT_EXERCISE = /^(?:i|im|me|my|mine|you|your|we|us|he|she|it|is|was|were|am|are|be|been|being|now|know|knows|known|no|not|where|wear|here|there|hello|hey|hi|can|could|would|will|shall|do|does|did|done|have|has|had|get|got|gets|going|go|went|weigh|weighs|weighed|weighing|weight|and|or|but|so|then|than|that|this|these|those|the|a|an|of|to|in|on|at|for|from|with|about|please|thanks|thank|ok|okay|yes|yeah|yep|today|tonight|yesterday|morning|evening|just|still|really|very|like|want|need|log|logged|logging|add|added|put|record|recorded|kg|kgs|kilo|kilos|kilogram|kilograms|lb|lbs|pound|pounds)$/i;
+  function looksLikeExercise(name) {
+    var ws = String(name || '').toLowerCase().split(/\s+/).filter(Boolean);
+    // Apostrophes go too, or "i'm" never matches the "im" in the list — which is exactly
+    // how "I'm now weigh 82 kilos" survived the first version of this guard.
+    return ws.length > 0 && ws.some(function (w) { return !NOT_EXERCISE.test(w.replace(/[^a-z]/g, '')); });
+  }
+  // A figure that could be a person rather than a barbell.
+  function bodyWeightish(w) { return !!w.wt && !w.sets && !w.reps && !w.mins && w.wt > 20 && w.wt < 400; }
+
   function parseWorkout(raw, host) {
     var t = spoken(String(raw || '').trim());
     if (!t) return null;
@@ -228,6 +246,7 @@
       reps: reps ? num(reps[1]) : 0,
       wt:   wt ? num(wt[1]) : 0,
       unit: wt && /lb|pound/i.test(wt[2]) ? 'lb' : 'kg',
+      namey: looksLikeExercise(name),
       quantified: !!(sets || mins || hrs || wt)
     };
   }
@@ -546,6 +565,16 @@
       run:function (m, host) {
         var w = parseWorkout(m[1], host);
         if (!w || !w.quantified) return null;          // not a workout shape — fall through
+        /* Same guard as the proposal path: an explicit "log" in front of it does not make
+           "I know where 82 kilos" an exercise. With a plausible bodyweight figure it is a
+           body weight; without one it falls through rather than inventing a lift. */
+        if (!w.known && !w.namey) {
+          if (bodyWeightish(w)) {
+            host.tools.logWeight(w.wt);
+            return 'I\u2019ve logged your weight at ' + w.wt + ' kg in your body metrics.';
+          }
+          return null;
+        }
         return logWorkout(w, host);
       } },
 
@@ -686,9 +715,25 @@
   /* Does this look like a workout even though no rule claimed it? Only proposes when
      there is something real to propose: a quantity, or an exercise the app actually
      knows. Random noise — "soil" — produces nothing and still gets an honest miss. */
+  function proposeBodyWeight(kg, host) {
+    return { kind:'confirm',
+      question: 'Did you want me to log ' + kg + ' kg as your body weight?',
+      run: function () {
+        host.tools.logWeight(kg);
+        return 'I\u2019ve logged your weight at ' + kg + ' kg in your body metrics.';
+      } };
+  }
+
   function proposeWorkout(text, host) {
     var w = parseWorkout(text, host);
     if (!w) return null;
+    /* A name that is not a name, carrying nothing but a plausible bodyweight figure, is
+       someone telling you what they weigh through an imperfect microphone. Offer that
+       rather than an exercise called "I know where". */
+    if (!w.known && !w.namey) {
+      if (bodyWeightish(w)) return proposeBodyWeight(w.wt, host);
+      return null;                                  // not a name and not a weight — honest miss
+    }
     if (w.quantified && (w.known || w.name.split(' ').length <= 4)) {
       return { kind:'confirm',
         question: 'Did you want me to log ' + describeWorkout(w) + ' for you?',
@@ -802,7 +847,12 @@
     // is simply the next command. The flag is NOT burned here — clearing it on a miss was
     // what left her answering "Sorry, I didn't catch that" to every attempt to end the
     // conversation after the first one.
-    if (AWAIT_CLOSE && CLOSE_YES.test(t) && t.split(/\s+/).length <= 3) {
+    /* A pending question wins. She asks "Is that all?" after every log, so the flag is
+       usually still set when the next command arrives — and if that command needs
+       confirming, the "yes" was being taken as "yes, that's all" and the log was dropped
+       on the floor without a word. Whichever question was asked most recently is the one
+       a bare yes is answering. */
+    if (!PENDING && AWAIT_CLOSE && CLOSE_YES.test(t) && t.split(/\s+/).length <= 3) {
       AWAIT_CLOSE = false;
       host.speak('Go ahead, I’m listening.');
       return Promise.resolve();

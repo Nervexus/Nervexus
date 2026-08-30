@@ -652,6 +652,51 @@ t('lifting weights still go to the workout log', async()=>{ let h=host();
   h=host(); await VA.handle('Log 3 sets of 10 squats at 80 kilos',h);
   if(call('logWeight')) throw new Error('a squat became a body weight'); });
 
+// ---- what the recogniser leaves behind ----
+/* Both of these are verbatim from real use. "I now weigh 82 kilos" reached the engine as
+   "I know where 82 kilos" and as "I'm now weigh 82 kilos"; the old test — any unknown name
+   of four words or fewer is an exercise — accepted both and logged chest sets called
+   "I know where" and "I'm now weigh". No regex for a mis-hearing can win that race, so the
+   guard is about the shape: a name whose every word is a pronoun, auxiliary or filler is
+   not the name of anything, and a lone plausible bodyweight figure beside it is a weight. */
+t('"I know where 82 kilos" is a body weight, not an exercise', async()=>{ const h=host();
+  await VA.handle('hey Laura I know where 82 kilos can you log in',h);
+  has(last(),'body weight','should offer the body weight');
+  await VA.handle('yes',h);
+  eq(call('logWeight'),['logWeight',82]);
+  if(call('logWorkout')) throw new Error('logged an exercise called "I know where"'); });
+t('"I\'m now weigh 82 kilos" likewise — the apostrophe must not hide it', async()=>{ const h=host();
+  await VA.handle("hello I'm now weigh 82 kilos can you log out",h);
+  await VA.handle('yes',h);
+  eq(call('logWeight'),['logWeight',82]);
+  if(call('logWorkout')) throw new Error('logged an exercise called "I\'m now weigh"'); });
+t('an explicit "log" does not make wreckage an exercise', async()=>{ const h=host();
+  await VA.handle('log I know where 82 kilos',h);
+  eq(call('logWeight'),['logWeight',82]);
+  if(call('logWorkout')) throw new Error('the command verb bypassed the guard'); });
+/* The guard must not start eating real training. An exercise the app has never heard of
+   still has to be loggable — that is the whole point of it testing the shape of the name
+   rather than consulting the exercise index. */
+t('a known lift is untouched', async()=>{ const h=host();
+  await VA.handle('Log 100kg bench press',h);
+  eq(call('logWorkout').slice(0,2),['logWorkout','Bench Press']);
+  if(call('logWeight')) throw new Error('a bench press became a body weight'); });
+t('an exercise the app does not know is still logged', async()=>{ let h=host();
+  await VA.handle('Log incline hammer press 3 sets of 10 at 40 kilos',h);
+  eq(call('logWorkout').slice(0,2),['logWorkout','Incline hammer press']);
+  h=host(); await VA.handle('Log incline hammer press 40 kilos',h);
+  eq(call('logWorkout').slice(0,2),['logWorkout','Incline hammer press'],'weight-only unknown lift was hijacked');
+  if(call('logWeight')) throw new Error('an unknown lift became a body weight'); });
+t('wreckage with no figure is an honest miss, not a guess', async()=>{ const h=host();
+  await VA.handle('hey Laura I know where can you log in',h);
+  if(call('logWeight')||call('logWorkout')) throw new Error('logged something from pure noise'); });
+
+t('a yes answers the newest question, not the outstanding "is that all?"', async()=>{ const h=host();
+  await VA.handle('Log 30 minutes of running',h);          // -> logs, then asks "is that all?"
+  await VA.handle('I know where 82 kilos',h);              // -> asks to confirm a body weight
+  await VA.handle('yes',h);
+  eq(call('logWeight'),['logWeight',82],'the yes was eaten by the close-out and the log was dropped'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');
