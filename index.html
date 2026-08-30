@@ -2578,7 +2578,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
               </div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
+                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ incCatDraft }}" onInput="{{ setIncCatDraft }}" onKeyDown="{{ addIncCatKey }}" onBlur="{{ addIncCat }}" placeholder="+ type your own" style="width:118px; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
               </div>
               <div style="display:flex; gap:6px; margin-bottom:6px;">
                 <input value="{{ incLabel }}" onInput="{{ setIncLabel }}" onKeyDown="{{ addIncKey }}" placeholder="Source" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
@@ -2596,7 +2596,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <!-- expense log -->
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span style="font-size:12px; font-weight:600;">Log Expense</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#e8e8ec;">{{ expTotal }}</span></div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for>
+                <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ expCatDraft }}" onInput="{{ setExpCatDraft }}" onKeyDown="{{ addExpCatKey }}" onBlur="{{ addExpCat }}" placeholder="+ type your own" style="width:118px; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
               </div>
               <div style="display:flex; gap:6px; margin-bottom:6px;">
                 <input value="{{ expLabel }}" onInput="{{ setExpLabel }}" onKeyDown="{{ addExpKey }}" placeholder="Item" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
@@ -9091,7 +9091,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.30-213 · v11.213 weight-routing';
+const NOTIF_BUILD_VERSION = '2026.08.30-214 · v11.214 finance-categories';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9284,7 +9284,7 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this._checkStaleBuild(); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -10124,7 +10124,36 @@ activities: this._mergeShipLog(s.activities),
   setPref(k,v){ this.mut(s=>({prefs:{...s.prefs,[k]:v}})); }
   setCoach(k,v){ this.mut(s=>({prefs:{...s.prefs, coaching:{...(s.prefs.coaching||{}), [k]:v}}})); }
   setFinanceBudget(cat,v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeBudgets:{...(s.prefs.financeBudgets||{}), [cat]:n}}, financeBudgetDraft:{...(s.financeBudgetDraft||{}), [cat]:undefined}})); }
-  _incomeCats(){ return ['Salary','Freelance','Business','Investment','Gift','Other']; }
+  /* Income categories used to be a hard-coded list, which is why Log Income still showed all
+     six while Log Expense had been pruned to a single chip: the expense list is editable and
+     had been emptied out through the Budget Planner. Both are now prefs-backed, both fall back
+     to the same defaults, and both accept a category typed by hand. */
+  _incomeCatsDefault(){ return ['Salary','Freelance','Business','Investment','Gift','Other']; }
+  _incomeCats(){ const c=this.state.prefs.incomeCategories; return (c && c.length) ? c : this._incomeCatsDefault(); }
+  addIncomeCategory(name){ const n=(name||'').trim(); if(!n) return; const cur=this._incomeCats();
+    const hit=cur.find(c=>c.toLowerCase()===n.toLowerCase());
+    // Already there — just select it, rather than adding a second one differing only in case.
+    if(hit){ this.setState({incCat:hit, newIncomeCat:''}); return; }
+    this.mut(s=>({prefs:{...s.prefs, incomeCategories:[...cur, n]}, incCat:n, newIncomeCat:''})); }
+  removeIncomeCategory(name){ const cur=this._incomeCats(); if(cur.length<=1) return;
+    const next=cur.filter(c=>c!==name);
+    this.mut(s=>({prefs:{...s.prefs, incomeCategories:next}, incCat: s.incCat===name ? (next[0]||'Other') : s.incCat})); }
+  /* A one-off repair, not a rule. Deleting a category has to keep working, so this runs once
+     and records that it has: it puts back any of the standard expense categories that are
+     missing, keeps whatever custom ones are there, and never fires again. */
+  _repairExpenseCats(){
+    const p=this.state.prefs||{};
+    if(p.expCatsRestored) return;
+    const cur=(p.expenseCategories&&p.expenseCategories.length)?p.expenseCategories:[];
+    const want=this._expenseCatsDefault();
+    const missing=want.filter(d=>!cur.some(c=>c.toLowerCase()===d.toLowerCase()));
+    // "Other" belongs last. It has to be pulled out of BOTH lists before being re-appended:
+    // it is present in `cur`, so it never appears in `missing`, and filtering it out of one
+    // side alone dropped it from the result entirely.
+    const merged=[...cur, ...missing].filter(c=>c.toLowerCase()!=='other');
+    const next = cur.length ? [...merged, 'Other'] : want;
+    this.mut(s=>({prefs:{...s.prefs, expenseCategories:next, expCatsRestored:true}}));
+  }
   _expenseCatsDefault(){ return ['Food','Transport','Housing','Bills','Subscriptions','Shopping','Health','Entertainment','Other']; }
   _expenseCats(){ const c=this.state.prefs.expenseCategories; return (c && c.length) ? c : this._expenseCatsDefault(); }
   addExpenseCategory(name){ const n=(name||'').trim(); if(!n) return; const cur=this._expenseCats();
@@ -19087,6 +19116,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ...(()=>{ const T=this._finTileTokens(); return { finTileCard:T.card, finTileLine:T.line, finTileLabel:T.label, finTileInk:T.ink, finTileNote:T.note, finTileShadow:T.shadow }; })(),
       incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       expCatChips: this._expenseCats().map(c=>({ l:c, set:()=>this.setState({expCat:c}), c:S.expCat===c?'#F4F4F5':'#9a9aa2', b:S.expCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.expCat===c?'rgba(255,255,255,0.18)':'transparent' })),
+      /* Deliberately NOT the newExpenseCat key the Budget Planner's own category box uses —
+         both are on this page at once, and sharing one draft made typing in either echo into
+         the other. Adding selects the new category straight away, so the entry you are part
+         way through typing gets it without a second click. */
+      incCatDraft:S.incCatDraft||'', setIncCatDraft:(e)=>this.setState({incCatDraft:e.target.value}),
+      addIncCat:()=>{ this.addIncomeCategory(S.incCatDraft); this.setState({incCatDraft:''}); },
+      addIncCatKey:(e)=>{ if(e.key==='Enter'){ this.addIncomeCategory(S.incCatDraft); this.setState({incCatDraft:''}); } },
+      expCatDraft:S.expCatDraft||'', setExpCatDraft:(e)=>this.setState({expCatDraft:e.target.value}),
+      addExpCat:()=>{ this.addExpenseCategory(S.expCatDraft); this.setState({expCat:(S.expCatDraft||'').trim()||S.expCat, expCatDraft:''}); },
+      addExpCatKey:(e)=>{ if(e.key==='Enter'){ this.addExpenseCategory(S.expCatDraft); this.setState({expCat:(S.expCatDraft||'').trim()||S.expCat, expCatDraft:''}); } },
       addIncome:()=>this.addIncome(), addIncKey:enterKey(()=>this.addIncome()), addExpense:()=>this.addExpense(), addExpKey:enterKey(()=>this.addExpense()),
       ...(()=>{ const y=S.moneyCalY, m=S.moneyCalM;
         const moneyMonthLabel=new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'});
