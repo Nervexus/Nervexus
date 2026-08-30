@@ -310,7 +310,8 @@
     // plain refusals — "no", "no thanks", "nope", "nah", "not right now"
     'no(?:pe)?', 'nah', 'not (?:right )?now',
     // that's-all family — "that's everything for today", "that'll do", "that's me done"
-    'that.?s (?:all|it|everything|the lot|enough|fine|great|lovely|perfect)',
+    // "that.?s" covers thats and that's but is one character short of "that is".
+    'that(?:.?s|\\s+is) (?:all|it|everything|the lot|enough|fine|great|lovely|perfect)',
     'that.?(?:s|.?ll| will) do', 'that.?s me (?:done|off)',
     'nothing(?: else| more| for now)?',
     // covered-it family — "I think that covers everything", "we've covered it"
@@ -359,7 +360,7 @@
 
   var LOCAL = [
     { id:'nav', acts:true, label:'Open a page', say:'"Open my fitness centre"',
-      re:/^(?:open|go to|show|take me to|switch to)\s+(?:the\s+|my\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:open|go to|show me|show|take me to|switch to|bring up|jump to)\s+(?:the\s+|my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         // People name pages loosely — "fitness", "fitness centre", "the fitness page". Strip
         // the furniture words, try the whole phrase, then fall back to its head word.
@@ -375,11 +376,11 @@
       /* "Remind me to X" is how people actually add a to-do out loud. It lands here rather
          than on the calendar because it names no time — an utterance that carries one
          ("remind me at 3pm") is claimed by the schedule rule, which sits above this. */
-      re:/^(?:add|create|make)\s+(?:a\s+)?(?:new\s+)?task(?:\s+(?:to|for|called|named))?\s+(.+?)[.?!]*$|^remind\s+me\s+(?:to\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:(?:add|create|make)\s+)?(?:a\s+)?(?:new\s+)?task(?:\s+(?:to|for|called|named))?\s+(.+?)[.?!]*$|^remind\s+me\s+(?:to\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) { var t = stripDest(m[1] || m[2]); if (!t) return null; host.tools.addTask(cap(t)); return 'I’ve added “' + t + '” to your tasks.'; } },
 
     { id:'openTasks', label:'What is still open', say:'"What tasks do I have left?"',
-      re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$/i,
+      re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$|^what(?:(?:’|')s| is)?\s+still\s+(?:on\s+my\s+list|to\s+do|outstanding|open)[.?!]*$|^(?:is\s+there\s+)?anything\s+(?:left\s+)?(?:to\s+do|on\s+my\s+list)[.?!]*$/i,
       run:function (m, host) {
         var open = host.tools.openTasks();
         return open.length ? 'You have ' + plural(open.length, 'task') + ' left: ' + list(open) + '.'
@@ -387,7 +388,7 @@
       } },
 
     { id:'doneToday', label:'What you finished today', say:'"What have I done today?"',
-      re:/^(?:what|how much)\s+(?:have\s+)?i\s+(?:done|finished|completed|got done)\s*(?:today|so far)?[.?!]*$/i,
+      re:/^(?:what|how much)\s+(?:have\s+|did\s+)?i\s+(?:done|do|finished|finish|completed|complete|got\s+done|get\s+done)\s*(?:today|so far)?[.?!]*$/i,
       run:function (m, host) {
         var d = host.tools.doneToday(), parts = [];
         if (d.tasks.length) parts.push(plural(d.tasks.length, 'task') + ' done: ' + list(d.tasks));
@@ -396,14 +397,14 @@
       } },
 
     { id:'trainingToday', label:'Training logged today', say:'"What did I train today?"',
-      re:/^(?:what|how much)\s+(?:did\s+)?i\s+(?:train|lift|work ?out|exercise)\w*\s*(?:today)?[.?!]*$/i,
+      re:/^(?:what|how much)\s+(?:did\s+|have\s+)?i\s+(?:train|lift|work ?out|exercise)\w*\s*(?:today)?[.?!]*$|^did\s+i\s+(?:train|lift|work ?out|exercise)\w*\s*(?:today)?[.?!]*$/i,
       run:function (m, host) {
         var d = host.tools.trainingToday();
         return d.length ? 'Today: ' + list(d) + '.' : 'No training logged today yet.';
       } },
 
     { id:'addMission', acts:true, label:'Add a mission', say:'"Add a mission called cold shower"',
-      re:/^(?:add|create|start)\s+(?:a\s+)?(?:new\s+)?mission(?:\s+(?:called|named|for|to))?\s+(.+?)[.?!]*$/i,
+      re:/^(?:(?:add|create|start)\s+)?(?:a\s+)?(?:new\s+)?mission(?:\s+(?:called|named|for|to))?\s+(.+?)[.?!]*$/i,
       run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addMission(cap(t)); return 'I’ve added the mission “' + t + '” for you.'; } },
 
     { id:'remember', acts:true, label:'Remember a fact', say:'"Remember that my gym closes at ten"',
@@ -423,10 +424,15 @@
       } },
 
     { id:'schedule', acts:true, label:'Schedule an event', say:'"Schedule a dentist appointment on Friday at 3pm"',
-      re:/^(?:schedule|book|put in|add)\s+(?:a\s+|an\s+)?(.+?)\s+(?:on|for|at)\s+(.+?)[.?!]*$/i,
+      /* "put" alone is NOT a scheduling verb, however tempting: this rule sits above the money
+         rule and a bare "put" swallowed "put 45 quid down for the phone bill". The split form
+         has to carry its own "in" — "put a meeting IN for tomorrow" — which no expense does. */
+      re:/^(?:schedule|book|put in|add)\s+(?:a\s+|an\s+)?(.+?)\s+(?:on|for|at)\s+(.+?)[.?!]*$|^put\s+(?:a\s+|an\s+)?(.+?)\s+in\s+(?:on|for|at)\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var r = host.tools.scheduleEvent(cap(m[1].trim()), m[2].trim());
-        return 'I’ve scheduled “' + m[1].trim() + '” for ' + r.date + (r.time ? ' at ' + r.time : '') + '.';
+        var what = (m[1] || m[3] || '').trim(), when = (m[2] || m[4] || '').trim();
+        if (!what || !when) return null;
+        var r = host.tools.scheduleEvent(cap(what), when);
+        return 'I’ve scheduled “' + what + '” for ' + r.date + (r.time ? ' at ' + r.time : '') + '.';
       } },
 
     { id:'completeTask', acts:true, label:'Tick a task off', say:'"Mark call the accountant as done"',
@@ -439,15 +445,15 @@
       } },
 
     { id:'completeMission', acts:true, label:'Complete a mission', say:'"Complete my cold shower mission"',
-      re:/^(?:complete|finish|did)\s+(?:my\s+|the\s+)?(.+?)\s*mission[.?!]*$|^(?:complete|finish)\s+mission\s+(.+?)[.?!]*$/i,
+      re:/^(?:i\s+)?(?:complete|completed|finish|finished|did|done)\s+(?:my\s+|the\s+)?(.+?)\s*mission[.?!]*$|^(?:complete|finish)\s+mission\s+(.+?)[.?!]*$|^i\s+did\s+my\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var want = (m[1] || m[2] || '').trim(); if (!want) return null;
+        var want = (m[1] || m[2] || m[3] || '').trim(); if (!want) return null;
         var hit = host.tools.completeMission(want);
         return hit === null ? 'I couldn’t find an open mission matching “' + want + '”.' : 'I’ve marked “' + hit + '” complete for you.';
       } },
 
     { id:'askWater', label:'Water so far today', say:'"How much water have I had?"',
-      re:/^how\s+much\s+water\s+(?:have\s+)?i\s+(?:had|drunk|drank)\s*(?:today)?[.?!]*$|^water\s+(?:today|so far)[.?!]*$/i,
+      re:/^how\s+much\s+water\s*(?:have\s+|did\s+|do\s+)?(?:i\s+)?(?:had|have|drunk|drank|got)?\s*(?:today|so far)?[.?!]*$|^water\s+(?:today|so far|count)?[.?!]*$|^am\s+i\s+drinking\s+enough[.?!]*$|^how(?:'|’)?s\s+my\s+(?:water|hydration)(?:\s+today)?[.?!]*$/i,
       run:function (m, host) {
         var w = host.tools.waterToday(); if (!w) return 'I can’t read your hydration log right now.';
         if (!w.ml) return 'No water logged yet today.';
@@ -456,14 +462,14 @@
       } },
 
     { id:'askWeight', label:'Latest body weight', say:'"What is my weight?"',
-      re:/^(?:what(?:’|')?s|what is|how much do i weigh)\s*(?:my\s+)?(?:current\s+|latest\s+)?(?:body\s*)?weight[.?!]*$|^how much do i weigh[.?!]*$/i,
+      re:/^(?:what(?:’|')?s|what is)\s*(?:my\s+)?(?:current\s+|latest\s+)?(?:body\s*)?weight[.?!]*$|^how\s+much\s+do\s+i\s+weigh(?:\s+now)?[.?!]*$|^what\s+did\s+i\s+weigh(?:\s+(?:last|last time|recently))?[.?!]*$|^my\s+weight[.?!]*$/i,
       run:function (m, host) {
         var w = host.tools.latestWeight();
         return w ? 'Your last logged weight is ' + w.kg + ' kg.' : 'You haven’t logged a weight yet.';
       } },
 
     { id:'askSleep', label:'Last night’s sleep', say:'"How did I sleep?"',
-      re:/^how\s+(?:did\s+i\s+sleep|much\s+sleep\s+did\s+i\s+get)\s*(?:last night)?[.?!]*$/i,
+      re:/^how\s+(?:did\s+i\s+sleep|much\s+sleep\s+did\s+i\s+get|was\s+my\s+sleep)\s*(?:last night|last nite)?[.?!]*$|^what\s+was\s+my\s+sleep\s*(?:last night|last nite)?[.?!]*$|^how(?:'|’)?s\s+my\s+sleep(?:\s+been)?[.?!]*$/i,
       run:function (m, host) {
         var sl = host.tools.lastSleep(); if (!sl) return 'No sleep logged yet.';
         var bits = [];
@@ -473,7 +479,7 @@
       } },
 
     { id:'askFood', label:'Calories and protein logged', say:'"How many calories have I had?"',
-      re:/^how\s+many\s+(?:calories|kcal)\s+(?:have\s+)?i\s+(?:had|eaten)\s*(?:today)?[.?!]*$|^what\s+have\s+i\s+eaten\s*(?:today)?[.?!]*$/i,
+      re:/^how\s+(?:many|much)\s+(?:calories|kcal|protein)\s*(?:have\s+|did\s+)?(?:i\s+)?(?:had|have|eaten|got)?\s*(?:today|so far)?[.?!]*$|^what\s+have\s+i\s+eaten\s*(?:today)?[.?!]*$/i,
       run:function (m, host) {
         // Deliberately says "on your meal list" rather than "today": meal entries carry no
         // date, so a daily figure would be invented.
@@ -483,24 +489,29 @@
       } },
 
     { id:'askMoney', label:'Money in and out today', say:'"How much have I spent today?"',
-      re:/^how\s+much\s+(?:have\s+)?i\s+(spent|earned|made)\s*(?:today)?[.?!]*$/i,
+      re:/^how\s+much\s+(?:have\s+|did\s+)?i\s+(spent|spend|earned|earn|made|make)\s*(?:today|so far)?[.?!]*$|^what\s+did\s+i\s+(spend|spent|earn|earned|make|made)\s*(?:today|so far)?[.?!]*$|^how\s+much\s+(came|went)\s+(?:in|out)\s*(?:today)?[.?!]*$|^show\s+me\s+(?:what\s+)?i\s+(spent|spend|earned|earn|made|make)\s*(?:today|so far)?[.?!]*$/i,
       run:function (m, host) {
         var mo = host.tools.moneyToday();
-        if (/spent/i.test(m[1])) return mo.expenses ? 'You’ve logged ' + mo.expenses + ' in expenses today.' : 'No expenses logged today.';
+        /* The verb decides the direction, and it can be captured by any of the alternatives —
+           reading m[1] alone made "what did I spend today" answer with the day's INCOME,
+           because that shape captures into a later group and m[1] came back undefined. */
+        var verb = m[1] || m[2] || m[3] || m[4] || '';
+        var out = /spent|spend|went/i.test(verb);
+        if (out) return mo.expenses ? 'You’ve logged ' + mo.expenses + ' in expenses today.' : 'No expenses logged today.';
         return mo.income ? 'You’ve logged ' + mo.income + ' in income today.' : 'No income logged today.';
       } },
 
     { id:'askAgenda', label:'What is on today or tomorrow', say:'"What is on tomorrow?"',
-      re:/^what(?:(?:’|')s| is)?\s+(?:on|happening|scheduled)\s*(today|tomorrow)?[.?!]*$|^(?:what(?:(?:’|')s| is)\s+)?(?:my\s+)?(?:agenda|schedule|diary)\s*(?:for\s+)?(today|tomorrow)?[.?!]*$/i,
+      re:/^what(?:(?:’|')s| is)?\s+(?:on|happening|scheduled)\s*(today|tomorrow)?[.?!]*$|^(?:what(?:(?:’|')s| is)\s+)?(?:in\s+)?(?:my\s+|the\s+)?(?:agenda|schedule|diary)\s*(?:for\s+)?(today|tomorrow)?[.?!]*$|^what\s+(?:have\s+i\s+got|do\s+i\s+have)\s+on\s*(today|tomorrow)?[.?!]*$/i,
       run:function (m, host) {
-        var when = (m[1] || m[2] || 'today').toLowerCase();
+        var when = (m[1] || m[2] || m[3] || 'today').toLowerCase();
         var date = when === 'tomorrow' ? host.tools.dateStrIn(1) : host.tools.todayStr();
         var ev = host.tools.eventsOn(date);
         return ev.length ? cap(when) + ': ' + list(ev) + '.' : 'Nothing in the calendar for ' + when + '.';
       } },
 
     { id:'askMissions', label:'Missions left today', say:'"What missions do I have left?"',
-      re:/^(?:what|which|how many)\s+missions?\s*(?:do\s+i\s+have\s+)?(?:left|open|remaining|outstanding)?[.?!]*$/i,
+      re:/^(?:what|which|how many)\s+missions?\s*(?:do\s+i\s+have\s+|are\s+)?(?:left|open|remaining|outstanding)?[.?!]*$|^any\s+missions?\s*(?:left|open|remaining|outstanding)?[.?!]*$/i,
       run:function (m, host) {
         var left = host.tools.missionsLeft();
         return left.length ? plural(left.length, 'mission') + ' left: ' + list(left) + '.' : 'All missions done for today.';
@@ -647,7 +658,7 @@
       run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addNote(cap(t), (m[2] || '').trim()); return 'I’ve saved that note for you.'; } },
 
     { id:'time', label:'Time and date', say:'"What is the date?"',
-      re:/^(?:what(?:’s| is)?\s+(?:the\s+)?)?(time|date|day)(?:\s+is\s+it)?[.?!]*$/i,
+      re:/^(?:what(?:’s| is)?\s+(?:the\s+)?)?(time|date|day)(?:\s+is\s+it)?(?:\s+today)?[.?!]*$/i,
       run:function (m) {
         var d = new Date();
         if (/time/i.test(m[1])) return 'It’s ' + d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }) + '.';
@@ -661,7 +672,7 @@
       } },
 
     { id:'capabilities', label:'Ask what she can do', say:'"What can you do?"',
-      re:/^(?:what\s+can\s+you\s+do|help|what\s+are\s+your\s+(?:commands|abilities))[.?!]*$/i,
+      re:/^(?:what\s+can\s+you\s+do|help|what\s+are\s+you\s+able\s+to\s+do|what\s+are\s+your\s+(?:commands|abilities))[.?!]*$/i,
       run:function (m, host) {
         var n = LOCAL.length;
         return 'I can handle about ' + n + ' things on my own — logging training, food, sleep, money and notes, '
@@ -671,7 +682,7 @@
       } },
 
     { id:'stop', acts:true, label:'Turn the assistant off', say:'"That will be all"',
-      re:/^(?:that(?:’|')?(?:ll| will) be all|stop listening|go to sleep|shut (?:up|down)|turn off)[.?!]*$/i,
+      re:/^(?:that(?:’|')?(?:ll| will) be all|stop listening|go to sleep|shut (?:up|down)|turn (?:yourself\s+)?off|switch (?:yourself\s+)?off|switch off the assistant|turn off the assistant)[.?!]*$/i,
       run:function (m, host) { host.tools.disableAssistant(); return 'Going quiet. Tap Hold to talk when you need me.'; } },
 
     /* Conversation enders. These used to be recognised only in the one beat straight after

@@ -748,6 +748,57 @@ t('a distance run is recognised and asked about, never silently dropped', async(
   h=host(); await VA.handle('I went for a 10k run this morning',h);
   has(last(),'Running'); });
 
+// ---- the no-key tier, said the way people say it ----
+/* Loura advertises 29 commands that work with nothing connected. Their advertised examples
+   all worked; the phrasings AROUND them did not — 26 of 97 natural variants fell through.
+   With no provider connected that is not a slower path, it is "Sorry, I didn't catch that"
+   about data the app is already holding. */
+/* These read back from the host's own data, so the assertion is the ANSWER, not a tool
+   call — several of the read-back tools in this file's stub return a value without being
+   recorded. The stub's fixtures are what each expected string comes from. */
+t('the questions answer from data, not from a model', async()=>{
+  for (const [say, expect] of [
+    ['how much water today','1500'], ['am I drinking enough','1500'],
+    ['what did I weigh last','82'], ['what was my sleep last night','7'],
+    ['how much protein today','70'], ['what did I spend today','40'],
+    ['how much came in today','1200'], ['show me what I spent today','40'],
+    ['what have I got on today','calendar'], ['what is in the diary tomorrow','Dentist'],
+    ['any missions left','Cold shower'], ['what missions are outstanding','Cold shower'],
+    ['what is still on my list','Call accountant'], ['anything left to do','Call accountant'],
+    ['what did I get done','Email Dan'], ['did I train today','Bench press'],
+    ['what have I trained','Bench press'],
+  ]) { const h=host(); await VA.handle(say,h);
+       // the LAST line: an acting rule above may acknowledge, decline, and hand on
+       const line=last()||'';
+       if(/didn.t catch/i.test(line) || !line) throw new Error(JSON.stringify(say)+' was not answered at all');
+       if(!line.toLowerCase().includes(String(expect).toLowerCase()))
+         throw new Error(JSON.stringify(say)+' answered without the data: '+JSON.stringify(line)); } });
+t('the actions take their looser forms', async()=>{
+  for (const [say, tool] of [
+    ['show me the calendar','nav'], ['new task renew the insurance','addTask'],
+    ['new mission read 20 pages','addMission'], ['put a meeting in for tomorrow at 10','scheduleEvent'],
+    ['I did my cold shower','completeMission'], ['turn yourself off','disableAssistant'],
+    ['switch off the assistant','disableAssistant'], ['what day is it today','__spoke'],
+    ['what are you able to do','__spoke'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(tool==='__spoke'){ if(!spoken.length || /didn.t catch/i.test(spoken[0])) throw new Error(JSON.stringify(say)+' was not answered'); }
+       else if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool); } });
+t('"that is all for now" is an ender', async()=>{ const h=host();
+  await VA.handle('that is all for now',h);
+  if(!call('stopListening')) throw new Error('kept listening'); });
+/* Looser patterns steal from each other — that is the whole risk of this change, and the
+   file's own comment says the order is load-bearing. These pin the boundaries that moved. */
+t('widening did not let one rule swallow another', async()=>{
+  for (const [say, tool] of [
+    ['log 30 minutes of running','logWorkout'],          // meal's optional tail must not claim it
+    ['put 45 quid down for the phone bill','logExpense'], // "put" must not become a schedule verb
+    ['put a meeting in for tomorrow at 10','scheduleEvent'],
+    ['show me the calendar','nav'],
+    ['I did 100kg bench press today','logWorkout'],       // vs "I did my <mission>"
+    ['I did my cold shower','completeMission'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' was claimed by the wrong rule'); } });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');
