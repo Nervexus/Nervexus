@@ -841,6 +841,48 @@ t('and the other first-person logs', async()=>{
   h=host(); await VA.handle("I've had a chicken salad about 400 cals",h);
   eq(call('logMeal'),['logMeal','Chicken salad',400,0]); });
 
+// ---- money by slots, not by sentence shape ----
+/* The point of the rewrite: NONE of these had a pattern written for them. If this block
+   only passes because someone added an alternative per line, the rule has regressed to
+   what it replaced. */
+t('sentences nobody wrote a pattern for', async()=>{
+  for (const [say, tool, label, amt] of [
+    ['hey just spent 100 as a demo can you log it','logExpense','Demo',100],
+    ['hey just made 5k can you log it','logIncome','Unlabelled',5000],
+    ['spent 40 on petrol','logExpense','Petrol',40],
+    ['that cost me 20 quid','logExpense','Unlabelled',20],
+    ['I bought a coffee for 3.50','logExpense','Coffee',3.5],
+    ['paid 950 rent','logExpense','Rent',950],
+    ['the phone bill was 45','logExpense','Phone bill',45],
+    ['got paid 2400 today','logIncome','Unlabelled',2400],
+    ['my salary of 2400 came in','logIncome','Salary',2400],
+    ['charged 120 for the job','logExpense','Job',120],
+  ]) { const h=host(); await VA.handle(say,h);
+       eq(call(tool),[tool,label,amt], JSON.stringify(say)); } });
+t('"k" and "grand" are thousands', async()=>{ let h=host();
+  await VA.handle('just made 5k',h); eq(call('logIncome')[2],5000);
+  h=host(); await VA.handle('spent 2 grand on the car',h); eq(call('logExpense')[2],2000); });
+/* The guard that makes the slot approach safe: a figure carrying a real unit is a
+   MEASUREMENT. Without it "I spent 30 minutes running" is a £30 expense — "spent" is a
+   direction word and 30 is a number. */
+t('a figure with a unit is a measurement, not money', async()=>{
+  for (const [say, tool] of [
+    ['I spent 30 minutes running','logWorkout'], ['I spent an hour on the bike','logWorkout'],
+    ['log 30 minutes of running','logWorkout'], ['I did 100kg bench press today','logWorkout'],
+    ['log 3 sets of 10 squats at 80 kilos','logWorkout'], ['log 500 ml of water','logHydration'],
+    ['log my weight at 82 kilos','logWeight'], ["I've had 8 hours of sleep",'logSleep'],
+    ['log chicken and rice at 600 calories','logMeal'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool);
+       if(call('logExpense')||call('logIncome')) throw new Error(JSON.stringify(say)+' was logged as money'); } });
+t('a money word with no figure logs nothing', async()=>{
+  for (const say of ['I paid attention in the meeting','I bought a coffee','make a note called ideas']) {
+    const h=host(); await VA.handle(say,h);
+    if(call('logExpense')||call('logIncome')) throw new Error(JSON.stringify(say)+' invented an amount'); } });
+t('direction comes from whichever marker is first', async()=>{ const h=host();
+  await VA.handle('I spent my salary of 400',h);
+  if(!call('logExpense')) throw new Error('"spent my salary" should be money going out'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

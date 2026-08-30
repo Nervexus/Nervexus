@@ -117,6 +117,56 @@
   var FRACTION = { half:0.5, quarter:0.25 };
   var MEASURE = /^(?:ml|mls|l|litres?|liters?|glass|glasses|cups?|pints?|hours?|hrs?|hr|minutes?|mins?|seconds?|secs?|kilos?|kilograms?|kgs?|kg|pounds?|lbs?|lb|stones?|grams?|calories?|kcals?|cals?|sets?|reps?|miles?|kilometres?|kilometers?|kms?|km|quid|dollars?|euros?|dozen|couple)$/i;
 
+  /* Recogniser substitutions that ONLY get applied on a retry — after a rule has matched
+     its shape and come up with no figure at all, where a number is definitely what was
+     meant. "Three" comes back as "free" constantly, and rewriting it everywhere would turn
+     "log a free coffee" into "log a 3 coffee"; on the retry path there is nothing to lose,
+     because the alternative is dropping the command.
+
+     Deliberately NOT here: "for" -> "four" and "too" -> "two". They would invent an amount
+     out of an ordinary preposition, and a wrong figure is worse than a refusal. */
+  var NUM_MISHEARD = [[/\bfree\b/gi, 'three'], [/\bfree\b/gi, 'three']];
+  function fixNums(t) {
+    var o = String(t == null ? '' : t);
+    for (var i = 0; i < NUM_MISHEARD.length; i++) o = o.replace(NUM_MISHEARD[i][0], NUM_MISHEARD[i][1]);
+    return o;
+  }
+
+  /* ---- money slots ---------------------------------------------------------------------
+     Direction is a word, not a sentence position. Two lists, and whichever appears first in
+     the utterance wins, so "I spent my salary" is money going out. */
+  var MONEY_OUT = /\b(?:spent|spend|spending|paid|pay|paying|bought|buy|buying|cost|costs|charged|expense|expenses|outgoing|outgoings|withdrew|withdrawn|bill|bills)\b/i;
+  var MONEY_IN  = /\b(?:earned|earn|earning|earnings|made|make|making|income|salary|wages?|invoiced?|received|receive|takings?|revenue|refund|refunded|dividend|bonus|got\s+paid|came\s+in)\b/i;
+  var MONEY_ANY = new RegExp('(?:' + MONEY_OUT.source + '|' + MONEY_IN.source + ')', 'i');
+  /* Only the words that name the RECORD come out of the label. Some direction words are the
+     label — "the phone BILL", "income from SALARY", "a REFUND from Amazon" — and stripping
+     those left entries called "Phone" and "Unlabelled". */
+  var MONEY_META = /\b(?:spent|spend|spending|paid|pay|paying|bought|buy|buying|cost|costs|charged|expense|expenses|outgoings?|withdrew|withdrawn|earned|earn|earning|earnings|made|make|making|income|received|receive|got\s+paid|came\s+in)\b/gi;
+
+  /* Units that make a figure a MEASUREMENT rather than money. Without this, "I spent 30
+     minutes running" logs a £30 expense — "spent" is a direction word and 30 is a number.
+     Deliberately omits "pounds", which in a money sentence is currency, not weight; a body
+     weight in pounds is claimed by the weight rule further up. */
+  var NOT_MONEY_UNIT = /^(?:mins?|minutes?|hours?|hrs?|h|secs?|seconds?|kgs?|kg|kilos?|kilograms?|lbs?|lb|stones?|ml|mls|l|litres?|liters?|kms?|km|miles?|mi|cals?|kcals?|calories|reps?|sets?|steps?|percent|degrees?|times?|days?|weeks?|months?|years?)$/i;
+  var MONEY_MULT = /^(?:k|grand|thousand)$/i;
+
+  /* Returns the first figure in the text that reads as money, with the exact substring it
+     came from so the label can have it removed. The trailing word is only swallowed when it
+     is a currency or a multiplier — otherwise "spent 40 on petrol" would lose "petrol". */
+  function moneyAmount(text) {
+    var re = /([£$€])?\s*(\d+(?:,\d{3})*(?:\.\d+)?)\s*([a-z]+)?/gi, m;
+    while ((m = re.exec(String(text || '')))) {
+      var cur = m[1] || '', v = parseFloat(m[2].replace(/,/g, '')), word = (m[3] || '');
+      if (!(v > 0)) continue;
+      var consumed = (cur ? cur : '') + m[2];
+      if (MONEY_MULT.test(word)) { v *= 1000; consumed = m[0]; }
+      else if (word && NOT_MONEY_UNIT.test(word) && !cur) continue;   // a measurement
+      else if (/^(?:pounds?|quid|dollars?|euros?|pence|gbp|usd|eur)$/i.test(word)) consumed = m[0];
+      return { value: Math.round(v * 100) / 100, text: consumed };
+    }
+    return null;
+  }
+
   function spoken(t) {
     var parts = String(t == null ? '' : t).split(/(\s+)/);   // words at even indices, gaps at odd
     var idx = []; for (var i = 0; i < parts.length; i += 2) idx.push(i);
@@ -261,7 +311,7 @@
     /* The pronoun is matched WITH its contraction. A bare \bi\b splits "i'm" and leaves "'m"
        behind, which reads as a real word to looksLikeExercise — and "I'm now weigh 82 kilos"
        went back to being logged as an exercise. Caught by the suite, not by hand. */
-    name = name.replace(/\bi(?:['\u2019](?:m|ve|d|ll))?\b|\b(?:log|logged|logging|add|added|record|recorded|track|tracked|enter|put|down|went|a|an|for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
+    name = name.replace(/\bi(?:['\u2019](?:m|ve|d|ll))?\b|\b(?:log|logged|logging|add|added|record|recorded|track|tracked|enter|put|down|went|spent|spend|spending|a|an|for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
                .replace(/\s+/g,' ').trim();
     if (!name) return null;
     var known = host.tools.exerciseName ? host.tools.exerciseName(name) : null;
@@ -581,48 +631,50 @@
         return 'I’ve logged ' + (hv ? plural(hv, 'hour') : '') + (mv ? (hv ? ' ' : '') + mv + ' min' : '') + ' of sleep for you.';
       } },
 
-    /* Money gets said in more shapes than any other log, and only the first of these was
-       understood. The other three all went to the model, which cannot write to the ledger, so
-       the entry was simply lost:
+    /* ---- money, by slots rather than by sentence shape ---------------------------------
+       This rule used to be four fixed sentence shapes, and that was a dead end. Every new way
+       of saying it — "just spent 100 as a demo", "made 5k", "that cost me 20 quid", "spent 40
+       on petrol" — needed another alternative, and the list is never finished because there is
+       no finite list of English sentences.
 
-         A  "log an expense of 40 pounds for fuel"   the keyword leads
-         B  "log 2400 income from salary"            the keyword trails the amount
-         C  "I spent 12.99 on netflix"               a past-tense statement
-         D  "put 45 quid down for the phone bill"
+       So it stops matching sentences and looks for three things anywhere in the utterance:
+       a DIRECTION word, an AMOUNT that is money rather than a measurement, and whatever is
+       left over as the label. Word order stops mattering, and one rule covers the shapes that
+       used to need five.
 
-       Each shape gets its own alternative rather than one greedy pattern, because this rule
-       sits above the workout rule and a loose "^log <anything>" here would swallow every
-       "log 30 minutes of running" in the app. */
+       It still declines rather than guesses. No direction word at all means this is not a
+       money sentence. And a figure carrying a real unit is a measurement, not money, which is
+       what keeps "I spent 30 minutes running" a workout rather than a £30 expense. */
     { id:'logMoney', acts:true, label:'Log income or an expense',
-      say:'"Log an expense of 40 pounds for fuel" \u00b7 "I spent 12.99 on Netflix"',
-      re:new RegExp(
-          '^(?:log|record|add)\\s+(?:an?\\s+)?(income|expense|payment|spend|cost)\\s*(?:of\\s*)?(.+?)[.?!]*$'
-        + '|^(?:log|record|add)\\s+(.+?)\\s+(income|expense|earnings?|wages?)\\b\\s*(?:from|for|on)?\\s*(.*?)[.?!]*$'
-        // "I've spent" is at least as common as "I spent", and "I have spent" happens too.
-        + '|^i(?:\\s*[\u2019\']ve|\\s+have)?\\s+(?:just\\s+)?(spent|paid|earned|made)\\s+(.+?)[.?!]*$'
-        + '|^(?:i(?:\\s*[\u2019\']ve|\\s+have)?\\s+)?(?:just\\s+)?got\\s+paid\\s+(.+?)[.?!]*$'
-        + '|^put\\s+(.+?)\\s+down\\s+(?:for|on)\\s+(.+?)[.?!]*$', 'i'),
+      say:'"Log an expense of 40 pounds for fuel" · "I spent 12.99 on Netflix" · "Just made 5k"',
+      re:MONEY_ANY,
       run:function (m, host) {
-        // Which shape fired, and what it says about direction.
-        var raw, income;
-        if (m[1] != null)      { raw = m[2];                    income = /income|payment/i.test(m[1]); }
-        else if (m[4] != null) { raw = m[3] + ' ' + (m[5] || ''); income = true; }
-        else if (m[6] != null) { raw = m[7];                     income = /earned|made/i.test(m[6]); }
-        else if (m[8] != null) { raw = m[8];                     income = true; }
-        else                   { raw = m[9] + ' ' + (m[10] || ''); income = false; }
+        /* This rule's pattern is a WORD, not a sentence, so m[0] is just the direction word.
+           The slots are read from the whole utterance, which exec puts on .input. */
+        var raw = m.input || m[0];
+        var money = moneyAmount(spoken(raw));
+        // shape matched but no figure — try once more with the recogniser's number slips
+        if (!money) money = moneyAmount(spoken(fixNums(raw)));
+        if (!money) return null;
 
+        /* Direction from whichever marker appears FIRST, so "I spent my salary" reads as
+           money going out rather than coming in. */
         var t = spoken(raw);
-        var amt = /(\d+(?:\.\d+)?)/.exec(t); if (!amt) return null;
-        /* Strip the currency word as well as the figure. "Forty pounds for fuel" became an
-           expense labelled "Pounds for fuel", because only the digits were removed. */
-        var label = t.replace(/[£$€]?\s*\d+(?:\.\d+)?/,'')
-                     .replace(/^\s*(?:pounds?|quid|dollars?|euros?|pence|gbp|usd|eur)\b/i,'')
-                     .replace(/^\s*(?:for|on|from|to)\s+/i,'')
-                     .replace(/^\s*(?:the|a|an)\s+/i,'').trim() || 'Unlabelled';
-        var isIncome = income;
-        if (isIncome) host.tools.logIncome(cap(label), num(amt[1]));
-        else host.tools.logExpense(cap(label), num(amt[1]));
-        return 'I’ve logged that ' + (isIncome ? 'income' : 'expense') + ' — ' + label + ', ' + num(amt[1]) + '.';
+        var iOut = t.search(MONEY_OUT), iIn = t.search(MONEY_IN);
+        if (iOut < 0 && iIn < 0) return null;
+        var isIncome = iOut < 0 ? true : (iIn < 0 ? false : iIn < iOut);
+
+        var label = t.replace(money.text, ' ')
+                     .replace(MONEY_META, ' ')
+                     .replace(/[£$€]/g, ' ')
+                     .replace(/\b(?:pounds?|quid|dollars?|euros?|pence|gbp|usd|eur)\b/gi, ' ')
+                     .replace(/\bi(?:['’]ve|ve)?\b/gi, ' ')
+                     .replace(/\b(?:just|have|has|had|as|a|an|the|on|for|from|to|of|in|out|me|my|that|this|it|and|log|logged|record|put|down|today|yesterday|please|was|were|been|about|around)\b/gi, ' ')
+                     .replace(/\s+/g, ' ').trim() || 'Unlabelled';
+
+        if (isIncome) host.tools.logIncome(cap(label), money.value);
+        else host.tools.logExpense(cap(label), money.value);
+        return 'I’ve logged that ' + (isIncome ? 'income' : 'expense') + ' — ' + label + ', ' + money.value + '.';
       } },
 
     { id:'logMeal', acts:true, label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
@@ -648,7 +700,7 @@
          The past-tense forms overlap with completeTask ("finished the shopping"), which is
          also above this rule and declines when no such task exists — so "finished 30
          minutes of cycling" tries the task list, misses, and lands here. */
-      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for)\s+(?:my\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for|i\s+(?:just\s+)?spent)\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var w = parseWorkout(m[1], host);
         if (!w || !w.quantified) return null;          // not a workout shape — fall through
