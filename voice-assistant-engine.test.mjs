@@ -820,6 +820,27 @@ t('a person called Logan is left alone', async()=>{ let h=host();
   h=host(); await VA.handle('Logan is coming to dinner',h);
   if(call('logExpense')||call('logIncome')) throw new Error('logged a person as money'); });
 
+// ---- contractions ----
+/* Caught mid-test: the rules were written for "I spent" and the sentence said "I've spent".
+   People contract almost every first-person verb out loud, so every rule that accepts a
+   first-person lead-in has to accept 've and "have" with it. */
+t('"I\'ve spent" is "I spent"', async()=>{
+  for (const say of ["hello I've spent £2.22 on demo 2","I've spent 2.22 on demo two",
+                     'I have spent 2.22 on demo two','I spent 2.22 on demo two']) {
+    const h=host(); await VA.handle(say,h);
+    eq(call('logExpense'),['logExpense','Demo 2',2.22], JSON.stringify(say)); } });
+t('and the other first-person logs', async()=>{
+  let h=host(); await VA.handle("I've earned 5.55 from demo five",h);
+  eq(call('logIncome'),['logIncome','Demo 5',5.55]);
+  h=host(); await VA.handle("I've paid 4.44 for demo four",h);
+  eq(call('logExpense'),['logExpense','Demo 4',4.44]);
+  h=host(); await VA.handle("I've drunk a litre of water",h);
+  eq(call('logHydration'),['logHydration',1000]);
+  h=host(); await VA.handle("I've had 8 hours of sleep",h);
+  eq(call('logSleep'),['logSleep',8,0]);
+  h=host(); await VA.handle("I've had a chicken salad about 400 cals",h);
+  eq(call('logMeal'),['logMeal','Chicken salad',400,0]); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

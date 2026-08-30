@@ -529,7 +529,7 @@
       } },
 
     { id:'logWater', acts:true, label:'Log water', say:'"Log 500 ml of water"',
-      re:/^(?:i\s+)?(?:just\s+)?(?:log|add|drank|drink|had|have)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
+      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:just\s+)?(?:log|add|drank|drunk|drink|had|have)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
       run:function (m, host) {
         var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?|pints?)?/i.exec(spoken(m[1] || m[2] || ''));
         var ml = 250;
@@ -567,7 +567,7 @@
       } },
 
     { id:'logSleep', acts:true, label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',
-      re:/^(?:i\s+)?(?:log|record|got|had|get)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:i\s+)?slept\s+(?:for\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:log|record|got|had|get)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:i\s+)?slept\s+(?:for\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1] || m[2] || '');
         var h = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)/i.exec(t);
@@ -598,8 +598,9 @@
       re:new RegExp(
           '^(?:log|record|add)\\s+(?:an?\\s+)?(income|expense|payment|spend|cost)\\s*(?:of\\s*)?(.+?)[.?!]*$'
         + '|^(?:log|record|add)\\s+(.+?)\\s+(income|expense|earnings?|wages?)\\b\\s*(?:from|for|on)?\\s*(.*?)[.?!]*$'
-        + '|^i\\s+(?:just\\s+)?(spent|paid|earned|made)\\s+(.+?)[.?!]*$'
-        + '|^(?:i\\s+)?(?:just\\s+)?got\\s+paid\\s+(.+?)[.?!]*$'
+        // "I've spent" is at least as common as "I spent", and "I have spent" happens too.
+        + '|^i(?:\\s*[\u2019\']ve|\\s+have)?\\s+(?:just\\s+)?(spent|paid|earned|made)\\s+(.+?)[.?!]*$'
+        + '|^(?:i(?:\\s*[\u2019\']ve|\\s+have)?\\s+)?(?:just\\s+)?got\\s+paid\\s+(.+?)[.?!]*$'
         + '|^put\\s+(.+?)\\s+down\\s+(?:for|on)\\s+(.+?)[.?!]*$', 'i'),
       run:function (m, host) {
         // Which shape fired, and what it says about direction.
@@ -625,7 +626,7 @@
       } },
 
     { id:'logMeal', acts:true, label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
-      re:/^(?:i\s+)?(?:just\s+)?(?:log|ate|had|have)\s+(?:a\s+|an\s+|some\s+)?(.+?)(?:(?:\s*[,\u2013-]\s*|\s+(?:at|with|about|around|approx(?:imately)?|roughly|thats?|it\s+was)\s+)(.+))?[.?!]*$/i,
+      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:just\s+)?(?:log|ate|had|have)\s+(?:a\s+|an\s+|some\s+)?(.+?)(?:(?:\s*[,\u2013-]\s*|\s+(?:at|with|about|around|approx(?:imately)?|roughly|thats?|it\s+was)\s+)(.+))?[.?!]*$/i,
       run:function (m, host) {
         var extra = spoken(m[2] || '');
         var kcal = /(\d+(?:\.\d+)?)\s*(?:k?cal|calories)/i.exec(extra);
