@@ -224,18 +224,33 @@
     /* Hours count as a duration too. Without this "an hour of running" found no quantity
        at all and the rule declined, sending a perfectly clear log to the model instead. */
     var hrs  = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)\b/i.exec(t);
+    /* "A 5k run" is how people log a run, and it carries no duration, no sets and no weight —
+       so the rule declined it and a perfectly clear instruction went to the model. Distance is
+       a quantity in its own right. "5k" and "5 km" are the same thing; miles are kept as miles
+       rather than silently converted, because the log should say what you said. */
+    var dist = /(\d+(?:\.\d+)?)\s*(k|km|kms|kilometres?|kilometers?|mi|miles?)\b/i.exec(t);
     var name = t
       .replace(/(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/ig,'')
       .replace(/(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/ig,'')
       .replace(/(?:(?:at|with|@)\s*)?(\d+(?:\.\d+)?)\s*(?:kgs?|kilos?|kilograms?|lbs?|pounds?)\b/ig,'')
       .replace(/(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/ig,'')
       .replace(/(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)\b/ig,'')
+      .replace(/(\d+(?:\.\d+)?)\s*(?:k|km|kms|kilometres?|kilometers?|mi|miles?)\b/ig,'')
       .replace(/\b(?:of|doing|did)\b/ig,' ')
       .replace(/\s+/g,' ').trim();
     /* stripDest FIRST — it matches on "on my training", so removing "on"/"my" as filler
        beforehand leaves it nothing to find and the destination survives into the name. */
     name = stripDest(name);
-    name = name.replace(/\b(?:for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
+    /* The command verb has to come out of the NAME too, not just be matched by the rule.
+       proposeWorkout is handed the whole utterance — no rule claimed it — so "log a 5k run"
+       arrived here as an exercise called "log a run", which resolves to nothing. Stripped, it
+       is "run", which is Running, and she can ask how long it took instead of giving up.
+       "and" is deliberately NOT in this list: it separates two exercises and the host splits
+       on it. */
+    /* The pronoun is matched WITH its contraction. A bare \bi\b splits "i'm" and leaves "'m"
+       behind, which reads as a real word to looksLikeExercise — and "I'm now weigh 82 kilos"
+       went back to being logged as an exercise. Caught by the suite, not by hand. */
+    name = name.replace(/\bi(?:['\u2019](?:m|ve|d|ll))?\b|\b(?:log|logged|logging|add|added|record|recorded|track|tracked|enter|put|down|went|a|an|for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
                .replace(/\s+/g,' ').trim();
     if (!name) return null;
     var known = host.tools.exerciseName ? host.tools.exerciseName(name) : null;
@@ -247,6 +262,16 @@
       wt:   wt ? num(wt[1]) : 0,
       unit: wt && /lb|pound/i.test(wt[2]) ? 'lb' : 'kg',
       namey: looksLikeExercise(name),
+      dist: dist ? num(dist[1]) : 0,
+      distUnit: dist && /^mi/i.test(dist[2]) ? 'mi' : 'km',
+      /* Distance is parsed but does NOT count as quantified yet, and that is deliberate.
+         addWorkout() stores minutes, weight, sets and reps — it has no distance column, and
+         it drops any entry carrying none of those, so treating a distance as a quantity would
+         mean "log a 5k run" parsed cleanly, called the host, and vanished without a word.
+         Recognising the distance still earns its keep: stripping "5k" out of the name leaves
+         "run", which resolves to Running, so instead of a dead end she now asks how long it
+         took and logs a real session. Fold `dist` into this line the day the record can hold
+         it — the parse is already here. */
       quantified: !!(sets || mins || hrs || wt)
     };
   }
@@ -347,8 +372,11 @@
       } },
 
     { id:'addTask', acts:true, label:'Add a task', say:'"Add a task to call the accountant"',
-      re:/^(?:add|create|make)\s+(?:a\s+)?(?:new\s+)?task(?:\s+(?:to|for|called|named))?\s+(.+?)[.?!]*$/i,
-      run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addTask(cap(t)); return 'I’ve added “' + t + '” to your tasks.'; } },
+      /* "Remind me to X" is how people actually add a to-do out loud. It lands here rather
+         than on the calendar because it names no time — an utterance that carries one
+         ("remind me at 3pm") is claimed by the schedule rule, which sits above this. */
+      re:/^(?:add|create|make)\s+(?:a\s+)?(?:new\s+)?task(?:\s+(?:to|for|called|named))?\s+(.+?)[.?!]*$|^remind\s+me\s+(?:to\s+)?(.+?)[.?!]*$/i,
+      run:function (m, host) { var t = stripDest(m[1] || m[2]); if (!t) return null; host.tools.addTask(cap(t)); return 'I’ve added “' + t + '” to your tasks.'; } },
 
     { id:'openTasks', label:'What is still open', say:'"What tasks do I have left?"',
       re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$/i,
@@ -402,7 +430,7 @@
       } },
 
     { id:'completeTask', acts:true, label:'Tick a task off', say:'"Mark call the accountant as done"',
-      re:/^(?:mark|tick|check)\s+(?:off\s+)?(?:the\s+)?(?:task\s+)?(.+?)(?:\s+(?:as\s+)?(?:done|off|complete[d]?))?[.?!]*$|^(?:i(?:’|')?ve\s+)?(?:done|finished|completed)\s+(.+?)[.?!]*$/i,
+      re:/^(?:mark|tick|check)\s+(?:off\s+)?(?:the\s+)?(?:task\s+)?(.+?)(?:\s+(?:as\s+)?(?:done|off|complete[d]?))?[.?!]*$|^(?:i\s*(?:’|')?ve\s+|i\s+)?(?:just\s+)?(?:done|finished|completed)\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
         var want = stripDest(m[1] || m[2] || ''); if (!want) return null;
         var hit = host.tools.completeTask(want);
@@ -479,7 +507,7 @@
       } },
 
     { id:'logWater', acts:true, label:'Log water', say:'"Log 500 ml of water"',
-      re:/^(?:log|add|drank|had)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
+      re:/^(?:i\s+)?(?:just\s+)?(?:log|add|drank|drink|had|have)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
       run:function (m, host) {
         var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?|pints?)?/i.exec(spoken(m[1] || m[2] || ''));
         var ml = 250;
@@ -500,7 +528,16 @@
     { id:'logWeight', acts:true, label:'Log body weight', say:'"Log my weight at 82 kilos" · "My weight is 82 kilos"',
       re:/^(?:log|record|set|update)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?(?:body\s*)?weight(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s+(?:weigh|weighed)(?:\s+in)?(?:\s+at)?\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var kg = num(spoken(m[1] || m[2] || m[3] || ''));
+        var t = spoken(m[1] || m[2] || m[3] || '');
+        var kg = num(t);
+        /* Stone and pounds are converted, not taken at face value. The store is kilos, so
+           "13 stone" used to go in as 13 — and once the plausibility guard below arrived it
+           was refused outright instead, which is safer but still not the number you said.
+           Stone may carry pounds after it, the way it is actually spoken: "13 stone 2". */
+        var st = /(\d+(?:\.\d+)?)\s*(?:st|stone|stones)\b(?:\s*(\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)?)?/i.exec(t);
+        var lb = /(\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)\b/i.exec(t);
+        if (st)      kg = Math.round((num(st[1]) * 6.35029 + (st[2] ? num(st[2]) * 0.453592 : 0)) * 10) / 10;
+        else if (lb) kg = Math.round(num(lb[1]) * 0.453592 * 10) / 10;
         /* A body weight, not any number that happened to be in the sentence. Outside this
            range it is a misheard word, and a wrong weight is worse than no weight. */
         if (!(kg > 20 && kg < 400)) return null;
@@ -508,7 +545,7 @@
       } },
 
     { id:'logSleep', acts:true, label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',
-      re:/^(?:log|record)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:i\s+)?slept\s+(.+?)[.?!]*$/i,
+      re:/^(?:i\s+)?(?:log|record|got|had|get)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:i\s+)?slept\s+(?:for\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var t = spoken(m[1] || m[2] || '');
         var h = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)/i.exec(t);
@@ -522,24 +559,51 @@
         return 'I’ve logged ' + (hv ? plural(hv, 'hour') : '') + (mv ? (hv ? ' ' : '') + mv + ' min' : '') + ' of sleep for you.';
       } },
 
-    { id:'logMoney', acts:true, label:'Log income or an expense', say:'"Log an expense of 40 pounds for fuel"',
-      re:/^(?:log|record|add)\s+(?:an?\s+)?(income|expense|payment|spend|cost)\s*(?:of\s*)?(.+?)[.?!]*$/i,
+    /* Money gets said in more shapes than any other log, and only the first of these was
+       understood. The other three all went to the model, which cannot write to the ledger, so
+       the entry was simply lost:
+
+         A  "log an expense of 40 pounds for fuel"   the keyword leads
+         B  "log 2400 income from salary"            the keyword trails the amount
+         C  "I spent 12.99 on netflix"               a past-tense statement
+         D  "put 45 quid down for the phone bill"
+
+       Each shape gets its own alternative rather than one greedy pattern, because this rule
+       sits above the workout rule and a loose "^log <anything>" here would swallow every
+       "log 30 minutes of running" in the app. */
+    { id:'logMoney', acts:true, label:'Log income or an expense',
+      say:'"Log an expense of 40 pounds for fuel" \u00b7 "I spent 12.99 on Netflix"',
+      re:new RegExp(
+          '^(?:log|record|add)\\s+(?:an?\\s+)?(income|expense|payment|spend|cost)\\s*(?:of\\s*)?(.+?)[.?!]*$'
+        + '|^(?:log|record|add)\\s+(.+?)\\s+(income|expense|earnings?|wages?)\\b\\s*(?:from|for|on)?\\s*(.*?)[.?!]*$'
+        + '|^i\\s+(?:just\\s+)?(spent|paid|earned|made)\\s+(.+?)[.?!]*$'
+        + '|^(?:i\\s+)?(?:just\\s+)?got\\s+paid\\s+(.+?)[.?!]*$'
+        + '|^put\\s+(.+?)\\s+down\\s+(?:for|on)\\s+(.+?)[.?!]*$', 'i'),
       run:function (m, host) {
-        var t = spoken(m[2]);
+        // Which shape fired, and what it says about direction.
+        var raw, income;
+        if (m[1] != null)      { raw = m[2];                    income = /income|payment/i.test(m[1]); }
+        else if (m[4] != null) { raw = m[3] + ' ' + (m[5] || ''); income = true; }
+        else if (m[6] != null) { raw = m[7];                     income = /earned|made/i.test(m[6]); }
+        else if (m[8] != null) { raw = m[8];                     income = true; }
+        else                   { raw = m[9] + ' ' + (m[10] || ''); income = false; }
+
+        var t = spoken(raw);
         var amt = /(\d+(?:\.\d+)?)/.exec(t); if (!amt) return null;
         /* Strip the currency word as well as the figure. "Forty pounds for fuel" became an
            expense labelled "Pounds for fuel", because only the digits were removed. */
         var label = t.replace(/[£$€]?\s*\d+(?:\.\d+)?/,'')
                      .replace(/^\s*(?:pounds?|quid|dollars?|euros?|pence|gbp|usd|eur)\b/i,'')
-                     .replace(/^\s*(?:for|on|from|to)\s+/i,'').trim() || 'Unlabelled';
-        var isIncome = /income|payment/i.test(m[1]);
+                     .replace(/^\s*(?:for|on|from|to)\s+/i,'')
+                     .replace(/^\s*(?:the|a|an)\s+/i,'').trim() || 'Unlabelled';
+        var isIncome = income;
         if (isIncome) host.tools.logIncome(cap(label), num(amt[1]));
         else host.tools.logExpense(cap(label), num(amt[1]));
         return 'I’ve logged that ' + (isIncome ? 'income' : 'expense') + ' — ' + label + ', ' + num(amt[1]) + '.';
       } },
 
     { id:'logMeal', acts:true, label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
-      re:/^(?:log|ate|had)\s+(?:a\s+|some\s+)?(.+?)(?:\s+(?:at|with)\s+(.+))?[.?!]*$/i,
+      re:/^(?:i\s+)?(?:just\s+)?(?:log|ate|had|have)\s+(?:a\s+|an\s+|some\s+)?(.+?)(?:(?:\s*[,\u2013-]\s*|\s+(?:at|with|about|around|approx(?:imately)?|roughly|thats?|it\s+was)\s+)(.+))?[.?!]*$/i,
       run:function (m, host) {
         var extra = spoken(m[2] || '');
         var kcal = /(\d+(?:\.\d+)?)\s*(?:k?cal|calories)/i.exec(extra);
@@ -561,7 +625,7 @@
          The past-tense forms overlap with completeTask ("finished the shopping"), which is
          also above this rule and declines when no such task exists — so "finished 30
          minutes of cycling" tries the task list, misses, and lands here. */
-      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do)\s+(?:my\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for)\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var w = parseWorkout(m[1], host);
         if (!w || !w.quantified) return null;          // not a workout shape — fall through

@@ -697,6 +697,57 @@ t('a yes answers the newest question, not the outstanding "is that all?"', async
   await VA.handle('yes',h);
   eq(call('logWeight'),['logWeight',82],'the yes was eaten by the close-out and the log was dropped'); });
 
+// ---- how people actually speak ----
+/* Every case below used to reach the model instead of the log. That is not a harmless
+   fallback: the model cannot write to the ledger, so the entry was simply lost — you were
+   told something helpful and nothing was recorded. */
+t('money said four different ways', async()=>{
+  let h=host(); await VA.handle('I spent 12.99 on netflix',h);
+  eq(call('logExpense'),['logExpense','Netflix',12.99]);
+  h=host(); await VA.handle('Log 2400 income from salary',h);
+  eq(call('logIncome'),['logIncome','Salary',2400]);
+  h=host(); await VA.handle('Put 45 quid down for the phone bill',h);
+  eq(call('logExpense'),['logExpense','Phone bill',45]);
+  h=host(); await VA.handle('I got paid 1200',h);
+  eq(call('logIncome').slice(0,1),['logIncome']); });
+t('earned and made are income, spent and paid are not', async()=>{
+  let h=host(); await VA.handle('I earned 500 from freelance',h); if(!call('logIncome')) throw new Error('earned went out, not in');
+  h=host(); await VA.handle('I paid 60 for petrol',h); if(!call('logExpense')) throw new Error('paid went in, not out'); });
+t('a money sentence with no figure logs nothing', async()=>{ const h=host();
+  await VA.handle('I paid the accountant',h);
+  if(call('logExpense')||call('logIncome')) throw new Error('logged an amount that was never said'); });
+t('sleep in the past tense', async()=>{ let h=host();
+  await VA.handle('I got 8 hours of sleep last night',h); eq(call('logSleep'),['logSleep',8,0]);
+  h=host(); await VA.handle('I slept for 6 hours 45 minutes',h); eq(call('logSleep'),['logSleep',6,45]); });
+t('water with a first-person lead-in', async()=>{ const h=host();
+  await VA.handle('I just drank a litre of water',h); eq(call('logHydration'),['logHydration',1000]); });
+t('a meal with a loose connector', async()=>{ let h=host();
+  await VA.handle('I had a chicken salad about 400 cals',h);
+  eq(call('logMeal'),['logMeal','Chicken salad',400,0]);
+  h=host(); await VA.handle('I had porridge, 350 calories',h);
+  eq(call('logMeal').slice(0,2),['logMeal','Porridge']); });
+t('stone and pounds are converted, not taken as kilos', async()=>{ let h=host();
+  await VA.handle('Log my weight 13 stone',h); eq(call('logWeight'),['logWeight',82.6],'13 stone is not 13 kg');
+  h=host(); await VA.handle('Log my weight 13 stone 2',h); eq(call('logWeight'),['logWeight',83.5]);
+  h=host(); await VA.handle('My weight is 180 lbs',h); eq(call('logWeight'),['logWeight',81.6]); });
+t('"remind me to" adds a task', async()=>{ const h=host();
+  await VA.handle('Remind me to call the accountant',h);
+  eq(call('addTask'),['addTask','Call the accountant']); });
+t('"I finished X" ticks a task off', async()=>{ const h=host();
+  await VA.handle('I finished calling the accountant',h);
+  if(!call('completeTask')) throw new Error('never reached the task list'); });
+/* A distance is understood well enough to name the exercise, but is NOT treated as a
+   quantity: addWorkout stores minutes, weight, sets and reps and drops an entry carrying
+   none of them, so counting distance would mean the log vanished silently. Asking is the
+   honest behaviour until the record can hold a distance. */
+t('a distance run is recognised and asked about, never silently dropped', async()=>{ let h=host();
+  await VA.handle('Log a 5k run',h);
+  has(last(),'Running','should have worked out the exercise from "5k run"');
+  await VA.handle('30 minutes',h);
+  eq(call('logWorkout').slice(0,3),['logWorkout','Running',30]);
+  h=host(); await VA.handle('I went for a 10k run this morning',h);
+  has(last(),'Running'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

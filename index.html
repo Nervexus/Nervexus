@@ -311,7 +311,7 @@
 <script src="exercise-index.js?v=2"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
-<script src="voice-assistant-engine.js?v=22"></script>
+<script src="voice-assistant-engine.js?v=23"></script>
 <script src="constellation-engine.js"></script>
 <script src="void-orb-engine.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9093,7 +9093,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.30-216 · v11.216 notes-vault-command-center';
+const NOTIF_BUILD_VERSION = '2026.08.30-217 · v11.217 natural-phrasing';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11196,6 +11196,26 @@ activities: this._mergeShipLog(s.activities),
           const list=this.state.checklist||[];
           let i=list.findIndex(c=>!c.done && c.label.toLowerCase()===want);
           if(i<0) i=list.findIndex(c=>!c.done && c.label.toLowerCase().includes(want));
+          /* Spoken tense rarely matches the tense a task was written in. "I finished calling
+             the accountant" arrives as "calling the accountant" and neither an exact nor a
+             substring test finds "Call the accountant". Compare the meaningful words instead,
+             crudely stemmed — and require one set to contain the other, so "call the plumber"
+             does NOT tick off "Call the accountant" just because both say "call". */
+          if(i<0){
+            const STOP=new Set(['the','a','an','to','my','for','on','of','and','off','it','that','this','with','up','down','some','about']);
+            const bag=(t)=>new Set((String(t).toLowerCase().match(/[a-z']+/g)||[])
+              .map(w=>w.replace(/['’]/g,'').replace(/(?:ing|ed|es|s)$/,''))
+              .filter(w=>w.length>2 && !STOP.has(w)));
+            const said=bag(want);
+            if(said.size){
+              i=list.findIndex(c=>{ if(c.done) return false;
+                const lab=bag(c.label); if(!lab.size) return false;
+                const shared=[...lab].filter(w=>said.has(w)).length;
+                if(!shared) return false;
+                return shared===lab.size || shared===said.size;   // one set contains the other
+              });
+            }
+          }
           if(i<0) return null;
           const c=list[i], firstAward=!c.xpAwarded;
           this.mut(s=>{ const a=[...s.checklist]; a[i]={...a[i],done:true,xpAwarded:a[i].xpAwarded||firstAward}; return {checklist:a}; });
