@@ -40,7 +40,14 @@
   'use strict';
 
   // ---- helpers ----------------------------------------------------------------
-  function num(v, dflt) { var n = parseFloat(String(v || '').replace(/[^0-9.]/g, '')); return isNaN(n) ? (dflt || 0) : n; }
+  /* Reads the FIRST number in the text. The old version stripped every non-digit from the
+     whole string and parsed what was left, so "7 hours 30" came back as 730 and any text
+     carrying two figures silently produced a third one that was in neither. Thousands
+     separators are dropped first so "1,250" still reads as 1250 rather than 1. */
+  function num(v, dflt) {
+    var m = /\d+(?:\.\d+)?/.exec(String(v == null ? '' : v).replace(/,(?=\d{3}(?!\d))/g, ''));
+    return m ? parseFloat(m[0]) : (dflt || 0);
+  }
   function list(a) { return a && a.length ? a.join(', ') : ''; }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
   function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
@@ -74,12 +81,93 @@
 
   /* Spoken numbers show up constantly in dictation ("log twenty minutes"), and the
      browser's recogniser is inconsistent about which it returns. Cheap to cover. */
-  var WORDS = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10,
-    eleven:11, twelve:12, fifteen:15, twenty:20, thirty:30, forty:40, fifty:50, sixty:60,
-    ninety:90, hundred:100, 'a couple':2, 'a few':3, half:0.5 };
+  /* ---- spoken numbers -------------------------------------------------------------
+     People say numbers as words at least as often as they say digits, and the old version
+     substituted each word independently against a table that was missing seventy and
+     eighty entirely. "Log my weight at eighty two kilos" became "eighty 2 kilos", and the
+     weight went into the body log as 2 kg — not a refusal you would notice, a wrong number
+     you would not. "Seven and a half hours of sleep" logged 30 minutes. Its 'a couple' and
+     'a few' entries could never fire at all, being two words behind a single-word regex.
+
+     So numbers are accumulated properly here: tens plus units, N hundred/thousand with an
+     optional "and", a trailing "and a half", and the quantity words people actually use
+     ("a couple of", "a few", "a dozen").
+
+     A bare "a"/"an" becomes 1 ONLY in front of a unit of measurement. That is what makes
+     "a litre of water" mean a litre while "add a task to call the accountant" is left
+     completely alone — and it is why MEASURE below lists no one-letter words except the
+     unambiguous ones: a bare "g" or "p" would turn ordinary sentences into numbers. */
+  var UNITS = { zero:0, one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8,
+    nine:9, ten:10, eleven:11, twelve:12, thirteen:13, fourteen:14, fifteen:15, sixteen:16,
+    seventeen:17, eighteen:18, nineteen:19 };
+  var TENS = { twenty:20, thirty:30, forty:40, fourty:40, fifty:50, sixty:60, seventy:70,
+    eighty:80, ninety:90 };
+  var SCALE = { hundred:100, thousand:1000 };
+  var FRACTION = { half:0.5, quarter:0.25 };
+  var MEASURE = /^(?:ml|mls|l|litres?|liters?|glass|glasses|cups?|pints?|hours?|hrs?|hr|minutes?|mins?|seconds?|secs?|kilos?|kilograms?|kgs?|kg|pounds?|lbs?|lb|stones?|grams?|calories?|kcals?|cals?|sets?|reps?|miles?|kilometres?|kilometers?|kms?|km|quid|dollars?|euros?|dozen|couple)$/i;
+
   function spoken(t) {
-    return String(t).replace(/\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|ninety|hundred|half)\b/gi,
-      function (m) { return WORDS[m.toLowerCase()]; });
+    var parts = String(t == null ? '' : t).split(/(\s+)/);   // words at even indices, gaps at odd
+    var idx = []; for (var i = 0; i < parts.length; i += 2) idx.push(i);
+    var W = function (n) { return (parts[idx[n]] || '').toLowerCase().replace(/[^a-z]/g, ''); };
+    var TAIL = function (n) { var m = /[^A-Za-z]*$/.exec(parts[idx[n]] || ''); return m ? m[0] : ''; };
+
+    // "seven and a half", "an hour and a half"
+    function withHalf(val, used, n) {
+      if (W(n + used) === 'and' && (W(n + used + 1) === 'a' || W(n + used + 1) === 'an')
+          && FRACTION[W(n + used + 2)] != null) return { val: val + FRACTION[W(n + used + 2)], used: used + 3 };
+      return { val: val, used: used };
+    }
+
+    /* The standard accumulator: units and tens add into the current group, "hundred"
+       multiplies that group, "thousand" banks it and starts a new one. A single lookahead
+       could not do this — "one thousand two hundred" came out as 1002. */
+    function readNumber(n) {
+      var result = 0, current = 0, sawAny = false, k = n, w0 = W(n);
+
+      if (w0 === 'a' || w0 === 'an') {
+        if (W(n + 1) === 'couple')     return { val: 2,  used: W(n + 2) === 'of' ? 3 : 2 };
+        if (W(n + 1) === 'few')        return { val: 3,  used: 2 };
+        if (W(n + 1) === 'dozen')      return { val: 12, used: 2 };
+        if (SCALE[W(n + 1)] != null)   { current = 1; sawAny = true; k = n + 1; }
+        else if (MEASURE.test(W(n + 1))) return withHalf(1, 1, n);
+        else return null;
+      } else if (FRACTION[w0] != null) {
+        if ((W(n + 1) === 'a' || W(n + 1) === 'an') && MEASURE.test(W(n + 2))) return { val: FRACTION[w0], used: 2 };
+        if (MEASURE.test(W(n + 1))) return { val: FRACTION[w0], used: 1 };
+        return null;
+      }
+
+      while (k < idx.length) {
+        var w = W(k);
+        if (UNITS[w] != null) { current += UNITS[w]; sawAny = true; k++; continue; }
+        if (TENS[w]  != null) { current += TENS[w];  sawAny = true; k++; continue; }
+        if (SCALE[w] != null) {
+          if (!sawAny) { current = 1; sawAny = true; }
+          if (SCALE[w] >= 1000) { result += current * SCALE[w]; current = 0; }
+          else current *= SCALE[w];
+          k++; continue;
+        }
+        // "and" only continues the number when another number word follows it
+        if (w === 'and' && sawAny) {
+          var nx = W(k + 1);
+          if (UNITS[nx] != null || TENS[nx] != null || SCALE[nx] != null) { k++; continue; }
+        }
+        break;
+      }
+      if (!sawAny) return null;
+      return withHalf(result + current, k - n, n);
+    }
+
+    var n = 0;
+    while (n < idx.length) {
+      var r = readNumber(n);
+      if (!r) { n++; continue; }
+      parts[idx[n]] = String(r.val) + TAIL(n + r.used - 1);
+      for (var d = 1; d < r.used; d++) { parts[idx[n + d]] = ''; parts[idx[n + d] - 1] = ''; }
+      n += r.used;
+    }
+    return parts.join('').replace(/\s+/g, ' ').trim();
   }
 
   // ---- LOCAL tier ---------------------------------------------------------------
@@ -115,11 +203,15 @@
        cannot be confused with a duration or a rep count. */
     var wt   = /(?:(?:at|with|@)\s*)?(\d+(?:\.\d+)?)\s*(kgs?|kilos?|kilograms?|lbs?|pounds?)\b/i.exec(t);
     var mins = /(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/i.exec(t);
+    /* Hours count as a duration too. Without this "an hour of running" found no quantity
+       at all and the rule declined, sending a perfectly clear log to the model instead. */
+    var hrs  = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)\b/i.exec(t);
     var name = t
       .replace(/(\d+(?:\.\d+)?)\s*(?:sets?|x)\b/ig,'')
       .replace(/(?:of|x)\s*(\d+(?:\.\d+)?)\s*(?:reps?)?\b/ig,'')
       .replace(/(?:(?:at|with|@)\s*)?(\d+(?:\.\d+)?)\s*(?:kgs?|kilos?|kilograms?|lbs?|pounds?)\b/ig,'')
       .replace(/(\d+(?:\.\d+)?)\s*(?:min(?:ute)?s?)\b/ig,'')
+      .replace(/(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)\b/ig,'')
       .replace(/\b(?:of|doing|did)\b/ig,' ')
       .replace(/\s+/g,' ').trim();
     /* stripDest FIRST — it matches on "on my training", so removing "on"/"my" as filler
@@ -131,12 +223,12 @@
     var known = host.tools.exerciseName ? host.tools.exerciseName(name) : null;
     return {
       name: known || cap(name), known: !!known,
-      mins: mins ? num(mins[1]) : 0,
+      mins: mins ? num(mins[1]) : (hrs ? Math.round(num(hrs[1]) * 60) : 0),
       sets: sets ? num(sets[1]) : 0,
       reps: reps ? num(reps[1]) : 0,
       wt:   wt ? num(wt[1]) : 0,
       unit: wt && /lb|pound/i.test(wt[2]) ? 'lb' : 'kg',
-      quantified: !!(sets || mins || wt)
+      quantified: !!(sets || mins || hrs || wt)
     };
   }
 
@@ -370,11 +462,12 @@
     { id:'logWater', acts:true, label:'Log water', say:'"Log 500 ml of water"',
       re:/^(?:log|add|drank|had)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
       run:function (m, host) {
-        var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?)?/i.exec(spoken(m[1] || m[2] || ''));
+        var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?|pints?)?/i.exec(spoken(m[1] || m[2] || ''));
         var ml = 250;
         if (amt) {
           var v = num(amt[1], 1), u = (amt[2] || 'ml').toLowerCase();
-          ml = /^(l|litre|liter)/.test(u) ? v * 1000 : /glass|cup/.test(u) ? v * 250 : v;
+          ml = /^(l|litre|liter)/.test(u) ? v * 1000 : /pint/.test(u) ? Math.round(v * 568)
+             : /glass|cup/.test(u) ? v * 250 : v;
         }
         host.tools.logHydration(ml);
         return 'I’ve logged ' + ml + ' ml of water for you.';
@@ -394,8 +487,12 @@
         var h = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)/i.exec(t);
         var mi = /(\d+)\s*(?:m|mins?|minutes?)/i.exec(t);
         if (!h && !mi) return null;
-        host.tools.logSleep(h ? num(h[1]) : 0, mi ? num(mi[1]) : 0);
-        return 'I’ve logged ' + (h ? plural(num(h[1]), 'hour') : '') + (mi ? (h ? ' ' : '') + mi[1] + ' min' : '') + ' of sleep for you.';
+        /* "Seven and a half hours" arrives as 7.5 — carry the remainder into minutes rather
+           than storing a fractional hour and reading it back as "7.5 hours". */
+        var hv = h ? num(h[1]) : 0, mv = mi ? num(mi[1]) : 0;
+        if (hv % 1) { mv += Math.round((hv % 1) * 60); hv = Math.floor(hv); }
+        host.tools.logSleep(hv, mv);
+        return 'I’ve logged ' + (hv ? plural(hv, 'hour') : '') + (mv ? (hv ? ' ' : '') + mv + ' min' : '') + ' of sleep for you.';
       } },
 
     { id:'logMoney', acts:true, label:'Log income or an expense', say:'"Log an expense of 40 pounds for fuel"',
@@ -403,7 +500,11 @@
       run:function (m, host) {
         var t = spoken(m[2]);
         var amt = /(\d+(?:\.\d+)?)/.exec(t); if (!amt) return null;
-        var label = t.replace(/[£$€]?\d+(?:\.\d+)?/,'').replace(/^\s*(?:for|on|from)\s+/i,'').trim() || 'Unlabelled';
+        /* Strip the currency word as well as the figure. "Forty pounds for fuel" became an
+           expense labelled "Pounds for fuel", because only the digits were removed. */
+        var label = t.replace(/[£$€]?\s*\d+(?:\.\d+)?/,'')
+                     .replace(/^\s*(?:pounds?|quid|dollars?|euros?|pence|gbp|usd|eur)\b/i,'')
+                     .replace(/^\s*(?:for|on|from|to)\s+/i,'').trim() || 'Unlabelled';
         var isIncome = /income|payment/i.test(m[1]);
         if (isIncome) host.tools.logIncome(cap(label), num(amt[1]));
         else host.tools.logExpense(cap(label), num(amt[1]));

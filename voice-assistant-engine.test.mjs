@@ -577,6 +577,52 @@ t('"log it" on its own is still an answer, not an empty utterance', async()=>{ c
   calls=[]; await VA.handle('log it',h);
   if(!call('logWorkout')) throw new Error('"log it" was stripped to nothing'); });
 
+// ---- spoken numbers ----
+/* People say numbers as words as often as they say digits, and these used to log a WRONG
+   figure rather than decline — the failure you never notice. Each case below is one that
+   silently wrote bad data: "eighty two kilos" went into the body log as 2 kg. */
+t('a compound number is read whole, not by its last word', async()=>{ const h=host();
+  await VA.handle('Log my weight at eighty two kilos',h);
+  eq(call('logWeight'),['logWeight',82],'"eighty two" logged 2 kg'); });
+t('seventy and eighty exist', async()=>{ const h=host();
+  await VA.handle('Log my weight at seventy five kilos',h); eq(call('logWeight'),['logWeight',75]); });
+t('"and a half" is half, not the whole quantity', async()=>{ const h=host();
+  await VA.handle('Log seven and a half hours of sleep',h);
+  eq(call('logSleep'),['logSleep',7,30],'logged 30 minutes instead of 7h30'); });
+t('a fractional hour is carried into minutes', async()=>{ const h=host();
+  await VA.handle('Log half an hour of sleep',h); eq(call('logSleep'),['logSleep',0,30]); });
+t('a bare article in front of a unit means one of them', async()=>{ const h=host();
+  await VA.handle('Log a litre of water',h); eq(call('logHydration'),['logHydration',1000],'defaulted to 250 ml'); });
+t('half a litre', async()=>{ const h=host();
+  await VA.handle('Log half a litre of water',h); eq(call('logHydration'),['logHydration',500],'logged 0.5 ml'); });
+t('"a couple of" finally fires', async()=>{ const h=host();
+  await VA.handle('Log a couple of glasses of water',h); eq(call('logHydration'),['logHydration',500]); });
+t('pints', async()=>{ const h=host();
+  await VA.handle('Log a pint of water',h); eq(call('logHydration'),['logHydration',568]); });
+t('hundreds carry their tail', async()=>{ const h=host();
+  await VA.handle('Log an expense of a hundred pounds for fuel',h);
+  eq(call('logExpense'),['logExpense','Fuel',100]); });
+t('the currency word does not become the label', async()=>{ const h=host();
+  await VA.handle('Log an expense of forty pounds for fuel',h);
+  eq(call('logExpense'),['logExpense','Fuel',40],'was labelled "Pounds for fuel"'); });
+t('hours count as a workout duration', async()=>{ const h=host();
+  await VA.handle('Log an hour of running',h);
+  eq(call('logWorkout').slice(0,3),['logWorkout','Running',60],'an hour found no quantity at all'); });
+t('half an hour of running', async()=>{ const h=host();
+  await VA.handle('Log half an hour of running',h); eq(call('logWorkout').slice(0,3),['logWorkout','Running',30]); });
+t('a quantity word with no number still declines', async()=>{ const h=host();
+  await VA.handle('Log my weight at half',h);
+  if(call('logWeight')) throw new Error('logged a weight of half a kilo'); });
+/* The other half of the bargain: an article in front of an ordinary noun is NOT a number,
+   or every "add a task" would turn into "add 1 task". */
+t('an article in front of a plain noun is left alone', async()=>{ const h=host();
+  await VA.handle('Add a task to call the accountant',h);
+  eq(call('addTask'),['addTask','Call the accountant']); });
+t('and so is a mission, a note and an appointment', async()=>{
+  let h=host(); await VA.handle('Add a mission called cold shower',h); eq(call('addMission'),['addMission','Cold shower']);
+  h=host(); await VA.handle('Make a note called ideas — buy the domain',h); if(!call('addNote')) throw new Error('note lost');
+  h=host(); await VA.handle('Schedule a dentist appointment on Friday at 3pm',h); if(!call('scheduleEvent')) throw new Error('event lost'); });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');
