@@ -2578,7 +2578,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
               </div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ incCatDraft }}" onInput="{{ setIncCatDraft }}" onKeyDown="{{ addIncCatKey }}" onBlur="{{ addIncCat }}" placeholder="+ type your own" style="width:118px; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
+                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ incCatDraft }}" onInput="{{ setIncCatDraft }}" onKeyDown="{{ addIncCatKey }}" onBlur="{{ addIncCat }}" placeholder="+ type your own" style="width:172px; flex:none; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
               </div>
               <div style="display:flex; gap:6px; margin-bottom:6px;">
                 <input value="{{ incLabel }}" onInput="{{ setIncLabel }}" onKeyDown="{{ addIncKey }}" placeholder="Source" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
@@ -2596,7 +2596,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <!-- expense log -->
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;"><span style="font-size:12px; font-weight:600;">Log Expense</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#e8e8ec;">{{ expTotal }}</span></div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ expCatDraft }}" onInput="{{ setExpCatDraft }}" onKeyDown="{{ addExpCatKey }}" onBlur="{{ addExpCat }}" placeholder="+ type your own" style="width:118px; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
+                <sc-for list="{{ expCatChips }}" as="c" hint-placeholder-count="9"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ expCatDraft }}" onInput="{{ setExpCatDraft }}" onKeyDown="{{ addExpCatKey }}" onBlur="{{ addExpCat }}" placeholder="+ type your own" style="width:172px; flex:none; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
               </div>
               <div style="display:flex; gap:6px; margin-bottom:6px;">
                 <input value="{{ expLabel }}" onInput="{{ setExpLabel }}" onKeyDown="{{ addExpKey }}" placeholder="Item" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
@@ -9091,7 +9091,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.30-214 · v11.214 finance-categories';
+const NOTIF_BUILD_VERSION = '2026.08.30-215 · v11.215 category-field-mobile';
 class Component extends DCLogic {
   constructor(props){
     super(props);
