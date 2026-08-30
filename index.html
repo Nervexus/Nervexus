@@ -1567,6 +1567,65 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
         </sc-if>
+        <!-- Moved off the Productivity page, where it sat in a narrow column below the
+             category pie. It is the last block on the Command Center now, full width. -->
+        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:22px; margin-top:18px; width:100%; box-sizing:border-box;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <span style="font-size:13px; font-weight:600; display:flex; align-items:center; gap:9px;"><span style="color:#C9C9CE;">🔒</span> Private Notes Vault</span>
+            <sc-if value="{{ notesUnlocked }}" hint-placeholder-val="{{ false }}"><span onClick="{{ lockNotes }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92; cursor:pointer; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px;" style-hover="{ color:'#FFFFFF' }">LOCK</span></sc-if>
+          </div>
+          <sc-if value="{{ notesLocked }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:32px 20px;">
+              <div style="width:64px; height:64px; border-radius:18px; border:1px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.12),transparent 70%); display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:16px;">🔒</div>
+              <div style="font-size:15px; font-weight:600; margin-bottom:4px;">{{ vaultTitle }}</div>
+              <div style="font-size:12px; color:#8a8a92; margin-bottom:16px;">{{ vaultHint }}</div>
+              <div style="display:flex; gap:9px; max-width:340px; width:100%;">
+                <input value="{{ notesPwInput }}" onInput="{{ setNotesPwInput }}" onKeyDown="{{ unlockNotesKey }}" type="password" placeholder="Password" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid {{ notesErrBorder }}; background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; letter-spacing:3px;">
+                <span onClick="{{ unlockNotes }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">Unlock</span>
+              </div>
+              <sc-if value="{{ notesErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">{{ vaultErr }}</div></sc-if>
+            </div>
+          </sc-if>
+          <sc-if value="{{ notesUnlocked }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:9px; margin-bottom:11px; flex-wrap:wrap;">
+              <input value="{{ noteTitle }}" onInput="{{ setNoteTitle }}" placeholder="Note title" style="flex:1; min-width:140px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+              <span onClick="{{ addNote }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">+ Note</span>
+            </div>
+            <textarea value="{{ noteBody }}" onInput="{{ setNoteBody }}" placeholder="Write a note…" style="width:100%; min-height:68px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; font-family:inherit; margin-bottom:14px;"></textarea>
+            <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <sc-for list="{{ notesList }}" as="n" hint-placeholder-count="2">
+                <div onClick="{{ n.open }}" class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; position:relative; cursor:pointer;">
+                  <div style="position:absolute; inset:7px; border:1px solid rgba(91,26,26,0.35); border-radius:11px; pointer-events:none;"></div>
+                  <img src="favicon.png" alt="" style="position:absolute; top:14px; left:16px; width:16px; height:16px; object-fit:contain; opacity:0.85;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding-left:22px;">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#8a8a92;">NOTE · {{ n.stamp }}</span>
+                    <span onClick="{{ n.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span>
+                  </div>
+                  <div style="height:2px; width:32px; background:#5B1A1A; border-radius:2px; margin:9px 0 11px; margin-left:22px;"></div>
+                  <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:6px; padding-left:22px;">{{ n.title }}</div>
+                  <div style="font-size:12px; color:#b8b8c0; line-height:1.5; white-space:pre-wrap; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; padding-left:22px;">{{ n.body }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ noteReadOpen }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ closeNoteRead }}" style="position:fixed; inset:0; z-index:999; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; padding:24px;">
+                <div onClick="{{ stopProp }}" class="cc-glowcard" style="width:100%; max-width:480px; max-height:80vh; overflow-y:auto; border-radius:20px; background:#101012; padding:30px 26px; box-shadow:0 30px 70px rgba(0,0,0,0.55); position:relative;">
+                  <div style="position:absolute; inset:10px; border:1px solid rgba(91,26,26,0.35); border-radius:14px; pointer-events:none;"></div>
+                  <img src="favicon.png" alt="" style="position:absolute; top:24px; left:26px; width:26px; height:26px; object-fit:contain; opacity:0.85;">
+                  <div style="padding-left:40px;">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">NOTE · {{ noteReadStamp }}</div>
+                    <h1 style="font-size:19px; font-weight:700; margin-bottom:0; color:#eef0f2;">{{ noteReadTitle }}</h1>
+                    <div style="height:2px; width:40px; background:#5B1A1A; border-radius:2px; margin:14px 0 18px;"></div>
+                  </div>
+                  <div style="font-size:13.5px; color:#c8c8ce; line-height:1.65; white-space:pre-wrap; padding:0 2px 4px 2px;">{{ noteReadBody }}</div>
+                  <div onClick="{{ closeNoteRead }}" style="margin-top:20px; text-align:center; padding:13px; border-radius:13px; cursor:pointer; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); color:#eef0f2; font-size:12.5px; font-weight:700; letter-spacing:1px;">CLOSE</div>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:6px 0;">No notes yet — add your first above.</div></sc-if>
+          </sc-if>
+        </div>
       </div>
       </sc-if>
 
@@ -2794,63 +2853,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-if value="{{ noCatPie }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:10px 0;">Log activities with minutes to see your time breakdown.</div></sc-if>
             </div>
           </div>
-        </div>
-        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-top:18px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-            <span style="font-size:13px; font-weight:600; display:flex; align-items:center; gap:9px;"><span style="color:#C9C9CE;">🔒</span> Private Notes Vault</span>
-            <sc-if value="{{ notesUnlocked }}" hint-placeholder-val="{{ false }}"><span onClick="{{ lockNotes }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92; cursor:pointer; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px;" style-hover="{ color:'#FFFFFF' }">LOCK</span></sc-if>
-          </div>
-          <sc-if value="{{ notesLocked }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:32px 20px;">
-              <div style="width:64px; height:64px; border-radius:18px; border:1px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.12),transparent 70%); display:flex; align-items:center; justify-content:center; font-size:26px; margin-bottom:16px;">🔒</div>
-              <div style="font-size:15px; font-weight:600; margin-bottom:4px;">{{ vaultTitle }}</div>
-              <div style="font-size:12px; color:#8a8a92; margin-bottom:16px;">{{ vaultHint }}</div>
-              <div style="display:flex; gap:9px; max-width:340px; width:100%;">
-                <input value="{{ notesPwInput }}" onInput="{{ setNotesPwInput }}" onKeyDown="{{ unlockNotesKey }}" type="password" placeholder="Password" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid {{ notesErrBorder }}; background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; text-align:center; letter-spacing:3px;">
-                <span onClick="{{ unlockNotes }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">Unlock</span>
-              </div>
-              <sc-if value="{{ notesErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">{{ vaultErr }}</div></sc-if>
-            </div>
-          </sc-if>
-          <sc-if value="{{ notesUnlocked }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; gap:9px; margin-bottom:11px; flex-wrap:wrap;">
-              <input value="{{ noteTitle }}" onInput="{{ setNoteTitle }}" placeholder="Note title" style="flex:1; min-width:140px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-              <span onClick="{{ addNote }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;">+ Note</span>
-            </div>
-            <textarea value="{{ noteBody }}" onInput="{{ setNoteBody }}" placeholder="Write a note…" style="width:100%; min-height:68px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; font-family:inherit; margin-bottom:14px;"></textarea>
-            <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-              <sc-for list="{{ notesList }}" as="n" hint-placeholder-count="2">
-                <div onClick="{{ n.open }}" class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; position:relative; cursor:pointer;">
-                  <div style="position:absolute; inset:7px; border:1px solid rgba(91,26,26,0.35); border-radius:11px; pointer-events:none;"></div>
-                  <img src="favicon.png" alt="" style="position:absolute; top:14px; left:16px; width:16px; height:16px; object-fit:contain; opacity:0.85;">
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding-left:22px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#8a8a92;">NOTE · {{ n.stamp }}</span>
-                    <span onClick="{{ n.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span>
-                  </div>
-                  <div style="height:2px; width:32px; background:#5B1A1A; border-radius:2px; margin:9px 0 11px; margin-left:22px;"></div>
-                  <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:6px; padding-left:22px;">{{ n.title }}</div>
-                  <div style="font-size:12px; color:#b8b8c0; line-height:1.5; white-space:pre-wrap; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; padding-left:22px;">{{ n.body }}</div>
-                </div>
-              </sc-for>
-            </div>
-
-            <sc-if value="{{ noteReadOpen }}" hint-placeholder-val="{{ false }}">
-              <div onClick="{{ closeNoteRead }}" style="position:fixed; inset:0; z-index:999; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; padding:24px;">
-                <div onClick="{{ stopProp }}" class="cc-glowcard" style="width:100%; max-width:480px; max-height:80vh; overflow-y:auto; border-radius:20px; background:#101012; padding:30px 26px; box-shadow:0 30px 70px rgba(0,0,0,0.55); position:relative;">
-                  <div style="position:absolute; inset:10px; border:1px solid rgba(91,26,26,0.35); border-radius:14px; pointer-events:none;"></div>
-                  <img src="favicon.png" alt="" style="position:absolute; top:24px; left:26px; width:26px; height:26px; object-fit:contain; opacity:0.85;">
-                  <div style="padding-left:40px;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">NOTE · {{ noteReadStamp }}</div>
-                    <h1 style="font-size:19px; font-weight:700; margin-bottom:0; color:#eef0f2;">{{ noteReadTitle }}</h1>
-                    <div style="height:2px; width:40px; background:#5B1A1A; border-radius:2px; margin:14px 0 18px;"></div>
-                  </div>
-                  <div style="font-size:13.5px; color:#c8c8ce; line-height:1.65; white-space:pre-wrap; padding:0 2px 4px 2px;">{{ noteReadBody }}</div>
-                  <div onClick="{{ closeNoteRead }}" style="margin-top:20px; text-align:center; padding:13px; border-radius:13px; cursor:pointer; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); color:#eef0f2; font-size:12.5px; font-weight:700; letter-spacing:1px;">CLOSE</div>
-                </div>
-              </div>
-            </sc-if>
-            <sc-if value="{{ noNotes }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:6px 0;">No notes yet — add your first above.</div></sc-if>
-          </sc-if>
         </div>
       </div>
       </sc-if>
@@ -8421,7 +8423,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
             <div style="margin-top:22px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
               <div style="font-size:13px; font-weight:600; margin-bottom:4px; display:flex; align-items:center; gap:8px;"><span style="color:#C9C9CE;">🔒</span> Notes Vault Password</div>
-              <div style="font-size:11.5px; color:#8a8a92; margin-bottom:12px;">Resets the password for the Private Notes Vault on the Productivity page.</div>
+              <div style="font-size:11.5px; color:#8a8a92; margin-bottom:12px;">Resets the password for the Private Notes Vault at the bottom of the Command Center.</div>
               <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center;">
                 <input value="{{ notesPwDraft }}" onInput="{{ setNotesPwDraft }}" type="text" placeholder="New notes password" style="width:210px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">
                 <span onClick="{{ saveNotesPw }}" style="padding:11px 20px; border-radius:11px; background:{{ notesPwBtnBg }}; border:1px solid rgba(255,255,255,0.35); color:#0c0c0d; font-size:13px; font-weight:700; cursor:pointer;">{{ notesPwBtnLabel }}</span>
@@ -9091,7 +9093,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.30-215 · v11.215 category-field-mobile';
+const NOTIF_BUILD_VERSION = '2026.08.30-216 · v11.216 notes-vault-command-center';
 class Component extends DCLogic {
   constructor(props){
     super(props);
