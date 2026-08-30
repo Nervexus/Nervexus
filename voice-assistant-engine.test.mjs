@@ -908,6 +908,66 @@ t('"lbs" is currency in a money sentence, not a weight', async()=>{ const h=host
   eq(call('logExpense').slice(0,1),['logExpense']);
   eq(call('logExpense')[2],45,'"45 lbs" was thrown away as a measurement'); });
 
+// ---- how people actually talk ----
+/* An audit of the whole rule set against real speech rather than written commands: slang,
+   dropped words, non-native grammar, hesitation, and the recogniser's usual damage. It
+   started at 13 of 35. None of these are phrasings anyone wrote a rule for. */
+t('slang', async()=>{
+  for (const [say, tool] of [
+    ['blew 60 quid on a takeaway','logExpense'], ['bagged 2 grand this week','logIncome'],
+    ['dropped a tenner on lunch','logExpense'], ['that set me back 45','logExpense'],
+    ['made a cheeky 300 on the side','logIncome'],
+    ['smashed 45 minutes on the bike','logWorkout'], ['hit the gym for an hour','logWorkout'],
+    ['knocked out 3 sets of 10 squats','logWorkout'], ['did a quick 20 minute walk','logWorkout'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool); } });
+t('broken english and dropped words', async()=>{
+  for (const [say, tool] of [
+    ['I make gym 30 minute today','logWorkout'], ['yesterday I sleep 6 hour','logSleep'],
+    ['I drink two litre water','logHydration'], ['my weight is 82 kilo','logWeight'],
+    ['I spend 40 pound petrol','logExpense'], ['I eat chicken rice 600 calorie','logMeal'],
+    ['log 20 minutes run','logWorkout'], ['weight 82 kilos','logWeight'],
+    ['water 500 ml','logHydration'], ['sleep 7 hours','logSleep'], ['spent 40 petrol','logExpense'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool); } });
+/* Hesitation does not just sit there — left in, it becomes the thing being logged. This
+   used to produce an exercise called "erm like running". */
+t('hesitation and self-correction', async()=>{
+  for (const [say, tool] of [
+    ['erm log like 30 minutes of running','logWorkout'],
+    ['um I spent you know 40 on petrol','logExpense'],
+    ['so yeah log 500 ml of water','logHydration'],
+    ['log 20 no 30 minutes of running','logWorkout'],
+    ['I spent 40 sorry 45 on petrol','logExpense'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool); } });
+/* The worst of the batch: "log my WAIT at 82 kilos" did not fail, it logged an EXERCISE
+   called "Wait" at 82 kg — the same silent wrong write as the chest-log bug, via a
+   different mis-hearing. */
+t('recogniser damage', async()=>{
+  const h0=host(); await VA.handle('log my wait at 82 kilos',h0);
+  eq(call('logWeight'),['logWeight',82],'"my wait" was logged as an exercise called Wait');
+  if(call('logWorkout')) throw new Error('still reaching the fitness log');
+  for (const [say, tool] of [
+    ['log ate hours of sleep','logSleep'], ['I spent for pounds on coffee','logExpense'],
+    ['log to litres of water','logHydration'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool); } });
+/* And the guard on that repair: a number word only becomes a digit in front of a unit, so
+   an ordinary preposition cannot turn into an amount. */
+t('a mis-heard number is only repaired in front of a unit', async()=>{ const h=host();
+  await VA.handle('I paid for the coffee',h);
+  if(call('logExpense')) throw new Error('"paid for the coffee" invented an amount of four'); });
+t('questions asked loosely', async()=>{
+  for (const [say, expect] of [
+    ['whats my weight','82'], ['how much water so far','1500'], ['sleep last night','7'],
+    ['whats left to do','Call accountant'], ['whats on tomorrow','Dentist'], ['spent today','40'],
+  ]) { const h=host(); await VA.handle(say,h);
+       const line=last()||'';
+       if(/didn.t catch/i.test(line)||!line) throw new Error(JSON.stringify(say)+' was not answered');
+       if(!line.toLowerCase().includes(String(expect).toLowerCase()))
+         throw new Error(JSON.stringify(say)+' answered without the data: '+JSON.stringify(line)); } });
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

@@ -71,8 +71,18 @@
      "log in" / "login" family, which is what the recogniser does with "log an" the rest of
      the time — and which the trailing-request handler already has to cope with. */
   var MISHEARD_LOGAN = /^(?:logan|logon|login|log\s+(?:on|in))\b(?=\s+(?:an?\s+)?(?:expense|income|payment|spend|cost|entry|amount)\b)/i;
+  /* "Weight" comes back as "wait" — and left alone it did not fail, it logged an EXERCISE
+     called "Wait" at 82 kg. Only rewritten where a body weight is the only reading: after
+     "my", or in front of a figure. */
+  var MISHEARD_WAIT = /\b(my\s+)wait\b|\bwait\b(?=\s+(?:is|was|at|of)?\s*\d)/ig;
+  /* Numbers the recogniser turns into words, rewritten ONLY when the next word is a unit or
+     a currency — "for pounds" is four pounds, "I paid for the coffee" is not four anything. */
+  var UNIT_NEXT = '(?:pounds?|lbs?|quid|dollars?|euros?|pence|k|grand|kg|kgs|kilos?|kilograms?|stone|ml|l|litres?|liters?|hours?|hrs?|mins?|minutes?|km|kms?|miles?|cals?|calories|kcals?|sets?|reps?|glasses|glass|cups?|pints?)';
+  var NUM_SLIPS = [['free','three'],['tree','three'],['ate','eight'],['for','four'],['ford','four'],
+                   ['to','two'],['too','two'],['won','one'],['sex','six'],['fife','five'],['nein','nine']];
   function fixVerb(t) {
-    return t.replace(MISHEARD_LOGAN, 'log an').replace(MISHEARD_LOG, 'log').replace(MISHEARD_ADD, 'add');
+    return t.replace(MISHEARD_WAIT, function (mm, my) { return (my || '') + 'weight'; })
+            .replace(MISHEARD_LOGAN, 'log an').replace(MISHEARD_LOG, 'log').replace(MISHEARD_ADD, 'add');
   }
 
   /* People name the destination as well as the thing: "log 30 minutes of running ON MY
@@ -125,23 +135,25 @@
 
      Deliberately NOT here: "for" -> "four" and "too" -> "two". They would invent an amount
      out of an ordinary preposition, and a wrong figure is worse than a refusal. */
-  var NUM_MISHEARD = [[/\bfree\b/gi, 'three'], [/\bfree\b/gi, 'three']];
   function fixNums(t) {
     var o = String(t == null ? '' : t);
-    for (var i = 0; i < NUM_MISHEARD.length; i++) o = o.replace(NUM_MISHEARD[i][0], NUM_MISHEARD[i][1]);
-    return o;
+    for (var i = 0; i < NUM_SLIPS.length; i++) {
+      o = o.replace(new RegExp('\\b' + NUM_SLIPS[i][0] + '\\b(?=\\s+' + UNIT_NEXT + '\\b)', 'ig'), NUM_SLIPS[i][1]);
+    }
+    // "free" on its own is safe to read as three on a retry — it is never a quantity word.
+    return o.replace(/\bfree\b/ig, 'three');
   }
 
   /* ---- money slots ---------------------------------------------------------------------
      Direction is a word, not a sentence position. Two lists, and whichever appears first in
      the utterance wins, so "I spent my salary" is money going out. */
-  var MONEY_OUT = /\b(?:spent|spend|spending|paid|pay|paying|bought|buy|buying|cost|costs|charged|expense|expenses|outgoing|outgoings|withdrew|withdrawn|bill|bills)\b/i;
-  var MONEY_IN  = /\b(?:earned|earn|earning|earnings|made|make|making|income|salary|wages?|invoiced?|received|receive|takings?|revenue|refund|refunded|dividend|bonus|got\s+paid|came\s+in)\b/i;
+  var MONEY_OUT = /\b(?:spent|spend|spending|paid|pay|paying|bought|buy|buying|cost|costs|charged|expense|expenses|outgoing|outgoings|withdrew|withdrawn|bill|bills|blew|blow|dropped|splashed|forked\s+out|shelled\s+out|set\s+me\s+back)\b/i;
+  var MONEY_IN  = /\b(?:earned|earn|earning|earnings|made|make|making|income|salary|wages?|invoiced?|received|receive|takings?|revenue|refund|refunded|dividend|bonus|got\s+paid|came\s+in|bagged|banked|cleared|netted|pulled\s+in|brought\s+in)\b/i;
   var MONEY_ANY = new RegExp('(?:' + MONEY_OUT.source + '|' + MONEY_IN.source + ')', 'i');
   /* Only the words that name the RECORD come out of the label. Some direction words are the
      label — "the phone BILL", "income from SALARY", "a REFUND from Amazon" — and stripping
      those left entries called "Phone" and "Unlabelled". */
-  var MONEY_META = /\b(?:spent|spend|spending|paid|pay|paying|bought|buy|buying|cost|costs|charged|expense|expenses|outgoings?|withdrew|withdrawn|earned|earn|earning|earnings|made|make|making|income|received|receive|got\s+paid|came\s+in)\b/gi;
+  var MONEY_META = /\b(?:spent|spend|spending|paid|pay|paying|bought|buy|buying|cost|costs|charged|expense|expenses|outgoings?|withdrew|withdrawn|blew|blow|dropped|splashed|forked\s+out|shelled\s+out|set\s+me\s+back|earned|earn|earning|earnings|made|make|making|income|received|receive|got\s+paid|came\s+in|bagged|banked|cleared|netted|pulled\s+in|brought\s+in)\b/gi;
 
   /* Units that make a figure a MEASUREMENT rather than money. Without this, "I spent 30
      minutes running" logs a £30 expense — "spent" is a direction word and 30 is a number.
@@ -221,6 +233,9 @@
       var result = 0, current = 0, sawAny = false, k = n, w0 = W(n);
 
       if (w0 === 'a' || w0 === 'an') {
+        if (W(n + 1) === 'tenner')     return { val: 10,   used: 2 };
+        if (W(n + 1) === 'fiver')      return { val: 5,    used: 2 };
+        if (W(n + 1) === 'grand')      return { val: 1000, used: 2 };
         if (W(n + 1) === 'couple')     return { val: 2,  used: W(n + 2) === 'of' ? 3 : 2 };
         if (W(n + 1) === 'few')        return { val: 3,  used: 2 };
         if (W(n + 1) === 'dozen')      return { val: 12, used: 2 };
@@ -345,7 +360,13 @@
     /* The pronoun is matched WITH its contraction. A bare \bi\b splits "i'm" and leaves "'m"
        behind, which reads as a real word to looksLikeExercise — and "I'm now weigh 82 kilos"
        went back to being logged as an exercise. Caught by the suite, not by hand. */
-    name = name.replace(/\bi(?:['\u2019](?:m|ve|d|ll))?\b|\b(?:log|logged|logging|add|added|record|recorded|track|tracked|enter|put|down|went|spent|spend|spending|a|an|for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
+    /* Every way of saying "I did" that is not the name of anything: the command verbs, the
+       slang ones people actually use, and the leftovers of hesitation. Without these the log
+       filled up with exercises called "smashed bike", "knocked out squats" and "make gym". */
+    name = name.replace(/\bhit\s+the\b/ig, ' ')
+               .replace(/\bknocked\s+out\b/ig, ' ')
+               .replace(/\bset\s+me\s+back\b/ig, ' ')
+               .replace(/\bi(?:['\u2019](?:m|ve|d|ll))?\b|\b(?:log|logged|logging|add|added|record|recorded|track|tracked|enter|put|down|went|spent|spend|spending|smashed|smash|banged|bang|knocked|knock|make|makes|making|made|quick|erm|um|uh|er|like|yeah|yesterday|a|an|for|on|in|the|my|today|tonight|this morning|this evening|just now|earlier)\b/ig,' ')
                .replace(/\s+/g,' ').trim();
     if (!name) return null;
     var known = host.tools.exerciseName ? host.tools.exerciseName(name) : null;
@@ -475,7 +496,7 @@
       run:function (m, host) { var t = stripDest(m[1] || m[2]); if (!t) return null; host.tools.addTask(cap(t)); return 'I’ve added “' + t + '” to your tasks.'; } },
 
     { id:'openTasks', label:'What is still open', say:'"What tasks do I have left?"',
-      re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$|^what(?:(?:’|')s| is)?\s+still\s+(?:on\s+my\s+list|to\s+do|outstanding|open)[.?!]*$|^(?:is\s+there\s+)?anything\s+(?:left\s+)?(?:to\s+do|on\s+my\s+list)[.?!]*$/i,
+      re:/^(?:what|which)?\s*(?:tasks?|to.?dos?)\s*(?:do i have|are)?\s*(?:left|open|outstanding|remaining|still)?[.?!]*$|^what(?:(?:’|')s| is)?\s+still\s+(?:on\s+my\s+list|to\s+do|outstanding|open)[.?!]*$|^(?:is\s+there\s+)?anything\s+(?:left\s+)?(?:to\s+do|on\s+my\s+list)[.?!]*$|^what(?:s|(?:’|')s| is)?\s+left\s+to\s+do[.?!]*$/i,
       run:function (m, host) {
         var open = host.tools.openTasks();
         return open.length ? 'You have ' + plural(open.length, 'task') + ' left: ' + list(open) + '.'
@@ -564,7 +585,7 @@
       } },
 
     { id:'askSleep', label:'Last night’s sleep', say:'"How did I sleep?"',
-      re:/^how\s+(?:did\s+i\s+sleep|much\s+sleep\s+did\s+i\s+get|was\s+my\s+sleep)\s*(?:last night|last nite)?[.?!]*$|^what\s+was\s+my\s+sleep\s*(?:last night|last nite)?[.?!]*$|^how(?:'|’)?s\s+my\s+sleep(?:\s+been)?[.?!]*$/i,
+      re:/^how\s+(?:did\s+i\s+sleep|much\s+sleep\s+did\s+i\s+get|was\s+my\s+sleep)\s*(?:last night|last nite)?[.?!]*$|^what\s+was\s+my\s+sleep\s*(?:last night|last nite)?[.?!]*$|^how(?:'|’)?s\s+my\s+sleep(?:\s+been)?[.?!]*$|^sleep\s*(?:last night|last nite)?[.?!]*$/i,
       run:function (m, host) {
         var sl = host.tools.lastSleep(); if (!sl) return 'No sleep logged yet.';
         var bits = [];
@@ -584,20 +605,20 @@
       } },
 
     { id:'askMoney', label:'Money in and out today', say:'"How much have I spent today?"',
-      re:/^how\s+much\s+(?:have\s+|did\s+)?i\s+(spent|spend|earned|earn|made|make)\s*(?:today|so far)?[.?!]*$|^what\s+did\s+i\s+(spend|spent|earn|earned|make|made)\s*(?:today|so far)?[.?!]*$|^how\s+much\s+(came|went)\s+(?:in|out)\s*(?:today)?[.?!]*$|^show\s+me\s+(?:what\s+)?i\s+(spent|spend|earned|earn|made|make)\s*(?:today|so far)?[.?!]*$/i,
+      re:/^how\s+much\s+(?:have\s+|did\s+)?i\s+(spent|spend|earned|earn|made|make)\s*(?:today|so far)?[.?!]*$|^what\s+did\s+i\s+(spend|spent|earn|earned|make|made)\s*(?:today|so far)?[.?!]*$|^how\s+much\s+(came|went)\s+(?:in|out)\s*(?:today)?[.?!]*$|^show\s+me\s+(?:what\s+)?i\s+(spent|spend|earned|earn|made|make)\s*(?:today|so far)?[.?!]*$|^(spent|earned|made)\s+(?:today|so far)[.?!]*$/i,
       run:function (m, host) {
         var mo = host.tools.moneyToday();
         /* The verb decides the direction, and it can be captured by any of the alternatives —
            reading m[1] alone made "what did I spend today" answer with the day's INCOME,
            because that shape captures into a later group and m[1] came back undefined. */
-        var verb = m[1] || m[2] || m[3] || m[4] || '';
+        var verb = m[1] || m[2] || m[3] || m[4] || m[5] || '';
         var out = /spent|spend|went/i.test(verb);
         if (out) return mo.expenses ? 'You’ve logged ' + mo.expenses + ' in expenses today.' : 'No expenses logged today.';
         return mo.income ? 'You’ve logged ' + mo.income + ' in income today.' : 'No income logged today.';
       } },
 
     { id:'askAgenda', label:'What is on today or tomorrow', say:'"What is on tomorrow?"',
-      re:/^what(?:(?:’|')s| is)?\s+(?:on|happening|scheduled)\s*(today|tomorrow)?[.?!]*$|^(?:what(?:(?:’|')s| is)\s+)?(?:in\s+)?(?:my\s+|the\s+)?(?:agenda|schedule|diary)\s*(?:for\s+)?(today|tomorrow)?[.?!]*$|^what\s+(?:have\s+i\s+got|do\s+i\s+have)\s+on\s*(today|tomorrow)?[.?!]*$/i,
+      re:/^what(?:s|(?:’|')s| is)?\s+(?:on|happening|scheduled)\s*(today|tomorrow)?[.?!]*$|^(?:what(?:(?:’|')s| is)\s+)?(?:in\s+)?(?:my\s+|the\s+)?(?:agenda|schedule|diary)\s*(?:for\s+)?(today|tomorrow)?[.?!]*$|^what\s+(?:have\s+i\s+got|do\s+i\s+have)\s+on\s*(today|tomorrow)?[.?!]*$/i,
       run:function (m, host) {
         var when = (m[1] || m[2] || m[3] || 'today').toLowerCase();
         var date = when === 'tomorrow' ? host.tools.dateStrIn(1) : host.tools.todayStr();
@@ -613,9 +634,9 @@
       } },
 
     { id:'logWater', acts:true, label:'Log water', say:'"Log 500 ml of water"',
-      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:just\s+)?(?:log|add|drank|drunk|drink|had|have)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$/i,
+      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:just\s+)?(?:log|add|drank|drunk|drink|had|have)\s+(?:my\s+)?(.+?)\s*(?:of\s+)?water[.?!]*$|^(?:log|add)\s+water\s*(.*)$|^water\s+(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?|pints?)?/i.exec(spoken(m[1] || m[2] || ''));
+        var amt = /(\d+(?:\.\d+)?)\s*(ml|l|litres?|liters?|glass|glasses|cups?|pints?)?/i.exec(spoken(m[1] || m[2] || m[3] || ''));
         var ml = 250;
         if (amt) {
           var v = num(amt[1], 1), u = (amt[2] || 'ml').toLowerCase();
@@ -632,9 +653,9 @@
        weight and a figure IS the instruction. "I weighed in at 82.5" is the same statement in
        the past tense and lands here too. */
     { id:'logWeight', acts:true, label:'Log body weight', say:'"Log my weight at 82 kilos" · "My weight is 82 kilos"',
-      re:/^(?:log|record|set|update)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?(?:body\s*)?weight(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s+(?:weigh|weighed)(?:\s+in)?(?:\s+at)?\s+(.+?)[.?!]*$/i,
+      re:/^(?:log|record|set|update)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?(?:body\s*)?weight(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s+(?:weigh|weighed)(?:\s+in)?(?:\s+at)?\s+(.+?)[.?!]*$|^(?:my\s+)?weight\s+(\d.+?)[.?!]*$/i,
       run:function (m, host) {
-        var t = spoken(m[1] || m[2] || m[3] || '');
+        var t = spoken(m[1] || m[2] || m[3] || m[4] || '');
         var kg = num(t);
         /* Stone and pounds are converted, not taken at face value. The store is kilos, so
            "13 stone" used to go in as 13 — and once the plausibility guard below arrived it
@@ -651,9 +672,9 @@
       } },
 
     { id:'logSleep', acts:true, label:'Log sleep', say:'"Log 7 hours 30 minutes of sleep"',
-      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:log|record|got|had|get)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:i\s+)?slept\s+(?:for\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:log|record|got|had|get)\s+(?:my\s+)?(.*?)\s*(?:of\s+)?sleep(?:\s+(?:last night|last nite|tonight|yesterday|today))?[.?!]*$|^(?:yesterday\s+|last\s+night\s+)?(?:i\s+)?(?:slept|sleep)\s+(?:for\s+)?(.+?)[.?!]*$|^sleep\s+(\d.+?)[.?!]*$/i,
       run:function (m, host) {
-        var t = spoken(m[1] || m[2] || '');
+        var t = spoken(m[1] || m[2] || m[3] || '');
         var h = /(\d+(?:\.\d+)?)\s*(?:h|hrs?|hours?)/i.exec(t);
         var mi = /(\d+)\s*(?:m|mins?|minutes?)/i.exec(t);
         if (!h && !mi) return null;
@@ -733,14 +754,23 @@
       } },
 
     { id:'logMeal', acts:true, label:'Log a meal', say:'"Log chicken and rice at 600 calories"',
-      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:just\s+)?(?:log|ate|had|have)\s+(?:a\s+|an\s+|some\s+)?(.+?)(?:(?:\s*[,\u2013-]\s*|\s+(?:at|with|about|around|approx(?:imately)?|roughly|thats?|it\s+was)\s+)(.+))?[.?!]*$/i,
+      re:/^(?:i(?:\s*[’']ve|\s+have)?\s+)?(?:just\s+)?(?:log|ate|eat|eating|had|have)\s+(?:a\s+|an\s+|some\s+)?(.+?)(?:(?:\s*[,\u2013-]\s*|\s+(?:at|with|about|around|approx(?:imately)?|roughly|thats?|it\s+was)\s+)(.+))?[.?!]*$/i,
       run:function (m, host) {
-        var extra = spoken(m[2] || '');
-        var kcal = /(\d+(?:\.\d+)?)\s*(?:k?cal|calories)/i.exec(extra);
-        var pro  = /(\d+(?:\.\d+)?)\s*g?\s*(?:of\s+)?protein/i.exec(extra);
+        var name = (m[1] || '').trim(), extra = spoken(m[2] || '');
+        var KCAL = /(\d+(?:\.\d+)?)\s*(?:k?cals?|calories?)/i, PRO = /(\d+(?:\.\d+)?)\s*g?\s*(?:of\s+)?protein/i;
+        var kcal = KCAL.exec(extra), pro = PRO.exec(extra);
+        /* "I eat chicken rice 600 calorie" has no "at" or "with" to split on, so the figures
+           are still sitting in the name. Look there before giving up, and take them out of
+           the name so the meal is not called "chicken rice 600 calorie". */
+        if (!kcal && !pro) {
+          var inName = spoken(name);
+          kcal = KCAL.exec(inName); pro = PRO.exec(inName);
+          if (kcal || pro) name = inName.replace(KCAL, ' ').replace(PRO, ' ').replace(/\s+/g, ' ').trim();
+        }
         if (!kcal && !pro) return null;                // no nutrition figures — not a meal log
-        host.tools.logMeal(cap(m[1].trim()), kcal ? num(kcal[1]) : 0, pro ? num(pro[1]) : 0);
-        return 'I’ve logged ' + m[1].trim() + (kcal ? ' at ' + num(kcal[1]) + ' kcal' : '') + ' for you.';
+        if (!name) return null;
+        host.tools.logMeal(cap(name), kcal ? num(kcal[1]) : 0, pro ? num(pro[1]) : 0);
+        return 'I’ve logged ' + name + (kcal ? ' at ' + num(kcal[1]) + ' kcal' : '') + ' for you.';
       } },
 
     { id:'logWorkout', acts:true, label:'Log a workout', say:'"Log 30 minutes of running" · "Add bench press 3 sets of 8 at 60 kilos"',
@@ -755,7 +785,7 @@
          The past-tense forms overlap with completeTask ("finished the shopping"), which is
          also above this rule and declines when no such task exists — so "finished 30
          minutes of cycling" tries the task list, misses, and lands here. */
-      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for|i\s+(?:just\s+)?spent)\s+(?:my\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for|i\s+(?:just\s+)?spent|(?:i\s+)?(?:just\s+)?(?:smashed|smash|knocked\s+out|banged\s+out|hit|make|makes)|(?:i\s+)?(?:just\s+)?did\s+a\s+quick)\s+(?:my\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
         var w = parseWorkout(m[1], host);
         if (!w || !w.quantified) return null;          // not a workout shape — fall through
@@ -1008,11 +1038,17 @@
      "add a task to log" keeps its last word. */
   var TRAIL_REQ = /[,\s]*(?:(?:can|could|would|will)\s+(?:you|u)\s+(?:please\s+)?(?:log|lock|add|save|record|put|note)(?:\s+(?:it|that|this|them|in|on|out|up|down))*|(?:log|add|save|record|put)\s+(?:it|that|this|them|in|on|out|up|down)(?:\s+(?:in|on|down|for me))?)[.?!]*$/i;
 
+  /* Hesitation noise. Left in, it does not just sit there — it becomes part of the thing
+     being logged: "erm log like 30 minutes of running" produced an exercise called "erm like
+     running". Stripped only at the start, plus "like" when it sits in front of a figure,
+     which is the one place it is filler rather than a real verb ("I like running"). */
+  var FILLER = /^(?:erm+|um+|uh+|er+|hmm+|so|yeah|yep|right|well|basically|actually|literally|i mean|you know)\b[,\s]*/i;
   function tidy(t) {
     var prev;
     do {
       prev = t;
-      t = t.replace(LEAD, '').replace(TRAIL, '');
+      t = t.replace(LEAD, '').replace(FILLER, '').replace(TRAIL, '');
+      t = t.replace(/\blike\s+(?=\d)/ig, '');
       // Never strip the whole utterance: "log it" on its own is an answer, not a tail.
       var cut = t.replace(TRAIL_REQ, '').trim();
       if (cut) t = cut;
@@ -1068,7 +1104,12 @@
     var rule = matchRule(t);
     if (rule && rule.acts && host.ack) host.ack(nextAck());
 
+    /* Nothing matched on the words as heard — try once more with the recogniser's number
+       slips repaired. Central rather than per-rule, so "log ate hours of sleep" and "to litres
+       of water" get the same help "free" already got in the money rule. The slips only apply
+       in front of a unit, so this cannot invent a figure out of a preposition. */
     var local = runLocal(t, host);
+    if (!local.handled) { var fixed = fixNums(t); if (fixed !== t) local = runLocal(fixed, host); }
     if (local.handled) {
       AWAIT_CLOSE = false;
       host.speak(local.reply);
