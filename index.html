@@ -193,6 +193,10 @@
       linear-gradient(168deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.16) 100%),
       #1E1E1E !important; }
   /* ===== MAISON ÉLYSÉE (quiet luxury: cornflower blue on cream, didone display) ===== */
+  /* Maison Éverpine — the second dark style: a deep forest ground, cream ink and a
+     champagne accent, taken from the house card. Scoped to the home screen for now by
+     themeClass, so the rest of the app stays Ultra X until the look is approved. */
+  .theme-ultra.theme-everpine{ --u-bg:#16211A; --u-card:rgba(30,44,36,0.86); --u-ink:#F2F1E9; --u-muted:#8E9C92; --u-line:rgba(142,156,146,0.26); --u-accent:#E7D8A6; --e-deep:#0F1813; --e-moss:#243228; --e-champagne:#E7D8A6; }
   .theme-ultra.theme-maison{ --u-bg:#F2ECE0; --u-card:#FBF7EF; --u-ink:#2E4560; --u-muted:#6E82A0; --u-line:rgba(60,90,125,0.18); --u-accent:#3C5A7D; --m-blue:#8FAAC9; --m-deep:#4E6E96; --m-cream:#F6F0E4; }
   .theme-ultra.theme-maison, .theme-ultra.theme-maison .cc-scene, .theme-ultra.theme-maison .cc-top, .theme-ultra.theme-maison .cc-side{ background-color:var(--u-bg) !important; background-image:none !important; }
   .theme-ultra.theme-maison .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-radius:14px !important; box-shadow:0 1px 0 rgba(255,255,255,0.75) inset, 0 10px 28px rgba(60,90,125,0.07) !important; }
@@ -223,6 +227,11 @@
   .theme-ultra.theme-maison [style*="Pinyon"]{ font-family:'Pinyon Script',cursive !important; }
   .theme-ultra.theme-maison h1, .theme-ultra.theme-maison h2, .theme-ultra.theme-maison h3{ font-family:'Cormorant Garamond',Georgia,serif !important; font-weight:500 !important; font-style:normal !important; letter-spacing:0 !important; color:var(--u-accent) !important; }
   .theme-ultra.theme-maison .cc-home-hero h1, .theme-ultra.theme-maison .cc-home-hero h1.cc-home-greeting{ color:#FDFAF4 !important; }
+  /* Same reason as the line above: `.theme-ultra h1,h2,h3` sets colour to var(--u-accent)
+     with !important, so the inline cream on the greeting loses. On the house card the big
+     script is cream and only the diamond is champagne — champagne stays on the frame and the
+     ornament, the greeting is cream. */
+  .theme-ultra.theme-everpine .cc-home-hero h1, .theme-ultra.theme-everpine .cc-home-hero h1.cc-home-greeting{ color:#F2F1E9 !important; }
   .theme-ultra.theme-maison .cc-home-hero p, .theme-ultra.theme-maison .cc-home-hero span{ color:#FDFAF4 !important; }
   .theme-ultra.theme-maison .cc-home-hero [style*="JetBrains Mono"]{ color:rgba(253,250,244,0.78) !important; }
   .theme-ultra.theme-maison [data-icon]{ color:var(--m-deep) !important; }
@@ -1178,6 +1187,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
+        <sc-if value="{{ isUltraEverpine }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:18px; border:1px solid rgba(231,216,166,0.55); border-radius:14px; pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; inset:26px; border:1px solid rgba(231,216,166,0.22); border-radius:10px; pointer-events:none; z-index:1;"></div>
+        </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
             <sc-if value="{{ showChrome }}" hint-placeholder-val="{{ true }}">
@@ -1218,6 +1231,34 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#968F82; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
+          </sc-if>
+          <sc-if value="{{ isUltraEverpine }}" hint-placeholder-val="{{ false }}">
+            <div class="cc-home-logo" style="border-color:rgba(231,216,166,0.5);"><img src="favicon.png" alt="Nervexus"></div>
+            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#F2F1E9;">{{ homeWordmark }}</p>
+            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#F2F1E9; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+            <div style="margin:56px 0 12px;">
+              <svg width="360" height="26" viewBox="0 0 600 28" style="display:block;">
+                <g fill="none" stroke="#E7D8A6" stroke-width="1.5" stroke-linecap="round">
+                  <line x1="10" y1="14" x2="235" y2="14"/>
+                  <line x1="365" y1="14" x2="590" y2="14"/>
+                </g>
+                <g fill="#E7D8A6">
+                  <circle cx="10" cy="14" r="2.2"/>
+                  <circle cx="590" cy="14" r="2.2"/>
+                  <circle cx="248" cy="14" r="1.6"/>
+                  <circle cx="258" cy="14" r="1.6"/>
+                  <circle cx="342" cy="14" r="1.6"/>
+                  <circle cx="352" cy="14" r="1.6"/>
+                </g>
+                <g fill="none" stroke="#E7D8A6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M270,14 C280,4 292,4 296,10 C300,16 292,20 286,16 C282,13 284,9 288,9"/>
+                  <path d="M330,14 C320,4 308,4 304,10 C300,16 308,20 314,16 C318,13 316,9 312,9"/>
+                </g>
+                <rect x="296" y="2" width="8" height="8" fill="#E7D8A6" transform="rotate(45 300 6)"/>
+              </svg>
+            </div>
+            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#8E9C92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#E7D8A6; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#E7D8A6' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
             <div class="cc-home-logo" style="border-color:rgba(246,240,228,0.8);"><img src="favicon.png" alt="Nervexus"></div>
@@ -9093,7 +9134,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.31-224 · v11.224 constellation-orbs';
+const NOTIF_BUILD_VERSION = '2026.08.31-225 · v11.225 everpine-home';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -17465,7 +17506,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       appearToggles:[ this._tog('animations','Animations','Cinematic transitions & motion'), this._tog('particles','Particle effects','AI orb & ambient particles'), this._tog('glass','Glassmorphism','Panel blur & transparency'), this._tog('reduceMotion','Reduce motion','Minimize non-essential movement') ],
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
-      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée',
+      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraEverpine:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Éverpine', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée' && S.prefs.ultraStyle!=='Maison Éverpine',
       ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Maison Éverpine']),
       raimentIcons:this._raimentIcons(), showRaimentSwitcher:S.scene!=='settings',
       ultraBriefBtnColor:(S.prefs.theme==='Ultra'&&S.prefs.ultraStyle==='Noir')?'#e7c98a':'#F4F4F5',
@@ -17639,7 +17680,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ]; })(),
       shellDisplay: S.loggedIn?'grid':'block', asideDisplay:this._isPrivatePageOpen()?'none':(typeof window!=='undefined' && window.innerWidth<=900)?'none':'flex', shellCols: (typeof window!=='undefined' && window.innerWidth<=900)?'1fr':((S.focusMode||this._isPrivatePageOpen())?'0px 1fr':'84px 1fr'),
       themeFilter:(()=>{ const t=S.prefs.theme; return t==='Ember'?'hue-rotate(83deg) saturate(1.1) brightness(0.95)':t==='Onyx'?'saturate(0) brightness(1.08)':t==='Ghost'?'saturate(0) contrast(1.08)':t==='Snow'?'hue-rotate(218deg) saturate(1.05)':'none'; })(),
-      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
+      /* Éverpine's class is only added on the home screen. It is the one style whose look is
+         still being judged, and scoping it here means every other page keeps the Ultra X it
+         has always had rather than half-inheriting a theme that has no chart, tile or card
+         palettes behind it yet. Drop the scene test to take it app-wide. */
+      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':(S.prefs.ultraStyle==='Maison Éverpine'&&scene==='home')?' theme-everpine':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
       showBanGate: S.loggedIn && !!(S.perfStatus && S.perfStatus.banned),
       showSuspendedGate: S.loggedIn && !!(S.profile && S.profile.account_status==='suspended' && S.profile.role!=='owner'),
       notifOpen:S.notifOpen, sidebarX:S.notifOpen?'0':'110%',
