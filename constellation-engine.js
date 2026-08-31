@@ -54,6 +54,7 @@
         n.r = (shell[cat] || shell.news) * (0.82 + jitter * 0.36);
         n.wy = Math.sin(n.phi) * n.r * 0.55;
         n.spin = 0.02 + jitter * 0.05;   // its own slow orbit, so nothing is ever still
+        n.seed = jitter * 6.2832;        // and its own mesh phase, so no two churn in step
       });
     });
   }
@@ -85,6 +86,58 @@
     if (zc < 40) return null;
     var k = FOV / zc;
     return { x: S.w / 2 + x1 * k, y: S.h / 2 + y1 * k, k: k, z: zc };
+  }
+
+  /* The voice orb is a wireframe icosahedron whose vertices are pushed along their normals
+     by noise — it reads as a churning mesh, not a lit ball. Nodes are drawn in that same
+     idiom so the map and the assistant look like one family: a dark body, a lat/long mesh
+     displaced by cheap noise, and the category hue carried by the lines rather than a fill.
+
+     Two strokes, not one per segment: the far half of the sphere is collected into one path
+     at low alpha and the near half into another. A node this size is ~340 segments, and
+     stroking each on its own turned a still frame into a stutter. */
+  function meshOrb(ctx, cx, cy, r, rgb, alpha, t, seed) {
+    /* Line count follows the radius. A fixed mesh looked right at 50px and turned into a
+       scribble at 16 — the same reason the orb engine takes a `detail` argument. */
+    var LAT = Math.max(3, Math.min(8, Math.round(r / 8)));
+    var LON = Math.max(6, Math.min(14, Math.round(r / 4.5)));
+    var SEG = Math.max(12, Math.min(22, Math.round(r / 3)));
+    var i, j, k;
+    var col = function (a) { return 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + a.toFixed(3) + ')'; };
+    var wob = function (u, v) {
+      return Math.sin(u * 2.1 + t * 0.9 + seed) * 0.5 + Math.sin(v * 2.7 - t * 0.6 + seed * 1.7) * 0.5;
+    };
+    // the body, so it sits as an object against the star field rather than a see-through cage
+    var body = ctx.createRadialGradient(cx - r * 0.25, cy - r * 0.3, r * 0.05, cx, cy, r);
+    body.addColorStop(0, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + (0.20 * alpha).toFixed(3) + ')');
+    body.addColorStop(1, 'rgba(6,6,8,' + (0.92 * alpha).toFixed(3) + ')');
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.fill();
+
+    var far = new Path2D(), near = new Path2D();
+    var pt = function (th, ph) {
+      var d = r * (1 + 0.12 * wob(th * 2, ph * 2));
+      var st = Math.sin(th);
+      return { x: cx + st * Math.cos(ph) * d, y: cy + Math.cos(th) * d, z: st * Math.sin(ph) };
+    };
+    for (i = 1; i < LAT; i++) {                       // latitude rings
+      var th = Math.PI * i / LAT, started = { f: false, n: false };
+      for (j = 0; j <= SEG; j++) {
+        var q = pt(th, 6.2832 * j / SEG), path = q.z < 0 ? far : near, key = q.z < 0 ? 'f' : 'n';
+        if (!started[key]) { path.moveTo(q.x, q.y); started[key] = true; } else path.lineTo(q.x, q.y);
+        if (j === SEG) { started.f = false; started.n = false; }
+      }
+    }
+    for (i = 0; i < LON; i++) {                       // longitude arcs
+      var ph = 6.2832 * i / LON, s2 = { f: false, n: false };
+      for (k = 0; k <= SEG; k++) {
+        var p2 = pt(Math.PI * k / SEG, ph), pa = p2.z < 0 ? far : near, ky = p2.z < 0 ? 'f' : 'n';
+        if (!s2[ky]) { pa.moveTo(p2.x, p2.y); s2[ky] = true; } else pa.lineTo(p2.x, p2.y);
+      }
+    }
+    ctx.lineWidth = Math.max(0.6, r * 0.018);
+    ctx.strokeStyle = col(0.16 * alpha); ctx.stroke(far);
+    ctx.strokeStyle = col(0.72 * alpha); ctx.stroke(near);
   }
 
   function nodePos(n, t) {
@@ -162,14 +215,16 @@
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.arc(nd.sx, nd.sy, rr * 3.4, 0, 6.2832); ctx.fill();
 
-      // lit-sphere body: white highlight falling off to the category hue
-      var b = ctx.createRadialGradient(nd.sx - rr * 0.3, nd.sy - rr * 0.35, rr * 0.1, nd.sx, nd.sy, rr);
-      b.addColorStop(0, nd.on ? 'rgba(255,255,255,' + (0.95 * fade).toFixed(3) + ')'
-                              : 'rgba(220,220,230,' + (0.5 * fade).toFixed(3) + ')');
-      b.addColorStop(1, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + ((nd.on ? 0.95 : 0.35) * fade).toFixed(3) + ')');
-      ctx.fillStyle = b;
-      ctx.beginPath(); ctx.arc(nd.sx, nd.sy, rr, 0, 6.2832); ctx.fill();
-
+      if (rr >= 5) meshOrb(ctx, nd.sx, nd.sy, rr, rgb, (nd.on ? 1 : 0.45) * fade, t, nd.seed || 0);
+      else {
+        // Below a few pixels a mesh is just noise — small nodes keep the lit sphere.
+        var b = ctx.createRadialGradient(nd.sx - rr * 0.3, nd.sy - rr * 0.35, rr * 0.1, nd.sx, nd.sy, rr);
+        b.addColorStop(0, nd.on ? 'rgba(255,255,255,' + (0.95 * fade).toFixed(3) + ')'
+                                : 'rgba(220,220,230,' + (0.5 * fade).toFixed(3) + ')');
+        b.addColorStop(1, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',' + ((nd.on ? 0.95 : 0.35) * fade).toFixed(3) + ')');
+        ctx.fillStyle = b;
+        ctx.beginPath(); ctx.arc(nd.sx, nd.sy, rr, 0, 6.2832); ctx.fill();
+      }
     }
 
     /* Labels are a second pass, walked nearest-first, and a pill that would land on one

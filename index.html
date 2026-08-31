@@ -312,7 +312,7 @@
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
 <script src="voice-assistant-engine.js?v=29"></script>
-<script src="constellation-engine.js"></script>
+<script src="constellation-engine.js?v=2"></script>
 <script src="void-orb-engine.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -9093,7 +9093,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.30-223 · v11.223 real-speech';
+const NOTIF_BUILD_VERSION = '2026.08.31-224 · v11.224 constellation-orbs';
 class Component extends DCLogic {
   constructor(props){
     super(props);
