@@ -9,6 +9,12 @@
 import fs from 'fs';
 const root={}; new Function('window', fs.readFileSync(new URL('./voice-assistant-engine.js', import.meta.url),'utf8'))(root);
 const VA=root.VoiceAssistant;
+/* The real exercise index, not a hand-written stub of it. A stub here is a second place
+   for my assumptions to live: it once knew "run" but not "ran", so a test failed on a
+   phrase the shipped app handles fine — and the reverse is the dangerous case, a test
+   passing on a name the real index would refuse. */
+const idxRoot={}; new Function('window', fs.readFileSync(new URL('./exercise-index.js', import.meta.url),'utf8'))(idxRoot);
+const EXERCISES=idxRoot.EXERCISE_INDEX;
 
 let calls, spoken, followUps;
 function host(hasAI=false, aiReply='AI says hi'){
@@ -27,11 +33,11 @@ function host(hasAI=false, aiReply='AI says hi'){
       doneToday:()=>{calls.push(['doneToday']); return {tasks:['Email Dan'], missions:['Cold shower']};},
       trainingToday:()=>{calls.push(['trainingToday']); return ['Bench press'];},
       logWorkout:rec('logWorkout'), logHydration:rec('logHydration'), logWeight:rec('logWeight'),
+      logBodyFat:rec('logBodyFat'), logHeight:rec('logHeight'),
       logSleep:rec('logSleep'), logMeal:rec('logMeal'), addNote:rec('addNote'),
       logIncome:rec('logIncome'), logExpense:rec('logExpense'), disableAssistant:rec('disableAssistant'),
       stopListening:rec('stopListening'),
-      // stands in for exercise-index.js
-      exerciseName:(n)=>({'on the stairmaster':'Stairmaster','hammer curls':'Hammer Curl','running':'Running','run':'Running','bench press':'Bench Press','cycling':'Cycling'}[String(n).toLowerCase()]||null),
+      exerciseName:(n)=>EXERCISES.nameOf(n),
       completeTask:(l)=>{ calls.push(['completeTask',l]); return /accountant/i.test(l)?'Call accountant':null; },
       completeMission:(n)=>{ calls.push(['completeMission',n]); return /cold/i.test(n)?'Cold shower':null; },
       waterToday:()=>({ml:1500, goalMl:2000}),
@@ -967,6 +973,80 @@ t('questions asked loosely', async()=>{
        if(/didn.t catch/i.test(line)||!line) throw new Error(JSON.stringify(say)+' was not answered');
        if(!line.toLowerCase().includes(String(expect).toLowerCase()))
          throw new Error(JSON.stringify(say)+' answered without the data: '+JSON.stringify(line)); } });
+
+/* ---- body metrics -----------------------------------------------------------------
+   Body fat and height are the other two fields on the Body metrics card. Before these
+   rules existed the sentences did not merely go unhandled — they fell through to the
+   workout parser, which read "body fat is 14 percent" as an exercise name. The first
+   test below is the one that matters: it asserts the fitness log is NOT touched. */
+t('body fat is logged as a body metric, never as an exercise', async()=>{
+  for (const [say, pct] of [
+    ['my body fat is 14 percent', 14], ['log my body fat at 14%', 14],
+    ['body fat 14', 14], ['my body fat is 14.2', 14.2],
+    ['log my body fat 22 percent', 22],
+  ]) { const h=host(); await VA.handle(say,h);
+       const c=call('logBodyFat');
+       if(!c) throw new Error(JSON.stringify(say)+' did not reach logBodyFat');
+       eq(c[1], pct, JSON.stringify(say)+':');
+       if(call('logWorkout')) throw new Error(JSON.stringify(say)+' also logged a workout'); } });
+
+/* Height is spoken in feet and inches far more often than in centimetres, and every
+   spelling of it has to land on the same number — including "5ft10", which has no break
+   between the unit and the inches and so defeats a plain word boundary. */
+t('height in every spelling lands on the same centimetres', async()=>{
+  for (const [say, cm] of [
+    ['my height is 180 cm', 180], ['log my height at 5 foot 10', 177.8],
+    ["i'm 5 foot 10", 177.8], ["i'm 5ft10", 177.8], ["i'm 5ft 10", 177.8],
+    ['i am 6ft2', 188], ["my height is 5'11", 180.3],
+    ['my height is 1.8 m', 180], ['height 175', 175], ["i'm 180cm", 180],
+    ["i'm 5 foot 10 tall", 177.8],
+  ]) { const h=host(); await VA.handle(say,h);
+       const c=call('logHeight');
+       if(!c) throw new Error(JSON.stringify(say)+' did not reach logHeight');
+       eq(c[1], cm, JSON.stringify(say)+':');
+       if(call('logWorkout')) throw new Error(JSON.stringify(say)+' also logged a workout'); } });
+
+/* The collision the height rule creates and has to close: "I'm 82 kilos" sits inside the
+   plausible-centimetres window, so without a mass check it would have gone in as a height
+   of 82 cm. Weight and height say "I'm <number>" identically; only the unit separates them. */
+t('"I am <number>" splits into height or weight by its unit alone', async()=>{
+  for (const [say, tool, val] of [
+    ["i'm 82 kilos", 'logWeight', 82], ["i'm 13 stone", 'logWeight', 82.6],
+    ["i'm 13 stone 4", 'logWeight', 84.4], ["i'm 180 lbs", 'logWeight', 81.6],
+    ["i'm 5ft10", 'logHeight', 177.8], ["i'm 180cm", 'logHeight', 180],
+  ]) { const h=host(); await VA.handle(say,h);
+       const c=call(tool);
+       if(!c) throw new Error(JSON.stringify(say)+' did not reach '+tool);
+       eq(c[1], val, JSON.stringify(say)+':');
+       const other = tool==='logWeight' ? 'logHeight' : 'logWeight';
+       if(call(other)) throw new Error(JSON.stringify(say)+' also reached '+other); } });
+
+/* A bare figure with no unit is an age, a time, or nothing — never a measurement. Both
+   rules must decline it rather than pick one. */
+t('a bare "I am <number>" is not a measurement', async()=>{
+  for (const say of ["i'm 40", "i'm 180", "i'm 5"]) {
+    const h=host(); await VA.handle(say,h);
+    if(call('logHeight')||call('logWeight'))
+      throw new Error(JSON.stringify(say)+' was taken as a measurement'); } });
+
+/* Implausible figures are refused outright. A wrong number on a tracked metric is worse
+   than no number, because it silently moves the chart. */
+t('implausible body metrics are refused, not stored', async()=>{
+  for (const say of ['my body fat is 140 percent', 'my body fat is 1 percent',
+                     'my height is 12 cm', 'my height is 900 cm']) {
+    const h=host(); await VA.handle(say,h);
+    if(call('logBodyFat')||call('logHeight'))
+      throw new Error(JSON.stringify(say)+' was stored'); } });
+
+/* The regression these rules could cause: real exercises whose names brush against the
+   new vocabulary must still reach the fitness log. */
+t('body-metric words did not break the workout parser', async()=>{
+  for (const say of ['log 3 sets of 10 bench press at 80kg', 'i ran for 30 minutes',
+                     'log 4 sets of 12 hammer curls at 15kg']) {
+    const h=host(); await VA.handle(say,h);
+    if(!call('logWorkout')) throw new Error(JSON.stringify(say)+' no longer logs a workout');
+    if(call('logHeight')||call('logBodyFat'))
+      throw new Error(JSON.stringify(say)+' leaked into body metrics'); } });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }

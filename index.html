@@ -317,10 +317,10 @@
 <script src="orb-engine.js?v=7"></script>
 <script src="notification-engine.js"></script>
 <script src="anatomy-3d.js"></script>
-<script src="exercise-index.js?v=2"></script>
+<script src="exercise-index.js?v=3"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
-<script src="voice-assistant-engine.js?v=29"></script>
+<script src="voice-assistant-engine.js?v=30"></script>
 <script src="constellation-engine.js?v=2"></script>
 <script src="void-orb-engine.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9134,7 +9134,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.31-225 · v11.225 everpine-home';
+const NOTIF_BUILD_VERSION = '2026.08.31-226 · v11.226 body-metrics-voice';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11310,6 +11310,8 @@ activities: this._mergeShipLog(s.activities),
         logWorkout:(exercise,minutes,weight,sets,reps)=>this.addWorkout({exercise,minutes,weight,sets,reps,part:this._guessBodyPart(exercise)}),
         logHydration:(ml)=>this.addHydMl(ml),
         logWeight:(kg)=>this.addWeight(kg),
+        logBodyFat:(pct)=>this.addBodyMetric('bodyFatPct',pct),
+        logHeight:(cm)=>this.addBodyMetric('height',cm),
         logSleep:(hours,minutes)=>{ this.setState(s=>({slp:{...s.slp,h:String(hours||0),m:String(minutes||0)}}),()=>this.saveSleep()); },
         logMeal:(name,kcal,protein)=>this.addMeal({name,kcal,protein}),
         addNote:(title,body)=>this.addNote(title,body),
@@ -15292,7 +15294,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!(w>20&&w<400)) return;
     const mu=this._hUnit('mass');
     const dispVal=mu==='kg'?K.round(w,1):K.round(K.toDisplay('mass',w,mu),1);
-    this.setState(s=>({bodyDraft:{...s.bodyDraft,weight:dispVal},weightInput:''}),()=>this.saveBody()); }
+    this.setState(s=>({bodyDraft:{...s.bodyDraft,weight:dispVal},weightInput:'',bodyEditDate:null}),()=>this.saveBody()); }
+  /* The voice path for the two Body metrics fields that are not weight. It writes through
+     bodyDraft + saveBody() exactly as addWeight does, so a spoken measurement and a typed
+     one produce the same row and the same Supabase sync. bodyEditDate is cleared first:
+     without that, a voice log made after tapping Edit on an old snapshot would silently
+     rewrite that older date instead of today. */
+  addBodyMetric(field,val){ const K=window.HealthKit; if(!K) return;
+    const v=+val; if(!isFinite(v)) return;
+    let dispVal;
+    if(field==='height'){ if(!(v>50&&v<260)) return; const lu=this._hUnit('length'); dispVal=K.round(K.toDisplay('length',v,lu),1); }
+    else if(field==='bodyFatPct'){ if(!(v>2&&v<70)) return; dispVal=K.round(v,1); }
+    else return;
+    this.setState(s=>({bodyDraft:{...s.bodyDraft,[field]:dispVal},bodyEditDate:null}),()=>this.saveBody()); }
   addMeal(opts){ const o=opts||{}, S=this.state;
     const n=(o.name!=null?o.name:S.mealName||'').trim();
     const k=o.kcal!=null?(+o.kcal||0):(+S.mealKcal||0);

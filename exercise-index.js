@@ -298,13 +298,16 @@
      six listed variants — both are better left to the fallback patterns than guessed. */
   var ALIAS = {
     'run':'running', 'runs':'running', 'ran':'running',
-    'jog':'jogging', 'jogs':'jogging',
-    'cycle':'cycling', 'cycles':'cycling', 'bike':'cycling', 'bikes':'cycling', 'biking':'cycling',
-    'swim':'swimming', 'swims':'swimming', 'swam':'swimming',
+    'jog':'jogging', 'jogs':'jogging', 'jogged':'jogging',
+    'cycle':'cycling', 'cycles':'cycling', 'cycled':'cycling', 'bike':'cycling', 'bikes':'cycling', 'biking':'cycling', 'biked':'cycling',
+    'swim':'swimming', 'swims':'swimming', 'swam':'swimming', 'swum':'swimming',
     'walk':'walking', 'walks':'walking', 'walked':'walking',
-    'sprint':'sprinting', 'sprints':'sprinting',
+    'sprint':'sprinting', 'sprints':'sprinting', 'sprinted':'sprinting',
     'hike':'hiking', 'hikes':'hiking', 'hiked':'hiking',
-    'skipping':'jump rope', 'skip rope':'jump rope', 'rope':'jump rope',
+    'skipping':'jump rope', 'skip rope':'jump rope', 'skipped rope':'jump rope', 'rope':'jump rope',
+    /* Past tense, because people report training in it: "I benched 80 kilos". Unlike bare
+       "row" and "squat" this one is not ambiguous — nothing else is called benching. */
+    'benched':'bench press', 'benching':'bench press',
     'treadmill run':'treadmill', 'cross-trainer':'cross trainer'
   };
 

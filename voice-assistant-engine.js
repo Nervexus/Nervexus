@@ -309,7 +309,7 @@
      The test is not a dictionary of exercises; the app already has one of those, and an
      exercise it does not know still has to be loggable. It is the opposite: a name whose
      every word is a pronoun, an auxiliary or a filler word is not the name of anything. */
-  var NOT_EXERCISE = /^(?:i|im|me|my|mine|you|your|we|us|he|she|it|is|was|were|am|are|be|been|being|now|know|knows|known|no|not|where|wear|here|there|hello|hey|hi|can|could|would|will|shall|do|does|did|done|have|has|had|get|got|gets|going|go|went|weigh|weighs|weighed|weighing|weight|and|or|but|so|then|than|that|this|these|those|the|a|an|of|to|in|on|at|for|from|with|about|please|thanks|thank|ok|okay|yes|yeah|yep|today|tonight|yesterday|morning|evening|just|still|really|very|like|want|need|log|logged|logging|add|added|put|record|recorded|kg|kgs|kilo|kilos|kilogram|kilograms|lb|lbs|pound|pounds)$/i;
+  var NOT_EXERCISE = /^(?:i|im|me|my|mine|you|your|we|us|he|she|it|is|was|were|am|are|be|been|being|now|know|knows|known|no|not|where|wear|here|there|hello|hey|hi|can|could|would|will|shall|do|does|did|done|have|has|had|get|got|gets|going|go|went|weigh|weighs|weighed|weighing|weight|and|or|but|so|then|than|that|this|these|those|the|a|an|of|to|in|on|at|for|from|with|about|please|thanks|thank|ok|okay|yes|yeah|yep|today|tonight|yesterday|morning|evening|just|still|really|very|like|want|need|log|logged|logging|add|added|put|record|recorded|kg|kgs|kilo|kilos|kilogram|kilograms|lb|lbs|pound|pounds|height|tall|fat|body|percent|percentage|pct|cm|centimetre|centimetres|centimeter|centimeters|foot|feet|ft|inch|inches)$/i;
   function looksLikeExercise(name) {
     var ws = String(name || '').toLowerCase().split(/\s+/).filter(Boolean);
     // Apostrophes go too, or "i'm" never matches the "im" in the list — which is exactly
@@ -647,15 +647,73 @@
         return 'I’ve logged ' + ml + ' ml of water for you.';
       } },
 
+    /* Body fat and height are the other two fields on the Body metrics card, and until now
+       neither had a rule. That was not merely "unsupported": "my body fat is 14 percent"
+       fell all the way through to the workout parser, which took "body fat is 14 percent"
+       as an exercise name — the same fault that once produced chest rows called "Weight is".
+       Both rules sit above logWeight because their subjects are more specific than "weight". */
+    { id:'logBodyFat', acts:true, label:'Log body fat', say:'"Log my body fat at 14%" \u00b7 "My body fat is 14 percent"',
+      re:/^(?:log|record|set|update)\s+(?:my\s+)?body\s*fat(?:\s+(?:percentage|percent|pct))?\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?body\s*fat(?:\s+(?:percentage|percent|pct))?(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^body\s*fat\s+(\d.+?)[.?!]*$/i,
+      run:function (m, host) {
+        var pct = num(spoken(m[1] || m[2] || m[3] || ''));
+        /* A body-fat percentage, not any number in the sentence. Below 2 or above 70 it is a
+           misheard word, and a wrong figure on a tracked metric is worse than none. */
+        if (!(pct > 2 && pct < 70)) return null;
+        pct = Math.round(pct * 10) / 10;
+        host.tools.logBodyFat(pct);
+        return 'I\u2019ve logged your body fat at ' + pct + '% in your body metrics.';
+      } },
+
+    { id:'logHeight', acts:true, label:'Log height', say:'"Log my height at 5 foot 10" \u00b7 "My height is 180 cm"',
+      re:/^(?:log|record|set|update)\s+(?:my\s+)?height\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?height(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s*(?:[\u2019']m|\s+am)\s+(\d[\d\s.'\u2019a-z]*?)\s*(?:tall)?[.?!]*$|^height\s+(\d.+?)[.?!]*$/i,
+      run:function (m, host) {
+        var t = spoken(m[1] || m[2] || m[3] || m[4] || '');
+        var cm = null;
+        /* A mass unit anywhere means this is a weight, not a height. Without this,
+           "I'm 82 kilos" landed in the 50-260 cm window and went in as 82 cm tall. */
+        if (/\b(?:kg|kgs|kilo|kilos|kilogram|kilograms|lb|lbs|pound|pounds|st|stone|stones)\b/i.test(t)) return null;
+        /* "I'm ..." only counts as a height when it says so. "My height is 180" may be a
+           bare figure because the subject is already named; "I'm 180" is not. */
+        var loose = !!m[3];
+        /* The unit may sit flush against the figure ("5ft10", "180cm"), so a leading word
+           boundary would never fire — a digit in front counts as the boundary instead. */
+        if (loose && !/(?:'|\u2019|\d\s*(?:ft|feet|foot|inch|in\b|cm\b|m\b|metres?|meters?)|\b(?:ft|feet|foot|inch(?:es)?|cm|metres?|meters?|tall)\b)/i.test(t)) return null;
+        /* Feet and inches first: in the UK this is how height is actually said, and every
+           form of it has to land on the same number — 5 foot 10, 5ft10, 5'10", five ten. */
+        /* The unit marker cannot demand a word boundary after it: "5ft10" has no break
+           between "ft" and "10", and requiring one sent that phrasing to the workout parser
+           instead. A negative lookahead for a letter lets a digit follow. */
+        var ft = /(\d+(?:\.\d+)?)\s*(?:'|\u2019|ft(?![a-z])|feet(?![a-z])|foot(?![a-z]))\s*(\d+(?:\.\d+)?)?\s*(?:"|\u201d|''|in(?![a-z])|ins(?![a-z])|inch(?:es)?(?![a-z]))?/i.exec(t);
+        var inc = /(\d+(?:\.\d+)?)\s*(?:in\b|ins\b|inch(?:es)?\b)/i.exec(t);
+        var mtr = /(\d+(?:\.\d+)?)\s*(?:m\b|metres?\b|meters?\b)/i.exec(t);
+        if (ft)       cm = num(ft[1]) * 30.48 + (ft[2] ? num(ft[2]) * 2.54 : 0);
+        else if (inc) cm = num(inc[1]) * 2.54;
+        else if (mtr) cm = num(mtr[1]) * (num(mtr[1]) < 3 ? 100 : 1);
+        else {
+          var v = num(t);
+          /* A bare figure is centimetres, unless it is small enough to only make sense as
+             metres ("my height is 1.8"). */
+          cm = (v > 0 && v < 3) ? v * 100 : v;
+        }
+        cm = Math.round(cm * 10) / 10;
+        if (!(cm > 50 && cm < 260)) return null;
+        host.tools.logHeight(cm);
+        return 'I\u2019ve logged your height at ' + cm + ' cm in your body metrics.';
+      } },
+
     /* "My weight is 82 kilos" used to miss this rule entirely and fall through to the workout
        parser, which found "82 kg", could not find an exercise, and logged a chest set called
        "Weight is". So the rule no longer insists on a command verb: a sentence that names your
        weight and a figure IS the instruction. "I weighed in at 82.5" is the same statement in
        the past tense and lands here too. */
     { id:'logWeight', acts:true, label:'Log body weight', say:'"Log my weight at 82 kilos" · "My weight is 82 kilos"',
-      re:/^(?:log|record|set|update)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?(?:body\s*)?weight(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s+(?:weigh|weighed)(?:\s+in)?(?:\s+at)?\s+(.+?)[.?!]*$|^(?:my\s+)?weight\s+(\d.+?)[.?!]*$/i,
+      re:/^(?:log|record|set|update)\s+(?:my\s+)?(?:body\s*)?weight\s*(?:at|as|to|is)?\s*(.+?)[.?!]*$|^(?:my\s+)?(?:body\s*)?weight(?:\s+today)?\s+(?:is|was)\s+(.+?)[.?!]*$|^i\s+(?:weigh|weighed)(?:\s+in)?(?:\s+at)?\s+(.+?)[.?!]*$|^(?:my\s+)?weight\s+(\d.+?)[.?!]*$|^i\s*(?:[\u2019']m|\s+am)\s+(\d[^.?!]*?)[.?!]*$/i,
       run:function (m, host) {
-        var t = spoken(m[1] || m[2] || m[3] || m[4] || '');
+        var t = spoken(m[1] || m[2] || m[3] || m[4] || m[5] || '');
+        /* "I'm 13 stone" is how weight is usually stated out loud, but "I'm 40" is an age and
+           "I'm 5" is nothing at all — so the bare "I'm" form counts only when it names a
+           mass unit. (The height rule sits above this one and has already taken "I'm 5ft10".) */
+        if (m[5] && !/\b(?:kg|kgs|kilo|kilos|kilogram|kilograms|lb|lbs|pound|pounds|st|stone|stones)\b/i.test(t)) return null;
         var kg = num(t);
         /* Stone and pounds are converted, not taken at face value. The store is kilos, so
            "13 stone" used to go in as 13 — and once the plausibility guard below arrived it
@@ -785,10 +843,22 @@
          The past-tense forms overlap with completeTask ("finished the shopping"), which is
          also above this rule and declines when no such task exists — so "finished 30
          minutes of cycling" tries the task list, misses, and lands here. */
-      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for|i\s+(?:just\s+)?spent|(?:i\s+)?(?:just\s+)?(?:smashed|smash|knocked\s+out|banged\s+out|hit|make|makes)|(?:i\s+)?(?:just\s+)?did\s+a\s+quick)\s+(?:my\s+)?(.+?)[.?!]*$/i,
+      re:/^(?:log|logged|logging|add|added|record|recorded|put down|put in|put|track|tracked|enter|mark|note down|chuck in|stick in|bang in|(?:i(?:\s+have|\s*[’']ve)?\s+)?(?:just\s+)?(?:did|done|finished|completed)|i(?:\s+have|\s*[’']ve)?\s+(?:just\s+)?do|i\s+(?:just\s+)?went\s+for|i\s+(?:just\s+)?spent|(?:i\s+)?(?:just\s+)?(?:smashed|smash|knocked\s+out|banged\s+out|hit|make|makes)|(?:i\s+)?(?:just\s+)?did\s+a\s+quick)\s+(?:my\s+)?(.+?)[.?!]*$|^i\s+(?:just\s+)?(.+?)[.?!]*$/i,
       run:function (m, host) {
-        var w = parseWorkout(m[1], host);
+        /* The verb list above is a phrasebook, and phrasebooks are never finished: it had
+           "i went for", "i spent" and "i smashed" but not "i ran", so "I ran for 30 minutes"
+           logged nothing at all. The last alternative drops the verb requirement entirely
+           and lets any "I ..." sentence try the parser, which is safe because the parser is
+           what decides: no duration, sets or weight and it declines, and an unrecognised
+           name declines too. Slots, not sentence shapes. */
+        var bare = !m[1] && !!m[2];                    // reached without any command verb
+        var w = parseWorkout(m[1] || m[2], host);
         if (!w || !w.quantified) return null;          // not a workout shape — fall through
+        /* With no verb in front, the exercise index has to vouch for the name. "Log squats
+           for 20 minutes" is an instruction and may name something the index has never heard
+           of; "I watched 30 minutes of tv" is not an instruction at all, and without this
+           line it went into the fitness log as an exercise called "Watched tv". */
+        if (bare && !w.known) return null;
         /* Same guard as the proposal path: an explicit "log" in front of it does not make
            "I know where 82 kilos" an exercise. With a plausible bodyweight figure it is a
            body weight; without one it falls through rather than inventing a lift. */
