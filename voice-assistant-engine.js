@@ -644,7 +644,10 @@
              : /glass|cup/.test(u) ? v * 250 : v;
         }
         host.tools.logHydration(ml);
-        return 'I’ve logged ' + ml + ' ml of water for you.';
+        // "2000 millilitres" is not how anyone says two litres out loud.
+        var amtSaid = ml >= 1000 && ml % 100 === 0 ? (ml / 1000) + ' litre' + (ml === 1000 ? '' : 's')
+                                                   : ml + ' ml';
+        return 'I\u2019ve logged ' + amtSaid + ' of water for you.';
       } },
 
     /* Body fat and height are the other two fields on the Body metrics card, and until now
@@ -698,7 +701,16 @@
         cm = Math.round(cm * 10) / 10;
         if (!(cm > 50 && cm < 260)) return null;
         host.tools.logHeight(cm);
-        return 'I\u2019ve logged your height at ' + cm + ' cm in your body metrics.';
+        /* Say it back the way it was said. Someone who tells you "five foot ten" and hears
+           "one hundred and seventy seven point eight centimetres" cannot tell whether they
+           were understood — the store is centimetres either way, but the confirmation is
+           for them, not for the database. */
+        var spokenBack = cm + ' cm';
+        if (ft) {
+          var wholeFt = Math.floor(num(ft[1])), ins = ft[2] ? num(ft[2]) : 0;
+          spokenBack = wholeFt + ' foot' + (ins ? ' ' + ins : '');
+        }
+        return 'I\u2019ve logged your height at ' + spokenBack + ' in your body metrics.';
       } },
 
     /* "My weight is 82 kilos" used to miss this rule entirely and fall through to the workout
@@ -972,7 +984,23 @@
      that". Anything that isn't a yes/no is treated as the next command, which is what
      someone who ignores the question and just keeps going actually means. */
   var AWAIT_CLOSE = false;
-  var CLOSE_YES = /^(?:yes|yeah|yep|yup|sure|ok(?:ay)?|please|actually|one more|there is|hold on|wait)\b/i;
+  /* "Is that all I can do for you today?" inverts yes and no, and the first version of this
+     got it backwards: one list called CLOSE_YES treated "yes" as "yes, I have more" and so
+     answered "Go ahead, I'm listening" to someone saying "yes that's it". Two lists now,
+     because the question has two genuinely different answers.
+
+       MORE  — "no", "actually", "one more", "hold on": there IS something else. Listen.
+       DONE  — "yes", "that's it", "that's all", "nothing": we are finished. Sign off.
+
+     Anything that is neither is simply the next command, which is what someone who ignores
+     the question and keeps talking actually means. */
+  var CLOSE_MORE = /^(?:no|nope|nah|not yet|actually|one more|another|there is|there’?s|there's|hold on|hang on|wait)\b/i;
+  /* Tested BEFORE the list above, because "no" starts both answers. Bare "no" means "no,
+     that is not all — I have another"; "no thanks" means "no thank you, we are finished".
+     One word of politeness reverses the meaning, which is why this branch reads what was
+     actually said rather than the tidied text: tidy() strips a trailing "thanks", so
+     "no thanks" reached the old code as bare "no". */
+  var CLOSE_DONE = /^(?:yes|yeah|yep|yup|sure|ok(?:ay)?|that’?s (?:it|all|everything|us)|that's (?:it|all|everything|us)|that will be all|nothing|none|no more|all good|we’?re done|we're done|i’?m done|i'm done|all done|no[,\s]+(?:thanks?|thank you|that’?s|that's|nothing|i’?m|i'm|we’?re|we're))\b/i;
   function closeOut(host) {
     if (!host.followUp) return;
     // Deliberately not firstName(): it takes the first word of the account name, which is
@@ -1095,7 +1123,7 @@
      tolerate "hey, could you please ... for me, thanks". */
   var LEAD = /^(?:hey|ok(?:ay)?|hi|hello|yo|loura|laura|lora|nervexus|assistant|please|now)\b[,\s]*/i;
   var POLITE = /^(?:(?:can|could|would|will)\s+you\s+)?(?:please\s+)?/i;
-  var TRAIL = /[,\s]*(?:please|for me|thanks|thank you|mate|now)[.?!]*$/i;
+  var TRAIL = /[,\s]*(?:please|for me|thanks|thank you|mate|now|as well|too|an all)[.?!]*$/i;
 
   /* People put the instruction at the END as often as the start: "I did 30 minutes of cardio
      today, can you log it". That tail is a request, not part of what was done — left in place
@@ -1113,17 +1141,28 @@
      running". Stripped only at the start, plus "like" when it sits in front of a figure,
      which is the one place it is filler rather than a real verb ("I like running"). */
   var FILLER = /^(?:erm+|um+|uh+|er+|hmm+|so|yeah|yep|right|well|basically|actually|literally|i mean|you know)\b[,\s]*/i;
+  /* The word people reach for when they ask a second thing in the same conversation. It is
+     why "can you ALSO log my height at 180" fell through to the AI tier while "can you log
+     my height at 180" worked perfectly — one word, and it read as an inability to hold a
+     conversation at all. */
+  var CONTINUE = /^(?:and|also|then|next|plus|as well|after that|one more thing|another one|oh and)\b[,\s]*/i;
   function tidy(t) {
     var prev;
     do {
       prev = t;
       t = t.replace(LEAD, '').replace(FILLER, '').replace(TRAIL, '');
       t = t.replace(/\blike\s+(?=\d)/ig, '');
+      /* POLITE used to run once, after the loop, so it could never uncover a continuation
+         word sitting behind it — "can you also log X" came out as "also log X". Both run
+         inside the loop now, and the loop repeats until the text stops changing, so the
+         prefixes peel off in whatever order they were said. */
+      var lead = t.replace(POLITE, '').replace(CONTINUE, '').trim();
+      if (lead) t = lead;
       // Never strip the whole utterance: "log it" on its own is an answer, not a tail.
       var cut = t.replace(TRAIL_REQ, '').trim();
       if (cut) t = cut;
     } while (t !== prev);
-    return t.replace(POLITE, '').trim();
+    return t.trim();
   }
 
   function handle(text, host) {
@@ -1152,10 +1191,19 @@
        confirming, the "yes" was being taken as "yes, that's all" and the log was dropped
        on the floor without a word. Whichever question was asked most recently is the one
        a bare yes is answering. */
-    if (!PENDING && AWAIT_CLOSE && CLOSE_YES.test(t) && t.split(/\s+/).length <= 3) {
-      AWAIT_CLOSE = false;
-      host.speak('Go ahead, I’m listening.');
-      return Promise.resolve();
+    var closeAns = raw.toLowerCase().replace(LEAD, '').replace(/[.?!,]+$/, '').trim();
+    if (!PENDING && AWAIT_CLOSE && closeAns && closeAns.split(/\s+/).length <= 4) {
+      if (CLOSE_DONE.test(closeAns)) {
+        AWAIT_CLOSE = false;
+        host.speak(signOffReply(closeAns));
+        if (host.tools.stopListening) host.tools.stopListening();
+        return Promise.resolve();
+      }
+      if (CLOSE_MORE.test(closeAns)) {
+        AWAIT_CLOSE = false;
+        host.speak('Go ahead, I’m listening.');
+        return Promise.resolve();
+      }
     }
 
     // A question is outstanding. Take it or leave it, then clear it either way.

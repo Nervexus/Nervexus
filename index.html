@@ -301,7 +301,7 @@
 <script src="supabase-client.js"></script>
 <script src="countries-data.js"></script>
 <script src="notif-engine.js"></script>
-<script src="voice-engine.js"></script>
+<script src="voice-engine.js?v=2"></script>
 <script src="providers-data.js"></script>
 <script src="health-tracker.js"></script>
 <script src="learning-maths.js"></script>
@@ -320,7 +320,7 @@
 <script src="exercise-index.js?v=3"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
-<script src="voice-assistant-engine.js?v=30"></script>
+<script src="voice-assistant-engine.js?v=31"></script>
 <script src="constellation-engine.js?v=2"></script>
 <script src="void-orb-engine.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -9134,7 +9134,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.31-226 · v11.226 body-metrics-voice';
+const NOTIF_BUILD_VERSION = '2026.08.31-227 · v11.227 conversation-fixes';
 class Component extends DCLogic {
   constructor(props){
     super(props);

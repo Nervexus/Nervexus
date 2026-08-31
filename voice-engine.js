@@ -272,6 +272,19 @@
          .replace(/\be\.g\.\b/gi, 'for example').replace(/\bi\.e\.\b/gi, 'that is')
          .replace(/\bvs\.?\b/gi, 'versus').replace(/\bapprox\.?\b/gi, 'approximately')
          .replace(/\bw\/\b/gi, 'with').replace(/&/g, ' and ');
+    /* Units the assistant actually emits that were being spelled out letter by letter:
+       "177.8 cm" came out as "see em", "2000 ml" as "em el", "30 min" as "min". Anchored to
+       a preceding digit rather than a word boundary, so a stray letter in ordinary prose is
+       never rewritten — which is the over-processing this function is careful to avoid.
+       Runs after the kg/kcal/km pass above so those are already expanded and the bare "g"
+       rule cannot chew the "g" off "kg". */
+    s = s.replace(/(\d)\s*cm\b/g, '$1 centimetres')
+         .replace(/(\d)\s*mm\b/g, '$1 millimetres')
+         .replace(/(\d)\s*ml\b/g, '$1 millilitres')
+         .replace(/(\d)\s*mins?\b/g, '$1 minutes')
+         .replace(/(\d)\s*hrs?\b/g, '$1 hours')
+         .replace(/(\d)\s*lbs?\b/g, '$1 pounds')
+         .replace(/(\d)\s*g\b/g, '$1 grams');
     return s.replace(/\s{2,}/g, ' ').trim();
   };
 

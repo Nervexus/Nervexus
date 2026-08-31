@@ -463,9 +463,16 @@ t('enders never steal a real command', async()=>{ const h=host();
   if(!call('logWorkout')) throw new Error('a workout was read as an ender');
   await VA.handle('Add a task to thank the accountant',h);
   if(!call('addTask')) throw new Error('"thank" ate a task'); });
-t('"yes" to the close-out hands the turn back', async()=>{ const h=host();
+/* This test used to assert the opposite, and the assertion was simply wrong: the question
+   is "is that all I can do for you today?", so "yes" means "yes, that is all". Someone
+   saying "yes that's it" was being answered with "Go ahead, I'm listening". */
+t('"yes" to the close-out means yes, that is all', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
   await VA.handle('yes',h);
+  signedOff('"yes"'); });
+t('a bare "no" to the close-out hands the turn back', async()=>{ const h=host();
+  VA._clearPending(); await VA.handle('Log 500 ml of water',h);
+  await VA.handle('no',h);
   has(last(),'go ahead'); });
 t('a real command after the close-out runs instead of being read as an answer', async()=>{ const h=host();
   VA._clearPending(); await VA.handle('Log 500 ml of water',h);
@@ -1047,6 +1054,59 @@ t('body-metric words did not break the workout parser', async()=>{
     if(!call('logWorkout')) throw new Error(JSON.stringify(say)+' no longer logs a workout');
     if(call('logHeight')||call('logBodyFat'))
       throw new Error(JSON.stringify(say)+' leaked into body metrics'); } });
+
+/* ---- holding a conversation -------------------------------------------------------
+   Reported as "she can't do more than one thing in a chat". It was not an architectural
+   gap at all — the loop already worked. It was the single word people reach for when
+   they ask a second thing: "can you ALSO log my height" fell through to the AI tier
+   while "can you log my height" worked perfectly. */
+t('a second request in the same breath is still a request', async()=>{
+  for (const [say, tool] of [
+    ['can you also log my height at 180 cm','logHeight'],
+    ['and also log 30 minutes of running','logWorkout'],
+    ['also log my height at 180','logHeight'],
+    ['oh and log 2 litres of water','logHydration'],
+    ['one more thing log my weight at 82 kilos','logWeight'],
+    ['then log 30 minutes of running','logWorkout'],
+    ['log my height at 180 cm as well','logHeight'],
+    ['log my body fat at 14 percent too','logBodyFat'],
+  ]) { const h=host(); await VA.handle(say,h);
+       if(!call(tool)) throw new Error(JSON.stringify(say)+' did not reach '+tool); } });
+
+/* "Is that all I can do for you today?" inverts yes and no, and the close-out had them
+   backwards: "yes that's it" was answered with "Go ahead, I'm listening". */
+t('yes and no mean the right things when she asks if that is all', async()=>{
+  const done=host(); await VA.handle('log my body fat at 14 percent',done);
+  if(!VA._awaitingClose()) throw new Error('she did not ask whether that was all');
+  await VA.handle("yes that's it",done);
+  if(/go ahead/i.test(last())) throw new Error('"yes that\'s it" was taken as "I have more"');
+  if(!call('stopListening')) throw new Error('"yes that\'s it" did not end the conversation');
+
+  const more=host(); await VA.handle('log my body fat at 14 percent',more);
+  await VA.handle('no one more',more);
+  if(!/go ahead/i.test(last())) throw new Error('"no one more" did not hand the turn back');
+  if(call('stopListening')) throw new Error('"no one more" ended the conversation'); });
+
+/* And the case that must survive both: someone who ignores the question entirely and
+   just says the next thing. */
+t('ignoring the closing question and carrying on still logs', async()=>{
+  const h=host(); await VA.handle('log my body fat at 14 percent',h);
+  await VA.handle('can you also log my height at 180 cm',h);
+  if(!call('logHeight')) throw new Error('the follow-up command was lost'); });
+
+/* Height is stored in centimetres but confirmed in whatever units it was given in —
+   "five foot ten" read back as "177.8 centimetres" gives no way to tell you were heard. */
+t('height is read back in the units it was given in', async()=>{
+  const a=host(); await VA.handle('log my height at 5 foot 10',a);
+  has(last(),'5 foot 10','feet and inches:');
+  const b=host(); await VA.handle('my height is 180 cm',b);
+  has(last(),'180 cm','centimetres:'); });
+
+t('water is confirmed in litres once it is litres', async()=>{
+  const a=host(); await VA.handle('log 2 litres of water',a);
+  has(last(),'2 litres','');
+  const b=host(); await VA.handle('log 250 ml of water',b);
+  has(last(),'250 ml',''); });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
