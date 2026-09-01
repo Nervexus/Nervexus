@@ -10,6 +10,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { sendPushToUser } from '../_shared/push.ts';
 import { sendReminderEmail } from '../_shared/email.ts';
+import { buildDigest } from '../_shared/digest-template.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -44,9 +45,113 @@ function applyEmailTemplate(prefs: Record<string, any>, title: string, body: str
     .replace(/\{\{\s*body\s*\}\}/g, body);
   return { subject: fill(subjTpl) || title, text: (fill(bodyTpl) || body) + EMAIL_SIGNOFF };
 }
-async function sendTemplatedEmail(prefs: Record<string, any>, title: string, body: string) {
-  const tpl = applyEmailTemplate(prefs, title, body);
-  return sendReminderEmail(prefs.reminderEmailAddr, tpl.subject, tpl.text, prefs.emailProvider);
+
+/* ---- one email, not five -----------------------------------------------------------
+   Every sweep below used to call sendTemplatedEmail directly, so a user with a pending
+   mission, an event tomorrow, an unlogged day and a new version waiting got four separate
+   emails within the same minute. The sweeps now COLLECT into a per-user bundle and one
+   flush at the end sends a single digest.
+
+   Two rules the collector exists to enforce:
+
+   1. A failed send must not burn the dedupe key. emailOnly() used to write the
+      notifications row — the row that says "already sent, never again" — whether or not
+      the provider accepted the message. One outage therefore suppressed that reminder
+      permanently. Rows are now written only after a confirmed send.
+
+   2. A deadline must not wait for a cadence. The digest is on a 4-hour rhythm, but the
+      Performance Terminal nudge fires at 21:30 for a 22:00 cut-off. Anything high or
+      critical forces the digest out immediately instead of being batched past the point
+      where it was any use. */
+type DigestItem = {
+  section: 'performance' | 'tasks' | 'calendar' | 'logs' | 'update';
+  line: string;
+  subject?: string;
+  meta?: string;
+  priority?: string;
+  // Bookkeeping for the notifications table, written only if the send succeeds.
+  category: string;
+  sourceType: string;
+  dedupeKey: string;
+};
+type Bundle = { items: DigestItem[] };
+function newBundle(): Bundle { return { items: [] }; }
+
+async function collect(admin: any, bundle: Bundle, item: DigestItem) {
+  if (item.dedupeKey && await alreadySent(admin, item.dedupeKey)) return 0;
+  // Two sweeps racing to the same key within one tick would otherwise both add it.
+  if (bundle.items.some((i) => i.dedupeKey === item.dedupeKey)) return 0;
+  bundle.items.push(item);
+  return 1;
+}
+
+const DIGEST_FREQ_MIN = 240;
+function forcesImmediateSend(items: DigestItem[]) {
+  return items.some((i) => i.priority === 'critical' || i.priority === 'high');
+}
+
+async function flushDigest(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
+  const items = bundle.items;
+  if (!items.length) return { sent: 0, emailed: 0 };
+  if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0, emailed: 0 };
+
+  if (!forcesImmediateSend(items)) {
+    const hour = localHour(new Date(), prefs.timezone);
+    if (hour < 6 || hour >= 23) return { sent: 0, emailed: 0, held: 'outside 6am-11pm' };
+    const { data: lastNotif } = await admin.from('notifications').select('created_at')
+      .eq('user_id', userId).eq('source_type', 'digest-email')
+      .order('created_at', { ascending: false }).limit(1);
+    const lastTs = (lastNotif && lastNotif[0]) ? new Date(lastNotif[0].created_at).getTime() : 0;
+    if (Date.now() - lastTs < DIGEST_FREQ_MIN * 60000 - 30000) return { sent: 0, emailed: 0, held: 'cadence' };
+  }
+
+  const digest = buildDigest({
+    name,
+    items,
+    signoff: EMAIL_SIGNOFF,
+    appUrl: 'https://nervexus.vercel.app',
+    dateLabel: new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase(),
+    signoffLine: 'Best, Ultra X management team',
+  });
+
+  /* A customized subject/body template still wraps the digest, so nobody who set one loses
+     it — {{message}} is now the whole digest rather than a single reminder. Customizing the
+     template deliberately drops the HTML part: their wording is the point, and silently
+     sending a designed HTML email that ignores it would be worse than sending plain text. */
+  const customized = !!((prefs.emailTemplateSubject || '').trim() || (prefs.emailTemplateBody || '').trim());
+  const tpl = customized ? applyEmailTemplate(prefs, digest.subject, digest.text)
+                         : { subject: digest.subject, text: digest.text };
+  const res = await sendReminderEmail(
+    prefs.reminderEmailAddr, tpl.subject, tpl.text, prefs.emailProvider,
+    customized ? undefined : digest.html,
+  );
+
+  if (!res.ok) {
+    /* Loud, not silent. The failure is recorded against the user so the Notification
+       Centre can show it, and returned so the cron response says what went wrong instead
+       of reporting a cheerful sent:0. */
+    await admin.from('notifications').insert({
+      user_id: userId, title: 'Reminder email could not be sent', body: res.error || 'Unknown error',
+      category: 'system', priority: 'high', status: 'failed',
+      source_type: 'digest-email-error', dedupe_key: 'digest-email-error:' + userId + ':' + new Date().toISOString().slice(0, 13),
+      channels: ['email'],
+    });
+    return { sent: 0, emailed: 0, error: res.error };
+  }
+
+  // Only now are the dedupe keys burned.
+  const rows = items.map((i) => ({
+    user_id: userId, title: i.subject || i.line, body: i.line,
+    category: i.category, priority: i.priority || 'normal', status: 'sent',
+    source_type: i.sourceType, dedupe_key: i.dedupeKey, channels: ['email'],
+  }));
+  rows.push({
+    user_id: userId, title: digest.subject, body: 'Digest of ' + items.length + ' item(s)',
+    category: 'system', priority: 'low', status: 'sent',
+    source_type: 'digest-email', dedupe_key: 'digest-email:' + userId + ':' + Date.now(), channels: ['email'],
+  } as any);
+  await admin.from('notifications').insert(rows);
+  return { sent: items.length, emailed: 1 };
 }
 
 // Checklist reminders (user_checklists) and the Daily Missions digest used to be two
@@ -73,13 +178,10 @@ function pickDigestText(missionNames: string[], checklistSummaries: { title: str
   }
   return parts.join(' ');
 }
-async function sweepDigest(admin: any, userId: string, name: string, prefs: Record<string, any>) {
+async function sweepDigest(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   if (prefs.notifsEnabled === false) return { sent: 0 };
-  // Fixed 4-hour minimum cadence and a 6am-11pm window, overriding notifFrequency —
-  // requested explicitly, rather than left on the general configurable cadence.
-  const freqMin = 240;
-  const hour = localHour(new Date(), prefs.timezone);
-  if (hour < 6 || hour >= 23) return { sent: 0 };
+  // The 6am-11pm window and 4-hour cadence now live on the digest flush, which is the
+  // thing that actually sends. This sweep only gathers.
   const today = new Date().toISOString().slice(0, 10);
 
   const { data: missions } = await admin
@@ -106,25 +208,37 @@ async function sweepDigest(admin: any, userId: string, name: string, prefs: Reco
 
   if (!openMissions.length && !checklistSummaries.length) return { sent: 0 };
 
-  const { data: lastNotif } = await admin.from('notifications').select('created_at')
-    .eq('user_id', userId).eq('source_type', 'digest')
-    .order('created_at', { ascending: false }).limit(1);
-  const lastTs = (lastNotif && lastNotif[0]) ? new Date(lastNotif[0].created_at).getTime() : 0;
-  if (Date.now() - lastTs < freqMin * 60000 - 30000) return { sent: 0 };
-
   const openChecklistItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
   const title = pickDigestSubject(name, openMissions.length, openChecklistItems);
   const body = pickDigestText(openMissions.map((m: any) => m.name), checklistSummaries);
   const priority = 'normal';
 
-  if (prefs.pushEnabled) await sendPushToUser(admin, userId, { title, body, category: 'mission', priority, url: './index.html' });
-  if (prefs.reminderEmailEnabled && prefs.reminderEmailAddr) await sendTemplatedEmail(prefs, title, body);
+  /* Push stays per-category and immediate — a phone notification is glanceable and batching
+     it would only make it late. It is the EMAIL that had to stop arriving five times over.
+     Push keeps its own cadence check against the existing 'digest' source_type. */
+  if (prefs.pushEnabled) {
+    const { data: lastPush } = await admin.from('notifications').select('created_at')
+      .eq('user_id', userId).eq('source_type', 'digest')
+      .order('created_at', { ascending: false }).limit(1);
+    const lastTs = (lastPush && lastPush[0]) ? new Date(lastPush[0].created_at).getTime() : 0;
+    const hour = localHour(new Date(), prefs.timezone);
+    if (hour >= 6 && hour < 23 && Date.now() - lastTs >= DIGEST_FREQ_MIN * 60000 - 30000) {
+      await sendPushToUser(admin, userId, { title, body, category: 'mission', priority, url: './index.html' });
+      await admin.from('notifications').insert({
+        user_id: userId, title, body, category: 'mission', priority, status: 'sent',
+        source_type: 'digest', dedupe_key: 'digest:' + userId + ':' + Date.now(), channels: ['push'],
+      });
+    }
+  }
 
-  await admin.from('notifications').insert({
-    user_id: userId, title, body, category: 'mission', priority, status: 'sent',
-    source_type: 'digest', dedupe_key: 'digest:' + userId + ':' + Date.now(), channels: ['push'],
+  /* Keyed by the day and the actual counts, so the same email is not re-sent every four
+     hours while nothing changes, but a newly-completed mission produces a fresh line. */
+  const key = 'tasks:' + userId + ':' + today + ':' + openMissions.length + ':' + openChecklistItems;
+  const added = await collect(admin, bundle, {
+    section: 'tasks', line: body, subject: title, priority,
+    category: 'mission', sourceType: 'digest-tasks', dedupeKey: key,
   });
-  return { sent: 1 };
+  return { sent: added };
 }
 
 // `events.repeat_days` (a per-weekday array, e.g. ['MON','WED','FRI']) — mirrors the
@@ -144,7 +258,7 @@ function eventOccursOn(e: { event_date: string; repeat_days?: string[] | null },
 // own dedupe key — the owner asked for email specifically to always go out a day ahead,
 // not for push to move too.
 const EMAIL_LEAD_MIN = 1440;
-async function sweepCalendarEvents(admin: any, userId: string, name: string, prefs: Record<string, any>) {
+async function sweepCalendarEvents(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   const canPush = prefs.reminderPushEnabled !== false;
   const canEmail = prefs.reminderEmailEnabled && prefs.reminderEmailAddr;
   if (!canPush && !canEmail) return { sent: 0 };
@@ -189,28 +303,47 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
     }
 
     if (canEmail && inWindow(EMAIL_LEAD_MIN)) {
-      const dedupeKey = 'calendar-email:' + e.id + ':' + todayStr;
-      const { data: already } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
-      if (!already || !already.length) {
-        const title = 'Event schedule';
-        const who = name ? name + ', y' : 'Y';
-        const body = `${who}ou have ${e.title} at ${e.event_time} tomorrow.`;
-        await sendTemplatedEmail(prefs, title, body);
-        await admin.from('notifications').insert({
-          user_id: userId, title, body, category: 'calendar', priority: 'normal', status: 'sent',
-          source_type: 'event', source_id: e.id, dedupe_key: dedupeKey, channels: ['email'],
-        });
-        sent++;
-      }
+      const who = name ? name + ', y' : 'Y';
+      sent += await collect(admin, bundle, {
+        section: 'calendar',
+        line: `${who}ou have ${e.title} at ${e.event_time} tomorrow.`,
+        subject: 'Event tomorrow: ' + e.title,
+        meta: e.event_time + ' tomorrow',
+        priority: 'normal',
+        category: 'calendar', sourceType: 'event',
+        dedupeKey: 'calendar-email:' + e.id + ':' + todayStr,
+      });
     }
   }
   return { sent };
 }
 
-// Bump this whenever index.html's _changelog()[0].version changes — there's no shared
-// source of truth between the client changelog and this function, so it's a manual sync
-// (same pattern as the Testing Panel's NOTIF_BUILD_VERSION indicator).
-const LATEST_VERSION = 'v9.23';
+/* This was a hand-bumped constant, and it had drifted to v9.23 while the app shipped
+   v11.x — which is precisely why nobody received a "new version" email any more. The
+   announcement fires once per NEW version string; once every user's lastSeenVersion had
+   caught up to a value that stopped changing, it could never fire again. A constant that
+   must be remembered on every release will always end up here.
+
+   So it is no longer remembered. The live site already publishes its own version in
+   NOTIF_BUILD_VERSION; the function reads it and falls back to the constant only if the
+   fetch fails. Cached per invocation, so a sweep over every user costs one request. */
+const LATEST_VERSION_FALLBACK = 'v11.227';
+const APP_URL = 'https://nervexus.vercel.app';
+let _versionCache: string | null = null;
+async function latestVersion(): Promise<string> {
+  if (_versionCache) return _versionCache;
+  try {
+    const r = await fetch(APP_URL + '/?v=' + Date.now(), { headers: { 'Cache-Control': 'no-cache' } });
+    if (r.ok) {
+      const html = await r.text();
+      // '2026.08.31-227 · v11.227 conversation-fixes' -> 'v11.227'
+      const m = /NOTIF_BUILD_VERSION\s*=\s*'[^']*?(v\d+\.\d+)/.exec(html);
+      if (m) { _versionCache = m[1]; return _versionCache; }
+    }
+  } catch { /* offline or blocked — the fallback is the point of having one */ }
+  _versionCache = LATEST_VERSION_FALLBACK;
+  return _versionCache;
+}
 
 function localDateStr(now: Date, tz: string) {
   try { return new Intl.DateTimeFormat('en-CA', { timeZone: tz || 'UTC' }).format(now); }
@@ -234,16 +367,6 @@ async function alreadySent(admin: any, dedupeKey: string) {
   const { data } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
   return !!(data && data.length);
 }
-async function emailOnly(admin: any, userId: string, prefs: Record<string, any>, category: string, sourceType: string, dedupeKey: string, title: string, body: string, priority = 'normal') {
-  if (await alreadySent(admin, dedupeKey)) return 0;
-  await sendTemplatedEmail(prefs, title, body);
-  await admin.from('notifications').insert({
-    user_id: userId, title, body, category, priority, status: 'sent',
-    source_type: sourceType, dedupe_key: dedupeKey, channels: ['email'],
-  });
-  return 1;
-}
-
 // The "performance-tick cron" the client comments referenced as the source of truth for
 // miss_streak/banned never actually existed — this is it. Fixed to UK time (Europe/London)
 // for every user, deliberately not per-user timezone: this is a uniform policy, not a
@@ -259,7 +382,7 @@ function addDaysToDateStr(ds: string, delta: number) {
   d.setUTCDate(d.getUTCDate() + delta);
   return d.toISOString().slice(0, 10);
 }
-async function sweepPerformanceTerminal(admin: any, userId: string, name: string, prefs: Record<string, any>) {
+async function sweepPerformanceTerminal(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   const { data: statusRows } = await admin.from('performance_status').select('*').eq('user_id', userId).limit(1);
   const status = (statusRows && statusRows[0]) || { miss_streak: 0, banned: false };
   if (status.banned) return { sent: 0 }; // locked pending appeal — nothing more to nag about
@@ -281,11 +404,16 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
     const { data: todayLog } = await admin.from('performance_logs').select('id').eq('user_id', userId).eq('log_date', ukToday).maybeSingle();
     if (!todayLog && canEmail) {
       const who = name ? name + ', t' : 'T';
-      sent += await emailOnly(admin, userId, prefs, 'system', 'performance',
-        'perf-nudge:' + userId + ':' + ukToday,
-        `${who}oday's performance check-in is pending`,
-        'It’s 9:30pm UK and today’s mandatory Performance Terminal check-in still hasn’t been done. You have until 10pm to log it and keep your streak clean.',
-        'high');
+      // 'high' — this forces the digest out now rather than waiting for the 4-hour
+      // cadence, because the deadline it is warning about is 30 minutes away.
+      sent += await collect(admin, bundle, {
+        section: 'performance',
+        line: 'It’s 9:30pm UK and today’s mandatory Performance Terminal check-in still hasn’t been done. You have until 10pm to log it and keep your streak clean.',
+        subject: `${who}oday's performance check-in is pending`,
+        priority: 'high',
+        category: 'system', sourceType: 'performance',
+        dedupeKey: 'perf-nudge:' + userId + ':' + ukToday,
+      });
     }
   }
 
@@ -304,18 +432,24 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
         const newStreak = (status.miss_streak || 0) + 1;
         if (newStreak >= 7) {
           await admin.from('performance_status').upsert({ user_id: userId, miss_streak: newStreak, banned: true, banned_at: new Date().toISOString() }, { onConflict: 'user_id' });
-          if (canEmail) sent += await emailOnly(admin, userId, prefs, 'system', 'performance',
-            'perf-banned:' + userId + ':' + ukToday,
-            'Performance Terminal — account locked',
-            'Your account has been locked after 7 consecutive missed daily check-ins. Log in to submit an appeal for the owner to review.',
-            'critical');
+          if (canEmail) sent += await collect(admin, bundle, {
+            section: 'performance',
+            line: 'Your account has been locked after 7 consecutive missed daily check-ins. Log in to submit an appeal for the owner to review.',
+            subject: 'Performance Terminal — account locked',
+            priority: 'critical',
+            category: 'system', sourceType: 'performance',
+            dedupeKey: 'perf-banned:' + userId + ':' + ukToday,
+          });
         } else {
           await admin.from('performance_status').upsert({ user_id: userId, miss_streak: newStreak, warned_at: new Date().toISOString() }, { onConflict: 'user_id' });
-          if (canEmail) sent += await emailOnly(admin, userId, prefs, 'system', 'performance',
-            'perf-warn:' + userId + ':' + ukToday,
-            'Performance Terminal — missed check-in (' + newStreak + '/7)',
-            'Yesterday’s mandatory check-in wasn’t logged. This is ' + newStreak + ' of 7 consecutive misses — the account locks at 7, pending appeal. Log today’s to reset the streak.',
-            'high');
+          if (canEmail) sent += await collect(admin, bundle, {
+            section: 'performance',
+            line: 'Yesterday’s mandatory check-in wasn’t logged. This is ' + newStreak + ' of 7 consecutive misses — the account locks at 7, pending appeal. Log today’s to reset the streak.',
+            subject: 'Performance Terminal — missed check-in (' + newStreak + '/7)',
+            priority: 'high',
+            category: 'system', sourceType: 'performance',
+            dedupeKey: 'perf-warn:' + userId + ':' + ukToday,
+          });
         }
       }
     }
@@ -324,45 +458,64 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
 }
 
 // One-time "new version" email — fires once per release, not on a recurring cadence.
-async function sweepVersionUpdate(admin: any, userId: string, prefs: Record<string, any>) {
+async function sweepVersionUpdate(admin: any, userId: string, prefs: Record<string, any>, bundle: Bundle) {
   if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0 };
+  const LATEST_VERSION = await latestVersion();
   if ((prefs.lastSeenVersion || '') === LATEST_VERSION) return { sent: 0 };
-  const sent = await emailOnly(admin, userId, prefs, 'system', 'version',
-    'vupdate:' + userId + ':' + LATEST_VERSION,
-    'Nervexus ' + LATEST_VERSION + ' is out',
-    'A new version is live. Open the app and check What’s New in Settings for details.',
-    'low');
+  // 'low' on purpose: a release note is never a reason to interrupt someone's evening. It
+  // rides along with whatever else is outstanding.
+  const sent = await collect(admin, bundle, {
+    section: 'update',
+    line: 'A new version is live. Open the app and check What’s New in Settings for details.',
+    subject: 'Nervexus ' + LATEST_VERSION + ' is out',
+    meta: LATEST_VERSION,
+    priority: 'low',
+    category: 'system', sourceType: 'version',
+    dedupeKey: 'vupdate:' + userId + ':' + LATEST_VERSION,
+  });
   return { sent };
 }
 
 // General wellness check — mirrors the in-app coaching "haven't seen you in a while"
 // nudge, but reaches you even if you never open the tab to see the in-app version.
-async function sweepWellnessCheckin(admin: any, userId: string, prefs: Record<string, any>) {
+async function sweepWellnessCheckin(admin: any, userId: string, prefs: Record<string, any>, bundle: Bundle) {
   if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0 };
   const { data: profile } = await admin.from('profiles').select('last_login_date').eq('id', userId).maybeSingle();
   if (!profile || !profile.last_login_date) return { sent: 0 };
   const daysSince = Math.floor((Date.now() - new Date(profile.last_login_date + 'T00:00:00Z').getTime()) / 86400000);
   if (daysSince < 3) return { sent: 0 };
   const todayStr = new Date().toISOString().slice(0, 10);
-  const sent = await emailOnly(admin, userId, prefs, 'system', 'checkin',
-    'checkin:' + userId + ':' + todayStr,
-    'Haven’t seen you in a few days',
-    'It’s been ' + daysSince + ' days since you last opened Nervexus. Just checking in — everything OK?',
-    'normal');
+  const sent = await collect(admin, bundle, {
+    section: 'logs',
+    line: 'It’s been ' + daysSince + ' days since you last opened Nervexus. Nothing has been logged in that time.',
+    subject: 'Haven’t seen you in a few days',
+    priority: 'normal',
+    category: 'system', sourceType: 'checkin',
+    dedupeKey: 'checkin:' + userId + ':' + todayStr,
+  });
   return { sent };
 }
 
+/* Collect from every sweep, then send once. The sweeps still do their own immediate work —
+   push notifications, streak arithmetic, account locking — because none of that belongs in
+   an email cadence. Only the email is batched. */
 async function sweepUser(admin: any, userId: string, fullName: string, prefs: Record<string, any>) {
   const name = firstName(fullName);
-  const digestResult = await sweepDigest(admin, userId, name, prefs);
-  const calendarResult = await sweepCalendarEvents(admin, userId, name, prefs);
-  const perfResult = await sweepPerformanceTerminal(admin, userId, name, prefs);
-  const versionResult = await sweepVersionUpdate(admin, userId, prefs);
-  const checkinResult = await sweepWellnessCheckin(admin, userId, prefs);
+  const bundle = newBundle();
+  const digestResult = await sweepDigest(admin, userId, name, prefs, bundle);
+  const calendarResult = await sweepCalendarEvents(admin, userId, name, prefs, bundle);
+  const perfResult = await sweepPerformanceTerminal(admin, userId, name, prefs, bundle);
+  const versionResult = await sweepVersionUpdate(admin, userId, prefs, bundle);
+  const checkinResult = await sweepWellnessCheckin(admin, userId, prefs, bundle);
+  const flush = await flushDigest(admin, userId, name, prefs, bundle);
   return {
     sent: (digestResult.sent || 0) + (calendarResult.sent || 0) + (perfResult.sent || 0) + (versionResult.sent || 0) + (checkinResult.sent || 0),
     digest: digestResult.sent || 0, calendar: calendarResult.sent || 0,
     performance: perfResult.sent || 0, version: versionResult.sent || 0, checkin: checkinResult.sent || 0,
+    // What actually left the building, and why it did not if it did not.
+    emails: flush.emailed || 0, collected: bundle.items.length,
+    ...(flush.held ? { held: flush.held } : {}),
+    ...(flush.error ? { emailError: flush.error } : {}),
   };
 }
 
