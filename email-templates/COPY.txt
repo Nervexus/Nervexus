@@ -64,11 +64,11 @@ LOGS — same 21:00 trigger as the performance log
            all of them in one place — open the app and tap "Log everything".
   SMALL    {n} of 5 outstanding
 
-  Only the MISSING logs are named. The five checked: Training, Finance,
-  Sleep & energy, Hydration, Body metrics.
-  Energy is a field on the sleep row, not a separate log, so it is counted once.
-  Nutrition is not checked: the `meals` table has no date column, so there is no
-  way to ask whether one was logged today.
+  Only the MISSING logs are named. All seven are checked: Training, Finance,
+  Sleep & energy, Hydration, Nutrition, Body metrics, Work log.
+  Finance counts either side of the ledger — income alone satisfies it.
+  Energy is a field on the sleep row, not a separate log, so it is counted once
+  under Sleep & energy rather than nagged for twice.
 
 APP UPDATE
   SUBJECT  Hey {name} — Nervexus {version} is out

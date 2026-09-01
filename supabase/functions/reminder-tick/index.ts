@@ -369,7 +369,7 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
    So it is no longer remembered. The live site already publishes its own version in
    NOTIF_BUILD_VERSION; the function reads it and falls back to the constant only if the
    fetch fails. Cached per invocation, so a sweep over every user costs one request. */
-const LATEST_VERSION_FALLBACK = 'v11.229';
+const LATEST_VERSION_FALLBACK = 'v11.230';
 const APP_URL = 'https://nervexus.vercel.app';
 let _versionCache: string | null = null;
 async function latestVersion(): Promise<string> {
@@ -544,15 +544,31 @@ async function sweepVersionUpdate(admin: any, userId: string, name: string, pref
      Nagging about it would be guessing.
    * Energy. It is not a separate log; it is a column on the sleep row, filled in by the
      same form. It is covered by 'Sleep & energy' below rather than counted twice. */
-const LOG_KINDS: { label: string; table: string; col: string; kind: 'date' | 'stamp' }[] = [
-  { label: 'Training',       table: 'workouts',       col: 'occurred_at', kind: 'stamp' },
-  { label: 'Finance',        table: 'expenses',       col: 'occurred_at', kind: 'stamp' },
-  { label: 'Sleep & energy', table: 'sleep_logs',     col: 'log_date',    kind: 'date'  },
-  { label: 'Hydration',      table: 'hydration_logs', col: 'log_date',    kind: 'date'  },
-  { label: 'Body metrics',   table: 'body_metrics',   col: 'log_date',    kind: 'date'  },
+/* Every daily-loggable thing the app has, checked against how each table is really keyed
+   rather than what its name suggests. The first draft assumed log_date everywhere and
+   would have reported Training missing every single day, because workouts carry an
+   occurred_at timestamp.
+
+   Nutrition needed no migration in the end: the client never writes a date, but the table
+   has created_at, and "was a meal logged today" is exactly what created_at answers.
+
+   Energy is still absent as a line of its own — it is a column on the sleep row, filled in
+   by the same form, so it is counted once under Sleep & energy rather than nagged for
+   twice. */
+type LogSource = { table: string; col: string; kind: 'date' | 'stamp' };
+const LOG_KINDS: { label: string; any: LogSource[] }[] = [
+  { label: 'Training',       any: [{ table: 'workouts',       col: 'occurred_at', kind: 'stamp' }] },
+  // Either side of the ledger counts: a day with income logged and no spending is logged.
+  { label: 'Finance',        any: [{ table: 'expenses',       col: 'occurred_at', kind: 'stamp' },
+                                   { table: 'income',         col: 'occurred_at', kind: 'stamp' }] },
+  { label: 'Sleep & energy', any: [{ table: 'sleep_logs',     col: 'log_date',    kind: 'date'  }] },
+  { label: 'Hydration',      any: [{ table: 'hydration_logs', col: 'log_date',    kind: 'date'  }] },
+  { label: 'Nutrition',      any: [{ table: 'meals',          col: 'created_at',  kind: 'stamp' }] },
+  { label: 'Body metrics',   any: [{ table: 'body_metrics',   col: 'log_date',    kind: 'date'  }] },
+  { label: 'Work log',       any: [{ table: 'activities',     col: 'occurred_at', kind: 'stamp' }] },
 ];
 
-async function loggedToday(admin: any, userId: string, k: { table: string; col: string; kind: string }, day: string) {
+async function sourceHasRow(admin: any, userId: string, k: LogSource, day: string) {
   try {
     let q = admin.from(k.table).select('id', { count: 'exact', head: true }).eq('user_id', userId);
     if (k.kind === 'date') q = q.eq(k.col, day);
@@ -564,6 +580,10 @@ async function loggedToday(admin: any, userId: string, k: { table: string; col: 
        missing — silence beats nagging someone about a feature they do not have. */
     return true;
   }
+}
+async function loggedToday(admin: any, userId: string, kind: { any: LogSource[] }, day: string) {
+  for (const src of kind.any) if (await sourceHasRow(admin, userId, src, day)) return true;
+  return false;
 }
 
 async function sweepLogs(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {

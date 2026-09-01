@@ -796,10 +796,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <input value="{{ laHydMl }}" onInput="{{ setLaHydMl }}" placeholder="ml today" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
         </div>
 
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">NUTRITION</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px;">
+          <input value="{{ laMealName }}" onInput="{{ setLaMealName }}" placeholder="Meal" style="flex:1 1 150px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laMealKcal }}" onInput="{{ setLaMealKcal }}" placeholder="kcal" style="width:74px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laMealProtein }}" onInput="{{ setLaMealProtein }}" placeholder="Protein" style="width:84px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">WORK LOG</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px;">
+          <input value="{{ laActText }}" onInput="{{ setLaActText }}" placeholder="What you worked on" style="flex:1 1 150px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laActMin }}" onInput="{{ setLaActMin }}" placeholder="Mins" style="width:74px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
         <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">BODY METRICS</div>
         <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:20px;">
           <input value="{{ laBodyWeight }}" onInput="{{ setLaBodyWeight }}" placeholder="Weight kg" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
-          <input value="{{ laBodyFat }}" onInput="{{ setLaBodyFat }}" placeholder="Body fat %" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laBodyFat }}" onInput="{{ setLaBodyFat }}" placeholder="Body fat %" style="flex:1 1 100px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laMuscle }}" onInput="{{ setLaMuscle }}" placeholder="Muscle kg" style="flex:1 1 100px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
         </div>
 
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
@@ -9231,7 +9245,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.01-229 · v11.229 calendar-fields';
+const NOTIF_BUILD_VERSION = '2026.09.01-230 · v11.230 all-logs';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15402,6 +15416,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     let dispVal;
     if(field==='height'){ if(!(v>50&&v<260)) return; const lu=this._hUnit('length'); dispVal=K.round(K.toDisplay('length',v,lu),1); }
     else if(field==='bodyFatPct'){ if(!(v>2&&v<70)) return; dispVal=K.round(v,1); }
+    else if(field==='muscleKg'){ if(!(v>10&&v<120)) return; const mu=this._hUnit('mass'); dispVal=K.round(K.toDisplay('mass',v,mu),1); }
     else return;
     this.setState(s=>({bodyDraft:{...s.bodyDraft,[field]:dispVal},bodyEditDate:null}),()=>this.saveBody()); }
   /* ---- Log everything ---------------------------------------------------------------
@@ -15420,10 +15435,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       { key:'finance',   label:'Finance',        done:[...(this.state.income||[]),...(this.state.expenses||[])].some(e=>sameDay(e.ts)) },
       { key:'sleep',     label:'Sleep & energy', done:(H.sleepLog||[]).some(x=>x.date===today) },
       { key:'hydration', label:'Hydration',      done:(H.hydrationLog||[]).some(x=>x.date===today) },
+      { key:'nutrition', label:'Nutrition',      done:(this.state.meals||[]).some(m=>sameDay(m.ts)) },
       { key:'body',      label:'Body metrics',   done:(bl||[]).some(x=>x.date===today) },
+      { key:'work',      label:'Work log',       done:(this.state.activities||[]).some(a=>sameDay(a.ts)) },
     ]; }
   openLogAll(){ this.setState({ logAllOpen:true, logAllSaved:0, logAll:{ woEx:'', woMin:'', woWeight:'', woSets:'', woReps:'',
-    finKind:'expense', finLabel:'', finAmt:'', slpH:'', slpM:'', slpEnergy:'', hydMl:'', bodyWeight:'', bodyFat:'' } }); }
+    finKind:'expense', finLabel:'', finAmt:'', slpH:'', slpM:'', slpEnergy:'', hydMl:'', bodyWeight:'', bodyFat:'', muscle:'',
+    mealName:'', mealKcal:'', mealProtein:'', actText:'', actMin:'' } }); }
   closeLogAll(){ this.setState({ logAllOpen:false }); }
   setLogAll(k,e){ const v=e&&e.target?e.target.value:e; this.setState(s=>({ logAll:{ ...(s.logAll||{}), [k]:v } })); }
   /* Saves only the sections that were actually filled in — an empty field is not an
@@ -15441,6 +15459,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if((+d.hydMl||0)>0){ this.addHydMl(+d.hydMl); n++; }
     if((+d.bodyWeight||0)>0){ this.addWeight(+d.bodyWeight); n++; }
     if((+d.bodyFat||0)>0){ this.addBodyMetric('bodyFatPct', +d.bodyFat); n++; }
+    if((+d.muscle||0)>0){ this.addBodyMetric('muscleKg', +d.muscle); n++; }
+    if((d.mealName||'').trim() && (+d.mealKcal||0)>0){ this.addMeal({name:d.mealName, kcal:+d.mealKcal, protein:+d.mealProtein||0}); n++; }
+    if((d.actText||'').trim()){ this.setState(s=>({actText:d.actText, actMin:String(+d.actMin||30), actHr:''}),()=>this.addActivity()); n++; }
     this.setState({ logAllSaved:n });
     if(n) this.showToast('fitness', n===1?'1 log saved':n+' logs saved', 'Logged for today');
     setTimeout(()=>this.setState({logAllOpen:false}), n?700:0); }
@@ -17863,6 +17884,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       laHydMl:(S.logAll||{}).hydMl||'', setLaHydMl:(e)=>this.setLogAll('hydMl',e),
       laBodyWeight:(S.logAll||{}).bodyWeight||'', setLaBodyWeight:(e)=>this.setLogAll('bodyWeight',e),
       laBodyFat:(S.logAll||{}).bodyFat||'', setLaBodyFat:(e)=>this.setLogAll('bodyFat',e),
+      laMuscle:(S.logAll||{}).muscle||'', setLaMuscle:(e)=>this.setLogAll('muscle',e),
+      laMealName:(S.logAll||{}).mealName||'', setLaMealName:(e)=>this.setLogAll('mealName',e),
+      laMealKcal:(S.logAll||{}).mealKcal||'', setLaMealKcal:(e)=>this.setLogAll('mealKcal',e),
+      laMealProtein:(S.logAll||{}).mealProtein||'', setLaMealProtein:(e)=>this.setLogAll('mealProtein',e),
+      laActText:(S.logAll||{}).actText||'', setLaActText:(e)=>this.setLogAll('actText',e),
+      laActMin:(S.logAll||{}).actMin||'', setLaActMin:(e)=>this.setLogAll('actMin',e),
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
       emailProvider:S.prefs.emailProvider||'resend', setEmailProvider:(e)=>this.setPref('emailProvider',e.target.value),
       speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?vTok.vInk:vTok.vMuted2, b:(S.prefs.voiceRate||1)===o?vTok.vAccent:vTok.vLine, bg:(S.prefs.voiceRate||1)===o?vTok.vLine2:'transparent'})),
