@@ -78,26 +78,53 @@ function buildText(name, groups, signoff) {
    are not browsers: Outlook drops flexbox and grid entirely, Gmail strips <style> blocks in
    some contexts, and a linked font silently falls back to Times. Every rule here is on the
    element that needs it, and the layout survives being reduced to a single column. */
+/* Themes are colour and type only — the table structure below is identical in all three,
+   because the structure is the part email clients are fussy about and it is not worth
+   re-proving per theme. A theme cannot introduce a rule the clients cannot render.
+
+   The serif/mono stacks name only faces that already exist on the devices; there are no
+   web fonts, because a linked font in an email silently becomes Times. */
+var SERIF = "Georgia,'Times New Roman',serif";
+var MONO  = "Consolas,Menlo,'Courier New',monospace";
+var SANS  = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
+
+var THEMES = {
+  /* The app's Maison/Ultra light identity: cream ground, serif wordmark, champagne rules. */
+  editorial: { ink:'#1B1B1F', muted:'#6E6E76', line:'#E2DED4', ground:'#F7F4EC', card:'#FFFFFF',
+               accent:'#8A7B4F', btnBg:'#1B1B1F', btnInk:'#FFFFFF', flagInk:'#8A3B2A', flagLine:'#E0B8AC',
+               head:SERIF, body:SERIF, label:MONO, wordSpace:'.14em', radius:'14px' },
+  /* Noir: the dark side of the same identity. Note the ground is NOT pure black — several
+     clients composite dark backgrounds against their own, and #121212 survives that. */
+  noir:      { ink:'#EDEBE6', muted:'#8E8B84', line:'#2A2A2A', ground:'#0E0E0E', card:'#161616',
+               accent:'#C4BDB0', btnBg:'#EDEBE6', btnInk:'#121212', flagInk:'#E8A08A', flagLine:'#4A2A22',
+               head:SERIF, body:SERIF, label:MONO, wordSpace:'.14em', radius:'14px' },
+  /* Terminal: the readout look — monospace throughout, square corners, denser. */
+  terminal:  { ink:'#101014', muted:'#63636B', line:'#DCDCE2', ground:'#EFEFF2', card:'#FFFFFF',
+               accent:'#3C6E5C', btnBg:'#101014', btnInk:'#FFFFFF', flagInk:'#8A3B2A', flagLine:'#E0B8AC',
+               head:MONO, body:SANS, label:MONO, wordSpace:'.22em', radius:'4px' },
+};
+
 function buildHtml(name, groups, opts) {
   var o = opts || {};
   var appUrl = o.appUrl || 'https://nervexus.vercel.app';
-  var ink = '#1B1B1F', muted = '#6E6E76', line = '#E2DED4', ground = '#F7F4EC', card = '#FFFFFF';
-  var accent = '#8A7B4F';
+  var th = THEMES[o.theme] || THEMES.editorial;
+  var ink = th.ink, muted = th.muted, line = th.line, ground = th.ground, card = th.card;
+  var accent = th.accent;
 
   var rows = groups.map(function (g) {
     var items = g.items.map(function (it) {
       var flag = (it.priority === 'critical' || it.priority === 'high')
-        ? '<span style="display:inline-block; font:600 10px/1 Consolas,Menlo,monospace; letter-spacing:.08em; text-transform:uppercase; color:#8A3B2A; border:1px solid #E0B8AC; border-radius:4px; padding:3px 6px; margin-right:8px; vertical-align:middle;">' + esc(it.priority) + '</span>'
+        ? '<span style="display:inline-block; font:600 10px/1 ' + th.label + '; letter-spacing:.08em; text-transform:uppercase; color:' + th.flagInk + '; border:1px solid ' + th.flagLine + '; border-radius:4px; padding:3px 6px; margin-right:8px; vertical-align:middle;">' + esc(it.priority) + '</span>'
         : '';
       return ''
         + '<tr><td style="padding:9px 0; border-bottom:1px solid ' + line + ';">'
-        +   '<div style="font:400 15px/1.5 Georgia,\'Times New Roman\',serif; color:' + ink + ';">' + flag + esc(it.line) + '</div>'
-        +   (it.meta ? '<div style="font:400 12px/1.5 Consolas,Menlo,monospace; color:' + muted + '; margin-top:3px;">' + esc(it.meta) + '</div>' : '')
+        +   '<div style="font:400 15px/1.5 ' + th.body + '; color:' + ink + ';">' + flag + esc(it.line) + '</div>'
+        +   (it.meta ? '<div style="font:400 12px/1.5 ' + th.label + '; color:' + muted + '; margin-top:3px;">' + esc(it.meta) + '</div>' : '')
         + '</td></tr>';
     }).join('');
     return ''
       + '<tr><td style="padding:26px 0 0 0;">'
-      +   '<div style="font:600 11px/1 Consolas,Menlo,monospace; letter-spacing:.16em; text-transform:uppercase; color:' + accent + '; padding-bottom:6px;">' + esc(g.label) + '</div>'
+      +   '<div style="font:600 11px/1 ' + th.label + '; letter-spacing:.16em; text-transform:uppercase; color:' + accent + '; padding-bottom:6px;">' + esc(g.label) + '</div>'
       +   '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">' + items + '</table>'
       + '</td></tr>';
   }).join('');
@@ -105,22 +132,22 @@ function buildHtml(name, groups, opts) {
   return ''
 + '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:' + ground + '; margin:0; padding:0;">'
 + '<tr><td align="center" style="padding:28px 14px;">'
-+   '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; background:' + card + '; border:1px solid ' + line + '; border-radius:14px;">'
++   '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; background:' + card + '; border:1px solid ' + line + '; border-radius:' + th.radius + ';">'
 +     '<tr><td style="padding:30px 30px 0 30px;">'
-+       '<div style="font:400 22px/1 Georgia,\'Times New Roman\',serif; letter-spacing:.14em; color:' + ink + ';">NERVEXUS</div>'
-+       '<div style="font:400 12px/1 Consolas,Menlo,monospace; letter-spacing:.1em; color:' + muted + '; padding-top:7px;">' + esc(o.dateLabel || '') + '</div>'
++       '<div style="font:400 22px/1 ' + th.head + '; letter-spacing:' + th.wordSpace + '; color:' + ink + ';">NERVEXUS</div>'
++       '<div style="font:400 12px/1 ' + th.label + '; letter-spacing:.1em; color:' + muted + '; padding-top:7px;">' + esc(o.dateLabel || '') + '</div>'
 +     '</td></tr>'
 +     '<tr><td style="padding:22px 30px 0 30px;">'
-+       '<div style="font:400 17px/1.5 Georgia,\'Times New Roman\',serif; color:' + ink + ';">' + esc(name ? 'Morning ' + name + ',' : 'Hello,') + '</div>'
-+       '<div style="font:400 14px/1.6 Georgia,\'Times New Roman\',serif; color:' + muted + '; padding-top:6px;">Here is everything outstanding, in one place.</div>'
++       '<div style="font:400 17px/1.5 ' + th.body + '; color:' + ink + ';">' + esc(name ? 'Morning ' + name + ',' : 'Hello,') + '</div>'
++       '<div style="font:400 14px/1.6 ' + th.body + '; color:' + muted + '; padding-top:6px;">Here is everything outstanding, in one place.</div>'
 +     '</td></tr>'
 +     '<tr><td style="padding:0 30px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">' + rows + '</table></td></tr>'
 +     '<tr><td style="padding:26px 30px 30px 30px;">'
-+       '<a href="' + esc(appUrl) + '" style="display:inline-block; font:600 13px/1 Consolas,Menlo,monospace; letter-spacing:.06em; color:#FFFFFF; background:' + ink + '; border-radius:9px; padding:13px 22px; text-decoration:none;">OPEN NERVEXUS</a>'
++       '<a href="' + esc(appUrl) + '" style="display:inline-block; font:600 13px/1 ' + th.label + '; letter-spacing:.06em; color:' + th.btnInk + '; background:' + th.btnBg + '; border-radius:' + th.radius + '; padding:13px 22px; text-decoration:none;">OPEN NERVEXUS</a>'
 +     '</td></tr>'
 +     '<tr><td style="padding:0 30px 26px 30px; border-top:1px solid ' + line + ';">'
-+       '<div style="font:400 12px/1.6 Georgia,\'Times New Roman\',serif; color:' + muted + '; padding-top:16px;">' + esc(o.signoffLine || 'Best, Ultra X management team') + '</div>'
-+       '<div style="font:400 11px/1.6 Consolas,Menlo,monospace; color:' + muted + '; padding-top:8px;">Turn these off in Settings &rarr; Notifications.</div>'
++       '<div style="font:400 12px/1.6 ' + th.body + '; color:' + muted + '; padding-top:16px;">' + esc(o.signoffLine || 'Best, Ultra X management team') + '</div>'
++       '<div style="font:400 11px/1.6 ' + th.label + '; color:' + muted + '; padding-top:8px;">Turn these off in Settings &rarr; Notifications.</div>'
 +     '</td></tr>'
 +   '</table>'
 + '</td></tr></table>';
@@ -139,4 +166,4 @@ function buildDigest(input) {
   };
 }
 
-export { buildDigest, buildSubject, groupBySection, SECTIONS };
+export { buildDigest, buildSubject, groupBySection, SECTIONS, THEMES };

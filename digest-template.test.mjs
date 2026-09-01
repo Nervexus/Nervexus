@@ -1,7 +1,7 @@
 /* Tests for the digest renderer: node digest-template.test.mjs
    The renderer is the part of the email system that can be checked without a database, a
    mail provider or a deploy, so it is checked properly. */
-import { buildDigest, buildSubject, groupBySection, SECTIONS } from './supabase/functions/_shared/digest-template.js';
+import { buildDigest, buildSubject, groupBySection, SECTIONS, THEMES } from './supabase/functions/_shared/digest-template.js';
 
 const T=[]; const t=(n,f)=>T.push([n,f]);
 const has=(s,sub,m)=>{ if(!String(s).includes(sub)) throw new Error((m||'')+' missing '+JSON.stringify(sub)+' in '+JSON.stringify(String(s).slice(0,200))); };
@@ -102,6 +102,47 @@ t('the signoff is appended once', ()=>{
 
 t('every declared section has a label', ()=>{
   for(const s of SECTIONS) if(!s.key||!s.label) throw new Error('bad section '+JSON.stringify(s));
+});
+
+/* ---- themes ------------------------------------------------------------------------
+   A theme changes colour and type only. The table structure is shared, so the email-client
+   constraints are proved once for all of them rather than per theme — and a theme that
+   tried to introduce, say, a media query would fail here. */
+t('every theme renders the same content and breaks no client rules', ()=>{
+  for(const name of Object.keys(THEMES)){
+    const d=buildDigest({ name:'Sam', items:sample, theme:name });
+    for(const it of sample){
+      const needle=it.line.replace(/&/g,'&amp;').replace(/'/g,'&#39;');
+      has(d.html,needle,name+':');
+    }
+    for(const bad of ['display:flex','display:grid','<link','@media','position:absolute','var(--','@font-face'])
+      not(d.html,bad,name+' uses '+bad+', which email clients drop:');
+    has(d.html,'role="presentation"',name+': layout must stay table-based —');
+    if(/<style[\s>]/.test(d.html)) throw new Error(name+' has a <style> block; Gmail strips those');
+  }
+});
+
+/* Dark themes have one failure mode worth pinning: a card with no explicit background
+   inherits the client's own, which on a dark ground turns the text invisible. */
+t('every theme paints its own background and ink', ()=>{
+  for(const name of Object.keys(THEMES)){
+    const th=THEMES[name];
+    const d=buildDigest({ name:'Sam', items:sample, theme:name });
+    has(d.html,'background:'+th.ground,name+': page ground not painted —');
+    has(d.html,'background:'+th.card,name+': card ground not painted —');
+    has(d.html,'color:'+th.ink,name+': ink not set —');
+  }
+});
+
+t('an unknown theme name falls back rather than rendering unstyled', ()=>{
+  const d=buildDigest({ name:'Sam', items:sample, theme:'does-not-exist' });
+  has(d.html,'background:'+THEMES.editorial.ground);
+});
+
+t('the plain-text part is identical whatever the theme', ()=>{
+  const a=buildDigest({ name:'Sam', items:sample, theme:'noir' }).text;
+  const b=buildDigest({ name:'Sam', items:sample, theme:'terminal' }).text;
+  if(a!==b) throw new Error('themes changed the plain-text part');
 });
 
 let pass=0, fail=0;
