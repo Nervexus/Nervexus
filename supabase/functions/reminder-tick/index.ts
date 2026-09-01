@@ -25,8 +25,22 @@ const FREQUENCY_MINUTES: Record<string, number> = { '15min': 15, '30min': 30, ho
 
 // Mirrors the client's own first-name extraction (index.html's firstName/nm helpers) so
 // personalized email copy reads the same way the in-app greeting does.
+/* The first word of an account name is a title as often as it is a name, and a live run
+   proved it: the digest went out addressed "Hey Mr". closeOut() already refuses to use this
+   helper for exactly that reason; the email path used it anyway.
+
+   Titles are skipped, and if nothing recognisable is left the caller gets an empty string —
+   every greeting here already has a no-name form, and no name at all reads better than the
+   wrong one. */
+const TITLES = /^(?:mr|mrs|ms|miss|mx|dr|prof|professor|sir|dame|lord|lady|rev|father|capt|captain|major|sgt)\.?$/i;
 function firstName(fullName: string) {
-  return (fullName || '').trim().split(/\s+/)[0] || '';
+  const words = (fullName || '').trim().split(/\s+/).filter(Boolean);
+  for (const w of words) {
+    if (TITLES.test(w)) continue;
+    const clean = w.replace(/[^\p{L}\p{M}'-]/gu, '');
+    if (clean.length >= 2) return clean;
+  }
+  return '';
 }
 
 // User-customizable email template (Settings → Notifications → Email template). Empty
@@ -96,7 +110,7 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
   if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0, emailed: 0 };
 
   if (!forcesImmediateSend(items)) {
-    const hour = localHour(new Date(), prefs.timezone);
+    const hour = localHour(new Date(), prefs.timezone || UK_TZ);
     if (hour < 6 || hour >= 23) return { sent: 0, emailed: 0, held: 'outside 6am-11pm' };
     const { data: lastNotif } = await admin.from('notifications').select('created_at')
       .eq('user_id', userId).eq('source_type', 'digest-email')
@@ -108,7 +122,7 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
   const digest = buildDigest({
     name,
     items,
-    localHour: localHour(new Date(), prefs.timezone),
+    localHour: localHour(new Date(), prefs.timezone || UK_TZ),
     signoff: EMAIL_SIGNOFF,
     appUrl: 'https://nervexus.vercel.app',
     dateLabel: new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase(),
@@ -203,7 +217,7 @@ async function sweepDigest(admin: any, userId: string, name: string, prefs: Reco
 
   const openChecklistItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
   const openTotal = openMissions.length + openChecklistItems;
-  const hoursLeft = hoursLeftToday(new Date(), prefs.timezone);
+  const hoursLeft = hoursLeftToday(new Date(), prefs.timezone || UK_TZ);
   const title = pickDigestSubject(name, openTotal);
   const body = pickDigestText(openTotal, hoursLeft);
   const priority = 'normal';
@@ -216,7 +230,7 @@ async function sweepDigest(admin: any, userId: string, name: string, prefs: Reco
       .eq('user_id', userId).eq('source_type', 'digest')
       .order('created_at', { ascending: false }).limit(1);
     const lastTs = (lastPush && lastPush[0]) ? new Date(lastPush[0].created_at).getTime() : 0;
-    const hour = localHour(new Date(), prefs.timezone);
+    const hour = localHour(new Date(), prefs.timezone || UK_TZ);
     if (hour >= 6 && hour < 23 && Date.now() - lastTs >= DIGEST_FREQ_MIN * 60000 - 30000) {
       await sendPushToUser(admin, userId, { title, body, category: 'mission', priority, url: './index.html' });
       await admin.from('notifications').insert({

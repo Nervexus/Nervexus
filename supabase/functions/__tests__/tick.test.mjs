@@ -301,6 +301,27 @@ t('an event that is not tomorrow produces no heads-up', async()=>{
   if(r.collected!==0) throw new Error('collected something: '+r.collected);
 });
 
+/* A live run addressed the digest "Hey Mr" — firstName() took the first word of the
+   account name, which was the title. This is the regression guard. */
+t('a title is never used as the name', async()=>{
+  for(const [full, expect] of [['Mr Sam Whitfield','Sam'], ['Dr. Sam','Sam'], ['Sam','Sam'],
+                               ['Mr','__none__'], ['Mr.','__none__'], ['','__none__']]) {
+    reset();
+    const admin=makeAdmin(baseTables({
+      performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+      performance_logs:[{user_id:UID,log_date:today,id:'p1'}] }));
+    await sweepUser(admin,UID,full,{...prefs, lastSeenVersion:LATEST});
+    const first=email.sends[0].text.split('\n')[0];
+    if(expect==='__none__'){
+      if(!/^Good (morning|afternoon|evening),$/.test(first))
+        throw new Error(JSON.stringify(full)+' greeted with a title: '+JSON.stringify(first));
+    } else {
+      if(!first.endsWith(expect+',')) throw new Error(JSON.stringify(full)+' -> '+JSON.stringify(first));
+      if(/\b(Mr|Mrs|Dr)\b/.test(first)) throw new Error('title leaked: '+first);
+    }
+  }
+});
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');
