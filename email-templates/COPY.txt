@@ -41,16 +41,22 @@ PERFORMANCE TERMINAL — locked
   BODY     Your account has been locked after 7 strikes. Log in to submit an
            appeal for the owner to review.
 
-CALENDAR — 24 hours ahead
-  SUBJECT  Tomorrow: {title}
-  BODY     For tomorrow you have {title} at {time}, which you have set for
-           yourself to do.
-  SMALL    {time} tomorrow
+CALENDAR — a heads-up about tomorrow, sent in the same 21:00 slot
+  SUBJECT  Hey {name} — tomorrow: {title}
+  SMALL    {time}–{end} tomorrow   (or just {time})
 
-  NOT YET POSSIBLE — the work-event and combined wordings need end_time,
-  attendees and a work/general flag on the events table. The migration is
-  written (supabase/migrations/20260901_event_details.sql); the calendar form
-  still needs the fields before the other two sentences can be used.
+  WORK EVENT
+    For tomorrow you have {title} from {time} till {end} with {persons}.
+    Any part that was not filled in is left out rather than printed empty, so a
+    work event with only a start time reads "…{title} at {time}."
+
+  GENERAL TASK
+    For tomorrow you have {title} at {time}, which you have set for yourself to
+    do. This should take about {duration}.
+    Duration is spoken naturally — 90 becomes "an hour and 30 minutes".
+
+  Which sentence is used comes from the event's type, chosen on the calendar
+  form. An event created before that field existed counts as general.
 
 LOGS — same 21:00 trigger as the performance log
   SUBJECT  Good evening {name} — your logs are pending

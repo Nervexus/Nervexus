@@ -214,6 +214,93 @@ t('a workout logged today counts, despite being a timestamp not a date', async()
     throw new Error('a workout logged today was still reported as missing');
 });
 
+/* ---- calendar wording ---------------------------------------------------------------
+   The heads-up is about TOMORROW and goes out in the 21:00 local slot, so the fixture has
+   to be a tomorrow-dated event and a timezone where it is currently evening. Rather than
+   skip when the clock is wrong, the test finds a zone where it is right — there is always
+   one, and a test that quietly skips is a test that stops testing. */
+function eveningTz(){
+  const zones=['Pacific/Kiritimati','Pacific/Auckland','Australia/Sydney','Asia/Tokyo','Asia/Shanghai',
+    'Asia/Bangkok','Asia/Dhaka','Asia/Karachi','Asia/Dubai','Europe/Moscow','Europe/Athens','Europe/Paris',
+    'Europe/London','Atlantic/Azores','America/Noronha','America/Sao_Paulo','America/New_York',
+    'America/Chicago','America/Denver','America/Los_Angeles','America/Anchorage','Pacific/Honolulu','Pacific/Midway'];
+  for(const tz of zones){
+    const h=+new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',hour12:false}).format(new Date());
+    if(h>=21 && h<=22) return tz;
+  }
+  throw new Error('no timezone is currently in the 21:00-22:00 send window');
+}
+const TZ_EVENING=eveningTz();
+const tomorrowUTC=new Date(Date.now()+86400000).toISOString().slice(0,10);
+function tomorrowEvent(extra){
+  return Object.assign({ id:'e1', user_id:UID, title:'Client review',
+    event_date:tomorrowUTC, event_time:'09:00', repeat_days:null, deleted_at:null, kind:'general' }, extra||{});
+}
+const calTables=(ev)=>baseTables({ missions:[], events:[ev],
+  performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+  performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+  workouts:[{id:'w',user_id:UID,occurred_at:today+'T10:00:00.000Z'}],
+  expenses:[{id:'x',user_id:UID,occurred_at:today+'T10:00:00.000Z'}],
+  sleep_logs:[{id:'s',user_id:UID,log_date:today}],
+  hydration_logs:[{id:'h',user_id:UID,log_date:today}],
+  body_metrics:[{id:'b',user_id:UID,log_date:today}] });
+const calPrefs=()=>({...prefs, timezone:TZ_EVENING, lastSeenVersion:LATEST});
+async function calLine(ev){
+  reset();
+  const admin=makeAdmin(calTables(ev));
+  const r=await sweepUser(admin,UID,'Sam',calPrefs());
+  if(!email.sends.length) throw new Error('no email sent: '+JSON.stringify(r));
+  return email.sends[0].text;
+}
+
+t('a work event reads with its end time and who is there', async()=>{
+  const body=await calLine(tomorrowEvent({ kind:'work', end_time:'17:00', attendees:'Dan and Priya' }));
+  if(!body.includes('from 09:00 till 17:00')) throw new Error('no time range:\n'+body);
+  if(!body.includes('with Dan and Priya')) throw new Error('no attendees:\n'+body);
+  if(/set for yourself to do/.test(body)) throw new Error('used the general wording for a work event');
+});
+
+t('a general task reads with its rough duration', async()=>{
+  const body=await calLine(tomorrowEvent({ kind:'general', est_minutes:90 }));
+  if(!/set for yourself to do/.test(body)) throw new Error('not the general wording:\n'+body);
+  // 90 minutes must not be read out as "90 minutes".
+  if(!/an hour and 30 minutes/.test(body)) throw new Error('duration not spoken naturally:\n'+body);
+  if(/till/.test(body)) throw new Error('a general task got a time range');
+});
+
+/* The failure this whole schema change exists to avoid: a work event with nothing else
+   filled in must not print "till undefined with undefined". */
+t('a work event with no end time or attendees says only what is known', async()=>{
+  const body=await calLine(tomorrowEvent({ kind:'work' }));
+  if(/undefined|null/.test(body)) throw new Error('leaked an empty field:\n'+body);
+  if(!body.includes('at 09:00')) throw new Error('lost the start time:\n'+body);
+});
+
+/* Every event created before these columns existed has no kind at all. */
+t('an event with no kind is treated as general, not broken', async()=>{
+  const ev=tomorrowEvent({}); delete ev.kind;
+  const body=await calLine(ev);
+  if(!/set for yourself to do/.test(body)) throw new Error('legacy event did not read as general:\n'+body);
+  if(/undefined/.test(body)) throw new Error('legacy event leaked undefined:\n'+body);
+});
+
+/* The bug this replaced: the email window was measured against TODAY's occurrence, so
+   "24 hours ahead" could only ever land in a 15-minute sliver after midnight. An event
+   tomorrow has to produce an email today. */
+t('an event tomorrow produces the heads-up today', async()=>{
+  const body=await calLine(tomorrowEvent({}));
+  if(!/For tomorrow you have Client review/.test(body)) throw new Error('no heads-up:\n'+body);
+});
+
+t('an event that is not tomorrow produces no heads-up', async()=>{
+  reset();
+  const far=tomorrowEvent({ event_date:new Date(Date.now()+5*86400000).toISOString().slice(0,10) });
+  const admin=makeAdmin(calTables(far));
+  const r=await sweepUser(admin,UID,'Sam',calPrefs());
+  if(email.sends.length) throw new Error('emailed about an event five days out:\n'+email.sends[0].text);
+  if(r.collected!==0) throw new Error('collected something: '+r.collected);
+});
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

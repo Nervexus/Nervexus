@@ -3622,7 +3622,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <div style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                   <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFFFFF; width:46px;">{{ e.time }}</span>
                   <div style="flex:1; min-width:0;">
-                    <div style="font-size:13px; color:#dbdbe0;">{{ e.title }}</div>
+                    <div style="display:flex; align-items:center; gap:7px; min-width:0;">
+                      <sc-if value="{{ e.isWork }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#e8b45a; border:1px solid rgba(232,180,90,0.34); border-radius:5px; padding:2px 5px; flex:none;">WORK</span></sc-if>
+                      <div style="font-size:13px; color:#dbdbe0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ e.title }}</div>
+                    </div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84; margin-top:2px;">{{ e.detail }}</div>
                     <sc-if value="{{ e.repeatLabel }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84; margin-top:2px;">↻ {{ e.repeatLabel }}</div></sc-if>
                   </div>
                   <span onClick="{{ e.remove }}" title="{{ e.removeTitle }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
@@ -3646,6 +3650,32 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <span onClick="{{ rd.toggle }}" style="flex:1; text-align:center; padding:8px 0; border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; cursor:pointer; color:{{ rd.c }}; background:{{ rd.bg }}; border:1px solid {{ rd.bd }};" style-hover="{ borderColor:'rgba(255,255,255,0.35)' }">{{ rd.l }}</span>
                 </sc-for>
               </div>
+              <!-- Work vs general. The reminder email picks its wording from this, so it is a
+                   two-way choice rather than free text — a typo would silently pick the
+                   wrong sentence. -->
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78;">TYPE</span>
+              </div>
+              <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <span onClick="{{ setEvKindGeneral }}" style="flex:1; text-align:center; padding:8px 0; border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; cursor:pointer; color:{{ evKindGenC }}; background:{{ evKindGenBg }}; border:1px solid {{ evKindGenBd }};">GENERAL</span>
+                <span onClick="{{ setEvKindWork }}" style="flex:1; text-align:center; padding:8px 0; border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; cursor:pointer; color:{{ evKindWorkC }}; background:{{ evKindWorkBg }}; border:1px solid {{ evKindWorkBd }};">WORK</span>
+              </div>
+
+              <!-- Work events carry an end time and who is there; a general task carries a
+                   rough duration. Each set only appears for the type that uses it, so the
+                   panel never asks for something the reminder will not read. -->
+              <sc-if value="{{ evIsWork }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; gap:9px; margin-bottom:9px;">
+                  <input value="{{ evEndTime }}" onInput="{{ setEvEndTime }}" onKeyDown="{{ addEventKey }}" placeholder="Ends 17:00" style="width:128px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
+                  <input value="{{ evAttendees }}" onInput="{{ setEvAttendees }}" onKeyDown="{{ addEventKey }}" placeholder="With who" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
+                </div>
+              </sc-if>
+              <sc-if value="{{ evIsGeneral }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; gap:9px; margin-bottom:9px;">
+                  <input value="{{ evEstMins }}" onInput="{{ setEvEstMins }}" onKeyDown="{{ addEventKey }}" placeholder="Takes about (mins)" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
+                </div>
+              </sc-if>
+
               <div style="display:flex; gap:9px;">
                 <input value="{{ evTime }}" onInput="{{ setEvTime }}" onKeyDown="{{ addEventKey }}" placeholder="09:00" style="width:90px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
                 <span onClick="{{ addEvent }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:11px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">Add to {{ selShort }}</span>
@@ -9201,7 +9231,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.01-228 · v11.228 log-everything';
+const NOTIF_BUILD_VERSION = '2026.09.01-229 · v11.229 calendar-fields';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9286,7 +9316,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'',
+      calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
       safetyQuery:'', safetyLoading:false, safetyResult:'', safetyErr:'',
       // No seeded notes.
@@ -12333,7 +12363,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(notes && notes.data) patch.notes=notes.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,title:r.title||'',body:r.body||'',ts:new Date(r.created_at).getTime()}));
       if(missions && missions.data) patch.missions=missions.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,name:r.name,recurring:!!r.recurring,dayKey:r.day_key||'',streak:r.streak||0,longest:r.longest_streak||0,total:r.total_completions||0,lastCompleted:r.last_completed||'',category:r.category||'mission',priority:r.priority||'normal',repeat:r.repeat||(r.recurring?'daily':'none'),dueDate:r.due_date||'',dueDow:(r.due_dow===null||r.due_dow===undefined)?null:r.due_dow,dueDom:(r.due_dom===null||r.due_dom===undefined)?null:r.due_dom}));
       if(missionHistory && missionHistory.data) patch.missionHistory=missionHistory.data.map(r=>({missionId:r.mission_id,name:r.name,date:r.completed_date,time:r.completed_time||'',notes:r.notes||'',xp:r.xp||0,streak:r.streak||0,recurring:!!r.recurring}));
-      if(events && events.data) patch.events=events.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,title:r.title,date:r.event_date,time:r.event_time||'09:00',repeat:r.repeat_days||[]}));
+      if(events && events.data) patch.events=events.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,title:r.title,date:r.event_date,time:r.event_time||'09:00',repeat:r.repeat_days||[],kind:r.kind||'general',endTime:r.end_time||null,attendees:r.attendees||null,estMins:r.est_minutes||null}));
       if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(expenses && expenses.data) patch.expenses=expenses.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(savings && savings.data) patch.savings=savings.data.map(r=>({id:r.id,label:r.label,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
@@ -15414,6 +15444,25 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({ logAllSaved:n });
     if(n) this.showToast('fitness', n===1?'1 log saved':n+' logs saved', 'Logged for today');
     setTimeout(()=>this.setState({logAllOpen:false}), n?700:0); }
+  /* Saving an event, from the button and from the Enter key alike.
+     kind decides which extra fields mean anything: a work event has an end time and who is
+     there, a general task has a rough duration. The other set is not merely hidden, it is
+     not written — a stale end time left over from switching type would otherwise reach the
+     reminder email and be read out. */
+  _addEventFromForm(){ const S=this.state; const t=(S.evTitle||'').trim(); if(!t) return;
+    const id=this._uuid();
+    const time=(S.evTime||'').trim()||'09:00';
+    const repeat=[...(S.evRepeatDays||[])];
+    const kind=(S.evKind==='work')?'work':'general';
+    const endTime  = kind==='work' ? ((S.evEndTime||'').trim()||null) : null;
+    const attendees= kind==='work' ? ((S.evAttendees||'').trim()||null) : null;
+    const estMins  = kind==='general' ? (parseInt(S.evEstMins,10)>0?parseInt(S.evEstMins,10):null) : null;
+    const ev={id,title:t,date:S.calSel,time,repeat,kind,endTime,attendees,estMins};
+    this.mut(s=>({events:[...s.events,ev], evTitle:'', evTime:'', evRepeatDays:[],
+      evEndTime:'', evAttendees:'', evEstMins:''}));
+    if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title:t,
+      event_date:S.calSel,event_time:time,repeat_days:repeat,
+      kind,end_time:endTime,attendees,est_minutes:estMins}); }
   addMeal(opts){ const o=opts||{}, S=this.state;
     const n=(o.name!=null?o.name:S.mealName||'').trim();
     const k=o.kcal!=null?(+o.kcal||0):(+S.mealKcal||0);
@@ -17227,7 +17276,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const calCells=[]; for(let i=0;i<startDow;i++) calCells.push({d:'',dots:[],bg:'transparent',border:'transparent',numColor:'transparent',cursor:'default',select:()=>{}});
     for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const isNoir=isU && S.prefs.ultraStyle==='Noir'; const bg=today?(isNoir?'rgba(196,189,176,0.18)':isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.16):(isNoir?'rgba(150,143,130,0.05)':isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isNoir?'#C4BDB0':isU?'#5B1A1A':'#FFFFFF'):(hl?this.hexA(hl,0.55):(isNoir?'rgba(150,143,130,0.18)':isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?(isNoir?'#C4BDB0':'#ff5563'):(hl?hl:(isNoir?'#968F82':isU?'#52525b':'#b8b8c0')); const ring=sel?(isNoir?'0 0 0 3px #FFFFFF inset':(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset')):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(()=>1), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
     const _hlDefs=[['Amber','#ffb020'],['Green','#2fce86'],['Cyan','#38bdf8'],['Blue','#4f7bff'],['Purple','#a855f7'],['Pink','#ff5fa2']]; const _curHl=(S.dayColors||{})[S.calSel]; const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], ring:_curHl===c[1]?'#ffffff':'rgba(255,255,255,0.15)', glow:_curHl===c[1]?'0 0 10px '+this.hexA(c[1],0.7):'none', pick:()=>{ const day=S.calSel, color=c[1]; this.mut(st=>{ const dc={...(st.dayColors||{})}; dc[day]=color; return {dayColors:dc}; }); if(this._sbOn()) window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } })); const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
-    const dayEvents=S.events.filter(e=>this._eventOccursOn(e,S.calSel)).sort((a,b)=>a.time.localeCompare(b.time)).map(e=>{ const idx=S.events.indexOf(e); const rl=this._repeatLabel(e.repeat); return {title:e.title,time:e.time,repeatLabel:rl,removeTitle:rl?'Remove this repeating series':'Remove event',remove:()=>{ this.mut(s=>({events:s.events.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('events',e.id); }}; });
+    const dayEvents=S.events.filter(e=>this._eventOccursOn(e,S.calSel)).sort((a,b)=>a.time.localeCompare(b.time)).map(e=>{ const idx=S.events.indexOf(e); const rl=this._repeatLabel(e.repeat); /* The detail line: a work event reads "09:00-17:00 with Dan", a general task
+         "09:00 - about 45 min". Empty when neither was filled in, so an event created
+         before these fields existed simply shows its time as it always did. */
+      const _isWork=(e.kind||'general')==='work';
+      const _det=_isWork
+        ? [(e.endTime?e.time+'\u2013'+e.endTime:e.time), e.attendees?('with '+e.attendees):''].filter(Boolean).join(' ')
+        : [e.time, e.estMins?('about '+e.estMins+' min'):''].filter(Boolean).join(' \u00b7 ');
+      return {title:e.title,time:e.time,kindLabel:_isWork?'WORK':'',detail:_det,isWork:_isWork,repeatLabel:rl,removeTitle:rl?'Remove this repeating series':'Remove event',remove:()=>{ this.mut(s=>({events:s.events.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('events',e.id); }}; });
     const evRepeatDays=S.evRepeatDays||[]; const _dowAll=['MON','TUE','WED','THU','FRI','SAT','SUN']; const evDowChips=_dowAll.map(code=>{ const on=evRepeatDays.indexOf(code)!==-1; return { l:code[0], c:on?'#0a0a0b':'#9a9aa2', bg:on?'#FFFFFF':'rgba(255,255,255,0.05)', bd:on?'#FFFFFF':'rgba(255,255,255,0.14)', toggle:()=>this.setState({evRepeatDays:on?evRepeatDays.filter(c=>c!==code):[...evRepeatDays,code]}) }; });
     const evRepeatSummary=evRepeatDays.length?this._repeatLabel(evRepeatDays):'Doesn\u2019t repeat';
     const selD=new Date(S.calSel+'T00:00:00'); const selDayLabel=selD.toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric'}); const selShort=selD.toLocaleString('en-US',{month:'short',day:'numeric'});
@@ -19486,8 +19542,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       calImportLabel:S.calImportLoading?'Reading screenshot…':'Upload calendar screenshot',
       calImportErr:S.calImportErr||'',
       evDowChips, evRepeatSummary,
-      addEvent:()=>{ const t=S.evTitle.trim(); if(t){ const id=this._uuid(); const time=(S.evTime.trim()||'09:00'), repeat=[...(S.evRepeatDays||[])]; this.mut(s=>({events:[...s.events,{id,title:t,date:s.calSel,time,repeat}],evTitle:'',evTime:'',evRepeatDays:[]})); if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title:t,event_date:S.calSel,event_time:time,repeat_days:repeat}); } },
-      addEventKey:enterKey(()=>{ const t=S.evTitle.trim(); if(t){ const id=this._uuid(); const time=(S.evTime.trim()||'09:00'), repeat=[...(S.evRepeatDays||[])]; this.mut(s=>({events:[...s.events,{id,title:t,date:s.calSel,time,repeat}],evTitle:'',evTime:'',evRepeatDays:[]})); if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title:t,event_date:S.calSel,event_time:time,repeat_days:repeat}); } }),
+      /* One save path shared by the button and the Enter key. They used to be two identical
+         copies of the same body, which is how the new fields would have ended up saved by
+         one and dropped by the other. */
+      addEvent:()=>this._addEventFromForm(),
+      addEventKey:enterKey(()=>this._addEventFromForm()),
+      evKind:S.evKind||'general',
+      evIsWork:(S.evKind||'general')==='work', evIsGeneral:(S.evKind||'general')!=='work',
+      setEvKindWork:()=>this.setState({evKind:'work'}), setEvKindGeneral:()=>this.setState({evKind:'general'}),
+      evKindWorkC:(S.evKind==='work')?'#0a0a0b':'#9a9aa2', evKindWorkBg:(S.evKind==='work')?'#FFFFFF':'rgba(255,255,255,0.05)', evKindWorkBd:(S.evKind==='work')?'#FFFFFF':'rgba(255,255,255,0.14)',
+      evKindGenC:(S.evKind!=='work')?'#0a0a0b':'#9a9aa2', evKindGenBg:(S.evKind!=='work')?'#FFFFFF':'rgba(255,255,255,0.05)', evKindGenBd:(S.evKind!=='work')?'#FFFFFF':'rgba(255,255,255,0.14)',
+      evEndTime:S.evEndTime||'', setEvEndTime:(e)=>this.setState({evEndTime:e.target.value}),
+      evAttendees:S.evAttendees||'', setEvAttendees:(e)=>this.setState({evAttendees:e.target.value}),
+      evEstMins:S.evEstMins||'', setEvEstMins:(e)=>this.setState({evEstMins:e.target.value}),
 
       // voice
       voiceTitle:S.listening?'Listening…':'Tap to speak',

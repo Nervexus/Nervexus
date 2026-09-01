@@ -253,6 +253,14 @@ function eventOccursOn(e: { event_date: string; repeat_days?: string[] | null },
 // own dedupe key — the owner asked for email specifically to always go out a day ahead,
 // not for push to move too.
 const EMAIL_LEAD_MIN = 1440;
+/* "45" reads badly out loud and "90 minutes" reads worse than "an hour and a half". */
+function humanMins(m: number) {
+  if (m < 60) return m + ' minutes';
+  const h = Math.floor(m / 60), r = m % 60;
+  const hs = h === 1 ? 'an hour' : h + ' hours';
+  return r ? hs + ' and ' + r + ' minutes' : hs;
+}
+
 async function sweepCalendarEvents(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   const canPush = prefs.reminderPushEnabled !== false;
   const canEmail = prefs.reminderEmailEnabled && prefs.reminderEmailAddr;
@@ -261,18 +269,24 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
 
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
+  const tomorrowStr = addDaysToDateStr(todayStr, 1);
   // Every non-deleted event is fetched, not just ones dated today — a recurring event's
   // own event_date can be any date in the past, so it has to be checked against today's
   // weekday via repeat_days rather than matched by date directly.
   const { data: events } = await admin
-    .from('events').select('id,title,event_date,event_time,repeat_days')
+    .from('events').select('id,title,event_date,event_time,repeat_days,kind,end_time,attendees,est_minutes')
     .eq('user_id', userId).is('deleted_at', null);
   if (!events || !events.length) return { sent: 0 };
 
   let sent = 0;
   for (const e of events) {
     if (!e.event_date || !e.event_time) continue;
-    if (!eventOccursOn(e, todayStr)) continue;
+    /* Push is about today's occurrence; the email is a heads-up about TOMORROW's. They are
+       different days, so both are worked out and the event is skipped only if neither
+       applies. */
+    const occursToday = eventOccursOn(e, todayStr);
+    const occursTomorrow = eventOccursOn(e, tomorrowStr);
+    if (!occursToday && !occursTomorrow) continue;
 
     const dt = new Date(todayStr + 'T' + e.event_time + ':00');
     const mins = (dt.getTime() - now.getTime()) / 60000;
@@ -280,7 +294,7 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
     // tick lands inside it without needing extra state on `events` itself.
     const inWindow = (lead: number) => mins <= lead && mins > lead - 16;
 
-    if (canPush && inWindow(leadMin)) {
+    if (canPush && occursToday && inWindow(leadMin)) {
       // Keyed to TODAY's occurrence, not the event's original event_date — a recurring
       // event used to dedupe against its first-ever firing forever and never fire again.
       const dedupeKey = 'calendar:' + e.id + ':' + todayStr;
@@ -297,21 +311,32 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
       }
     }
 
-    if (canEmail && inWindow(EMAIL_LEAD_MIN)) {
-      /* The owner's copy has three shapes here — work events ("from {time} till {time}
-         with {persons}"), general tasks, and a combined one. Only the general shape can be
-         filled in today: an `events` row is title, date, time and repeat_days, with no end
-         time, no attendees and nothing marking it work or personal. Writing the work copy
-         now would print "from 15:00 till undefined with undefined".
+    /* This used to be inWindow(1440) against today's occurrence — and `mins` is measured
+       to a time earlier the SAME day, so it can never exceed about 1439. The window
+       (1424, 1440] was therefore reachable only in a fifteen-minute sliver just after
+       midnight, for an event at 23:59. In practice the "24 hours ahead" email never fired
+       at all, which is its own answer to why calendar reminders were never received.
 
-         supabase/migrations/20260901_event_details.sql adds end_time, attendees and kind;
-         once that is applied and the calendar form collects them, the other two shapes
-         switch on here. Until then this says only what is actually known. */
+       It is now what it always claimed to be: a heads-up about tomorrow, sent in the same
+       21:00 slot as the performance and logs reminders, so the evening produces one email
+       rather than three. The dedupe key is per event per day, so it goes once. */
+    if (canEmail && occursTomorrow && localMinuteOfDay(now, prefs.timezone || UK_TZ) >= 21 * 60) {
+      /* Three shapes, as asked for. Which one is used depends on what the event actually
+         carries, never on a guess: a work event needs an end time or attendees to say
+         anything more than a general one, and if a work event has neither it reads exactly
+         like a general task, because that is all that is known about it. */
+      const isWork = (e.kind || 'general') === 'work';
+      const when = e.end_time ? `from ${e.event_time} till ${e.end_time}` : `at ${e.event_time}`;
+      const withWho = e.attendees ? ` with ${e.attendees}` : '';
+      const takes = e.est_minutes ? ` This should take about ${humanMins(e.est_minutes)}.` : '';
+      const line = isWork
+        ? `For tomorrow you have ${e.title} ${when}${withWho}.`
+        : `For tomorrow you have ${e.title} at ${e.event_time}, which you have set for yourself to do.${takes}`;
       sent += await collect(admin, bundle, {
         section: 'calendar',
-        line: `For tomorrow you have ${e.title} at ${e.event_time}, which you have set for yourself to do.`,
-        subject: 'Tomorrow: ' + e.title,
-        meta: e.event_time + ' tomorrow',
+        line,
+        subject: (name ? 'Hey ' + name + ' — ' : '') + 'tomorrow: ' + e.title,
+        meta: (e.end_time ? e.event_time + '\u2013' + e.end_time : e.event_time) + ' tomorrow',
         priority: 'normal',
         category: 'calendar', sourceType: 'event',
         dedupeKey: 'calendar-email:' + e.id + ':' + todayStr,
@@ -330,7 +355,7 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
    So it is no longer remembered. The live site already publishes its own version in
    NOTIF_BUILD_VERSION; the function reads it and falls back to the constant only if the
    fetch fails. Cached per invocation, so a sweep over every user costs one request. */
-const LATEST_VERSION_FALLBACK = 'v11.228';
+const LATEST_VERSION_FALLBACK = 'v11.229';
 const APP_URL = 'https://nervexus.vercel.app';
 let _versionCache: string | null = null;
 async function latestVersion(): Promise<string> {
