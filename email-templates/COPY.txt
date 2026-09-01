@@ -1,119 +1,84 @@
-NERVEXUS — EMAIL COPY
-=====================
-Every line of text the system can send. Edit the wording, keep the {placeholders},
-send it back. Anything in {braces} is filled in at send time.
+NERVEXUS — EMAIL COPY  (as of v11.228)
+======================================
+Every line of text the system can send. {placeholders} are filled in at send time.
 
-Words like mission/missions, item/items, day/days pluralise automatically — write
-them singular and the code handles the "s".
+THE WRAPPER — on every email
+  GREETING     Good morning / Good afternoon / Good evening {name},
+               (from the hour in YOUR timezone, not the server's)
+  SIGN-OFF     Thank you,
+               Ultra X Management team
+  BUTTON       OPEN NERVEXUS
+  FOOTER       Turn these off in Settings → Notifications.
+  SUBJECT      {the most urgent item's subject} (+{count} more)
+               The name is added only if that subject does not already contain it.
 
+SECTION HEADINGS
+  Performance Terminal
+  Daily Tasks          (was two sections: Daily Checklists + Tasks & Missions)
+  Calendar
+  Logs
+  App Update
 
------------------------------------------------------------------------------
-1. THE WRAPPER  — appears on every email, around whatever sections are included
------------------------------------------------------------------------------
-GREETING              Morning {name},
-GREETING (no name)    Hello,
-STRAPLINE             Here is everything outstanding, in one place.
-BUTTON                OPEN NERVEXUS
-SIGN-OFF              Best,
-                      Ultra X management team
-FOOTER                Turn these off in Settings → Notifications.
+DAILY TASKS
+  SUBJECT  Hey {name}, you have {count} tasks pending completion
+  BODY     You have {count} tasks pending, awaiting completion. You have {hours}
+           hours left until the day ends. Please log in as soon as possible.
 
-SUBJECT (one thing)   {name} — {the lead item's subject, from below}
-SUBJECT (several)     {name} — {the lead item's subject} (+{count} more)
-SUBJECT (nothing)     {name} — Nothing outstanding
+PERFORMANCE TERMINAL — 21:00 UK, one hour before the deadline
+  SUBJECT  Good evening {name} — your Daily Performance log is due
+  BODY     It's 9pm UK time — in one hour you will need to fill out a mandatory
+           Daily Performance log. This ensures that you are keeping yourself to a
+           high standard. Failing this will lead to a strike on your account.
 
+PERFORMANCE TERMINAL — a strike
+  SUBJECT  Performance Terminal — strike {n} of 7
+  BODY     Yesterday's mandatory Daily Performance log wasn't filled out, so a
+           strike has been added to your account. This is strike {n} of 7 — the
+           account locks at 7, pending appeal. Log today's to clear the strikes.
 
------------------------------------------------------------------------------
-2. SECTION HEADINGS  — the five groups items are sorted into
------------------------------------------------------------------------------
-Performance Terminal
-Tasks & Missions
-Calendar
-Logs
-App Update
-Other                 (only appears if something is mis-filed — a bug, not a feature)
+PERFORMANCE TERMINAL — locked
+  SUBJECT  Performance Terminal — account locked
+  BODY     Your account has been locked after 7 strikes. Log in to submit an
+           appeal for the owner to review.
 
+CALENDAR — 24 hours ahead
+  SUBJECT  Tomorrow: {title}
+  BODY     For tomorrow you have {title} at {time}, which you have set for
+           yourself to do.
+  SMALL    {time} tomorrow
 
------------------------------------------------------------------------------
-3. TASKS & MISSIONS
------------------------------------------------------------------------------
-SUBJECT (missions)    {name}, you have {count} mission pending.
-SUBJECT (checklists)  {name}, you have {count} checklist item pending.
-LINE (missions)       {names} — you have {count} mission pending completion.
-LINE (one checklist)  {count} checklist item open on {title} ({open}).
-LINE (several)        {count} checklist items open across {n} checklists: {title} ({open}), {title} ({open}).
+  NOT YET POSSIBLE — the work-event and combined wordings need end_time,
+  attendees and a work/general flag on the events table. The migration is
+  written (supabase/migrations/20260901_event_details.sql); the calendar form
+  still needs the fields before the other two sentences can be used.
 
+LOGS — same 21:00 trigger as the performance log
+  SUBJECT  Good evening {name} — your logs are pending
+  BODY     Your logs are pending. You have {list} still to fill in. You can do
+           all of them in one place — open the app and tap "Log everything".
+  SMALL    {n} of 5 outstanding
 
------------------------------------------------------------------------------
-4. CALENDAR  — sent 24 hours ahead
------------------------------------------------------------------------------
-SUBJECT               Event tomorrow: {title}
-LINE                  {name}, you have {title} at {time} tomorrow.
-SMALL LINE UNDER IT   {time} tomorrow
+  Only the MISSING logs are named. The five checked: Training, Finance,
+  Sleep & energy, Hydration, Body metrics.
+  Energy is a field on the sleep row, not a separate log, so it is counted once.
+  Nutrition is not checked: the `meals` table has no date column, so there is no
+  way to ask whether one was logged today.
 
+APP UPDATE
+  SUBJECT  Hey {name} — Nervexus {version} is out
+  BODY     A new version is live. Open the app and check What's New in Settings
+           for details.
+  SMALL    {version}
 
------------------------------------------------------------------------------
-5. PERFORMANCE TERMINAL — same-day nudge, sent 21:30 UK for the 22:00 deadline
------------------------------------------------------------------------------
-SUBJECT               {name}, today's performance check-in is pending
-LINE                  It's 9:30pm UK and today's mandatory Performance Terminal
-                      check-in still hasn't been done. You have until 10pm to log
-                      it and keep your streak clean.
+LOGS — been away a while
+  SUBJECT  Haven't seen you in a few days
+  BODY     It's been {days} days since you last opened Nervexus. Nothing has been
+           logged in that time.
 
+TEST EMAIL — the "Send test email" button
+  SUBJECT  Test reminder from Nervexus
+  BODY     This is a test email — your reminder emails are working.
 
------------------------------------------------------------------------------
-6. PERFORMANCE TERMINAL — missed a day
------------------------------------------------------------------------------
-SUBJECT               Performance Terminal — missed check-in ({streak}/7)
-LINE                  Yesterday's mandatory check-in wasn't logged. This is
-                      {streak} of 7 consecutive misses — the account locks at 7,
-                      pending appeal. Log today's to reset the streak.
-
-
------------------------------------------------------------------------------
-7. PERFORMANCE TERMINAL — account locked (the most severe email sent)
------------------------------------------------------------------------------
-SUBJECT               Performance Terminal — account locked
-LINE                  Your account has been locked after 7 consecutive missed
-                      daily check-ins. Log in to submit an appeal for the owner
-                      to review.
-
-
------------------------------------------------------------------------------
-8. APP UPDATE
------------------------------------------------------------------------------
-SUBJECT               Nervexus {version} is out
-LINE                  A new version is live. Open the app and check What's New in
-                      Settings for details.
-SMALL LINE UNDER IT   {version}
-
-
------------------------------------------------------------------------------
-9. LOGS — nobody has opened the app in a while
------------------------------------------------------------------------------
-SUBJECT               Haven't seen you in a few days
-LINE                  It's been {days} days since you last opened Nervexus.
-                      Nothing has been logged in that time.
-
-
------------------------------------------------------------------------------
-10. TEST EMAIL — the "Send test email" button in Settings
------------------------------------------------------------------------------
-SUBJECT               Test reminder from Nervexus
-LINE                  This is a test email — your reminder emails are working.
-
-
------------------------------------------------------------------------------
-11. YOUR OWN OVERRIDE — Settings → Notifications → Email template
------------------------------------------------------------------------------
-Two fields in the app that override the subject and body of every email.
-Empty means "use the wording above". They accept:
-
-  {{title}}     the subject that would have been used
-  {{message}}   the whole body
-
-DEFAULT SUBJECT       {{title}}
-DEFAULT BODY          {{message}}
-
-Note: filling these in switches the email to plain text — your wording is the
-point, so the designed HTML version steps aside rather than ignoring you.
+YOUR OWN OVERRIDE — Settings → Notifications → Email template
+  Accepts {{title}} and {{message}}. Empty means "use the copy above".
+  Filling it in switches the email to plain text.

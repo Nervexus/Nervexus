@@ -37,7 +37,9 @@ t('four outstanding concerns produce exactly one email', async()=>{
   if(email.sends.length!==1) throw new Error('expected 1 email, got '+email.sends.length+': '+email.sends.map(s=>s.subject).join(' | '));
   if(r.collected<2) throw new Error('expected several items collected, got '+r.collected);
   const body=email.sends[0].text;
-  for(const need of ['Cold shower','new version is live','last opened Nervexus'])
+  // The tasks line is a count now, not a list of names — the owner's copy asks for
+  // "you have {n} tasks pending", so the mission names are deliberately gone.
+  for(const need of ['tasks pending','new version is live','last opened Nervexus'])
     if(!body.includes(need)) throw new Error('digest missing '+JSON.stringify(need)+'\n'+body);
 });
 
@@ -94,7 +96,7 @@ t('a high-priority item forces the digest out immediately', async()=>{
   }));
   await sweepUser(admin2,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
   if(email.sends.length!==1) throw new Error('a high-priority warning was batched past its deadline');
-  if(!/missed check-in/i.test(email.sends[0].subject)) throw new Error('subject did not lead with the urgent item: '+email.sends[0].subject);
+  if(!/strike/i.test(email.sends[0].subject)) throw new Error('subject did not lead with the urgent item: '+email.sends[0].subject);
 });
 
 /* Email off must mean email off, without disabling push. */
@@ -129,6 +131,87 @@ t('nothing outstanding sends nothing', async()=>{
   const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
   if(email.sends.length!==0) throw new Error('sent an empty digest');
   if(r.collected!==0) throw new Error('collected '+r.collected);
+});
+
+/* ---- the rewritten copy -------------------------------------------------------------
+   Checks the wording actually reaches the email, and that the numbers inside it are the
+   right numbers — a template with the wrong count in it is worse than no template. */
+t('the tasks line counts missions and checklist items as one total', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({
+    user_checklists:[{id:'c1',user_id:UID,title:'Weekly reset',completed_at:null}],
+    checklist_items:[{id:'i1',checklist_id:'c1',done:false},{id:'i2',checklist_id:'c1',done:false}],
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+  }));
+  await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+  const body=email.sends[0].text;
+  // 2 missions + 2 checklist items = 4, in one sentence, not two sections.
+  if(!/You have 4 tasks pending, awaiting completion/.test(body))
+    throw new Error('tasks copy or count wrong:\n'+body);
+  if(!/hours? left until the day ends/.test(body)) throw new Error('missing the hours-left line');
+  if(/checklist item/i.test(body)) throw new Error('checklists are still a separate line');
+});
+
+t('the greeting follows the time of day, not the server clock', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+  }));
+  await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+  const first=email.sends[0].text.split('\n')[0];
+  if(!/^Good (morning|afternoon|evening) Sam,$/.test(first))
+    throw new Error('greeting is not time-aware: '+JSON.stringify(first));
+});
+
+t('every email closes the same way', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+  }));
+  await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+  if(!/Ultra X [Mm]anagement team\s*$/.test(email.sends[0].text.trimEnd()))
+    throw new Error('sign-off missing or not last');
+});
+
+/* The Logs sweep names only what is genuinely missing. Listing a log you already filled in
+   is how a reminder email teaches you to ignore it. */
+t('the logs line names only the logs actually missing', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({
+    missions:[],
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+    sleep_logs:[{id:'s1',user_id:UID,log_date:today}],
+    hydration_logs:[{id:'h1',user_id:UID,log_date:today}],
+  }));
+  const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+  const ukMin=(()=>{ const f=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
+    const [h,m]=f.split(':').map(Number); return h*60+m; })();
+  if(ukMin < 21*60){ if(r.logs!==0) throw new Error('logs fired before 21:00 UK'); return; }
+  const body=email.sends[0].text;
+  if(/Sleep & energy/.test(body)) throw new Error('named a log that was already filled in');
+  if(/Hydration/.test(body)) throw new Error('named a log that was already filled in');
+  if(!/Training/.test(body)) throw new Error('did not name Training, which is missing');
+  if(!/Body metrics/.test(body)) throw new Error('did not name Body metrics, which is missing');
+});
+
+/* The bug this replaced: 'log_date' was assumed on every table, but workouts and expenses
+   are stamped with an occurred_at timestamp. A workout logged today has to count. */
+t('a workout logged today counts, despite being a timestamp not a date', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({
+    missions:[],
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+    workouts:[{id:'w1',user_id:UID,occurred_at:today+'T18:30:00.000Z'}],
+  }));
+  const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+  if(r.logs===0) return; // before 21:00 UK, nothing to assert
+  if(/Training/.test(email.sends[0].text))
+    throw new Error('a workout logged today was still reported as missing');
 });
 
 let pass=0, fail=0;

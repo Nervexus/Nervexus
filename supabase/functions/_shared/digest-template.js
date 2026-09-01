@@ -17,7 +17,9 @@
    say comes first because it is the only category with a deadline attached to it. */
 var SECTIONS = [
   { key: 'performance', label: 'Performance Terminal' },
-  { key: 'tasks',       label: 'Tasks & Missions' },
+  /* Daily Checklists and Tasks & Missions were two sections saying the same thing, and the
+     owner said so outright. One section, one line, one count. */
+  { key: 'tasks',       label: 'Daily Tasks' },
   { key: 'calendar',    label: 'Calendar' },
   { key: 'logs',        label: 'Logs' },
   { key: 'update',      label: 'App Update' },
@@ -35,14 +37,16 @@ function esc(s) {
    urgent thing outright and then counts the rest, rather than saying "you have 5 updates"
    and making them open it to find out whether any of them mattered. */
 function buildSubject(name, items) {
-  var who = name ? name + ' — ' : '';
-  if (!items.length) return who + 'Nothing outstanding';
+  if (!items.length) return name ? name + ' — Nothing outstanding' : 'Nothing outstanding';
   var sorted = items.slice().sort(function (a, b) { return (RANK[a.priority] || 2) - (RANK[b.priority] || 2); });
   var lead = sorted[0];
   var rest = items.length - 1;
   var head = lead.subject || lead.line;
-  if (!rest) return who + head;
-  return who + head + ' (+' + rest + ' more)';
+  /* The section subjects address the reader by name themselves now ("Good evening Sam —
+     your logs are pending"), so prefixing the name again produced "Sam — Good evening Sam
+     — ...". The name is added only when the lead subject does not already carry it. */
+  if (name && head.indexOf(name) === -1) head = name + ' — ' + head;
+  return rest ? head + ' (+' + rest + ' more)' : head;
 }
 
 function groupBySection(items) {
@@ -61,9 +65,20 @@ function groupBySection(items) {
   return out;
 }
 
-function buildText(name, groups, signoff) {
+/* "Good Morning or evening this part must be dynamic" — so it is, from the hour the email
+   is actually sent in the reader's own timezone, not the server's. The caller passes the
+   local hour because only it knows the timezone. */
+function greetingFor(name, hour) {
+  var part = hour == null ? 'Hello'
+    : hour < 12 ? 'Good morning'
+    : hour < 18 ? 'Good afternoon'
+    : 'Good evening';
+  return name ? part + ' ' + name + ',' : part + ',';
+}
+
+function buildText(name, groups, signoff, hour) {
   var lines = [];
-  lines.push(name ? 'Morning ' + name + ',' : 'Hello,');
+  lines.push(greetingFor(name, hour));
   lines.push('');
   groups.forEach(function (g) {
     lines.push(g.label.toUpperCase());
@@ -150,15 +165,14 @@ function buildHtml(name, groups, opts) {
 +       '<div style="font:400 12px/1 ' + th.label + '; letter-spacing:.1em; color:' + muted + '; padding-top:7px;">' + esc(o.dateLabel || '') + '</div>'
 +     '</td></tr>'
 +     '<tr><td style="padding:22px 30px 0 30px;">'
-+       '<div style="font:400 17px/1.5 ' + th.body + '; color:' + ink + ';">' + esc(name ? 'Morning ' + name + ',' : 'Hello,') + '</div>'
-+       '<div style="font:400 14px/1.6 ' + th.body + '; color:' + muted + '; padding-top:6px;">Here is everything outstanding, in one place.</div>'
++       '<div style="font:400 17px/1.5 ' + th.body + '; color:' + ink + ';">' + esc(greetingFor(name, o.localHour)) + '</div>'
 +     '</td></tr>'
 +     '<tr><td style="padding:0 30px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">' + rows + '</table></td></tr>'
 +     '<tr><td style="padding:26px 30px 30px 30px;">'
 +       '<a href="' + esc(appUrl) + '" style="display:inline-block; font:600 13px/1 ' + th.label + '; letter-spacing:.06em; color:' + th.btnInk + '; background:' + th.btnBg + '; border-radius:' + th.radius + '; padding:13px 22px; text-decoration:none;">OPEN NERVEXUS</a>'
 +     '</td></tr>'
 +     '<tr><td style="padding:0 30px 26px 30px; border-top:1px solid ' + line + ';">'
-+       '<div style="font:400 12px/1.6 ' + th.body + '; color:' + muted + '; padding-top:16px;">' + esc(o.signoffLine || 'Best, Ultra X management team') + '</div>'
++       '<div style="font:400 12px/1.6 ' + th.body + '; color:' + muted + '; padding-top:16px;">' + esc(o.signoffLine || 'Thank you, Ultra X Management team') + '</div>'
 +       '<div style="font:400 11px/1.6 ' + th.label + '; color:' + muted + '; padding-top:8px;">Turn these off in Settings &rarr; Notifications.</div>'
 +     '</td></tr>'
 +   '</table>'
@@ -173,9 +187,9 @@ function buildDigest(input) {
   return {
     count: items.length,
     subject: buildSubject(o.name, items),
-    text: buildText(o.name, groups, o.signoff),
+    text: buildText(o.name, groups, o.signoff, o.localHour),
     html: buildHtml(o.name, groups, o),
   };
 }
 
-export { buildDigest, buildSubject, groupBySection, SECTIONS, THEMES };
+export { buildDigest, buildSubject, groupBySection, greetingFor, SECTIONS, THEMES };

@@ -747,6 +747,70 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     </div>
   </sc-if>
 
+  <!-- Log everything — the one place the evening reminder points at, instead of naming
+       five pending logs and leaving you to find five different screens. -->
+  <sc-if value="{{ logAllOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLogAll }}" style="position:fixed; inset:0; z-index:998; background:rgba(0,0,0,0.62); display:flex; align-items:center; justify-content:center; padding:18px;">
+      <div onClick="{{ stopLogAllClick }}" class="cc-glowcard" style="width:100%; max-width:560px; max-height:88vh; overflow-y:auto; padding:22px 22px 20px; box-sizing:border-box;">
+
+        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:4px;">
+          <div style="font-size:17px; color:#eef0f2; letter-spacing:0.2px;">Log everything</div>
+          <span onClick="{{ closeLogAll }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99; cursor:pointer;">CLOSE</span>
+        </div>
+        <div style="font-size:12px; color:#8f8f99; margin-bottom:14px;">{{ logAllSummary }}</div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;">
+          <sc-for value="{{ logKinds }}">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; padding:5px 9px; border-radius:7px; border:1px solid {{ item.edge }}; color:{{ item.ink }};">{{ item.chip }}</span>
+          </sc-for>
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">TRAINING</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px;">
+          <input value="{{ laWoEx }}" onInput="{{ setLaWoEx }}" placeholder="Exercise" style="flex:1 1 150px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laWoMin }}" onInput="{{ setLaWoMin }}" placeholder="Min" style="width:62px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laWoWeight }}" onInput="{{ setLaWoWeight }}" placeholder="kg" style="width:62px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laWoSets }}" onInput="{{ setLaWoSets }}" placeholder="Sets" style="width:62px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laWoReps }}" onInput="{{ setLaWoReps }}" placeholder="Reps" style="width:62px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">FINANCE</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px;">
+          <select value="{{ laFinKind }}" onChange="{{ setLaFinKind }}" style="width:120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+          <input value="{{ laFinLabel }}" onInput="{{ setLaFinLabel }}" placeholder="What for" style="flex:1 1 150px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laFinAmt }}" onInput="{{ setLaFinAmt }}" placeholder="Amount" style="width:88px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">SLEEP &amp; ENERGY</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px;">
+          <input value="{{ laSlpH }}" onInput="{{ setLaSlpH }}" placeholder="Hours" style="width:76px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laSlpM }}" onInput="{{ setLaSlpM }}" placeholder="Mins" style="width:76px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laSlpEnergy }}" onInput="{{ setLaSlpEnergy }}" placeholder="Energy 1-10" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">HYDRATION</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px;">
+          <input value="{{ laHydMl }}" onInput="{{ setLaHydMl }}" placeholder="ml today" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.4px; color:#8f8f99; margin-bottom:6px;">BODY METRICS</div>
+        <div style="display:flex; gap:7px; flex-wrap:wrap; margin-bottom:20px;">
+          <input value="{{ laBodyWeight }}" onInput="{{ setLaBodyWeight }}" placeholder="Weight kg" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+          <input value="{{ laBodyFat }}" onInput="{{ setLaBodyFat }}" placeholder="Body fat %" style="flex:1 1 120px; font-size:13px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; outline:none; box-sizing:border-box;">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span onClick="{{ saveLogAll }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:#0d0d10; background:#eef0f2; border-radius:10px; padding:11px 20px; cursor:pointer; white-space:nowrap;">SAVE LOGS</span>
+          <span style="font-size:11.5px; color:#8f8f99; flex:1 1 180px;">Leave anything blank and it is simply not logged.</span>
+        </div>
+
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeSearch }}" style="position:absolute; inset:0; z-index:998; background:rgba(0,0,0,0.6); display:flex; align-items:flex-start; justify-content:center; padding:90px 24px;">
       <div onClick="{{ stopSearchClick }}" class="cc-glowcard" style="width:100%; max-width:560px; max-height:70vh; overflow-y:auto; border-radius:20px; background:#101012; padding:20px; box-shadow:0 30px 70px rgba(0,0,0,0.55);">
@@ -1349,6 +1413,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
               <div style="display:flex; align-items:baseline; gap:9px;">
                 <span style="font-size:13px; font-weight:600;">Daily Missions</span>
+                <!-- The evening reminder email tells you to tap this, so it has to exist
+                     somewhere you will already be looking. -->
+                <span onClick="{{ openLogAll }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.6px; color:{{ logAllChipInk }}; border:1px solid {{ logAllChipEdge }}; border-radius:7px; padding:4px 8px; cursor:pointer;">{{ logAllChip }}</span>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ missDoneToday }} / {{ missTotalToday }}</span>
               </div>
               <div style="display:flex; gap:6px;">
@@ -9134,7 +9201,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.08.31-227 · v11.227 conversation-fixes';
+const NOTIF_BUILD_VERSION = '2026.09.01-228 · v11.228 log-everything';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15307,6 +15374,46 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     else if(field==='bodyFatPct'){ if(!(v>2&&v<70)) return; dispVal=K.round(v,1); }
     else return;
     this.setState(s=>({bodyDraft:{...s.bodyDraft,[field]:dispVal},bodyEditDate:null}),()=>this.saveBody()); }
+  /* ---- Log everything ---------------------------------------------------------------
+     The evening reminder used to name five pending logs and then leave you to find five
+     different screens to fill them in on. This is the one place it points at.
+
+     It writes through the SAME methods the individual screens use — addWorkout, addExpense,
+     saveSleep, addHydMl, addBodyMetric — rather than talking to Supabase itself. A second
+     write path would be a second thing to keep in step, and it is exactly how the fields
+     here would quietly drift out of line with the real forms. */
+  _logKinds(){ const K=window.HealthKit, H=this.state.health||{}, today=K?K.today():'';
+    const bl=(H.bodyLog||[]), snap=bl.length?bl[bl.length-1]:{};
+    const sameDay=(ts)=>{ try{ return new Date(ts).toLocaleDateString('en-CA')===today; }catch(e){ return false; } };
+    return [
+      { key:'training',  label:'Training',       done:(this.state.workouts||[]).some(w=>sameDay(w.ts)) },
+      { key:'finance',   label:'Finance',        done:[...(this.state.income||[]),...(this.state.expenses||[])].some(e=>sameDay(e.ts)) },
+      { key:'sleep',     label:'Sleep & energy', done:(H.sleepLog||[]).some(x=>x.date===today) },
+      { key:'hydration', label:'Hydration',      done:(H.hydrationLog||[]).some(x=>x.date===today) },
+      { key:'body',      label:'Body metrics',   done:(bl||[]).some(x=>x.date===today) },
+    ]; }
+  openLogAll(){ this.setState({ logAllOpen:true, logAllSaved:0, logAll:{ woEx:'', woMin:'', woWeight:'', woSets:'', woReps:'',
+    finKind:'expense', finLabel:'', finAmt:'', slpH:'', slpM:'', slpEnergy:'', hydMl:'', bodyWeight:'', bodyFat:'' } }); }
+  closeLogAll(){ this.setState({ logAllOpen:false }); }
+  setLogAll(k,e){ const v=e&&e.target?e.target.value:e; this.setState(s=>({ logAll:{ ...(s.logAll||{}), [k]:v } })); }
+  /* Saves only the sections that were actually filled in — an empty field is not an
+     instruction to log a zero. Returns nothing; the count shown comes from state. */
+  saveLogAll(){ const d=this.state.logAll||{}; let n=0;
+    if((d.woEx||'').trim()){ this.addWorkout({ exercise:d.woEx, minutes:d.woMin, weight:d.woWeight, sets:d.woSets, reps:d.woReps,
+      part:this._guessBodyPart(d.woEx) }); n++; }
+    if((d.finLabel||'').trim() && parseFloat(d.finAmt)>0){
+      if(d.finKind==='income') this.setState({incLabel:d.finLabel, incAmt:String(d.finAmt)},()=>this.addIncome());
+      else this.setState({expLabel:d.finLabel, expAmt:String(d.finAmt)},()=>this.addExpense());
+      n++; }
+    if((+d.slpH||0)>0 || (+d.slpM||0)>0){
+      this.setState(s=>({ slp:{ ...s.slp, h:String(+d.slpH||0), m:String(+d.slpM||0),
+        energy:(+d.slpEnergy||s.slp.energy||7) } }),()=>this.saveSleep()); n++; }
+    if((+d.hydMl||0)>0){ this.addHydMl(+d.hydMl); n++; }
+    if((+d.bodyWeight||0)>0){ this.addWeight(+d.bodyWeight); n++; }
+    if((+d.bodyFat||0)>0){ this.addBodyMetric('bodyFatPct', +d.bodyFat); n++; }
+    this.setState({ logAllSaved:n });
+    if(n) this.showToast('fitness', n===1?'1 log saved':n+' logs saved', 'Logged for today');
+    setTimeout(()=>this.setState({logAllOpen:false}), n?700:0); }
   addMeal(opts){ const o=opts||{}, S=this.state;
     const n=(o.name!=null?o.name:S.mealName||'').trim();
     const k=o.kcal!=null?(+o.kcal||0):(+S.mealKcal||0);
@@ -17672,6 +17779,34 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       pushLoading:!!S.pushLoading, pushErr:S.pushErr||'', pushErrShow:!!S.pushErr,
       clearAllNotifs:()=>this.clearAllNotifs(),
       dashboardWidgets:[['missions','Daily & Diet Checklists'],['training','Training Checklist'],['news','Money / News & Law News']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
+      /* Log everything — one modal covering every daily log. The chips report what is
+         already done today, so the panel opens showing what is actually left. */
+      logAllOpen:!!S.logAllOpen,
+      logAllChip:(()=>{ const left=this._logKinds().filter(k=>!k.done).length;
+        return left?('LOG EVERYTHING \u00b7 '+left):'ALL LOGGED'; })(),
+      logAllChipInk:this._logKinds().every(k=>k.done)?'#6cffba':'#e8b45a',
+      logAllChipEdge:this._logKinds().every(k=>k.done)?'rgba(108,255,186,0.32)':'rgba(232,180,90,0.34)',
+      closeLogAll:()=>this.closeLogAll(), stopLogAllClick:(e)=>{ e.stopPropagation(); },
+      openLogAll:()=>this.openLogAll(), saveLogAll:()=>this.saveLogAll(),
+      logKinds:this._logKinds().map(k=>({ chip:(k.done?'\u2713 ':'')+k.label,
+        ink:k.done?'#6cffba':'#8f8f99', edge:k.done?'rgba(108,255,186,0.32)':'rgba(255,255,255,0.14)' })),
+      logAllSummary:(()=>{ const left=this._logKinds().filter(k=>!k.done).length;
+        return left===0 ? 'Everything is logged for today.'
+             : left+' of '+this._logKinds().length+' still to fill in \u2014 all of them here.'; })(),
+      laWoEx:(S.logAll||{}).woEx||'', setLaWoEx:(e)=>this.setLogAll('woEx',e),
+      laWoMin:(S.logAll||{}).woMin||'', setLaWoMin:(e)=>this.setLogAll('woMin',e),
+      laWoWeight:(S.logAll||{}).woWeight||'', setLaWoWeight:(e)=>this.setLogAll('woWeight',e),
+      laWoSets:(S.logAll||{}).woSets||'', setLaWoSets:(e)=>this.setLogAll('woSets',e),
+      laWoReps:(S.logAll||{}).woReps||'', setLaWoReps:(e)=>this.setLogAll('woReps',e),
+      laFinKind:(S.logAll||{}).finKind||'expense', setLaFinKind:(e)=>this.setLogAll('finKind',e),
+      laFinLabel:(S.logAll||{}).finLabel||'', setLaFinLabel:(e)=>this.setLogAll('finLabel',e),
+      laFinAmt:(S.logAll||{}).finAmt||'', setLaFinAmt:(e)=>this.setLogAll('finAmt',e),
+      laSlpH:(S.logAll||{}).slpH||'', setLaSlpH:(e)=>this.setLogAll('slpH',e),
+      laSlpM:(S.logAll||{}).slpM||'', setLaSlpM:(e)=>this.setLogAll('slpM',e),
+      laSlpEnergy:(S.logAll||{}).slpEnergy||'', setLaSlpEnergy:(e)=>this.setLogAll('slpEnergy',e),
+      laHydMl:(S.logAll||{}).hydMl||'', setLaHydMl:(e)=>this.setLogAll('hydMl',e),
+      laBodyWeight:(S.logAll||{}).bodyWeight||'', setLaBodyWeight:(e)=>this.setLogAll('bodyWeight',e),
+      laBodyFat:(S.logAll||{}).bodyFat||'', setLaBodyFat:(e)=>this.setLogAll('bodyFat',e),
       sendTestReminderEmail:()=>this.sendTestReminderEmail(), testEmailLabel:S.testEmailLoading?'Sending…':'Send test email', testEmailErr:S.testEmailErr||'',
       emailProvider:S.prefs.emailProvider||'resend', setEmailProvider:(e)=>this.setPref('emailProvider',e.target.value),
       speedChips:[0.5,0.75,1,1.25,1.5,2].map(o=>({l:o+'×', set:()=>this.setPlaybackSpeed(o), c:(S.prefs.voiceRate||1)===o?vTok.vInk:vTok.vMuted2, b:(S.prefs.voiceRate||1)===o?vTok.vAccent:vTok.vLine, bg:(S.prefs.voiceRate||1)===o?vTok.vLine2:'transparent'})),

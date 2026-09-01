@@ -19,7 +19,7 @@ const sample = [
 t('one email carries every section', ()=>{
   const d=buildDigest({ name:'Sam', items:sample });
   // Labels are HTML-escaped on the way in, so "Tasks & Missions" is "Tasks &amp; Missions".
-  for(const label of ['Performance Terminal','Tasks &amp; Missions','Calendar','Logs','App Update'])
+  for(const label of ['Performance Terminal','Daily Tasks','Calendar','Logs','App Update'])
     has(d.html,label,'html:');
   if(d.count!==6) throw new Error('count '+d.count);
 });
@@ -94,10 +94,12 @@ t('an item with no line is dropped rather than rendered blank', ()=>{
 });
 
 t('the signoff is appended once', ()=>{
-  const d=buildDigest({ name:'Sam', items:sample, signoff:'\n\nBest,\nUltra X management team' });
-  const n=d.text.split('Ultra X management team').length-1;
+  const d=buildDigest({ name:'Sam', items:sample, signoff:'\n\nThank you,\nUltra X Management team' });
+  const n=d.text.split('Ultra X Management team').length-1;
   if(n!==1) throw new Error('signoff appears '+n+' times');
-  if(!d.text.trimEnd().endsWith('Ultra X management team')) throw new Error('signoff is not last');
+  if(!d.text.trimEnd().endsWith('Ultra X Management team')) throw new Error('signoff is not last');
+  // The plain-text and HTML sign-offs must agree — they drifted apart once already.
+  has(buildDigest({ name:'Sam', items:sample }).html, 'Ultra X Management team', 'html signoff:');
 });
 
 t('every declared section has a label', ()=>{
@@ -183,6 +185,21 @@ t('maison is the default theme', ()=>{
   const a=buildDigest({ name:'Sam', items:sample });
   const b=buildDigest({ name:'Sam', items:sample, theme:'maison' });
   if(a.html!==b.html) throw new Error('no theme given did not render maison');
+});
+
+/* The section subjects greet the reader themselves, so the wrapper must not greet them
+   again — "Sam — Good evening Sam — your logs are pending" reached a preview once. */
+t('the subject never says the name twice', ()=>{
+  const d=buildDigest({ name:'Sam', items:[
+    { section:'logs', line:'x', subject:'Good evening Sam — your logs are pending', priority:'normal' },
+    { section:'tasks', line:'y', priority:'normal' }] });
+  const n=d.subject.split('Sam').length-1;
+  if(n!==1) throw new Error('name appears '+n+' times: '+d.subject);
+});
+t('a subject without the name still gets it', ()=>{
+  const d=buildDigest({ name:'Sam', items:[
+    { section:'update', line:'x', subject:'Nervexus v11.228 is out', priority:'low' }] });
+  has(d.subject,'Sam — Nervexus');
 });
 
 let pass=0, fail=0;

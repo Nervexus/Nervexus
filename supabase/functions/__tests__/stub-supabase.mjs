@@ -12,6 +12,8 @@ export function makeAdmin(tables){
       eq(c,v){ rows = rows.filter(r=>r[c]===v); return api; },
       is(c,v){ rows = rows.filter(r=>(r[c]??null)===v); return api; },
       order(){ return api; },
+      gte(c,v){ rows = rows.filter(r=>String(r[c])>=v); return api; },
+      lte(c,v){ rows = rows.filter(r=>String(r[c])<=v); return api; },
       limit(n){ rows = rows.slice(0,n); return thenable(); },
       maybeSingle(){ return Promise.resolve({ data: rows[0]||null }); },
       insert(r){ const arr = Array.isArray(r)?r:[r]; arr.forEach(x=>{ inserted.push({table:name,...x}); (db[name]=db[name]||[]).push(x); }); return Promise.resolve({data:arr}); },

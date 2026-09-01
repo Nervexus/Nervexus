@@ -1,107 +1,106 @@
 ==============================================================================
 01-full — Everything outstanding — the busiest the email gets
 ==============================================================================
-SUBJECT: Sam — Performance check-in pending (+5 more)
+SUBJECT: Good evening Sam — your Daily Performance log is due (+4 more)
 
-Morning Sam,
+Good evening Sam,
 
 PERFORMANCE TERMINAL
-  - It’s 9:30pm UK and today’s mandatory Performance Terminal check-in still hasn’t been done. You have until 10pm to log it and keep your streak clean.
+  - It’s 9pm UK time — in one hour you will need to fill out a mandatory Daily Performance log. This ensures that you are keeping yourself to a high standard. Failing this will lead to a strike on your account.
 
-TASKS & MISSIONS
-  - Cold shower, Read 20 pages — you have 2 missions pending completion.
-  - 3 checklist items open on Weekly reset.
+DAILY TASKS
+  - You have 4 tasks pending, awaiting completion. You have 3 hours left until the day ends. Please log in as soon as possible.
 
 CALENDAR
-  - Sam, you have Dentist at 15:00 tomorrow.
+  - For tomorrow you have Dentist at 15:00, which you have set for yourself to do.
 
 LOGS
-  - No training logged yet today.
+  - Your logs are pending. You have Training, Finance, Body metrics still to fill in. You can do all of them in one place — open the app and tap "Log everything".
 
 APP UPDATE
   - A new version is live. Open the app and check What’s New in Settings for details.
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team
 
 ==============================================================================
 02-single — One item only — the most common real case
 ==============================================================================
-SUBJECT: Sam — Cold shower, Read 20 pages — you have 2 missions pending completion.
+SUBJECT: Hey Sam, you have 4 tasks pending completion
 
-Morning Sam,
+Good evening Sam,
 
-TASKS & MISSIONS
-  - Cold shower, Read 20 pages — you have 2 missions pending completion.
+DAILY TASKS
+  - You have 4 tasks pending, awaiting completion. You have 3 hours left until the day ends. Please log in as soon as possible.
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team
 
 ==============================================================================
 03-two-sections — Two sections, no urgent item
 ==============================================================================
-SUBJECT: Sam — Cold shower, Read 20 pages — you have 2 missions pending completion. (+1 more)
+SUBJECT: Hey Sam, you have 4 tasks pending completion (+1 more)
 
-Morning Sam,
+Good evening Sam,
 
-TASKS & MISSIONS
-  - Cold shower, Read 20 pages — you have 2 missions pending completion.
+DAILY TASKS
+  - You have 4 tasks pending, awaiting completion. You have 3 hours left until the day ends. Please log in as soon as possible.
 
 CALENDAR
-  - Sam, you have Dentist at 15:00 tomorrow.
+  - For tomorrow you have Dentist at 15:00, which you have set for yourself to do.
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team
 
 ==============================================================================
 04-critical — Account locked — the most severe email sent
 ==============================================================================
 SUBJECT: Sam — Performance Terminal — account locked
 
-Morning Sam,
+Good evening Sam,
 
 PERFORMANCE TERMINAL
   - Your account has been locked after 7 consecutive missed daily check-ins. Log in to submit an appeal for the owner to review.
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team
 
 ==============================================================================
 05-update-only — A release note on its own
 ==============================================================================
-SUBJECT: Sam — A new version is live. Open the app and check What’s New in Settings for details.
+SUBJECT: Hey Sam — Nervexus v11.228 is out
 
-Morning Sam,
+Good evening Sam,
 
 APP UPDATE
   - A new version is live. Open the app and check What’s New in Settings for details.
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team
 
 ==============================================================================
 06-long-text — Long mission names and a long checklist title — wrapping stress test
 ==============================================================================
 SUBJECT: Sam — Cold shower before 7am, Read 20 pages of the Black Book, Stretch for 15 minutes, Review the week’s finance log, Call the accountant back about the quarterly filing — you have 5 missions pending completion. (+1 more)
 
-Morning Sam,
+Good evening Sam,
 
-TASKS & MISSIONS
+DAILY TASKS
   - Cold shower before 7am, Read 20 pages of the Black Book, Stretch for 15 minutes, Review the week’s finance log, Call the accountant back about the quarterly filing — you have 5 missions pending completion.
   - 11 checklist items open across 3 checklists: Weekly reset (4), Monthly admin and renewals (5), Travel prep for the Milan trip (2).
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team
 
 ==============================================================================
 07-test-email — What the "Send test email" button produces
 ==============================================================================
 SUBJECT: Sam — Test reminder from Nervexus
 
-Morning Sam,
+Good evening Sam,
 
 LOGS
   - This is a test email — your reminder emails are working.
 
-Best,
-Ultra X management team
+Thank you,
+Ultra X Management team

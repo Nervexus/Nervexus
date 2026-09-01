@@ -35,7 +35,7 @@ function firstName(fullName: string) {
 // EMAIL_SIGNOFF is appended to every outgoing email's body, unconditionally, after the
 // template is applied — requested to always close every email the same way. Mirrored in
 // index.html's _renderEmailTemplate() for the client-side test-email paths.
-const EMAIL_SIGNOFF = '\n\nBest,\nUltra X management team';
+const EMAIL_SIGNOFF = '\n\nThank you,\nUltra X Management team';
 function applyEmailTemplate(prefs: Record<string, any>, title: string, body: string) {
   const subjTpl = (prefs.emailTemplateSubject || '').trim() || '{{title}}';
   const bodyTpl = (prefs.emailTemplateBody || '').trim() || '{{message}}';
@@ -108,6 +108,7 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
   const digest = buildDigest({
     name,
     items,
+    localHour: localHour(new Date(), prefs.timezone),
     signoff: EMAIL_SIGNOFF,
     appUrl: 'https://nervexus.vercel.app',
     dateLabel: new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase(),
@@ -159,24 +160,16 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
 // still open, and how many." Merged into one digest covering both. Per the owner's
 // explicit request: fixed to a 6am-11pm send window and a flat 4-hour minimum cadence,
 // overriding the configurable notifFrequency setting for this specific email.
-function pickDigestSubject(name: string, openMissions: number, openChecklistItems: number) {
-  const who = name ? name + ', y' : 'Y';
-  if (openMissions > 0) return `${who}ou have ${openMissions} mission${openMissions === 1 ? '' : 's'} pending.`;
-  return `${who}ou have ${openChecklistItems} checklist item${openChecklistItems === 1 ? '' : 's'} pending.`;
+/* Daily Checklists and Tasks & Missions were two sections telling you the same thing in
+   different words, so they are one count now. */
+function pickDigestSubject(name: string, openTotal: number) {
+  const who = name ? 'Hey ' + name + ', y' : 'Y';
+  return `${who}ou have ${openTotal} task${openTotal === 1 ? '' : 's'} pending completion`;
 }
-function pickDigestText(missionNames: string[], checklistSummaries: { title: string; open: number }[]) {
-  const parts: string[] = [];
-  if (missionNames.length) {
-    parts.push(`${missionNames.join(', ')} — you have ${missionNames.length} mission${missionNames.length === 1 ? '' : 's'} pending completion.`);
-  }
-  if (checklistSummaries.length) {
-    const totalItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
-    const list = checklistSummaries.map((c) => `${c.title} (${c.open})`).join(', ');
-    parts.push(checklistSummaries.length === 1
-      ? `${totalItems} checklist item${totalItems === 1 ? '' : 's'} open on ${list}.`
-      : `${totalItems} checklist items open across ${checklistSummaries.length} checklists: ${list}.`);
-  }
-  return parts.join(' ');
+function pickDigestText(openTotal: number, hoursLeft: number) {
+  return `You have ${openTotal} task${openTotal === 1 ? '' : 's'} pending, awaiting completion. `
+       + `You have ${hoursLeft} hour${hoursLeft === 1 ? '' : 's'} left until the day ends. `
+       + `Please log in as soon as possible.`;
 }
 async function sweepDigest(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   if (prefs.notifsEnabled === false) return { sent: 0 };
@@ -209,8 +202,10 @@ async function sweepDigest(admin: any, userId: string, name: string, prefs: Reco
   if (!openMissions.length && !checklistSummaries.length) return { sent: 0 };
 
   const openChecklistItems = checklistSummaries.reduce((a, c) => a + c.open, 0);
-  const title = pickDigestSubject(name, openMissions.length, openChecklistItems);
-  const body = pickDigestText(openMissions.map((m: any) => m.name), checklistSummaries);
+  const openTotal = openMissions.length + openChecklistItems;
+  const hoursLeft = hoursLeftToday(new Date(), prefs.timezone);
+  const title = pickDigestSubject(name, openTotal);
+  const body = pickDigestText(openTotal, hoursLeft);
   const priority = 'normal';
 
   /* Push stays per-category and immediate — a phone notification is glanceable and batching
@@ -233,7 +228,7 @@ async function sweepDigest(admin: any, userId: string, name: string, prefs: Reco
 
   /* Keyed by the day and the actual counts, so the same email is not re-sent every four
      hours while nothing changes, but a newly-completed mission produces a fresh line. */
-  const key = 'tasks:' + userId + ':' + today + ':' + openMissions.length + ':' + openChecklistItems;
+  const key = 'tasks:' + userId + ':' + today + ':' + openTotal;
   const added = await collect(admin, bundle, {
     section: 'tasks', line: body, subject: title, priority,
     category: 'mission', sourceType: 'digest-tasks', dedupeKey: key,
@@ -303,11 +298,19 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
     }
 
     if (canEmail && inWindow(EMAIL_LEAD_MIN)) {
-      const who = name ? name + ', y' : 'Y';
+      /* The owner's copy has three shapes here — work events ("from {time} till {time}
+         with {persons}"), general tasks, and a combined one. Only the general shape can be
+         filled in today: an `events` row is title, date, time and repeat_days, with no end
+         time, no attendees and nothing marking it work or personal. Writing the work copy
+         now would print "from 15:00 till undefined with undefined".
+
+         supabase/migrations/20260901_event_details.sql adds end_time, attendees and kind;
+         once that is applied and the calendar form collects them, the other two shapes
+         switch on here. Until then this says only what is actually known. */
       sent += await collect(admin, bundle, {
         section: 'calendar',
-        line: `${who}ou have ${e.title} at ${e.event_time} tomorrow.`,
-        subject: 'Event tomorrow: ' + e.title,
+        line: `For tomorrow you have ${e.title} at ${e.event_time}, which you have set for yourself to do.`,
+        subject: 'Tomorrow: ' + e.title,
         meta: e.event_time + ' tomorrow',
         priority: 'normal',
         category: 'calendar', sourceType: 'event',
@@ -327,7 +330,7 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
    So it is no longer remembered. The live site already publishes its own version in
    NOTIF_BUILD_VERSION; the function reads it and falls back to the constant only if the
    fetch fails. Cached per invocation, so a sweep over every user costs one request. */
-const LATEST_VERSION_FALLBACK = 'v11.227';
+const LATEST_VERSION_FALLBACK = 'v11.228';
 const APP_URL = 'https://nervexus.vercel.app';
 let _versionCache: string | null = null;
 async function latestVersion(): Promise<string> {
@@ -363,6 +366,13 @@ function localMinuteOfDay(now: Date, tz: string) {
     return h * 60 + m;
   } catch { return now.getUTCHours() * 60 + now.getUTCMinutes(); }
 }
+/* "you have {Hours} left until the day ends" — measured in the reader's own timezone, so
+   someone in London and someone in New York are each told their own truth. */
+function hoursLeftToday(now: Date, tz: string) {
+  const mins = localMinuteOfDay(now, tz);
+  return Math.max(0, Math.round((24 * 60 - mins) / 60));
+}
+
 async function alreadySent(admin: any, dedupeKey: string) {
   const { data } = await admin.from('notifications').select('id').eq('dedupe_key', dedupeKey).limit(1);
   return !!(data && data.length);
@@ -398,18 +408,18 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
   let sent = 0;
   const canEmail = prefs.reminderEmailEnabled && prefs.reminderEmailAddr;
 
-  // Job 1: same-day nudge at 21:30 UK (30 min ahead of the 22:00 hard deadline, giving
-  // extra warning), if today isn't logged yet.
-  if (ukMinuteOfDay >= 21 * 60 + 30 && !onHoliday(ukToday)) {
+  // Job 1: same-day nudge at 21:00 UK — a full hour before the 22:00 deadline, because the
+  // copy says "in one hour" and copy that lies about the clock is worse than no copy.
+  if (ukMinuteOfDay >= 21 * 60 && !onHoliday(ukToday)) {
     const { data: todayLog } = await admin.from('performance_logs').select('id').eq('user_id', userId).eq('log_date', ukToday).maybeSingle();
     if (!todayLog && canEmail) {
-      const who = name ? name + ', t' : 'T';
       // 'high' — this forces the digest out now rather than waiting for the 4-hour
-      // cadence, because the deadline it is warning about is 30 minutes away.
+      // cadence, because the deadline it is warning about is an hour away.
       sent += await collect(admin, bundle, {
         section: 'performance',
-        line: 'It’s 9:30pm UK and today’s mandatory Performance Terminal check-in still hasn’t been done. You have until 10pm to log it and keep your streak clean.',
-        subject: `${who}oday's performance check-in is pending`,
+        line: 'It’s 9pm UK time — in one hour you will need to fill out a mandatory Daily Performance log. '
+            + 'This ensures that you are keeping yourself to a high standard. Failing this will lead to a strike on your account.',
+        subject: name ? 'Good evening ' + name + ' — your Daily Performance log is due' : 'Your Daily Performance log is due',
         priority: 'high',
         category: 'system', sourceType: 'performance',
         dedupeKey: 'perf-nudge:' + userId + ':' + ukToday,
@@ -434,7 +444,7 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
           await admin.from('performance_status').upsert({ user_id: userId, miss_streak: newStreak, banned: true, banned_at: new Date().toISOString() }, { onConflict: 'user_id' });
           if (canEmail) sent += await collect(admin, bundle, {
             section: 'performance',
-            line: 'Your account has been locked after 7 consecutive missed daily check-ins. Log in to submit an appeal for the owner to review.',
+            line: 'Your account has been locked after 7 strikes. Log in to submit an appeal for the owner to review.',
             subject: 'Performance Terminal — account locked',
             priority: 'critical',
             category: 'system', sourceType: 'performance',
@@ -444,8 +454,9 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
           await admin.from('performance_status').upsert({ user_id: userId, miss_streak: newStreak, warned_at: new Date().toISOString() }, { onConflict: 'user_id' });
           if (canEmail) sent += await collect(admin, bundle, {
             section: 'performance',
-            line: 'Yesterday’s mandatory check-in wasn’t logged. This is ' + newStreak + ' of 7 consecutive misses — the account locks at 7, pending appeal. Log today’s to reset the streak.',
-            subject: 'Performance Terminal — missed check-in (' + newStreak + '/7)',
+            line: 'Yesterday’s mandatory Daily Performance log wasn’t filled out, so a strike has been added to your account. '
+                + 'This is strike ' + newStreak + ' of 7 — the account locks at 7, pending appeal. Log today’s to clear the strikes.',
+            subject: 'Performance Terminal — strike ' + newStreak + ' of 7',
             priority: 'high',
             category: 'system', sourceType: 'performance',
             dedupeKey: 'perf-warn:' + userId + ':' + ukToday,
@@ -458,7 +469,7 @@ async function sweepPerformanceTerminal(admin: any, userId: string, name: string
 }
 
 // One-time "new version" email — fires once per release, not on a recurring cadence.
-async function sweepVersionUpdate(admin: any, userId: string, prefs: Record<string, any>, bundle: Bundle) {
+async function sweepVersionUpdate(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0 };
   const LATEST_VERSION = await latestVersion();
   if ((prefs.lastSeenVersion || '') === LATEST_VERSION) return { sent: 0 };
@@ -467,11 +478,74 @@ async function sweepVersionUpdate(admin: any, userId: string, prefs: Record<stri
   const sent = await collect(admin, bundle, {
     section: 'update',
     line: 'A new version is live. Open the app and check What’s New in Settings for details.',
-    subject: 'Nervexus ' + LATEST_VERSION + ' is out',
+    subject: name ? 'Hey ' + name + ' — Nervexus ' + LATEST_VERSION + ' is out' : 'Nervexus ' + LATEST_VERSION + ' is out',
     meta: LATEST_VERSION,
     priority: 'low',
     category: 'system', sourceType: 'version',
     dedupeKey: 'vupdate:' + userId + ':' + LATEST_VERSION,
+  });
+  return { sent };
+}
+
+/* ---- the Logs sweep -----------------------------------------------------------------
+   "Logs this should be around the same time as performance log" — so it runs on the same
+   21:00 UK trigger, and because both are collected into one bundle they arrive as one
+   email rather than two a minute apart.
+
+   It names only the logs that are actually MISSING today. A list that includes things you
+   already did is a list you stop reading. */
+/* What can actually be checked, verified against how the app writes each table rather
+   than assumed from its name — the first draft of this guessed 'log_date' everywhere and
+   would have reported Training as missing every single day, because workouts are stamped
+   with an occurred_at timestamp, not a date.
+
+   Two kinds are deliberately absent:
+   * Nutrition. The `meals` table has no date column at all — id, user_id, name, kcal,
+     protein and nothing else — so there is no way to ask whether one was logged today.
+     Nagging about it would be guessing.
+   * Energy. It is not a separate log; it is a column on the sleep row, filled in by the
+     same form. It is covered by 'Sleep & energy' below rather than counted twice. */
+const LOG_KINDS: { label: string; table: string; col: string; kind: 'date' | 'stamp' }[] = [
+  { label: 'Training',       table: 'workouts',       col: 'occurred_at', kind: 'stamp' },
+  { label: 'Finance',        table: 'expenses',       col: 'occurred_at', kind: 'stamp' },
+  { label: 'Sleep & energy', table: 'sleep_logs',     col: 'log_date',    kind: 'date'  },
+  { label: 'Hydration',      table: 'hydration_logs', col: 'log_date',    kind: 'date'  },
+  { label: 'Body metrics',   table: 'body_metrics',   col: 'log_date',    kind: 'date'  },
+];
+
+async function loggedToday(admin: any, userId: string, k: { table: string; col: string; kind: string }, day: string) {
+  try {
+    let q = admin.from(k.table).select('id', { count: 'exact', head: true }).eq('user_id', userId);
+    if (k.kind === 'date') q = q.eq(k.col, day);
+    else q = q.gte(k.col, day + 'T00:00:00.000Z').lte(k.col, day + 'T23:59:59.999Z');
+    const { count } = await q;
+    return !!count;
+  } catch {
+    /* A table this deployment does not have must not make the email claim the log is
+       missing — silence beats nagging someone about a feature they do not have. */
+    return true;
+  }
+}
+
+async function sweepLogs(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
+  if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0 };
+  const now = new Date();
+  if (localMinuteOfDay(now, UK_TZ) < 21 * 60) return { sent: 0 };
+  const day = localDateStr(now, prefs.timezone || UK_TZ);
+
+  const missing: string[] = [];
+  for (const k of LOG_KINDS) if (!(await loggedToday(admin, userId, k, day))) missing.push(k.label);
+  if (!missing.length) return { sent: 0 };
+
+  const sent = await collect(admin, bundle, {
+    section: 'logs',
+    line: 'Your logs are pending. You have ' + missing.join(', ') + ' still to fill in. '
+        + 'You can do all of them in one place — open the app and tap "Log everything".',
+    subject: name ? 'Good evening ' + name + ' — your logs are pending' : 'Your logs are pending',
+    meta: missing.length + ' of ' + LOG_KINDS.length + ' outstanding',
+    priority: 'normal',
+    category: 'system', sourceType: 'logs',
+    dedupeKey: 'logs:' + userId + ':' + day,
   });
   return { sent };
 }
@@ -505,13 +579,15 @@ async function sweepUser(admin: any, userId: string, fullName: string, prefs: Re
   const digestResult = await sweepDigest(admin, userId, name, prefs, bundle);
   const calendarResult = await sweepCalendarEvents(admin, userId, name, prefs, bundle);
   const perfResult = await sweepPerformanceTerminal(admin, userId, name, prefs, bundle);
-  const versionResult = await sweepVersionUpdate(admin, userId, prefs, bundle);
+  const versionResult = await sweepVersionUpdate(admin, userId, name, prefs, bundle);
+  const logsResult = await sweepLogs(admin, userId, name, prefs, bundle);
   const checkinResult = await sweepWellnessCheckin(admin, userId, prefs, bundle);
   const flush = await flushDigest(admin, userId, name, prefs, bundle);
   return {
-    sent: (digestResult.sent || 0) + (calendarResult.sent || 0) + (perfResult.sent || 0) + (versionResult.sent || 0) + (checkinResult.sent || 0),
+    sent: (digestResult.sent || 0) + (calendarResult.sent || 0) + (perfResult.sent || 0) + (versionResult.sent || 0) + (logsResult.sent || 0) + (checkinResult.sent || 0),
     digest: digestResult.sent || 0, calendar: calendarResult.sent || 0,
-    performance: perfResult.sent || 0, version: versionResult.sent || 0, checkin: checkinResult.sent || 0,
+    performance: perfResult.sent || 0, version: versionResult.sent || 0,
+    logs: logsResult.sent || 0, checkin: checkinResult.sent || 0,
     // What actually left the building, and why it did not if it did not.
     emails: flush.emailed || 0, collected: bundle.items.length,
     ...(flush.held ? { held: flush.held } : {}),
