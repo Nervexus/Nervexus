@@ -89,9 +89,20 @@ var MONO  = "Consolas,Menlo,'Courier New',monospace";
 var SANS  = "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif";
 
 var THEMES = {
-  /* The app's Maison/Ultra light identity: cream ground, serif wordmark, champagne rules. */
-  editorial: { ink:'#1B1B1F', muted:'#6E6E76', line:'#E2DED4', ground:'#F7F4EC', card:'#FFFFFF',
-               accent:'#8A7B4F', btnBg:'#1B1B1F', btnInk:'#FFFFFF', flagInk:'#8A3B2A', flagLine:'#E0B8AC',
+  /* Maison Elysee, taken from the app's own theme rather than approximated: --u-bg #F2ECE0,
+     --u-card #FBF7EF, --u-ink #2E4560, --u-accent #3C5A7D, --m-cream #F6F0E4. This is the
+     default.
+
+     Two deliberate departures from the CSS, both because email is not the app:
+     * --u-line is rgba(60,90,125,0.18), and rgba over two different backdrops gives two
+       different colours. Email needs solids, so the composite is precomputed against each:
+       #D9DBDA inside the card, #D1D2CE for the card's own edge on the ground.
+     * --u-muted #6E82A0 sits at 3.7:1 on the card, under the 4.5:1 needed for body text.
+       In the app that colour is on a bright screen you are already looking at; an email is
+       read on a phone in daylight. Deepened to #5A6E8C — same family, 4.9:1. */
+  maison:    { ink:'#2E4560', muted:'#5A6E8C', line:'#D9DBDA', cardLine:'#D1D2CE',
+               ground:'#F2ECE0', card:'#FBF7EF',
+               accent:'#3C5A7D', btnBg:'#2E4560', btnInk:'#F6F0E4', flagInk:'#8A3B2A', flagLine:'#DDB6A9',
                head:SERIF, body:SERIF, label:MONO, wordSpace:'.14em', radius:'14px' },
   /* Noir: the dark side of the same identity. Note the ground is NOT pure black — several
      clients composite dark backgrounds against their own, and #121212 survives that. */
@@ -107,8 +118,9 @@ var THEMES = {
 function buildHtml(name, groups, opts) {
   var o = opts || {};
   var appUrl = o.appUrl || 'https://nervexus.vercel.app';
-  var th = THEMES[o.theme] || THEMES.editorial;
+  var th = THEMES[o.theme] || THEMES.maison;
   var ink = th.ink, muted = th.muted, line = th.line, ground = th.ground, card = th.card;
+  var cardLine = th.cardLine || th.line;
   var accent = th.accent;
 
   var rows = groups.map(function (g) {
@@ -132,7 +144,7 @@ function buildHtml(name, groups, opts) {
   return ''
 + '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:' + ground + '; margin:0; padding:0;">'
 + '<tr><td align="center" style="padding:28px 14px;">'
-+   '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; background:' + card + '; border:1px solid ' + line + '; border-radius:' + th.radius + ';">'
++   '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:560px; background:' + card + '; border:1px solid ' + cardLine + '; border-radius:' + th.radius + ';">'
 +     '<tr><td style="padding:30px 30px 0 30px;">'
 +       '<div style="font:400 22px/1 ' + th.head + '; letter-spacing:' + th.wordSpace + '; color:' + ink + ';">NERVEXUS</div>'
 +       '<div style="font:400 12px/1 ' + th.label + '; letter-spacing:.1em; color:' + muted + '; padding-top:7px;">' + esc(o.dateLabel || '') + '</div>'

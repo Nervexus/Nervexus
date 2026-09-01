@@ -136,13 +136,53 @@ t('every theme paints its own background and ink', ()=>{
 
 t('an unknown theme name falls back rather than rendering unstyled', ()=>{
   const d=buildDigest({ name:'Sam', items:sample, theme:'does-not-exist' });
-  has(d.html,'background:'+THEMES.editorial.ground);
+  has(d.html,'background:'+THEMES.maison.ground);
 });
 
 t('the plain-text part is identical whatever the theme', ()=>{
   const a=buildDigest({ name:'Sam', items:sample, theme:'noir' }).text;
   const b=buildDigest({ name:'Sam', items:sample, theme:'terminal' }).text;
   if(a!==b) throw new Error('themes changed the plain-text part');
+});
+
+/* Contrast is arithmetic, not taste. Every theme's body ink, muted text and section
+   labels are checked against the card they sit on, at the WCAG AA threshold for normal
+   text. This is the check that caught Maison's --u-muted at 3.7:1 — fine on a bright
+   screen you are already looking at, not fine in an email read outdoors. */
+function relLum(hex){
+  const v=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
+    .map(c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4));
+  return 0.2126*v[0]+0.7152*v[1]+0.0722*v[2];
+}
+const contrast=(a,b)=>{ const [x,y]=[relLum(a),relLum(b)].sort((p,q)=>q-p); return (x+0.05)/(y+0.05); };
+
+t('every theme meets AA contrast on its own card', ()=>{
+  for(const name of Object.keys(THEMES)){
+    const th=THEMES[name];
+    for(const [role,fg,bg,min] of [
+      ['ink',    th.ink,    th.card,  4.5],
+      ['muted',  th.muted,  th.card,  4.5],
+      ['accent', th.accent, th.card,  4.5],
+      ['button', th.btnInk, th.btnBg, 4.5],
+    ]){
+      const c=contrast(fg,bg);
+      if(c<min) throw new Error(name+' '+role+' '+fg+' on '+bg+' is '+c.toFixed(2)+':1, needs '+min);
+    }
+  }
+});
+
+t('maison uses the app\'s own Elysee values', ()=>{
+  const m=THEMES.maison;
+  if(m.ground!=='#F2ECE0') throw new Error('ground drifted from --u-bg: '+m.ground);
+  if(m.card!=='#FBF7EF')   throw new Error('card drifted from --u-card: '+m.card);
+  if(m.ink!=='#2E4560')    throw new Error('ink drifted from --u-ink: '+m.ink);
+  if(m.accent!=='#3C5A7D') throw new Error('accent drifted from --u-accent: '+m.accent);
+});
+
+t('maison is the default theme', ()=>{
+  const a=buildDigest({ name:'Sam', items:sample });
+  const b=buildDigest({ name:'Sam', items:sample, theme:'maison' });
+  if(a.html!==b.html) throw new Error('no theme given did not render maison');
 });
 
 let pass=0, fail=0;

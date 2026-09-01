@@ -1,0 +1,107 @@
+==============================================================================
+01-full — Everything outstanding — the busiest the email gets
+==============================================================================
+SUBJECT: Sam — Performance check-in pending (+5 more)
+
+Morning Sam,
+
+PERFORMANCE TERMINAL
+  - It’s 9:30pm UK and today’s mandatory Performance Terminal check-in still hasn’t been done. You have until 10pm to log it and keep your streak clean.
+
+TASKS & MISSIONS
+  - Cold shower, Read 20 pages — you have 2 missions pending completion.
+  - 3 checklist items open on Weekly reset.
+
+CALENDAR
+  - Sam, you have Dentist at 15:00 tomorrow.
+
+LOGS
+  - No training logged yet today.
+
+APP UPDATE
+  - A new version is live. Open the app and check What’s New in Settings for details.
+
+Best,
+Ultra X management team
+
+==============================================================================
+02-single — One item only — the most common real case
+==============================================================================
+SUBJECT: Sam — Cold shower, Read 20 pages — you have 2 missions pending completion.
+
+Morning Sam,
+
+TASKS & MISSIONS
+  - Cold shower, Read 20 pages — you have 2 missions pending completion.
+
+Best,
+Ultra X management team
+
+==============================================================================
+03-two-sections — Two sections, no urgent item
+==============================================================================
+SUBJECT: Sam — Cold shower, Read 20 pages — you have 2 missions pending completion. (+1 more)
+
+Morning Sam,
+
+TASKS & MISSIONS
+  - Cold shower, Read 20 pages — you have 2 missions pending completion.
+
+CALENDAR
+  - Sam, you have Dentist at 15:00 tomorrow.
+
+Best,
+Ultra X management team
+
+==============================================================================
+04-critical — Account locked — the most severe email sent
+==============================================================================
+SUBJECT: Sam — Performance Terminal — account locked
+
+Morning Sam,
+
+PERFORMANCE TERMINAL
+  - Your account has been locked after 7 consecutive missed daily check-ins. Log in to submit an appeal for the owner to review.
+
+Best,
+Ultra X management team
+
+==============================================================================
+05-update-only — A release note on its own
+==============================================================================
+SUBJECT: Sam — A new version is live. Open the app and check What’s New in Settings for details.
+
+Morning Sam,
+
+APP UPDATE
+  - A new version is live. Open the app and check What’s New in Settings for details.
+
+Best,
+Ultra X management team
+
+==============================================================================
+06-long-text — Long mission names and a long checklist title — wrapping stress test
+==============================================================================
+SUBJECT: Sam — Cold shower before 7am, Read 20 pages of the Black Book, Stretch for 15 minutes, Review the week’s finance log, Call the accountant back about the quarterly filing — you have 5 missions pending completion. (+1 more)
+
+Morning Sam,
+
+TASKS & MISSIONS
+  - Cold shower before 7am, Read 20 pages of the Black Book, Stretch for 15 minutes, Review the week’s finance log, Call the accountant back about the quarterly filing — you have 5 missions pending completion.
+  - 11 checklist items open across 3 checklists: Weekly reset (4), Monthly admin and renewals (5), Travel prep for the Milan trip (2).
+
+Best,
+Ultra X management team
+
+==============================================================================
+07-test-email — What the "Send test email" button produces
+==============================================================================
+SUBJECT: Sam — Test reminder from Nervexus
+
+Morning Sam,
+
+LOGS
+  - This is a test email — your reminder emails are working.
+
+Best,
+Ultra X management team
