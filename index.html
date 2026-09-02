@@ -9245,7 +9245,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.02-233 · v11.233 guards-complete';
+const NOTIF_BUILD_VERSION = '2026.09.02-234 · v11.234 log-popup';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9438,7 +9438,7 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this._checkStaleBuild(); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -9721,6 +9721,29 @@ activities: this._mergeShipLog(s.activities),
   // Engine's user_checklists (which the real Reminder Engine in notification-engine.js
   // already watches on its own cadence). Kept as a feature, but now goes through the
   // one Notification Manager instead of calling addNotif/sendPush directly.
+  /* Ten minutes after the performance log, offer the rest of the day's logs in one panel.
+     Deliberately narrow about when it may interrupt:
+       * only once per day, and only after today's performance log is actually done
+       * only if something is still outstanding — a popup listing nothing you have to do is
+         how people learn to dismiss popups without reading them
+       * never on top of another modal, and never while the panel is already open
+     Closing it counts as answered: the date is stamped before it opens, so dismissing it
+     does not bring it back an hour later. */
+  _checkLogAllPopup(){
+    const S=this.state, p=S.prefs||{};
+    if(S.logAllOpen) return;
+    // The same two _checkPerfCheckinPopup() defers to, plus search — a panel that opens
+    // on top of the mandatory check-in would cover the thing it is waiting for.
+    if(S.perfCheckinOpen || S.whatsNewOpen || S.searchOpen) return;
+    const today=this._todayStr();
+    if(p._logAllPopupDate===today) return;                        // already offered today
+    if(!(S.perfLogs||[]).some(l=>l.date===today)) return;         // performance log not done
+    const at=+p._perfLoggedAt||0;
+    if(!at || Date.now()-at < 10*60000) return;                   // not ten minutes yet
+    if(!this._logKinds().some(k=>!k.done)) return;                // nothing left to log
+    this.mut(st=>({prefs:{...st.prefs, _logAllPopupDate:today}}));
+    this.openLogAll();
+  }
   _checkChecklistReminders(){
     const p=this.state.prefs||{}; if(p.checklistReminderEnabled===false) return;
     const open=(this.state.checklist||[]).filter(c=>!c.done);
@@ -12646,6 +12669,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const today=this._todayStr();
     const suspicious=this._perfEntrySuspicious(what,benefit,learned,improve);
     const entry={ id:this._uuid(), date:today, whatDone:what, duration, benefit, learned, trained:!!s.perfDraftTrained, improvement:improve, selfRating:s.perfDraftRating, ownerRating:null, ownerNote:'', ts:Date.now(), flagged:suspicious, flagReason:suspicious?'Looks auto-generated or very low-effort':'' };
+    /* The Log everything popup is timed from HERE, not from the clock: ten minutes after
+       you actually finish the performance log, whenever that is. _logAllPopupDate is
+       cleared so re-logging on a later day re-arms it. */
+    this.mut(st=>({ prefs:{...st.prefs, _perfLoggedAt:Date.now(), _logAllPopupDate:null} }));
     this.mut(st=>({ perfLogs:[entry, ...(st.perfLogs||[]).filter(l=>l.date!==today)], perfDraftWhat:'', perfDraftDuration:'', perfDraftBenefit:'', perfDraftLearned:'', perfDraftImprovement:'', perfDraftTrained:true, perfDraftRating:0, perfSubmitErr:'', perfStatus:{...(st.perfStatus||{}), missStreak:0} }));
     if(this._sbOn()) window.SB.upsert('performance_logs', { user_id:this.state.authUserId, log_date:today, what_done:what, duration, benefit, learned, trained:!!s.perfDraftTrained, improvement:improve, self_rating:s.perfDraftRating, flagged:suspicious, flag_reason:suspicious?'Looks auto-generated or very low-effort':null }, 'user_id,log_date').catch(()=>{});
     this.showToast('system','Performance logged', suspicious?'Saved — a few answers look auto-generated or very short. You can edit today’s entry any time before midnight.':'Today’s check-in is saved.');
