@@ -17,6 +17,9 @@
    camera like anything else in the scene.
 */
 (function () {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (window.ProviderConstellation) return;
+
   'use strict';
 
   var S = {

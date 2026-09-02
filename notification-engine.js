@@ -35,6 +35,9 @@
      vibrate(pattern)
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.NotificationManager) return;
+
   'use strict';
 
   // ---- Categories (every category must be configurable) --------------------

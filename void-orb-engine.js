@@ -32,6 +32,9 @@
    one does not, so it was a no-op.
 */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.VoidOrb) return;
+
   'use strict';
 
   var BUNDLE_URL = 'anatomy-three.js';

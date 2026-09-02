@@ -21,6 +21,9 @@
      live      : true only for adapters that genuinely run in this environment
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.PROVIDERS_DATA) return;
+
   'use strict';
 
   // Claude is the primary provider for everything (chat, tutors, briefings, voice assistant),

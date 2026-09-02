@@ -14,6 +14,9 @@
    Exposes window.NotifEngine = { generate, buildContext, CATS, PALETTE }.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.NotifEngine) return;
+
   'use strict';
 
   var PALETTE = {

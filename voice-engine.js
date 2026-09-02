@@ -26,6 +26,9 @@
    onUpdate callback that receives playback state on every change.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.VoiceEngine) return;
+
   'use strict';
 
   var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };

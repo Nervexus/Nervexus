@@ -37,6 +37,14 @@
    window.VoiceAssistant.manifest()           the two tiers, for the UI to render
 */
 (function (root) {
+  /* Runs once, even when the browser runs this file twice.
+
+     index.html relocates <helmet> content at boot, and that relocation re-executes every
+     engine <script> — the cause of the v11.202 bug. A second pass would rebuild state the
+     first pass already built and re-attach whatever listeners it had attached, so the
+     module returns immediately if its global is already there. */
+  if (root.VoiceAssistant) return;
+
   'use strict';
 
   // ---- helpers ----------------------------------------------------------------

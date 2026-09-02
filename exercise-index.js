@@ -23,6 +23,9 @@
    the numbers still attached.
 */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.EXERCISE_INDEX) return;
+
   'use strict';
 
   // normalised name -> [muscle, app group, display name]
