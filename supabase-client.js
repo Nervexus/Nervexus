@@ -7,6 +7,9 @@ window.SUPABASE_CONFIG = {
 };
 
 (function initSupabase(){
+  // Runs once: the <helmet> relocation re-executes every script, and a second client
+  // would replace window.SB while the app still holds the first. See engine-guards.test.mjs.
+  if (window.SB) return;
   if (!window.supabase || !window.supabase.createClient) { return; }
   if (!window.SUPABASE_CONFIG.url || window.SUPABASE_CONFIG.url === 'YOUR_SUPABASE_PROJECT_URL') {
     console.warn('[supabase-client] Add your project URL + anon key to supabase-client.js to go live.');
@@ -18,7 +21,10 @@ window.SUPABASE_CONFIG = {
 })();
 
 // Thin helpers the app's logic class will call. Every function resolves to {data, error}.
-window.SB = {
+/* The helper object is a top-level assignment, outside the IIFE above — so the guard in
+   there protected the client but not this, and a second execution still replaced
+   window.SB while the app held the first one. Both are guarded now. */
+if (!window.SB) window.SB = {
   ready(){ return !!window.sb; },
 
   async signUp(email, password, meta){ return window.sb.auth.signUp({ email, password, options:{ data: meta||{} } }); },

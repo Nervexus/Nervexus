@@ -11,6 +11,9 @@
    fluently. Consumed by the DC logic class via window.LearningMoney.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.LearningMoney) return;
+
   'use strict';
 
   function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }

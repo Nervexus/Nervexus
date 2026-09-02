@@ -21,6 +21,9 @@
    point to verify, not a guarantee. Nothing here is a paid placement.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.BLACKBOOK_DATA) return;
+
   'use strict';
 
   var BRAND_CATEGORIES = [

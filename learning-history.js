@@ -7,6 +7,9 @@
    Consumed by the DC logic class via window.LearningHistory.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.LearningHistory) return;
+
   'use strict';
   function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
   function pick(arr) { return arr[ri(0, arr.length - 1)]; }

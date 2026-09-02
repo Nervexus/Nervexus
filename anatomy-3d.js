@@ -14,6 +14,9 @@
 // from 29MB to 2.1MB. three.js + GLTFLoader + the meshopt decoder are bundled locally rather
 // than pulled from a CDN so the PWA keeps working offline.
 (function () {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (window.NervexusAnatomy3D) return;
+
   'use strict';
 
   var BUNDLE_URL = 'anatomy-three.js';

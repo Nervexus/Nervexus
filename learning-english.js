@@ -6,6 +6,9 @@
    Consumed by the DC logic class via window.LearningEnglish.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.LearningEnglish) return;
+
   'use strict';
 
   function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }

@@ -298,25 +298,25 @@
      login and sync still work. document.write is deliberate — it blocks the parser here,
      which keeps supabase-client.js below from running before the library exists. -->
 <script>if(!window.supabase){document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>');}</script>
-<script src="supabase-client.js"></script>
+<script src="supabase-client.js?v=1"></script>
 <script src="countries-data.js"></script>
 <script src="notif-engine.js?v=1"></script>
 <script src="voice-engine.js?v=3"></script>
 <script src="providers-data.js?v=1"></script>
-<script src="health-tracker.js"></script>
-<script src="learning-maths.js"></script>
-<script src="learning-english.js?v=4"></script>
-<script src="learning-science.js?v=2"></script>
-<script src="learning-grammar.js?v=3"></script>
-<script src="learning-history.js?v=3"></script>
-<script src="learning-speaking.js?v=2"></script>
-<script src="learning-physiology.js?v=3"></script>
-<script src="learning-money.js?v=3"></script>
-<script src="learning-gentleman.js?v=1"></script>
-<script src="gentleman-blackbook.js?v=1"></script>
-<script src="orb-engine.js?v=7"></script>
+<script src="health-tracker.js?v=1"></script>
+<script src="learning-maths.js?v=1"></script>
+<script src="learning-english.js?v=5"></script>
+<script src="learning-science.js?v=3"></script>
+<script src="learning-grammar.js?v=4"></script>
+<script src="learning-history.js?v=4"></script>
+<script src="learning-speaking.js?v=3"></script>
+<script src="learning-physiology.js?v=4"></script>
+<script src="learning-money.js?v=4"></script>
+<script src="learning-gentleman.js?v=2"></script>
+<script src="gentleman-blackbook.js?v=2"></script>
+<script src="orb-engine.js?v=8"></script>
 <script src="notification-engine.js?v=1"></script>
-<script src="anatomy-3d.js"></script>
+<script src="anatomy-3d.js?v=1"></script>
 <script src="exercise-index.js?v=4"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
@@ -9245,7 +9245,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.01-232 · v11.232 engine-guards';
+const NOTIF_BUILD_VERSION = '2026.09.02-233 · v11.233 guards-complete';
 class Component extends DCLogic {
   constructor(props){
     super(props);

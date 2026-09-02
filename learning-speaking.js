@@ -8,6 +8,9 @@
    VoiceEngine/voice-actor system — this file only supplies content.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.LearningSpeaking) return;
+
   'use strict';
 
   function ri(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }

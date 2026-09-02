@@ -7,6 +7,9 @@
    all persisted data lives inside state.health and is saved by the app.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.HealthKit) return;
+
   'use strict';
 
   var DAY = 86400000;

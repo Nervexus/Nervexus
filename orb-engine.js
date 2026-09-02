@@ -12,6 +12,9 @@
    opts: hue, satMul, dimMul, specMul, overrideMix, overrideColor1/2/3 ([r,g,b] 0..1),
          hoverIntensity, rotateOnHover, forceHoverState */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (root.OrbEngine) return;
+
   'use strict';
 
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
