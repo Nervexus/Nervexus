@@ -3602,10 +3602,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <div style="animation:rise .5s ease both;">
 
         <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:18px;">
-          <div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ THE FORGE</div>
+          <div style="display:flex; align-items:center; gap:15px; min-width:0;">
+          <!-- the house crest: Éverpine's double rule around its own lozenge -->
+          <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
+            <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
+            <span style="width:27px; height:27px; color:#E7D8A6; display:flex; position:relative;" data-icon="forge"></span>
+          </div>
+          <div style="min-width:0;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#E7D8A6; margin-bottom:7px;">❖ THE FORGE</div>
             <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">{{ forgeTierLabel }}</h1>
             <div style="font-size:12.5px; color:#8f8f99; margin-top:5px;">{{ forgeSub }}</div>
+          </div>
           </div>
           <div style="text-align:right;">
             <div style="font-family:'JetBrains Mono',monospace; font-size:34px; font-weight:700; color:{{ forgeScoreInk }}; line-height:1;">{{ forgeScorePct }}</div>
@@ -9435,7 +9442,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-238 · v11.238 forge-progress';
+const NOTIF_BUILD_VERSION = '2026.09.03-239 · v11.239 forge-crest';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9603,10 +9610,9 @@ activities: this._mergeShipLog(s.activities),
 
   navDefs=[
     {id:'home',label:'Home'},
-    {id:'dashboard',label:'Command'},{id:'ai',label:'AI Command Center'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
+    {id:'dashboard',label:'Command'},{id:'forge',label:'The Forge'},{id:'ai',label:'AI Command Center'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
     {id:'globe',label:'World Intel'},
     {id:'fitness',label:'Fitness'},
-    {id:'forge',label:'The Forge'},
     {id:'calendar',label:'Calendar'},
     {id:'requests',label:'Account Requests',owner:true},{id:'settings',label:'Settings'},
   ];
@@ -13705,7 +13711,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       settings:'<circle cx="9" cy="9" r="2.6"/><path d="M9 1.8v2.2M9 14v2.2M16.2 9h-2.2M4 9H1.8M14.2 3.8l-1.55 1.55M5.35 12.65L3.8 14.2M14.2 14.2l-1.55-1.55M5.35 5.35L3.8 3.8"/>',
       voice:'<rect x="6.8" y="1.6" width="4.4" height="8" rx="2.2"/><path d="M4.3 8.6a4.7 4.7 0 0 0 9.4 0"/><path d="M9 13.3v3.1M6.7 16.4h4.6"/>', requests:'<circle cx="6.5" cy="6" r="3"/><path d="M1.5 15.5c0-2.8 2.2-4.8 5-4.8 1 0 1.9.3 2.7.8"/><path d="M12.5 10.5v5M10 13h5"/>',
       flame:'<path d="M9 16.2c-3.4 0-5.9-2.4-5.9-5.7 0-2.1 1-3.7 2.2-5.4.3 1.4 1 2.1 1.8 2.1-.2-2.9 1-5.5 3.5-7-.4 2.1.1 3.7 1.4 5 1.5 1.5 3 3.1 3 5.3 0 3.3-2.5 5.7-5.9 5.7z"/><path d="M9 13.6c-1.3 0-2.3-.9-2.3-2.2 0-.9.5-1.5 1-2.1.1.6.4.9.8.9-.1-1.1.4-2 1.3-2.6-.1.8 0 1.4.5 1.9.6.6 1.1 1.1 1.1 1.9 0 1.3-1 2.2-2.4 2.2z" opacity="0.4"/>',
-      trending:'<path d="M2 14l4.5-5 3 3L16 4"/><path d="M11.5 4H16v4.5"/>' };
+      trending:'<path d="M2 14l4.5-5 3 3L16 4"/><path d="M11.5 4H16v4.5"/>',
+      /* The Forge wears Maison Éverpine's mark: the champagne lozenge inside its own
+         outline, struck onto a ruled base with the paired end-dots from the house
+         divider. Everything else on this page is drawn at 19px, so the ornament had to
+         survive that size — the anvil and the double-frame versions did not. */
+      forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>' };
     this.root.querySelectorAll('[data-icon]').forEach(el=>{ const k=el.dataset.icon; if(el._k===k) return; el._k=k; el.innerHTML='<svg viewBox="0 0 18 18" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(ic[k]||'')+'</svg>'; });
   }
 
@@ -13944,6 +13955,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.239', date:'Sep 3, 2026', notes:[
+      'The Forge has moved up the sidebar — it now sits directly above the AI Command Center rather than under Fitness.',
+      'It has its own mark: Maison \u00c9verpine\u2019s champagne lozenge inside its own outline, struck onto a ruled base. It wears the full crest at the top of the page and the same mark in the sidebar.',
+      'Fixed a side effect of the move \u2014 the Forge was lighting the Fitness entry as well as its own, so two sidebar items looked active at once.',
+    ]},
     {version:'v11.238', date:'Sep 3, 2026', notes:[
       'The Forge now shows your assessments back to you: the last eight as a chart, the change since the one before it, and which standards actually crossed a tier.',
       'Going backwards is reported, and it is listed first. A number creeping up inside the same tier is not reported at all \u2014 it has not moved the thing being measured.',
@@ -17521,7 +17537,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const appVer='v11.47 — Aug 19, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
-    const navActive=(id)=> id===scene || (id==='fitness' && (scene==='health'||scene==='forge')) || (id==='briefing' && scene==='voice');
+    /* The Forge used to sit under Fitness in the sidebar, so it lit the Fitness entry.
+       It is its own top-level page now and lights itself — leaving both clauses in would
+       highlight two entries at once. */
+    const navActive=(id)=> id===scene || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
     const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='requests'?(S.requests||[]).filter(r=>r.status==='pending').length:0), hasBadge:(n.id==='requests'&&(S.requests||[]).some(r=>r.status==='pending')), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
     // Mobile-first set: Home, Tasks (Command dashboard — missions/checklist/notes-adjacent),
     // Calendar, Fitness (also reaches Health/Productivity-Notes/Music via its own sub-tabs),

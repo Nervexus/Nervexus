@@ -84,15 +84,104 @@ t('the Forge is its own scene, not a tab inside Fitness', async () => {
   const st = await page.evaluate(() => window.__nvx.state.scene);
   eq(st, 'forge', 'scene');
   const body = await text();
-  ok(/◆ THE FORGE/.test(body), 'the page header did not render');
+  ok(/❖ THE FORGE/.test(body), 'the page header did not render');
   ok(!/Body Systems/.test(body), 'the Fitness page rendered at the same time — the scenes are not exclusive');
 });
 
 t('it is reachable from the Fitness tab row', async () => {
   await boot({ scene: 'fitness' });
-  await page.getByText('The Forge', { exact: true }).first().click();
-  await page.waitForTimeout(700);
+  /* "The Forge" is on the page twice — the sidebar and this tab row — so scope the click
+     to the row that also holds Fitness HQ. Clicking whichever came first in the DOM passed
+     either way and proved nothing about the tab. */
+  const hit = await page.evaluate(() => {
+    const inTabRow = (el) => {
+      let n = el.parentElement;
+      for (let i = 0; i < 3 && n; i++, n = n.parentElement) {
+        if (/Fitness HQ/.test(n.textContent || '')) return true;
+      }
+      return false;
+    };
+    const tab = [...document.querySelectorAll('div,span')].find(e =>
+      e.children.length === 0 && e.textContent.trim() === 'The Forge' && inTabRow(e));
+    if (!tab) return false;
+    tab.click();
+    return true;
+  });
+  ok(hit, 'no "The Forge" tab found alongside Fitness HQ');
+  await page.waitForTimeout(900);
   eq(await page.evaluate(() => window.__nvx.state.scene), 'forge', 'scene after clicking the tab');
+});
+
+t('the sidebar lists The Forge directly above the AI Command Center', async () => {
+  await boot();
+  const ids = await page.evaluate(() =>
+    [...document.querySelectorAll('.cc-side span[data-icon]')].map(s => s.dataset.icon));
+  const ai = ids.indexOf('ai');
+  ok(ai > 0, 'the AI Command Center is not in the sidebar');
+  eq(ids[ai - 1], 'forge', 'the entry above AI Command Center — full order: ' + ids.join(' > '));
+});
+
+t('the Forge is the only nav entry lit while you are on it', async () => {
+  await boot();
+  const lit = await page.evaluate(() =>
+    [...document.querySelectorAll('.cc-side span[data-icon]')]
+      .filter(s => getComputedStyle(s).color === 'rgb(255, 255, 255)')
+      .map(s => s.dataset.icon));
+  eq(lit.join(','), 'forge', 'exactly one sidebar entry should be active, and it is this page');
+});
+
+t('Fitness still lights itself, and still owns Health', async () => {
+  for (const [scene, want] of [['fitness', 'fitness'], ['health', 'fitness']]) {
+    await boot({ scene });
+    const lit = await page.evaluate(() =>
+      [...document.querySelectorAll('.cc-side span[data-icon]')]
+        .filter(s => getComputedStyle(s).color === 'rgb(255, 255, 255)')
+        .map(s => s.dataset.icon));
+    eq(lit.join(','), want, 'active entry on the ' + scene + ' scene');
+  }
+});
+
+t('the Forge nav entry actually draws its mark', async () => {
+  await boot();
+  /* A nav id with no entry in the icon map renders an empty span and throws nothing, so
+     assert on the drawn paths rather than on the element existing. */
+  const drawn = await page.evaluate(() => {
+    const el = document.querySelector('.cc-side span[data-icon="forge"]');
+    if (!el) return null;
+    const svg = el.querySelector('svg');
+    return svg ? { paths: svg.querySelectorAll('path').length, dots: svg.querySelectorAll('circle').length } : null;
+  });
+  ok(drawn, 'the Forge nav entry has no icon drawn into it');
+  ok(drawn.paths >= 3, 'the crest should be the lozenge, its inner fill and the base rule: ' + JSON.stringify(drawn));
+  eq(drawn.dots, 2, 'the base rule carries the house divider\'s paired end dots');
+});
+
+t('the Forge is reachable on mobile through More', async () => {
+  await boot({ mobMoreOpen: true });
+  /* The mobile bar carries six fixed entries and everything else falls through to the More
+     sheet, which is only in the DOM while it is open. Promoting the Forge in the sidebar
+     does not put it on that bar, so the only thing that matters here is that it has not
+     become unreachable on a phone. */
+  const inMore = await page.evaluate(() => {
+    const more = [...document.querySelectorAll('*')].filter(e =>
+      e.children.length === 0 && e.textContent.trim() === 'The Forge' && !e.closest('.cc-side'));
+    return more.length > 0;
+  });
+  ok(inMore, 'The Forge appears nowhere outside the desktop sidebar — check mobMoreList');
+});
+
+t('the page wears the Éverpine crest in champagne', async () => {
+  await boot();
+  const crest = await page.evaluate(() => {
+    const marks = [...document.querySelectorAll('span[data-icon="forge"]')];
+    const onPage = marks.find(m => m.closest('h1, div') && /THE FORGE/.test(
+      (m.parentElement.parentElement && m.parentElement.parentElement.textContent) || ''));
+    if (!onPage) return null;
+    return { colour: getComputedStyle(onPage).color, size: onPage.getBoundingClientRect().width };
+  });
+  ok(crest, 'no crest beside the page title');
+  eq(crest.colour, 'rgb(231, 216, 166)', 'the crest must be Éverpine champagne (#E7D8A6)');
+  ok(crest.size > 20, 'the page crest should read as a logo, not a nav glyph: ' + crest.size + 'px');
 });
 
 /* ---- bindings: the failure mode here is silence, so assert on rendered text ---- */
