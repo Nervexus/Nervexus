@@ -323,6 +323,7 @@
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
+<script src="forge-engine.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3593,6 +3594,167 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
           </sc-for>
         </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===== THE FORGE ===== -->
+      <sc-if value="{{ isForge }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:rise .5s ease both;">
+
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:18px;">
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ THE FORGE</div>
+            <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">{{ forgeTierLabel }}</h1>
+            <div style="font-size:12.5px; color:#8f8f99; margin-top:5px;">{{ forgeSub }}</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:34px; font-weight:700; color:{{ forgeScoreInk }}; line-height:1;">{{ forgeScorePct }}</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-top:5px;">UNIT SCORE · {{ forgeAssessed }}/{{ forgeTotal }} MEASURED</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
+          <sc-for list="{{ forgeCentres }}" as="c" hint-placeholder-count="3">
+            <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; padding:9px 15px; border-radius:9px; cursor:pointer; color:{{ c.ink }}; background:{{ c.bg }}; border:1px solid {{ c.bd }};">{{ c.label }}</span>
+          </sc-for>
+        </div>
+
+        <!-- what the logs already know, rather than asking again -->
+        <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; margin-bottom:16px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:10px;">FROM YOUR LOGS · LAST 7 DAYS</div>
+          <div style="display:flex; gap:22px; flex-wrap:wrap;">
+            <sc-for list="{{ forgeLink }}" as="l" hint-placeholder-count="5">
+              <div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:18px; color:{{ l.ink }};">{{ l.value }}</div>
+                <div style="font-size:10.5px; color:#8f8f99; margin-top:2px;">{{ l.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <sc-if value="{{ forgeWeakest.length }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; margin-bottom:16px; border:1px solid rgba(232,180,90,0.28);">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#e8b45a; margin-bottom:9px;">WEAKEST LINKS — WORK HERE</div>
+            <sc-for list="{{ forgeWeakest }}" as="w" hint-placeholder-count="3">
+              <div style="display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-top:1px solid rgba(255,255,255,0.05);">
+                <span style="font-size:12.5px; color:#dbdbe0;">{{ w.name }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8f8f99;">{{ w.where }} · {{ w.tierName }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- TRAINING + MENTAL share a shape: a group, its rationale, its standards, its work -->
+        <sc-if value="{{ forgeShowGroups }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ forgeGroups }}" as="g" hint-placeholder-count="4">
+            <div class="cc-glowcard" style="border-radius:16px; padding:0; margin-bottom:11px; overflow:hidden;">
+              <div onClick="{{ g.toggle }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px 18px; cursor:pointer;">
+                <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                  <span style="font-size:14.5px; font-weight:600; color:#eef0f2;">{{ g.name }}</span>
+                  <sc-if value="{{ g.neglected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#e8b45a; border:1px solid rgba(232,180,90,0.34); border-radius:5px; padding:2px 5px;">NEGLECTED</span></sc-if>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ g.tierInk }};">{{ g.tierLabel }}</span>
+              </div>
+              <sc-if value="{{ g.open }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 18px 18px;">
+                  <div style="font-size:12.5px; color:#a8a8b0; line-height:1.6; margin-bottom:14px;">{{ g.why }}</div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:8px;">THE STANDARD</div>
+                  <sc-for list="{{ g.standards }}" as="st" hint-placeholder-count="3">
+                    <div style="padding:9px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                      <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+                        <span style="font-size:12.5px; color:#dbdbe0;">{{ st.name }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99;">{{ st.unit }}</span>
+                      </div>
+                      <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:7px; align-items:center;">
+                        <sc-for list="{{ st.tierChips }}" as="tc" hint-placeholder-count="4">
+                          <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; padding:4px 7px; border-radius:6px; color:{{ tc.ink }}; background:{{ tc.bg }}; border:1px solid {{ tc.bd }};">{{ tc.label }}</span>
+                        </sc-for>
+                        <input value="{{ st.draft }}" onInput="{{ st.set }}" placeholder="{{ st.placeholder }}" style="width:96px; margin-left:auto; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
+                      </div>
+                      <sc-if value="{{ st.how }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#75757d; margin-top:5px;">{{ st.how }}</div></sc-if>
+                    </div>
+                  </sc-for>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin:16px 0 8px;">THE WORK</div>
+                  <sc-for list="{{ g.work }}" as="w" hint-placeholder-count="4">
+                    <div style="padding:9px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                      <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                        <span style="font-size:12.5px; color:#dbdbe0;">{{ w.name }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba;">{{ w.dose }}</span>
+                      </div>
+                      <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55;">{{ w.cue }}</div>
+                      <sc-if value="{{ w.risk }}" hint-placeholder-val="{{ false }}">
+                        <div style="font-size:11px; color:#ff8a5b; margin-top:5px; line-height:1.55;">⚠ {{ w.risk }}</div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:16px 0 4px;">
+            <span onClick="{{ saveForgeScores }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:#0d0d10; background:#eef0f2; border-radius:10px; padding:11px 20px; cursor:pointer; white-space:nowrap;">RECORD ASSESSMENT</span>
+            <span style="font-size:11.5px; color:#8f8f99; flex:1 1 200px;">Enter what you actually hit. Blank means not tested — it is not counted against you.</span>
+          </div>
+        </sc-if>
+
+        <!-- HEALTH -->
+        <sc-if value="{{ forgeShowHealth }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:16px; padding:18px; margin-bottom:12px;">
+            <div style="font-size:14.5px; font-weight:600; margin-bottom:4px;">Testosterone — what actually moves it</div>
+            <div style="font-size:12px; color:#8f8f99; margin-bottom:13px; line-height:1.6;">Graded by strength of evidence, strongest first. A list that ranks sleep alongside a supplement is not information.</div>
+            <sc-for list="{{ forgeLevers }}" as="l" hint-placeholder-count="6">
+              <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+                  <span style="font-size:12.5px; color:#dbdbe0;">{{ l.name }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.8px; padding:3px 7px; border-radius:6px; color:{{ l.ink }}; border:1px solid {{ l.bd }};">{{ l.badge }}</span>
+                </div>
+                <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55;">{{ l.detail }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px;">
+            <div class="cc-glowcard" style="border-radius:16px; padding:18px;">
+              <div style="font-size:14.5px; font-weight:600; margin-bottom:11px;">Lifestyle</div>
+              <sc-for list="{{ forgeLifestyle }}" as="x" hint-placeholder-count="6">
+                <div style="padding:8px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size:12.5px; color:#dbdbe0;">{{ x.name }}</div>
+                  <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55;">{{ x.detail }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div class="cc-glowcard" style="border-radius:16px; padding:18px;">
+              <div style="font-size:14.5px; font-weight:600; margin-bottom:4px;">The rules</div>
+              <div style="font-size:12px; color:#8f8f99; margin-bottom:9px;">No ultra-processed food. That is the diet in one line.</div>
+              <sc-for list="{{ forgeRules }}" as="r" hint-placeholder-count="7">
+                <div style="padding:8px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size:12.5px; color:#dbdbe0;">{{ r.rule }}</div>
+                  <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55;">{{ r.why }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div class="cc-glowcard" style="border-radius:16px; padding:18px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline; margin-bottom:11px;">
+              <div style="font-size:14.5px; font-weight:600;">Food — what it costs, what it gives</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8f8f99;">{{ forgeFoodSpend }}</div>
+            </div>
+            <sc-for list="{{ forgeFoods }}" as="f" hint-placeholder-count="8">
+              <div style="padding:9px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                  <span style="font-size:12.5px; color:#dbdbe0;">{{ f.name }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#6cffba;">{{ f.per }}</span>
+                </div>
+                <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55;">{{ f.gives }} — {{ f.note }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
       </div>
       </sc-if>
 
@@ -9245,10 +9407,14 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-236 · v11.236 quiet-release-notes';
+const NOTIF_BUILD_VERSION = '2026.09.03-237 · v11.237 the-forge';
 class Component extends DCLogic {
   constructor(props){
     super(props);
+    /* Test seam: the browser test suite needs to drive scenes and state directly, and
+       clicking through a 2FA login on every run is not a test of anything. Localhost only,
+       so the live app exposes nothing. */
+    try{ if(location.hostname==='127.0.0.1'||location.hostname==='localhost') window.__nvx=this; }catch(e){}
     const s=(()=>{ try{ return JSON.parse(localStorage.getItem('cc_v2')||'{}'); }catch(e){ return {}; } })();
     if(s.loggedIn && s.currentEmail && s.accounts){ const _acc=s.accounts[(s.currentEmail||'').trim().toLowerCase()]; if(_acc) Object.assign(s, _acc); }
     const D=86400000, now=Date.now();
@@ -9330,6 +9496,8 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
+      forgeCentre:'training', forgeOpen:null, forgeDraft:{},
+      forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
       safetyQuery:'', safetyLoading:false, safetyResult:'', safetyErr:'',
@@ -9410,6 +9578,7 @@ activities: this._mergeShipLog(s.activities),
     {id:'dashboard',label:'Command'},{id:'ai',label:'AI Command Center'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
     {id:'globe',label:'World Intel'},
     {id:'fitness',label:'Fitness'},
+    {id:'forge',label:'The Forge'},
     {id:'calendar',label:'Calendar'},
     {id:'requests',label:'Account Requests',owner:true},{id:'settings',label:'Settings'},
   ];
@@ -10051,9 +10220,9 @@ activities: this._mergeShipLog(s.activities),
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
-    const slice={ account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
+    const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
-    localStorage.setItem('cc_v2', JSON.stringify({ loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
+    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
   // ===== AI & INTELLIGENCE PROVIDER MANAGER =====
   _pd(){ return window.PROVIDERS_DATA; }
   // Genuine empty state — every provider/source starts off and unsaved. Nothing is
@@ -13747,6 +13916,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.237', date:'Sep 3, 2026', major:true, notes:[
+      'The Forge. A new page under Fitness \u2014 not a plan, a standard.',
+      'Training Centre: ten regions, head to feet. The neck, the feet, the hands and the lower legs are numbered the same as the chest, because they are what actually fails first.',
+      'Every standard is a number you either hit or you do not. Baseline, Hardened, Forged, Unit \u2014 and Unit is meant to be rare.',
+      'Mental Centre: focus, memory, creativity, motivation, discipline, and getting off the things that have you. Same treatment, same tiers.',
+      'Health Centre: what actually moves testosterone, graded by strength of evidence. Sleep and a supplement are not listed as equals.',
+      'Food priced per serving, whole foods only. Nothing ultra-processed \u2014 that is the diet in one line.',
+      'It reads your training log, your sleep, your body stats and your food spending. Nothing is entered twice.',
+      'Record an assessment and it is kept with the date, so progress is a line rather than a single number that overwrites itself.',
+      'The weakest links are named. It points somewhere specific.',
+    ]},
     {version:'v11.199', date:'Aug 27, 2026', major:true, notes:[
       'She has a name. Loura.',
       'Two seconds of quiet is not the end of a sentence. She waits \u2014 for the rest of the thought, for the drink, for the word you are still reaching for.',
@@ -15515,6 +15695,58 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title:t,
       event_date:S.calSel,event_time:time,repeat_days:repeat,
       kind,end_time:endTime,attendees,est_minutes:estMins}); }
+  /* ---- THE FORGE --------------------------------------------------------------------
+     Three centres over one dataset (forge-engine.js). This class holds only what the
+     engine cannot: the user's own scores, and the joins into the logs the app already
+     keeps. The programme content itself never lives here. */
+  _forge(){ return window.Forge||null; }
+  setForgeCentre(k){ this.setState({forgeCentre:k}); }
+  setForgeOpen(k){ this.setState(s=>({forgeOpen:s.forgeOpen===k?null:k})); }
+  setForgeScore(id,e){ const v=e&&e.target?e.target.value:e;
+    this.setState(s=>({forgeDraft:{...(s.forgeDraft||{}), [id]:v}})); }
+  /* Saved with the date so progress is a series, not a single figure that overwrites
+     itself. The assessment history is the only way to answer "am I actually moving". */
+  saveForgeScores(){ const F=this._forge(); if(!F) return;
+    const d=this.state.forgeDraft||{}; const clean={};
+    Object.keys(d).forEach(k=>{ const v=parseFloat(d[k]); if(!isNaN(v)) clean[k]=v; });
+    if(!Object.keys(clean).length) return;
+    const today=(window.HealthKit?window.HealthKit.today():new Date().toLocaleDateString('en-CA'));
+    this.mut(st=>({
+      forgeScores:{...(st.forgeScores||{}), ...clean},
+      forgeHistory:[...(st.forgeHistory||[]).filter(h=>h.date!==today),
+                    {date:today, scores:{...(st.forgeScores||{}), ...clean}}].slice(-90),
+      forgeDraft:{}
+    }));
+    const n=Object.keys(clean).length;
+    this.showToast('fitness', n===1?'1 standard recorded':n+' standards recorded', F.unitScore({...(this.state.forgeScores||{}), ...clean}).tier); }
+
+  /* The joins the brief asked for. The Forge does not keep its own training or spending
+     record — it reads the ones already there, so nothing is entered twice and nothing can
+     disagree with itself. */
+  _forgeFitnessLink(){
+    const K=window.HealthKit, H=this.state.health||{}, W=this.state.workouts||[];
+    const now=Date.now(), wk=now-7*864e5;
+    const recent=W.filter(w=>w.ts>=wk);
+    const parts={};
+    recent.forEach(w=>{ parts[w.part]=(parts[w.part]||0)+1; });
+    const sleep=(H.sleepLog||[]).slice(-7);
+    const avgSleep=sleep.length?(sleep.reduce((a,x)=>a+x.hours+(x.minutes||0)/60,0)/sleep.length):null;
+    const snap=(H.bodyLog||[]).slice(-1)[0]||{};
+    return {
+      sessions: recent.length,
+      partsHit: Object.keys(parts).length,
+      partsList: Object.keys(parts).sort(),
+      avgSleep: avgSleep!=null?Math.round(avgSleep*10)/10:null,
+      bodyFat: snap.bodyFatPct!=null?snap.bodyFatPct:null,
+      weightKg: snap.weightKg!=null?snap.weightKg:null
+    }; }
+  /* Food spend, because "natural and cost effective" is a claim the app can actually
+     check rather than repeat. */
+  _forgeFoodSpend(){
+    const now=Date.now(), mo=now-30*864e5;
+    const food=(this.state.expenses||[]).filter(e=>e.ts>=mo && /food|grocer|shop|meal|eat|lunch|dinner|tesco|aldi|lidl|sainsbury|asda|morrison/i.test(e.label||''));
+    const total=food.reduce((a,e)=>a+(+e.amount||0),0);
+    return { total:Math.round(total*100)/100, count:food.length, perDay:Math.round((total/30)*100)/100 }; }
   addMeal(opts){ const o=opts||{}, S=this.state;
     const n=(o.name!=null?o.name:S.mealName||'').trim();
     const k=o.kcal!=null?(+o.kcal||0):(+S.mealKcal||0);
@@ -17257,7 +17489,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const appVer='v11.47 — Aug 19, 2026';
     const _dietBase=(S.health&&S.health.diet)||[];
     const go=(s)=>()=>{ if(this.state.focusMode && s!=='home') return; this.setState({scene:s}); };
-    const navActive=(id)=> id===scene || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
+    const navActive=(id)=> id===scene || (id==='fitness' && (scene==='health'||scene==='forge')) || (id==='briefing' && scene==='voice');
     const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='requests'?(S.requests||[]).filter(r=>r.status==='pending').length:0), hasBadge:(n.id==='requests'&&(S.requests||[]).some(r=>r.status==='pending')), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
     // Mobile-first set: Home, Tasks (Command dashboard — missions/checklist/notes-adjacent),
     // Calendar, Fitness (also reaches Health/Productivity-Notes/Music via its own sub-tabs),
@@ -17626,6 +17858,80 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       addMemBtn:()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } },
       addMemKey:enterKey(()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } }),
       tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security',  tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabTrouble:S.settingsTab==='Troubleshooting', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
+      /* THE FORGE. The engine holds the standards; this turns them into a page. Colour
+         escalates with tier so the difference between Baseline and Unit is visible before
+         anything is read. Unmeasured is grey, never red — not tested is not a failure. */
+      ...this._safe(()=>{
+        const F=this._forge(); if(!F) throw new Error('forge engine missing');
+        const TI=['#6f6f78','#c9c9ce','#6cffba','#e8b45a','#ffffff'];
+        const centre=S.forgeCentre||'training';
+        const sc=S.forgeScores||{}, dr=S.forgeDraft||{};
+        const us=F.unitScore(sc);
+        const tierName=(t)=>t===0?'Not measured':F.TIERS[t-1];
+        const centres=[['training','TRAINING'],['mental','MENTAL'],['health','HEALTH']].map(c=>({
+          label:c[1], go:()=>this.setForgeCentre(c[0]),
+          ink:centre===c[0]?'#F4F4F5':'#9a9aa2',
+          bg:centre===c[0]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)',
+          bd:centre===c[0]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' }));
+        const L=this._forgeFitnessLink();
+        const link=[
+          { value:String(L.sessions), label:'sessions', ink:L.sessions>=4?'#6cffba':L.sessions>=2?'#e8b45a':'#ff8a5b' },
+          { value:L.partsHit+'/10', label:'regions trained', ink:L.partsHit>=6?'#6cffba':L.partsHit>=3?'#e8b45a':'#ff8a5b' },
+          { value:L.avgSleep!=null?(L.avgSleep+'h'):'—', label:'avg sleep', ink:L.avgSleep==null?'#6f6f78':L.avgSleep>=7?'#6cffba':'#ff8a5b' },
+          { value:L.bodyFat!=null?(L.bodyFat+'%'):'—', label:'body fat', ink:L.bodyFat==null?'#6f6f78':(L.bodyFat<=15?'#6cffba':L.bodyFat<=20?'#e8b45a':'#ff8a5b') },
+          { value:L.weightKg!=null?(L.weightKg+'kg'):'—', label:'bodyweight', ink:L.weightKg==null?'#6f6f78':'#c9c9ce' }
+        ];
+        const groups=(centre==='mental'?F.MENTAL:F.REGIONS).map(g=>{
+          const measured=g.standards.filter(st=>sc[st.id]!=null && !isNaN(sc[st.id]));
+          const mean=measured.length?measured.reduce((a,st)=>a+F.tierOf(st,+sc[st.id]),0)/measured.length:0;
+          const gt=measured.length?Math.max(1,Math.min(4,Math.ceil(mean))):0;
+          return {
+            name:g.name, neglected:!!g.neglected, why:g.why,
+            tierInk:TI[gt], tierLabel:measured.length?(tierName(gt).toUpperCase()+' · '+measured.length+'/'+g.standards.length):'NOT MEASURED',
+            open:S.forgeOpen===g.key, toggle:()=>this.setForgeOpen(g.key),
+            standards:g.standards.map(st=>{
+              const has=sc[st.id]!=null && !isNaN(sc[st.id]);
+              const t=has?F.tierOf(st,+sc[st.id]):0;
+              const chips=st.binary
+                ? [{lvl:1,txt:'FAIL'},{lvl:4,txt:'PASS · UNIT'}]
+                : st.tiers.map((v,i)=>({lvl:i+1,txt:F.TIERS[i].toUpperCase()+' '+(st.lowerIsBetter?'≤':'')+v}));
+              return {
+                name:st.name, unit:st.unit, how:st.how||'',
+                placeholder:st.binary?'0 / 1':st.unit,
+                draft:dr[st.id]!=null?dr[st.id]:(has?String(sc[st.id]):''),
+                set:(e)=>this.setForgeScore(st.id,e),
+                tierChips:chips.map(c=>({
+                  label:c.txt,
+                  ink:t>=c.lvl?'#0d0d10':TI[c.lvl],
+                  bg:t>=c.lvl?TI[c.lvl]:'transparent',
+                  bd:t>=c.lvl?TI[c.lvl]:'rgba(255,255,255,0.12)' }))
+              };
+            }),
+            work:(g.work||g.drills||[]).map(w=>({ name:w.name, dose:w.dose, cue:w.cue||w.how||'', risk:w.risk||'' }))
+          };
+        });
+        const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
+        const sp=this._forgeFoodSpend();
+        const EV={strong:'#6cffba',moderate:'#e8b45a',weak:'#ff8a5b'};
+        return {
+          forgeTierLabel:us.assessed?us.tier:'Unmeasured',
+          forgeSub:us.assessed
+            ? 'Bigger, stronger, faster, healthier. '+us.assessed+' standards on record — the rest are still an unknown.'
+            : 'Ten regions, six faculties, one standard. Nothing is measured yet, so nothing is proven yet.',
+          forgeScorePct:us.assessed?(us.score+'%'):'—',
+          forgeScoreInk:us.assessed?TI[Math.max(1,Math.min(4,Math.ceil(us.score/25)))]:'#6f6f78',
+          forgeAssessed:us.assessed, forgeTotal:us.total,
+          forgeCentres:centres, forgeLink:link, forgeWeakest:wk,
+          forgeShowGroups:centre!=='health', forgeShowHealth:centre==='health',
+          forgeGroups:groups,
+          saveForgeScores:()=>this.saveForgeScores(),
+          forgeLevers:F.T_LEVERS.map(l=>({ name:l.name, detail:l.detail, badge:l.evidence.toUpperCase()+' · '+l.effect.toUpperCase(), ink:EV[l.evidence]||'#8f8f99', bd:(EV[l.evidence]||'#8f8f99')+'55' })),
+          forgeLifestyle:F.LIFESTYLE, forgeRules:F.NUTRITION_RULES, forgeFoods:F.FOODS,
+          forgeFoodSpend:sp.count?('£'+sp.total.toFixed(2)+' on food · 30 days · £'+sp.perDay.toFixed(2)+'/day'):'No food spending logged yet'
+        };
+      }, { forgeTierLabel:'The Forge', forgeSub:'Standards unavailable — reload to try again.', forgeScorePct:'—', forgeScoreInk:'#6f6f78', forgeAssessed:0, forgeTotal:0,
+           forgeCentres:[], forgeLink:[], forgeWeakest:[], forgeGroups:[], forgeShowGroups:false, forgeShowHealth:false,
+           forgeLevers:[], forgeLifestyle:[], forgeRules:[], forgeFoods:[], forgeFoodSpend:'', saveForgeScores:()=>{} }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
@@ -18152,11 +18458,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           incSaveAmt:S.incSaveAmt||'', setIncSaveAmt:(e)=>this.setState({incSaveAmt:e.target.value}),
         };
       })(),
-      fitTabs:[['Fitness HQ','fitness'],['Health & Productivity','health'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
+      fitTabs:[['Fitness HQ','fitness'],['The Forge','forge'],['Health & Productivity','health'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
       goHealthDiet:()=>this.setState({scene:'health', healthSub:'diet'}),
-      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isHealth:scene==='health' && S.healthProdView!=='productivity', isBiz:scene==='business', isProd:scene==='health' && S.healthProdView==='productivity', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
+      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isForge:scene==='forge', isHealth:scene==='health' && S.healthProdView!=='productivity', isBiz:scene==='business', isProd:scene==='health' && S.healthProdView==='productivity', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
       healthProdView: S.healthProdView==='productivity'?'productivity':'health',
       goHealthView:()=>this.setState({scene:'health', healthProdView:'health'}),
       goProdView:()=>this.setState({scene:'health', healthProdView:'productivity'}),

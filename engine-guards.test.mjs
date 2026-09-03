@@ -42,6 +42,8 @@ const ENGINES = [
   // These two already carried guards; the list simply did not know about them.
   ['finance-import.js','FinanceImport'],
   ['ai-gateway.js','AIGateway'],
+  // The Forge — training/mental/health standards data.
+  ['forge-engine.js','Forge'],
 ];
 
 /* Two files are deliberately unguarded, and the completeness check below knows it:
