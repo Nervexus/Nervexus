@@ -322,6 +322,43 @@ t('a title is never used as the name', async()=>{
   }
 });
 
+/* ---- release notes must not be an email on their own ---------------------------------
+   Reported from the live app: an unexpected afternoon email that turned out to be
+   "Nervexus v11.235 is out". The version note fires whenever the live version string
+   changes, so every deploy sent one — two in a day, and more on a busy day. It is marked
+   'low' precisely so it rides along with something worth interrupting for. */
+t('a release note alone does not send an email', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({ missions:[],
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
+    workouts:[{id:'w',user_id:UID,occurred_at:today+'T10:00:00.000Z'}],
+    expenses:[{id:'x',user_id:UID,occurred_at:today+'T10:00:00.000Z'}],
+    sleep_logs:[{id:'s',user_id:UID,log_date:today}],
+    hydration_logs:[{id:'h',user_id:UID,log_date:today}],
+    meals:[{id:'m',user_id:UID,logged_date:today}],
+    body_metrics:[{id:'b',user_id:UID,log_date:today}],
+    activities:[{id:'a',user_id:UID,occurred_at:today+'T10:00:00.000Z'}] }));
+  const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:'older'});
+  if(email.sends.length) throw new Error('emailed a release note on its own:\n'+email.sends[0].text);
+  if(r.held!=='low-priority only') throw new Error('expected a low-priority hold, got '+JSON.stringify(r.held));
+  // and it must not be thrown away — no dedupe key burned, so it can ride along later
+  const burned=admin._inserted.filter(x=>x.source_type==='version');
+  if(burned.length) throw new Error('the release note was marked sent without being sent');
+});
+
+t('a release note rides along with real content', async()=>{
+  reset();
+  const admin=makeAdmin(baseTables({
+    performance_status:[{user_id:UID,miss_streak:0,banned:false,last_eval_date:today}],
+    performance_logs:[{user_id:UID,log_date:today,id:'p1'}] }));
+  await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:'older'});
+  if(!email.sends.length) throw new Error('nothing sent when there were real tasks pending');
+  const body=email.sends[0].text;
+  if(!/tasks pending/.test(body)) throw new Error('missing the tasks line');
+  if(!/new version is live/.test(body)) throw new Error('the release note did not ride along:\n'+body);
+});
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

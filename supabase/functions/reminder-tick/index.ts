@@ -109,6 +109,18 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
   if (!items.length) return { sent: 0, emailed: 0 };
   if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0, emailed: 0 };
 
+  /* A digest of nothing but low-priority notes does not justify an email. The release note
+     is the only 'low' item there is, and it fires whenever the live version string changes —
+     so every deploy sent one, and a day with several deploys sent several. It is marked low
+     precisely so it can ride along with something that was worth interrupting for; this is
+     the line that actually makes that true.
+
+     Nothing is discarded and no dedupe key is burned: the note simply waits, and goes out
+     with the next digest that has real content. */
+  if (items.every((i) => (i.priority || 'normal') === 'low')) {
+    return { sent: 0, emailed: 0, held: 'low-priority only' };
+  }
+
   if (!forcesImmediateSend(items)) {
     const hour = localHour(new Date(), prefs.timezone || UK_TZ);
     if (hour < 6 || hour >= 23) return { sent: 0, emailed: 0, held: 'outside 6am-11pm' };
@@ -369,7 +381,7 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
    So it is no longer remembered. The live site already publishes its own version in
    NOTIF_BUILD_VERSION; the function reads it and falls back to the constant only if the
    fetch fails. Cached per invocation, so a sweep over every user costs one request. */
-const LATEST_VERSION_FALLBACK = 'v11.230';
+const LATEST_VERSION_FALLBACK = 'v11.236';
 const APP_URL = 'https://nervexus.vercel.app';
 let _versionCache: string | null = null;
 async function latestVersion(): Promise<string> {
