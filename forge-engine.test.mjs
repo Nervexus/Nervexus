@@ -160,6 +160,65 @@ t('the genuinely risky work carries a warning', ()=>{
   if(!addiction.drills.some(d=>d.risk && /withdrawal/i.test(d.risk))) throw new Error('withdrawal danger must be stated');
 });
 
+/* ---- progress ---------------------------------------------------------------------
+   "Assessments to measure progress" is only met if the second assessment can be compared
+   with the first. These cover the comparison, not the storage. */
+
+t('every saved score can be traced back to the standard it came from', ()=>{
+  const ids=[];
+  F.REGIONS.forEach(r=>r.standards.forEach(s=>ids.push(s.id)));
+  F.MENTAL.forEach(m=>m.standards.forEach(s=>ids.push(s.id)));
+  for(const id of ids) if(!F.standardById(id)) throw new Error(id+' is not resolvable');
+  if(F.standardById('not-a-standard')) throw new Error('unknown ids must return null, not a guess');
+});
+
+t('the series scores each assessment as the header would score it today', ()=>{
+  const h=[{date:'2026-08-01',scores:{'pullups':5}},{date:'2026-08-20',scores:{'pullups':20}}];
+  const s=F.series(h);
+  if(s.length!==2) throw new Error('one point per assessment');
+  if(s[0].date!=='2026-08-01') throw new Error('dates must survive');
+  if(s[1].score<=s[0].score) throw new Error('a better assessment must score higher');
+  for(const p of s) if(p.score!==F.unitScore(h[s.indexOf(p)].scores).score) throw new Error('series must agree with unitScore');
+});
+
+t('an empty history is a series of nothing, not a crash', ()=>{
+  if(F.series().length || F.series([]).length) throw new Error('empty history must give no points');
+  if(F.movement().length || F.movement({}, {}).length) throw new Error('nothing to compare is not movement');
+});
+
+t('movement reports tier changes and ignores drift inside a tier', ()=>{
+  const st=F.standardById('pullups');
+  if(!st) throw new Error('fixture standard missing');
+  const inTier=st.tiers[0], sameTier=st.tiers[0]+0.5;
+  if(F.tierOf(st,inTier)!==F.tierOf(st,sameTier)) throw new Error('fixture does not stay inside one tier');
+  if(F.movement({pullups:inTier},{pullups:sameTier}).length)
+    throw new Error('a number moving inside its own tier is not progress');
+  const up=F.movement({pullups:st.tiers[0]},{pullups:st.tiers[3]});
+  if(up.length!==1 || up[0].dir!=='up') throw new Error('crossing a tier upward must register');
+  if(up[0].to<=up[0].from) throw new Error('the tiers either side must be reported');
+  if(!up[0].group || !up[0].area) throw new Error('movement must say where it happened');
+});
+
+t('a first-ever score is new, not an improvement', ()=>{
+  const m=F.movement({},{'pullups':12});
+  if(m.length!==1 || m[0].dir!=='new') throw new Error('an unmeasured standard has nothing to improve on');
+  if(m[0].from!==null) throw new Error('there is no previous tier to report');
+});
+
+t('regressions are reported, and reported first', ()=>{
+  const pu=F.standardById('pullups'), nw=F.standardById('nasal-walk');
+  const before={pullups:pu.tiers[3], 'nasal-walk':nw.tiers[0]};
+  const after ={pullups:pu.tiers[0], 'nasal-walk':nw.tiers[3]};
+  const m=F.movement(before,after);
+  const down=m.filter(x=>x.dir==='down');
+  if(!down.length) throw new Error('going backwards must not be silently dropped');
+  if(m[0].dir!=='down') throw new Error('a regression must sort above a gain — it is the one worth reading');
+});
+
+t('a standard dropped from a later assessment is not counted as a change', ()=>{
+  if(F.movement({pullups:20},{}).length) throw new Error('not re-testing something is not a regression');
+});
+
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
 console.log('\n'+pass+' passed, '+fail+' failed');

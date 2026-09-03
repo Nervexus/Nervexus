@@ -438,10 +438,64 @@
     return out.slice(0, n || 5);
   }
 
+  /* Every standard in one flat index, so a saved score can be turned back into the
+     standard it came from. Built once, on first use. */
+  var INDEX = null;
+  function index() {
+    if (INDEX) return INDEX;
+    INDEX = {};
+    function add(groups, area) {
+      groups.forEach(function (g) {
+        g.standards.forEach(function (st) {
+          INDEX[st.id] = { standard: st, group: g.name, area: area };
+        });
+      });
+    }
+    add(REGIONS, 'Training');
+    add(MENTAL, 'Mental');
+    return INDEX;
+  }
+  function standardById(id) { var e = index()[id]; return e ? e.standard : null; }
+
+  /* One point per recorded assessment, so progress can be drawn as a line rather than
+     asserted. Each stored entry holds the full picture as it stood that day, so the
+     score is computed the same way the header computes today's. */
+  function series(history) {
+    return (history || []).map(function (h) {
+      var u = unitScore(h.scores);
+      return { date: h.date, score: u.score, tier: u.tier, assessed: u.assessed };
+    });
+  }
+
+  /* What actually changed between two assessments. Tier movement, not raw numbers: a
+     number creeping up inside the same tier has not moved the thing being measured, and
+     a page that congratulates you for it is teaching you to ignore it.
+     Regressions sort first. They are the ones worth reading. */
+  function movement(before, after) {
+    var b = before || {}, a = after || {}, ix = index(), out = [];
+    Object.keys(a).forEach(function (id) {
+      var e = ix[id];
+      if (!e || a[id] == null || isNaN(a[id])) return;
+      var to = tierOf(e.standard, +a[id]);
+      var had = !(b[id] == null || isNaN(b[id]));
+      var from = had ? tierOf(e.standard, +b[id]) : null;
+      if (had && from === to) return;
+      out.push({
+        id: id, name: e.standard.name, group: e.group, area: e.area,
+        from: from, to: to,
+        dir: !had ? 'new' : (to > from ? 'up' : 'down')
+      });
+    });
+    var rank = { down: 0, up: 1, new: 2 };
+    out.sort(function (x, y) { return rank[x.dir] - rank[y.dir]; });
+    return out;
+  }
+
   root.Forge = {
     TIERS: TIERS, REGIONS: REGIONS, MENTAL: MENTAL,
     T_LEVERS: T_LEVERS, LIFESTYLE: LIFESTYLE, FOODS: FOODS, NUTRITION_RULES: NUTRITION_RULES,
-    tierOf: tierOf, unitScore: unitScore, weakest: weakest
+    tierOf: tierOf, unitScore: unitScore, weakest: weakest,
+    standardById: standardById, series: series, movement: movement
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.Forge;
 })(typeof window !== 'undefined' ? window : this);

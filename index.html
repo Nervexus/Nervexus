@@ -3632,6 +3632,34 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
 
+        <!-- progress: the assessments as a series, and what actually crossed a tier -->
+        <sc-if value="{{ forgeHasProgress }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline; margin-bottom:2px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99;">PROGRESS · LAST 8 ASSESSMENTS</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ forgeDeltaInk }};">{{ forgeDeltaLabel }}</div>
+            </div>
+            <div style="display:flex; align-items:flex-end; gap:6px; height:96px; padding-top:8px;">
+              <sc-for list="{{ forgeBars }}" as="b" hint-placeholder-count="8">
+                <div style="flex:1; min-width:0; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ b.valC }}; white-space:nowrap;">{{ b.val }}</span>
+                  <div title="{{ b.title }}" style="width:100%; max-width:26px; height:{{ b.h }}%; min-height:2px; border-radius:5px 5px 2px 2px; background:{{ b.bg }};"></div>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78; white-space:nowrap;">{{ b.label }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ forgeMovedAny }}" hint-placeholder-val="{{ false }}">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin:15px 0 5px;">WHAT MOVED</div>
+              <sc-for list="{{ forgeMoved }}" as="m" hint-placeholder-count="3">
+                <div style="display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-top:1px solid rgba(255,255,255,0.05);">
+                  <span style="font-size:12.5px; color:#dbdbe0;"><span style="color:{{ m.ink }};">{{ m.arrow }}</span> {{ m.name }}</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ m.ink }};">{{ m.where }} · {{ m.label }}</span>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+        </sc-if>
+
         <sc-if value="{{ forgeWeakest.length }}" hint-placeholder-val="{{ false }}">
           <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; margin-bottom:16px; border:1px solid rgba(232,180,90,0.28);">
             <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#e8b45a; margin-bottom:9px;">WEAKEST LINKS — WORK HERE</div>
@@ -9407,7 +9435,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-237 · v11.237 the-forge';
+const NOTIF_BUILD_VERSION = '2026.09.03-238 · v11.238 forge-progress';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13916,6 +13944,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.238', date:'Sep 3, 2026', notes:[
+      'The Forge now shows your assessments back to you: the last eight as a chart, the change since the one before it, and which standards actually crossed a tier.',
+      'Going backwards is reported, and it is listed first. A number creeping up inside the same tier is not reported at all \u2014 it has not moved the thing being measured.',
+    ]},
     {version:'v11.237', date:'Sep 3, 2026', major:true, notes:[
       'The Forge. A new page under Fitness \u2014 not a plan, a standard.',
       'Training Centre: ten regions, head to feet. The neck, the feet, the hands and the lower legs are numbered the same as the chest, because they are what actually fails first.',
@@ -17911,6 +17943,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           };
         });
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
+        /* Progress. An assessment you cannot compare with the last one measures nothing,
+           so the history is drawn rather than just stored. Bars are scaled to the best
+           result on record, not to 100 — the shape of the last eight is the point. */
+        const hist=(S.forgeHistory||[]), pts=F.series(hist), last8=pts.slice(-8);
+        const best=Math.max(1, ...last8.map(p=>p.score));
+        const dLbl=(d)=>{ const q=String(d||'').split('-'); return q.length===3?(+q[2]+'/'+ +q[1]):String(d||''); };
+        const ink4=(n)=>TI[Math.max(1,Math.min(4,Math.ceil(n/25)))];
+        const bars=last8.map(p=>({ h:Math.round((p.score/best)*100), val:p.score+'%', valC:ink4(p.score),
+          label:dLbl(p.date), bg:ink4(p.score), title:p.date+' · '+p.score+'% · '+p.assessed+' measured' }));
+        const prevEntry=hist.length>1?hist[hist.length-2]:null;
+        const moved=prevEntry?F.movement(prevEntry.scores, hist[hist.length-1].scores):[];
+        const dScore=pts.length>1?(pts[pts.length-1].score-pts[pts.length-2].score):null;
         const sp=this._forgeFoodSpend();
         const EV={strong:'#6cffba',moderate:'#e8b45a',weak:'#ff8a5b'};
         return {
@@ -17922,6 +17966,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           forgeScoreInk:us.assessed?TI[Math.max(1,Math.min(4,Math.ceil(us.score/25)))]:'#6f6f78',
           forgeAssessed:us.assessed, forgeTotal:us.total,
           forgeCentres:centres, forgeLink:link, forgeWeakest:wk,
+          forgeHasProgress:!!pts.length, forgeBars:bars, forgeMovedAny:!!moved.length,
+          forgeDeltaLabel: dScore==null
+            ? 'First assessment on record — nothing to measure it against yet.'
+            : (dScore>0?'+'+dScore:dScore<0?String(dScore):'no change')+' points since '+dLbl(prevEntry.date),
+          forgeDeltaInk: dScore==null?'#8f8f99':dScore>0?'#6cffba':dScore<0?'#ff8a5b':'#8f8f99',
+          forgeMoved: moved.map(m=>({ name:m.name, where:m.group,
+            arrow: m.dir==='up'?'▲':m.dir==='down'?'▼':'●',
+            label: m.dir==='new'?('first recorded · '+tierName(m.to)):(tierName(m.from)+' → '+tierName(m.to)),
+            ink: m.dir==='up'?'#6cffba':m.dir==='down'?'#ff8a5b':'#c9c9ce' })),
           forgeShowGroups:centre!=='health', forgeShowHealth:centre==='health',
           forgeGroups:groups,
           saveForgeScores:()=>this.saveForgeScores(),
@@ -17931,6 +17984,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         };
       }, { forgeTierLabel:'The Forge', forgeSub:'Standards unavailable — reload to try again.', forgeScorePct:'—', forgeScoreInk:'#6f6f78', forgeAssessed:0, forgeTotal:0,
            forgeCentres:[], forgeLink:[], forgeWeakest:[], forgeGroups:[], forgeShowGroups:false, forgeShowHealth:false,
+           forgeHasProgress:false, forgeBars:[], forgeMoved:[], forgeMovedAny:false, forgeDeltaLabel:'', forgeDeltaInk:'#8f8f99',
            forgeLevers:[], forgeLifestyle:[], forgeRules:[], forgeFoods:[], forgeFoodSpend:'', saveForgeScores:()=>{} }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
