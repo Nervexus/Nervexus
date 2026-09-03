@@ -348,6 +348,59 @@ t('the bars are scaled to the best result on record', async () => {
   ok(heights[0] < heights[1], 'a worse assessment must draw shorter');
 });
 
+t('a higher score never draws a dimmer bar', async () => {
+  await boot({
+    forgeHistory: [
+      { date: '2026-08-01', scores: { 'nasal-walk': 20 } },
+      { date: '2026-08-08', scores: { 'nasal-walk': 45 } },
+      { date: '2026-08-20', scores: { 'nasal-walk': 90 } },
+    ],
+    forgeScores: { 'nasal-walk': 90 },
+  });
+  /* The bars encode magnitude, so their colour must be one hue getting brighter. The
+     tier palette rotates through green and amber; reused here it makes a better score
+     read as a warning. Lightness must rise with the score, and the hue must not move. */
+  const bars = await page.evaluate(() =>
+    [...document.querySelectorAll('div[title]')]
+      .filter(d => /^\d{4}-\d{2}-\d{2} · /.test(d.getAttribute('title')))
+      .map(d => d.style.background || d.style.backgroundColor));
+  eq(bars.length, 3, 'one bar per assessment');
+  /* The browser normalises whatever we wrote to rgb(), so go back to hue and lightness
+     from the pixels rather than from the CSS we happened to author. */
+  const parsed = bars.map(b => {
+    const m = /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/.exec(b);
+    if (!m) throw new Error('unreadable bar colour: ' + b);
+    const [r, g, bl] = [+m[1] / 255, +m[2] / 255, +m[3] / 255];
+    const max = Math.max(r, g, bl), min = Math.min(r, g, bl), d = max - min;
+    let h = 0;
+    if (d) {
+      if (max === r) h = ((g - bl) / d) % 6;
+      else if (max === g) h = (bl - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h = (h * 60 + 360) % 360;
+    }
+    return { h: Math.round(h), l: (max + min) / 2 };
+  });
+  const spread = Math.max(...parsed.map(p => p.h)) - Math.min(...parsed.map(p => p.h));
+  ok(spread <= 2, 'the hue must not change across the ramp (spread ' + spread + '°): ' + bars.join(' | '));
+  ok(parsed[0].l < parsed[1].l && parsed[1].l < parsed[2].l,
+     'lightness must rise with the score: ' + parsed.map(p => p.l.toFixed(2)).join(' < '));
+});
+
+t('the value labels wear text ink, not the series colour', async () => {
+  await boot({
+    forgeHistory: [{ date: '2026-08-01', scores: { 'nasal-walk': 20 } }],
+    forgeScores: { 'nasal-walk': 20 },
+  });
+  const coloured = await page.evaluate(() => {
+    const strip = [...document.querySelectorAll('div[title]')]
+      .find(d => /^\d{4}-\d{2}-\d{2} · /.test(d.getAttribute('title')));
+    return [...strip.parentElement.querySelectorAll('span')].map(s => s.style.color);
+  });
+  ok(coloured.length > 0, 'no labels found on the bar');
+  ok(!coloured.some(c => /hsl\(/.test(c)), 'a label is wearing the bar colour: ' + coloured.join(' | '));
+});
+
 /* ---- weakest links ---- */
 
 t('the weakest measured standards are named, lowest first', async () => {

@@ -17950,8 +17950,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const best=Math.max(1, ...last8.map(p=>p.score));
         const dLbl=(d)=>{ const q=String(d||'').split('-'); return q.length===3?(+q[2]+'/'+ +q[1]):String(d||''); };
         const ink4=(n)=>TI[Math.max(1,Math.min(4,Math.ceil(n/25)))];
-        const bars=last8.map(p=>({ h:Math.round((p.score/best)*100), val:p.score+'%', valC:ink4(p.score),
-          label:dLbl(p.date), bg:ink4(p.score), title:p.date+' · '+p.score+'% · '+p.assessed+' measured' }));
+        /* One hue, dim to bright, rather than the tier colours. The tier palette is an
+           identity scale — it tells four states apart. Reused on a bar chart it rotates
+           green then amber, so a better score reads as a warning and a worse one reads as
+           fine. Height carries the magnitude; the ramp only reinforces it. */
+        const ramp=(n)=>'hsl(157,64%,'+Math.round(22+(Math.max(0,Math.min(100,n))/100)*40)+'%)';
+        const bars=last8.map((p,i)=>({ h:Math.round((p.score/best)*100), val:p.score+'%',
+          valC:(i===last8.length-1)?'#eef0f2':'#8f8f99',
+          label:dLbl(p.date), bg:ramp(p.score), title:p.date+' · '+p.score+'% · '+p.assessed+' measured' }));
         const prevEntry=hist.length>1?hist[hist.length-2]:null;
         const moved=prevEntry?F.movement(prevEntry.scores, hist[hist.length-1].scores):[];
         const dScore=pts.length>1?(pts[pts.length-1].score-pts[pts.length-2].score):null;
