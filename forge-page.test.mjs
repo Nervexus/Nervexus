@@ -393,17 +393,94 @@ t('the risky work carries its loading warning on the page, not just in the data'
   ok(/ISOMETRICS FIRST/i.test(body), 'the neck loading order must be visible where the neck work is');
 });
 
-t('only one group is open at a time, and clicking it again closes it', async () => {
-  await boot();
+t('picking a region swaps the detail pane', async () => {
+  await boot({ forgeCentre: 'training' });
   await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(600);
+  ok(/A neck carries the head/.test(await text()), 'the neck detail did not open');
   await page.evaluate(() => window.__nvx.setForgeOpen('chest'));
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(600);
   const body = await text();
-  ok(!/A neck carries the head/.test(body), 'opening a second group must close the first');
-  await page.evaluate(() => window.__nvx.setForgeOpen('chest'));
-  await page.waitForTimeout(400);
-  ok(!/THE STANDARD/.test(await text()), 'clicking an open group must close it');
+  ok(!/A neck carries the head/.test(body), 'the previous region is still in the pane');
+  ok(/THE STANDARD/.test(body) && /THE WORK/.test(body), 'the new region did not render');
+});
+
+t('the detail pane is never empty', async () => {
+  /* Master-detail with no selection is a blank half-page. There is no closed state: the
+     binding falls back to the first region rather than rendering nothing. */
+  await boot({ forgeCentre: 'training', forgeOpen: null });
+  let body = await text();
+  ok(/THE STANDARD/.test(body), 'nothing selected and nothing shown');
+  ok(/Head/.test(body), 'the fallback should be the first region');
+
+  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
+  await page.waitForTimeout(500);
+  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
+  await page.waitForTimeout(500);
+  ok(/A neck carries the head/.test(await text()), 'clicking the selected region must not empty the pane');
+});
+
+t('switching to Mental falls back rather than landing on nothing', async () => {
+  /* forgeOpen would still hold a training key, which does not exist in Mental. */
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
+  await page.waitForTimeout(500);
+  await page.evaluate(() => window.__nvx.setForgeCentre('mental'));
+  await page.waitForTimeout(700);
+  const body = await text();
+  ok(/THE STANDARD/.test(body), 'the Mental pane came up empty');
+  ok(/Attention is the one resource/.test(body), 'it should fall back to Focus, the first faculty');
+  ok(!/A neck carries the head/.test(body), 'a training region leaked into Mental');
+});
+
+t('every region is listed in the rail at once', async () => {
+  await boot({ forgeCentre: 'training' });
+  const rail = await page.evaluate(() => {
+    /* Interpolated text renders inside a span.sc-interp, so the element whose textContent
+       matches is that span — the card is two levels up, not one. */
+    const lbl = [...document.querySelectorAll('*')].find(e =>
+      e.children.length === 0 && e.textContent.trim() === 'THE TEN REGIONS');
+    const card = lbl && lbl.closest('.cc-glowcard');
+    if (!card) return null;
+    return [...card.querySelectorAll('span')].map(e => e.textContent.trim());
+  });
+  ok(rail, 'no region rail rendered');
+  for (const r of ['Head', 'Neck', 'Shoulders', 'Chest', 'Abs & Core', 'Back', 'Upper Legs', 'Lower Legs', 'Feet', 'Hands & Grip']) {
+    ok(rail.includes(r), r + ' is missing from the rail');
+  }
+});
+
+t('the rail sits beside the detail, not above it', async () => {
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await boot({ forgeCentre: 'training' });
+  const box = await page.evaluate(() => {
+    const lbl = [...document.querySelectorAll('*')].find(e =>
+      e.children.length === 0 && e.textContent.trim() === 'THE TEN REGIONS');
+    const std = [...document.querySelectorAll('*')].find(e =>
+      e.children.length === 0 && e.textContent.trim() === 'THE STANDARD');
+    if (!lbl || !std) return null;
+    return { rail: lbl.getBoundingClientRect().left, pane: std.getBoundingClientRect().left };
+  });
+  ok(box, 'could not find both columns');
+  ok(box.pane > box.rail + 200, 'the detail pane should sit to the right of the rail: ' + JSON.stringify(box));
+});
+
+t('the selected region is the one marked in the rail', async () => {
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => window.__nvx.setForgeOpen('feet'));
+  await page.waitForTimeout(600);
+  const marked = await page.evaluate(() => {
+    const lbl = [...document.querySelectorAll('*')].find(e =>
+      e.children.length === 0 && e.textContent.trim() === 'THE TEN REGIONS');
+    const card = lbl && lbl.closest('.cc-glowcard');
+    if (!card) return [];
+    return [...card.querySelectorAll('div')]
+      .filter(r => r.style && r.style.borderLeftWidth === '2px' &&
+                   r.style.borderLeftColor && r.style.borderLeftColor !== 'transparent')
+      .map(r => r.textContent.trim().split('\n')[0]);
+  });
+  eq(marked.length, 1, 'exactly one rail row should carry the accent: ' + marked.join(','));
+  ok(/Feet/.test(marked[0]), 'the accent is on the wrong row: ' + marked[0]);
 });
 
 /* ---- recording an assessment ---- */
