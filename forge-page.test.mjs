@@ -54,11 +54,13 @@ async function boot(extra) {
       loggedIn: true, scene: 'forge', forgeCentre: 'training',
       forgeOpen: null, forgeDraft: {}, forgeScores: {}, forgeHistory: [],
       perfCheckinOpen: false, whatsNewOpen: false, staleOpen: false, toasts: [], searchOpen: false,
+      /* The real stored shape: `exercise`, and a capitalised part. The log list filters on
+         both, so a loose fixture renders an empty log and quietly proves nothing. */
       workouts: [
-        { id: 'w1', ts: now - 1 * day, part: 'chest', name: 'Bench', mins: 40 },
-        { id: 'w2', ts: now - 2 * day, part: 'back', name: 'Row', mins: 35 },
-        { id: 'w3', ts: now - 3 * day, part: 'legs', name: 'Squat', mins: 50 },
-        { id: 'w4', ts: now - 40 * day, part: 'arms', name: 'Curl', mins: 20 },   // outside the 7-day window
+        { id: 'w1', ts: now - 1 * day, part: 'Chest', exercise: 'Bench', weight: 80, sets: 3, reps: 8, min: 40 },
+        { id: 'w2', ts: now - 2 * day, part: 'Back',  exercise: 'Row',   weight: 60, sets: 3, reps: 10, min: 35 },
+        { id: 'w3', ts: now - 3 * day, part: 'Legs',  exercise: 'Squat', weight: 100, sets: 4, reps: 6, min: 50 },
+        { id: 'w4', ts: now - 40 * day, part: 'Arms', exercise: 'Curl',  weight: 20, sets: 3, reps: 12, min: 20 }, // outside the 7-day window
       ],
       expenses: [
         { id: 'e1', ts: now - 4 * day, label: 'Tesco groceries', amount: 42.50 },
@@ -88,28 +90,18 @@ t('the Forge is its own scene, not a tab inside Fitness', async () => {
   ok(!/Body Systems/.test(body), 'the Fitness page rendered at the same time — the scenes are not exclusive');
 });
 
-t('it is reachable from the Fitness tab row', async () => {
+t('the Forge is no longer a tab inside Fitness', async () => {
   await boot({ scene: 'fitness' });
-  /* "The Forge" is on the page twice — the sidebar and this tab row — so scope the click
-     to the row that also holds Fitness HQ. Clicking whichever came first in the DOM passed
-     either way and proved nothing about the tab. */
-  const hit = await page.evaluate(() => {
-    const inTabRow = (el) => {
-      let n = el.parentElement;
-      for (let i = 0; i < 3 && n; i++, n = n.parentElement) {
-        if (/Fitness HQ/.test(n.textContent || '')) return true;
-      }
-      return false;
-    };
-    const tab = [...document.querySelectorAll('div,span')].find(e =>
-      e.children.length === 0 && e.textContent.trim() === 'The Forge' && inTabRow(e));
-    if (!tab) return false;
-    tab.click();
-    return true;
+  const tabs = await page.evaluate(() => {
+    const hq = [...document.querySelectorAll('*')].find(e =>
+      e.children.length === 0 && e.textContent.trim() === 'Fitness HQ');
+    if (!hq) return null;
+    return [...hq.parentElement.parentElement.querySelectorAll('*')]
+      .filter(e => e.children.length === 0).map(e => e.textContent.trim());
   });
-  ok(hit, 'no "The Forge" tab found alongside Fitness HQ');
-  await page.waitForTimeout(900);
-  eq(await page.evaluate(() => window.__nvx.state.scene), 'forge', 'scene after clicking the tab');
+  ok(tabs, 'the Fitness tab row did not render');
+  ok(!tabs.includes('The Forge'), 'the Forge is still a tab inside Fitness: ' + tabs.join(' | '));
+  ok(tabs.includes('Fitness HQ') && tabs.includes('Music'), 'the other tabs must survive: ' + tabs.join(' | '));
 });
 
 t('the sidebar lists The Forge directly above the AI Command Center', async () => {
@@ -182,6 +174,100 @@ t('the page wears the Éverpine crest in champagne', async () => {
   ok(crest, 'no crest beside the page title');
   eq(crest.colour, 'rgb(231, 216, 166)', 'the crest must be Éverpine champagne (#E7D8A6)');
   ok(crest.size > 20, 'the page crest should read as a logo, not a nav glyph: ' + crest.size + 'px');
+});
+
+/* ---- the home centre: the working half of Fitness HQ, on the Forge ---- */
+
+t('the Forge opens on its home', async () => {
+  /* Read the constructor's own default — boot() sets forgeCentre itself, so going through it
+     would only prove the fixture. */
+  await page.goto(BASE, { waitUntil: 'load' });
+  await page.waitForFunction(() => !!window.__nvx, null, { timeout: 20000 });
+  eq(await page.evaluate(() => window.__nvx.state.forgeCentre), 'home', 'the centre it lands on');
+  await boot({ forgeCentre: 'home' });
+  const body = await text();
+  ok(/HOME/.test(body), 'a HOME tab should sit alongside TRAINING, MENTAL and HEALTH');
+});
+
+t('the home carries the training floor', async () => {
+  await boot({ forgeCentre: 'home' });
+  const body = await text();
+  for (const panel of ['Muscle Training Split', 'Anatomy', 'Log Training', 'MOVE', 'TRAIN TODAY', 'WEEK TOTAL', 'Strength Chart']) {
+    ok(body.includes(panel), panel + ' is missing from the Forge home');
+  }
+  ok(!/THE STANDARD/.test(body), 'the standards belong to Training, not the home');
+});
+
+t('the home is not shown on the other centres', async () => {
+  for (const centre of ['training', 'mental', 'health']) {
+    await boot({ forgeCentre: centre });
+    ok(!/Muscle Training Split/.test(await text()), 'the training floor leaked onto the ' + centre + ' centre');
+  }
+});
+
+t('the log on the Forge is the same log as Fitness HQ, not a second one', async () => {
+  await boot({ forgeCentre: 'home' });
+  /* The whole point of moving these cards rather than rebuilding them: one set of numbers.
+     A separate store would show different totals on two screens and both would look right. */
+  const seeded = await page.evaluate(() => window.__nvx.state.workouts.length);
+  const shown = await text();
+  ok(/Bench/.test(shown), 'the seeded sessions should already be listed on the Forge home');
+
+  await page.evaluate(() => window.__nvx.setState({
+    woPart: 'Chest', woEx: 'Incline press', woWeight: '60', woSets: '3', woReps: '8', woMin: '' }));
+  await page.waitForTimeout(400);
+  const clicked = await page.evaluate(() => {
+    const btn = [...document.querySelectorAll('span')].find(e => e.textContent.trim() === 'Log Set');
+    if (!btn) return false; btn.click(); return true;
+  });
+  ok(clicked, 'no Log Set button on the Forge home');
+  await page.waitForTimeout(900);
+
+  const after = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(after.length, seeded + 1, 'the set should land in the shared workouts store');
+  ok(after.some(w => w.exercise === 'Incline press' || w.name === 'Incline press'),
+     'the logged set is not in the store: ' + JSON.stringify(after.slice(-1)));
+
+  /* Switch scene without re-booting — boot() re-seeds workouts, which would wipe the set
+     and make this assertion test the fixture instead of the store. */
+  await page.evaluate(() => window.__nvx.setState({ scene: 'fitness' }));
+  await page.waitForTimeout(900);
+  ok(/Incline press/.test(await text()), 'Fitness HQ must show the set logged on the Forge');
+});
+
+t('the rings canvas is actually drawn on the Forge home', async () => {
+  await boot({ forgeCentre: 'home' });
+  await page.waitForTimeout(1200);
+  /* init_forge has to exist and run: the scene signature only watched `scene`, so switching
+     centre inside the Forge used to leave this canvas blank. */
+  const painted = await page.evaluate(() => {
+    const cv = document.querySelector('canvas[data-chart="fitRings"]');
+    if (!cv || !cv.width) return null;
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+    let on = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) on++;
+    return { w: cv.width, lit: on };
+  });
+  ok(painted, 'no rings canvas on the Forge home');
+  ok(painted.lit > 200, 'the rings canvas rendered blank: ' + JSON.stringify(painted));
+});
+
+t('leaving the home and coming back redraws the rings', async () => {
+  await boot({ forgeCentre: 'home' });
+  await page.waitForTimeout(900);
+  await page.evaluate(() => window.__nvx.setForgeCentre('training'));
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setForgeCentre('home'));
+  await page.waitForTimeout(1200);
+  const lit = await page.evaluate(() => {
+    const cv = document.querySelector('canvas[data-chart="fitRings"]');
+    if (!cv || !cv.width) return -1;
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+    let on = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) on++;
+    return on;
+  });
+  ok(lit > 200, 'the rings did not come back after switching centres: ' + lit + ' lit pixels');
 });
 
 /* ---- bindings: the failure mode here is silence, so assert on rendered text ---- */
