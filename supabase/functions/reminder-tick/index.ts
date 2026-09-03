@@ -549,8 +549,9 @@ async function sweepVersionUpdate(admin: any, userId: string, name: string, pref
    would have reported Training missing every single day, because workouts carry an
    occurred_at timestamp.
 
-   Nutrition needed no migration in the end: the client never writes a date, but the table
-   has created_at, and "was a meal logged today" is exactly what created_at answers.
+   Nutrition asks meals.logged_date. That column was there all along, defaulting to
+   CURRENT_DATE — I had read the client's insert, seen no date in it, and concluded the
+   table had none. The client sets it explicitly now rather than leaning on the default.
 
    Energy is still absent as a line of its own — it is a column on the sleep row, filled in
    by the same form, so it is counted once under Sleep & energy rather than nagged for
@@ -563,7 +564,7 @@ const LOG_KINDS: { label: string; any: LogSource[] }[] = [
                                    { table: 'income',         col: 'occurred_at', kind: 'stamp' }] },
   { label: 'Sleep & energy', any: [{ table: 'sleep_logs',     col: 'log_date',    kind: 'date'  }] },
   { label: 'Hydration',      any: [{ table: 'hydration_logs', col: 'log_date',    kind: 'date'  }] },
-  { label: 'Nutrition',      any: [{ table: 'meals',          col: 'created_at',  kind: 'stamp' }] },
+  { label: 'Nutrition',      any: [{ table: 'meals',          col: 'logged_date', kind: 'date'  }] },
   { label: 'Body metrics',   any: [{ table: 'body_metrics',   col: 'log_date',    kind: 'date'  }] },
   { label: 'Work log',       any: [{ table: 'activities',     col: 'occurred_at', kind: 'stamp' }] },
 ];

@@ -1,22 +1,19 @@
--- Nutrition needs a day of its own.
+-- Nutrition already had its day. This migration is a no-op, kept as the record of a
+-- mistake rather than deleted.
 --
--- `meals` records id, user_id, name, kcal and protein — no date at all. The Logs reminder
--- currently asks created_at instead, which answers "was a meal logged today" but not "was
--- this meal eaten today": a meal entered after midnight for the evening before lands on the
--- wrong day, and a backfilled meal lands on the day it was typed.
+-- I read the client's insert into `meals` — id, user_id, name, kcal, protein — saw no date
+-- and concluded the table had no date column, at a point when I could not query the schema
+-- to check. It has had `logged_date date default CURRENT_DATE` all along.
 --
--- log_date is what every other daily table already uses (sleep_logs, hydration_logs,
--- body_metrics), so nutrition stops being the odd one out.
+-- The first version of this file added a second date column, `log_date`, which was applied
+-- and then dropped once the real schema was visible. Two columns meaning the same thing is
+-- worse than the problem it was solving.
+--
+-- What actually needed fixing was elsewhere and is not SQL:
+--   * the client now sets logged_date explicitly instead of relying on the default, so a
+--     meal entered after midnight for the evening before can be given the right day
+--   * the Logs reminder reads logged_date rather than created_at, which answered "when was
+--     this row written" rather than "which day does this meal count for"
 
-alter table public.meals add column if not exists log_date date;
-
--- Existing rows keep their meaning: the day they were written is the best evidence there is.
-update public.meals set log_date = (created_at at time zone 'UTC')::date where log_date is null;
-
--- New rows default to today rather than null, so a client that has not been updated yet
--- still produces a usable date.
-alter table public.meals alter column log_date set default (now() at time zone 'UTC')::date;
-
-create index if not exists meals_user_day_idx on public.meals (user_id, log_date);
-
-comment on column public.meals.log_date is 'The day the meal counts for — not necessarily the day the row was written.';
+-- Intentionally empty.
+select 1;
