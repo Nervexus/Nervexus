@@ -753,13 +753,18 @@ t('"I finished X" ticks a task off', async()=>{ const h=host();
    quantity: addWorkout stores minutes, weight, sets and reps and drops an entry carrying
    none of them, so counting distance would mean the log vanished silently. Asking is the
    honest behaviour until the record can hold a distance. */
-t('a distance run is recognised and asked about, never silently dropped', async()=>{ let h=host();
+/* This asserted the old behaviour: a 5k could not be stored, so she asked how long it took
+   and logged the answer as minutes. The distance is a record in its own right now, so it is
+   logged on the spot — no question, and the 5k is kept rather than converted into a time. */
+t('a distance run logs on the spot, without needing a duration', async()=>{ let h=host();
   await VA.handle('Log a 5k run',h);
-  has(last(),'Running','should have worked out the exercise from "5k run"');
-  await VA.handle('30 minutes',h);
-  eq(call('logWorkout').slice(0,3),['logWorkout','Running',30]);
+  const c=call('logWorkout');
+  if(!c) throw new Error('a 5k run still is not logged');
+  eq(c.slice(0,3),['logWorkout','Running',0],'should log with no minutes:');
+  eq(c[6],5,'distance:');
+  has(last(),'5km');
   h=host(); await VA.handle('I went for a 10k run this morning',h);
-  has(last(),'Running'); });
+  eq(call('logWorkout')[6],10,'10k:'); });
 
 // ---- the no-key tier, said the way people say it ----
 /* Loura advertises 29 commands that work with nothing connected. Their advertised examples
@@ -1107,6 +1112,39 @@ t('water is confirmed in litres once it is litres', async()=>{
   has(last(),'2 litres','');
   const b=host(); await VA.handle('log 250 ml of water',b);
   has(last(),'250 ml',''); });
+
+/* ---- distance -----------------------------------------------------------------------
+   "log a 5k run" parsed the 5k correctly and then threw it away, because logWorkout carried
+   no distance and addWorkout dropped any entry without minutes, weight or reps. The parse
+   was right and the record could not hold it. Now it can. */
+t('a distance is a quantity, and reaches the log', async()=>{
+  for (const [say, dist, unit, mins] of [
+    ['log a 5k run', 5, 'km', 0],
+    ['i ran 5k', 5, 'km', 0],
+    ['i ran 10k in 48 minutes', 10, 'km', 48],
+    ['log a 3 mile run', 3, 'mi', 0],
+  ]) { const h=host(); await VA.handle(say,h);
+       const c=call('logWorkout');
+       if(!c) throw new Error(JSON.stringify(say)+' did not reach logWorkout');
+       // logWorkout(exercise, minutes, weight, sets, reps, dist, distUnit)
+       eq(c[6], dist, JSON.stringify(say)+' distance:');
+       eq(c[7], unit, JSON.stringify(say)+' unit:');
+       eq(c[2], mins, JSON.stringify(say)+' minutes:'); } });
+
+/* The confirmation has to say the distance back, or a 5k and a 10k read identically. */
+t('the reply names the distance in the unit that was said', async()=>{
+  const a=host(); await VA.handle('log a 5k run',a); has(last(),'5km');
+  const b=host(); await VA.handle('log a 3 mile run',b); has(last(),'3mi');
+  const c=host(); await VA.handle('i ran 10k in 48 minutes',c); has(last(),'10km'); has(last(),'48 minutes'); });
+
+/* And the regression: sessions with no distance must be unchanged. */
+t('workouts without a distance are unaffected', async()=>{
+  const a=host(); await VA.handle('log 30 minutes of running',a);
+  eq(call('logWorkout')[6], 0, 'minutes-only run gained a distance:');
+  has(last(),'30 minutes of running');
+  const b=host(); await VA.handle('log 3 sets of 10 bench press at 80kg',b);
+  eq(call('logWorkout')[6], 0, 'a lift gained a distance:');
+  has(last(),'3 sets of 10'); });
 
 let pass=0, fail=0;
 for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }

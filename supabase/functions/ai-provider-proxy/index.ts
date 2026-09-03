@@ -32,6 +32,16 @@ const DEFAULT_MODEL: Record<string, string> = {
   google: 'gemini-3.6-flash',
   openai: 'gpt-5.6-luna',
 };
+/* 1024 was low enough that ordinary answers hit it — a training plan, a month's summary —
+   and nothing checked stop_reason, so a reply cut off mid-sentence was handed over as if it
+   were finished. Both are fixed together: a ceiling that fits the kind of answer this app
+   asks for, and a check that says so when it is still reached.
+
+   Named once because the two call paths (streaming and not) each had their own literal, and
+   two literals are how the streaming path ends up with a different limit to the other. */
+const MAX_TOKENS = 4096;
+const TRUNCATED_NOTE = '\n\n[Reply cut short at the length limit — ask me to continue.]';
+
 const ALLOWED_MODELS: Record<string, string[]> = {
   anthropic: ['claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001'],
   google: ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite'],
@@ -374,7 +384,7 @@ function streamCall(provider: string, keys: KeyEntry[], prompt: string, model: s
     async start(controller) {
       const enc = new TextEncoder();
       const send = (obj: unknown) => { try { controller.enqueue(enc.encode(sseFrame(obj))); } catch { /* client closed */ } };
-      let usageIn = 0, usageOut = 0;
+      let usageIn = 0, usageOut = 0, stopReason = '';
       try {
         if (!keys.length) { send({ error: 'Provider not configured yet' }); controller.close(); return; }
 
@@ -392,11 +402,13 @@ function streamCall(provider: string, keys: KeyEntry[], prompt: string, model: s
           } else if (provider === 'anthropic') {
             url = 'https://api.anthropic.com/v1/messages';
             headers = { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' };
-            reqBody = { model: resolveModel('anthropic', model), max_tokens: 1024, stream: true, messages: [{ role: 'user', content: prompt }] };
+            reqBody = { model: resolveModel('anthropic', model), max_tokens: MAX_TOKENS, stream: true, messages: [{ role: 'user', content: prompt }] };
             extractDelta = (obj) => (obj.type === 'content_block_delta' && obj.delta?.type === 'text_delta') ? (obj.delta.text || '') : '';
             extractUsage = (obj) => {
               if (obj.type === 'message_start' && obj.message?.usage) usageIn = obj.message.usage.input_tokens || usageIn;
               if (obj.type === 'message_delta' && obj.usage) usageOut = obj.usage.output_tokens || usageOut;
+              // The stop reason arrives on message_delta, at the very end of the stream.
+              if (obj.type === 'message_delta' && obj.delta?.stop_reason) stopReason = obj.delta.stop_reason;
             };
           } else if (provider === 'perplexity') {
             url = 'https://api.perplexity.ai/chat/completions';
@@ -470,6 +482,10 @@ function streamCall(provider: string, keys: KeyEntry[], prompt: string, model: s
             extractUsage(obj);
           }
         }
+        /* Sent as one final delta rather than a flag, so it reaches the reader through the
+           path the answer already took — the client renders deltas and would have had to
+           learn a new field otherwise. */
+        if (stopReason === 'max_tokens') send({ delta: TRUNCATED_NOTE });
         send({ done: true, citations: getCitations() });
       } catch (e) {
         send({ error: (e as Error)?.message || 'Stream failed' });
@@ -707,12 +723,15 @@ Deno.serve(async (req) => {
         } else if (provider === 'anthropic') {
           const r = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST', headers: { 'x-api-key': k, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: usedModel, max_tokens: 1024, messages: [{ role: 'user', content: prompt }] }),
+            body: JSON.stringify({ model: usedModel, max_tokens: MAX_TOKENS, messages: [{ role: 'user', content: prompt }] }),
           });
           if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
           const j = await r.json();
           if (!r.ok) return json({ error: j.error?.message || 'Anthropic request failed (' + r.status + ')' }, 400);
           result = j.content?.[0]?.text || '';
+          // 'max_tokens' means the model was still talking. Saying nothing turns a cut-off
+          // answer into a confidently wrong one.
+          if (j.stop_reason === 'max_tokens') result += TRUNCATED_NOTE;
           if (j.usage) await logUsage(admin, uid, provider, usedModel, j.usage.input_tokens, j.usage.output_tokens);
           lastErr = ''; break;
         } else {

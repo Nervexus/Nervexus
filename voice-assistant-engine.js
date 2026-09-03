@@ -388,21 +388,24 @@
       namey: looksLikeExercise(name),
       dist: dist ? num(dist[1]) : 0,
       distUnit: dist && /^mi/i.test(dist[2]) ? 'mi' : 'km',
-      /* Distance is parsed but does NOT count as quantified yet, and that is deliberate.
-         addWorkout() stores minutes, weight, sets and reps — it has no distance column, and
-         it drops any entry carrying none of those, so treating a distance as a quantity would
-         mean "log a 5k run" parsed cleanly, called the host, and vanished without a word.
-         Recognising the distance still earns its keep: stripping "5k" out of the name leaves
-         "run", which resolves to Running, so instead of a dead end she now asks how long it
-         took and logs a real session. Fold `dist` into this line the day the record can hold
-         it — the parse is already here. */
-      quantified: !!(sets || mins || hrs || wt)
+      /* A distance is a quantity now. It was deliberately excluded while addWorkout() had
+         nowhere to put one — "log a 5k run" would have parsed cleanly, called the host and
+         vanished without a word, which is worse than declining. The workouts table carries
+         distance and distance_unit as of 20260903_workout_distance.sql, so the day named in
+         the old note is this one. */
+      quantified: !!(sets || mins || hrs || wt || dist)
     };
   }
 
   /* Read it back as a sentence, not as fields. "running — 30 min" is how the data is
      shaped; "30 minutes of running" is how it was said to us. */
   function describeWorkout(w) {
+    /* Distance leads when there is one, because it is what the person said: "a 5k run" comes
+       back as "a 5k run", with the time added if they gave one. */
+    if (w.dist && !w.sets) {
+      return w.dist + w.distUnit + ' ' + w.name.toLowerCase()
+           + (w.mins ? ' in ' + plural(w.mins, 'minute') : '');
+    }
     if (w.mins && !w.sets) return plural(w.mins, 'minute') + ' of ' + w.name.toLowerCase();
     if (w.sets) {
       return w.name + ', ' + w.sets + ' set' + (w.sets === 1 ? '' : 's')
@@ -414,7 +417,7 @@
   }
 
   function logWorkout(w, host) {
-    host.tools.logWorkout(w.name, w.mins, w.wt, w.sets, w.reps);
+    host.tools.logWorkout(w.name, w.mins, w.wt, w.sets, w.reps, w.dist, w.distUnit);
     return 'I’ve logged ' + describeWorkout(w) + ' on your fitness log for you.';
   }
 

@@ -11441,7 +11441,7 @@ activities: this._mergeShipLog(s.activities),
         // The proper name for an exercise the index knows, so "on the stairmaster" and
         // "hammer curls" both land as the canonical entry rather than as parse leftovers.
         exerciseName:(name)=>(window.EXERCISE_INDEX ? window.EXERCISE_INDEX.nameOf(name) : null),
-        logWorkout:(exercise,minutes,weight,sets,reps)=>this.addWorkout({exercise,minutes,weight,sets,reps,part:this._guessBodyPart(exercise)}),
+        logWorkout:(exercise,minutes,weight,sets,reps,dist,distUnit)=>this.addWorkout({exercise,minutes,weight,sets,reps,dist,distUnit,part:this._guessBodyPart(exercise)}),
         logHydration:(ml)=>this.addHydMl(ml),
         logWeight:(kg)=>this.addWeight(kg),
         logBodyFat:(pct)=>this.addBodyMetric('bodyFatPct',pct),
@@ -15413,7 +15413,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // below, so it's one real number, not a second disconnected copy.
     const bw=unit==='BW' ? (o.bodyWeight!=null?(+o.bodyWeight||0):(parseFloat(S.woBodyWeight)||0)) : 0;
     if(unit==='BW' && wt<=0 && bw>0) wt=bw;
-    if(!exRaw||!(mn>0||wt>0||rp>0)) return;
+    const dist=o.dist!=null?(+o.dist||0):(parseFloat(S.woDist)||0);
+    const distUnit=(o.distUnit||S.woDistUnit||'km');
+    // A distance is a real quantity now, so a 5k run is no longer dropped for having
+    // no minutes, weight or reps.
+    if(!exRaw||!(mn>0||wt>0||rp>0||dist>0)) return;
     const partsValid=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
     // A part the user explicitly picked (and isn't the catch-all 'Mixed') is respected as-is;
     // otherwise — including when 'Mixed' is selected — split the name and classify each piece
@@ -15423,9 +15427,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const names=forcedPart?[exRaw]:this._splitExerciseNames(exRaw);
     const list=names.length?names:[exRaw];
     const ts=Date.now();
-    const entries=list.map((ex,i)=>({ id:this._uuid(), part:forcedPart||this._guessBodyPart(ex), exercise:ex, min:mn, weight:wt, unit, sets:st, reps:rp, ts:ts-i }));
+    const entries=list.map((ex,i)=>({ id:this._uuid(), part:forcedPart||this._guessBodyPart(ex), exercise:ex, min:mn, weight:wt, unit, sets:st, reps:rp, dist, distUnit, ts:ts-i }));
     this.mut(s=>({workouts:[...s.workouts,...entries],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
-    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()}));
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString()}));
     if(bw>0){ this.setState({woBodyWeight:''}); this.addWeight(bw); } }
   addWeight(kg){ const K=window.HealthKit; if(!K) return;
     const w=kg!=null?+kg:parseFloat(this.state.weightInput);
@@ -15518,7 +15522,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const id=this._uuid(), protein=o.protein!=null?(+o.protein||0):(+S.mealProtein||0);
     this.mut(s=>({health:{...s.health,meals:[...s.health.meals,{id,name:n,kcal:k,protein}]},mealName:'',mealKcal:'',mealProtein:''}));
     this.showToast('fitness','Meal logged',n+' · '+k+' kcal');
-    if(this._sbOn()) window.SB.insert('meals',{id,user_id:this.state.authUserId,name:n,kcal:k,protein}); }
+    if(this._sbOn()) window.SB.insert('meals',{id,user_id:this.state.authUserId,name:n,kcal:k,protein,log_date:(window.HealthKit?window.HealthKit.today():new Date().toLocaleDateString('en-CA'))}); }
   addNote(title,body){ const S=this.state;
     const t=(title!=null?title:S.noteTitle||'').trim();
     const b=(body!=null?body:S.noteBody||'').trim();
@@ -15970,7 +15974,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       return { id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight, unit, sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000 };
     });
     this.mut(s=>({workouts:[...s.workouts, ...entries]}));
-    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,occurred_at:new Date(e.ts).toISOString()}));
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString()}));
     this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log.');
     this.setState({woImportOpen:false, woImportRows:[], woImportText:'', woImportDayOffset:0});
     // Syncs the entered weight into the real Health body-weight tracker — one real number,
@@ -17293,7 +17297,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const woRangeStart=this._rangeStartTs(S.woRange||'Week');
     const woCanLog=S.woPart!=='Full';
     const woLogHintShow=!woCanLog;
-    const workoutList=[...S.workouts].filter(w=>(S.woPart==='Full'||w.part===S.woPart) && w.ts>=woRangeStart).sort((a,b)=>b.ts-a.ts).map((w)=>{ const idx=S.workouts.indexOf(w); const isBW=w.unit==='BW'; const det=isBW ? ('BW'+(w.weight?'+'+w.weight+'kg':'')+'·'+(w.sets||1)+'×'+(w.reps||0)) : (w.weight? (w.weight+'kg·'+(w.sets||1)+'×'+(w.reps||0)) : ((w.min||0)+'m')); return {exercise:w.exercise,part:w.part,min:w.min,detail:det,ago:this.ago(w.ts),color:partColor[w.part]||'#FFFFFF', remove:()=>{ this.mut(s=>({workouts:s.workouts.filter((_,j)=>j!==idx)})); if(this._sbOn() && w.id) window.SB.remove('workouts',w.id); }}; });
+    const workoutList=[...S.workouts].filter(w=>(S.woPart==='Full'||w.part===S.woPart) && w.ts>=woRangeStart).sort((a,b)=>b.ts-a.ts).map((w)=>{ const idx=S.workouts.indexOf(w); const isBW=w.unit==='BW'; const det=isBW ? ('BW'+(w.weight?'+'+w.weight+'kg':'')+'·'+(w.sets||1)+'×'+(w.reps||0)) : (w.weight? (w.weight+'kg·'+(w.sets||1)+'×'+(w.reps||0)) : (w.dist? (w.dist+(w.distUnit||'km')+(w.min?'·'+w.min+'m':'')) : ((w.min||0)+'m'))); return {exercise:w.exercise,part:w.part,min:w.min,detail:det,ago:this.ago(w.ts),color:partColor[w.part]||'#FFFFFF', remove:()=>{ this.mut(s=>({workouts:s.workouts.filter((_,j)=>j!==idx)})); if(this._sbOn() && w.id) window.SB.remove('workouts',w.id); }}; });
     const trainedList=Object.keys(pm).filter(k=>pm[k]>0);
     const coachMsg = trainedList.length===0 ? 'No sessions logged this week. Start with a full-body session to build momentum.' : `This week you trained ${trainedList.join(', ')} for ${this.weekMin()} min. ${pm.Back===0?'Your back is untrained — add a pull session.':(pm.Legs===0?'Legs are untrained — add a lower-body day.':'Balanced split — prioritise recovery and progressive overload.')}`;
 
