@@ -367,228 +367,11 @@ t('the logs panel reads the real fitness and health logs', async () => {
   ok(panel.includes(SEED.weightKg + 'kg'), 'bodyweight: ' + panel);
 });
 
-t('the food panel prices against the finance log, and only the food in it', async () => {
-  await boot({ forgeCentre: 'health' });
-  const body = await text();
-  const line = (body.match(/£[\d.]+ on food[^\n]*/) || ['none'])[0];
-  ok(line.includes('£' + SEED.foodTotal.toFixed(2)),
-     'should total the two grocery rows and exclude the train ticket and the 90-day-old shop: ' + line);
-});
-
-t('with no spending logged the food panel says so instead of showing £0.00', async () => {
-  await boot({ forgeCentre: 'health', expenses: [] });
-  const body = await text();
-  ok(/No food spending logged/.test(body), 'an empty finance log must read as absent, not as zero spend');
-});
-
 /* ---- the three centres ---- */
-
-t('the Training Centre covers all ten regions, head to feet', async () => {
-  await boot();
-  const seen = await spans();
-  const want = ['Head', 'Neck', 'Shoulders', 'Chest', 'Abs & Core', 'Back', 'Upper Legs', 'Lower Legs', 'Feet', 'Hands & Grip'];
-  const missing = want.filter(w => !seen.includes(w));
-  eq(missing.length, 0, 'regions missing from the page: ' + missing.join(', '));
-});
-
-t('the neglected regions are marked as neglected', async () => {
-  await boot();
-  const marked = await page.evaluate(() => {
-    const out = [];
-    document.querySelectorAll('span').forEach(s => {
-      if (s.textContent.trim() === 'NEGLECTED') {
-        const row = s.parentElement;
-        const name = row && row.querySelector('span');
-        if (name) out.push(name.textContent.trim());
-      }
-    });
-    return out;
-  });
-  for (const r of ['Head', 'Neck', 'Lower Legs', 'Feet', 'Hands & Grip']) {
-    ok(marked.includes(r), r + ' should be flagged as neglected — that is the point of listing it');
-  }
-});
-
-t('the Mental Centre covers all six faculties', async () => {
-  await boot({ forgeCentre: 'mental' });
-  const seen = await spans();
-  const want = ['Focus', 'Memory', 'Creativity', 'Motivation', 'Discipline', 'Overcoming Addictions'];
-  const missing = want.filter(w => !seen.includes(w));
-  eq(missing.length, 0, 'mental domains missing: ' + missing.join(', '));
-  ok(!seen.includes('Chest'), 'training regions must not leak into the mental centre');
-});
-
-t('the Health Centre grades its claims by evidence, strongest first', async () => {
-  await boot({ forgeCentre: 'health' });
-  const body = await text();
-  ok(/Sleep 7-9 hours/.test(body), 'sleep must be listed');
-  ok(/STRONG · LARGE/.test(body), 'strong evidence must be badged as such');
-  ok(/WEAK · NEGLIGIBLE/.test(body), 'the supplement claim must be badged weak');
-  ok(body.indexOf('Sleep 7-9 hours') < body.indexOf('Testosterone-boosting supplements'),
-     'sleep must sort above the supplements — the ordering is the honesty');
-  ok(/Nothing ultra-processed/.test(body), 'the nutrition rules must render');
-  ok(/Beef liver/.test(body), 'the food list must render');
-  ok(!/THE STANDARD/.test(body), 'the health centre has no standards panel');
-});
 
 /* ---- expanding a group ---- */
 
-t('opening a region shows its rationale, its standards and its work', async () => {
-  await boot();
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(600);
-  const body = await text();
-  ok(/THE STANDARD/.test(body), 'standards heading missing');
-  ok(/THE WORK/.test(body), 'work heading missing');
-  ok(/A neck carries the head/.test(body), 'the rationale must render');
-  ok(/BASELINE 0/.test(body) && /UNIT 20/.test(body), 'tier chips must show their thresholds');
-});
-
-t('the risky work carries its loading warning on the page, not just in the data', async () => {
-  await boot();
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(600);
-  const body = await text();
-  ok(/⚠/.test(body), 'no warning rendered');
-  ok(/ISOMETRICS FIRST/i.test(body), 'the neck loading order must be visible where the neck work is');
-});
-
-t('picking a region swaps the detail pane', async () => {
-  await boot({ forgeCentre: 'training' });
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(600);
-  ok(/A neck carries the head/.test(await text()), 'the neck detail did not open');
-  await page.evaluate(() => window.__nvx.setForgeOpen('chest'));
-  await page.waitForTimeout(600);
-  const body = await text();
-  ok(!/A neck carries the head/.test(body), 'the previous region is still in the pane');
-  ok(/THE STANDARD/.test(body) && /THE WORK/.test(body), 'the new region did not render');
-});
-
-t('the detail pane is never empty', async () => {
-  /* Master-detail with no selection is a blank half-page. There is no closed state: the
-     binding falls back to the first region rather than rendering nothing. */
-  await boot({ forgeCentre: 'training', forgeOpen: null });
-  let body = await text();
-  ok(/THE STANDARD/.test(body), 'nothing selected and nothing shown');
-  ok(/Head/.test(body), 'the fallback should be the first region');
-
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(500);
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(500);
-  ok(/A neck carries the head/.test(await text()), 'clicking the selected region must not empty the pane');
-});
-
-t('switching to Mental falls back rather than landing on nothing', async () => {
-  /* forgeOpen would still hold a training key, which does not exist in Mental. */
-  await boot({ forgeCentre: 'training' });
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(500);
-  await page.evaluate(() => window.__nvx.setForgeCentre('mental'));
-  await page.waitForTimeout(700);
-  const body = await text();
-  ok(/THE STANDARD/.test(body), 'the Mental pane came up empty');
-  ok(/Attention is the one resource/.test(body), 'it should fall back to Focus, the first faculty');
-  ok(!/A neck carries the head/.test(body), 'a training region leaked into Mental');
-});
-
-t('every region is listed in the rail at once', async () => {
-  await boot({ forgeCentre: 'training' });
-  const rail = await page.evaluate(() => {
-    /* Interpolated text renders inside a span.sc-interp, so the element whose textContent
-       matches is that span — the card is two levels up, not one. */
-    const lbl = [...document.querySelectorAll('*')].find(e =>
-      e.children.length === 0 && e.textContent.trim() === 'THE TEN REGIONS');
-    const card = lbl && lbl.closest('.cc-glowcard');
-    if (!card) return null;
-    return [...card.querySelectorAll('span')].map(e => e.textContent.trim());
-  });
-  ok(rail, 'no region rail rendered');
-  for (const r of ['Head', 'Neck', 'Shoulders', 'Chest', 'Abs & Core', 'Back', 'Upper Legs', 'Lower Legs', 'Feet', 'Hands & Grip']) {
-    ok(rail.includes(r), r + ' is missing from the rail');
-  }
-});
-
-t('the rail sits beside the detail, not above it', async () => {
-  await page.setViewportSize({ width: 1280, height: 1000 });
-  await boot({ forgeCentre: 'training' });
-  const box = await page.evaluate(() => {
-    const lbl = [...document.querySelectorAll('*')].find(e =>
-      e.children.length === 0 && e.textContent.trim() === 'THE TEN REGIONS');
-    const std = [...document.querySelectorAll('*')].find(e =>
-      e.children.length === 0 && e.textContent.trim() === 'THE STANDARD');
-    if (!lbl || !std) return null;
-    return { rail: lbl.getBoundingClientRect().left, pane: std.getBoundingClientRect().left };
-  });
-  ok(box, 'could not find both columns');
-  ok(box.pane > box.rail + 200, 'the detail pane should sit to the right of the rail: ' + JSON.stringify(box));
-});
-
-t('the selected region is the one marked in the rail', async () => {
-  await boot({ forgeCentre: 'training' });
-  await page.evaluate(() => window.__nvx.setForgeOpen('feet'));
-  await page.waitForTimeout(600);
-  const marked = await page.evaluate(() => {
-    const lbl = [...document.querySelectorAll('*')].find(e =>
-      e.children.length === 0 && e.textContent.trim() === 'THE TEN REGIONS');
-    const card = lbl && lbl.closest('.cc-glowcard');
-    if (!card) return [];
-    return [...card.querySelectorAll('div')]
-      .filter(r => r.style && r.style.borderLeftWidth === '2px' &&
-                   r.style.borderLeftColor && r.style.borderLeftColor !== 'transparent')
-      .map(r => r.textContent.trim().split('\n')[0]);
-  });
-  eq(marked.length, 1, 'exactly one rail row should carry the accent: ' + marked.join(','));
-  ok(/Feet/.test(marked[0]), 'the accent is on the wrong row: ' + marked[0]);
-});
-
 /* ---- recording an assessment ---- */
-
-t('a score typed into a standard reaches state, is saved, and is dated', async () => {
-  await boot();
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(600);
-  await page.evaluate(() => {
-    const i = [...document.querySelectorAll('input')].find(i => /kg for/.test(i.placeholder || ''));
-    if (!i) throw new Error('no score input rendered for the neck standards');
-    i.focus();
-  });
-  await page.keyboard.type('12');
-  await page.waitForTimeout(500);
-  eq(await page.evaluate(() => window.__nvx.state.forgeDraft['neck-prone']), '12', 'draft after typing');
-
-  await page.getByText('RECORD ASSESSMENT', { exact: true }).first().click();
-  await page.waitForTimeout(900);
-  const after = await page.evaluate(() => ({
-    score: window.__nvx.state.forgeScores['neck-prone'],
-    draft: Object.keys(window.__nvx.state.forgeDraft || {}).length,
-    hist: window.__nvx.state.forgeHistory || [],
-    stored: JSON.parse(localStorage.getItem('cc_v2') || '{}').forgeScores || {},
-  }));
-  eq(after.score, 12, 'recorded score');
-  eq(after.draft, 0, 'the draft must clear once recorded');
-  eq(after.hist.length, 1, 'history entries');
-  ok(/^\d{4}-\d{2}-\d{2}$/.test(after.hist[0].date), 'the entry must carry a date: ' + after.hist[0].date);
-  eq(after.stored['neck-prone'], 12, 'the score must reach localStorage, not just state');
-});
-
-t('recording moves the region tier and the unit score', async () => {
-  await boot();
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(500);
-  const before = await text();
-  ok(/Neck\nNEGLECTED\nNOT MEASURED/.test(before), 'the neck should start unmeasured: '
-     + (before.match(/Neck\n[^\n]*\n[^\n]*/) || [])[0]);
-  await page.evaluate(() => { window.__nvx.setForgeScore('neck-prone', { target: { value: '12' } }); });
-  await page.waitForTimeout(300);
-  await page.evaluate(() => window.__nvx.saveForgeScores());
-  await page.waitForTimeout(700);
-  const after = await text();
-  ok(/Neck\nNEGLECTED\nFORGED · 1\/3/.test(after), 'the neck tier did not update: '
-     + (after.match(/Neck\n[^\n]*\n[^\n]*/) || [])[0]);
-  ok(/UNIT SCORE · 1\/\d+ MEASURED/.test(after), 'the measured count did not update');
-});
 
 t('an empty form records nothing rather than writing a blank assessment', async () => {
   await boot();
@@ -602,6 +385,45 @@ t('a blank standard is not counted against the score', async () => {
   const body = await text();
   const pct = Number((body.match(/(\d+)%/) || [0, 0])[1]);
   eq(pct, 100, 'one standard at Unit and the rest untested must read 100%, not a fraction of 48');
+});
+
+/* ---- the three cleared centres ---- */
+
+t('Training, Mental and Health are empty pages', async () => {
+  for (const [centre, label] of [['training', 'TRAINING'], ['mental', 'MENTAL'], ['health', 'HEALTH']]) {
+    await boot({ forgeCentre: centre });
+    const body = await text();
+    ok(body.includes(label), label + ' should still name itself on its empty page');
+    ok(/Nothing here yet/.test(body), label + ' is not showing its empty state');
+    /* Everything the three centres used to carry, gone from all of them. */
+    for (const ghost of ['THE STANDARD', 'THE WORK', 'THE TEN REGIONS', 'THE SIX FACULTIES',
+                         'RECORD ASSESSMENT', 'Sleep 7-9 hours', 'Beef liver',
+                         'Nothing ultra-processed', 'NEGLECTED', 'on food · 30 days']) {
+      ok(!body.includes(ghost), ghost + ' is still on the ' + centre + ' page');
+    }
+  }
+});
+
+t('the four centres still switch', async () => {
+  await boot({ forgeCentre: 'home' });
+  for (const [tab, probe] of [['TRAINING', 'TRAINING'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Muscle Training Split']]) {
+    await page.evaluate((t) => {
+      const el = [...document.querySelectorAll('span')].find(e =>
+        e.children.length === 0 && e.textContent.trim() === t);
+      if (el) el.click();
+    }, tab);
+    await page.waitForTimeout(700);
+    ok((await text()).includes(probe), 'clicking ' + tab + ' did not land on it');
+  }
+});
+
+t('clearing the three centres left the Home alone', async () => {
+  await boot({ forgeCentre: 'home' });
+  const body = await text();
+  for (const panel of ['Muscle Training Split', 'Anatomy', 'Log Training', 'MOVE', 'Strength Chart']) {
+    ok(body.includes(panel), panel + ' went missing from the Forge home');
+  }
+  ok(!/Nothing here yet/.test(body), 'the home must not render the empty state');
 });
 
 /* ---- progress ---- */

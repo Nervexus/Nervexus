@@ -3789,126 +3789,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </sc-if>
 
-        <!-- TRAINING + MENTAL: ten regions is too many to stack full width, and the detail is
-             too long to push down the page every time one opens. A rail of every region beside
-             one detail pane keeps the whole list in view and the reading column narrow. -->
-        <sc-if value="{{ forgeShowGroups }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-grid-fit" style="display:grid; grid-template-columns:326px 1fr; gap:16px; align-items:start;">
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:14px 12px; position:sticky; top:14px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; padding:0 6px 10px;">{{ forgeRailLabel }}</div>
-              <sc-for list="{{ forgeGroups }}" as="g" hint-placeholder-count="10">
-                <div onClick="{{ g.select }}" style="padding:9px 11px; border-radius:10px; cursor:pointer; background:{{ g.bg }}; border-left:2px solid {{ g.accent }}; margin-bottom:2px;" style-hover="{ background:'rgba(255,255,255,0.05)' }">
-                  <div style="display:flex; align-items:center; gap:7px; min-width:0;">
-                    <span style="font-size:13.5px; font-weight:600; color:{{ g.nameInk }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ g.name }}</span>
-                    <sc-if value="{{ g.neglected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.7px; color:#e8b45a; border:1px solid rgba(232,180,90,0.34); border-radius:4px; padding:1px 4px; flex:0 0 auto;">NEGLECTED</span></sc-if>
-                  </div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.8px; color:{{ g.tierInk }}; margin-top:3px;">{{ g.tierLabel }}</div>
-                </div>
-              </sc-for>
-            </div>
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px 20px 18px;">
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:9px;">
-                <div style="display:flex; align-items:center; gap:9px;">
-                  <span style="font-size:19px; font-weight:700; color:#eef0f2;">{{ forgeDetail.name }}</span>
-                  <sc-if value="{{ forgeDetail.neglected }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#e8b45a; border:1px solid rgba(232,180,90,0.34); border-radius:5px; padding:2px 5px;">NEGLECTED</span></sc-if>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ forgeDetail.tierInk }};">{{ forgeDetail.tierLabel }}</span>
-              </div>
-              <div style="font-size:12.5px; color:#a8a8b0; line-height:1.6; margin-bottom:16px; max-width:70ch;">{{ forgeDetail.why }}</div>
-
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE STANDARD</div>
-              <sc-for list="{{ forgeDetail.standards }}" as="st" hint-placeholder-count="3">
-                <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:12.5px; color:#dbdbe0;">{{ st.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99;">{{ st.unit }}</span>
-                  </div>
-                  <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
-                    <sc-for list="{{ st.tierChips }}" as="tc" hint-placeholder-count="4">
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; padding:5px 8px; border-radius:6px; color:{{ tc.ink }}; background:{{ tc.bg }}; border:1px solid {{ tc.bd }};">{{ tc.label }}</span>
-                    </sc-for>
-                    <input value="{{ st.draft }}" onInput="{{ st.set }}" placeholder="{{ st.placeholder }}" style="width:104px; margin-left:auto; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
-                  </div>
-                  <sc-if value="{{ st.how }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#75757d; margin-top:6px;">{{ st.how }}</div></sc-if>
-                </div>
-              </sc-for>
-
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin:20px 0 6px;">THE WORK</div>
-              <sc-for list="{{ forgeDetail.work }}" as="w" hint-placeholder-count="5">
-                <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                    <span style="font-size:12.5px; color:#dbdbe0;">{{ w.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; white-space:nowrap;">{{ w.dose }}</span>
-                  </div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55; max-width:74ch;">{{ w.cue }}</div>
-                  <sc-if value="{{ w.risk }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:11px; color:#ff8a5b; margin-top:6px; line-height:1.55; max-width:74ch;">⚠ {{ w.risk }}</div>
-                  </sc-if>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-
-          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:16px 0 4px;">
-            <span onClick="{{ saveForgeScores }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:#0d0d10; background:#eef0f2; border-radius:10px; padding:11px 20px; cursor:pointer; white-space:nowrap;">RECORD ASSESSMENT</span>
-            <span style="font-size:11.5px; color:#8f8f99; flex:1 1 200px;">Enter what you actually hit. Blank means not tested — it is not counted against you.</span>
-          </div>
-        </sc-if>
-
-        <!-- HEALTH -->
-        <sc-if value="{{ forgeShowHealth }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:16px; padding:18px; margin-bottom:12px;">
-            <div style="font-size:14.5px; font-weight:600; margin-bottom:4px;">Testosterone — what actually moves it</div>
-            <div style="font-size:12px; color:#8f8f99; margin-bottom:13px; line-height:1.6;">Graded by strength of evidence, strongest first. A list that ranks sleep alongside a supplement is not information.</div>
-            <sc-for list="{{ forgeLevers }}" as="l" hint-placeholder-count="6">
-              <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
-                  <span style="font-size:12.5px; color:#dbdbe0;">{{ l.name }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.8px; padding:3px 7px; border-radius:6px; color:{{ l.ink }}; border:1px solid {{ l.bd }};">{{ l.badge }}</span>
-                </div>
-                <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55;">{{ l.detail }}</div>
-              </div>
-            </sc-for>
-          </div>
-
-          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px;">
-            <div class="cc-glowcard" style="border-radius:16px; padding:18px;">
-              <div style="font-size:14.5px; font-weight:600; margin-bottom:11px;">Lifestyle</div>
-              <sc-for list="{{ forgeLifestyle }}" as="x" hint-placeholder-count="6">
-                <div style="padding:8px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="font-size:12.5px; color:#dbdbe0;">{{ x.name }}</div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55;">{{ x.detail }}</div>
-                </div>
-              </sc-for>
-            </div>
-            <div class="cc-glowcard" style="border-radius:16px; padding:18px;">
-              <div style="font-size:14.5px; font-weight:600; margin-bottom:4px;">The rules</div>
-              <div style="font-size:12px; color:#8f8f99; margin-bottom:9px;">No ultra-processed food. That is the diet in one line.</div>
-              <sc-for list="{{ forgeRules }}" as="r" hint-placeholder-count="7">
-                <div style="padding:8px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="font-size:12.5px; color:#dbdbe0;">{{ r.rule }}</div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55;">{{ r.why }}</div>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-
-          <div class="cc-glowcard" style="border-radius:16px; padding:18px; margin-top:12px;">
-            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline; margin-bottom:11px;">
-              <div style="font-size:14.5px; font-weight:600;">Food — what it costs, what it gives</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8f8f99;">{{ forgeFoodSpend }}</div>
-            </div>
-            <sc-for list="{{ forgeFoods }}" as="f" hint-placeholder-count="8">
-              <div style="padding:9px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                  <span style="font-size:12.5px; color:#dbdbe0;">{{ f.name }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#6cffba;">{{ f.per }}</span>
-                </div>
-                <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55;">{{ f.gives }} — {{ f.note }}</div>
-              </div>
-            </sc-for>
+        <!-- TRAINING · MENTAL · HEALTH — cleared, awaiting their rebuild. The tabs and the
+             page shell stay so the Forge still reads as four centres rather than one. -->
+        <sc-if value="{{ forgeShowEmpty }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">{{ forgeEmptyLabel }}</div>
+            <div style="font-size:12.5px; color:#6f6f78; margin-top:10px;">Nothing here yet.</div>
           </div>
         </sc-if>
 
@@ -9564,7 +9450,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-242 · v11.242 anatomy-fix';
+const NOTIF_BUILD_VERSION = '2026.09.03-243 · v11.243 forge-centres-cleared';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14083,6 +13969,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.243', date:'Sep 3, 2026', notes:[
+      'Training, Mental and Health in the Forge are now empty pages, ready to be rebuilt. The four tabs and the Home stay exactly as they were.',
+      'Anything you had already recorded is still saved \u2014 nothing was deleted, it just has no page to show it on for now.',
+    ]},
     {version:'v11.242', date:'Sep 3, 2026', notes:[
       'Fixed the anatomy model coming back as a thumbnail stuck to the left of the card, or dropping to the plain drawn figure altogether, after switching theme or moving between pages.',
       'It was being measured while it was still hidden, so it had no width to measure and got sized to the smallest it is allowed to be. It is now shown first and measured second, and it re-fits itself whenever the card around it changes size.',
@@ -18079,47 +17969,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           { value:L.bodyFat!=null?(L.bodyFat+'%'):'—', label:'body fat', ink:L.bodyFat==null?'#6f6f78':(L.bodyFat<=15?'#6cffba':L.bodyFat<=20?'#e8b45a':'#ff8a5b') },
           { value:L.weightKg!=null?(L.weightKg+'kg'):'—', label:'bodyweight', ink:L.weightKg==null?'#6f6f78':'#c9c9ce' }
         ].map((x,i)=>({...x, rule:i?'rgba(255,255,255,0.07)':'transparent'}));
-        /* The rail and the pane are built from one pass. The selection falls back to the
-           first region rather than allowing an empty pane, and it has to fall back whenever
-           forgeOpen holds a key from the other centre — switching Training to Mental would
-           otherwise land on nothing. */
-        const src=(centre==='mental'?F.MENTAL:F.REGIONS);
-        const openKey=(S.forgeOpen && src.some(g=>g.key===S.forgeOpen)) ? S.forgeOpen : (src[0]||{}).key;
-        const build=(g)=>{
-          const measured=g.standards.filter(st=>sc[st.id]!=null && !isNaN(sc[st.id]));
-          const mean=measured.length?measured.reduce((a,st)=>a+F.tierOf(st,+sc[st.id]),0)/measured.length:0;
-          const gt=measured.length?Math.max(1,Math.min(4,Math.ceil(mean))):0;
-          const sel=g.key===openKey;
-          return {
-            key:g.key, name:g.name, neglected:!!g.neglected, why:g.why,
-            selected:sel, select:()=>this.setForgeOpen(g.key),
-            bg:sel?'rgba(255,255,255,0.07)':'transparent',
-            accent:sel?'#E7D8A6':'transparent',
-            nameInk:sel?'#eef0f2':'#b6b6be',
-            tierInk:TI[gt],
-            tierLabel:measured.length?(tierName(gt).toUpperCase()+' · '+measured.length+'/'+g.standards.length):'NOT MEASURED',
-            standards:g.standards.map(st=>{
-              const has=sc[st.id]!=null && !isNaN(sc[st.id]);
-              const t=has?F.tierOf(st,+sc[st.id]):0;
-              const chips=st.binary
-                ? [{lvl:1,txt:'FAIL'},{lvl:4,txt:'PASS · UNIT'}]
-                : st.tiers.map((v,i)=>({lvl:i+1,txt:F.TIERS[i].toUpperCase()+' '+(st.lowerIsBetter?'≤':'')+v}));
-              return {
-                name:st.name, unit:st.unit, how:st.how||'',
-                placeholder:st.binary?'0 / 1':st.unit,
-                draft:dr[st.id]!=null?dr[st.id]:(has?String(sc[st.id]):''),
-                set:(e)=>this.setForgeScore(st.id,e),
-                tierChips:chips.map(c=>({
-                  label:c.txt,
-                  ink:t>=c.lvl?'#0d0d10':TI[c.lvl],
-                  bg:t>=c.lvl?TI[c.lvl]:'transparent',
-                  bd:t>=c.lvl?TI[c.lvl]:'rgba(255,255,255,0.12)' }))
-              };
-            }),
-            work:(g.work||g.drills||[]).map(w=>({ name:w.name, dose:w.dose, cue:w.cue||w.how||'', risk:w.risk||'' }))
-          };
-        };
-        const groups=src.map(build);
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
         /* Progress. An assessment you cannot compare with the last one measures nothing,
            so the history is drawn rather than just stored. Bars are scaled to the best
@@ -18139,13 +17988,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const prevEntry=hist.length>1?hist[hist.length-2]:null;
         const moved=prevEntry?F.movement(prevEntry.scores, hist[hist.length-1].scores):[];
         const dScore=pts.length>1?(pts[pts.length-1].score-pts[pts.length-2].score):null;
-        const sp=this._forgeFoodSpend();
-        const EV={strong:'#6cffba',moderate:'#e8b45a',weak:'#ff8a5b'};
         return {
           forgeTierLabel:us.assessed?us.tier:'Unmeasured',
           forgeSub:us.assessed
             ? 'Bigger, stronger, faster, healthier. '+us.assessed+' standards on record — the rest are still an unknown.'
-            : 'Ten regions, six faculties, one standard. Nothing is measured yet, so nothing is proven yet.',
+            : 'Bigger, stronger, faster, healthier.',
           forgeScorePct:us.assessed?(us.score+'%'):'—',
           forgeScoreInk:us.assessed?TI[Math.max(1,Math.min(4,Math.ceil(us.score/25)))]:'#6f6f78',
           forgeAssessed:us.assessed, forgeTotal:us.total,
@@ -18159,21 +18006,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             arrow: m.dir==='up'?'▲':m.dir==='down'?'▼':'●',
             label: m.dir==='new'?('first recorded · '+tierName(m.to)):(tierName(m.from)+' → '+tierName(m.to)),
             ink: m.dir==='up'?'#6cffba':m.dir==='down'?'#ff8a5b':'#c9c9ce' })),
-          forgeShowHome:centre==='home', forgeShowGroups:centre==='training'||centre==='mental', forgeShowHealth:centre==='health',
-          forgeGroups:groups,
-          forgeRailLabel:centre==='mental'?'THE SIX FACULTIES':'THE TEN REGIONS',
-          forgeDetail:groups.find(g=>g.key===openKey)||groups[0]||{name:'',neglected:false,why:'',tierInk:'#6f6f78',tierLabel:'',standards:[],work:[]},
-          saveForgeScores:()=>this.saveForgeScores(),
-          forgeLevers:F.T_LEVERS.map(l=>({ name:l.name, detail:l.detail, badge:l.evidence.toUpperCase()+' · '+l.effect.toUpperCase(), ink:EV[l.evidence]||'#8f8f99', bd:(EV[l.evidence]||'#8f8f99')+'55' })),
-          forgeLifestyle:F.LIFESTYLE, forgeRules:F.NUTRITION_RULES, forgeFoods:F.FOODS,
-          forgeFoodSpend:sp.count?('£'+sp.total.toFixed(2)+' on food · 30 days · £'+sp.perDay.toFixed(2)+'/day'):'No food spending logged yet'
+          forgeShowHome:centre==='home', forgeShowEmpty:centre!=='home',
+          forgeEmptyLabel:(centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH')
         };
       }, { forgeTierLabel:'The Forge', forgeSub:'Standards unavailable — reload to try again.', forgeScorePct:'—', forgeScoreInk:'#6f6f78', forgeAssessed:0, forgeTotal:0,
-           forgeCentres:[], forgeLink:[], forgeWeakest:[], forgeGroups:[], forgeShowGroups:false, forgeShowHealth:false,
+           forgeCentres:[], forgeLink:[], forgeWeakest:[],
            forgeHasProgress:false, forgeBars:[], forgeMoved:[], forgeMovedAny:false, forgeDeltaLabel:'', forgeDeltaInk:'#8f8f99',
-           forgeShowHome:false, forgeRailLabel:'',
-           forgeDetail:{name:'',neglected:false,why:'',tierInk:'#6f6f78',tierLabel:'',standards:[],work:[]},
-           forgeLevers:[], forgeLifestyle:[], forgeRules:[], forgeFoods:[], forgeFoodSpend:'', saveForgeScores:()=>{} }),
+           forgeShowHome:false, forgeShowEmpty:false, forgeEmptyLabel:'' }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
