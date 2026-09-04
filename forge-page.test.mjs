@@ -379,8 +379,8 @@ t('an empty form records nothing rather than writing a blank assessment', async 
 
 /* ---- the three cleared centres ---- */
 
-t('Training, Mental and Health are empty pages', async () => {
-  for (const [centre, label] of [['training', 'TRAINING'], ['mental', 'MENTAL'], ['health', 'HEALTH']]) {
+t('Mental and Health are still empty pages', async () => {
+  for (const [centre, label] of [['mental', 'MENTAL'], ['health', 'HEALTH']]) {
     await boot({ forgeCentre: centre });
     const body = await text();
     ok(body.includes(label), label + ' should still name itself on its empty page');
@@ -391,6 +391,54 @@ t('Training, Mental and Health are empty pages', async () => {
                          'Nothing ultra-processed', 'NEGLECTED', 'on food · 30 days']) {
       ok(!body.includes(ghost), ghost + ' is still on the ' + centre + ' page');
     }
+  }
+});
+
+t('Training carries the Hand Training section', async () => {
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  ok(!/Nothing here yet/.test(body), 'Training is still showing the empty state');
+  ok(/Hand Training/.test(body), 'the section is missing');
+  for (const heading of ['THE FIVE GRIPS', 'THE MUSCLES', 'THE STANDARD', 'THE WORK', 'THE RULES']) {
+    ok(body.includes(heading), heading + ' is missing from the section');
+  }
+});
+
+t('the section renders everything the data holds, not a sample of it', async () => {
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  const D = await page.evaluate(() => window.ForgeTraining.section('hands'));
+  for (const ty of D.types) ok(body.includes(ty.name), 'grip type not rendered: ' + ty.name);
+  for (const g of D.muscles) for (const m of g.items)
+    ok(body.includes(m.name), 'muscle not rendered: ' + m.name);
+  for (const st of D.standards) ok(body.includes(st.name), 'standard not rendered: ' + st.name);
+  for (const w of D.work) ok(body.includes(w.name), 'exercise not rendered: ' + w.name);
+  for (const r of D.rules) ok(body.includes(r.rule), 'rule not rendered: ' + r.rule);
+});
+
+t('the tier targets are on the page with their numbers', async () => {
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  const D = await page.evaluate(() => window.ForgeTraining.section('hands'));
+  const hang = D.standards.find(s => s.id === 'hang-two');
+  for (let i = 0; i < hang.tiers.length; i++) {
+    const chip = ['BASELINE', 'HARDENED', 'FORGED', 'UNIT'][i] + ' ' + hang.tiers[i];
+    ok(body.includes(chip), 'tier chip missing: ' + chip);
+  }
+});
+
+t('the loading warnings reach the page, not just the data', async () => {
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  ok(/⚠/.test(body), 'no warnings rendered');
+  ok(/not a daily max|angry elbow/i.test(body), 'the gripper warning is missing');
+  ok(/tennis elbow|golfer/i.test(body), 'the extension warning is missing');
+});
+
+t('Hand Training stays out of the other centres', async () => {
+  for (const centre of ['home', 'mental', 'health']) {
+    await boot({ forgeCentre: centre });
+    ok(!/THE FIVE GRIPS/.test(await text()), 'the hand section leaked onto ' + centre);
   }
 });
 

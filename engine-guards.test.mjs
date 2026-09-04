@@ -44,6 +44,8 @@ const ENGINES = [
   ['ai-gateway.js','AIGateway'],
   // The Forge — training/mental/health standards data.
   ['forge-engine.js','Forge'],
+  // The Training centre's section data.
+  ['forge-training.js','ForgeTraining'],
 ];
 
 /* Two files are deliberately unguarded, and the completeness check below knows it:

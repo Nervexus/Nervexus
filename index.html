@@ -324,6 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
+  <script src="forge-training.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3795,6 +3796,95 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">{{ forgeEmptyLabel }}</div>
             <div style="font-size:12.5px; color:#6f6f78; margin-top:10px;">Nothing here yet.</div>
           </div>
+        </sc-if>
+
+        <!-- TRAINING — built from sections. The page renders whatever forge-training.js holds,
+             so the next section is a data change rather than another block of markup. -->
+        <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
+
+            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:8px;">{{ sec.tag }}</div>
+              <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 9px;">{{ sec.name }}</h2>
+              <div style="font-size:12.5px; color:#a8a8b0; line-height:1.65; max-width:74ch;">{{ sec.why }}</div>
+            </div>
+
+            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:4px;">THE FIVE GRIPS</div>
+              <div style="font-size:11.5px; color:#75757d; margin-bottom:6px;">Training one does almost nothing for the others.</div>
+              <sc-for list="{{ sec.types }}" as="ty" hint-placeholder-count="5">
+                <div style="padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
+                    <span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ ty.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; text-align:right;">{{ ty.what }}</span>
+                  </div>
+                  <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55; max-width:76ch;">{{ ty.detail }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:12px;">THE MUSCLES</div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:20px; align-items:start;">
+                <sc-for list="{{ sec.muscles }}" as="mg" hint-placeholder-count="4">
+                  <div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#E7D8A6; line-height:1.5; margin-bottom:7px;">{{ mg.group }}</div>
+                    <sc-for list="{{ mg.items }}" as="mu" hint-placeholder-count="4">
+                      <div style="padding:7px 0; border-top:1px solid rgba(255,255,255,0.05);">
+                        <div style="font-size:12.5px; color:#dbdbe0;">{{ mu.name }}</div>
+                        <div style="font-size:11px; color:#8f8f99; margin-top:3px; line-height:1.5;">{{ mu.does }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE STANDARD</div>
+              <sc-for list="{{ sec.standards }}" as="st" hint-placeholder-count="8">
+                <div style="padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:12.5px; color:#dbdbe0;">{{ st.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99;">{{ st.unit }}</span>
+                  </div>
+                  <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                    <sc-for list="{{ st.tierChips }}" as="tc" hint-placeholder-count="4">
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; padding:5px 8px; border-radius:6px; color:{{ tc.ink }}; border:1px solid {{ tc.bd }};">{{ tc.label }}</span>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:11px; color:#75757d; margin-top:6px; line-height:1.5; max-width:76ch;">{{ st.how }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE WORK</div>
+              <sc-for list="{{ sec.work }}" as="w" hint-placeholder-count="12">
+                <div style="padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                    <span style="font-size:12.5px; color:#dbdbe0;">{{ w.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; text-align:right;">{{ w.dose }}</span>
+                  </div>
+                  <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55; max-width:76ch;">{{ w.cue }}</div>
+                  <sc-if value="{{ w.risk }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:11px; color:#ff8a5b; margin-top:6px; line-height:1.55; max-width:76ch;">⚠ {{ w.risk }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+
+            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE RULES</div>
+              <sc-for list="{{ sec.rules }}" as="r" hint-placeholder-count="5">
+                <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                  <div style="font-size:12.5px; color:#dbdbe0;">{{ r.rule }}</div>
+                  <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55; max-width:76ch;">{{ r.why }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+          </sc-for>
         </sc-if>
 
       </div>
@@ -9449,7 +9539,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-244 · v11.244 forge-header-cleared';
+const NOTIF_BUILD_VERSION = '2026.09.04-245 · v11.245 hand-training';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13968,6 +14058,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.245', date:'Sep 4, 2026', major:true, notes:[
+      'Hand Training is the first section of the rebuilt Training centre \u2014 grip and hand development, hands only.',
+      'The five kinds of grip and why training one does almost nothing for the others; seventeen muscles named with what each actually moves, including the ones inside the hand rather than just the forearm; eight standards you either hit or you do not; twelve exercises with doses; and the rules that keep grip work from turning into elbow pain.',
+      'Training is built from sections now, so the next one is added to the list rather than bolted onto the page.',
+    ]},
     {version:'v11.244', date:'Sep 3, 2026', notes:[
       'The Forge\u2019s unit score, tier and strapline are gone \u2014 they counted standards that no longer have a page. The crest and the wordmark stay.',
       'Training, Mental and Health are now genuinely blank: no header, no logs strip, no progress. The Home keeps all of it.',
@@ -17971,6 +18066,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           { value:L.bodyFat!=null?(L.bodyFat+'%'):'—', label:'body fat', ink:L.bodyFat==null?'#6f6f78':(L.bodyFat<=15?'#6cffba':L.bodyFat<=20?'#e8b45a':'#ff8a5b') },
           { value:L.weightKg!=null?(L.weightKg+'kg'):'—', label:'bodyweight', ink:L.weightKg==null?'#6f6f78':'#c9c9ce' }
         ].map((x,i)=>({...x, rule:i?'rgba(255,255,255,0.07)':'transparent'}));
+        /* Training sections. The tiers are shown as targets to work toward — this section is a
+           protocol to follow, not a form to fill in, so there is nothing to record yet. */
+        const TR=window.ForgeTraining;
+        const trainSections=(TR?TR.SECTIONS:[]).map(sec=>({
+          key:sec.key, name:sec.name, tag:sec.tag, why:sec.why,
+          types:sec.types, muscles:sec.muscles, work:sec.work, rules:sec.rules,
+          standards:sec.standards.map(st=>({
+            name:st.name, unit:st.unit, how:st.how||'',
+            tierChips:st.tiers.map((v,i)=>({
+              label:TR.TIERS[i].toUpperCase()+' '+v,
+              ink:TI[i+1], bd:TI[i+1]+'4d' }))
+          }))
+        }));
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
         /* Progress. An assessment you cannot compare with the last one measures nothing,
            so the history is drawn rather than just stored. Bars are scaled to the best
@@ -18001,12 +18109,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             arrow: m.dir==='up'?'▲':m.dir==='down'?'▼':'●',
             label: m.dir==='new'?('first recorded · '+tierName(m.to)):(tierName(m.from)+' → '+tierName(m.to)),
             ink: m.dir==='up'?'#6cffba':m.dir==='down'?'#ff8a5b':'#c9c9ce' })),
-          forgeShowHome:centre==='home', forgeShowEmpty:centre!=='home',
-          forgeEmptyLabel:(centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH')
+          forgeShowHome:centre==='home',
+          forgeShowTraining:centre==='training' && !!trainSections.length,
+          forgeShowEmpty:centre!=='home' && !(centre==='training' && trainSections.length),
+          forgeEmptyLabel:(centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
+          trainSections:trainSections
         };
       }, { forgeCentres:[], forgeLink:[], forgeWeakest:[],
            forgeHasProgress:false, forgeBars:[], forgeMoved:[], forgeMovedAny:false, forgeDeltaLabel:'', forgeDeltaInk:'#8f8f99',
-           forgeShowHome:false, forgeShowEmpty:false, forgeEmptyLabel:'' }),
+           forgeShowHome:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[] }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
