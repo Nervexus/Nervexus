@@ -46,6 +46,7 @@ const ENGINES = [
   ['forge-engine.js','Forge'],
   // The Training centre's section data.
   ['forge-training.js','ForgeTraining'],
+  ['forge-hand-figures.js','HandFigures'],
 ];
 
 /* Two files are deliberately unguarded, and the completeness check below knows it:

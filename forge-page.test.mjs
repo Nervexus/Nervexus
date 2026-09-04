@@ -394,37 +394,71 @@ t('Mental and Health are still empty pages', async () => {
   }
 });
 
-t('Training carries the Hand Training section', async () => {
+t('Training carries the Hand Training chart', async () => {
   await boot({ forgeCentre: 'training' });
   const body = await text();
   ok(!/Nothing here yet/.test(body), 'Training is still showing the empty state');
   ok(/Hand Training/.test(body), 'the section is missing');
-  for (const heading of ['THE FIVE GRIPS', 'THE MUSCLES', 'THE STANDARD', 'THE WORK', 'THE RULES']) {
-    ok(body.includes(heading), heading + ' is missing from the section');
+  ok(/THE TOOLS/.test(body), 'the kit list is missing');
+});
+
+t('every exercise in the data is on the chart, with its dose', async () => {
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  const W = await page.evaluate(() => window.ForgeTraining.section('hands').work);
+  ok(W.length >= 15, 'the fixture is not the real chart');
+  for (const w of W) {
+    ok(body.includes(w.name), 'exercise not rendered: ' + w.name);
+    ok(body.includes(w.dose), 'dose not rendered for: ' + w.name);
+  }
+  ok(body.includes('Kettlebell finger curls'), 'the kettlebell finger curl is missing');
+});
+
+t('every card is drawn, not left as an empty box', async () => {
+  await boot({ forgeCentre: 'training' });
+  await page.waitForTimeout(600);
+  /* The framework interpolates text, not markup, so these are painted in by
+     drawHandFigures(). If that never runs the cards render as blank gaps and nothing throws. */
+  const figs = await page.evaluate(() =>
+    [...document.querySelectorAll('[data-handfig]')].map(el => ({
+      key: el.dataset.handfig,
+      paths: el.querySelectorAll('svg path, svg circle, svg rect').length,
+    })));
+  const W = await page.evaluate(() => window.ForgeTraining.section('hands').work);
+  eq(figs.length, W.length, 'one drawing per exercise');
+  for (const f of figs) ok(f.paths >= 3, f.key + ' drew ' + f.paths + ' shapes — it is blank or broken');
+});
+
+t('the chart is graded on the page, and filters', async () => {
+  await boot({ forgeCentre: 'training' });
+  const all = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
+  for (const lvl of ['EASY', 'HARD', 'BRUTAL']) {
+    await page.evaluate((l) => {
+      const el = [...document.querySelectorAll('span')].find(e =>
+        e.children.length === 0 && e.textContent.trim() === l);
+      if (el) el.click();
+    }, lvl);
+    await page.waitForTimeout(600);
+    const n = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
+    ok(n > 0, lvl + ' filtered everything out');
+    ok(n < all, lvl + ' did not filter anything (' + n + ' of ' + all + ')');
+    const shown = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-handfig]')].map(e => e.dataset.handfig));
+    const want = await page.evaluate((l) =>
+      window.ForgeTraining.section('hands').work.filter(w => w.level === l.toLowerCase()).map(w => w.fig), lvl);
+    eq(shown.join(','), want.join(','), 'wrong exercises shown for ' + lvl);
   }
 });
 
-t('the section renders everything the data holds, not a sample of it', async () => {
+t('the tools say what they cost and whether you need them', async () => {
   await boot({ forgeCentre: 'training' });
   const body = await text();
-  const D = await page.evaluate(() => window.ForgeTraining.section('hands'));
-  for (const ty of D.types) ok(body.includes(ty.name), 'grip type not rendered: ' + ty.name);
-  for (const g of D.muscles) for (const m of g.items)
-    ok(body.includes(m.name), 'muscle not rendered: ' + m.name);
-  for (const st of D.standards) ok(body.includes(st.name), 'standard not rendered: ' + st.name);
-  for (const w of D.work) ok(body.includes(w.name), 'exercise not rendered: ' + w.name);
-  for (const r of D.rules) ok(body.includes(r.rule), 'rule not rendered: ' + r.rule);
-});
-
-t('the tier targets are on the page with their numbers', async () => {
-  await boot({ forgeCentre: 'training' });
-  const body = await text();
-  const D = await page.evaluate(() => window.ForgeTraining.section('hands'));
-  const hang = D.standards.find(s => s.id === 'hang-two');
-  for (let i = 0; i < hang.tiers.length; i++) {
-    const chip = ['BASELINE', 'HARDENED', 'FORGED', 'UNIT'][i] + ' ' + hang.tiers[i];
-    ok(body.includes(chip), 'tier chip missing: ' + chip);
+  const T = await page.evaluate(() => window.ForgeTraining.section('hands').tools);
+  for (const x of T) {
+    ok(body.includes(x.name), 'tool not rendered: ' + x.name);
+    ok(body.includes(x.cost), 'cost not rendered for: ' + x.name);
   }
+  ok(/ESSENTIAL/.test(body) && /OPTIONAL/.test(body), 'the tools are not graded on the page');
 });
 
 t('the loading warnings reach the page, not just the data', async () => {
