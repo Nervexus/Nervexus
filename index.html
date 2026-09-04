@@ -316,7 +316,7 @@
 <script src="gentleman-blackbook.js?v=2"></script>
 <script src="orb-engine.js?v=8"></script>
 <script src="notification-engine.js?v=1"></script>
-<script src="anatomy-3d.js?v=1"></script>
+<script src="anatomy-3d.js?v=9"></script>
 <script src="exercise-index.js?v=4"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
@@ -9564,7 +9564,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-241 · v11.241 forge-training-layout';
+const NOTIF_BUILD_VERSION = '2026.09.03-242 · v11.242 anatomy-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12342,41 +12342,44 @@ activities: this._mergeShipLog(s.activities),
     const strengths={}; Object.keys(glow).forEach(k=>{ strengths[k]=glow[k].strength; });
 
     const A3=window.NervexusAnatomy3D;
+    /* Reveal the 3D mount before anything measures it. It ships as display:none so the drawn
+       figure is what shows if WebGL is missing, but a container that is still hidden has no
+       width — fit() then sized the canvas to its 120px floor and left a thumbnail against the
+       left edge of a full-width card. Show first, measure second.
+       Front/Back only exist for the drawn fallback, which cannot spin, so they go with it. */
+    const show3d=()=>{
+      mount3d.style.display='block';
+      if(svgMount) svgMount.style.display='none';
+      const vw=this.root.querySelector('.cc-anatomy-views');
+      if(vw) vw.style.display='none';
+    };
     if(mount3d && A3 && A3.supported() && this._anat3dFailed!==true){
       // A page re-render replaces these nodes, so the canvas ends up orphaned and the drawn
-      // figure below shows through. Re-home the existing canvas rather than reloading it.
-      if(A3.hasScene && A3.hasScene() && !A3.isMounted() && A3.reattach(mount3d)){
-        mount3d.style.display='block';
-        if(svgMount) svgMount.style.display='none';
-        const vw0=this.root.querySelector('.cc-anatomy-views');
-        if(vw0) vw0.style.display='none';
+      // figure below shows through. Re-home the existing canvas rather than reloading it —
+      // and re-assert the display state every time, because the fresh nodes come back with
+      // the markup's defaults and would otherwise leave the fallback showing.
+      if(A3.hasScene && A3.hasScene()){
+        show3d();
+        if(!A3.isMounted()) A3.reattach(mount3d);
+        const phone0=(typeof window!=='undefined' && window.innerWidth<=900);
+        A3.setAspect(phone0?1.25:1.5);   // re-fits, now that the mount has a real width
         A3.setGlow(strengths);
         return;
       }
-      if(!this._anat3dLoading && !A3.isMounted()){
+      if(!this._anat3dLoading){
         this._anat3dLoading=true;
         A3.mount(mount3d).then(()=>{
           this._anat3dLoading=false;
-          mount3d.style.display='block';
-          if(svgMount) svgMount.style.display='none';
+          show3d();
           const phone=(typeof window!=='undefined' && window.innerWidth<=900);
           A3.setAspect(phone?1.25:1.5);
           A3.setAutoSpin(true);           // endless rotation everywhere; drag overrides it
-          // Front/Back only exist for the drawn fallback, which cannot spin. With the 3D
-          // model up they are dead weight, so hide them rather than leave two ways to do
-          // the same thing (this used to be a mobile-only CSS rule, which left desktop
-          // showing buttons next to a model that ignored them).
-          const vw=this.root.querySelector('.cc-anatomy-views');
-          if(vw) vw.style.display='none';
           A3.setGlow(strengths);
         }).catch((e)=>{
           // Stay on the SVG rather than showing an empty box.
           this._anat3dLoading=false; this._anat3dFailed=true;
           console.warn('[anatomy] 3D unavailable, using drawn figure:', e && e.message);
         });
-      } else if(A3.isMounted()){
-        A3.setGlow(strengths);
-        return;   // 3D is live; the SVG below is hidden and needs no work
       }
     }
 
@@ -14080,6 +14083,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.242', date:'Sep 3, 2026', notes:[
+      'Fixed the anatomy model coming back as a thumbnail stuck to the left of the card, or dropping to the plain drawn figure altogether, after switching theme or moving between pages.',
+      'It was being measured while it was still hidden, so it had no width to measure and got sized to the smallest it is allowed to be. It is now shown first and measured second, and it re-fits itself whenever the card around it changes size.',
+    ]},
     {version:'v11.241', date:'Sep 3, 2026', notes:[
       'Training and Mental rebuilt as a list beside a page. Every region stays visible down the left, and picking one swaps the panel next to it \u2014 no more scrolling past ten near-empty rows, and opening one no longer pushes the rest of the page out of sight.',
       'Progress and Weakest Links now sit side by side instead of stacked.',

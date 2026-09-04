@@ -235,6 +235,66 @@ t('the log on the Forge is the same log as Fitness HQ, not a second one', async 
   ok(/Incline press/.test(await text()), 'Fitness HQ must show the set logged on the Forge');
 });
 
+t('the 3D anatomy is revealed before anything measures it', async () => {
+  await boot({ forgeCentre: 'home' });
+  /* The real defect: reattach() ran fit() while the mount was still display:none, so
+     clientWidth was 0, the canvas locked to its 120px floor, and the model came back as a
+     thumbnail against the left edge of a full-width card. Stub the engine and watch the
+     order — this holds whether or not the test browser has WebGL. */
+  await page.evaluate(() => {
+    window.__anat = [];
+    const el = () => document.querySelector('[data-anatomy3d]');
+    window.NervexusAnatomy3D = {
+      supported: () => true,
+      hasScene: () => true,
+      isMounted: () => false,
+      reattach(node) {
+        window.__anat.push({ fn: 'reattach', display: node.style.display, width: node.clientWidth });
+        return true;
+      },
+      setAspect() {
+        const n = el();
+        window.__anat.push({ fn: 'setAspect', display: n.style.display, width: n.clientWidth });
+      },
+      setGlow() {}, setAutoSpin() {}, dispose() {},
+      mount() { return Promise.resolve(true); },
+    };
+  });
+  await page.evaluate(() => window.__nvx.setState({ anatomyTick: Date.now() }));
+  await page.waitForTimeout(800);
+
+  const calls = await page.evaluate(() => window.__anat);
+  ok(calls.length, '_syncAnatomy never reached the 3D engine');
+  for (const c of calls) {
+    eq(c.display, 'block', c.fn + ' ran while the mount was still hidden');
+    ok(c.width > 200, c.fn + ' measured a ' + c.width + 'px container — it would lock the canvas to the 120px floor');
+  }
+  ok(calls.some(c => c.fn === 'setAspect'), 'the mount must be re-fitted once it is visible');
+});
+
+t('the drawn figure is put away whenever the model is up', async () => {
+  await boot({ forgeCentre: 'home' });
+  await page.evaluate(() => {
+    window.NervexusAnatomy3D = {
+      supported: () => true, hasScene: () => true, isMounted: () => false,
+      reattach: () => true, setAspect() {}, setGlow() {}, setAutoSpin() {}, dispose() {},
+      mount() { return Promise.resolve(true); },
+    };
+  });
+  await page.evaluate(() => window.__nvx.setState({ anatomyTick: Date.now() }));
+  await page.waitForTimeout(800);
+  /* A re-render hands back fresh nodes carrying the markup's defaults, so the display state
+     has to be re-asserted every pass or the drawn fallback reappears under a live model. */
+  const st = await page.evaluate(() => ({
+    model: document.querySelector('[data-anatomy3d]').style.display,
+    drawn: document.querySelector('[data-anatomy]').style.display,
+    toggle: (document.querySelector('.cc-anatomy-views') || {}).style?.display,
+  }));
+  eq(st.model, 'block', 'the model mount should be visible');
+  eq(st.drawn, 'none', 'the drawn fallback is showing underneath the model');
+  eq(st.toggle, 'none', 'Front/Back belongs to the drawn figure and should be hidden');
+});
+
 t('the rings canvas is actually drawn on the Forge home', async () => {
   await boot({ forgeCentre: 'home' });
   await page.waitForTimeout(1200);

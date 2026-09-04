@@ -229,6 +229,13 @@
 
   function fit() {
     if (!S.el || !S.renderer || !S.camera) return;
+    /* A container that is still display:none measures 0, and sizing off that locked the
+       canvas at the 120px floor — setSize writes an inline width, so the model stayed a
+       thumbnail hugging the left of a full-width card until something else forced a resize.
+       reattach() hit this on every page re-render. Wait for a real width instead; the
+       observer below re-fits the moment there is one. */
+    if (!S.el.clientWidth) { S.pendingFit = true; return; }
+    S.pendingFit = false;
     var w = Math.max(120, S.el.clientWidth);
     var h = Math.max(220, Math.round(w * S.aspect));
     // Cap height so the model never dominates a tall phone viewport.
@@ -324,6 +331,7 @@
         fit();
         wireDrag(renderer.domElement);
         if (!S._resize) { S._resize = function () { fit(); }; window.addEventListener('resize', S._resize); }
+        watch(el);
         S.dirty = true;
         frame();
         return true;
@@ -348,6 +356,7 @@
     S.raf = 0;
     if (S._off) { S._off(); S._off = null; }
     if (S._resize) { window.removeEventListener('resize', S._resize); S._resize = null; }
+    if (S._ro) { try { S._ro.disconnect(); } catch (e) { } S._ro = null; }
     try {
       S.meshes.forEach(function (m) { m.geometry.dispose(); if (m.material) m.material.dispose(); });
       if (S.renderer) { S.renderer.dispose(); if (S.renderer.domElement && S.renderer.domElement.parentNode) S.renderer.domElement.parentNode.removeChild(S.renderer.domElement); }
@@ -387,11 +396,21 @@
   function attached() {
     return !!(S.renderer && S.renderer.domElement && S.renderer.domElement.isConnected);
   }
+  /* window resize is not enough: the container changes size when it is revealed, when the
+     theme swaps its card padding, or when the page re-renders around it, and none of those
+     fire a window resize. */
+  function watch(el) {
+    if (typeof ResizeObserver === 'undefined' || !el) return;
+    if (S._ro) { try { S._ro.disconnect(); } catch (e) { } }
+    S._ro = new ResizeObserver(function () { fit(); });
+    try { S._ro.observe(el); } catch (e) { S._ro = null; }
+  }
   function reattach(el) {
     if (!S.mounted || !S.renderer || !el) return false;
     var c = S.renderer.domElement;
     if (c.parentNode !== el) { el.innerHTML = ''; el.appendChild(c); }
     S.el = el;
+    watch(el);
     fit();
     S.dirty = true;
     return true;
