@@ -3601,23 +3601,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <sc-if value="{{ isForge }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
 
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:18px;">
-          <div style="display:flex; align-items:center; gap:15px; min-width:0;">
+        <!-- The unit score, the tier and its strapline all measured standards that no longer
+             exist, so they are gone with them. The crest and the wordmark stay: they name the
+             page, and without them the three cleared centres are four tabs on a blank screen. -->
+        <div style="display:flex; align-items:center; gap:15px; min-width:0; margin-bottom:18px;">
           <!-- the house crest: Éverpine's double rule around its own lozenge -->
           <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
             <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
             <span style="width:27px; height:27px; color:#E7D8A6; display:flex; position:relative;" data-icon="forge"></span>
           </div>
-          <div style="min-width:0;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#E7D8A6; margin-bottom:7px;">❖ THE FORGE</div>
-            <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">{{ forgeTierLabel }}</h1>
-            <div style="font-size:12.5px; color:#8f8f99; margin-top:5px;">{{ forgeSub }}</div>
-          </div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:34px; font-weight:700; color:{{ forgeScoreInk }}; line-height:1;">{{ forgeScorePct }}</div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-top:5px;">UNIT SCORE · {{ forgeAssessed }}/{{ forgeTotal }} MEASURED</div>
-          </div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#E7D8A6;">❖ THE FORGE</div>
         </div>
 
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
@@ -3626,7 +3619,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-for>
         </div>
 
-        <!-- what the logs already know, rather than asking again -->
+        <!-- the logs strip, progress and the weakest links all belong to the Home; the other
+             three centres are empty pages until they are rebuilt -->
+        <sc-if value="{{ forgeShowHome }}" hint-placeholder-val="{{ false }}">
         <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; margin-bottom:16px;">
           <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:10px;">FROM YOUR LOGS · LAST 7 DAYS</div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));">
@@ -3639,6 +3634,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
 
+        </sc-if>
+
+        <sc-if value="{{ forgeShowHome }}" hint-placeholder-val="{{ false }}">
         <!-- progress and the weakest links read together: what is moving, and what is not -->
         <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:12px; align-items:start; margin-bottom:16px;">
         <sc-if value="{{ forgeHasProgress }}" hint-placeholder-val="{{ false }}">
@@ -3680,6 +3678,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </sc-if>
         </div>
+        </sc-if>
 
         <!-- HOME — the training floor. These four cards are the working half of Fitness HQ,
              brought over so the Forge can stand on its own: the split and the anatomy model, the
@@ -9450,7 +9449,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.03-243 · v11.243 forge-centres-cleared';
+const NOTIF_BUILD_VERSION = '2026.09.03-244 · v11.244 forge-header-cleared';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13969,6 +13968,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.244', date:'Sep 3, 2026', notes:[
+      'The Forge\u2019s unit score, tier and strapline are gone \u2014 they counted standards that no longer have a page. The crest and the wordmark stay.',
+      'Training, Mental and Health are now genuinely blank: no header, no logs strip, no progress. The Home keeps all of it.',
+    ]},
     {version:'v11.243', date:'Sep 3, 2026', notes:[
       'Training, Mental and Health in the Forge are now empty pages, ready to be rebuilt. The four tabs and the Home stay exactly as they were.',
       'Anything you had already recorded is still saved \u2014 nothing was deleted, it just has no page to show it on for now.',
@@ -17954,7 +17957,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const TI=['#6f6f78','#c9c9ce','#6cffba','#e8b45a','#ffffff'];
         const centre=S.forgeCentre||'training';
         const sc=S.forgeScores||{}, dr=S.forgeDraft||{};
-        const us=F.unitScore(sc);
         const tierName=(t)=>t===0?'Not measured':F.TIERS[t-1];
         const centres=[['home','HOME'],['training','TRAINING'],['mental','MENTAL'],['health','HEALTH']].map(c=>({
           label:c[1], go:()=>this.setForgeCentre(c[0]),
@@ -17989,13 +17991,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const moved=prevEntry?F.movement(prevEntry.scores, hist[hist.length-1].scores):[];
         const dScore=pts.length>1?(pts[pts.length-1].score-pts[pts.length-2].score):null;
         return {
-          forgeTierLabel:us.assessed?us.tier:'Unmeasured',
-          forgeSub:us.assessed
-            ? 'Bigger, stronger, faster, healthier. '+us.assessed+' standards on record — the rest are still an unknown.'
-            : 'Bigger, stronger, faster, healthier.',
-          forgeScorePct:us.assessed?(us.score+'%'):'—',
-          forgeScoreInk:us.assessed?TI[Math.max(1,Math.min(4,Math.ceil(us.score/25)))]:'#6f6f78',
-          forgeAssessed:us.assessed, forgeTotal:us.total,
           forgeCentres:centres, forgeLink:link, forgeWeakest:wk,
           forgeHasProgress:!!pts.length, forgeBars:bars, forgeMovedAny:!!moved.length,
           forgeDeltaLabel: dScore==null
@@ -18009,8 +18004,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           forgeShowHome:centre==='home', forgeShowEmpty:centre!=='home',
           forgeEmptyLabel:(centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH')
         };
-      }, { forgeTierLabel:'The Forge', forgeSub:'Standards unavailable — reload to try again.', forgeScorePct:'—', forgeScoreInk:'#6f6f78', forgeAssessed:0, forgeTotal:0,
-           forgeCentres:[], forgeLink:[], forgeWeakest:[],
+      }, { forgeCentres:[], forgeLink:[], forgeWeakest:[],
            forgeHasProgress:false, forgeBars:[], forgeMoved:[], forgeMovedAny:false, forgeDeltaLabel:'', forgeDeltaInk:'#8f8f99',
            forgeShowHome:false, forgeShowEmpty:false, forgeEmptyLabel:'' }),
       ...this._safe(()=>{

@@ -51,7 +51,7 @@ async function boot(extra) {
   await page.evaluate((patch) => {
     const A = window.__nvx, now = Date.now(), day = 864e5;
     A.setState(Object.assign({
-      loggedIn: true, scene: 'forge', forgeCentre: 'training',
+      loggedIn: true, scene: 'forge', forgeCentre: 'home',
       forgeOpen: null, forgeDraft: {}, forgeScores: {}, forgeHistory: [],
       perfCheckinOpen: false, whatsNewOpen: false, staleOpen: false, toasts: [], searchOpen: false,
       /* The real stored shape: `exercise`, and a capitalised part. The log list filters on
@@ -339,19 +339,16 @@ t('every binding the markup asks for is produced', async () => {
   ok(src.length > 0, 'no document');
 });
 
-t('the unit score header reads from the engine', async () => {
-  await boot({ forgeScores: { 'nasal-walk': 45 } });
-  const body = await text();
-  ok(/UNIT SCORE · 1\/\d+ MEASURED/.test(body), 'measured count wrong: ' + (body.match(/UNIT SCORE[^\n]*/) || [])[0]);
-  const total = await page.evaluate(() => window.Forge.unitScore({}).total);
-  ok(new RegExp('1/' + total + ' MEASURED').test(body), 'the header total must match the engine total');
-});
-
-t('an unmeasured Forge says so rather than showing a zero', async () => {
-  await boot();
-  const body = await text();
-  ok(/Unmeasured/.test(body), 'a Forge with nothing recorded must not claim a tier');
-  ok(!/\b0%/.test(body.split('UNIT SCORE')[0] || ''), 'nothing measured must not read as 0% — that is a different claim');
+t('the unit score header is gone', async () => {
+  /* It counted standards that no longer have a page to be measured on. The crest and the
+     wordmark stay — without them the cleared centres are four tabs on a blank screen. */
+  for (const centre of ['home', 'training', 'mental', 'health']) {
+    await boot({ forgeCentre: centre });
+    const body = await text();
+    ok(!/UNIT SCORE/.test(body), 'the unit score is still on the ' + centre + ' page');
+    ok(!/MEASURED/.test(body), 'the measured count is still on the ' + centre + ' page');
+    ok(/❖ THE FORGE/.test(body), 'the page lost its wordmark on ' + centre);
+  }
 });
 
 /* ---- the log integration the brief asked for ---- */
@@ -378,13 +375,6 @@ t('an empty form records nothing rather than writing a blank assessment', async 
   await page.evaluate(() => window.__nvx.saveForgeScores());
   await page.waitForTimeout(500);
   eq(await page.evaluate(() => (window.__nvx.state.forgeHistory || []).length), 0, 'history entries after an empty save');
-});
-
-t('a blank standard is not counted against the score', async () => {
-  await boot({ forgeScores: { 'nasal-walk': 90 } });
-  const body = await text();
-  const pct = Number((body.match(/(\d+)%/) || [0, 0])[1]);
-  eq(pct, 100, 'one standard at Unit and the rest untested must read 100%, not a fraction of 48');
 });
 
 /* ---- the three cleared centres ---- */
