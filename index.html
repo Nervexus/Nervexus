@@ -3701,6 +3701,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#6f6f78; padding-bottom:12px;">
                         <span><span style="color:#E7D8A6;">●</span> SCHEDULED</span>
                         <span><span style="color:#6cffba;">●</span> LOGGED</span>
+                        <sc-if value="{{ sec.weekHint }}" hint-placeholder-val="{{ false }}"><span>{{ sec.weekHint }}</span></sc-if>
                       </div>
                     </sc-if>
 
@@ -9392,7 +9393,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.05-256 · v11.256 own-session';
+const NOTIF_BUILD_VERSION = '2026.09.05-257 · v11.257 weekly-days';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9482,7 +9483,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',days:[],items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -13914,6 +13915,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.257', date:'Sep 5, 2026', notes:[
+      'On Weekly you can now tap the days you train. They repeat on your main calendar every week, not just this one.',
+      'Tap a day again to drop it. Drop the last one and the calendar entry goes with it.',
+    ]},
     {version:'v11.256', date:'Sep 5, 2026', major:true, notes:[
       'The Full Body session is yours to build. Add exercises, set the sets, reps or minutes, remove any of them. It starts empty \u2014 the ten it used to open with were invented, however sensible they looked.',
       'Weekly is a calendar now: the week Monday to Sunday, with a gold dot on days you have a session booked and a green one on days you actually logged something.',
@@ -15816,15 +15821,43 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const mode=f.mode||'day', on=f.on||'';
     const period=this._fbPeriod(mode, on);
     if(f.period===period) return f;
-    return {period, mode, on, evId:f.evId||'', items:f.items||[], done:{}, w:f.w||{}};
+    return {period, mode, on, evId:f.evId||'', days:f.days||[], items:f.items||[], done:{}, w:f.w||{}};
   }
+  /* Both weekly and scheduled put something on the calendar, and they are different shapes —
+     a repeating event against a one-off. Drop whatever is there and re-make it for the mode
+     being switched to, rather than trying to convert one into the other. */
   setForgeFBMode(m){
     const f=this._fb();
-    if(m!=='date' && f.evId) this._fbClearEvent(f.evId);
-    const next={...f, mode:m, evId:(m==='date'?f.evId:''), done:{}};
+    if(f.evId) this._fbClearEvent(f.evId);
+    const next={...f, mode:m, evId:'', done:{}};
     next.period=this._fbPeriod(m, next.on);
-    this.setState({forgeFB:next});
-    if(m==='date' && next.on) this._fbSyncEvent(next.on);
+    this.setState({forgeFB:next}, ()=>{
+      if(m==='date' && next.on) this._fbSyncEvent(next.on);
+      if(m==='week' && (next.days||[]).length) this._fbSyncWeekly(next.days);
+    });
+  }
+  /* Weekly: pick the days you train. One repeating event carries them, which is the shape
+     the calendar already understands — _eventOccursOn matches an anchor date or a day code
+     after it — so the main calendar draws the session every week without knowing about any
+     of this. */
+  toggleForgeFBDay(dateStr){
+    const f=this._fb(), code=this._dowCode(dateStr);
+    const days=(f.days||[]).indexOf(code)>=0 ? (f.days||[]).filter(d=>d!==code) : [...(f.days||[]), code];
+    this.setState({forgeFB:{...f, days}}, ()=>this._fbSyncWeekly(days));
+  }
+  _fbSyncWeekly(days){
+    const f=this.state.forgeFB||{};
+    if(f.evId) this._fbClearEvent(f.evId);
+    if(!days || !days.length) return;
+    // Anchor on the first chosen day of this week, so it shows this week and every week after.
+    const week=this.fbWeek();
+    const first=week.find(d=>days.indexOf(this._dowCode(d.date))>=0) || week[0];
+    const id=this._uuid(), title='Full Body session', time='09:00';
+    const ev={id, title, date:first.date, time, repeat:[...days], kind:'general', endTime:null, attendees:null, estMins:60};
+    this.mut(st=>({events:[...(st.events||[]), ev]}));
+    this.setState(st=>({forgeFB:{...(st.forgeFB||{}), evId:id}}));
+    if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title,
+      event_date:first.date,event_time:time,repeat_days:[...days],kind:'general',end_time:null,attendees:null,est_minutes:60});
   }
   setForgeFBDate(e){
     const on=(e&&e.target?e.target.value:e)||'';
@@ -15839,6 +15872,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   fbWeek(){
     const start=this._fbWeekStart(), f=this.state.forgeFB||{}, today=this._fbToday();
     const evs=(this.state.events||[]).filter(e=>/^Full Body session$/i.test(e.title||''));
+    const booked=(key)=>evs.some(e=>this._eventOccursOn(e,key));
     const logged={};
     (this.state.workouts||[]).forEach(w=>{ const d=this._fbLocal(new Date(w.ts)); logged[d]=(logged[d]||0)+1; });
     const out=[];
@@ -15846,8 +15880,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const d=new Date(start+'T12:00:00'); d.setDate(d.getDate()+i);
       const key=this._fbLocal(d);
       out.push({ date:key, dow:['MON','TUE','WED','THU','FRI','SAT','SUN'][i], day:d.getDate(),
-        isToday:key===today, scheduled:evs.some(e=>e.date===key), logged:logged[key]||0,
-        selected:f.mode==='date' && f.on===key });
+        isToday:key===today, scheduled:booked(key), logged:logged[key]||0,
+        selected:(f.mode==='date' && f.on===key) || (f.mode==='week' && (f.days||[]).indexOf(this._dowCode(key))>=0) });
     }
     return out;
   }
@@ -18164,10 +18198,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             /* The week shows for both the weekly cadence and a scheduled one — that is where
                you check a booked session actually landed. */
             showWeek:fbMode==='week'||fbMode==='date',
+            weekHint:fbMode==='week'?'TAP A DAY TO TRAIN ON IT':(fbMode==='date'?'TAP A DAY TO SET IT':''),
             week:this.fbWeek().map(d=>({
               dow:d.dow, day:d.day, scheduled:d.scheduled, didLog:d.logged>0,
-              cursor:fbMode==='date'?'pointer':'default',
-              pick:()=>{ if(fbMode==='date') this.setForgeFBDate(d.date); },
+              cursor:(fbMode==='date'||fbMode==='week')?'pointer':'default',
+              pick:()=>{ if(fbMode==='date') this.setForgeFBDate(d.date);
+                         else if(fbMode==='week') this.toggleForgeFBDay(d.date); },
               bg:d.selected?'rgba(231,216,166,0.16)':(d.isToday?'rgba(255,255,255,0.05)':'rgba(0,0,0,0)'),
               bd:d.selected?'#E7D8A6':(d.isToday?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.08)'),
               dowInk:d.isToday?'#c9c9ce':'#6f6f78',
