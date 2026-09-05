@@ -9393,7 +9393,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.05-257 · v11.257 weekly-days';
+const NOTIF_BUILD_VERSION = '2026.09.05-258 · v11.258 drop-weekly';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9483,7 +9483,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',days:[],items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -9598,7 +9598,7 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this._fbMigrateWeekly(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this._checkStaleBuild(); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -13915,6 +13915,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.258', date:'Sep 5, 2026', notes:[
+      'Dropped the Weekly setting. Daily covers a session you do most days and Scheduled covers one you have booked; the middle option was not earning its place.',
+      'If you had picked weekly days, the repeating entry has been taken off your calendar and the setting is back to Daily \u2014 otherwise it would have sat there with nothing able to remove it.',
+    ]},
     {version:'v11.257', date:'Sep 5, 2026', notes:[
       'On Weekly you can now tap the days you train. They repeat on your main calendar every week, not just this one.',
       'Tap a day again to drop it. Drop the last one and the calendar entry goes with it.',
@@ -15810,7 +15814,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   /* The period the ticks belong to. Daily rolls at midnight, weekly on Monday, and a session
      set for one day belongs to that day and nothing else. */
   _fbPeriod(mode, on){
-    if(mode==='week') return 'W'+this._fbWeekStart();
     if(mode==='date') return 'D'+(on||'');
     return this._fbToday();
   }
@@ -15818,46 +15821,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      what you squat does not change because it is Tuesday. */
   _fb(){
     const f=this.state.forgeFB||{};
-    const mode=f.mode||'day', on=f.on||'';
+    const mode=(f.mode==='date')?'date':'day', on=f.on||'';   // 'week' was removed; it reads as daily
     const period=this._fbPeriod(mode, on);
     if(f.period===period) return f;
-    return {period, mode, on, evId:f.evId||'', days:f.days||[], items:f.items||[], done:{}, w:f.w||{}};
+    return {period, mode, on, evId:f.evId||'', items:f.items||[], done:{}, w:f.w||{}};
   }
-  /* Both weekly and scheduled put something on the calendar, and they are different shapes —
-     a repeating event against a one-off. Drop whatever is there and re-make it for the mode
-     being switched to, rather than trying to convert one into the other. */
   setForgeFBMode(m){
     const f=this._fb();
     if(f.evId) this._fbClearEvent(f.evId);
     const next={...f, mode:m, evId:'', done:{}};
     next.period=this._fbPeriod(m, next.on);
-    this.setState({forgeFB:next}, ()=>{
-      if(m==='date' && next.on) this._fbSyncEvent(next.on);
-      if(m==='week' && (next.days||[]).length) this._fbSyncWeekly(next.days);
-    });
-  }
-  /* Weekly: pick the days you train. One repeating event carries them, which is the shape
-     the calendar already understands — _eventOccursOn matches an anchor date or a day code
-     after it — so the main calendar draws the session every week without knowing about any
-     of this. */
-  toggleForgeFBDay(dateStr){
-    const f=this._fb(), code=this._dowCode(dateStr);
-    const days=(f.days||[]).indexOf(code)>=0 ? (f.days||[]).filter(d=>d!==code) : [...(f.days||[]), code];
-    this.setState({forgeFB:{...f, days}}, ()=>this._fbSyncWeekly(days));
-  }
-  _fbSyncWeekly(days){
-    const f=this.state.forgeFB||{};
-    if(f.evId) this._fbClearEvent(f.evId);
-    if(!days || !days.length) return;
-    // Anchor on the first chosen day of this week, so it shows this week and every week after.
-    const week=this.fbWeek();
-    const first=week.find(d=>days.indexOf(this._dowCode(d.date))>=0) || week[0];
-    const id=this._uuid(), title='Full Body session', time='09:00';
-    const ev={id, title, date:first.date, time, repeat:[...days], kind:'general', endTime:null, attendees:null, estMins:60};
-    this.mut(st=>({events:[...(st.events||[]), ev]}));
-    this.setState(st=>({forgeFB:{...(st.forgeFB||{}), evId:id}}));
-    if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title,
-      event_date:first.date,event_time:time,repeat_days:[...days],kind:'general',end_time:null,attendees:null,est_minutes:60});
+    this.setState({forgeFB:next}, ()=>{ if(m==='date' && next.on) this._fbSyncEvent(next.on); });
   }
   setForgeFBDate(e){
     const on=(e&&e.target?e.target.value:e)||'';
@@ -15865,6 +15839,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const next={...f, mode:'date', on, done:{}};
     next.period=this._fbPeriod('date', on);
     this.setState({forgeFB:next}, ()=>{ on ? this._fbSyncEvent(on) : (f.evId && this._fbClearEvent(f.evId)); });
+  }
+  /* A weekly setting lived here: pick the days you train, carried as one repeating calendar
+     event. Removed — daily covers a session you do most days and a date covers one you have
+     booked, and the middle option earned nothing. _fbMigrateWeekly cleans up after anyone
+     who had picked days before it went. */
+  _fbMigrateWeekly(){
+    const f=this.state.forgeFB||{};
+    if(f.mode!=='week' && !(f.days||[]).length) return;
+    // They would otherwise keep a repeating session on the calendar with no control left
+    // anywhere that could remove it.
+    if(f.evId) this._fbClearEvent(f.evId);
+    this.setState(st=>{ const g={...(st.forgeFB||{})}; delete g.days;
+      return {forgeFB:{...g, mode:'day', evId:'', period:''}}; });
   }
   /* The week, Monday to Sunday, with what is scheduled and what was actually logged on each
      day. Scheduled sessions are read back out of the same events the main calendar renders,
@@ -15881,7 +15868,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const key=this._fbLocal(d);
       out.push({ date:key, dow:['MON','TUE','WED','THU','FRI','SAT','SUN'][i], day:d.getDate(),
         isToday:key===today, scheduled:booked(key), logged:logged[key]||0,
-        selected:(f.mode==='date' && f.on===key) || (f.mode==='week' && (f.days||[]).indexOf(this._dowCode(key))>=0) });
+        selected:f.mode==='date' && f.on===key });
     }
     return out;
   }
@@ -18185,7 +18172,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             empty:sec.key!=='full-body' && !list.length,
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
-            modes:[['day','DAILY'],['week','WEEKLY'],['date','SCHEDULED']].map(m=>({
+            modes:[['day','DAILY'],['date','SCHEDULED']].map(m=>({
               label:m[1], go:()=>this.setForgeFBMode(m[0]),
               ink:fbMode===m[0]?'#0d0d10':'#9a9aa2',
               bg:fbMode===m[0]?'#eef0f2':'transparent',
@@ -18194,16 +18181,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             setDate:(e)=>this.setForgeFBDate(e),
             onCalendar:fbMode==='date' && !!fb.on && !!fb.evId,
             dateNice:fb.on?this._niceDate(fb.on):'',
-            periodLabel:fbMode==='week'?'THIS WEEK':(fbMode==='date'?(fb.on?'ON THE DAY':'PICK A DAY'):'TODAY'),
-            /* The week shows for both the weekly cadence and a scheduled one — that is where
-               you check a booked session actually landed. */
-            showWeek:fbMode==='week'||fbMode==='date',
-            weekHint:fbMode==='week'?'TAP A DAY TO TRAIN ON IT':(fbMode==='date'?'TAP A DAY TO SET IT':''),
+            periodLabel:fbMode==='date'?(fb.on?'ON THE DAY':'PICK A DAY'):'TODAY',
+            /* The week is where you check a booked session actually landed. */
+            showWeek:fbMode==='date',
+            weekHint:'TAP A DAY TO SET IT',
             week:this.fbWeek().map(d=>({
               dow:d.dow, day:d.day, scheduled:d.scheduled, didLog:d.logged>0,
-              cursor:(fbMode==='date'||fbMode==='week')?'pointer':'default',
-              pick:()=>{ if(fbMode==='date') this.setForgeFBDate(d.date);
-                         else if(fbMode==='week') this.toggleForgeFBDay(d.date); },
+              cursor:fbMode==='date'?'pointer':'default',
+              pick:()=>{ if(fbMode==='date') this.setForgeFBDate(d.date); },
               bg:d.selected?'rgba(231,216,166,0.16)':(d.isToday?'rgba(255,255,255,0.05)':'rgba(0,0,0,0)'),
               bd:d.selected?'#E7D8A6':(d.isToday?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.08)'),
               dowInk:d.isToday?'#c9c9ce':'#6f6f78',

@@ -529,31 +529,13 @@ t('a timed item logs too, not just the rep ones', async () => {
   ok(w[0].min > 0, 'the plank logged no minutes');
 });
 
-t('the session repeats daily, weekly or on one day', async () => {
+t('the session repeats daily or on a set day', async () => {
   await openFullBody();
   const body = await text();
-  for (const m of ['DAILY', 'WEEKLY', 'SCHEDULED']) ok(body.includes(m), m + ' option is missing');
+  for (const m of ['DAILY', 'SCHEDULED']) ok(body.includes(m), m + ' option is missing');
   ok(!/ON A DAY/.test(body), 'the old name is still on the page');
+  ok(!/WEEKLY/.test(body), 'the weekly setting is still on the page');
   ok(/TODAY/.test(body), 'it should start on the daily setting');
-});
-
-t('weekly ticks survive tomorrow but not next week', async () => {
-  await openFullBody();
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(500);
-  await tick('Back squat');
-  await page.waitForTimeout(700);
-  eq((await logged()).done, 1, 'the weekly tick did not register');
-  ok(/THIS WEEK/.test(await text()), 'it should say the period it is counting');
-
-  /* A tick made today is still there tomorrow on a weekly session — that is the whole
-     difference from daily — but a stamp from a previous week is dropped. */
-  const stamp = await page.evaluate(() => window.__nvx.state.forgeFB.period);
-  ok(/^W\d{4}-\d{2}-\d{2}$/.test(stamp), 'a weekly session should be stamped with its week: ' + stamp);
-  await page.evaluate(() => window.__nvx.setState({
-    forgeFB: { ...window.__nvx.state.forgeFB, period: 'W2020-01-06' } }));
-  await page.waitForTimeout(600);
-  eq((await logged()).done, 0, "last week's ticks carried into this one");
 });
 
 t('a session set for a day goes on the calendar', async () => {
@@ -603,19 +585,6 @@ t('switching back off a set day takes the event with it', async () => {
   await page.evaluate(() => window.__nvx.setForgeFBMode('day'));
   await page.waitForTimeout(700);
   eq(await page.evaluate(() => window.__nvx.state.events.length), 0, 'the calendar kept a session that is no longer scheduled');
-});
-
-t('changing how often it repeats does not touch the training log', async () => {
-  /* The ticks reset because they belong to a different period now, but the sets that were
-     already logged happened — they are not the checklist's to take back. */
-  await openFullBody();
-  await tick('Back squat');
-  await page.waitForTimeout(700);
-  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'nothing logged to check');
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(700);
-  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'switching the schedule deleted a logged set');
-  eq((await logged()).done, 0, 'the new period should start empty');
 });
 
 t('weights survive the period rolling over', async () => {
@@ -718,91 +687,6 @@ t('the list survives the day rolling over', async () => {
 
 /* ---- the week ---- */
 
-t('WEEKLY shows a week, Monday to Sunday', async () => {
-  await openFullBody();
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(700);
-  const body = await text();
-  for (const d of ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])
-    ok(body.includes(d), d + ' is missing from the week');
-  const w = await page.evaluate(() => window.__nvx.fbWeek());
-  eq(w.length, 7, 'a week is seven days');
-  eq(w[0].dow, 'MON', 'the week should start on Monday');
-  eq(w.filter(d => d.isToday).length, 1, 'exactly one day should be today');
-});
-
-t('on WEEKLY the days can be picked', async () => {
-  await openFullBody();
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(600);
-  const week = await page.evaluate(() => window.__nvx.fbWeek());
-  eq(week.filter(d => d.selected).length, 0, 'nothing should be picked to start');
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), week[0].date);
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), week[2].date);
-  await page.waitForTimeout(700);
-  eq(await page.evaluate(() => (window.__nvx.state.forgeFB.days || []).join(',')), 'MON,WED',
-     'the picked days were not stored');
-  const picked = await page.evaluate(() => window.__nvx.fbWeek().filter(d => d.selected).map(d => d.dow));
-  eq(picked.join(','), 'MON,WED', 'the week does not show them picked');
-});
-
-t('picking a day again unpicks it', async () => {
-  await openFullBody();
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(500);
-  const d0 = await page.evaluate(() => window.__nvx.fbWeek()[1].date);
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), d0);
-  await page.waitForTimeout(500);
-  eq(await page.evaluate(() => (window.__nvx.state.forgeFB.days || []).length), 1, 'it did not pick');
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), d0);
-  await page.waitForTimeout(600);
-  eq(await page.evaluate(() => (window.__nvx.state.forgeFB.days || []).length), 0, 'it did not unpick');
-  eq(await page.evaluate(() => window.__nvx.state.events.length), 0,
-     'the last day was unpicked but a calendar event was left behind');
-});
-
-t('the training days repeat on the main calendar', async () => {
-  /* One repeating event carries them, which is the shape the calendar already understands,
-     so it draws the session every week without knowing anything about the Forge. */
-  await openFullBody();
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(500);
-  const week = await page.evaluate(() => window.__nvx.fbWeek());
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), week[0].date);
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), week[4].date);
-  await page.waitForTimeout(700);
-
-  const ev = await page.evaluate(() => window.__nvx.state.events);
-  eq(ev.length, 1, 'there should be one repeating event, not one per day');
-  eq((ev[0].repeat || []).join(','), 'MON,FRI', 'the repeat days are wrong');
-
-  /* Next week's Friday, which no anchor date covers — only the repeat can put it there. */
-  const nextFri = await page.evaluate(() => {
-    const d = new Date(window.__nvx.fbWeek()[4].date + 'T12:00:00');
-    d.setDate(d.getDate() + 7);
-    return d.toLocaleDateString('en-CA');
-  });
-  ok(await page.evaluate((d) => window.__nvx._eventOccursOn(window.__nvx.state.events[0], d), nextFri),
-     'the session does not recur into next week');
-  await page.evaluate((d) => window.__nvx.setState({ scene: 'calendar', calSel: d }), nextFri);
-  await page.waitForTimeout(900);
-  ok(/Full Body session/.test(await text()), 'next week does not show it on the main calendar');
-});
-
-t('switching from weekly to scheduled does not leave the repeat behind', async () => {
-  await openFullBody();
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
-  await page.waitForTimeout(400);
-  const week = await page.evaluate(() => window.__nvx.fbWeek());
-  await page.evaluate((d) => window.__nvx.toggleForgeFBDay(d), week[1].date);
-  await page.waitForTimeout(600);
-  eq(await page.evaluate(() => window.__nvx.state.events.length), 1, 'nothing to switch away from');
-  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
-  await page.waitForTimeout(700);
-  eq(await page.evaluate(() => window.__nvx.state.events.length), 0,
-     'the repeating event survived the switch');
-});
-
 t('a scheduled session shows on the week and on the main calendar', async () => {
   /* Both read the same event, so they cannot disagree — it is one session shown twice. */
   await openFullBody();
@@ -842,10 +726,39 @@ t('the week marks the days something was actually logged', async () => {
   await openFullBody();
   await tick('Deadlift');
   await page.waitForTimeout(700);
-  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
   await page.waitForTimeout(700);
   const today = await page.evaluate(() => window.__nvx.fbWeek().find(d => d.isToday));
   ok(today.logged > 0, 'today should be marked as logged');
+});
+
+t('an old weekly setting is cleaned up rather than stranded', async () => {
+  /* Someone who had picked weekly days keeps a repeating session on their calendar, and once
+     the setting is gone there is no control left anywhere that could remove it. */
+  await openFullBody();
+  await page.evaluate(() => {
+    window.__nvx.setState({
+      events: [{ id: 'old-weekly', title: 'Full Body session', date: '2026-08-31', time: '09:00',
+                 repeat: ['MON', 'WED'], kind: 'general' }],
+      forgeFB: { ...window.__nvx.state.forgeFB, mode: 'week', days: ['MON', 'WED'], evId: 'old-weekly' } });
+  });
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx._fbMigrateWeekly());
+  await page.waitForTimeout(700);
+  const f = await page.evaluate(() => window.__nvx.state.forgeFB);
+  eq(f.mode, 'day', 'the stored weekly setting was not dropped');
+  ok(!f.days, 'the picked days were left behind');
+  eq(await page.evaluate(() => window.__nvx.state.events.length), 0,
+     'the repeating session was left on the calendar with nothing able to remove it');
+});
+
+t('a stored weekly setting reads as daily even before the cleanup runs', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setState({
+    forgeFB: { ...window.__nvx.state.forgeFB, mode: 'week' } }));
+  await page.waitForTimeout(600);
+  eq(await page.evaluate(() => window.__nvx._fb().mode), 'day', 'it did not fall back to daily');
+  ok(/TODAY/.test(await text()), 'the page should read as the daily setting');
 });
 
 t('the week is not shown on the daily setting', async () => {
