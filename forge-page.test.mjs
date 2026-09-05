@@ -338,12 +338,34 @@ t('every section is listed, marked with the house crest and not a number', async
 
 /* ---- the Full Body checklist ---- */
 
-async function openFullBody() {
+/* The session starts empty — the exercises are the user's own, not a prescribed list — so
+   openFullBody builds one first. openEmptySession leaves it empty for the tests about
+   adding, removing and the empty state. */
+async function openEmptySession() {
   await boot({ forgeCentre: 'training' });
   await page.evaluate(() => window.__nvx.setState({
-    forgeSection: 'full-body', forgeFB: { period: '', mode: 'day', on: '', evId: '', done: {}, w: {} }, workouts: [], events: [] }));
+    forgeSection: 'full-body',
+    forgeFB: { period: '', mode: 'day', on: '', evId: '', items: [], done: {}, w: {} },
+    fbDraft: { part: 'Chest' }, workouts: [], events: [] }));
   await page.waitForTimeout(600);
 }
+async function openFullBody() {
+  await openEmptySession();
+  await page.evaluate(() => {
+    const mk = (name, part, sets, reps, minutes) => ({
+      id: name.toLowerCase().replace(/\W+/g, '-'), name, part, sets, reps,
+      minutes: minutes || 0, dist: 0, distUnit: 'm' });
+    window.__nvx.setState({ forgeFB: { ...window.__nvx.state.forgeFB, items: [
+      mk('Back squat', 'Legs', 3, 5), mk('Deadlift', 'Back', 1, 5), mk('Bench press', 'Chest', 3, 5),
+      mk('Pull-ups', 'Back', 3, 8), mk('Dips', 'Chest', 3, 8), mk('Plank', 'Core', 0, 0, 3) ] } });
+  });
+  await page.waitForTimeout(500);
+}
+const logged = async () => {
+  const m = /(\d+)\s*\/\s*(\d+)\s*LOGGED/.exec(await text());
+  if (!m) throw new Error('no LOGGED counter on the page');
+  return { done: +m[1], total: +m[2] };
+};
 const ticks = () => page.evaluate(() =>
   [...document.querySelectorAll('span')].filter(e => e.textContent.trim() === '✓').length);
 const tick = (name) => page.evaluate((n) => {
@@ -356,13 +378,13 @@ const tick = (name) => page.evaluate((n) => {
 t('Full Body carries the session checklist', async () => {
   await openFullBody();
   const body = await text();
+  const L = await page.evaluate(() => window.__nvx.state.forgeFB.items || []);
   ok(/THE SESSION/.test(body), 'the checklist is missing');
-  const L = await page.evaluate(() => window.ForgeTraining.section('full-body').checklist);
-  for (const it of L) {
-    ok(body.includes(it.name), 'not listed: ' + it.name);
-    ok(body.includes(it.target), 'no target shown for: ' + it.name);
-  }
-  ok(/0\/10 LOGGED/.test(body), 'the counter should start at zero');
+  ok(L.length, 'the fixture built no session');
+  for (const it of L) ok(body.includes(it.name), 'not listed: ' + it.name);
+  const c0 = await logged();
+  eq(c0.done, 0, 'the counter should start at zero');
+  eq(c0.total, L.length, 'the counter should count the items in the session');
 });
 
 t('ticking an item writes it to the main training log', async () => {
@@ -377,7 +399,7 @@ t('ticking an item writes it to the main training log', async () => {
   eq(w[0].part, 'Legs', 'wrong body part');
   eq(w[0].sets, 3, 'sets not carried through');
   eq(w[0].reps, 5, 'reps not carried through');
-  ok(/1\/10 LOGGED/.test(await text()), 'the counter did not move');
+  eq((await logged()).done, 1, 'the counter did not move');
 });
 
 t('the logged set shows up on Fitness HQ', async () => {
@@ -453,7 +475,7 @@ t('unticking takes the set back out of the log', async () => {
   await tick('Bench press');
   await page.waitForTimeout(700);
   eq(await page.evaluate(() => window.__nvx.state.workouts.length), 0, 'unticking left the entry behind');
-  ok(/0\/10 LOGGED/.test(await text()), 'the counter did not come back down');
+  eq((await logged()).done, 0, 'the counter did not come back down');
 });
 
 t('unticking removes only what that tick logged', async () => {
@@ -492,30 +514,26 @@ t('yesterday\'s ticks do not carry into today', async () => {
     forgeFB: { period: '2020-01-01', mode: 'day', on: '', evId: '',
                done: { squat: { ids: ['x'] }, bench: { ids: ['y'] } }, w: {} } }));
   await page.waitForTimeout(700);
-  ok(/0\/10 LOGGED/.test(await text()), 'a stale day is still showing its ticks');
+  eq((await logged()).done, 0, 'a stale day is still showing its ticks');
   eq(await ticks(), 0, 'yesterday\'s ticks carried over');
 });
 
-t('the timed and distance items log too, not just the rep ones', async () => {
+t('a timed item logs too, not just the rep ones', async () => {
   /* The log refuses an entry with no reps, minutes or distance, and it does it silently —
      the tick would look like it worked and record nothing. */
   await openFullBody();
   await tick('Plank');
-  await page.waitForTimeout(600);
-  await tick("Farmer's carry");
   await page.waitForTimeout(700);
   const w = await page.evaluate(() => window.__nvx.state.workouts);
-  eq(w.length, 2, 'a timed or distance item was refused by the log');
-  const plank = w.find(x => x.exercise === 'Plank');
-  ok(plank && plank.min > 0, 'the plank logged no minutes');
-  const carry = w.find(x => /Farmer/.test(x.exercise));
-  ok(carry && carry.dist > 0, 'the carry logged no distance');
+  eq(w.length, 1, 'a timed item was refused by the log');
+  ok(w[0].min > 0, 'the plank logged no minutes');
 });
 
 t('the session repeats daily, weekly or on one day', async () => {
   await openFullBody();
   const body = await text();
-  for (const m of ['DAILY', 'WEEKLY', 'ON A DAY']) ok(body.includes(m), m + ' option is missing');
+  for (const m of ['DAILY', 'WEEKLY', 'SCHEDULED']) ok(body.includes(m), m + ' option is missing');
+  ok(!/ON A DAY/.test(body), 'the old name is still on the page');
   ok(/TODAY/.test(body), 'it should start on the daily setting');
 });
 
@@ -525,7 +543,7 @@ t('weekly ticks survive tomorrow but not next week', async () => {
   await page.waitForTimeout(500);
   await tick('Back squat');
   await page.waitForTimeout(700);
-  ok(/1\/10 LOGGED/.test(await text()), 'the weekly tick did not register');
+  eq((await logged()).done, 1, 'the weekly tick did not register');
   ok(/THIS WEEK/.test(await text()), 'it should say the period it is counting');
 
   /* A tick made today is still there tomorrow on a weekly session — that is the whole
@@ -535,7 +553,7 @@ t('weekly ticks survive tomorrow but not next week', async () => {
   await page.evaluate(() => window.__nvx.setState({
     forgeFB: { ...window.__nvx.state.forgeFB, period: 'W2020-01-06' } }));
   await page.waitForTimeout(600);
-  ok(/0\/10 LOGGED/.test(await text()), 'last week\'s ticks carried into this one');
+  eq((await logged()).done, 0, "last week's ticks carried into this one");
 });
 
 t('a session set for a day goes on the calendar', async () => {
@@ -597,7 +615,7 @@ t('changing how often it repeats does not touch the training log', async () => {
   await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
   await page.waitForTimeout(700);
   eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'switching the schedule deleted a logged set');
-  ok(/0\/10 LOGGED/.test(await text()), 'the new period should start empty');
+  eq((await logged()).done, 0, 'the new period should start empty');
 });
 
 t('weights survive the period rolling over', async () => {
@@ -613,6 +631,155 @@ t('weights survive the period rolling over', async () => {
   await page.waitForTimeout(600);
   const w = await page.evaluate(() => window.__nvx.state.forgeFB.w);
   ok(w && Object.keys(w).length, 'the weights were wiped with the ticks');
+});
+
+/* ---- the session is the user's own ---- */
+
+t('the session starts empty, with nothing prescribed', async () => {
+  /* A sensible-looking ten was shipped here once. It was still fiction. */
+  await openEmptySession();
+  const body = await text();
+  ok(/Nothing in the session yet/.test(body), 'it should say the session is empty');
+  eq(await page.evaluate(() => (window.__nvx.state.forgeFB.items || []).length), 0, 'items are pre-filled');
+  const prescribed = await page.evaluate(() => !!window.ForgeTraining.section('full-body').checklist);
+  ok(!prescribed, 'the section data still carries a prescribed list');
+  for (const ghost of ['Back squat', 'Deadlift', 'Bench press', 'Farmer', 'Plank'])
+    ok(!body.includes(ghost), ghost + ' is still being suggested');
+});
+
+t('an exercise can be added, and it is yours', async () => {
+  await openEmptySession();
+  await page.evaluate(() => {
+    window.__nvx.setFbDraft('name', 'Zercher squat'); window.__nvx.setFbDraft('part', 'Legs');
+    window.__nvx.setFbDraft('sets', '4'); window.__nvx.setFbDraft('reps', '6');
+  });
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.addForgeFBItem());
+  await page.waitForTimeout(600);
+  const it = await page.evaluate(() => window.__nvx.state.forgeFB.items[0]);
+  ok(it, 'nothing was added');
+  eq(it.name, 'Zercher squat', 'wrong name');
+  eq(it.part, 'Legs', 'wrong body part');
+  const body = await text();
+  ok(body.includes('Zercher squat'), 'it is not on the list');
+  ok(body.includes('4 × 6'), 'the target was not derived: ' + (body.match(/Zercher[\s\S]{0,40}/) || [])[0]);
+});
+
+t('an item with nothing to log is refused rather than ticking into nothing', async () => {
+  /* The log silently drops an entry with no reps, minutes or distance, so the tick would
+     look like it worked and record nothing. */
+  await openEmptySession();
+  await page.evaluate(() => {
+    window.__nvx.setFbDraft('name', 'Stretching'); window.__nvx.setFbDraft('sets', '3');
+  });
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.addForgeFBItem());
+  await page.waitForTimeout(500);
+  eq(await page.evaluate(() => (window.__nvx.state.forgeFB.items || []).length), 0,
+     'an unloggable item was added');
+  await page.evaluate(() => window.__nvx.setFbDraft('reps', '10'));
+  await page.waitForTimeout(200);
+  await page.evaluate(() => window.__nvx.addForgeFBItem());
+  await page.waitForTimeout(500);
+  eq(await page.evaluate(() => (window.__nvx.state.forgeFB.items || []).length), 1,
+     'it should be accepted once it has reps');
+});
+
+t('removing an item takes its logged sets with it', async () => {
+  /* Otherwise the log keeps sets belonging to an exercise that no longer exists, and no
+     tick can ever remove them. */
+  await openFullBody();
+  await tick('Back squat');
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'nothing logged to check');
+  await page.evaluate(() => {
+    const id = window.__nvx.state.forgeFB.items.find(i => i.name === 'Back squat').id;
+    window.__nvx.removeForgeFBItem(id);
+  });
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 0, 'the logged set was orphaned');
+  /* The toast from the tick still says the name, so check the row itself rather than the
+     page text. */
+  const row = await page.evaluate(() =>
+    [...document.querySelectorAll('span')].some(e => e.children.length === 0 && e.textContent.trim() === 'Back squat'));
+  ok(!row, 'the item is still on the list');
+  eq(await page.evaluate(() => window.__nvx.state.forgeFB.items.some(i => i.name === 'Back squat')), false,
+     'the item is still in the session');
+});
+
+t('the list survives the day rolling over', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setState({
+    forgeFB: { ...window.__nvx.state.forgeFB, period: '2020-01-01' } }));
+  await page.waitForTimeout(600);
+  const n = await page.evaluate(() => (window.__nvx.state.forgeFB.items || []).length);
+  ok(n > 0, 'the session emptied itself overnight');
+});
+
+/* ---- the week ---- */
+
+t('WEEKLY shows a week, Monday to Sunday', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
+  await page.waitForTimeout(700);
+  const body = await text();
+  for (const d of ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'])
+    ok(body.includes(d), d + ' is missing from the week');
+  const w = await page.evaluate(() => window.__nvx.fbWeek());
+  eq(w.length, 7, 'a week is seven days');
+  eq(w[0].dow, 'MON', 'the week should start on Monday');
+  eq(w.filter(d => d.isToday).length, 1, 'exactly one day should be today');
+});
+
+t('a scheduled session shows on the week and on the main calendar', async () => {
+  /* Both read the same event, so they cannot disagree — it is one session shown twice. */
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
+  await page.waitForTimeout(400);
+  const day = await page.evaluate(() => window.__nvx.fbWeek()[3].date);
+  await page.evaluate((d) => window.__nvx.setForgeFBDate(d), day);
+  await page.waitForTimeout(800);
+
+  const marked = await page.evaluate(() => window.__nvx.fbWeek().filter(d => d.scheduled).map(d => d.date));
+  eq(marked.join(','), day, 'the week does not mark the scheduled day');
+  const ev = await page.evaluate(() => window.__nvx.state.events.map(e => e.title + '|' + e.date));
+  eq(ev.join(','), 'Full Body session|' + day, 'the calendar event is wrong');
+
+  await page.evaluate((d) => window.__nvx.setState({ scene: 'calendar', calSel: d }), day);
+  await page.waitForTimeout(900);
+  ok(/Full Body session/.test(await text()), 'the main calendar does not show it');
+});
+
+t('the week can be used to pick the day', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
+  await page.waitForTimeout(500);
+  const day = await page.evaluate(() => window.__nvx.fbWeek()[5].date);
+  await page.evaluate((d) => {
+    const cells = [...document.querySelectorAll('div')].filter(e => e.getAttribute('style') && /grid-template-columns:repeat\(7/.test(e.getAttribute('style')));
+    return cells.length;
+  }, day);
+  await page.evaluate((d) => window.__nvx.setForgeFBDate(d), day);
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.forgeFB.on), day, 'picking a day did not set it');
+  const sel = await page.evaluate(() => window.__nvx.fbWeek().filter(d => d.selected).length);
+  eq(sel, 1, 'exactly one day should read as selected');
+});
+
+t('the week marks the days something was actually logged', async () => {
+  await openFullBody();
+  await tick('Deadlift');
+  await page.waitForTimeout(700);
+  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
+  await page.waitForTimeout(700);
+  const today = await page.evaluate(() => window.__nvx.fbWeek().find(d => d.isToday));
+  ok(today.logged > 0, 'today should be marked as logged');
+});
+
+t('the week is not shown on the daily setting', async () => {
+  await openFullBody();
+  const body = await text();
+  ok(!/MON[\s\S]{0,60}SUN/.test(body), 'the week strip is showing on the daily setting');
 });
 
 t('the section list is a sidebar beside the section, not above it', async () => {

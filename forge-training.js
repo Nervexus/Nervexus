@@ -14,28 +14,10 @@
 
   var LEVELS = ['easy', 'hard', 'brutal'];
 
-  /* Full Body is a session rather than a subject: one checklist, ticked as you go. Ticking
-     writes the set to the same training log Fitness HQ uses, so there is one record of what
-     you did rather than two that disagree.
-
-     Every item carries what addWorkout needs to log it — the body part it counts toward and
-     a real quantity (reps, minutes or distance). An item with none of those is silently
-     refused by the log, so the tick would appear to work and record nothing. */
-  var FULL_BODY = {
-    key: 'full-body', name: 'Full Body', tag: 'FULL BODY',
-    checklist: [
-      { id: 'squat',    name: 'Back squat',        part: 'Legs',      target: '3 × 5',    sets: 3, reps: 5,  load: true },
-      { id: 'deadlift', name: 'Deadlift',          part: 'Back',      target: '1 × 5',    sets: 1, reps: 5,  load: true },
-      { id: 'bench',    name: 'Bench press',       part: 'Chest',     target: '3 × 5',    sets: 3, reps: 5,  load: true },
-      { id: 'press',    name: 'Overhead press',    part: 'Shoulders', target: '3 × 5',    sets: 3, reps: 5,  load: true },
-      { id: 'row',      name: 'Barbell row',       part: 'Back',      target: '3 × 8',    sets: 3, reps: 8,  load: true },
-      { id: 'pullup',   name: 'Pull-ups',          part: 'Back',      target: '3 × max',  sets: 3, reps: 8,  load: true },
-      { id: 'dip',      name: 'Dips',              part: 'Chest',     target: '3 × 8',    sets: 3, reps: 8,  load: true },
-      { id: 'carry',    name: "Farmer's carry",    part: 'Core',      target: '3 × 40m',  dist: 120, distUnit: 'm', load: true },
-      { id: 'legraise', name: 'Hanging leg raise', part: 'Core',      target: '3 × 12',   sets: 3, reps: 12, load: false },
-      { id: 'plank',    name: 'Plank',             part: 'Core',      target: '3 × 60s',  minutes: 3, load: false }
-    ]
-  };
+  /* Full Body is a session rather than a subject: a checklist you build and tick, which
+     writes each set to the same training log Fitness HQ uses. The exercises are the user's
+     own — a prescribed ten was shipped here once and it was fiction, however sensible it
+     looked, so the list starts empty and is edited on the page. */
 
   /* The Training centre's sections, in the order they are worked through. None of them have
      content yet — each is a key, a name and a label, and the page renders it as an empty
@@ -56,7 +38,7 @@
     stub('feet', 'Feet & Ankles'),
     stub('neck', 'Neck'),
     stub('hands', 'Hands & Forearms'),
-    FULL_BODY
+    stub('full-body', 'Full Body')
   ];
 
   function section(key) {

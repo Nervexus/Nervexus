@@ -324,7 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=6"></script>
+  <script src="forge-training.js?v=7"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3682,6 +3682,28 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <input value="{{ sec.dateVal }}" onInput="{{ sec.setDate }}" type="date" style="padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
                       </sc-if>
                     </div>
+
+                    <!-- The week, with what is booked and what was actually done. The scheduled
+                         marks are read from the same events the main calendar draws. -->
+                    <sc-if value="{{ sec.showWeek }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:6px; padding-bottom:12px;">
+                        <sc-for list="{{ sec.week }}" as="d" hint-placeholder-count="7">
+                          <div onClick="{{ d.pick }}" style="border-radius:10px; border:1px solid {{ d.bd }}; background:{{ d.bg }}; padding:8px 4px 7px; text-align:center; cursor:{{ d.cursor }};">
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.8px; color:{{ d.dowInk }};">{{ d.dow }}</div>
+                            <div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:{{ d.numInk }}; margin-top:2px;">{{ d.day }}</div>
+                            <div style="height:6px; margin-top:5px; display:flex; gap:3px; justify-content:center;">
+                              <sc-if value="{{ d.scheduled }}" hint-placeholder-val="{{ false }}"><span style="width:5px; height:5px; border-radius:50%; background:#E7D8A6;"></span></sc-if>
+                              <sc-if value="{{ d.didLog }}" hint-placeholder-val="{{ false }}"><span style="width:5px; height:5px; border-radius:50%; background:#6cffba;"></span></sc-if>
+                            </div>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#6f6f78; padding-bottom:12px;">
+                        <span><span style="color:#E7D8A6;">●</span> SCHEDULED</span>
+                        <span><span style="color:#6cffba;">●</span> LOGGED</span>
+                      </div>
+                    </sc-if>
+
                     <sc-if value="{{ sec.onCalendar }}" hint-placeholder-val="{{ false }}">
                       <div style="font-size:11px; color:#6cffba; padding-bottom:10px;">On your calendar for {{ sec.dateNice }}.</div>
                     </sc-if>
@@ -3691,11 +3713,25 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <span onClick="{{ it.toggle }}" style="width:20px; height:20px; flex:0 0 20px; border-radius:6px; border:1px solid {{ it.boxBd }}; background:{{ it.boxBg }}; color:#0d0d10; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; cursor:pointer;">{{ it.tick }}</span>
                         <span onClick="{{ it.toggle }}" style="font-size:13px; color:{{ it.ink }}; text-decoration:{{ it.strike }}; cursor:pointer; flex:1; min-width:0;">{{ it.name }}</span>
                         <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99; white-space:nowrap;">{{ it.target }}</span>
-                        <sc-if value="{{ it.load }}" hint-placeholder-val="{{ true }}">
-                          <input value="{{ it.weight }}" onInput="{{ it.setWeight }}" placeholder="kg" type="number" style="width:66px; flex:0 0 66px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
-                        </sc-if>
+                        <input value="{{ it.weight }}" onInput="{{ it.setWeight }}" placeholder="kg" type="number" style="width:62px; flex:0 0 62px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
+                        <span onClick="{{ it.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px; flex:0 0 auto; padding:0 2px;" style-hover="{ color:'#ff5563' }">×</span>
                       </div>
                     </sc-for>
+
+                    <sc-if value="{{ sec.noItems }}" hint-placeholder-val="{{ true }}">
+                      <div style="padding:22px 0 14px; text-align:center; font-size:12px; color:#6f6f78; border-top:1px solid rgba(255,255,255,0.06);">Nothing in the session yet. Add the exercises you actually do.</div>
+                    </sc-if>
+
+                    <div style="display:flex; gap:7px; flex-wrap:wrap; align-items:center; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
+                      <input value="{{ sec.dName }}" onInput="{{ sec.setDName }}" onKeyDown="{{ sec.addKey }}" placeholder="Exercise" style="flex:1 1 150px; min-width:0; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
+                      <select value="{{ sec.dPart }}" onChange="{{ sec.setDPart }}" style="padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none;">
+                        <sc-for list="{{ sec.parts }}" as="pp" hint-placeholder-count="7"><option value="{{ pp }}">{{ pp }}</option></sc-for>
+                      </select>
+                      <input value="{{ sec.dSets }}" onInput="{{ sec.setDSets }}" onKeyDown="{{ sec.addKey }}" placeholder="Sets" type="number" style="width:62px; flex:0 0 62px; padding:8px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
+                      <input value="{{ sec.dReps }}" onInput="{{ sec.setDReps }}" onKeyDown="{{ sec.addKey }}" placeholder="Reps" type="number" style="width:62px; flex:0 0 62px; padding:8px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
+                      <input value="{{ sec.dMins }}" onInput="{{ sec.setDMins }}" onKeyDown="{{ sec.addKey }}" placeholder="Mins" type="number" style="width:62px; flex:0 0 62px; padding:8px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
+                      <span onClick="{{ sec.add }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:600; color:#0d0d10; background:#eef0f2; border-radius:8px; padding:9px 15px; cursor:pointer; white-space:nowrap;">ADD</span>
+                    </div>
                   </div>
                 </sc-if>
               </sc-for>
@@ -9356,7 +9392,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-255 · v11.255 blank-height';
+const NOTIF_BUILD_VERSION = '2026.09.05-256 · v11.256 own-session';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9446,7 +9482,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',done:{},w:{}}, forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -13878,6 +13914,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.256', date:'Sep 5, 2026', major:true, notes:[
+      'The Full Body session is yours to build. Add exercises, set the sets, reps or minutes, remove any of them. It starts empty \u2014 the ten it used to open with were invented, however sensible they looked.',
+      'Weekly is a calendar now: the week Monday to Sunday, with a gold dot on days you have a session booked and a green one on days you actually logged something.',
+      '\u201cOn a day\u201d is now \u201cScheduled\u201d. A scheduled session shows on the week strip and on your main calendar \u2014 it is one session drawn twice, not two that can drift apart.',
+      'Removing an exercise takes its logged sets with it, so the log never keeps sets belonging to something that no longer exists.',
+    ]},
     {version:'v11.255', date:'Sep 4, 2026', notes:[
       'Height now starts blank for you to fill in. It used to assume 181cm, which meant anyone who had never entered a height still got a confident BMI \u2014 worked out from someone else\u2019s.',
       'BMI shows a dash until you give a real height, then works as before.',
@@ -15774,7 +15816,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const mode=f.mode||'day', on=f.on||'';
     const period=this._fbPeriod(mode, on);
     if(f.period===period) return f;
-    return {period, mode, on, evId:f.evId||'', done:{}, w:f.w||{}};
+    return {period, mode, on, evId:f.evId||'', items:f.items||[], done:{}, w:f.w||{}};
   }
   setForgeFBMode(m){
     const f=this._fb();
@@ -15791,7 +15833,25 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     next.period=this._fbPeriod('date', on);
     this.setState({forgeFB:next}, ()=>{ on ? this._fbSyncEvent(on) : (f.evId && this._fbClearEvent(f.evId)); });
   }
-  _fbClearEvent(id){
+  /* The week, Monday to Sunday, with what is scheduled and what was actually logged on each
+     day. Scheduled sessions are read back out of the same events the main calendar renders,
+     so the two cannot disagree — there is one session, shown twice. */
+  fbWeek(){
+    const start=this._fbWeekStart(), f=this.state.forgeFB||{}, today=this._fbToday();
+    const evs=(this.state.events||[]).filter(e=>/^Full Body session$/i.test(e.title||''));
+    const logged={};
+    (this.state.workouts||[]).forEach(w=>{ const d=this._fbLocal(new Date(w.ts)); logged[d]=(logged[d]||0)+1; });
+    const out=[];
+    for(let i=0;i<7;i++){
+      const d=new Date(start+'T12:00:00'); d.setDate(d.getDate()+i);
+      const key=this._fbLocal(d);
+      out.push({ date:key, dow:['MON','TUE','WED','THU','FRI','SAT','SUN'][i], day:d.getDate(),
+        isToday:key===today, scheduled:evs.some(e=>e.date===key), logged:logged[key]||0,
+        selected:f.mode==='date' && f.on===key });
+    }
+    return out;
+  }
+    _fbClearEvent(id){
     if(!id) return;
     this.mut(s=>({events:(s.events||[]).filter(e=>e.id!==id)}));
     if(this._sbOn()) window.SB.remove('events', id);
@@ -15812,6 +15872,42 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   setForgeFBWeight(id,e){ const v=e&&e.target?e.target.value:e; const f=this._fb();
     this.setState({forgeFB:{...f, w:{...(f.w||{}), [id]:v}}}); }
+  /* The session is whatever the user puts in it. A prescribed list shipped here once and it
+     was invented, so there is no default — you add what you actually do. */
+  FB_PARTS(){ return ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio']; }
+  fbTarget(it){
+    const bits=[];
+    if(it.reps>0) bits.push((it.sets>0?it.sets:1)+' × '+it.reps);
+    if(it.minutes>0) bits.push(it.minutes+' min');
+    if(it.dist>0) bits.push(it.dist+(it.distUnit||'m'));
+    return bits.join(' · ')||'—';
+  }
+  setFbDraft(k,e){ const v=e&&e.target?e.target.value:e; this.setState(st=>({fbDraft:{...(st.fbDraft||{}), [k]:v}})); }
+  addForgeFBItem(){
+    const d=this.state.fbDraft||{};
+    const name=(d.name||'').trim();
+    const sets=parseInt(d.sets,10)||0, reps=parseInt(d.reps,10)||0, minutes=parseInt(d.minutes,10)||0;
+    const part=this.FB_PARTS().indexOf(d.part)>=0?d.part:'Full';
+    /* The log refuses an entry with no reps, minutes or distance and says nothing, so an
+       item without one would tick and record nothing. Catch it here instead. */
+    if(!name){ this.showToast('fitness','Needs a name','Give the exercise a name first'); return; }
+    if(!(reps>0||minutes>0)){ this.showToast('fitness','Needs reps or minutes','Otherwise there is nothing to log when you tick it'); return; }
+    const it={ id:this._uuid(), name, part, sets, reps, minutes, dist:0, distUnit:'m' };
+    const f=this._fb();
+    this.setState({forgeFB:{...f, items:[...(f.items||[]), it]}, fbDraft:{part:d.part||'Chest'}});
+  }
+  removeForgeFBItem(id){
+    const f=this._fb(), done={...(f.done||{})};
+    // Take its logged rows with it, or the log keeps sets belonging to an exercise that is gone.
+    const ids=(done[id]||{}).ids||[];
+    if(ids.length){
+      this.mut(st=>({workouts:(st.workouts||[]).filter(w=>ids.indexOf(w.id)<0)}));
+      if(this._sbOn()) ids.forEach(x=>window.SB.remove('workouts',x));
+    }
+    delete done[id];
+    const w={...(f.w||{})}; delete w[id];
+    this.setState({forgeFB:{...f, items:(f.items||[]).filter(x=>x.id!==id), done, w}});
+  }
   /* Ticking logs the set to the training log Fitness HQ writes to; unticking removes exactly
      the rows that tick created. Every field is passed explicitly — addWorkout falls back to
      the Fitness HQ form for anything left undefined, so a blank weight here would otherwise
@@ -18046,14 +18142,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
         const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
+        const dr0=S.fbDraft||{};
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
-          const list=sec.checklist||[];
+          const list=(sec.key==='full-body') ? (fb.items||[]) : (sec.checklist||[]);
           const n=list.filter(it=>fbDone[it.id]).length;
           return {
             key:sec.key, name:sec.name, tag:sec.tag,
-            empty:!list.length, hasList:!!list.length,
+            empty:sec.key!=='full-body' && !list.length,
+            hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
-            modes:[['day','DAILY'],['week','WEEKLY'],['date','ON A DAY']].map(m=>({
+            modes:[['day','DAILY'],['week','WEEKLY'],['date','SCHEDULED']].map(m=>({
               label:m[1], go:()=>this.setForgeFBMode(m[0]),
               ink:fbMode===m[0]?'#0d0d10':'#9a9aa2',
               bg:fbMode===m[0]?'#eef0f2':'transparent',
@@ -18063,11 +18161,28 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             onCalendar:fbMode==='date' && !!fb.on && !!fb.evId,
             dateNice:fb.on?this._niceDate(fb.on):'',
             periodLabel:fbMode==='week'?'THIS WEEK':(fbMode==='date'?(fb.on?'ON THE DAY':'PICK A DAY'):'TODAY'),
+            /* The week shows for both the weekly cadence and a scheduled one — that is where
+               you check a booked session actually landed. */
+            showWeek:fbMode==='week'||fbMode==='date',
+            week:this.fbWeek().map(d=>({
+              dow:d.dow, day:d.day, scheduled:d.scheduled, didLog:d.logged>0,
+              cursor:fbMode==='date'?'pointer':'default',
+              pick:()=>{ if(fbMode==='date') this.setForgeFBDate(d.date); },
+              bg:d.selected?'rgba(231,216,166,0.16)':(d.isToday?'rgba(255,255,255,0.05)':'rgba(0,0,0,0)'),
+              bd:d.selected?'#E7D8A6':(d.isToday?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.08)'),
+              dowInk:d.isToday?'#c9c9ce':'#6f6f78',
+              numInk:d.selected?'#E7D8A6':(d.isToday?'#eef0f2':'#9a9aa2') })),
+            parts:this.FB_PARTS(),
+            dName:dr0.name||'', dPart:dr0.part||'Chest', dSets:dr0.sets||'', dReps:dr0.reps||'', dMins:dr0.minutes||'',
+            setDName:(e)=>this.setFbDraft('name',e), setDPart:(e)=>this.setFbDraft('part',e),
+            setDSets:(e)=>this.setFbDraft('sets',e), setDReps:(e)=>this.setFbDraft('reps',e), setDMins:(e)=>this.setFbDraft('minutes',e),
+            add:()=>this.addForgeFBItem(), addKey:enterKey(()=>this.addForgeFBItem()),
             doneInk:n===0?'#8f8f99':(n===list.length?'#6cffba':'#e8b45a'),
             clear:()=>this.clearForgeFB(),
             list:list.map(it=>{
               const on=!!fbDone[it.id];
-              return { name:it.name, target:it.target, load:!!it.load,
+              return { name:it.name, target:it.target||this.fbTarget(it),
+                remove:()=>this.removeForgeFBItem(it.id),
                 tick:on?'✓':'', ink:on?'#8f8f99':'#dbdbe0', strike:on?'line-through':'none',
                 boxBg:on?'#6cffba':'transparent', boxBd:on?'#6cffba':'rgba(255,255,255,0.22)',
                 weight:fbW[it.id]!=null?fbW[it.id]:'',
