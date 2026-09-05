@@ -378,6 +378,51 @@ t('Hand Training stays out of the other centres', async () => {
   }
 });
 
+t('every section is listed, marked with the house crest and not a number', async () => {
+  await boot({ forgeCentre: 'training' });
+  const picker = await page.evaluate(() => {
+    const marks = [...document.querySelectorAll('[data-icon="forge"]')];
+    return marks
+      .map(m => m.parentElement)
+      .filter(el => el && el.getAttribute('onclick') !== null || (el && el.tagName === 'SPAN' && el.textContent.trim()))
+      .map(el => ({ text: el.textContent.trim(), drawn: !!m0(el) }));
+    function m0(el) { const s = el.querySelector('svg'); return s && s.querySelectorAll('path,circle,rect').length >= 3; }
+  });
+  const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.name));
+  eq(S.length, 12, 'twelve sections in the data');
+  for (const name of S) {
+    const row = picker.find(p => p.text === name);
+    ok(row, 'section not in the picker: ' + name);
+    ok(row.drawn, name + ' has no crest drawn beside it');
+  }
+  const body = await text();
+  ok(!/^\s*\d+\.\s/m.test(body), 'the sections are numbered somewhere — the crest replaces the number');
+});
+
+t('an empty section is an empty page, and does not borrow the chart', async () => {
+  await boot({ forgeCentre: 'training' });
+  for (const key of ['chest', 'core', 'neck']) {
+    await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
+    await page.waitForTimeout(600);
+    const r = await page.evaluate(() => ({
+      figs: document.querySelectorAll('[data-handfig]').length,
+      body: document.body.innerText,
+    }));
+    eq(r.figs, 0, key + ' is showing exercise cards');
+    ok(/Nothing here yet/.test(r.body), key + ' is not showing its empty state');
+    ok(!/THE TOOLS/.test(r.body), key + ' borrowed the hand tools');
+    ok(!/EASY|BRUTAL/.test(r.body), key + ' is showing a level filter for a chart it does not have');
+  }
+});
+
+t('Training opens on the section that actually has something in it', async () => {
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  ok(/Hand Training/.test(body), 'it should land on the only section with content');
+  const figs = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
+  ok(figs > 0, 'landed on an empty section while a full one exists');
+});
+
 t('the four centres still switch', async () => {
   await boot({ forgeCentre: 'home' });
   for (const [tab, probe] of [['TRAINING', 'Hand Training'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Nothing here yet']]) {
@@ -403,7 +448,12 @@ t('nothing on the page is rendered twice', async () => {
      includes() assertion still passed, so nothing caught it until it was live. */
   await boot({ forgeCentre: 'training' });
   const body = await text();
-  for (const once of ['Hand Training', 'THE TOOLS', 'GRIP & HAND DEVELOPMENT', '❖ THE FORGE']) {
+  /* "Hand Training" legitimately appears twice now — once in the section picker and once as
+     the heading — so count the heading element rather than the text. */
+  const headings = await page.evaluate(() =>
+    [...document.querySelectorAll('h2')].filter(h => h.textContent.trim() === 'Hand Training').length);
+  eq(headings, 1, 'the section heading rendered ' + headings + ' times');
+  for (const once of ['THE TOOLS', 'GRIP & HAND DEVELOPMENT', '❖ THE FORGE']) {
     const n = (body.match(new RegExp(once.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     eq(n, 1, once + ' appears ' + n + ' times');
   }

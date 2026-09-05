@@ -18,6 +18,29 @@ t('the training centre is built from sections, and hands is one', () => {
   if(!hands.name || !hands.tag) throw new Error('a section needs a name and a label');
 });
 
+t('all twelve sections are listed, in order, and only hands has content', () => {
+  const want = ['Chest','Shoulders','Arms','Back','Core','Hips & Glutes','Quads',
+                'Hamstrings','Calves','Feet & Ankles','Neck','Hand Training'];
+  const got = T.SECTIONS.map(x=>x.name);
+  if(got.join(' | ')!==want.join(' | ')) throw new Error('section list is wrong:\n  got  '+got.join(', '));
+  for(const x of T.SECTIONS){
+    if(!x.key || !x.name) throw new Error('a section with no key or name');
+    if(!x.tag) throw new Error(x.name+' has no label');
+  }
+  const full = T.SECTIONS.filter(x=>x.work && x.work.length).map(x=>x.name);
+  if(full.join()!=='Hand Training') throw new Error('only Hand Training should have content yet, got: '+full.join(', '));
+});
+
+t('an empty section carries nothing that would half-render', () => {
+  /* A stub with a stray empty array reads as "built but broken" rather than "not started".
+     Nothing there is the point. */
+  for(const x of T.SECTIONS){
+    if(x.work && x.work.length) continue;
+    for(const k of ['work','tools','types','muscles','standards','rules'])
+      if(x[k]!==undefined) throw new Error(x.name+' carries an empty '+k+' — leave it off entirely');
+  }
+});
+
 t('every exercise has a figure that actually exists', () => {
   /* A missing figure renders an empty box and throws nothing, so the chart would look
      half-built and nothing would say why. */

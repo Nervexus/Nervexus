@@ -324,7 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=2"></script>
+  <script src="forge-training.js?v=3"></script>
   <script src="forge-hand-figures.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -3634,6 +3634,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
              thing, drawn, graded and dosed. Figures are inline SVG from forge-hand-figures.js,
              painted in by drawHandFigures() the same way the nav icons are. -->
         <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
+
+          <!-- The section list. The house mark leads each entry rather than a number: these are
+               a set of equals to be worked through, not an order to do them in. -->
+          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+            <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="12">
+              <span onClick="{{ p.go }}" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:8px 12px; border-radius:9px; cursor:pointer; color:{{ p.ink }}; background:{{ p.bg }}; border:1px solid {{ p.bd }};">
+                <span style="width:13px; height:13px; display:flex; flex:0 0 13px; color:{{ p.mark }};" data-icon="forge"></span>{{ p.name }}
+              </span>
+            </sc-for>
+          </div>
+
           <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
 
             <div style="display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
@@ -3647,6 +3658,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </sc-for>
               </div>
             </div>
+
+            <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ false }}">
+              <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+                <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
+              </div>
+            </sc-if>
 
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(224px,1fr)); gap:12px; margin-bottom:16px;">
               <sc-for list="{{ sec.chart }}" as="w" hint-placeholder-count="20">
@@ -3665,6 +3682,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </sc-for>
             </div>
 
+            <sc-if value="{{ sec.hasTools }}" hint-placeholder-val="{{ false }}">
             <div class="cc-glowcard" style="border-radius:16px; padding:20px;">
               <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:3px;">THE TOOLS</div>
               <div style="font-size:11.5px; color:#75757d; margin-bottom:10px;">What each one is for, what it costs, and whether you actually need it.</div>
@@ -3681,6 +3699,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </sc-for>
               </div>
             </div>
+            </sc-if>
 
           </sc-for>
         </sc-if>
@@ -9337,7 +9356,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-247 · v11.247 forge-home-cleared';
+const NOTIF_BUILD_VERSION = '2026.09.04-248 · v11.248 training-sections';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9426,7 +9445,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeLevel:'all', forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeLevel:'all', forgeSection:'', forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -13864,6 +13883,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.248', date:'Sep 4, 2026', notes:[
+      'All twelve training sections are in: Chest, Shoulders, Arms, Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck and Hand Training.',
+      'Each is marked with the house crest rather than a number \u2014 they are a set to work through, not an order to do them in.',
+      'Only Hand Training has content so far; the rest are empty pages waiting for theirs.',
+    ]},
     {version:'v11.247', date:'Sep 4, 2026', notes:[
       'The Forge\u2019s Home is now an empty page too, ready to be rebuilt. Training keeps the Hand Training chart; Home, Mental and Health are blank.',
       'Fixed the last update rendering the Forge\u2019s panels twice \u2014 an editing mistake on my side that duplicated a block of the page.',
@@ -15699,6 +15723,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
   setForgeLevel(k){ this.setState({forgeLevel:k}); }
+  setForgeSection(k){ this.setState({forgeSection:k, forgeLevel:'all'}); }
   /* Master-detail: picking a region swaps the pane rather than collapsing it. There is no
      empty state to fall into — the binding falls back to the first region of whichever
      centre you are on. */
@@ -17875,22 +17900,36 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           ink:centre===c[0]?'#F4F4F5':'#9a9aa2',
           bg:centre===c[0]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)',
           bd:centre===c[0]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' }));
-        /* Training sections: the chart, its level filter, and the kit list. */
+        /* Training sections. Only the ones carrying work have a chart; the rest render as
+           empty pages, so the whole list is visible from the start rather than appearing a
+           section at a time. The picker opens on the first section that has anything in it. */
         const TR=window.ForgeTraining;
         const LV={easy:'#6cffba', hard:'#e8b45a', brutal:'#ff8a5b'};
         const NEED={essential:'#ff8a5b', useful:'#e8b45a', optional:'#8f8f99'};
         const lvl=S.forgeLevel||'all';
-        const trainSections=(TR?TR.SECTIONS:[]).map(sec=>({
+        const secs=(TR?TR.SECTIONS:[]);
+        const firstFull=(secs.find(x=>x.work && x.work.length)||secs[0]||{}).key;
+        const secKey=(S.forgeSection && secs.some(x=>x.key===S.forgeSection)) ? S.forgeSection : firstFull;
+        const trainPicker=secs.map(x=>({
+          name:x.name, go:()=>this.setForgeSection(x.key),
+          ink:x.key===secKey?'#0d0d10':'#b6b6be',
+          mark:x.key===secKey?'#0d0d10':'#E7D8A6',
+          bg:x.key===secKey?'#E7D8A6':'rgba(255,255,255,0.02)',
+          bd:x.key===secKey?'#E7D8A6':'rgba(255,255,255,0.10)' }));
+        const trainSections=secs.filter(x=>x.key===secKey).map(sec=>({
           key:sec.key, name:sec.name, tag:sec.tag,
-          filters:[['all','ALL']].concat(TR.LEVELS.map(l=>[l,l.toUpperCase()])).map(f=>({
-            label:f[1], go:()=>this.setForgeLevel(f[0]),
-            ink:lvl===f[0]?'#0d0d10':(f[0]==='all'?'#9a9aa2':LV[f[0]]),
-            bg:lvl===f[0]?(f[0]==='all'?'#eef0f2':LV[f[0]]):'transparent',
-            bd:lvl===f[0]?(f[0]==='all'?'#eef0f2':LV[f[0]]):'rgba(255,255,255,0.12)' })),
-          chart:sec.work.filter(w=>lvl==='all'||w.level===lvl).map(w=>({
+          empty:!(sec.work && sec.work.length),
+          hasTools:!!(sec.tools && sec.tools.length),
+          filters:!(sec.work && sec.work.length) ? [] :
+            [['all','ALL']].concat(TR.LEVELS.map(l=>[l,l.toUpperCase()])).map(f=>({
+              label:f[1], go:()=>this.setForgeLevel(f[0]),
+              ink:lvl===f[0]?'#0d0d10':(f[0]==='all'?'#9a9aa2':LV[f[0]]),
+              bg:lvl===f[0]?(f[0]==='all'?'#eef0f2':LV[f[0]]):'transparent',
+              bd:lvl===f[0]?(f[0]==='all'?'#eef0f2':LV[f[0]]):'rgba(255,255,255,0.12)' })),
+          chart:(sec.work||[]).filter(w=>lvl==='all'||w.level===lvl).map(w=>({
             fig:w.fig, name:w.name, dose:w.dose, cue:w.cue, risk:w.risk||'',
             level:w.level.toUpperCase(), lvlInk:LV[w.level]||'#8f8f99', lvlBd:(LV[w.level]||'#8f8f99')+'55' })),
-          tools:sec.tools.map(x=>({ name:x.name, cost:x.cost, does:x.does, need:x.need.toUpperCase(),
+          tools:(sec.tools||[]).map(x=>({ name:x.name, cost:x.cost, does:x.does, need:x.need.toUpperCase(),
             needInk:NEED[x.need]||'#8f8f99', needBd:(NEED[x.need]||'#8f8f99')+'55' }))
         }));
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
@@ -17917,9 +17956,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           forgeShowTraining:centre==='training' && !!trainSections.length,
           forgeShowEmpty:!(centre==='training' && trainSections.length),
           forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
-          trainSections:trainSections
+          trainSections:trainSections, trainPicker:trainPicker
         };
-      }, { forgeCentres:[], forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[] }),
+      }, { forgeCentres:[], forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[] }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');

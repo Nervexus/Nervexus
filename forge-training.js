@@ -99,7 +99,25 @@
     ]
   };
 
-  var SECTIONS = [HANDS];
+  /* The Training centre's sections, in the order they are worked through. Only the ones
+     carrying `work` have anything in them yet; the rest are placeholders waiting for their
+     content, and the page renders them as empty pages rather than hiding them. */
+  function stub(key, name) { return { key: key, name: name, tag: name.toUpperCase() }; }
+
+  var SECTIONS = [
+    stub('chest', 'Chest'),
+    stub('shoulders', 'Shoulders'),
+    stub('arms', 'Arms'),
+    stub('back', 'Back'),
+    stub('core', 'Core'),
+    stub('hips', 'Hips & Glutes'),
+    stub('quads', 'Quads'),
+    stub('hamstrings', 'Hamstrings'),
+    stub('calves', 'Calves'),
+    stub('feet', 'Feet & Ankles'),
+    stub('neck', 'Neck'),
+    HANDS
+  ];
 
   function section(key) {
     for (var i = 0; i < SECTIONS.length; i++) if (SECTIONS[i].key === key) return SECTIONS[i];
