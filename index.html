@@ -324,7 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=4"></script>
+  <script src="forge-training.js?v=5"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3633,23 +3633,32 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
              lists them all and the body renders whichever is open as an empty page. -->
         <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
 
-          <!-- The section list. The house mark leads each entry rather than a number: these are
-               a set of equals to be worked through, not an order to do them in. -->
-          <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
-            <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="12">
-              <span onClick="{{ p.go }}" style="display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:8px 12px; border-radius:9px; cursor:pointer; color:{{ p.ink }}; background:{{ p.bg }}; border:1px solid {{ p.bd }};">
-                <span style="width:13px; height:13px; display:flex; flex:0 0 13px; color:{{ p.mark }};" data-icon="forge"></span>{{ p.name }}
-              </span>
-            </sc-for>
-          </div>
+          <!-- The section list is a sidebar, built like the app's own: a column of rows, the
+               house mark where the nav has its icon, one row lit. It folds to a single column
+               under 900px on the cc-grid2 media rule, same as every other split on the app. -->
+          <div class="cc-grid2" style="display:grid; grid-template-columns:224px 1fr; gap:16px; align-items:start;">
 
-          <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:6px;">{{ sec.tag }}</div>
-            <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 14px;">{{ sec.name }}</h2>
-            <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
-              <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
+            <div class="cc-glowcard" style="border-radius:16px; padding:8px; position:sticky; top:14px;">
+              <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="13">
+                <div onClick="{{ p.go }}" style="position:relative; display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:11px; cursor:pointer; background:{{ p.bg }};" style-hover="{ background:'rgba(255,255,255,0.06)' }">
+                  <span style="position:absolute; left:0; top:11px; bottom:11px; width:2px; border-radius:2px; background:#E7D8A6; opacity:{{ p.barOpacity }};"></span>
+                  <span style="width:17px; height:17px; flex:0 0 17px; display:flex; color:{{ p.mark }};" data-icon="forge"></span>
+                  <span style="font-size:13px; color:{{ p.ink }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.name }}</span>
+                </div>
+              </sc-for>
             </div>
-          </sc-for>
+
+            <div>
+              <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:6px;">{{ sec.tag }}</div>
+                <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 14px;">{{ sec.name }}</h2>
+                <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+                  <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
+                </div>
+              </sc-for>
+            </div>
+
+          </div>
         </sc-if>
 
       </div>
@@ -9304,7 +9313,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-249 · v11.249 sections-empty';
+const NOTIF_BUILD_VERSION = '2026.09.04-250 · v11.250 section-sidebar';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13820,6 +13829,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.250', date:'Sep 4, 2026', notes:[
+      'The training sections are a sidebar now, built like the app\u2019s own \u2014 a column down the left with the section open beside it. On a phone it stacks.',
+      'Added Full Body, making thirteen sections.',
+    ]},
     {version:'v11.249', date:'Sep 4, 2026', notes:[
       'All twelve training sections are now empty pages, hands included \u2014 Chest, Shoulders, Arms, Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck, Hands & Forearms.',
       'The hand chart has been taken back out. Nothing is lost \u2014 the twenty drawings are still in the app and the chart itself is kept in the history, ready for when Hands & Forearms gets built.',
@@ -17848,10 +17861,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const secKey=(S.forgeSection && secs.some(x=>x.key===S.forgeSection)) ? S.forgeSection : (secs[0]||{}).key;
         const trainPicker=secs.map(x=>({
           name:x.name, go:()=>this.setForgeSection(x.key),
-          ink:x.key===secKey?'#0d0d10':'#b6b6be',
-          mark:x.key===secKey?'#0d0d10':'#E7D8A6',
-          bg:x.key===secKey?'#E7D8A6':'rgba(255,255,255,0.02)',
-          bd:x.key===secKey?'#E7D8A6':'rgba(255,255,255,0.10)' }));
+          ink:x.key===secKey?'#ffffff':'#aeaeb6',
+          mark:x.key===secKey?'#E7D8A6':'#7c7c84',
+          bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
+          barOpacity:x.key===secKey?1:0 }));
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>({
           key:sec.key, name:sec.name, tag:sec.tag }));
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));

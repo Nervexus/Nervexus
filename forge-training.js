@@ -32,7 +32,8 @@
     stub('calves', 'Calves'),
     stub('feet', 'Feet & Ankles'),
     stub('neck', 'Neck'),
-    stub('hands', 'Hands & Forearms')
+    stub('hands', 'Hands & Forearms'),
+    stub('full-body', 'Full Body')
   ];
 
   function section(key) {

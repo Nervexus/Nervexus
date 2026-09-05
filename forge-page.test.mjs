@@ -299,7 +299,7 @@ t('Home, Mental and Health are empty pages', async () => {
 t('every section is an empty page', async () => {
   await boot({ forgeCentre: 'training' });
   const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.key));
-  eq(S.length, 12, 'twelve sections');
+  eq(S.length, 13, 'thirteen sections');
   for (const key of S) {
     await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
     await page.waitForTimeout(400);
@@ -315,16 +315,17 @@ t('every section is an empty page', async () => {
 
 t('every section is listed, marked with the house crest and not a number', async () => {
   await boot({ forgeCentre: 'training' });
-  const picker = await page.evaluate(() => {
-    const marks = [...document.querySelectorAll('[data-icon="forge"]')];
-    return marks
+  const picker = await page.evaluate(() =>
+    [...document.querySelectorAll('.cc-scene [data-icon="forge"]')]
       .map(m => m.parentElement)
-      .filter(el => el && el.getAttribute('onclick') !== null || (el && el.tagName === 'SPAN' && el.textContent.trim()))
-      .map(el => ({ text: el.textContent.trim(), drawn: !!m0(el) }));
-    function m0(el) { const s = el.querySelector('svg'); return s && s.querySelectorAll('path,circle,rect').length >= 3; }
-  });
+      .filter(el => el && el.tagName === 'DIV' && el.textContent.trim())
+      .map(el => {
+        const svg = el.querySelector('svg');
+        return { text: el.textContent.trim(),
+                 drawn: !!svg && svg.querySelectorAll('path,circle,rect').length >= 3 };
+      }));
   const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.name));
-  eq(S.length, 12, 'twelve sections in the data');
+  eq(S.length, 13, 'thirteen sections in the data');
   for (const name of S) {
     const row = picker.find(p => p.text === name);
     ok(row, 'section not in the picker: ' + name);
@@ -332,6 +333,40 @@ t('every section is listed, marked with the house crest and not a number', async
   }
   const body = await text();
   ok(!/^\s*\d+\.\s/m.test(body), 'the sections are numbered somewhere — the crest replaces the number');
+});
+
+t('the section list is a sidebar beside the section, not above it', async () => {
+  await page.setViewportSize({ width: 1280, height: 1000 });
+  await boot({ forgeCentre: 'training' });
+  const box = await page.evaluate(() => {
+    const row = [...document.querySelectorAll('.cc-scene [data-icon="forge"]')]
+      .map(m => m.parentElement).find(el => el && /Shoulders/.test(el.textContent));
+    const h2 = document.querySelector('.cc-scene h2');
+    if (!row || !h2) return null;
+    const a = row.getBoundingClientRect(), b = h2.getBoundingClientRect();
+    return { railRight: a.right, paneLeft: b.left, railTop: a.top, paneTop: b.top };
+  });
+  ok(box, 'could not find both the rail and the section');
+  ok(box.paneLeft >= box.railRight - 2,
+     'the section should sit to the right of the rail, not under it: ' + JSON.stringify(box));
+});
+
+t('one sidebar row is lit, and it is the section that is open', async () => {
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => window.__nvx.setForgeSection('calves'));
+  await page.waitForTimeout(500);
+  const lit = await page.evaluate(() =>
+    [...document.querySelectorAll('.cc-scene [data-icon="forge"]')]
+      .map(m => m.parentElement)
+      /* The page crest is also a forge mark with a background, and it has no label — only
+         rows with a name are sidebar rows. */
+      .filter(el => el && el.tagName === 'DIV' && el.textContent.trim()
+                    && el.style.background && el.style.background !== 'rgba(0, 0, 0, 0)')
+      .map(el => el.textContent.trim()));
+  eq(lit.length, 1, 'exactly one row should be lit: ' + lit.join(', '));
+  eq(lit[0], 'Calves', 'the wrong row is lit');
+  eq(await page.evaluate(() => document.querySelector('.cc-scene h2').textContent.trim()), 'Calves',
+     'the pane did not follow the sidebar');
 });
 
 t('the four centres still switch', async () => {

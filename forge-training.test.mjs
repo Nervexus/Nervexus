@@ -6,9 +6,9 @@ import T from './forge-training.js';
 
 const TESTS=[]; const t=(n,f)=>TESTS.push([n,f]);
 
-t('all twelve sections are listed, in order', () => {
+t('all thirteen sections are listed, in order', () => {
   const want = ['Chest','Shoulders','Arms','Back','Core','Hips & Glutes','Quads',
-                'Hamstrings','Calves','Feet & Ankles','Neck','Hands & Forearms'];
+                'Hamstrings','Calves','Feet & Ankles','Neck','Hands & Forearms','Full Body'];
   const got = T.SECTIONS.map(x=>x.name);
   if(got.join(' | ')!==want.join(' | '))
     throw new Error('section list is wrong:\n  got  '+got.join(', ')+'\n  want '+want.join(', '));
