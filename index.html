@@ -61,6 +61,15 @@
   @keyframes scanline{ 0%{ transform:translateY(-100%); } 100%{ transform:translateY(900%); } }
   @keyframes rise{ from{ transform:translateY(16px); } to{ transform:translateY(0); } }
   @keyframes xpFloat{ 0%{ opacity:0; transform:translateY(8px) scale(.85); } 18%{ opacity:1; } 100%{ opacity:0; transform:translateY(-30px) scale(1.08); } }
+  /* Level-up card: the ring draws, the number lands, and a slow sheen crosses the crest. */
+  @keyframes luPop{ 0%{ opacity:0; transform:scale(.9) translateY(14px); } 60%{ opacity:1; transform:scale(1.015) translateY(0); } 100%{ opacity:1; transform:scale(1) translateY(0); } }
+  @keyframes luRing{ 0%{ transform:scale(.55); opacity:0; } 45%{ opacity:.9; } 100%{ transform:scale(1); opacity:1; } }
+  @keyframes luHalo{ 0%{ transform:scale(.7); opacity:.65; } 100%{ transform:scale(2.4); opacity:0; } }
+  @keyframes luSheen{ 0%{ transform:translateX(-130%); } 60%,100%{ transform:translateX(130%); } }
+  @media (prefers-reduced-motion: reduce){
+    .lu-card,.lu-ring{ animation:none !important; }
+    .lu-halo,.lu-sheen{ display:none !important; }
+  }
   @keyframes missPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.04); } 100%{ transform:scale(1); } }
   @keyframes blink{ 0%,100%{ opacity:1; } 50%{ opacity:.2; } }
   @keyframes ticker{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
@@ -325,6 +334,7 @@
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
   <script src="forge-training.js?v=8"></script>
+<script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -613,6 +623,42 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <div onClick="{{ submitPerfCheckinFromModal }}" style="margin-top:2px; text-align:center; padding:13px; border-radius:13px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0a0a0b; font-size:13.5px; font-weight:700;" style-hover="{ transform:'translateY(-1px)' }">SUBMIT CHECK-IN</div>
       </div>
       </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- Level up. Fired by _xpWatch when the computed level rises, so it covers every route
+       XP can arrive by rather than only the ones that remembered to raise it. -->
+  <sc-if value="{{ levelUpOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:1000; background:rgba(6,6,9,0.72); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:24px;">
+      <div class="cc-glowcard lu-card" style="width:100%; max-width:420px; border-radius:24px; background:#101014; border:1px solid rgba(231,216,166,0.34); padding:34px 28px 26px; text-align:center; box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 60px rgba(231,216,166,0.09); animation:luPop 520ms cubic-bezier(.2,.9,.3,1) both; position:relative; overflow:hidden;">
+        <div class="lu-sheen" style="position:absolute; top:0; bottom:0; width:70px; background:linear-gradient(100deg, rgba(231,216,166,0) 0%, rgba(231,216,166,0.13) 50%, rgba(231,216,166,0) 100%); animation:luSheen 2600ms ease-in-out 380ms infinite; pointer-events:none;"></div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:3px; color:#E7D8A6;">{{ luBanner }}</div>
+
+        <div style="position:relative; width:138px; height:138px; margin:20px auto 4px;">
+          <div class="lu-halo" style="position:absolute; inset:0; border-radius:50%; border:1px solid rgba(231,216,166,0.5); animation:luHalo 1500ms ease-out 240ms 2;"></div>
+          <div class="lu-ring" style="position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(231,216,166,0.55); box-shadow:inset 0 0 30px rgba(231,216,166,0.14); display:flex; flex-direction:column; align-items:center; justify-content:center; animation:luRing 620ms cubic-bezier(.2,.9,.3,1) both;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2.6px; color:#8f8f99;">LEVEL</div>
+            <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:52px; line-height:1; color:#ffffff; margin-top:2px;">{{ luLevel }}</div>
+          </div>
+        </div>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.4px; color:#75757d; margin-top:10px;">{{ luFromTo }}</div>
+
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:27px; font-weight:600; color:#eef0f2; margin:16px 0 2px;">{{ luRank }}</h2>
+        <div style="font-size:11.5px; color:#75757d;">{{ luRankDesc }}</div>
+
+        <sc-if value="{{ luRankUp }}" hint-placeholder-val="{{ false }}">
+          <div style="display:inline-block; margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#0d0d10; background:#E7D8A6; border-radius:999px; padding:6px 14px;">NEW RANK</div>
+        </sc-if>
+
+        <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.2px; color:#6f6f78;">{{ luTotal }}</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.2px; color:#6f6f78;">{{ luNext }}</span>
+        </div>
+
+        <div onClick="{{ closeLevelUp }}" style="margin-top:18px; padding:14px; border-radius:12px; cursor:pointer; background:#eef0f2; color:#0d0d10; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.4px;">CONTINUE</div>
+      </div>
     </div>
   </sc-if>
 
@@ -1796,13 +1842,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:14px;">↗ RANK PROGRESSION</div>
-            <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="19">
-              <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); opacity:{{ r.op }};">
+            <!-- Fifty-one ranks rather than nineteen, so the ladder scrolls in its own box and
+                 the panel keeps the height it always had. It opens on your current rank. -->
+            <div id="rankLadder" style="max-height:430px; overflow-y:auto; padding-right:4px;">
+            <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="51">
+              <div data-rank-cur="{{ r.isCur }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); opacity:{{ r.op }};">
                 <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid {{ r.bd }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ r.numC }};">{{ r.min }}</span>
                 <div style="flex:1;"><div style="font-size:13px; color:{{ r.nameC }}; font-weight:600;">{{ r.n }}</div><div style="font-size:10.5px; color:#75757d;">{{ r.d }}</div></div>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ r.tagC }}; border:1px solid {{ r.tagBd }}; border-radius:6px; padding:2px 7px;">{{ r.tag }}</span>
               </div>
             </sc-for>
+            </div>
           </div>
         </div>
         <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1.3fr; gap:18px;">
@@ -9425,7 +9475,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.05-259 · v11.259 chest-pool';
+const NOTIF_BUILD_VERSION = '2026.09.05-260 · v11.260 xp-streak-ranks';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9515,7 +9565,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      levelUp:null, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -9630,7 +9680,7 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this._fbMigrateWeekly(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else { this._sbRefreshLearningOnFocus(); this._awardDailyLogin(); } }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this._fbMigrateWeekly(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>{ this.maybeRollover(); this._awardDailyLogin(); },60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this._checkStaleBuild(); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -10020,7 +10070,21 @@ activities: this._mergeShipLog(s.activities),
       });
     });
   }
+  /* The ladder is 51 ranks deep, so opening the page on row one would bury where you
+     actually are. Runs once per visit to the page, not on every render — otherwise it would
+     yank the box back every time anything else on the page changed. */
+  _scrollRankLadder(){
+    if(this.state.scene!=='power'){ this._rankScrolled=false; return; }
+    if(this._rankScrolled) return;
+    const box=this.root && this.root.querySelector('#rankLadder');
+    if(!box) return;
+    const row=box.querySelector('[data-rank-cur="1"]');
+    if(!row) return;
+    this._rankScrolled=true;
+    box.scrollTop=Math.max(0, row.offsetTop-box.clientHeight/2+row.clientHeight/2);
+  }
   componentDidUpdate(prevProps){ this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs();
+    this._scrollRankLadder();
     if(this.state.prefs.theme==='Ultra' && !this._hasUltraAccess() && !this._ultraRevoking){ this._ultraRevoking=true; this.setPref('theme','Lime'); this.showToast('system','Ultra access revoked','Your Ultra access was removed — reverted to the default theme.'); setTimeout(()=>{ this._ultraRevoking=false; },500); }
     if(typeof window!=='undefined' && window.innerWidth<=900 && ['power','requests'].includes(this.state.scene)) this.setState({scene:'home'});
     if(this.state.prefs.homeBg==='Black Hole'){ const cv=this.root && this.root.querySelector('[data-chart="bhStars"]'); if(cv && !this._bhStarsStarted) this.startBHStars(cv); }
@@ -10245,7 +10309,36 @@ activities: this._mergeShipLog(s.activities),
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
     const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
-    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
+    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} this._xpWatch(); }
+  /* XP is not awarded from one place — it is summed out of the logs by computePower, and a
+     logged set, a mission, an income entry and the daily login all move it. Rather than
+     dressing up a dozen award sites (and missing the next one), the effect watches the total
+     from save(), which runs after every mutation. The first reading is the opening balance,
+     not a gain, so nothing fires on it. */
+  _xpWatch(){
+    if(!this.state.loggedIn) return;
+    let P; try{ P=this.computePower(); }catch(e){ return; }
+    const who=(this.state.currentEmail||'')+'';
+    const prev=(this._xpSeen && this._xpSeen.who===who) ? this._xpSeen : null;
+    this._xpSeen={who, xp:P.totalXP, level:P.level, rank:(P.rank||{}).n};
+    // A fresh baseline — first save of a session, or a different account — is the opening
+    // balance. Nothing fires until the Supabase history has had time to land, or the whole
+    // log arriving would read as one enormous gain.
+    if(!prev){ this._xpLive=false; clearTimeout(this._xpArm);
+      this._xpArm=setTimeout(()=>{ this._xpLive=true; }, 6000); return; }
+    if(!this._xpLive) return;
+    const gain=P.totalXP-prev.xp;
+    // One action is worth a few hundred XP at the very most. Thousands at once is history
+    // landing late, not something that was just done — rebaseline quietly.
+    if(gain>2000) return;
+    if(gain>0 && window.XPFx) try{ window.XPFx.gain(gain); }catch(e){}
+    if(P.level>prev.level){
+      this.setState({levelUp:{from:prev.level, to:P.level, rank:(P.rank||{}).n||'',
+        rankDesc:(P.rank||{}).d||'', rankUp:((P.rank||{}).n)!==prev.rank,
+        next:P.next?(P.next.n+' at Level '+P.next.min):'', total:P.totalXP}});
+    }
+  }
+  closeLevelUp(){ this.setState({levelUp:null}); }
   // ===== AI & INTELLIGENCE PROVIDER MANAGER =====
   _pd(){ return window.PROVIDERS_DATA; }
   // Genuine empty state — every provider/source starts off and unsaved. Nothing is
@@ -13827,11 +13920,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // pushed every attribute down a rung or two on day one.
     let level=1; while(T(level+1)<=totalXP) level++; const xpIn=totalXP-T(level), xpNext=T(level+1)-T(level);
     const toRoman=(n)=>{ const vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r=''; for(const [v,s] of vals){ while(n>=v){ r+=s; n-=v; } } return r; };
-    // Bands tighten early and widen late: every 20 levels up to 180, then every 100 up to
-    // the level-1000 cap. 19 bands, grouped into families whose sizes must sum to
-    // RANK_MINS.length — 5+5+3+3+2+1. Titan is a family of one, so it carries no numeral.
-    const RANK_MINS=[1,20,40,60,80,100,120,140,160,180,200,300,400,500,600,700,800,900,1000];
-    const RANK_FAMS=[['Recruit',5],['Specialist',5],['Elite',3],['Commander',3],['Master',2],['Titan',1]];
+    // One band every 20 levels, all the way up: the ladder used to widen to 100-level bands
+    // above 200, so Elite I covered five times the ground Specialist I did and the whole top
+    // half of the ladder moved five times more slowly than the bottom. Fifty 20-level bands
+    // reach level 1000, grouped five to a family — I to V — which is where the family names
+    // come from. Immortal is a family of one at the cap, so it carries no numeral. Family
+    // sizes must sum to RANK_MINS.length.
+    const RANK_MINS=[1]; for(let m=20;m<1000;m+=20) RANK_MINS.push(m); RANK_MINS.push(1000);
+    const RANK_FAMS=[['Recruit',5],['Specialist',5],['Elite',5],['Commander',5],['Master',5],
+      ['Vanguard',5],['Centurion',5],['Paragon',5],['Sovereign',5],['Titan',5],['Immortal',1]];
     const ranks=[]; let rfi=0, rti=0;
     RANK_MINS.forEach((min,k)=>{
       const fam=RANK_FAMS[rfi][0], size=RANK_FAMS[rfi][1]; rti++;
@@ -13947,6 +14044,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.260', date:'Sep 5, 2026', major:true, notes:[
+      'Your login streak was being lost. The award only ran when the app started up, so leaving it open past midnight — a pinned tab, or the app on your phone — never recorded the new day. The log has 5–17 August and then holes; those days were used, they just were never written. It now records the day when the date turns and when you come back to the app, and the streak is counted back through the log instead of being carried in a number a slow sync could reset to 1.',
+      'Your streak has been restored from 4 August, and 1,000 XP added.',
+      'Ranks step every 20 levels the whole way up. They used to widen to 100-level bands above level 200, so Elite I covered five times the ground Specialist I did. Fifty-one ranks now: Recruit, Specialist, Elite, Commander, Master, Vanguard, Centurion, Paragon, Sovereign and Titan, each I to V, then Immortal at level 1000.',
+      'XP you earn now shows itself — a gain floats up in the corner, wherever it came from.',
+      'Levelling up opens a card with the new level and rank.',
+      'On each chest exercise you can set the weight and the reps before you add it. Once it is in your session those buttons drive the session item itself, and once you have ticked it they stop — those reps are already in your training log.',
+    ]},
     {version:'v11.259', date:'Sep 5, 2026', major:true, notes:[
       'Chest is the first section with exercises: twenty for the gym and ten for home, switched with a tab.',
       'Each one has an ADD that drops it straight into your Full Body daily session, with its sets and reps, ready to tick and log. It reads ADDED once it is in, so you cannot add it twice.',
@@ -15420,20 +15525,34 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const curV=(this._changelog()[0]||{}).version;
     if(curV && this.state.prefs.lastSeenVersion!==curV && !this.state.perfCheckinOpen && this._hasUnseenMajorUpdate()) this.setState({whatsNewOpen:true});
     setTimeout(()=>{ this.maybeProactiveCoach(); try{ localStorage.setItem('cc_lastOpen', String(Date.now())); }catch(e){} }, 2500);
-    const today=this._todayStr(), yest=this._yestStr();
-    if(this.state.lastLoginDate===today) return;
-    if(!this._isOwner()) return;
-    // lastLoginDate alone was not enough: it lives in state, so every call that landed
-    // before the mutation committed — or before the Supabase load restored it — awarded
-    // again. The account collected 37 login awards on 6 Aug and 37 more on 7 Aug that way.
-    // The latch blocks repeats inside one session; the log check survives a stale or
-    // not-yet-loaded lastLoginDate, since the awards themselves carry the date.
+    this._awardDailyLogin();
+  }
+  /* Separate from the once-per-open routine above because it has to run again while the app
+     is still open. It used to fire only on mount and on login, so a session left running —
+     a pinned tab, or the PWA on a phone — sailed past midnight and never recorded the new
+     day. That is why the log shows 5-17 Aug and then holes: the days were used, they were
+     just never written. Now the day-rollover timer and the return-to-foreground both ask. */
+  _awardDailyLogin(){ if(!this.state.loggedIn) return;
+    const today=this._todayStr();
     if(this._dailyLoginAwarded===today) return;
+    if(!this._isOwner()) return;
+    // The account once collected 37 login awards on 6 Aug and 37 more on 7 Aug, because
+    // lastLoginDate lives in state and every call that landed before the mutation
+    // committed — or before the Supabase load restored it — awarded again. The latch
+    // blocks repeats inside one session; the log check survives a stale or not-yet-loaded
+    // lastLoginDate, since the awards themselves carry the date.
     if((this.state.loginXPLog||[]).some(l=>l.date===today)) return;
     this._dailyLoginAwarded=today;
-    const newStreak=(this.state.lastLoginDate===yest)?(this.state.loginStreak||0)+1:1;
     const xp=250;   /* owner daily login */
-    this.mut(s=>({ loginStreak:newStreak, lastLoginDate:today, loginXPLog:[...(s.loginXPLog||[]), {id:this._uuid(),xp,ts:Date.now(),date:today}] }));
+    // The streak is counted back through the log rather than carried as a number. The
+    // counter read lastLoginDate out of state, so any call that landed before the Supabase
+    // load had restored it saw a blank and reset the streak to 1. Deriving it means the
+    // awards themselves are the record and the figure repairs itself on every load.
+    this.mut(s=>{
+      const log=[...(s.loginXPLog||[]), {id:this._uuid(),xp,ts:Date.now(),date:today}];
+      const d=this._deriveLoginStreak(log);
+      return { loginXPLog:log, loginStreak:d.loginStreak, lastLoginDate:d.lastLoginDate };
+    });
     this.save();
   }
   async fitAskAI(v){ const s=this.state;
@@ -18044,7 +18163,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       powerLevel:P.level, rankName:P.rank.n, rankDesc:P.rank.d, powerPct:P.pct+'%', xpIn:P.xpInLevel, xpNext:P.xpForNext, nextRankName:P.next?P.next.n:'MAX RANK', nextRankLevel:P.next?P.next.min:'—',
       powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'#ff5563'},{label:'WEEKLY XP',value:'+'+P.week,c:'#eef0f2'},{label:'TOTAL XP',value:P.totalXP,c:'#eef0f2'},{label:'DAY STREAK',value:P.streak+'d',c:'#ff5563'}],
       powerCats:P.categories.map(c=>({name:c.name,level:c.level,pct:c.pct+'%'})),
-      powerRanks:P.ranks.map(r=>{ const cur=r.n===P.rank.n, locked=P.level<r.min, passed=!cur&&!locked; return {n:r.n,d:r.d,min:r.min,op:locked?0.45:1,bd:cur?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',numC:cur?'#ff5563':(passed?'#eef0f2':'#75757d'),nameC:locked?'#9a9aa2':'#eef0f2',tag:cur?'CURRENT':(passed?'UNLOCKED':'LOCKED'),tagC:cur?'#F4F4F5':(passed?'#9a9aa2':'#6f6f78'),tagBd:cur?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)'}; }),
+      powerRanks:P.ranks.map(r=>{ const cur=r.n===P.rank.n, locked=P.level<r.min, passed=!cur&&!locked; return {n:r.n,d:r.d,min:r.min,isCur:cur?'1':'0',op:locked?0.45:1,bd:cur?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',numC:cur?'#ff5563':(passed?'#eef0f2':'#75757d'),nameC:locked?'#9a9aa2':'#eef0f2',tag:cur?'CURRENT':(passed?'UNLOCKED':'LOCKED'),tagC:cur?'#F4F4F5':(passed?'#9a9aa2':'#6f6f78'),tagBd:cur?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)'}; }),
       powerAch:P.achievements.map(a=>({name:a.name,desc:a.desc,icon:a.u?'✓':'🔒',op:a.u?1:0.42,c:a.u?'#ff5563':'#6f6f78',bd:a.u?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.06)'})),
       powerStrong:P.strongest.name, powerWeak:P.weakest.name, powerMission:P.mission,
       woWeight:S.woWeight, woSets:S.woSets, woReps:S.woReps, setWoWeight:(e)=>this.setState({woWeight:e.target.value}), setWoSets:(e)=>this.setState({woSets:e.target.value}), setWoReps:(e)=>this.setState({woReps:e.target.value}),
@@ -18591,6 +18710,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // and their open-flags used to survive a logout — so a popup left open (or a stray daily
       // check-in timer firing right around logout) could render on top of the logged-out screen.
       // Gate rendering on S.loggedIn directly, on top of clearing both flags in logout() itself.
+      levelUpOpen:!!S.levelUp && !!S.loggedIn,
+      luBanner:(S.levelUp&&S.levelUp.rankUp)?'RANK UP':'LEVEL UP',
+      luLevel:S.levelUp?String(S.levelUp.to):'',
+      luFromTo:S.levelUp?('LEVEL '+S.levelUp.from+'  \u2192  LEVEL '+S.levelUp.to):'',
+      luRank:S.levelUp?S.levelUp.rank:'',
+      luRankDesc:S.levelUp?S.levelUp.rankDesc:'',
+      luRankUp:!!(S.levelUp&&S.levelUp.rankUp),
+      luTotal:S.levelUp?(S.levelUp.total.toLocaleString()+' XP'):'',
+      luNext:S.levelUp&&S.levelUp.next?('NEXT: '+S.levelUp.next):'',
+      closeLevelUp:()=>this.closeLevelUp(),
       whatsNewOpen:!!S.whatsNewOpen && !!S.loggedIn, closeWhatsNew:()=>{ if(S.prefs.theme==='Ultra' || S.whatsNewSigned) this.dismissWhatsNew(); }, openWhatsNewBtn:()=>this.openWhatsNew(),
       perfCheckinOpen:!!S.perfCheckinOpen && !!S.loggedIn,
       staleOpen:!!S.staleOpen && !!S.loggedIn,

@@ -46,6 +46,8 @@ const ENGINES = [
   ['forge-engine.js','Forge'],
   // The Training centre's section data.
   ['forge-training.js','ForgeTraining'],
+  // The XP gain chip and its spark ring.
+  ['xp-fx.js','XPFx'],
 ];
 
 /* Two files are deliberately unguarded, and the completeness check below knows it:
