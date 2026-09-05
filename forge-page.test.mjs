@@ -296,86 +296,21 @@ t('Home, Mental and Health are empty pages', async () => {
   }
 });
 
-t('Training carries the Hand Training chart', async () => {
+t('every section is an empty page', async () => {
   await boot({ forgeCentre: 'training' });
-  const body = await text();
-  ok(!/Nothing here yet/.test(body), 'Training is still showing the empty state');
-  ok(/Hand Training/.test(body), 'the section is missing');
-  ok(/THE TOOLS/.test(body), 'the kit list is missing');
-});
-
-t('every exercise in the data is on the chart, with its dose', async () => {
-  await boot({ forgeCentre: 'training' });
-  const body = await text();
-  const W = await page.evaluate(() => window.ForgeTraining.section('hands').work);
-  ok(W.length >= 15, 'the fixture is not the real chart');
-  for (const w of W) {
-    ok(body.includes(w.name), 'exercise not rendered: ' + w.name);
-    ok(body.includes(w.dose), 'dose not rendered for: ' + w.name);
+  const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.key));
+  eq(S.length, 12, 'twelve sections');
+  for (const key of S) {
+    await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
+    await page.waitForTimeout(400);
+    const body = await text();
+    ok(/Nothing here yet/.test(body), key + ' is not showing its empty state');
+    for (const ghost of ['THE TOOLS', 'THE STANDARD', 'EASY', 'BRUTAL', 'Rice bucket', 'Dead hang']) {
+      ok(!body.includes(ghost), key + ' is still showing ' + ghost);
+    }
   }
-  ok(body.includes('Kettlebell finger curls'), 'the kettlebell finger curl is missing');
-});
-
-t('every card is drawn, not left as an empty box', async () => {
-  await boot({ forgeCentre: 'training' });
-  await page.waitForTimeout(600);
-  /* The framework interpolates text, not markup, so these are painted in by
-     drawHandFigures(). If that never runs the cards render as blank gaps and nothing throws. */
-  const figs = await page.evaluate(() =>
-    [...document.querySelectorAll('[data-handfig]')].map(el => ({
-      key: el.dataset.handfig,
-      paths: el.querySelectorAll('svg path, svg circle, svg rect').length,
-    })));
-  const W = await page.evaluate(() => window.ForgeTraining.section('hands').work);
-  eq(figs.length, W.length, 'one drawing per exercise');
-  for (const f of figs) ok(f.paths >= 3, f.key + ' drew ' + f.paths + ' shapes — it is blank or broken');
-});
-
-t('the chart is graded on the page, and filters', async () => {
-  await boot({ forgeCentre: 'training' });
-  const all = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
-  for (const lvl of ['EASY', 'HARD', 'BRUTAL']) {
-    await page.evaluate((l) => {
-      const el = [...document.querySelectorAll('span')].find(e =>
-        e.children.length === 0 && e.textContent.trim() === l);
-      if (el) el.click();
-    }, lvl);
-    await page.waitForTimeout(600);
-    const n = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
-    ok(n > 0, lvl + ' filtered everything out');
-    ok(n < all, lvl + ' did not filter anything (' + n + ' of ' + all + ')');
-    const shown = await page.evaluate(() =>
-      [...document.querySelectorAll('[data-handfig]')].map(e => e.dataset.handfig));
-    const want = await page.evaluate((l) =>
-      window.ForgeTraining.section('hands').work.filter(w => w.level === l.toLowerCase()).map(w => w.fig), lvl);
-    eq(shown.join(','), want.join(','), 'wrong exercises shown for ' + lvl);
-  }
-});
-
-t('the tools say what they cost and whether you need them', async () => {
-  await boot({ forgeCentre: 'training' });
-  const body = await text();
-  const T = await page.evaluate(() => window.ForgeTraining.section('hands').tools);
-  for (const x of T) {
-    ok(body.includes(x.name), 'tool not rendered: ' + x.name);
-    ok(body.includes(x.cost), 'cost not rendered for: ' + x.name);
-  }
-  ok(/ESSENTIAL/.test(body) && /OPTIONAL/.test(body), 'the tools are not graded on the page');
-});
-
-t('the loading warnings reach the page, not just the data', async () => {
-  await boot({ forgeCentre: 'training' });
-  const body = await text();
-  ok(/⚠/.test(body), 'no warnings rendered');
-  ok(/not a daily max|angry elbow/i.test(body), 'the gripper warning is missing');
-  ok(/tennis elbow|golfer/i.test(body), 'the extension warning is missing');
-});
-
-t('Hand Training stays out of the other centres', async () => {
-  for (const centre of ['home', 'mental', 'health']) {
-    await boot({ forgeCentre: centre });
-    ok(!/THE FIVE GRIPS/.test(await text()), 'the hand section leaked onto ' + centre);
-  }
+  const figs = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
+  eq(figs, 0, 'the chart markup is still on the page');
 });
 
 t('every section is listed, marked with the house crest and not a number', async () => {
@@ -399,33 +334,9 @@ t('every section is listed, marked with the house crest and not a number', async
   ok(!/^\s*\d+\.\s/m.test(body), 'the sections are numbered somewhere — the crest replaces the number');
 });
 
-t('an empty section is an empty page, and does not borrow the chart', async () => {
-  await boot({ forgeCentre: 'training' });
-  for (const key of ['chest', 'core', 'neck']) {
-    await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
-    await page.waitForTimeout(600);
-    const r = await page.evaluate(() => ({
-      figs: document.querySelectorAll('[data-handfig]').length,
-      body: document.body.innerText,
-    }));
-    eq(r.figs, 0, key + ' is showing exercise cards');
-    ok(/Nothing here yet/.test(r.body), key + ' is not showing its empty state');
-    ok(!/THE TOOLS/.test(r.body), key + ' borrowed the hand tools');
-    ok(!/EASY|BRUTAL/.test(r.body), key + ' is showing a level filter for a chart it does not have');
-  }
-});
-
-t('Training opens on the section that actually has something in it', async () => {
-  await boot({ forgeCentre: 'training' });
-  const body = await text();
-  ok(/Hand Training/.test(body), 'it should land on the only section with content');
-  const figs = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
-  ok(figs > 0, 'landed on an empty section while a full one exists');
-});
-
 t('the four centres still switch', async () => {
   await boot({ forgeCentre: 'home' });
-  for (const [tab, probe] of [['TRAINING', 'Hand Training'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Nothing here yet']]) {
+  for (const [tab, probe] of [['TRAINING', 'Chest'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Nothing here yet']]) {
     await page.evaluate((t) => {
       const el = [...document.querySelectorAll('span')].find(e =>
         e.children.length === 0 && e.textContent.trim() === t);
@@ -450,16 +361,20 @@ t('nothing on the page is rendered twice', async () => {
   const body = await text();
   /* "Hand Training" legitimately appears twice now — once in the section picker and once as
      the heading — so count the heading element rather than the text. */
-  const headings = await page.evaluate(() =>
-    [...document.querySelectorAll('h2')].filter(h => h.textContent.trim() === 'Hand Training').length);
+  const headings = await page.evaluate(() => document.querySelectorAll('h2').length);
   eq(headings, 1, 'the section heading rendered ' + headings + ' times');
-  for (const once of ['THE TOOLS', 'GRIP & HAND DEVELOPMENT', '❖ THE FORGE']) {
+  for (const once of ['❖ THE FORGE', 'Nothing here yet']) {
     const n = (body.match(new RegExp(once.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     eq(n, 1, once + ' appears ' + n + ' times');
   }
-  const figs = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
-  const want = await page.evaluate(() => window.ForgeTraining.section('hands').work.length);
-  eq(figs, want, 'the chart rendered ' + figs + ' cards for ' + want + ' exercises');
+  /* One section body, whichever is open — the duplication this catches was a whole block
+     copied, so the count is the signal. */
+  const bodies = await page.evaluate(() =>
+    [...document.querySelectorAll('h2')].length);
+  eq(bodies, 1, 'the section body rendered ' + bodies + ' times');
+  const picker = await page.evaluate(() => document.querySelectorAll('.cc-scene [data-icon="forge"]').length);
+  const want = await page.evaluate(() => window.ForgeTraining.SECTIONS.length);
+  ok(picker >= want, 'the picker lists ' + picker + ' entries for ' + want + ' sections');
 });
 
 t('the page raised no errors while all of that happened', async () => {

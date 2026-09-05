@@ -324,8 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=3"></script>
-  <script src="forge-hand-figures.js?v=1"></script>
+  <script src="forge-training.js?v=4"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3630,9 +3629,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </sc-if>
 
-        <!-- TRAINING — built from sections. The chart is the section: every way to train the
-             thing, drawn, graded and dosed. Figures are inline SVG from forge-hand-figures.js,
-             painted in by drawHandFigures() the same way the nav icons are. -->
+        <!-- TRAINING — built from sections. Twelve of them, none with content yet: the picker
+             lists them all and the body renders whichever is open as an empty page. -->
         <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
 
           <!-- The section list. The house mark leads each entry rather than a number: these are
@@ -3646,61 +3644,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
 
           <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
-
-            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:14px;">
-              <div>
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:6px;">{{ sec.tag }}</div>
-                <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0;">{{ sec.name }}</h2>
-              </div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <sc-for list="{{ sec.filters }}" as="f" hint-placeholder-count="4">
-                  <span onClick="{{ f.go }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; padding:7px 12px; border-radius:8px; cursor:pointer; color:{{ f.ink }}; background:{{ f.bg }}; border:1px solid {{ f.bd }};">{{ f.label }}</span>
-                </sc-for>
-              </div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:6px;">{{ sec.tag }}</div>
+            <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 14px;">{{ sec.name }}</h2>
+            <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+              <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
             </div>
-
-            <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ false }}">
-              <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
-                <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
-              </div>
-            </sc-if>
-
-            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(224px,1fr)); gap:12px; margin-bottom:16px;">
-              <sc-for list="{{ sec.chart }}" as="w" hint-placeholder-count="20">
-                <div class="cc-glowcard" style="border-radius:14px; padding:14px; display:flex; flex-direction:column;">
-                  <div style="display:flex; justify-content:flex-end; margin-bottom:2px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; padding:2px 6px; border-radius:5px; color:{{ w.lvlInk }}; border:1px solid {{ w.lvlBd }};">{{ w.level }}</span>
-                  </div>
-                  <div style="height:88px; display:flex; align-items:center; justify-content:center; color:#eef0f2;" data-handfig="{{ w.fig }}"></div>
-                  <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-top:10px;">{{ w.name }}</div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6cffba; margin-top:4px;">{{ w.dose }}</div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:7px; line-height:1.5; flex:1;">{{ w.cue }}</div>
-                  <sc-if value="{{ w.risk }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:10.5px; color:#ff8a5b; margin-top:8px; line-height:1.5;">⚠ {{ w.risk }}</div>
-                  </sc-if>
-                </div>
-              </sc-for>
-            </div>
-
-            <sc-if value="{{ sec.hasTools }}" hint-placeholder-val="{{ false }}">
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:3px;">THE TOOLS</div>
-              <div style="font-size:11.5px; color:#75757d; margin-bottom:10px;">What each one is for, what it costs, and whether you actually need it.</div>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:0 22px;">
-                <sc-for list="{{ sec.tools }}" as="tl" hint-placeholder-count="12">
-                  <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                      <span style="font-size:12.5px; color:#dbdbe0;">{{ tl.name }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.8px; padding:2px 5px; border-radius:4px; color:{{ tl.needInk }}; border:1px solid {{ tl.needBd }};">{{ tl.need }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; margin-left:auto;">{{ tl.cost }}</span>
-                    </div>
-                    <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.5;">{{ tl.does }}</div>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-            </sc-if>
-
           </sc-for>
         </sc-if>
 
@@ -9356,7 +9304,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-248 · v11.248 training-sections';
+const NOTIF_BUILD_VERSION = '2026.09.04-249 · v11.249 sections-empty';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9445,7 +9393,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeLevel:'all', forgeSection:'', forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -13635,17 +13583,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          survive that size — the anvil and the double-frame versions did not. */
       forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>' };
     this.root.querySelectorAll('[data-icon]').forEach(el=>{ const k=el.dataset.icon; if(el._k===k) return; el._k=k; el.innerHTML='<svg viewBox="0 0 18 18" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(ic[k]||'')+'</svg>'; });
-    this.drawHandFigures();
-  }
-  /* The hand-training chart. Same approach as the icons above: the framework interpolates
-     text, not markup, so the drawings are painted in from the figure map rather than bound. */
-  drawHandFigures(){
-    if(!this.root) return;
-    const F=window.HandFigures; if(!F) return;
-    this.root.querySelectorAll('[data-handfig]').forEach(el=>{
-      const k=el.dataset.handfig; if(!k || el._hf===k) return; el._hf=k;
-      el.innerHTML='<svg viewBox="0 0 100 76" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(F[k]||'')+'</svg>';
-    });
   }
 
   // ===== SCENE INITS =====
@@ -13883,6 +13820,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.249', date:'Sep 4, 2026', notes:[
+      'All twelve training sections are now empty pages, hands included \u2014 Chest, Shoulders, Arms, Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck, Hands & Forearms.',
+      'The hand chart has been taken back out. Nothing is lost \u2014 the twenty drawings are still in the app and the chart itself is kept in the history, ready for when Hands & Forearms gets built.',
+    ]},
     {version:'v11.248', date:'Sep 4, 2026', notes:[
       'All twelve training sections are in: Chest, Shoulders, Arms, Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck and Hand Training.',
       'Each is marked with the house crest rather than a number \u2014 they are a set to work through, not an order to do them in.',
@@ -15722,8 +15663,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      keeps. The programme content itself never lives here. */
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
-  setForgeLevel(k){ this.setState({forgeLevel:k}); }
-  setForgeSection(k){ this.setState({forgeSection:k, forgeLevel:'all'}); }
+  setForgeSection(k){ this.setState({forgeSection:k}); }
   /* Master-detail: picking a region swaps the pane rather than collapsing it. There is no
      empty state to fall into — the binding falls back to the first region of whichever
      centre you are on. */
@@ -17900,16 +17840,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           ink:centre===c[0]?'#F4F4F5':'#9a9aa2',
           bg:centre===c[0]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)',
           bd:centre===c[0]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' }));
-        /* Training sections. Only the ones carrying work have a chart; the rest render as
-           empty pages, so the whole list is visible from the start rather than appearing a
-           section at a time. The picker opens on the first section that has anything in it. */
+        /* Training sections. Twelve, none with content yet — the picker lists them and the
+           body shows whichever is open. Level filters and tool panels come back with the
+           first section that has a chart. */
         const TR=window.ForgeTraining;
-        const LV={easy:'#6cffba', hard:'#e8b45a', brutal:'#ff8a5b'};
-        const NEED={essential:'#ff8a5b', useful:'#e8b45a', optional:'#8f8f99'};
-        const lvl=S.forgeLevel||'all';
         const secs=(TR?TR.SECTIONS:[]);
-        const firstFull=(secs.find(x=>x.work && x.work.length)||secs[0]||{}).key;
-        const secKey=(S.forgeSection && secs.some(x=>x.key===S.forgeSection)) ? S.forgeSection : firstFull;
+        const secKey=(S.forgeSection && secs.some(x=>x.key===S.forgeSection)) ? S.forgeSection : (secs[0]||{}).key;
         const trainPicker=secs.map(x=>({
           name:x.name, go:()=>this.setForgeSection(x.key),
           ink:x.key===secKey?'#0d0d10':'#b6b6be',
@@ -17917,21 +17853,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bg:x.key===secKey?'#E7D8A6':'rgba(255,255,255,0.02)',
           bd:x.key===secKey?'#E7D8A6':'rgba(255,255,255,0.10)' }));
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>({
-          key:sec.key, name:sec.name, tag:sec.tag,
-          empty:!(sec.work && sec.work.length),
-          hasTools:!!(sec.tools && sec.tools.length),
-          filters:!(sec.work && sec.work.length) ? [] :
-            [['all','ALL']].concat(TR.LEVELS.map(l=>[l,l.toUpperCase()])).map(f=>({
-              label:f[1], go:()=>this.setForgeLevel(f[0]),
-              ink:lvl===f[0]?'#0d0d10':(f[0]==='all'?'#9a9aa2':LV[f[0]]),
-              bg:lvl===f[0]?(f[0]==='all'?'#eef0f2':LV[f[0]]):'transparent',
-              bd:lvl===f[0]?(f[0]==='all'?'#eef0f2':LV[f[0]]):'rgba(255,255,255,0.12)' })),
-          chart:(sec.work||[]).filter(w=>lvl==='all'||w.level===lvl).map(w=>({
-            fig:w.fig, name:w.name, dose:w.dose, cue:w.cue, risk:w.risk||'',
-            level:w.level.toUpperCase(), lvlInk:LV[w.level]||'#8f8f99', lvlBd:(LV[w.level]||'#8f8f99')+'55' })),
-          tools:(sec.tools||[]).map(x=>({ name:x.name, cost:x.cost, does:x.does, need:x.need.toUpperCase(),
-            needInk:NEED[x.need]||'#8f8f99', needBd:(NEED[x.need]||'#8f8f99')+'55' }))
-        }));
+          key:sec.key, name:sec.name, tag:sec.tag }));
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
         /* Progress. An assessment you cannot compare with the last one measures nothing,
            so the history is drawn rather than just stored. Bars are scaled to the best
