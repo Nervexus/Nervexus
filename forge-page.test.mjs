@@ -305,6 +305,7 @@ t('every section is an empty page', async () => {
     await page.waitForTimeout(400);
     const body = await text();
     if (key === 'full-body') { ok(/THE SESSION/.test(body), 'Full Body should carry its checklist'); continue; }
+    if (key === 'chest') { ok(/GYM/.test(body), 'Chest should carry its exercise pool'); continue; }
     ok(/Nothing here yet/.test(body), key + ' is not showing its empty state');
     for (const ghost of ['THE TOOLS', 'THE STANDARD', 'EASY', 'BRUTAL', 'Rice bucket', 'Dead hang']) {
       ok(!body.includes(ghost), key + ' is still showing ' + ghost);
@@ -685,6 +686,110 @@ t('the list survives the day rolling over', async () => {
   ok(n > 0, 'the session emptied itself overnight');
 });
 
+/* ---- a section's exercise pool ---- */
+
+const addBtns = () => page.evaluate(() =>
+  [...document.querySelectorAll('span')]
+    .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD').length);
+
+async function openChest() {
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => window.__nvx.setState({
+    forgeSection: 'chest', forgePool: 'gym',
+    forgeFB: { period: '', mode: 'day', on: '', evId: '', items: [], done: {}, w: {} },
+    workouts: [], events: [] }));
+  await page.waitForTimeout(700);
+}
+
+t('Chest lists its gym and home exercises', async () => {
+  await openChest();
+  const D = await page.evaluate(() => window.ForgeTraining.section('chest').pool);
+  eq(await addBtns(), D.gym.length, 'the gym list did not render one block each');
+  const body = await text();
+  for (const x of D.gym) ok(body.includes(x.name), 'missing from the gym list: ' + x.name);
+
+  await page.evaluate(() => window.__nvx.setForgePool('home'));
+  await page.waitForTimeout(600);
+  eq(await addBtns(), D.home.length, 'the home list did not render one block each');
+  const home = await text();
+  for (const x of D.home) ok(home.includes(x.name), 'missing from the home list: ' + x.name);
+  ok(!home.includes(D.gym[0].name), 'the gym list is still showing under HOME');
+});
+
+t('adding one puts it in the Full Body daily session', async () => {
+  await openChest();
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD');
+    b[0].click();
+  });
+  await page.waitForTimeout(700);
+  const items = await page.evaluate(() => window.__nvx.state.forgeFB.items);
+  eq(items.length, 1, 'nothing was added to the session');
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  eq(items[0].name, src.name, 'the wrong exercise was added');
+  eq(items[0].part, 'Chest', 'it did not carry the body part');
+  eq(items[0].sets, src.sets, 'sets were not carried across');
+  eq(items[0].reps, src.reps, 'reps were not carried across');
+
+  /* And it is really on the Full Body list, not just in state. */
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(800);
+  ok((await text()).includes(src.name), 'it is not on the Full Body checklist');
+});
+
+t('an added exercise reads as added and cannot be added twice', async () => {
+  await openChest();
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD');
+    b[0].click();
+  });
+  await page.waitForTimeout(700);
+  const added = await page.evaluate(() =>
+    [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADDED').length);
+  eq(added, 1, 'the block does not read as added');
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADDED');
+    b[0].click();
+  });
+  await page.waitForTimeout(600);
+  eq(await page.evaluate(() => window.__nvx.state.forgeFB.items.length), 1, 'it was added twice');
+});
+
+t('an added exercise ticks and logs like any other', async () => {
+  /* The point of the join: a pooled exercise is a real session item, not a shortcut that
+     bypasses the log. */
+  await openChest();
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD');
+    b[0].click();
+  });
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(700);
+  const name = await page.evaluate(() => window.__nvx.state.forgeFB.items[0].name);
+  await tick(name);
+  await page.waitForTimeout(800);
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 1, 'ticking it logged nothing');
+  eq(w[0].part, 'Chest', 'it logged against the wrong body part');
+});
+
+t('the pool does not appear on a section that has none', async () => {
+  await boot({ forgeCentre: 'training' });
+  for (const key of ['neck', 'calves']) {
+    await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
+    await page.waitForTimeout(500);
+    const body = await text();
+    ok(/Nothing here yet/.test(body), key + ' should still be empty');
+    ok(!/\+ ADD/.test(body), key + ' is showing an exercise pool');
+  }
+});
+
 /* ---- the week ---- */
 
 t('a scheduled session shows on the week and on the main calendar', async () => {
@@ -824,13 +929,22 @@ t('nothing on the page is rendered twice', async () => {
   /* v11.246 shipped 108 duplicated lines: a slice edit ran backwards through the file and
      copied a region instead of removing it. Tag balance stayed perfect and every
      includes() assertion still passed, so nothing caught it until it was live. */
-  await boot({ forgeCentre: 'training' });
+  await openChest();
   const body = await text();
+  const blocks = await addBtns();
+  const pool = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym.length);
+  eq(blocks, pool, 'the exercise pool rendered ' + blocks + ' blocks for ' + pool + ' exercises');
   /* "Hand Training" legitimately appears twice now — once in the section picker and once as
      the heading — so count the heading element rather than the text. */
   const headings = await page.evaluate(() => document.querySelectorAll('h2').length);
   eq(headings, 1, 'the section heading rendered ' + headings + ' times');
-  for (const once of ['❖ THE FORGE', 'Nothing here yet']) {
+  /* Training opens on Chest now, which has a pool rather than an empty state, so the empty
+     state is checked on a section that still has one. */
+  await page.evaluate(() => window.__nvx.setForgeSection('neck'));
+  await page.waitForTimeout(600);
+  const emptyBody = await text();
+  eq(emptyBody.split('Nothing here yet').length - 1, 1, 'the empty state rendered more than once');
+  for (const once of ['❖ THE FORGE']) {
     const n = (body.match(new RegExp(once.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     eq(n, 1, once + ' appears ' + n + ' times');
   }

@@ -324,7 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=7"></script>
+  <script src="forge-training.js?v=8"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3656,6 +3656,28 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ true }}">
                   <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
                     <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
+                  </div>
+                </sc-if>
+
+                <!-- The section's exercise pool. Adding one drops it into the Full Body daily
+                     checklist, where it is ticked and logged like anything else. -->
+                <sc-if value="{{ sec.hasPool }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+                    <sc-for list="{{ sec.pools }}" as="pl" hint-placeholder-count="2">
+                      <span onClick="{{ pl.go }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; padding:7px 13px; border-radius:8px; cursor:pointer; color:{{ pl.ink }}; background:{{ pl.bg }}; border:1px solid {{ pl.bd }};">{{ pl.label }}</span>
+                    </sc-for>
+                    <span style="font-size:11.5px; color:#6f6f78;">{{ sec.poolHint }}</span>
+                  </div>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(196px,1fr)); gap:10px;">
+                    <sc-for list="{{ sec.poolList }}" as="x" hint-placeholder-count="20">
+                      <div class="cc-glowcard" style="border-radius:13px; padding:13px 14px; display:flex; flex-direction:column; gap:8px;">
+                        <div style="font-size:13px; color:#eef0f2; line-height:1.35;">{{ x.name }}</div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99;">{{ x.target }}</span>
+                          <span onClick="{{ x.add }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.8px; padding:5px 9px; border-radius:7px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
+                        </div>
+                      </div>
+                    </sc-for>
                   </div>
                 </sc-if>
 
@@ -9393,7 +9415,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.05-258 · v11.258 drop-weekly';
+const NOTIF_BUILD_VERSION = '2026.09.05-259 · v11.259 chest-pool';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9483,7 +9505,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgePool:'gym', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -13915,6 +13937,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.259', date:'Sep 5, 2026', major:true, notes:[
+      'Chest is the first section with exercises: twenty for the gym and ten for home, switched with a tab.',
+      'Each one has an ADD that drops it straight into your Full Body daily session, with its sets and reps, ready to tick and log. It reads ADDED once it is in, so you cannot add it twice.',
+    ]},
     {version:'v11.258', date:'Sep 5, 2026', notes:[
       'Dropped the Weekly setting. Daily covers a session you do most days and Scheduled covers one you have booked; the middle option was not earning its place.',
       'If you had picked weekly days, the repeating entry has been taken off your calendar and the setting is back to Daily \u2014 otherwise it would have sat there with nothing able to remove it.',
@@ -15917,6 +15943,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const f=this._fb();
     this.setState({forgeFB:{...f, items:[...(f.items||[]), it]}, fbDraft:{part:d.part||'Chest'}});
   }
+  /* Straight from a section's pool into the Full Body session, which is the daily checklist.
+     Nothing is logged here — it joins the list, and ticking it there is what writes the set. */
+  addPoolToSession(ex, part){
+    const f=this._fb();
+    if((f.items||[]).some(i=>i.name.toLowerCase()===ex.name.toLowerCase())){
+      this.showToast('fitness','Already in your session', ex.name); return;
+    }
+    const it={ id:this._uuid(), name:ex.name, part:(this.FB_PARTS().indexOf(part)>=0?part:'Full'),
+      sets:ex.sets||0, reps:ex.reps||0, minutes:ex.minutes||0, dist:0, distUnit:'m' };
+    this.setState({forgeFB:{...f, items:[...(f.items||[]), it]}});
+    this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it));
+  }
+  setForgePool(k){ this.setState({forgePool:k}); }
   removeForgeFBItem(id){
     const f=this._fb(), done={...(f.done||{})};
     // Take its logged rows with it, or the log keeps sets belonging to an exercise that is gone.
@@ -18163,13 +18202,29 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
         const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
-        const dr0=S.fbDraft||{};
+        const dr0=S.fbDraft||{}, pool=S.forgePool||'gym';
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
           const list=(sec.key==='full-body') ? (fb.items||[]) : (sec.checklist||[]);
           const n=list.filter(it=>fbDone[it.id]).length;
           return {
             key:sec.key, name:sec.name, tag:sec.tag,
-            empty:sec.key!=='full-body' && !list.length,
+            empty:sec.key!=='full-body' && !list.length && !sec.pool,
+            hasPool:!!sec.pool,
+            pools:[['gym','GYM'],['home','HOME']].map(q=>({
+              label:q[1], go:()=>this.setForgePool(q[0]),
+              ink:pool===q[0]?'#0d0d10':'#9a9aa2',
+              bg:pool===q[0]?'#eef0f2':'transparent',
+              bd:pool===q[0]?'#eef0f2':'rgba(255,255,255,0.12)' })),
+            poolHint:'Adds to your Full Body session',
+            poolList:((sec.pool||{})[pool]||[]).map(x=>{
+              const inSession=(fb.items||[]).some(i=>i.name.toLowerCase()===x.name.toLowerCase());
+              return { name:x.name, target:(x.sets||1)+' × '+x.reps,
+                label:inSession?'ADDED':'+ ADD', cursor:inSession?'default':'pointer',
+                ink:inSession?'#6cffba':'#0d0d10',
+                bg:inSession?'transparent':'#eef0f2',
+                bd:inSession?'rgba(108,255,186,0.45)':'#eef0f2',
+                add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part); } };
+            }),
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
             modes:[['day','DAILY'],['date','SCHEDULED']].map(m=>({
