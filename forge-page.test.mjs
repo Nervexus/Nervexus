@@ -304,6 +304,7 @@ t('every section is an empty page', async () => {
     await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
     await page.waitForTimeout(400);
     const body = await text();
+    if (key === 'full-body') { ok(/THE SESSION/.test(body), 'Full Body should carry its checklist'); continue; }
     ok(/Nothing here yet/.test(body), key + ' is not showing its empty state');
     for (const ghost of ['THE TOOLS', 'THE STANDARD', 'EASY', 'BRUTAL', 'Rice bucket', 'Dead hang']) {
       ok(!body.includes(ghost), key + ' is still showing ' + ghost);
@@ -333,6 +334,152 @@ t('every section is listed, marked with the house crest and not a number', async
   }
   const body = await text();
   ok(!/^\s*\d+\.\s/m.test(body), 'the sections are numbered somewhere — the crest replaces the number');
+});
+
+/* ---- the Full Body checklist ---- */
+
+async function openFullBody() {
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => window.__nvx.setState({
+    forgeSection: 'full-body', forgeFB: { date: '', done: {}, w: {} }, workouts: [] }));
+  await page.waitForTimeout(600);
+}
+const ticks = () => page.evaluate(() =>
+  [...document.querySelectorAll('span')].filter(e => e.textContent.trim() === '✓').length);
+const tick = (name) => page.evaluate((n) => {
+  const row = [...document.querySelectorAll('span')].find(e =>
+    e.children.length === 0 && e.textContent.trim() === n);
+  if (!row) throw new Error('no row for ' + n);
+  row.click();
+}, name);
+
+t('Full Body carries the session checklist', async () => {
+  await openFullBody();
+  const body = await text();
+  ok(/THE SESSION/.test(body), 'the checklist is missing');
+  const L = await page.evaluate(() => window.ForgeTraining.section('full-body').checklist);
+  for (const it of L) {
+    ok(body.includes(it.name), 'not listed: ' + it.name);
+    ok(body.includes(it.target), 'no target shown for: ' + it.name);
+  }
+  ok(/0\/10 LOGGED/.test(body), 'the counter should start at zero');
+});
+
+t('ticking an item writes it to the main training log', async () => {
+  /* The whole point: one record of what you did, in the same place Fitness HQ writes to —
+     not a tally that only the Forge knows about. */
+  await openFullBody();
+  await tick('Back squat');
+  await page.waitForTimeout(700);
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 1, 'the set did not reach the training log');
+  eq(w[0].exercise, 'Back squat', 'wrong exercise logged');
+  eq(w[0].part, 'Legs', 'wrong body part');
+  eq(w[0].sets, 3, 'sets not carried through');
+  eq(w[0].reps, 5, 'reps not carried through');
+  ok(/1\/10 LOGGED/.test(await text()), 'the counter did not move');
+});
+
+t('the logged set shows up on Fitness HQ', async () => {
+  await openFullBody();
+  await tick('Deadlift');
+  await page.waitForTimeout(700);
+  await page.evaluate(() => window.__nvx.setState({ scene: 'fitness', woPart: 'Back' }));
+  await page.waitForTimeout(800);
+  ok(/Deadlift/.test(await text()), 'Fitness HQ does not show the set logged on the Forge');
+});
+
+t('a blank weight does not pick up whatever is in the Fitness HQ form', async () => {
+  /* addWorkout falls back to the Fitness HQ fields for anything left undefined, so an
+     unfilled weight here would silently log someone else's number. */
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setState({ woWeight: '999', woSets: '7', woReps: '77' }));
+  await page.waitForTimeout(300);
+  await tick('Pull-ups');
+  await page.waitForTimeout(700);
+  const w = await page.evaluate(() => window.__nvx.state.workouts[0]);
+  eq(w.weight, 0, 'it borrowed the weight from the other form');
+  eq(w.sets, 3, 'it borrowed the sets from the other form');
+  eq(w.reps, 8, 'it borrowed the reps from the other form');
+});
+
+t('a weight typed on the checklist is the weight logged', async () => {
+  await openFullBody();
+  await page.evaluate(() => {
+    const i = [...document.querySelectorAll('input')].find(x => x.placeholder === 'kg');
+    i.focus();
+  });
+  await page.keyboard.type('80');
+  await page.waitForTimeout(400);
+  await tick('Back squat');
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts[0].weight), 80, 'the typed weight was not used');
+});
+
+t('unticking takes the set back out of the log', async () => {
+  await openFullBody();
+  await tick('Bench press');
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'nothing was logged to undo');
+  await tick('Bench press');
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 0, 'unticking left the entry behind');
+  ok(/0\/10 LOGGED/.test(await text()), 'the counter did not come back down');
+});
+
+t('unticking removes only what that tick logged', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setState({
+    workouts: [{ id: 'other', ts: Date.now(), part: 'Chest', exercise: 'Something else', weight: 50, sets: 3, reps: 5 }] }));
+  await page.waitForTimeout(300);
+  await tick('Dips');
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 2, 'the tick did not log');
+  await tick('Dips');
+  await page.waitForTimeout(700);
+  const left = await page.evaluate(() => window.__nvx.state.workouts.map(w => w.exercise));
+  eq(left.join(','), 'Something else', 'unticking took out more than it put in: ' + left.join(', '));
+});
+
+t('CLEAR empties the session and everything it logged', async () => {
+  await openFullBody();
+  await tick('Back squat');
+  await tick('Plank');
+  await page.waitForTimeout(800);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 2, 'both should be logged');
+  await page.evaluate(() => {
+    const el = [...document.querySelectorAll('span')].find(e => e.textContent.trim() === 'CLEAR');
+    el.click();
+  });
+  await page.waitForTimeout(800);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 0, 'CLEAR left entries in the log');
+  eq(await ticks(), 0, 'CLEAR left ticks on the checklist');
+});
+
+t('yesterday\'s ticks do not carry into today', async () => {
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => window.__nvx.setState({
+    forgeSection: 'full-body',
+    forgeFB: { date: '2020-01-01', done: { squat: { ids: ['x'] }, bench: { ids: ['y'] } }, w: {} } }));
+  await page.waitForTimeout(700);
+  ok(/0\/10 LOGGED/.test(await text()), 'a stale day is still showing its ticks');
+  eq(await ticks(), 0, 'yesterday\'s ticks carried over');
+});
+
+t('the timed and distance items log too, not just the rep ones', async () => {
+  /* The log refuses an entry with no reps, minutes or distance, and it does it silently —
+     the tick would look like it worked and record nothing. */
+  await openFullBody();
+  await tick('Plank');
+  await page.waitForTimeout(600);
+  await tick("Farmer's carry");
+  await page.waitForTimeout(700);
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 2, 'a timed or distance item was refused by the log');
+  const plank = w.find(x => x.exercise === 'Plank');
+  ok(plank && plank.min > 0, 'the plank logged no minutes');
+  const carry = w.find(x => /Farmer/.test(x.exercise));
+  ok(carry && carry.dist > 0, 'the carry logged no distance');
 });
 
 t('the section list is a sidebar beside the section, not above it', async () => {

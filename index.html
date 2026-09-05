@@ -324,7 +324,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=5"></script>
+  <script src="forge-training.js?v=6"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
 <link rel="preconnect" href="https://basemaps.cartocdn.com" crossorigin="">
@@ -3652,9 +3652,38 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
                 <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:6px;">{{ sec.tag }}</div>
                 <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 14px;">{{ sec.name }}</h2>
-                <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
-                  <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
-                </div>
+
+                <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ true }}">
+                  <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+                    <div style="font-size:12.5px; color:#6f6f78;">Nothing here yet.</div>
+                  </div>
+                </sc-if>
+
+                <!-- A checklist that writes through to the training log rather than keeping its
+                     own tally. Ticking logs the set; unticking takes it back out again. -->
+                <sc-if value="{{ sec.hasList }}" hint-placeholder-val="{{ false }}">
+                  <div class="cc-glowcard" style="border-radius:16px; padding:18px 20px;">
+                    <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:4px;">
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99;">THE SESSION</div>
+                      <div style="display:flex; align-items:baseline; gap:12px;">
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ sec.doneInk }};">{{ sec.doneLabel }}</span>
+                        <span onClick="{{ sec.clear }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#8f8f99; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.16);">CLEAR</span>
+                      </div>
+                    </div>
+                    <div style="font-size:11.5px; color:#75757d; margin-bottom:8px;">Ticking one logs it straight to your training log. Unticking removes it again.</div>
+
+                    <sc-for list="{{ sec.list }}" as="it" hint-placeholder-count="10">
+                      <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
+                        <span onClick="{{ it.toggle }}" style="width:20px; height:20px; flex:0 0 20px; border-radius:6px; border:1px solid {{ it.boxBd }}; background:{{ it.boxBg }}; color:#0d0d10; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; cursor:pointer;">{{ it.tick }}</span>
+                        <span onClick="{{ it.toggle }}" style="font-size:13px; color:{{ it.ink }}; text-decoration:{{ it.strike }}; cursor:pointer; flex:1; min-width:0;">{{ it.name }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99; white-space:nowrap;">{{ it.target }}</span>
+                        <sc-if value="{{ it.load }}" hint-placeholder-val="{{ true }}">
+                          <input value="{{ it.weight }}" onInput="{{ it.setWeight }}" placeholder="kg" type="number" style="width:66px; flex:0 0 66px; padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
               </sc-for>
             </div>
 
@@ -9313,7 +9342,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-250 · v11.250 section-sidebar';
+const NOTIF_BUILD_VERSION = '2026.09.04-251 · v11.251 full-body-checklist';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9402,7 +9431,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{date:'',done:{},w:{}}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -10125,9 +10154,9 @@ activities: this._mergeShipLog(s.activities),
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
-    const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
+    const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
-    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
+    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} }
   // ===== AI & INTELLIGENCE PROVIDER MANAGER =====
   _pd(){ return window.PROVIDERS_DATA; }
   // Genuine empty state — every provider/source starts off and unsaved. Nothing is
@@ -13829,6 +13858,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.251', date:'Sep 4, 2026', major:true, notes:[
+      'Full Body has a session checklist \u2014 squat, deadlift, bench, press, row, pull-ups, dips, carry, leg raise, plank \u2014 with a weight box on each.',
+      'Ticking one logs it straight to your training log, the same one Fitness HQ writes to, so there is one record of what you did rather than two. Unticking takes it back out again.',
+      'The checklist clears itself each day, and CLEAR empties both the ticks and everything they logged.',
+    ]},
     {version:'v11.250', date:'Sep 4, 2026', notes:[
       'The training sections are a sidebar now, built like the app\u2019s own \u2014 a column down the left with the section open beside it. On a phone it stacks.',
       'Added Full Body, making thirteen sections.',
@@ -15585,7 +15619,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const entries=list.map((ex,i)=>({ id:this._uuid(), part:forcedPart||this._guessBodyPart(ex), exercise:ex, min:mn, weight:wt, unit, sets:st, reps:rp, dist, distUnit, ts:ts-i }));
     this.mut(s=>({workouts:[...s.workouts,...entries],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
     if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString()}));
-    if(bw>0){ this.setState({woBodyWeight:''}); this.addWeight(bw); } }
+    if(bw>0){ this.setState({woBodyWeight:''}); this.addWeight(bw); }
+    // Returned so a caller that logged on someone's behalf can take it back again — the
+    // Full Body checklist removes exactly these rows when an item is unticked.
+    return entries; }
   addWeight(kg){ const K=window.HealthKit; if(!K) return;
     const w=kg!=null?+kg:parseFloat(this.state.weightInput);
     if(!(w>20&&w<400)) return;
@@ -15677,6 +15714,45 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
   setForgeSection(k){ this.setState({forgeSection:k}); }
+  _fbToday(){ return window.HealthKit ? window.HealthKit.today() : new Date().toLocaleDateString('en-CA'); }
+  /* The checklist resets itself at midnight rather than carrying yesterday's ticks. State is
+     stamped with the day it belongs to and read back through this. */
+  _fb(){ const f=this.state.forgeFB||{}; return f.date===this._fbToday() ? f : {date:this._fbToday(), done:{}, w:{}}; }
+  setForgeFBWeight(id,e){ const v=e&&e.target?e.target.value:e; const f=this._fb();
+    this.setState({forgeFB:{...f, w:{...(f.w||{}), [id]:v}}}); }
+  /* Ticking logs the set to the training log Fitness HQ writes to; unticking removes exactly
+     the rows that tick created. Every field is passed explicitly — addWorkout falls back to
+     the Fitness HQ form for anything left undefined, so a blank weight here would otherwise
+     pick up whatever is sitting in that form. */
+  toggleForgeFBItem(item){
+    const f=this._fb(), done={...(f.done||{})};
+    if(done[item.id]){
+      const ids=done[item.id].ids||[];
+      if(ids.length){
+        this.mut(s=>({workouts:(s.workouts||[]).filter(w=>ids.indexOf(w.id)<0)}));
+        if(this._sbOn()) ids.forEach(id=>window.SB.remove('workouts',id));
+      }
+      delete done[item.id];
+      this.setState({forgeFB:{...f, done}});
+      this.showToast('fitness','Removed from your log',item.name);
+      return;
+    }
+    const entries=this.addWorkout({
+      exercise:item.name, part:item.part, unit:'kg',
+      minutes:item.minutes||0, weight:parseFloat((f.w||{})[item.id])||0,
+      sets:item.sets||0, reps:item.reps||0,
+      dist:item.dist||0, distUnit:item.distUnit||'km' });
+    if(!entries || !entries.length){ this.showToast('fitness','Could not log that', item.name+' needs reps, minutes or a distance'); return; }
+    done[item.id]={ids:entries.map(e=>e.id)};
+    this.setState({forgeFB:{...f, done}});
+    this.showToast('fitness','Logged to your training log', item.name+' · '+item.target); }
+  clearForgeFB(){ const f=this._fb(); const ids=Object.keys(f.done||{}).reduce((a,k)=>a.concat((f.done[k].ids)||[]),[]);
+    if(ids.length){
+      this.mut(s=>({workouts:(s.workouts||[]).filter(w=>ids.indexOf(w.id)<0)}));
+      if(this._sbOn()) ids.forEach(id=>window.SB.remove('workouts',id));
+    }
+    this.setState({forgeFB:{date:this._fbToday(), done:{}, w:{}}});
+    this.showToast('fitness','Session cleared', ids.length?(ids.length+' entries removed from your log'):'Nothing was logged yet'); }
   /* Master-detail: picking a region swaps the pane rather than collapsing it. There is no
      empty state to fall into — the binding falls back to the first region of whichever
      centre you are on. */
@@ -17865,8 +17941,27 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           mark:x.key===secKey?'#E7D8A6':'#7c7c84',
           bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
-        const trainSections=secs.filter(x=>x.key===secKey).map(sec=>({
-          key:sec.key, name:sec.name, tag:sec.tag }));
+        const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{};
+        const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
+          const list=sec.checklist||[];
+          const n=list.filter(it=>fbDone[it.id]).length;
+          return {
+            key:sec.key, name:sec.name, tag:sec.tag,
+            empty:!list.length, hasList:!!list.length,
+            doneLabel:n+'/'+list.length+' LOGGED',
+            doneInk:n===0?'#8f8f99':(n===list.length?'#6cffba':'#e8b45a'),
+            clear:()=>this.clearForgeFB(),
+            list:list.map(it=>{
+              const on=!!fbDone[it.id];
+              return { name:it.name, target:it.target, load:!!it.load,
+                tick:on?'✓':'', ink:on?'#8f8f99':'#dbdbe0', strike:on?'line-through':'none',
+                boxBg:on?'#6cffba':'transparent', boxBd:on?'#6cffba':'rgba(255,255,255,0.22)',
+                weight:fbW[it.id]!=null?fbW[it.id]:'',
+                setWeight:(e)=>this.setForgeFBWeight(it.id,e),
+                toggle:()=>this.toggleForgeFBItem(it) };
+            })
+          };
+        });
         const wk=F.weakest(sc,5).map(w=>({ name:w.name, where:w.group, tierName:tierName(w.tier).toUpperCase() }));
         /* Progress. An assessment you cannot compare with the last one measures nothing,
            so the history is drawn rather than just stored. Bars are scaled to the best
