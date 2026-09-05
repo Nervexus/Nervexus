@@ -93,7 +93,9 @@
     opts = opts || {};
     if (H._v2) { // already migrated — still backfill newer fields
       if (!H.diet || !H.diet.length) H.diet = defaultDiet();
-      if (!H.energyLog || !H.energyLog.length) seedEnergyOnly(H);
+      // An empty energy log used to be refilled with 78 days of invented entries here, on
+      // every load after the first. Empty means empty.
+      H.energyLog = H.energyLog || [];
       return H;
     }
     // preserve legacy fields the rest of the app still reads
@@ -110,104 +112,15 @@
     H.diet = H.diet || defaultDiet();
     H.energyLog = H.energyLog || [];
 
-    if (opts.seed && !H.sleepLog.length && !H.bodyLog.length) seed(H);
     H._v2 = true;
     return H;
   }
 
-  function seed(H) {
-    var N = 78; // ~11 weeks of history
-    // Body composition — realistic slow recomposition: weight & fat down, muscle up.
-    var w0 = 84.6, bf0 = 17.8, mm0 = 60.4;
-    var base = { neck: 39.5, shoulders: 122, chest: 104, armL: 37.6, armR: 38.1, forearmL: 29.4, forearmR: 29.8, waist: 87, hips: 100, thighL: 60.5, thighR: 61, calfL: 39.2, calfR: 39.4, ankleL: 23, ankleR: 23 };
-    var bodyLog = [];
-    // body snapshots roughly every 4–5 days
-    for (var d = N; d >= 0; d -= (Math.random() < 0.5 ? 4 : 5)) {
-      var t = (N - d) / N; // 0..1 progress
-      var wob = Math.sin(d * 0.7) * 0.25;
-      var snap = {
-        date: shift(-d),
-        weightKg: round(w0 - t * 3.9 + wob, 1),
-        bodyFatPct: round(bf0 - t * 4.1 + Math.sin(d * 0.5) * 0.2, 1),
-        muscleKg: round(mm0 + t * 2.7 + Math.sin(d * 0.9) * 0.15, 1)
-      };
-      MEASURES.forEach(function (m) {
-        var dir = /waist|hips/.test(m.key) ? -1 : 1;      // waist/hips shrink; limbs grow
-        var span = /waist/.test(m.key) ? 5.5 : /hips/.test(m.key) ? 2.5 : /chest|shoulders/.test(m.key) ? 3.2 : /thigh/.test(m.key) ? 2.4 : /arm|forearm|calf/.test(m.key) ? 1.7 : 0.6;
-        snap[m.key] = round(base[m.key] + dir * t * span + Math.sin(d + m.key.length) * 0.15, 1);
-      });
-      bodyLog.push(snap);
-    }
-    H.bodyLog = bodyLog;
-    // keep legacy quick-read fields in sync with the latest snapshot
-    var last = bodyLog[bodyLog.length - 1];
-    H.bodyFat = last.bodyFatPct; H.muscleMass = last.muscleKg; H.waist = last.waist;
-    H.weights = bodyLog.slice(-14).map(function (b) { return b.weightKg; });
-    H.bmi = round(last.weightKg / Math.pow(H.heightCm / 100, 2), 1);
-
-    // Sleep — nightly log with weekend drift & quality/energy correlation.
-    var sleepLog = [];
-    for (var s = N; s >= 0; s--) {
-      var date = shift(-s);
-      var dow = new Date(date + 'T12:00:00').getDay();
-      var weekend = (dow === 5 || dow === 6);
-      var dur = clamp(rnd(6.2, 8.4) + (weekend ? 0.5 : 0), 5, 9.3);
-      var hours = Math.floor(dur), minutes = Math.round((dur - hours) * 60);
-      var bh = weekend ? 0 : 23, bm = Math.floor(rnd(0, 55));
-      var bed = String((bh + (Math.random() < 0.35 ? 1 : 0)) % 24).padStart(2, '0') + ':' + String(bm).padStart(2, '0');
-      var wkMin = Math.round((bh * 60 + bm + dur * 60)) % (24 * 60);
-      var wake = String(Math.floor(wkMin / 60)).padStart(2, '0') + ':' + String(wkMin % 60).padStart(2, '0');
-      var quality = Math.round(clamp(dur * 1.05 + rnd(-1.3, 1.3), 3, 10));
-      var energy = Math.round(clamp(quality + rnd(-1.5, 1.2), 2, 10));
-      sleepLog.push({ id: uid(), date: date, hours: hours, minutes: minutes, bedtime: bed, wake: wake, quality: quality, energy: energy, notes: '' });
-    }
-    H.sleepLog = sleepLog;
-    H.sleepH = sleepLog.slice(-7).map(function (x) { return round(x.hours + x.minutes / 60, 1); });
-
-    // Hydration — 4–8 entries/day around the goal.
-    var hyd = [];
-    var goal = H.hydrationGoalMl;
-    for (var q = N; q >= 0; q--) {
-      var day = shift(-q);
-      var target = goal * rnd(0.72, 1.12);
-      var pored = 0, n = 0;
-      while (pored < target && n < 9) {
-        var amt = [250, 300, 350, 500, 500, 750][Math.floor(Math.random() * 6)];
-        var hh = 7 + Math.floor(n * rnd(1.4, 2.2));
-        if (hh > 23) break;
-        hyd.push({ id: uid(), date: day, ml: amt, time: String(hh).padStart(2, '0') + ':' + String(Math.floor(rnd(0, 59))).padStart(2, '0') });
-        pored += amt; n++;
-      }
-    }
-    H.hydrationLog = hyd;
-    H.water = Math.round(dayHydration(H, today()) / 250);
-
-    // Goals seeded from a sensible target relative to current.
-    H.goals = {
-      weightKg: 79, bodyFatPct: 11, muscleKg: 65, hydrationMl: goal, sleepH: 8,
-      chest: 108, waist: 80, arm: 40, leg: 63, calf: 41
-    };
-    // Today's manual extras
-    H.todayExtra = { date: today(), steps: 8420, activeKcal: 620, workoutMin: 52, carbs: 210, fat: 62, fibre: 28, sugar: 44 };
-
-    // Energy — three slots/day, loosely correlated with sleep quality that night.
-    seedEnergyOnly(H, sleepLog);
-  }
-
-  function seedEnergyOnly(H, sleepLogArg) {
-    var N = 78;
-    var sleepLog = sleepLogArg || H.sleepLog || [];
-    var sleepByDate = {}; sleepLog.forEach(function (s) { sleepByDate[s.date] = s; });
-    var energyLog = [];
-    for (var e = N; e >= 0; e--) {
-      var eDate = shift(-e);
-      var sEntry = sleepByDate[eDate];
-      var base = sEntry ? clamp(sEntry.quality * 0.8 + 1.5, 3, 9.5) : rnd(4.5, 8);
-      var mkSlot = function (drift) { var v = Math.round(clamp(base + drift + rnd(-1.1, 1.1), 1, 10)); return { val: v, note: '' }; };
-      energyLog.push({ date: eDate, morning: mkSlot(0.6), midday: mkSlot(-1.8), evening: mkSlot(-0.3) });
-    }
-    H.energyLog = energyLog;
-  }
+  /* The demo generator lived here: 78 days of invented sleep, hydration, energy and body
+     composition, plus 8,420 steps and a 52-minute workout for today. It ran for any account
+     with no history, which is every new account, and everything downstream then reported it
+     as fact. Deleted rather than switched off — an option that fabricates a history is not
+     one worth keeping around. */
 
   /* ---- derived series ------------------------------------------------- */
   function bySorted(arr) { return (arr || []).slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; }); }
@@ -307,7 +220,7 @@
     CONV: CONV, MEASURES: MEASURES, STATS: STATS,
     toDisplay: toDisplay, toCanonical: toCanonical, fmtMass: fmtMass, fmtLen: fmtLen, fmtVol: fmtVol,
     DIET_FOODS: DIET_FOODS, defaultDiet: defaultDiet,
-    ensure: ensure, seed: seed,
+    ensure: ensure,
     bySorted: bySorted, dayHydration: dayHydration, sleepDur: sleepDur,
     dailyHydrationSeries: dailyHydrationSeries, sleepSeries: sleepSeries, bodySeries: bodySeries,
     regression: regression, etaDays: etaDays, sleepConsistency: sleepConsistency, consistencyLabel: consistencyLabel,

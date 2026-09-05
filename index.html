@@ -303,7 +303,7 @@
 <script src="notif-engine.js?v=1"></script>
 <script src="voice-engine.js?v=3"></script>
 <script src="providers-data.js?v=1"></script>
-<script src="health-tracker.js?v=1"></script>
+<script src="health-tracker.js?v=12"></script>
 <script src="learning-maths.js?v=1"></script>
 <script src="learning-english.js?v=5"></script>
 <script src="learning-science.js?v=3"></script>
@@ -9356,7 +9356,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-253 · v11.253 log-form-guard';
+const NOTIF_BUILD_VERSION = '2026.09.04-254 · v11.254 no-invented-data';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9402,7 +9402,7 @@ class Component extends DCLogic {
       newFitChecklistTitle:'', activeFitChecklistId: s.activeFitChecklistId || '', newFitChecklistItemDraft:'',
       missions: s.missions || [],
       missionHistory: s.missionHistory || [],
-      missionXP: s.missionXP!=null ? s.missionXP : 80,
+      missionXP: s.missionXP!=null ? s.missionXP : 0,   // was 80 XP from nowhere
       loginStreak: s.loginStreak||0, lastLoginDate: s.lastLoginDate||'', loginXPLog: s.loginXPLog||[],
       perfLogs: s.perfLogs||[], perfHolidays: s.perfHolidays||[], perfStatus: s.perfStatus||{missStreak:0,banned:false,bannedAt:null,warnedAt:null,appealStatus:'none',appealText:'',appealAt:null},
       perfDraftWhat:'', perfDraftDuration:'', perfDraftBenefit:'', perfDraftLearned:'', perfDraftTrained:true, perfDraftImprovement:'', perfDraftRating:0, perfSubmitErr:'',
@@ -9418,7 +9418,8 @@ class Component extends DCLogic {
       wiNews:[], wiNewsAt:0, wiNewsLoading:false, wiNewsErr:'',
       moneyNewsLoading:false, lawNewsLoading:false, moneyNewsErr:'', lawNewsErr:'',
       missGenOpen:false, missGenCat:null, missGenLoading:false, missGenErr:'', missGenResult:null,
-      move: s.move || { streak:13, last:yestC, longest:21 },
+      // Was a 13-day streak and a 21-day record, for someone who had not moved yet.
+      move: s.move || { streak:0, last:'', longest:0 },
       lastRollover: s.lastRollover || todayC,
       // No seeded workouts. These five were timestamped relative to now, so they never aged out:
       // a user who had logged nothing still saw the anatomy model glowing on legs and core,
@@ -9463,7 +9464,12 @@ activities: this._mergeShipLog(s.activities),
       notifs:[], notifOpen:false, toasts:[], notifPreview:[],
       notifTestScheduled:[], testScheduleCat:'system', testScheduleMin:1, notifHistory:[], notifHistoryFilter:'all', notifHistoryLoading:false, notifHistoryErr:'', reminderTickLoading:false, reminderTickResult:null, calendarTestResult:'', missionsTestResult:'',
       searchOpen:false, searchQuery:'', searchWebResult:'', searchWebErr:'', searchWebLoading:false, vp:{loaded:false,playing:false,paused:false,pct:0,timeLabel:'0:00',totalLabel:'0:00',remainLabel:'0:00',title:'',count:0}, vtx:s.vtx||[], memories:s.memories||[], readText:'', readTitle:'', importErr:'', importing:false, dragOver:false, provView:'ai', provSearch:'', intelCat:'All', provDraft:{}, provExpanded:{}, aiBrief:null, aiBriefLoading:false, aiBriefErr:'', aiBriefProvider:'', aiBriefStamp:'', vtx:[], vInput:'',
-      health: s.health || { water:5, waterGoal:8, kcalGoal:2400, proteinGoal:180, meals:[{name:'Oatmeal & berries',kcal:420,protein:18},{name:'Chicken & rice bowl',kcal:640,protein:52},{name:'Protein shake',kcal:240,protein:38}], sleepH:[7.2,6.8,7.9,7.4,8.1,6.5,7.7], weights:[83.4,83.1,82.8,82.9,82.4,82.1,81.8], recovery:82, soreness:'Low', stress:'Low', energy:'High', mood:'Focused', bodyFat:14.2, muscleMass:63.5, bmi:22.8, waist:81 },
+      /* Nothing invented. This used to open with five glasses drunk, three meals eaten, a week
+         of sleep and bodyweight, 82% recovery and a 14.2% body fat — none of it logged by
+         anyone. The goals stay because a goal is a setting, not a claim about what you did. */
+      health: s.health || { water:0, waterGoal:8, kcalGoal:2400, proteinGoal:180, meals:[],
+        sleepH:[], weights:[], recovery:null, soreness:'', stress:'', energy:'', mood:'',
+        bodyFat:null, muscleMass:null, bmi:null, waist:null },
       mealName:'', mealKcal:'', mealProtein:'', weightInput:'',
       healthSub:'overview',
       slp:{h:'',m:'',bed:'',wake:'',qual:7,energy:7,notes:''}, slpEditId:null,
@@ -9983,7 +9989,7 @@ activities: this._mergeShipLog(s.activities),
       if(this._lastSyncedWiRoutes!==S.wiRoutes){ this._lastSyncedWiRoutes=S.wiRoutes; this._debounce('sbWiRoutes', ()=>window.SB.upsert('world_intel_routes', {user_id:this.state.authUserId, data:this.state.wiRoutes||[]}, 'user_id').then(r=>{ if(r&&r.error) console.error('[sb] world intel routes save failed', r.error); })); }
     }
   }
-  _hkEnsure(){ if(this._hkReady) return; if(!window.HealthKit){ if(!this._hkWait){ this._hkWait=setInterval(()=>{ if(window.HealthKit){ clearInterval(this._hkWait); this._hkWait=null; this._hkEnsure(); } },120); } return; } this._hkReady=true; let H=window.HealthKit.ensure(this.state.health||{}, {seed:true}); if(!H._energyLogCleared){ H={...H, energyLog:[], _energyLogCleared:true}; } this.mut(()=>({health:H})); }
+  _hkEnsure(){ if(this._hkReady) return; if(!window.HealthKit){ if(!this._hkWait){ this._hkWait=setInterval(()=>{ if(window.HealthKit){ clearInterval(this._hkWait); this._hkWait=null; this._hkEnsure(); } },120); } return; } this._hkReady=true; let H=window.HealthKit.ensure(this.state.health||{}); if(!H._energyLogCleared){ H={...H, energyLog:[], _energyLogCleared:true}; } this.mut(()=>({health:H})); }
   _setH(patch){ this.mut(s=>({health:{...s.health, ...patch}})); }
   // Icon/color per notification category — covers both the app's formal category
   // taxonomy (notification-engine.js CATEGORIES) and a couple of legacy labels
@@ -13872,6 +13878,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.254', date:'Sep 4, 2026', major:true, notes:[
+      'Removed the invented data. The app used to open with eleven weeks of sleep, hydration, energy and body-composition history that nobody had entered, plus five glasses of water, three meals, 82% recovery, 14.2% body fat, 8,420 steps, a 52-minute workout, a 13-day movement streak and 80 XP.',
+      'The energy log was also being refilled with made-up entries every time you loaded the app after the first. That is gone too.',
+      'Your health score is now blank until there is something real to score, rather than a number built on figures nobody logged. Goals are kept \u2014 a goal is a setting, not a claim about what you did.',
+    ]},
     {version:'v11.253', date:'Sep 4, 2026', notes:[
       'Fixed: ticking something on the Full Body checklist wiped whatever you had half-typed into Fitness HQ\u2019s Log Training form. The same was true of anything logged by voice.',
     ]},
@@ -15539,7 +15550,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const H=this.state.health, K=window.HealthKit; if(!H||!K) return;
     const kcalT=(H.meals||[]).reduce((a,m)=>a+(+m.kcal||0),0);
     const avgSleep7=K.avg(K.sleepSeries(H,7).map(x=>x.hours))||0;
-    const g1=this.root.querySelector('[data-hgauge="recovery"]'); if(g1) this.startHGauge(g1,(H.recovery||0)/100,'#FFFFFF',(H.recovery||0)+'%');
+    const g1=this.root.querySelector('[data-hgauge="recovery"]'); if(g1) this.startHGauge(g1,(H.recovery||0)/100,'#FFFFFF',H.recovery!=null?(H.recovery+'%'):'—');
     const g2=this.root.querySelector('[data-hgauge="sleep"]'); if(g2) this.startHGauge(g2,Math.min(1,avgSleep7/8),'#9a9aa2',avgSleep7.toFixed(1));
     const g3=this.root.querySelector('[data-hgauge="kcal"]'); if(g3) this.startHGauge(g3,Math.min(1,kcalT/(H.kcalGoal||2400)),'#e8e8ec',Math.round(kcalT/(H.kcalGoal||2400)*100)+'%');
     const todayMl=K.dayHydration(H,K.today()); const goalMl=H.hydrationGoalMl||2000;
@@ -17886,17 +17897,29 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       bizLoading:!!S.bizLoading, bizSendLabel:S.bizLoading?'…':'Send', bizSendOpacity:S.bizLoading?'0.5':'1',
 
       // ===== HEALTH CENTRE =====
-      ...this._safe(()=>{ const H=S.health; const kcalTotal=H.meals.reduce((a,m)=>a+(+m.kcal||0),0); const proteinTotal=H.meals.reduce((a,m)=>a+(+m.protein||0),0); const remKcal=Math.max(0,kcalTotal-proteinTotal*4); const carbs=Math.round(remKcal*0.55/4); const fat=Math.round(remKcal*0.45/9); const lastSleep=H.sleepH[H.sleepH.length-1]; const avgSleep=(H.sleepH.reduce((a,b)=>a+b,0)/H.sleepH.length); const curWeight=H.weights[H.weights.length-1]; const sc=Math.round((H.recovery*0.3)+(Math.min(100,avgSleep/8*100)*0.25)+(Math.min(100,kcalTotal/H.kcalGoal*100)*0.15)+(Math.min(100,H.water/H.waterGoal*100)*0.15)+((100-H.bodyFat*3)*0.15));
+      ...this._safe(()=>{ const H=S.health; const kcalTotal=H.meals.reduce((a,m)=>a+(+m.kcal||0),0); const proteinTotal=H.meals.reduce((a,m)=>a+(+m.protein||0),0); const remKcal=Math.max(0,kcalTotal-proteinTotal*4); const carbs=Math.round(remKcal*0.55/4); const fat=Math.round(remKcal*0.45/9); const sleeps=(H.sleepH||[]).filter(v=>v!=null&&!isNaN(v)); const wts=(H.weights||[]).filter(v=>v!=null&&!isNaN(v));
+        const lastSleep=sleeps.length?sleeps[sleeps.length-1]:null; const avgSleep=sleeps.length?(sleeps.reduce((a,b)=>a+b,0)/sleeps.length):null; const curWeight=wts.length?wts[wts.length-1]:null;
+        /* Score only what has been measured, and rescale to the weights that applied — a
+           missing input used to make the whole thing NaN, and before that the seed data hid
+           the problem by never letting anything be missing. No inputs, no score. */
+        const parts=[];
+        if(H.recovery!=null) parts.push([0.30, H.recovery]);
+        if(avgSleep!=null) parts.push([0.25, Math.min(100, avgSleep/8*100)]);
+        if(H.kcalGoal>0) parts.push([0.15, Math.min(100, kcalTotal/H.kcalGoal*100)]);
+        if(H.waterGoal>0) parts.push([0.15, Math.min(100, (H.water||0)/H.waterGoal*100)]);
+        if(H.bodyFat!=null) parts.push([0.15, Math.max(0, 100-H.bodyFat*3)]);
+        const wsum=parts.reduce((a,x)=>a+x[0],0);
+        const sc=wsum?Math.round(parts.reduce((a,x)=>a+x[0]*x[1],0)/wsum):null;
         const sig=(v)=>v==='High'?['86%','#6cffba']:v==='Focused'?['84%','#6cffba']:v==='Moderate'?['58%','#ffd66b']:v==='Low'?['22%','#6cffba']:v==='Elevated'?['72%','#ff5563']:['50%','#9a9aa2'];
-        const mkAdvice=(topic)=>{ if(topic==='sleep') return 'Your 7-day sleep average is '+avgSleep.toFixed(1)+'h with 88% quality. Aim for a consistent 23:00 bedtime — pushing average past 7.5h would lift recovery and next-day focus measurably.'; if(topic==='nutrition') return 'You\u2019re at '+kcalTotal+' of '+H.kcalGoal+' kcal and '+proteinTotal+'g protein. To support lean mass, target ~'+H.proteinGoal+'g protein — you\u2019re '+Math.max(0,H.proteinGoal-proteinTotal)+'g short. Add a lean protein source at your next meal.'; if(topic==='hydration') return 'Hydration is '+H.water+' of '+H.waterGoal+' glasses. Front-load water earlier in the day; even mild dehydration can dent recovery and cognitive performance.'; return 'Recovery is '+(H.recovery||0)+'% with '+(H.soreness||'moderate').toLowerCase()+' soreness and '+(H.energy||'moderate').toLowerCase()+' energy. Sleep ('+avgSleep.toFixed(1)+'h avg) and protein ('+proteinTotal+'g) are your biggest levers today. Hydration at '+H.water+'/'+H.waterGoal+' — a glass now keeps you on pace. Overall health score '+sc+'/100.'; };
-        return { healthScore:sc, curWeight:curWeight!=null?curWeight.toFixed(1):'—', lastSleep:lastSleep!=null?lastSleep.toFixed(1):'—', avgSleep:(avgSleep||0).toFixed(1), kcalTotal, kcalGoal:H.kcalGoal, proteinTotal,
+        const mkAdvice=(topic)=>{ if(topic==='sleep') return avgSleep==null ? 'No sleep logged yet, so there is nothing to average. Log a few nights and this will tell you where you actually stand.' : ('Your sleep average across '+sleeps.length+' logged night'+(sleeps.length===1?'':'s')+' is '+avgSleep.toFixed(1)+'h. Aim for a consistent 23:00 bedtime \u2014 pushing the average past 7.5h would lift recovery and next-day focus measurably.'); if(topic==='nutrition') return 'You\u2019re at '+kcalTotal+' of '+H.kcalGoal+' kcal and '+proteinTotal+'g protein. To support lean mass, target ~'+H.proteinGoal+'g protein — you\u2019re '+Math.max(0,H.proteinGoal-proteinTotal)+'g short. Add a lean protein source at your next meal.'; if(topic==='hydration') return 'Hydration is '+H.water+' of '+H.waterGoal+' glasses. Front-load water earlier in the day; even mild dehydration can dent recovery and cognitive performance.'; return 'Recovery is '+(H.recovery!=null?H.recovery+'%':'not logged')+(H.soreness?(' with '+H.soreness.toLowerCase()+' soreness'):'')+(H.energy?(' and '+H.energy.toLowerCase()+' energy'):'')+'. Sleep ('+(avgSleep!=null?avgSleep.toFixed(1)+'h avg':'none logged')+') and protein ('+proteinTotal+'g) are your biggest levers today. Hydration at '+(H.water||0)+'/'+H.waterGoal+' \u2014 a glass now keeps you on pace.'+(sc!=null?(' Overall health score '+sc+'/100.'):' Log recovery, sleep or body fat and this gets a score.'); };
+        return { healthScore:sc!=null?sc:'—', curWeight:curWeight!=null?curWeight.toFixed(1):'—', lastSleep:lastSleep!=null?lastSleep.toFixed(1):'—', avgSleep:avgSleep!=null?avgSleep.toFixed(1):'—', kcalTotal, kcalGoal:H.kcalGoal, proteinTotal,
           macros:[{label:'PROTEIN',val:proteinTotal+'g',c:'#ff5563'},{label:'CARBS',val:carbs+'g',c:'#eef0f2'},{label:'FAT',val:fat+'g',c:'#9a9aa2'}],
           mealList:H.meals.map((m,idx)=>({name:m.name, kcal:m.kcal, protein:m.protein, remove:()=>{ this.mut(s=>({health:{...s.health,meals:s.health.meals.filter((_,j)=>j!==idx)}})); if(this._sbOn() && m.id) window.SB.remove('meals',m.id); }})),
           mealName:S.mealName, setMealName:(e)=>this.setState({mealName:e.target.value}), mealKcal:S.mealKcal, setMealKcal:(e)=>this.setState({mealKcal:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,4)}), mealProtein:S.mealProtein, setMealProtein:(e)=>this.setState({mealProtein:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,3)}),
           addMeal:()=>this.addMeal(),
           waterPlus:()=>this.mut(s=>({health:{...s.health,water:Math.min(20,s.health.water+1)}})), waterMinus:()=>this.mut(s=>({health:{...s.health,water:Math.max(0,s.health.water-1)}})),
-          recSignals:[{label:'Muscle soreness',v:H.soreness,w:sig(H.soreness)[0],c:sig(H.soreness)[1]},{label:'Stress',v:H.stress,w:sig(H.stress)[0],c:sig(H.stress)[1]},{label:'Energy',v:H.energy,w:sig(H.energy)[0],c:sig(H.energy)[1]},{label:'Mood',v:H.mood,w:sig(H.mood)[0],c:sig(H.mood)[1]}],
-          bodyFat:H.bodyFat, muscleMass:H.muscleMass, bmi:H.bmi, waist:H.waist,
+          recSignals:[['Muscle soreness',H.soreness],['Stress',H.stress],['Energy',H.energy],['Mood',H.mood]].map(r=>({label:r[0], v:r[1]||'—', w:r[1]?sig(r[1])[0]:'0%', c:r[1]?sig(r[1])[1]:'#6f6f78'})),
+          bodyFat:H.bodyFat!=null?H.bodyFat:'—', muscleMass:H.muscleMass!=null?H.muscleMass:'—', bmi:H.bmi!=null?H.bmi:'—', waist:H.waist!=null?H.waist:'—',
           weightInput:S.weightInput, setWeightInput:(e)=>this.setState({weightInput:(e.target.value||'').replace(/[^0-9.]/g,'').slice(0,5)}),
           addWeight:()=>this.addWeight(),
           addWeightKey:enterKey(()=>this.addWeight()),
