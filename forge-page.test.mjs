@@ -309,8 +309,8 @@ t('every section is an empty page', async () => {
       ok(!body.includes(ghost), key + ' is still showing ' + ghost);
     }
   }
-  const figs = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
-  eq(figs, 0, 'the chart markup is still on the page');
+  const cards = await page.evaluate(() => document.querySelectorAll('.cc-scene .cc-glowcard').length);
+  eq(cards, 2, 'a section should be the sidebar and one empty card, got ' + cards);
 });
 
 t('every section is listed, marked with the house crest and not a number', async () => {

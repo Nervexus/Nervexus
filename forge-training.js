@@ -3,11 +3,11 @@
    The Training centre is built from sections. The page renders whatever is in SECTIONS, so
    a new section is a data change rather than a page rewrite.
 
-   Each section carries a chart of ways to train it and the tools that do the job. Every
-   exercise names a figure in forge-hand-figures.js, a level, and a dose — an exercise
-   without a dose is a suggestion, not training. `risk` is loading information, not a
-   disclaimer: grip is the easiest thing in the body to overtrain into tendinopathy,
-   because strength climbs faster than the tendon behind it. */
+   A section will carry a chart of ways to train it and the tools that do the job. None of
+   them do yet — every entry here is a stub, and the page renders it as an empty page. When
+   the first chart lands: every exercise needs a dose, because an exercise without one is a
+   suggestion rather than training, and `risk` is loading information rather than a
+   disclaimer. */
 (function (root) {
   // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
   if (root.ForgeTraining) return;
