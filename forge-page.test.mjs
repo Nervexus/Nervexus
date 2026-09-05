@@ -416,6 +416,35 @@ t('a weight typed on the checklist is the weight logged', async () => {
   eq(await page.evaluate(() => window.__nvx.state.workouts[0].weight), 80, 'the typed weight was not used');
 });
 
+t('ticking does not wipe what is half-typed in the Fitness HQ form', async () => {
+  /* addWorkout empties those fields after a log, which is right when the form is the caller
+     and wrong when anything else is — it threw away an entry mid-typing. */
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setState({
+    woEx: 'Incline press', woWeight: '60', woSets: '3', woReps: '8' }));
+  await page.waitForTimeout(300);
+  await tick('Back squat');
+  await page.waitForTimeout(700);
+  const form = await page.evaluate(() => {
+    const s = window.__nvx.state;
+    return { ex: s.woEx, wt: s.woWeight, sets: s.woSets, reps: s.woReps };
+  });
+  eq(form.ex, 'Incline press', 'the half-typed exercise was wiped');
+  eq(form.wt, '60', 'the half-typed weight was wiped');
+  eq(form.sets, '3', 'the half-typed sets were wiped');
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'and it should still have logged');
+});
+
+t('the Fitness HQ form still clears itself when it is the one logging', async () => {
+  await boot({ scene: 'fitness' });
+  await page.evaluate(() => window.__nvx.setState({
+    woPart: 'Chest', woEx: 'Incline press', woWeight: '60', woSets: '3', woReps: '8' }));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.addWorkout({}));
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.woEx), '', 'the form kept its contents after logging');
+});
+
 t('unticking takes the set back out of the log', async () => {
   await openFullBody();
   await tick('Bench press');

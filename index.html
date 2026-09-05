@@ -9356,7 +9356,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-252 · v11.252 session-schedule';
+const NOTIF_BUILD_VERSION = '2026.09.04-253 · v11.253 log-form-guard';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13872,6 +13872,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.253', date:'Sep 4, 2026', notes:[
+      'Fixed: ticking something on the Full Body checklist wiped whatever you had half-typed into Fitness HQ\u2019s Log Training form. The same was true of anything logged by voice.',
+    ]},
     {version:'v11.252', date:'Sep 4, 2026', notes:[
       'The Full Body session now repeats daily, weekly, or on a day you pick. Daily clears at midnight, weekly on a Monday.',
       'Pick a day and it appears on your calendar. Move the day and the event moves with it; switch back to daily or weekly and it comes off again.',
@@ -15636,7 +15639,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const list=names.length?names:[exRaw];
     const ts=Date.now();
     const entries=list.map((ex,i)=>({ id:this._uuid(), part:forcedPart||this._guessBodyPart(ex), exercise:ex, min:mn, weight:wt, unit, sets:st, reps:rp, dist, distUnit, ts:ts-i }));
-    this.mut(s=>({workouts:[...s.workouts,...entries],woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}));
+    /* Only the Fitness HQ form gets emptied, and only when it is the caller. A named exercise
+       means someone else logged this — the Full Body checklist, or the voice assistant — and
+       clearing the form then throws away an entry the user was halfway through typing. */
+    const fromForm=(o.exercise==null);
+    this.mut(s=>Object.assign({workouts:[...s.workouts,...entries]},
+      fromForm?{woEx:'',woMin:'',woWeight:'',woSets:'',woReps:''}:{}));
     if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString()}));
     if(bw>0){ this.setState({woBodyWeight:''}); this.addWeight(bw); }
     // Returned so a caller that logged on someone's behalf can take it back again — the
