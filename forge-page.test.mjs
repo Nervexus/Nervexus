@@ -779,6 +779,177 @@ t('an added exercise ticks and logs like any other', async () => {
   eq(w[0].part, 'Chest', 'it logged against the wrong body part');
 });
 
+/* ---- the weight and reps steppers on a pool block ---- */
+
+/* A stepper belongs to one exercise, so it is addressed by walking up from the exercise's
+   name to its card. The name renders inside a span.sc-interp, so the card is found with
+   closest() rather than by climbing parents. */
+const stepClick = (name, label, sign) => page.evaluate(([n, l, g]) => {
+  const title = [...document.querySelectorAll('span')]
+    .find(e => e.children.length === 0 && e.textContent.trim() === n);
+  if (!title) throw new Error('no block for ' + n);
+  const card = title.closest('.cc-glowcard');
+  const row = [...card.querySelectorAll('div')]
+    .find(r => { const s = r.querySelector('span'); return s && s.textContent.trim() === l; });
+  if (!row) throw new Error('no ' + l + ' row on ' + n);
+  const btn = [...row.querySelectorAll('span')]
+    .filter(e => e.children.length === 0 && e.textContent.trim() === g)[0];
+  if (!btn) throw new Error('no ' + g + ' button on the ' + l + ' row');
+  btn.click();
+}, [name, label, sign]);
+
+const stepVal = (name, label) => page.evaluate(([n, l]) => {
+  const title = [...document.querySelectorAll('span')]
+    .find(e => e.children.length === 0 && e.textContent.trim() === n);
+  const card = title.closest('.cc-glowcard');
+  const row = [...card.querySelectorAll('div')]
+    .find(r => { const s = r.querySelector('span'); return s && s.textContent.trim() === l; });
+  const spans = [...row.querySelectorAll('span')].filter(e => e.children.length === 0);
+  const i = spans.findIndex(e => e.textContent.trim() === '−');
+  return spans[i + 1].textContent.trim();
+}, [name, label]);
+
+const MINUS = '−';
+
+t('every pool block carries a weight and a reps stepper', async () => {
+  await openChest();
+  const n = await addBtns();
+  const counts = await page.evaluate(() => {
+    const t = (s) => [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === s).length;
+    return { w: t('WEIGHT'), r: t('REPS') };
+  });
+  eq(counts.w, n, 'not every block has a weight stepper');
+  eq(counts.r, n, 'not every block has a reps stepper');
+
+  /* Reps start on the pool's own figure; weight starts at bodyweight, because the app has
+     no business guessing what the user can lift. */
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  eq(await stepVal(src.name, 'REPS'), String(src.reps), 'reps did not start on the pool figure');
+  eq(await stepVal(src.name, 'WEIGHT'), 'BW', 'weight did not start at bodyweight');
+});
+
+t('stepping sets the numbers the exercise is added with', async () => {
+  await openChest();
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  await stepClick(src.name, 'WEIGHT', '+');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await stepClick(src.name, 'REPS', '+');
+  await page.waitForTimeout(600);
+  eq(await stepVal(src.name, 'WEIGHT'), '5kg', 'the weight did not step up in 2.5kg jumps');
+  eq(await stepVal(src.name, 'REPS'), String(src.reps + 1), 'the reps did not step up');
+
+  await page.evaluate(() => {
+    [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+  });
+  await page.waitForTimeout(700);
+  const st = await page.evaluate(() => window.__nvx.state.forgeFB);
+  eq(st.items[0].reps, src.reps + 1, 'the session took the pool reps, not the stepped ones');
+  eq(parseFloat(st.w[st.items[0].id]), 5, 'the chosen weight did not reach the session');
+});
+
+t('the chosen weight is what gets logged', async () => {
+  await openChest();
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  await stepClick(src.name, 'WEIGHT', '+');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+  });
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(700);
+  await tick(src.name);
+  await page.waitForTimeout(800);
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 1, 'ticking it logged nothing');
+  eq(w[0].weight, 10, 'the training log did not get the weight set on the block');
+});
+
+t('weight will not step below bodyweight and reps will not reach zero', async () => {
+  await openChest();
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  await stepClick(src.name, 'WEIGHT', MINUS);
+  await stepClick(src.name, 'WEIGHT', MINUS);
+  await page.waitForTimeout(500);
+  eq(await stepVal(src.name, 'WEIGHT'), 'BW', 'the weight went negative');
+  for (let i = 0; i < src.reps + 3; i++) await stepClick(src.name, 'REPS', MINUS);
+  await page.waitForTimeout(500);
+  eq(await stepVal(src.name, 'REPS'), '1', 'reps stepped down past one');
+});
+
+t('once added the steppers drive the session item itself', async () => {
+  /* Two places showing the same exercise must not be able to disagree, so after it is added
+     the block edits the session item rather than a private copy. */
+  await openChest();
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  await page.evaluate(() => {
+    [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+  });
+  await page.waitForTimeout(700);
+  await stepClick(src.name, 'REPS', '+');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await page.waitForTimeout(600);
+  const st = await page.evaluate(() => window.__nvx.state.forgeFB);
+  eq(st.items[0].reps, src.reps + 1, 'the session item did not follow the stepper');
+  eq(parseFloat(st.w[st.items[0].id]), 2.5, 'the session weight did not follow the stepper');
+  eq(await stepVal(src.name, 'REPS'), String(src.reps + 1), 'the block is showing a stale figure');
+
+  /* And the Full Body list shows the same numbers. */
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(800);
+  ok((await text()).includes((src.sets || 1) + ' × ' + (src.reps + 1)),
+    'the Full Body checklist is showing different numbers to the block');
+});
+
+t('the steppers freeze once the set is in the log', async () => {
+  await openChest();
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
+  await page.evaluate(() => {
+    [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+  });
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(700);
+  await tick(src.name);
+  await page.waitForTimeout(800);
+  await page.evaluate(() => window.__nvx.setForgeSection('chest'));
+  await page.waitForTimeout(700);
+
+  ok((await text()).includes('LOGGED'), 'the block does not say the set is logged');
+  await stepClick(src.name, 'REPS', '+');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await page.waitForTimeout(600);
+  const st = await page.evaluate(() => window.__nvx.state.forgeFB);
+  eq(st.items[0].reps, src.reps, 'a logged set was edited from the block');
+  eq(await stepVal(src.name, 'REPS'), String(src.reps), 'the block let a logged set change');
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 1, 'the log picked up a second entry');
+  eq(w[0].reps, src.reps, 'the logged entry drifted from what was logged');
+});
+
+t('the home list gets the same steppers', async () => {
+  await openChest();
+  await page.evaluate(() => window.__nvx.setForgePool('home'));
+  await page.waitForTimeout(700);
+  const n = await addBtns();
+  const w = await page.evaluate(() => [...document.querySelectorAll('span')]
+    .filter(e => e.children.length === 0 && e.textContent.trim() === 'WEIGHT').length);
+  eq(w, n, 'the home blocks are missing their steppers');
+  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.home[0]);
+  eq(await stepVal(src.name, 'WEIGHT'), 'BW', 'a bodyweight exercise should start at BW');
+  await stepClick(src.name, 'WEIGHT', '+');
+  await page.waitForTimeout(500);
+  eq(await stepVal(src.name, 'WEIGHT'), '2.5kg', 'a weighted press-up could not be set');
+});
+
 t('the pool does not appear on a section that has none', async () => {
   await boot({ forgeCentre: 'training' });
   for (const key of ['neck', 'calves']) {

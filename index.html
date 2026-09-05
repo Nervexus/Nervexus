@@ -3668,12 +3668,22 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </sc-for>
                     <span style="font-size:11.5px; color:#6f6f78;">{{ sec.poolHint }}</span>
                   </div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(196px,1fr)); gap:10px;">
+                  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(204px,1fr)); gap:10px;">
                     <sc-for list="{{ sec.poolList }}" as="x" hint-placeholder-count="20">
-                      <div class="cc-glowcard" style="border-radius:13px; padding:13px 14px; display:flex; flex-direction:column; gap:8px;">
+                      <div class="cc-glowcard" style="border-radius:13px; padding:13px 14px; display:flex; flex-direction:column; gap:7px;">
                         <div style="font-size:13px; color:#eef0f2; line-height:1.35;">{{ x.name }}</div>
+                        <sc-for list="{{ x.steps }}" as="st" hint-placeholder-count="2">
+                          <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                            <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.1px; color:#6f6f78;">{{ st.label }}</span>
+                            <span style="display:flex; align-items:center; gap:3px;">
+                              <span onClick="{{ st.dec }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:6px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">&#8722;</span>
+                              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ st.valInk }}; min-width:44px; text-align:center;">{{ st.val }}</span>
+                              <span onClick="{{ st.inc }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:6px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">+</span>
+                            </span>
+                          </div>
+                        </sc-for>
                         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99;">{{ x.target }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ x.targetInk }};">{{ x.target }}</span>
                           <span onClick="{{ x.add }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.8px; padding:5px 9px; border-radius:7px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
                         </div>
                       </div>
@@ -9505,7 +9515,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgePool:'gym', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -15945,17 +15955,60 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   /* Straight from a section's pool into the Full Body session, which is the daily checklist.
      Nothing is logged here — it joins the list, and ticking it there is what writes the set. */
-  addPoolToSession(ex, part){
+  addPoolToSession(ex, part, over){
     const f=this._fb();
     if((f.items||[]).some(i=>i.name.toLowerCase()===ex.name.toLowerCase())){
       this.showToast('fitness','Already in your session', ex.name); return;
     }
+    const o=over||{};
+    const reps=o.reps!=null?o.reps:(ex.reps||0);
+    const weight=o.weight!=null?o.weight:0;
     const it={ id:this._uuid(), name:ex.name, part:(this.FB_PARTS().indexOf(part)>=0?part:'Full'),
-      sets:ex.sets||0, reps:ex.reps||0, minutes:ex.minutes||0, dist:0, distUnit:'m' };
-    this.setState({forgeFB:{...f, items:[...(f.items||[]), it]}});
-    this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it));
+      sets:ex.sets||0, reps:reps, minutes:ex.minutes||0, dist:0, distUnit:'m' };
+    // The weight rides in the session's weight map, which is where ticking reads it from.
+    const w={...(f.w||{})}; if(weight>0) w[it.id]=String(weight);
+    this.setState({forgeFB:{...f, items:[...(f.items||[]), it], w}});
+    this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it)+(weight>0?' · '+weight+'kg':''));
   }
   setForgePool(k){ this.setState({forgePool:k}); }
+  /* The numbers on a pool block are yours to set before you add it — nothing is prescribed.
+     Once the exercise is in the session the same buttons drive the session item itself, so
+     the block and the checklist can never show different numbers. Once it is ticked they
+     stop: those reps are already sitting in the training log. */
+  POOL_STEP(field){ return field==='weight' ? 2.5 : 1; }
+  _poolKey(secKey, name){ return secKey+'|'+String(name||'').toLowerCase(); }
+  _poolClamp(field, v){
+    if(field==='weight') return Math.max(0, Math.min(500, Math.round(v*2)/2));
+    return Math.max(1, Math.min(100, Math.round(v)));
+  }
+  poolVals(secKey, ex, item){
+    if(item){
+      const f=this._fb();
+      return { reps:item.reps||0, weight:parseFloat((f.w||{})[item.id])||0 };
+    }
+    const d=(this.state.poolDraft||{})[this._poolKey(secKey, ex.name)]||{};
+    return { reps:d.reps!=null?d.reps:(ex.reps||0), weight:d.weight!=null?d.weight:0 };
+  }
+  stepPool(secKey, ex, item, field, dir){
+    const step=this.POOL_STEP(field)*dir;
+    if(item){
+      const f=this._fb();
+      if((f.done||{})[item.id]) return;   // logged already — untick it to change the numbers
+      if(field==='weight'){
+        const v=this._poolClamp('weight', (parseFloat((f.w||{})[item.id])||0)+step);
+        this.setState({forgeFB:{...f, w:{...(f.w||{}), [item.id]: v>0?String(v):''}}});
+      } else {
+        const v=this._poolClamp('reps', (item.reps||0)+step);
+        this.setState({forgeFB:{...f, items:(f.items||[]).map(i=>i.id===item.id?{...i, reps:v}:i)}});
+      }
+      return;
+    }
+    const key=this._poolKey(secKey, ex.name);
+    const cur=(this.state.poolDraft||{})[key]||{};
+    const base=(field==='weight') ? (cur.weight!=null?cur.weight:0) : (cur.reps!=null?cur.reps:(ex.reps||0));
+    const v=this._poolClamp(field, base+step);
+    this.setState(st=>({poolDraft:{...(st.poolDraft||{}), [key]:{...cur, [field]:v}}}));
+  }
   removeForgeFBItem(id){
     const f=this._fb(), done={...(f.done||{})};
     // Take its logged rows with it, or the log keeps sets belonging to an exercise that is gone.
@@ -18217,13 +18270,29 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               bd:pool===q[0]?'#eef0f2':'rgba(255,255,255,0.12)' })),
             poolHint:'Adds to your Full Body session',
             poolList:((sec.pool||{})[pool]||[]).map(x=>{
-              const inSession=(fb.items||[]).some(i=>i.name.toLowerCase()===x.name.toLowerCase());
-              return { name:x.name, target:(x.sets||1)+' × '+x.reps,
+              const item=(fb.items||[]).find(i=>i.name.toLowerCase()===x.name.toLowerCase());
+              const inSession=!!item, ticked=!!(item && fbDone[item.id]);
+              const v=this.poolVals(sec.key, x, item);
+              /* Frozen once ticked: the set is in the training log with these numbers, and
+                 editing them here would leave the two disagreeing. */
+              const stepIt=(field,dir)=>()=>{ if(!ticked) this.stepPool(sec.key, x, item, field, dir); };
+              const steps=[
+                {label:'WEIGHT', val:v.weight>0?(v.weight+'kg'):'BW'},
+                {label:'REPS', val:String(v.reps)}
+              ].map((st,i)=>({ label:st.label, val:st.val,
+                valInk:ticked?'#7c7c84':'#eef0f2',
+                ink:ticked?'#4a4a52':'#c9c9d2',
+                bd:ticked?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.16)',
+                cursor:ticked?'default':'pointer',
+                dec:stepIt(i===0?'weight':'reps',-1), inc:stepIt(i===0?'weight':'reps',1) }));
+              return { name:x.name, steps,
+                target:ticked?'LOGGED':((x.sets||1)+' SETS'),
+                targetInk:ticked?'#6cffba':'#8f8f99',
                 label:inSession?'ADDED':'+ ADD', cursor:inSession?'default':'pointer',
                 ink:inSession?'#6cffba':'#0d0d10',
                 bg:inSession?'transparent':'#eef0f2',
                 bd:inSession?'rgba(108,255,186,0.45)':'#eef0f2',
-                add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part); } };
+                add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part, v); } };
             }),
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
