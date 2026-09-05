@@ -187,56 +187,11 @@ t('the Forge opens on its home', async () => {
   await boot({ forgeCentre: 'home' });
   const body = await text();
   ok(/HOME/.test(body), 'a HOME tab should sit alongside TRAINING, MENTAL and HEALTH');
-});
-
-t('the home carries the training floor', async () => {
-  await boot({ forgeCentre: 'home' });
-  const body = await text();
-  for (const panel of ['Muscle Training Split', 'Anatomy', 'Log Training', 'MOVE', 'TRAIN TODAY', 'WEEK TOTAL', 'Strength Chart']) {
-    ok(body.includes(panel), panel + ' is missing from the Forge home');
-  }
-  ok(!/THE STANDARD/.test(body), 'the standards belong to Training, not the home');
-});
-
-t('the home is not shown on the other centres', async () => {
-  for (const centre of ['training', 'mental', 'health']) {
-    await boot({ forgeCentre: centre });
-    ok(!/Muscle Training Split/.test(await text()), 'the training floor leaked onto the ' + centre + ' centre');
-  }
-});
-
-t('the log on the Forge is the same log as Fitness HQ, not a second one', async () => {
-  await boot({ forgeCentre: 'home' });
-  /* The whole point of moving these cards rather than rebuilding them: one set of numbers.
-     A separate store would show different totals on two screens and both would look right. */
-  const seeded = await page.evaluate(() => window.__nvx.state.workouts.length);
-  const shown = await text();
-  ok(/Bench/.test(shown), 'the seeded sessions should already be listed on the Forge home');
-
-  await page.evaluate(() => window.__nvx.setState({
-    woPart: 'Chest', woEx: 'Incline press', woWeight: '60', woSets: '3', woReps: '8', woMin: '' }));
-  await page.waitForTimeout(400);
-  const clicked = await page.evaluate(() => {
-    const btn = [...document.querySelectorAll('span')].find(e => e.textContent.trim() === 'Log Set');
-    if (!btn) return false; btn.click(); return true;
-  });
-  ok(clicked, 'no Log Set button on the Forge home');
-  await page.waitForTimeout(900);
-
-  const after = await page.evaluate(() => window.__nvx.state.workouts);
-  eq(after.length, seeded + 1, 'the set should land in the shared workouts store');
-  ok(after.some(w => w.exercise === 'Incline press' || w.name === 'Incline press'),
-     'the logged set is not in the store: ' + JSON.stringify(after.slice(-1)));
-
-  /* Switch scene without re-booting — boot() re-seeds workouts, which would wipe the set
-     and make this assertion test the fixture instead of the store. */
-  await page.evaluate(() => window.__nvx.setState({ scene: 'fitness' }));
-  await page.waitForTimeout(900);
-  ok(/Incline press/.test(await text()), 'Fitness HQ must show the set logged on the Forge');
+  ok(/Nothing here yet/.test(body), 'the Home is cleared, so it lands on the empty state');
 });
 
 t('the 3D anatomy is revealed before anything measures it', async () => {
-  await boot({ forgeCentre: 'home' });
+  await boot({ scene: 'fitness' });
   /* The real defect: reattach() ran fit() while the mount was still display:none, so
      clientWidth was 0, the canvas locked to its 120px floor, and the model came back as a
      thumbnail against the left edge of a full-width card. Stub the engine and watch the
@@ -273,7 +228,7 @@ t('the 3D anatomy is revealed before anything measures it', async () => {
 });
 
 t('the drawn figure is put away whenever the model is up', async () => {
-  await boot({ forgeCentre: 'home' });
+  await boot({ scene: 'fitness' });
   await page.evaluate(() => {
     window.NervexusAnatomy3D = {
       supported: () => true, hasScene: () => true, isMounted: () => false,
@@ -293,41 +248,6 @@ t('the drawn figure is put away whenever the model is up', async () => {
   eq(st.model, 'block', 'the model mount should be visible');
   eq(st.drawn, 'none', 'the drawn fallback is showing underneath the model');
   eq(st.toggle, 'none', 'Front/Back belongs to the drawn figure and should be hidden');
-});
-
-t('the rings canvas is actually drawn on the Forge home', async () => {
-  await boot({ forgeCentre: 'home' });
-  await page.waitForTimeout(1200);
-  /* init_forge has to exist and run: the scene signature only watched `scene`, so switching
-     centre inside the Forge used to leave this canvas blank. */
-  const painted = await page.evaluate(() => {
-    const cv = document.querySelector('canvas[data-chart="fitRings"]');
-    if (!cv || !cv.width) return null;
-    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-    let on = 0;
-    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) on++;
-    return { w: cv.width, lit: on };
-  });
-  ok(painted, 'no rings canvas on the Forge home');
-  ok(painted.lit > 200, 'the rings canvas rendered blank: ' + JSON.stringify(painted));
-});
-
-t('leaving the home and coming back redraws the rings', async () => {
-  await boot({ forgeCentre: 'home' });
-  await page.waitForTimeout(900);
-  await page.evaluate(() => window.__nvx.setForgeCentre('training'));
-  await page.waitForTimeout(600);
-  await page.evaluate(() => window.__nvx.setForgeCentre('home'));
-  await page.waitForTimeout(1200);
-  const lit = await page.evaluate(() => {
-    const cv = document.querySelector('canvas[data-chart="fitRings"]');
-    if (!cv || !cv.width) return -1;
-    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
-    let on = 0;
-    for (let i = 3; i < d.length; i += 4) if (d[i] > 8) on++;
-    return on;
-  });
-  ok(lit > 200, 'the rings did not come back after switching centres: ' + lit + ' lit pixels');
 });
 
 /* ---- bindings: the failure mode here is silence, so assert on rendered text ---- */
@@ -353,42 +273,24 @@ t('the unit score header is gone', async () => {
 
 /* ---- the log integration the brief asked for ---- */
 
-t('the logs panel reads the real fitness and health logs', async () => {
-  await boot();
-  const body = await text();
-  const panel = body.split('FROM YOUR LOGS')[1].split('\n').slice(0, 12).join(' ');
-  ok(panel.includes(String(SEED.sessions)), 'sessions in the last 7 days: ' + panel);
-  ok(panel.includes('3/10'), 'regions trained should be 3 of 10: ' + panel);
-  ok(panel.includes('7.5h'), 'average sleep: ' + panel);
-  ok(panel.includes(SEED.bodyFat + '%'), 'body fat: ' + panel);
-  ok(panel.includes(SEED.weightKg + 'kg'), 'bodyweight: ' + panel);
-});
-
 /* ---- the three centres ---- */
 
 /* ---- expanding a group ---- */
 
 /* ---- recording an assessment ---- */
 
-t('an empty form records nothing rather than writing a blank assessment', async () => {
-  await boot();
-  await page.evaluate(() => window.__nvx.saveForgeScores());
-  await page.waitForTimeout(500);
-  eq(await page.evaluate(() => (window.__nvx.state.forgeHistory || []).length), 0, 'history entries after an empty save');
-});
-
 /* ---- the three cleared centres ---- */
 
-t('Mental and Health are still empty pages', async () => {
-  for (const [centre, label] of [['mental', 'MENTAL'], ['health', 'HEALTH']]) {
+t('Home, Mental and Health are empty pages', async () => {
+  for (const [centre, label] of [['home', 'HOME'], ['mental', 'MENTAL'], ['health', 'HEALTH']]) {
     await boot({ forgeCentre: centre });
     const body = await text();
     ok(body.includes(label), label + ' should still name itself on its empty page');
     ok(/Nothing here yet/.test(body), label + ' is not showing its empty state');
     /* Everything the three centres used to carry, gone from all of them. */
-    for (const ghost of ['THE STANDARD', 'THE WORK', 'THE TEN REGIONS', 'THE SIX FACULTIES',
-                         'RECORD ASSESSMENT', 'Sleep 7-9 hours', 'Beef liver',
-                         'Nothing ultra-processed', 'NEGLECTED', 'on food · 30 days']) {
+    for (const ghost of ['Muscle Training Split', 'Anatomy', 'Log Training', 'Strength Chart',
+                         'FROM YOUR LOGS', 'PROGRESS', 'WEAKEST LINKS', 'THE TOOLS',
+                         'Hand Training', 'RECORD ASSESSMENT']) {
       ok(!body.includes(ghost), ghost + ' is still on the ' + centre + ' page');
     }
   }
@@ -478,7 +380,7 @@ t('Hand Training stays out of the other centres', async () => {
 
 t('the four centres still switch', async () => {
   await boot({ forgeCentre: 'home' });
-  for (const [tab, probe] of [['TRAINING', 'TRAINING'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Muscle Training Split']]) {
+  for (const [tab, probe] of [['TRAINING', 'Hand Training'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Nothing here yet']]) {
     await page.evaluate((t) => {
       const el = [...document.querySelectorAll('span')].find(e =>
         e.children.length === 0 && e.textContent.trim() === t);
@@ -489,149 +391,25 @@ t('the four centres still switch', async () => {
   }
 });
 
-t('clearing the three centres left the Home alone', async () => {
-  await boot({ forgeCentre: 'home' });
-  const body = await text();
-  for (const panel of ['Muscle Training Split', 'Anatomy', 'Log Training', 'MOVE', 'Strength Chart']) {
-    ok(body.includes(panel), panel + ' went missing from the Forge home');
-  }
-  ok(!/Nothing here yet/.test(body), 'the home must not render the empty state');
-});
-
 /* ---- progress ---- */
-
-t('with one assessment the progress panel says there is nothing to compare', async () => {
-  await boot({ forgeHistory: [{ date: '2026-08-20', scores: { 'nasal-walk': 45 } }], forgeScores: { 'nasal-walk': 45 } });
-  const body = await text();
-  ok(/PROGRESS · LAST 8 ASSESSMENTS/.test(body), 'the progress panel should show once there is a record');
-  ok(/nothing to measure it against/.test(body), 'a single assessment must not imply a trend');
-  ok(!/WHAT MOVED/.test(body), 'there is nothing to have moved yet');
-});
-
-t('a second assessment reports the delta and what crossed a tier', async () => {
-  const st = { 'nasal-walk': 20 }, st2 = { 'nasal-walk': 90 };
-  await boot({
-    forgeHistory: [{ date: '2026-08-20', scores: st }, { date: '2026-08-27', scores: st2 }],
-    forgeScores: st2,
-  });
-  const body = await text();
-  ok(/\+\d+ points since 20\/8/.test(body), 'the delta line is wrong: ' + (body.match(/[^\n]*points since[^\n]*/) || [])[0]);
-  ok(/WHAT MOVED/.test(body), 'the movement list should render');
-  ok(/Nasal-only walk/.test(body.split('WHAT MOVED')[1] || ''), 'the standard that moved must be named');
-  ok(/▲/.test(body), 'an improvement should read as one');
-});
-
-t('going backwards is reported, not quietly dropped', async () => {
-  const good = { 'nasal-walk': 90 }, bad = { 'nasal-walk': 20 };
-  await boot({
-    forgeHistory: [{ date: '2026-08-20', scores: good }, { date: '2026-08-27', scores: bad }],
-    forgeScores: bad,
-  });
-  const body = await text();
-  ok(/-\d+ points since/.test(body), 'a fall must show as a negative delta: ' + (body.match(/[^\n]*points since[^\n]*/) || [])[0]);
-  ok(/▼/.test(body), 'a regression must be marked');
-});
-
-t('the progress panel stays hidden until there is something to show', async () => {
-  await boot();
-  ok(!/PROGRESS · LAST 8 ASSESSMENTS/.test(await text()), 'an empty history must not render an empty chart');
-});
-
-t('the bars are scaled to the best result on record', async () => {
-  await boot({
-    forgeHistory: [
-      { date: '2026-08-01', scores: { 'nasal-walk': 20 } },
-      { date: '2026-08-20', scores: { 'nasal-walk': 90 } },
-    ],
-    forgeScores: { 'nasal-walk': 90 },
-  });
-  const heights = await page.evaluate(() =>
-    [...document.querySelectorAll('div[title]')]
-      .filter(d => /^\d{4}-\d{2}-\d{2} · /.test(d.getAttribute('title')))
-      .map(d => parseInt(d.style.height, 10)));
-  eq(heights.length, 2, 'one bar per assessment');
-  eq(heights[1], 100, 'the best result must fill the panel');
-  ok(heights[0] < heights[1], 'a worse assessment must draw shorter');
-});
-
-t('a higher score never draws a dimmer bar', async () => {
-  await boot({
-    forgeHistory: [
-      { date: '2026-08-01', scores: { 'nasal-walk': 20 } },
-      { date: '2026-08-08', scores: { 'nasal-walk': 45 } },
-      { date: '2026-08-20', scores: { 'nasal-walk': 90 } },
-    ],
-    forgeScores: { 'nasal-walk': 90 },
-  });
-  /* The bars encode magnitude, so their colour must be one hue getting brighter. The
-     tier palette rotates through green and amber; reused here it makes a better score
-     read as a warning. Lightness must rise with the score, and the hue must not move. */
-  const bars = await page.evaluate(() =>
-    [...document.querySelectorAll('div[title]')]
-      .filter(d => /^\d{4}-\d{2}-\d{2} · /.test(d.getAttribute('title')))
-      .map(d => d.style.background || d.style.backgroundColor));
-  eq(bars.length, 3, 'one bar per assessment');
-  /* The browser normalises whatever we wrote to rgb(), so go back to hue and lightness
-     from the pixels rather than from the CSS we happened to author. */
-  const parsed = bars.map(b => {
-    const m = /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/.exec(b);
-    if (!m) throw new Error('unreadable bar colour: ' + b);
-    const [r, g, bl] = [+m[1] / 255, +m[2] / 255, +m[3] / 255];
-    const max = Math.max(r, g, bl), min = Math.min(r, g, bl), d = max - min;
-    let h = 0;
-    if (d) {
-      if (max === r) h = ((g - bl) / d) % 6;
-      else if (max === g) h = (bl - r) / d + 2;
-      else h = (r - g) / d + 4;
-      h = (h * 60 + 360) % 360;
-    }
-    return { h: Math.round(h), l: (max + min) / 2 };
-  });
-  const spread = Math.max(...parsed.map(p => p.h)) - Math.min(...parsed.map(p => p.h));
-  ok(spread <= 2, 'the hue must not change across the ramp (spread ' + spread + '°): ' + bars.join(' | '));
-  ok(parsed[0].l < parsed[1].l && parsed[1].l < parsed[2].l,
-     'lightness must rise with the score: ' + parsed.map(p => p.l.toFixed(2)).join(' < '));
-});
-
-t('the value labels wear text ink, not the series colour', async () => {
-  await boot({
-    forgeHistory: [{ date: '2026-08-01', scores: { 'nasal-walk': 20 } }],
-    forgeScores: { 'nasal-walk': 20 },
-  });
-  const coloured = await page.evaluate(() => {
-    const strip = [...document.querySelectorAll('div[title]')]
-      .find(d => /^\d{4}-\d{2}-\d{2} · /.test(d.getAttribute('title')));
-    return [...strip.parentElement.querySelectorAll('span')].map(s => s.style.color);
-  });
-  ok(coloured.length > 0, 'no labels found on the bar');
-  ok(!coloured.some(c => /hsl\(/.test(c)), 'a label is wearing the bar colour: ' + coloured.join(' | '));
-});
 
 /* ---- weakest links ---- */
 
-t('the weakest measured standards are named, lowest first', async () => {
-  await boot({ forgeScores: { 'nasal-walk': 90, 'deep-block': 25 } });
-  const body = await text();
-  ok(/WEAKEST LINKS/.test(body), 'the panel should render once something is measured');
-  const block = body.split('WEAKEST LINKS')[1];
-  ok(block.indexOf('Unbroken deep work') < block.indexOf('Nasal-only walk'),
-     'the lower tier must sort first — the panel exists to point somewhere specific');
-});
-
-t('nothing measured means no weakest link to name', async () => {
-  await boot();
-  ok(!/WEAKEST LINKS/.test(await text()), 'with nothing measured there is nothing to rank');
-});
-
 /* ---- the mistake that parsing does not catch ---- */
 
-t('every score input kept its own styling', async () => {
-  await boot();
-  await page.evaluate(() => window.__nvx.setForgeOpen('neck'));
-  await page.waitForTimeout(600);
-  const broken = await page.evaluate(() =>
-    [...document.querySelectorAll('input')].filter(i => !i.getAttribute('style')).length);
-  eq(broken, 0, 'an input lost its style attribute — markup spliced into a neighbouring attribute');
+t('nothing on the page is rendered twice', async () => {
+  /* v11.246 shipped 108 duplicated lines: a slice edit ran backwards through the file and
+     copied a region instead of removing it. Tag balance stayed perfect and every
+     includes() assertion still passed, so nothing caught it until it was live. */
+  await boot({ forgeCentre: 'training' });
+  const body = await text();
+  for (const once of ['Hand Training', 'THE TOOLS', 'GRIP & HAND DEVELOPMENT', '❖ THE FORGE']) {
+    const n = (body.match(new RegExp(once.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    eq(n, 1, once + ' appears ' + n + ' times');
+  }
+  const figs = await page.evaluate(() => document.querySelectorAll('[data-handfig]').length);
+  const want = await page.evaluate(() => window.ForgeTraining.section('hands').work.length);
+  eq(figs, want, 'the chart rendered ' + figs + ' cards for ' + want + ' exercises');
 });
 
 t('the page raised no errors while all of that happened', async () => {

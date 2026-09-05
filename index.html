@@ -3621,177 +3621,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-for>
         </div>
 
-        <!-- the logs strip, progress and the weakest links all belong to the Home; the other
-             three centres are empty pages until they are rebuilt -->
-        <sc-if value="{{ forgeShowHome }}" hint-placeholder-val="{{ false }}">
-        <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; margin-bottom:16px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:10px;">FROM YOUR LOGS · LAST 7 DAYS</div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr));">
-            <sc-for list="{{ forgeLink }}" as="l" hint-placeholder-count="5">
-              <div style="text-align:center; padding:2px 10px; border-left:1px solid {{ l.rule }};">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:19px; color:{{ l.ink }};">{{ l.value }}</div>
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; color:#8f8f99; margin-top:5px;">{{ l.label }}</div>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-
-        </sc-if>
-
-        <sc-if value="{{ forgeShowHome }}" hint-placeholder-val="{{ false }}">
-        <!-- progress and the weakest links read together: what is moving, and what is not -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:12px; align-items:start; margin-bottom:16px;">
-        <sc-if value="{{ forgeHasProgress }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px;">
-            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline; margin-bottom:2px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99;">PROGRESS · LAST 8 ASSESSMENTS</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ forgeDeltaInk }};">{{ forgeDeltaLabel }}</div>
-            </div>
-            <div style="display:flex; align-items:flex-end; gap:6px; height:96px; padding-top:8px;">
-              <sc-for list="{{ forgeBars }}" as="b" hint-placeholder-count="8">
-                <div style="flex:1 1 0; min-width:0; max-width:58px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ b.valC }}; white-space:nowrap;">{{ b.val }}</span>
-                  <div title="{{ b.title }}" style="width:100%; max-width:26px; height:{{ b.h }}%; min-height:2px; border-radius:5px 5px 2px 2px; background:{{ b.bg }};"></div>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78; white-space:nowrap;">{{ b.label }}</span>
-                </div>
-              </sc-for>
-            </div>
-            <sc-if value="{{ forgeMovedAny }}" hint-placeholder-val="{{ false }}">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin:15px 0 5px;">WHAT MOVED</div>
-              <sc-for list="{{ forgeMoved }}" as="m" hint-placeholder-count="3">
-                <div style="display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-top:1px solid rgba(255,255,255,0.05);">
-                  <span style="font-size:12.5px; color:#dbdbe0;"><span style="color:{{ m.ink }};">{{ m.arrow }}</span> {{ m.name }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ m.ink }};">{{ m.where }} · {{ m.label }}</span>
-                </div>
-              </sc-for>
-            </sc-if>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{ forgeWeakest.length }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:16px; padding:16px 18px; border:1px solid rgba(232,180,90,0.28);">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#e8b45a; margin-bottom:9px;">WEAKEST LINKS — WORK HERE</div>
-            <sc-for list="{{ forgeWeakest }}" as="w" hint-placeholder-count="3">
-              <div style="display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-top:1px solid rgba(255,255,255,0.05);">
-                <span style="font-size:12.5px; color:#dbdbe0;">{{ w.name }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8f8f99;">{{ w.where }} · {{ w.tierName }}</span>
-              </div>
-            </sc-for>
-          </div>
-        </sc-if>
-        </div>
-        </sc-if>
-
-        <!-- HOME — the training floor. These four cards are the working half of Fitness HQ,
-             brought over so the Forge can stand on its own: the split and the anatomy model, the
-             log you actually type into, the day's movement, and the strength series. They read the
-             same bindings as Fitness HQ, so both screens show one set of numbers, never two. -->
-        <sc-if value="{{ forgeShowHome }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-grid-fit" style="display:grid; grid-template-columns:340px 1fr; gap:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-                <span style="font-size:13px; font-weight:600;">Muscle Training Split</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#6f6f78;">VOLUME · LAST 7 DAYS</span>
-              </div>
-              <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,1fr)); gap:9px;">
-                <sc-for list="{{ muscleSplitStats }}" as="s" hint-placeholder-count="7">
-                  <div style="border:1px solid {{ s.bd }}; border-radius:11px; padding:10px 11px; background:{{ s.bg }};">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:{{ s.valC }};">{{ s.val }}</div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:3px;">{{ s.label }}</div>
-                  </div>
-                </sc-for>
-              </div>
-              <div style="display:flex; align-items:center; justify-content:space-between; margin:16px 0 10px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.07); gap:10px; flex-wrap:wrap;">
-                <span style="font-size:13px; font-weight:600;">Anatomy</span>
-                <div class="cc-anatomy-views" style="display:flex; gap:6px;">
-                  <span onClick="{{ setAnatomyFront }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyFrontC }}; border:1px solid {{ anatomyFrontBd }}; background:{{ anatomyFrontBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">FRONT{{ anatomyFrontCount }}</span>
-                  <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
-                </div>
-              </div>
-              <div data-anatomy3d="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:420px; margin:0 auto; padding:4px 0 2px;"></div>
-              <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
-              <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px;">
-                <sc-for list="{{ anatomyActive }}" as="a" hint-placeholder-count="0"><span style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#ffb3ba; border:1px solid rgba(255,85,99,0.35); border-radius:20px; padding:4px 10px;"><span style="width:6px; height:6px; border-radius:50%; background:#ff3b4a; box-shadow:0 0 7px #ff3b4a;"></span>{{ a.name }} · {{ a.ago }}</span></sc-for>
-                            </div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:18px;">
-              <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ woLogEyebrow }}</div>
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-                  <span style="font-size:13px; font-weight:600;">Log Training</span>
-                  <span onClick="{{ openWoImport }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#7cb0ff; cursor:pointer; border:1px solid rgba(124,176,255,0.3); border-radius:8px; padding:5px 10px;" style-hover="{ background:'rgba(124,176,255,0.1)' }">⬆ Bulk Import</span>
-                </div>
-                <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:8px;">
-                  <sc-for list="{{ woParts }}" as="p" hint-placeholder-count="8"><span onClick="{{ p.pick }}" style="font-size:11.5px; color:{{ p.c }}; border:1px solid {{ p.b }}; border-radius:8px; padding:6px 12px; cursor:pointer; background:{{ p.bg }};">{{ p.name }}</span></sc-for>
-                </div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
-                  <sc-for list="{{ woRanges }}" as="r" hint-placeholder-count="3"><span onClick="{{ r.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 10px; cursor:pointer; background:{{ r.bg }};">{{ r.name }}</span></sc-for>
-                </div>
-                <sc-if value="{{ woCanLog }}" hint-placeholder-val="{{ true }}">
-                <input value="{{ woEx }}" onInput="{{ setWoEx }}" onKeyDown="{{ addWorkoutKey }}" placeholder="Exercise (e.g. Bench Press)" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <input value="{{ woWeight }}" onInput="{{ setWoWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="kg" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <span onClick="{{ toggleWoUnit }}" title="Mark this set as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ woUnitC }}; border:1px solid {{ woUnitBd }}; border-radius:8px; padding:0 10px; display:flex; align-items:center; cursor:pointer; background:{{ woUnitBg }};">{{ woUnitLabel }}</span>
-                  <sc-if value="{{ woUnitIsBW }}" hint-placeholder-val="{{ false }}">
-                  <input value="{{ woBodyWeight }}" onInput="{{ setWoBodyWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Your kg" title="Your current bodyweight — used as the load, and synced to Health" style="width:74px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  </sc-if>
-                  <input value="{{ woSets }}" onInput="{{ setWoSets }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Sets" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <input value="{{ woReps }}" onInput="{{ setWoReps }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Reps" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <input value="{{ woMin }}" onInput="{{ setWoMin }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Min" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <span onClick="{{ addWorkout }}" class="cc-glowbtn" style="flex:1; min-width:78px; text-align:center; padding:11px 16px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">Log Set</span>
-                </div>
-                </sc-if>
-                <sc-if value="{{ woLogHintShow }}" hint-placeholder-val="{{ false }}">
-                  <div style="font-size:11px; color:#6f6f78; font-style:italic;">Pick a muscle group above to log a set — Full is for viewing everything at once.</div>
-                </sc-if>
-                <div style="margin-top:14px; max-height:150px; overflow-y:auto;">
-                  <sc-for list="{{ workoutList }}" as="w" hint-placeholder-count="4">
-                    <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                      <span style="width:7px; height:7px; border-radius:50%; flex:0 0 7px; background:{{ w.color }};"></span>
-                      <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ w.exercise }}</span>
-                      <span style="font-size:10px; letter-spacing:.5px; color:#8a8a92; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 7px;">{{ w.part }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">{{ w.detail }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; width:64px; text-align:right;">{{ w.ago }}</span>
-                      <span onClick="{{ w.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-              <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
-                  <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:18px;">
-                    <canvas data-chart="fitRings" style="width:150px; height:150px; flex:0 0 150px;"></canvas>
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                      <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">MOVE</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#FFFFFF;">{{ moveKcal }}</div></div>
-                      <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">TRAIN TODAY</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#eef0f2;">{{ trainToday }}m</div></div>
-                      <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">WEEK TOTAL</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#9a9aa2;">{{ trainWeek }}m</div></div>
-                    </div>
-                  </div>
-                  <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;"><span style="font-size:13px; font-weight:600;">Strength Chart</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ strengthTrendColor }};">{{ strengthTrendLabel }}</span></div>
-                    <div style="display:flex; gap:20px; margin:10px 0 6px; font-family:'JetBrains Mono',monospace; flex-wrap:wrap;">
-                      <div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px;">EST 1RM</div><div style="font-size:17px; color:#FFFFFF;">{{ est1RM }}</div></div>
-                      <div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px;">TOTAL VOL</div><div style="font-size:17px; color:#eef0f2;">{{ totalVolume }}</div></div>
-                      <div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px;">THIS WEEK</div><div style="font-size:17px; color:#9a9aa2;">{{ weekVolume }}</div></div>
-                    </div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#6f6f78; margin:8px 0 6px;">WEEKLY VOLUME · LAST 8 WEEKS</div>
-                    <div style="display:flex; align-items:flex-end; gap:6px; height:118px; padding-top:4px;">
-                      <sc-for list="{{ strengthWeekBars }}" as="b" hint-placeholder-count="8">
-                        <div style="flex:1; min-width:0; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px;">
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ b.valC }}; white-space:nowrap;">{{ b.val }}</span>
-                          <div title="{{ b.title }}" style="width:100%; max-width:22px; height:{{ b.h }}%; min-height:2px; border-radius:5px 5px 2px 2px; background:{{ b.bg }};"></div>
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78; white-space:nowrap;">{{ b.label }}</span>
-                        </div>
-                      </sc-for>
-                    </div>
-                    <div style="font-size:11.5px; color:#9a9aa2; line-height:1.5; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">{{ strengthInsight }}</div>
-                  </div>
-              </div>
-            </div>
-          </div>
-        </sc-if>
-
-        <!-- TRAINING · MENTAL · HEALTH — cleared, awaiting their rebuild. The tabs and the
-             page shell stay so the Forge still reads as four centres rather than one. -->
+        <!-- Any centre with nothing in it yet. The tabs and the page shell stay so the Forge still
+             reads as four centres rather than one. -->
         <sc-if value="{{ forgeShowEmpty }}" hint-placeholder-val="{{ false }}">
           <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">{{ forgeEmptyLabel }}</div>
@@ -3849,212 +3680,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
                 </sc-for>
               </div>
-            </div>
-
-          </sc-for>
-        </sc-if>
-
-        <!-- HOME — the training floor. These four cards are the working half of Fitness HQ,
-             brought over so the Forge can stand on its own: the split and the anatomy model, the
-             log you actually type into, the day's movement, and the strength series. They read the
-             same bindings as Fitness HQ, so both screens show one set of numbers, never two. -->
-        <sc-if value="{{ forgeShowHome }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-grid-fit" style="display:grid; grid-template-columns:340px 1fr; gap:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-                <span style="font-size:13px; font-weight:600;">Muscle Training Split</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#6f6f78;">VOLUME · LAST 7 DAYS</span>
-              </div>
-              <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,1fr)); gap:9px;">
-                <sc-for list="{{ muscleSplitStats }}" as="s" hint-placeholder-count="7">
-                  <div style="border:1px solid {{ s.bd }}; border-radius:11px; padding:10px 11px; background:{{ s.bg }};">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; color:{{ s.valC }};">{{ s.val }}</div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:3px;">{{ s.label }}</div>
-                  </div>
-                </sc-for>
-              </div>
-              <div style="display:flex; align-items:center; justify-content:space-between; margin:16px 0 10px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.07); gap:10px; flex-wrap:wrap;">
-                <span style="font-size:13px; font-weight:600;">Anatomy</span>
-                <div class="cc-anatomy-views" style="display:flex; gap:6px;">
-                  <span onClick="{{ setAnatomyFront }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyFrontC }}; border:1px solid {{ anatomyFrontBd }}; background:{{ anatomyFrontBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">FRONT{{ anatomyFrontCount }}</span>
-                  <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
-                </div>
-              </div>
-              <div data-anatomy3d="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:420px; margin:0 auto; padding:4px 0 2px;"></div>
-              <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
-              <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px;">
-                <sc-for list="{{ anatomyActive }}" as="a" hint-placeholder-count="0"><span style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#ffb3ba; border:1px solid rgba(255,85,99,0.35); border-radius:20px; padding:4px 10px;"><span style="width:6px; height:6px; border-radius:50%; background:#ff3b4a; box-shadow:0 0 7px #ff3b4a;"></span>{{ a.name }} · {{ a.ago }}</span></sc-for>
-                            </div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:18px;">
-              <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ woLogEyebrow }}</div>
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-                  <span style="font-size:13px; font-weight:600;">Log Training</span>
-                  <span onClick="{{ openWoImport }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#7cb0ff; cursor:pointer; border:1px solid rgba(124,176,255,0.3); border-radius:8px; padding:5px 10px;" style-hover="{ background:'rgba(124,176,255,0.1)' }">⬆ Bulk Import</span>
-                </div>
-                <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:8px;">
-                  <sc-for list="{{ woParts }}" as="p" hint-placeholder-count="8"><span onClick="{{ p.pick }}" style="font-size:11.5px; color:{{ p.c }}; border:1px solid {{ p.b }}; border-radius:8px; padding:6px 12px; cursor:pointer; background:{{ p.bg }};">{{ p.name }}</span></sc-for>
-                </div>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;">
-                  <sc-for list="{{ woRanges }}" as="r" hint-placeholder-count="3"><span onClick="{{ r.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ r.c }}; border:1px solid {{ r.b }}; border-radius:7px; padding:4px 10px; cursor:pointer; background:{{ r.bg }};">{{ r.name }}</span></sc-for>
-                </div>
-                <sc-if value="{{ woCanLog }}" hint-placeholder-val="{{ true }}">
-                <input value="{{ woEx }}" onInput="{{ setWoEx }}" onKeyDown="{{ addWorkoutKey }}" placeholder="Exercise (e.g. Bench Press)" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <input value="{{ woWeight }}" onInput="{{ setWoWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="kg" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <span onClick="{{ toggleWoUnit }}" title="Mark this set as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:{{ woUnitC }}; border:1px solid {{ woUnitBd }}; border-radius:8px; padding:0 10px; display:flex; align-items:center; cursor:pointer; background:{{ woUnitBg }};">{{ woUnitLabel }}</span>
-                  <sc-if value="{{ woUnitIsBW }}" hint-placeholder-val="{{ false }}">
-                  <input value="{{ woBodyWeight }}" onInput="{{ setWoBodyWeight }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Your kg" title="Your current bodyweight — used as the load, and synced to Health" style="width:74px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  </sc-if>
-                  <input value="{{ woSets }}" onInput="{{ setWoSets }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Sets" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <input value="{{ woReps }}" onInput="{{ setWoReps }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Reps" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <input value="{{ woMin }}" onInput="{{ setWoMin }}" onKeyDown="{{ addWorkoutKey }}" type="number" placeholder="Min" style="width:64px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
-                  <span onClick="{{ addWorkout }}" class="cc-glowbtn" style="flex:1; min-width:78px; text-align:center; padding:11px 16px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">Log Set</span>
-                </div>
-                </sc-if>
-                <sc-if value="{{ woLogHintShow }}" hint-placeholder-val="{{ false }}">
-                  <div style="font-size:11px; color:#6f6f78; font-style:italic;">Pick a muscle group above to log a set — Full is for viewing everything at once.</div>
-                </sc-if>
-                <div style="margin-top:14px; max-height:150px; overflow-y:auto;">
-                  <sc-for list="{{ workoutList }}" as="w" hint-placeholder-count="4">
-                    <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                      <span style="width:7px; height:7px; border-radius:50%; flex:0 0 7px; background:{{ w.color }};"></span>
-                      <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ w.exercise }}</span>
-                      <span style="font-size:10px; letter-spacing:.5px; color:#8a8a92; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:2px 7px;">{{ w.part }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">{{ w.detail }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; width:64px; text-align:right;">{{ w.ago }}</span>
-                      <span onClick="{{ w.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-              <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
-                  <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:18px;">
-                    <canvas data-chart="fitRings" style="width:150px; height:150px; flex:0 0 150px;"></canvas>
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                      <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">MOVE</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#FFFFFF;">{{ moveKcal }}</div></div>
-                      <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">TRAIN TODAY</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#eef0f2;">{{ trainToday }}m</div></div>
-                      <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">WEEK TOTAL</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#9a9aa2;">{{ trainWeek }}m</div></div>
-                    </div>
-                  </div>
-                  <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;"><span style="font-size:13px; font-weight:600;">Strength Chart</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ strengthTrendColor }};">{{ strengthTrendLabel }}</span></div>
-                    <div style="display:flex; gap:20px; margin:10px 0 6px; font-family:'JetBrains Mono',monospace; flex-wrap:wrap;">
-                      <div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px;">EST 1RM</div><div style="font-size:17px; color:#FFFFFF;">{{ est1RM }}</div></div>
-                      <div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px;">TOTAL VOL</div><div style="font-size:17px; color:#eef0f2;">{{ totalVolume }}</div></div>
-                      <div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px;">THIS WEEK</div><div style="font-size:17px; color:#9a9aa2;">{{ weekVolume }}</div></div>
-                    </div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#6f6f78; margin:8px 0 6px;">WEEKLY VOLUME · LAST 8 WEEKS</div>
-                    <div style="display:flex; align-items:flex-end; gap:6px; height:118px; padding-top:4px;">
-                      <sc-for list="{{ strengthWeekBars }}" as="b" hint-placeholder-count="8">
-                        <div style="flex:1; min-width:0; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:5px;">
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:{{ b.valC }}; white-space:nowrap;">{{ b.val }}</span>
-                          <div title="{{ b.title }}" style="width:100%; max-width:22px; height:{{ b.h }}%; min-height:2px; border-radius:5px 5px 2px 2px; background:{{ b.bg }};"></div>
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:8px; color:#6f6f78; white-space:nowrap;">{{ b.label }}</span>
-                        </div>
-                      </sc-for>
-                    </div>
-                    <div style="font-size:11.5px; color:#9a9aa2; line-height:1.5; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06);">{{ strengthInsight }}</div>
-                  </div>
-              </div>
-            </div>
-          </div>
-        </sc-if>
-
-        <!-- TRAINING · MENTAL · HEALTH — cleared, awaiting their rebuild. The tabs and the
-             page shell stay so the Forge still reads as four centres rather than one. -->
-        <sc-if value="{{ forgeShowEmpty }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">{{ forgeEmptyLabel }}</div>
-            <div style="font-size:12.5px; color:#6f6f78; margin-top:10px;">Nothing here yet.</div>
-          </div>
-        </sc-if>
-
-        <!-- TRAINING — built from sections. The page renders whatever forge-training.js holds,
-             so the next section is a data change rather than another block of markup. -->
-        <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
-          <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:8px;">{{ sec.tag }}</div>
-              <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 9px;">{{ sec.name }}</h2>
-              <div style="font-size:12.5px; color:#a8a8b0; line-height:1.65; max-width:74ch;">{{ sec.why }}</div>
-            </div>
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:4px;">THE FIVE GRIPS</div>
-              <div style="font-size:11.5px; color:#75757d; margin-bottom:6px;">Training one does almost nothing for the others.</div>
-              <sc-for list="{{ sec.types }}" as="ty" hint-placeholder-count="5">
-                <div style="padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;">
-                    <span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ ty.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; text-align:right;">{{ ty.what }}</span>
-                  </div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55; max-width:76ch;">{{ ty.detail }}</div>
-                </div>
-              </sc-for>
-            </div>
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:12px;">THE MUSCLES</div>
-              <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:20px; align-items:start;">
-                <sc-for list="{{ sec.muscles }}" as="mg" hint-placeholder-count="4">
-                  <div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#E7D8A6; line-height:1.5; margin-bottom:7px;">{{ mg.group }}</div>
-                    <sc-for list="{{ mg.items }}" as="mu" hint-placeholder-count="4">
-                      <div style="padding:7px 0; border-top:1px solid rgba(255,255,255,0.05);">
-                        <div style="font-size:12.5px; color:#dbdbe0;">{{ mu.name }}</div>
-                        <div style="font-size:11px; color:#8f8f99; margin-top:3px; line-height:1.5;">{{ mu.does }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE STANDARD</div>
-              <sc-for list="{{ sec.standards }}" as="st" hint-placeholder-count="8">
-                <div style="padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px;">
-                    <span style="font-size:12.5px; color:#dbdbe0;">{{ st.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8f8f99;">{{ st.unit }}</span>
-                  </div>
-                  <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                    <sc-for list="{{ st.tierChips }}" as="tc" hint-placeholder-count="4">
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; padding:5px 8px; border-radius:6px; color:{{ tc.ink }}; border:1px solid {{ tc.bd }};">{{ tc.label }}</span>
-                    </sc-for>
-                  </div>
-                  <div style="font-size:11px; color:#75757d; margin-top:6px; line-height:1.5; max-width:76ch;">{{ st.how }}</div>
-                </div>
-              </sc-for>
-            </div>
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE WORK</div>
-              <sc-for list="{{ sec.work }}" as="w" hint-placeholder-count="12">
-                <div style="padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                    <span style="font-size:12.5px; color:#dbdbe0;">{{ w.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; text-align:right;">{{ w.dose }}</span>
-                  </div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:4px; line-height:1.55; max-width:76ch;">{{ w.cue }}</div>
-                  <sc-if value="{{ w.risk }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:11px; color:#ff8a5b; margin-top:6px; line-height:1.55; max-width:76ch;">⚠ {{ w.risk }}</div>
-                  </sc-if>
-                </div>
-              </sc-for>
-            </div>
-
-            <div class="cc-glowcard" style="border-radius:16px; padding:20px; margin-bottom:12px;">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99; margin-bottom:6px;">THE RULES</div>
-              <sc-for list="{{ sec.rules }}" as="r" hint-placeholder-count="5">
-                <div style="padding:10px 0; border-top:1px solid rgba(255,255,255,0.06);">
-                  <div style="font-size:12.5px; color:#dbdbe0;">{{ r.rule }}</div>
-                  <div style="font-size:11.5px; color:#8f8f99; margin-top:3px; line-height:1.55; max-width:76ch;">{{ r.why }}</div>
-                </div>
-              </sc-for>
             </div>
 
           </sc-for>
@@ -9712,7 +9337,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-246 · v11.246 hand-chart';
+const NOTIF_BUILD_VERSION = '2026.09.04-247 · v11.247 forge-home-cleared';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9911,7 +9536,7 @@ activities: this._mergeShipLog(s.activities),
     let i=0; this.setState({bootLine:lines[0]});
     this._bootTimer=setInterval(()=>{ i++; if(i<lines.length){ this.setState({bootLine:lines[i]}); } if(i>=lines.length-1){ clearInterval(this._bootTimer); setTimeout(()=>{ this.setState({bootDone:true}); setTimeout(()=>this.setState({bootGone:true}),550); },260); } },320);
   }
-  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness' && this.state.scene!=='forge') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
+  componentDidMount(){ this._migrateVoicePrefs(); this._repairExpenseCats(); this._seedEliseOnce(); this.loadDashboardLayout(); this._bootSeq(); this._remindersTimer=setInterval(()=>{ this._checkEventReminders(); this._checkChecklistReminders(); this._checkDailyLogReminders(); this._maybeFireCustomNotif(); this._checkPerfCheckinPopup(); this._checkLogAllPopup(); this._checkStaleBuild(); },60000); setTimeout(()=>this._checkPerfCheckinPopup(),3000); document.addEventListener('visibilitychange', ()=>{ if(document.hidden) this._flushDebounced(); else this._sbRefreshLearningOnFocus(); }); window.addEventListener('pagehide', ()=>this._flushDebounced()); window.addEventListener('beforeunload', ()=>this._flushDebounced()); this._hkEnsure(); this.startClock(); this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs(); this._initVoice(); this._provInit(); this.maybeRollover(); this._checkDailyLogin(); this._dayTimer=setInterval(()=>this.maybeRollover(),60000); this._anatomyTimer=setInterval(()=>{ if(this.state.scene!=='fitness') return; const lit=Object.keys(this._activeMuscleGlow()).length; if(lit||this._anatomyWasLit){ this._anatomyWasLit=lit>0; this.setState({anatomyTick:Date.now()}); } },60000); this._quoteTimer=setInterval(()=>this.maybeShowQuote(),300000); this._initPWA(); this._sbBoot(); if(window.NotificationManager) window.NotificationManager.ReminderEngine.start(this._notifHost()); this._wireNotifActionRelay(); this._consumeNotifDeepLink(); this._wireUpdateAvailable(); }
   _wireUpdateAvailable(){ const notify=()=>this._checkStaleBuild(); window.addEventListener('nervexus:update-available', notify); if(window.__nvxUpdateAvailable) notify(); setTimeout(()=>this._checkStaleBuild(), 2500); }
   // Real install/notification popups only exist in certain browser contexts — iOS never
   // fires beforeinstallprompt (install is always manual via the Share sheet), and in-app
@@ -14040,9 +13665,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!(this.state.learningTab==='Maths' && this.state.mtMode==='hub')) return; const hist=(((this.state.learning&&this.state.learning.mathsHistory)||[]).filter(h=>h.mode==='GCSE Test').slice(0,10).reverse()); if(hist.length<2) return; const cv=this.root.querySelector('[data-chart="mtProgress"]'); if(cv) this.startTrend(cv, hist.map(h=>h.pct), '#4ADE80'); }
   init_dashboard(){ this.loadDashNews('money'); this.loadDashNews('law'); const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m, this.productivitySeries().series); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
   init_fitness(){ const today=this.todayMin(); const move=Math.min(1,(today*8)/700); const r=this.root.querySelector('[data-chart="fitRings"]'); if(r) this.startRingSet(r,[move, Math.min(1,today/45), 0.9],['#FFFFFF','#eef0f2','#7a7a82'],15,7);  }
-  /* The Forge home carries the same rings canvas as Fitness HQ. Only one scene renders at a
-     time, so the querySelector inside finds whichever copy is on screen. */
-  init_forge(){ this.init_fitness(); }
   init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
   startPowerHills(cv){ const {ctx,w,h}=this.prep(cv); const rows=10;
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const t=ts*0.00035;
@@ -14242,6 +13864,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.247', date:'Sep 4, 2026', notes:[
+      'The Forge\u2019s Home is now an empty page too, ready to be rebuilt. Training keeps the Hand Training chart; Home, Mental and Health are blank.',
+      'Fixed the last update rendering the Forge\u2019s panels twice \u2014 an editing mistake on my side that duplicated a block of the page.',
+      'Nothing was deleted. Fitness HQ still has the split, the anatomy model, the log, Move and the strength chart, exactly as before.',
+    ]},
     {version:'v11.246', date:'Sep 4, 2026', major:true, notes:[
       'Hand Training is now a chart: twenty ways to train a hand, each one drawn, graded easy / hard / brutal, and given a dose. Filter it by level.',
       'Kettlebell finger curls are in, with the note that the lowering half is the half that builds it.',
@@ -18243,20 +17870,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const TI=['#6f6f78','#c9c9ce','#6cffba','#e8b45a','#ffffff'];
         const centre=S.forgeCentre||'training';
         const sc=S.forgeScores||{}, dr=S.forgeDraft||{};
-        const tierName=(t)=>t===0?'Not measured':F.TIERS[t-1];
         const centres=[['home','HOME'],['training','TRAINING'],['mental','MENTAL'],['health','HEALTH']].map(c=>({
           label:c[1], go:()=>this.setForgeCentre(c[0]),
           ink:centre===c[0]?'#F4F4F5':'#9a9aa2',
           bg:centre===c[0]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)',
           bd:centre===c[0]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' }));
-        const L=this._forgeFitnessLink();
-        const link=[
-          { value:String(L.sessions), label:'sessions', ink:L.sessions>=4?'#6cffba':L.sessions>=2?'#e8b45a':'#ff8a5b' },
-          { value:L.partsHit+'/10', label:'regions trained', ink:L.partsHit>=6?'#6cffba':L.partsHit>=3?'#e8b45a':'#ff8a5b' },
-          { value:L.avgSleep!=null?(L.avgSleep+'h'):'—', label:'avg sleep', ink:L.avgSleep==null?'#6f6f78':L.avgSleep>=7?'#6cffba':'#ff8a5b' },
-          { value:L.bodyFat!=null?(L.bodyFat+'%'):'—', label:'body fat', ink:L.bodyFat==null?'#6f6f78':(L.bodyFat<=15?'#6cffba':L.bodyFat<=20?'#e8b45a':'#ff8a5b') },
-          { value:L.weightKg!=null?(L.weightKg+'kg'):'—', label:'bodyweight', ink:L.weightKg==null?'#6f6f78':'#c9c9ce' }
-        ].map((x,i)=>({...x, rule:i?'rgba(255,255,255,0.07)':'transparent'}));
         /* Training sections: the chart, its level filter, and the kit list. */
         const TR=window.ForgeTraining;
         const LV={easy:'#6cffba', hard:'#e8b45a', brutal:'#ff8a5b'};
@@ -18295,25 +17913,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const moved=prevEntry?F.movement(prevEntry.scores, hist[hist.length-1].scores):[];
         const dScore=pts.length>1?(pts[pts.length-1].score-pts[pts.length-2].score):null;
         return {
-          forgeCentres:centres, forgeLink:link, forgeWeakest:wk,
-          forgeHasProgress:!!pts.length, forgeBars:bars, forgeMovedAny:!!moved.length,
-          forgeDeltaLabel: dScore==null
-            ? 'First assessment on record — nothing to measure it against yet.'
-            : (dScore>0?'+'+dScore:dScore<0?String(dScore):'no change')+' points since '+dLbl(prevEntry.date),
-          forgeDeltaInk: dScore==null?'#8f8f99':dScore>0?'#6cffba':dScore<0?'#ff8a5b':'#8f8f99',
-          forgeMoved: moved.map(m=>({ name:m.name, where:m.group,
-            arrow: m.dir==='up'?'▲':m.dir==='down'?'▼':'●',
-            label: m.dir==='new'?('first recorded · '+tierName(m.to)):(tierName(m.from)+' → '+tierName(m.to)),
-            ink: m.dir==='up'?'#6cffba':m.dir==='down'?'#ff8a5b':'#c9c9ce' })),
-          forgeShowHome:centre==='home',
+          forgeCentres:centres,
           forgeShowTraining:centre==='training' && !!trainSections.length,
-          forgeShowEmpty:centre!=='home' && !(centre==='training' && trainSections.length),
-          forgeEmptyLabel:(centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
+          forgeShowEmpty:!(centre==='training' && trainSections.length),
+          forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
           trainSections:trainSections
         };
-      }, { forgeCentres:[], forgeLink:[], forgeWeakest:[],
-           forgeHasProgress:false, forgeBars:[], forgeMoved:[], forgeMovedAny:false, forgeDeltaLabel:'', forgeDeltaInk:'#8f8f99',
-           forgeShowHome:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[] }),
+      }, { forgeCentres:[], forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[] }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
