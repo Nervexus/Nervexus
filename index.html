@@ -303,7 +303,7 @@
 <script src="notif-engine.js?v=1"></script>
 <script src="voice-engine.js?v=3"></script>
 <script src="providers-data.js?v=1"></script>
-<script src="health-tracker.js?v=12"></script>
+<script src="health-tracker.js?v=13"></script>
 <script src="learning-maths.js?v=1"></script>
 <script src="learning-english.js?v=5"></script>
 <script src="learning-science.js?v=3"></script>
@@ -9356,7 +9356,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-254 · v11.254 no-invented-data';
+const NOTIF_BUILD_VERSION = '2026.09.04-255 · v11.255 blank-height';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13878,6 +13878,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.255', date:'Sep 4, 2026', notes:[
+      'Height now starts blank for you to fill in. It used to assume 181cm, which meant anyone who had never entered a height still got a confident BMI \u2014 worked out from someone else\u2019s.',
+      'BMI shows a dash until you give a real height, then works as before.',
+    ]},
     {version:'v11.254', date:'Sep 4, 2026', major:true, notes:[
       'Removed the invented data. The app used to open with eleven weeks of sleep, hydration, energy and body-composition history that nobody had entered, plus five glasses of water, three meals, 82% recovery, 14.2% body fat, 8,420 steps, a 52-minute workout, a 13-day movement streak and 80 XP.',
       'The energy log was also being refilled with made-up entries every time you loaded the app after the first. That is gone too.',

@@ -110,6 +110,32 @@ t('the goals survive, because a goal is not a claim', async () => {
   for (const k of Object.keys(g)) ok(g[k] > 0, k + ' should still have a default');
 });
 
+t('height starts blank, and BMI waits for it', async () => {
+  /* It defaulted to 181cm, so anyone who had never entered a height still got a confident
+     BMI — computed from a stranger's. */
+  await fresh();
+  eq(await page.evaluate(() => window.__nvx.state.health.heightCm), null, 'a height was assumed');
+  eq(await page.evaluate(() => window.HealthKit.bmi({ heightCm: null }, 82)), null, 'BMI without a height');
+  eq(await page.evaluate(() => window.HealthKit.bmi({ heightCm: 0 }, 82)), null, 'BMI from a zero height');
+  ok(await page.evaluate(() => window.HealthKit.bmi({ heightCm: 180 }, 82) > 0), 'BMI should still work once a height is given');
+});
+
+t('the body page shows a dash for BMI rather than a made-up one', async () => {
+  await fresh();
+  await page.evaluate(() => window.__nvx.setState({ scene: 'health', healthSub: 'body', perfCheckinOpen: false }));
+  await page.waitForTimeout(800);
+  const txt = await body();
+  ok(/BMI/i.test(txt), 'the body page should still offer BMI');
+  ok(!/BMI[^\n]*\d/.test(txt), 'a BMI number is showing with no height entered: '
+     + (txt.match(/BMI[^\n]*/) || [])[0]);
+  const h = await page.evaluate(() => {
+    const i = [...document.querySelectorAll('input')].find(x => /Height/i.test(x.placeholder || '')
+      || /Height/i.test((x.previousElementSibling || {}).textContent || ''));
+    return i ? i.value : null;
+  });
+  ok(h === null || h === '', 'the height field is pre-filled with ' + h);
+});
+
 t('an empty account scores nothing rather than scoring zero', async () => {
   /* 0/100 is a judgement on someone who has not logged anything. There is no score to give. */
   await fresh();

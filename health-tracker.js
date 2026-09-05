@@ -100,7 +100,8 @@
     }
     // preserve legacy fields the rest of the app still reads
     H.units = H.units || { mass: 'kg', length: 'cm', volume: 'ml' };
-    H.heightCm = H.heightCm || 181;
+    // No assumed height. BMI is withheld until the user gives a real one.
+    if (H.heightCm == null) H.heightCm = null;
     if (!H.hydrationGoalMl) H.hydrationGoalMl = (H.waterGoal || 8) * 250;
     H.statsPrefs = H.statsPrefs || ['calories', 'protein', 'carbs', 'fat', 'water', 'steps', 'activeKcal', 'workoutMin'];
     H.sleepLog = H.sleepLog || [];
@@ -199,7 +200,14 @@
   }
   function consistencyLabel(v) { return v == null ? '—' : v >= 85 ? 'Excellent' : v >= 70 ? 'Good' : v >= 50 ? 'Fair' : 'Erratic'; }
 
-  function bmi(H, weightKg) { var w = weightKg != null ? weightKg : latestBody(H, 'weightKg'); if (w == null) return null; return round(w / Math.pow((H.heightCm || 181) / 100, 2), 1); }
+  /* No height, no BMI. It used to fall back to 181cm, so someone who had never entered a
+     height still got a confident number — computed from a stranger's. */
+  function bmi(H, weightKg) {
+    var w = weightKg != null ? weightKg : latestBody(H, 'weightKg');
+    var h = H && H.heightCm;
+    if (w == null || h == null || !(h > 0)) return null;
+    return round(w / Math.pow(h / 100, 2), 1);
+  }
   function leanMass(weightKg, bodyFatPct) { if (weightKg == null || bodyFatPct == null) return null; return round(weightKg * (1 - bodyFatPct / 100), 1); }
   function latestBody(H, key) { var s = bySorted(H.bodyLog); for (var i = s.length - 1; i >= 0; i--) if (s[i][key] != null) return s[i][key]; return null; }
   function latestSnap(H) { var s = bySorted(H.bodyLog); return s[s.length - 1] || null; }
