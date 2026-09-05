@@ -3667,10 +3667,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#8f8f99;">THE SESSION</div>
                       <div style="display:flex; align-items:baseline; gap:12px;">
                         <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ sec.doneInk }};">{{ sec.doneLabel }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78;">{{ sec.periodLabel }}</span>
                         <span onClick="{{ sec.clear }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#8f8f99; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.16);">CLEAR</span>
                       </div>
                     </div>
-                    <div style="font-size:11.5px; color:#75757d; margin-bottom:8px;">Ticking one logs it straight to your training log. Unticking removes it again.</div>
+                    <div style="font-size:11.5px; color:#75757d; margin-bottom:10px;">Ticking one logs it straight to your training log. Unticking removes it again.</div>
+
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-bottom:12px;">
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.2px; color:#8f8f99;">REPEATS</span>
+                      <sc-for list="{{ sec.modes }}" as="m" hint-placeholder-count="3">
+                        <span onClick="{{ m.go }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; padding:6px 11px; border-radius:8px; cursor:pointer; color:{{ m.ink }}; background:{{ m.bg }}; border:1px solid {{ m.bd }};">{{ m.label }}</span>
+                      </sc-for>
+                      <sc-if value="{{ sec.showDate }}" hint-placeholder-val="{{ false }}">
+                        <input value="{{ sec.dateVal }}" onInput="{{ sec.setDate }}" type="date" style="padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{ sec.onCalendar }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:11px; color:#6cffba; padding-bottom:10px;">On your calendar for {{ sec.dateNice }}.</div>
+                    </sc-if>
 
                     <sc-for list="{{ sec.list }}" as="it" hint-placeholder-count="10">
                       <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid rgba(255,255,255,0.06);">
@@ -9342,7 +9356,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.04-251 · v11.251 full-body-checklist';
+const NOTIF_BUILD_VERSION = '2026.09.04-252 · v11.252 session-schedule';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9431,7 +9445,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{date:'',done:{},w:{}}, forgeOpen:null, forgeDraft:{},
+      forgeCentre:'home', forgeSection:'', forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',done:{},w:{}}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -13858,6 +13872,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.252', date:'Sep 4, 2026', notes:[
+      'The Full Body session now repeats daily, weekly, or on a day you pick. Daily clears at midnight, weekly on a Monday.',
+      'Pick a day and it appears on your calendar. Move the day and the event moves with it; switch back to daily or weekly and it comes off again.',
+      'Changing how often it repeats never touches what you have already logged \u2014 those sets happened.',
+    ]},
     {version:'v11.251', date:'Sep 4, 2026', major:true, notes:[
       'Full Body has a session checklist \u2014 squat, deadlift, bench, press, row, pull-ups, dips, carry, leg raise, plank \u2014 with a weight box on each.',
       'Ticking one logs it straight to your training log, the same one Fitness HQ writes to, so there is one record of what you did rather than two. Unticking takes it back out again.',
@@ -15715,9 +15734,59 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
   setForgeSection(k){ this.setState({forgeSection:k}); }
   _fbToday(){ return window.HealthKit ? window.HealthKit.today() : new Date().toLocaleDateString('en-CA'); }
-  /* The checklist resets itself at midnight rather than carrying yesterday's ticks. State is
-     stamped with the day it belongs to and read back through this. */
-  _fb(){ const f=this.state.forgeFB||{}; return f.date===this._fbToday() ? f : {date:this._fbToday(), done:{}, w:{}}; }
+  _fbLocal(d){ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } }
+  // Monday, so a week rolls over on the day people restart a programme rather than mid-weekend.
+  _fbWeekStart(){ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-((d.getDay()+6)%7)); return this._fbLocal(d); }
+  /* The period the ticks belong to. Daily rolls at midnight, weekly on Monday, and a session
+     set for one day belongs to that day and nothing else. */
+  _fbPeriod(mode, on){
+    if(mode==='week') return 'W'+this._fbWeekStart();
+    if(mode==='date') return 'D'+(on||'');
+    return this._fbToday();
+  }
+  /* Ticks are stamped with their period and dropped when it rolls over. Weights are not —
+     what you squat does not change because it is Tuesday. */
+  _fb(){
+    const f=this.state.forgeFB||{};
+    const mode=f.mode||'day', on=f.on||'';
+    const period=this._fbPeriod(mode, on);
+    if(f.period===period) return f;
+    return {period, mode, on, evId:f.evId||'', done:{}, w:f.w||{}};
+  }
+  setForgeFBMode(m){
+    const f=this._fb();
+    if(m!=='date' && f.evId) this._fbClearEvent(f.evId);
+    const next={...f, mode:m, evId:(m==='date'?f.evId:''), done:{}};
+    next.period=this._fbPeriod(m, next.on);
+    this.setState({forgeFB:next});
+    if(m==='date' && next.on) this._fbSyncEvent(next.on);
+  }
+  setForgeFBDate(e){
+    const on=(e&&e.target?e.target.value:e)||'';
+    const f=this._fb();
+    const next={...f, mode:'date', on, done:{}};
+    next.period=this._fbPeriod('date', on);
+    this.setState({forgeFB:next}, ()=>{ on ? this._fbSyncEvent(on) : (f.evId && this._fbClearEvent(f.evId)); });
+  }
+  _fbClearEvent(id){
+    if(!id) return;
+    this.mut(s=>({events:(s.events||[]).filter(e=>e.id!==id)}));
+    if(this._sbOn()) window.SB.remove('events', id);
+    this.setState(s=>({forgeFB:{...(s.forgeFB||{}), evId:''}}));
+  }
+  /* A session set for a day is a thing you have to turn up to, so it goes on the calendar
+     like anything else you have to turn up to — one event, moved rather than duplicated when
+     the day changes. */
+  _fbSyncEvent(on){
+    const f=this.state.forgeFB||{};
+    if(f.evId) this._fbClearEvent(f.evId);
+    const id=this._uuid(), title='Full Body session', time='09:00';
+    const ev={id, title, date:on, time, repeat:[], kind:'general', endTime:null, attendees:null, estMins:60};
+    this.mut(s=>({events:[...(s.events||[]), ev]}));
+    this.setState(s=>({forgeFB:{...(s.forgeFB||{}), evId:id}}));
+    if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title,
+      event_date:on,event_time:time,repeat_days:[],kind:'general',end_time:null,attendees:null,est_minutes:60});
+  }
   setForgeFBWeight(id,e){ const v=e&&e.target?e.target.value:e; const f=this._fb();
     this.setState({forgeFB:{...f, w:{...(f.w||{}), [id]:v}}}); }
   /* Ticking logs the set to the training log Fitness HQ writes to; unticking removes exactly
@@ -15751,7 +15820,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       this.mut(s=>({workouts:(s.workouts||[]).filter(w=>ids.indexOf(w.id)<0)}));
       if(this._sbOn()) ids.forEach(id=>window.SB.remove('workouts',id));
     }
-    this.setState({forgeFB:{date:this._fbToday(), done:{}, w:{}}});
+    this.setState({forgeFB:{...f, done:{}}});
     this.showToast('fitness','Session cleared', ids.length?(ids.length+' entries removed from your log'):'Nothing was logged yet'); }
   /* Master-detail: picking a region swaps the pane rather than collapsing it. There is no
      empty state to fall into — the binding falls back to the first region of whichever
@@ -17941,7 +18010,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           mark:x.key===secKey?'#E7D8A6':'#7c7c84',
           bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
-        const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{};
+        const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
           const list=sec.checklist||[];
           const n=list.filter(it=>fbDone[it.id]).length;
@@ -17949,6 +18018,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             key:sec.key, name:sec.name, tag:sec.tag,
             empty:!list.length, hasList:!!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
+            modes:[['day','DAILY'],['week','WEEKLY'],['date','ON A DAY']].map(m=>({
+              label:m[1], go:()=>this.setForgeFBMode(m[0]),
+              ink:fbMode===m[0]?'#0d0d10':'#9a9aa2',
+              bg:fbMode===m[0]?'#eef0f2':'transparent',
+              bd:fbMode===m[0]?'#eef0f2':'rgba(255,255,255,0.12)' })),
+            showDate:fbMode==='date', dateVal:fb.on||'',
+            setDate:(e)=>this.setForgeFBDate(e),
+            onCalendar:fbMode==='date' && !!fb.on && !!fb.evId,
+            dateNice:fb.on?this._niceDate(fb.on):'',
+            periodLabel:fbMode==='week'?'THIS WEEK':(fbMode==='date'?(fb.on?'ON THE DAY':'PICK A DAY'):'TODAY'),
             doneInk:n===0?'#8f8f99':(n===list.length?'#6cffba':'#e8b45a'),
             clear:()=>this.clearForgeFB(),
             list:list.map(it=>{

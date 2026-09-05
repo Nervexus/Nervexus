@@ -341,7 +341,7 @@ t('every section is listed, marked with the house crest and not a number', async
 async function openFullBody() {
   await boot({ forgeCentre: 'training' });
   await page.evaluate(() => window.__nvx.setState({
-    forgeSection: 'full-body', forgeFB: { date: '', done: {}, w: {} }, workouts: [] }));
+    forgeSection: 'full-body', forgeFB: { period: '', mode: 'day', on: '', evId: '', done: {}, w: {} }, workouts: [], events: [] }));
   await page.waitForTimeout(600);
 }
 const ticks = () => page.evaluate(() =>
@@ -460,7 +460,8 @@ t('yesterday\'s ticks do not carry into today', async () => {
   await boot({ forgeCentre: 'training' });
   await page.evaluate(() => window.__nvx.setState({
     forgeSection: 'full-body',
-    forgeFB: { date: '2020-01-01', done: { squat: { ids: ['x'] }, bench: { ids: ['y'] } }, w: {} } }));
+    forgeFB: { period: '2020-01-01', mode: 'day', on: '', evId: '',
+               done: { squat: { ids: ['x'] }, bench: { ids: ['y'] } }, w: {} } }));
   await page.waitForTimeout(700);
   ok(/0\/10 LOGGED/.test(await text()), 'a stale day is still showing its ticks');
   eq(await ticks(), 0, 'yesterday\'s ticks carried over');
@@ -480,6 +481,109 @@ t('the timed and distance items log too, not just the rep ones', async () => {
   ok(plank && plank.min > 0, 'the plank logged no minutes');
   const carry = w.find(x => /Farmer/.test(x.exercise));
   ok(carry && carry.dist > 0, 'the carry logged no distance');
+});
+
+t('the session repeats daily, weekly or on one day', async () => {
+  await openFullBody();
+  const body = await text();
+  for (const m of ['DAILY', 'WEEKLY', 'ON A DAY']) ok(body.includes(m), m + ' option is missing');
+  ok(/TODAY/.test(body), 'it should start on the daily setting');
+});
+
+t('weekly ticks survive tomorrow but not next week', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
+  await page.waitForTimeout(500);
+  await tick('Back squat');
+  await page.waitForTimeout(700);
+  ok(/1\/10 LOGGED/.test(await text()), 'the weekly tick did not register');
+  ok(/THIS WEEK/.test(await text()), 'it should say the period it is counting');
+
+  /* A tick made today is still there tomorrow on a weekly session — that is the whole
+     difference from daily — but a stamp from a previous week is dropped. */
+  const stamp = await page.evaluate(() => window.__nvx.state.forgeFB.period);
+  ok(/^W\d{4}-\d{2}-\d{2}$/.test(stamp), 'a weekly session should be stamped with its week: ' + stamp);
+  await page.evaluate(() => window.__nvx.setState({
+    forgeFB: { ...window.__nvx.state.forgeFB, period: 'W2020-01-06' } }));
+  await page.waitForTimeout(600);
+  ok(/0\/10 LOGGED/.test(await text()), 'last week\'s ticks carried into this one');
+});
+
+t('a session set for a day goes on the calendar', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx.setForgeFBDate('2026-09-20'));
+  await page.waitForTimeout(700);
+  const ev = await page.evaluate(() => window.__nvx.state.events);
+  eq(ev.length, 1, 'no calendar event was created');
+  eq(ev[0].date, '2026-09-20', 'the event is on the wrong day');
+  ok(/Full Body/.test(ev[0].title), 'the event is not named for the session');
+  ok(/On your calendar/.test(await text()), 'the page does not say it is on the calendar');
+});
+
+t('the event really shows on the main calendar', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.setForgeFBDate('2026-09-20'));
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setState({ scene: 'calendar', calSel: '2026-09-20' }));
+  await page.waitForTimeout(900);
+  ok(/Full Body session/.test(await text()), 'the calendar page does not show the session');
+});
+
+t('moving the day moves the event rather than leaving two', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.setForgeFBDate('2026-09-20'));
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setForgeFBDate('2026-09-27'));
+  await page.waitForTimeout(700);
+  const ev = await page.evaluate(() => window.__nvx.state.events);
+  eq(ev.length, 1, 'changing the day left ' + ev.length + ' events behind');
+  eq(ev[0].date, '2026-09-27', 'the event did not move');
+});
+
+t('switching back off a set day takes the event with it', async () => {
+  await openFullBody();
+  await page.evaluate(() => window.__nvx.setForgeFBMode('date'));
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.setForgeFBDate('2026-09-20'));
+  await page.waitForTimeout(600);
+  eq(await page.evaluate(() => window.__nvx.state.events.length), 1, 'nothing to remove');
+  await page.evaluate(() => window.__nvx.setForgeFBMode('day'));
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.events.length), 0, 'the calendar kept a session that is no longer scheduled');
+});
+
+t('changing how often it repeats does not touch the training log', async () => {
+  /* The ticks reset because they belong to a different period now, but the sets that were
+     already logged happened — they are not the checklist's to take back. */
+  await openFullBody();
+  await tick('Back squat');
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'nothing logged to check');
+  await page.evaluate(() => window.__nvx.setForgeFBMode('week'));
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'switching the schedule deleted a logged set');
+  ok(/0\/10 LOGGED/.test(await text()), 'the new period should start empty');
+});
+
+t('weights survive the period rolling over', async () => {
+  await openFullBody();
+  await page.evaluate(() => {
+    const i = [...document.querySelectorAll('input')].find(x => x.placeholder === 'kg');
+    i.focus();
+  });
+  await page.keyboard.type('80');
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx.setState({
+    forgeFB: { ...window.__nvx.state.forgeFB, period: '2020-01-01' } }));
+  await page.waitForTimeout(600);
+  const w = await page.evaluate(() => window.__nvx.state.forgeFB.w);
+  ok(w && Object.keys(w).length, 'the weights were wiped with the ticks');
 });
 
 t('the section list is a sidebar beside the section, not above it', async () => {
