@@ -60,7 +60,7 @@
         rng('Medicine-ball chest pass', 3, 5, 3, 6),
         rng('Cable chest press', 3, 4, 8, 12),
         rng('Single-arm cable press', 3, 4, 6, 12, {perSide: true}),
-        rng('Landmine press', 3, 4, 6, 10, {perSide: true}),
+        rng('Single-arm dumbbell floor press', 3, 4, 6, 10, {perSide: true}),
         rng('Cable fly', 2, 3, 10, 15),
         rng('Dumbbell squeeze press', 3, 3, 8, 12)
       ]

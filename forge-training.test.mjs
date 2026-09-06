@@ -104,17 +104,18 @@ t('no home list needs a gym', () => {
   }
 });
 
-t('a name shared between sections is at least a different body part', () => {
-  /* A landmine press is genuinely on both the Chest and the Shoulders list, so the session
-     tells items apart by body part as well as name. Two sections sharing both would still
-     collide, and one of them would silently refuse to add. */
+t('no exercise name appears in two sections', () => {
+  /* A landmine press was on both the Chest and the Shoulders list. The session can tell two
+     of them apart by body part now, but a name on two lists is still a name on two lists —
+     the same movement described twice, and a second chance to disagree about its numbers.
+     One list keeps it and the other gets its own movement. */
   const seen={};
   for(const sec of T.SECTIONS){
     if(!sec.pool) continue;
     for(const where of Object.keys(sec.pool)){
       for(const x of sec.pool[where]){
-        const k=x.name.toLowerCase()+' @ '+sec.part;
-        if(seen[k] && seen[k]!==sec.name) throw new Error('"'+x.name+'" is in both '+seen[k]+' and '+sec.name+' against the same body part');
+        const k=x.name.toLowerCase();
+        if(seen[k] && seen[k]!==sec.name) throw new Error('"'+x.name+'" is on both the '+seen[k]+' and '+sec.name+' lists');
         seen[k]=sec.name;
       }
     }

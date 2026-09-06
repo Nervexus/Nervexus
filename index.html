@@ -341,7 +341,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=11"></script>
+  <script src="forge-training.js?v=12"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -9530,7 +9530,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-271 · v11.271 shoulders-fighter';
+const NOTIF_BUILD_VERSION = '2026.09.06-272 · v11.272 no-dupes';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14166,6 +14166,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.272', date:'Sep 6, 2026', major:true, notes:[
+      'The landmine press was on both the Chest and the Shoulders list. It stays on Shoulders, where it sits in the pressing block; Chest gets a single-arm dumbbell floor press in its place — same slot, same job, unilateral pressing. Both lists keep their length.',
+      'No exercise name may now appear on two lists at all, and there is a check that keeps it that way.',
+    ]},
     {version:'v11.271', date:'Sep 6, 2026', major:true, notes:[
       'Shoulders is now the fighter session too: sixteen exercises in priority order with real ranges, same as Chest. No gym/home tabs — one ordered list.',
       'Battle ropes are rounds of seconds rather than reps, so the block says ROUNDS and SECS and the session turns them into minutes, which is what the training log actually records.',

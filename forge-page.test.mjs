@@ -1296,15 +1296,18 @@ t('timed work is offered in seconds and logged as time', async () => {
 });
 
 t('the same exercise on two body parts can both be added', async () => {
-  /* A landmine press is on the Chest list and on the Shoulders list. The session matched on
-     name alone, so whichever was added second silently refused. */
+  /* A landmine press was on the Chest list and on the Shoulders list, and the session matched
+     on name alone, so whichever was added second silently refused. The lists no longer share
+     a name — that is now a data rule with its own test — so the collision is created here
+     rather than shipped, and the session still has to survive it. */
   await openChest();
   const shared = await page.evaluate(() => {
-    const names = (k) => window.ForgeTraining.section(k).pool.all.map(x => x.name.toLowerCase());
-    const c = names('chest'), s = names('shoulders');
-    return c.find(n => s.includes(n)) || null;
+    const s = window.ForgeTraining.section('shoulders');
+    const name = window.ForgeTraining.section('chest').pool.all[0].name;
+    s.pool.all = [{ ...s.pool.all[0], name }, ...s.pool.all.slice(1)];
+    return name.toLowerCase();
   });
-  ok(shared, 'no exercise is on two lists, so nothing is being tested');
+  ok(shared, 'could not set up the collision');
 
   const add = (n) => page.evaluate((name) => {
     const title = [...document.querySelectorAll('span')]
@@ -1324,6 +1327,8 @@ t('the same exercise on two body parts can both be added', async () => {
   eq(items.length, 2, 'the second one refused to add');
   eq([...new Set(items.map(i => i.part))].sort().join(','), 'Chest,Shoulders',
     'they did not go in against different body parts');
+  await page.evaluate(() => location.reload());
+  await page.waitForFunction(() => !!window.__nvx, null, { timeout: 20000 });
 });
 
 t('the pool does not appear on a section that has none', async () => {
