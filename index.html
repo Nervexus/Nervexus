@@ -341,7 +341,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=10"></script>
+  <script src="forge-training.js?v=11"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -9530,7 +9530,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-270 · v11.270 xp-rebalance';
+const NOTIF_BUILD_VERSION = '2026.09.06-271 · v11.271 shoulders-fighter';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14166,6 +14166,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.271', date:'Sep 6, 2026', major:true, notes:[
+      'Shoulders is now the fighter session too: sixteen exercises in priority order with real ranges, same as Chest. No gym/home tabs — one ordered list.',
+      'Battle ropes are rounds of seconds rather than reps, so the block says ROUNDS and SECS and the session turns them into minutes, which is what the training log actually records.',
+      'A landmine press is on both the Chest and the Shoulders list. The session used to match on name alone, so whichever you added second silently refused — it now tells them apart by body part, and both can sit in one session.',
+    ]},
     {version:'v11.270', date:'Sep 6, 2026', major:true, notes:[
       'Your Power Level was measuring the wrong things, so it has been rebuilt. It will drop a long way — that is the fix, not a side effect.',
       'Shipping a build used to pay 500 XP. 113 of them had landed, which was 72% of your entire score: the index went up whenever the app was deployed, whether or not you had done anything. That is gone.',
@@ -16249,18 +16254,28 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   /* Straight from a section's pool into the Full Body session, which is the daily checklist.
      Nothing is logged here — it joins the list, and ticking it there is what writes the set. */
+  /* Matched on the body part as well as the name: a landmine press is on both the Chest and
+     the Shoulders list, and on name alone the second one would refuse to add and say nothing
+     useful about why. */
+  _fbSame(a, b){ return a.name.toLowerCase()===b.name.toLowerCase() && (a.part||'')===(b.part||''); }
   addPoolToSession(ex, part, over){
     const f=this._fb();
-    if((f.items||[]).some(i=>i.name.toLowerCase()===ex.name.toLowerCase())){
+    const asPart=(this.FB_PARTS().indexOf(part)>=0?part:'Full');
+    if((f.items||[]).some(i=>this._fbSame(i, {name:ex.name, part:asPart}))){
       this.showToast('fitness','Already in your session', ex.name); return;
     }
     const o=over||{};
     const reps=o.reps!=null?o.reps:(ex.reps||0);
     const weight=o.weight!=null?o.weight:0;
-    const it={ id:this._uuid(), name:ex.name, part:(this.FB_PARTS().indexOf(part)>=0?part:'Full'),
-      sets:ex.sets||0, reps:reps, minutes:ex.minutes||0, dist:0, distUnit:'m' };
+    /* Timed work goes into the log as minutes, which is what it records — seconds a round
+       across the rounds, never rounded away to nothing. */
+    const timed=ex.unit==='sec';
+    const it={ id:this._uuid(), name:ex.name, part:asPart,
+      sets:ex.sets||0, reps:timed?0:reps,
+      minutes:timed?Math.max(1, Math.round((ex.sets||1)*reps/60)):(ex.minutes||0),
+      dist:0, distUnit:'m' };
     // The weight rides in the session's weight map, which is where ticking reads it from.
-    const w={...(f.w||{})}; if(weight>0) w[it.id]=String(weight);
+    const w={...(f.w||{})}; if(weight>0 && !timed) w[it.id]=String(weight);
     this.setState({forgeFB:{...f, items:[...(f.items||[]), it], w}});
     this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it)+(weight>0?' · '+weight+'kg':''));
   }
@@ -18610,7 +18625,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             poolHint:'Adds to your Full Body session',
             hasPriority:!!sec.priority, priority:sec.priority||'',
             poolList:((sec.pool||{})[pool]||[]).map(x=>{
-              const item=(fb.items||[]).find(i=>i.name.toLowerCase()===x.name.toLowerCase());
+              const asPart=(this.FB_PARTS().indexOf(sec.part)>=0?sec.part:'Full');
+              const item=(fb.items||[]).find(i=>this._fbSame(i, {name:x.name, part:asPart}));
               const inSession=!!item, ticked=!!(item && fbDone[item.id]);
               const v=this.poolVals(sec.key, x, item);
               /* Frozen once ticked: the set is in the training log with these numbers, and
@@ -18620,7 +18636,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
                  than a weight stepper that would sit unset for ever. */
               const raw=[];
               if(!x.noLoad) raw.push(['weight','WEIGHT','kg', v.weight>0?String(v.weight):'']);
-              raw.push(['reps','REPS','reps', String(v.reps)]);
+              raw.push(['reps', x.unit==='sec'?'SECS':'REPS', x.unit==='sec'?'sec':'reps', String(v.reps)]);
               const steps=raw.map(st=>{
                 const tk=this._poolTextKey(sec.key, x, st[0]);
                 const typed=pt[tk];
@@ -18634,9 +18650,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               });
               const setsTxt=(x.setsMax && x.setsMax>x.sets) ? (x.sets+'\u2013'+x.setsMax) : String(x.sets||1);
               const repsTxt=(x.repsMax && x.repsMax>x.reps) ? (' \u00d7 '+x.reps+'\u2013'+x.repsMax) : '';
+              const unitTxt=x.unit==='sec'?' SEC':'';
               const side=x.perSide?' \u00b7 PER SIDE':'';
               return { name:x.name, steps,
-                target:ticked?'LOGGED':(setsTxt+' SETS'+repsTxt+side),
+                target:ticked?'LOGGED':(setsTxt+' '+(x.setsLabel||'SETS')+repsTxt+unitTxt+side),
                 targetInk:ticked?'#E7D8A6':'#8f8f99',
                 label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
                 ink:inSession?'var(--forge-add-on)':'var(--forge-add-ink)',

@@ -38,6 +38,12 @@
     var e = { name: name, sets: setsLo, setsMax: setsHi, reps: repsLo, repsMax: repsHi };
     if (opt && opt.noLoad) e.noLoad = true;
     if (opt && opt.perSide) e.perSide = true;
+    /* Some work is timed rather than counted. unit:'sec' means the numbers are seconds of
+       work, and the session turns them into minutes on the way in, because minutes are what
+       the training log records. setsLabel renames "sets" where the work is not counted in
+       sets — rounds, on the ropes. */
+    if (opt && opt.unit) e.unit = opt.unit;
+    if (opt && opt.setsLabel) e.setsLabel = opt.setsLabel;
     return e;
   }
   var CHEST = {
@@ -64,22 +70,29 @@
 
   var SHOULDERS = {
     key: 'shoulders', name: 'Shoulders', tag: 'SHOULDERS', part: 'Shoulders',
+    priority: 'Shoulder strength → Explosiveness → Rotator cuff stability → Rear delts → Shoulder endurance',
     pool: {
-      gym: [ ex('Standing barbell overhead press',4,6), ex('Seated barbell overhead press',4,8),
-        ex('Seated dumbbell shoulder press',4,8), ex('Standing dumbbell shoulder press',3,10),
-        ex('Arnold press',3,10), ex('Push press',4,5), ex('Z press',3,8),
-        ex('Smith machine shoulder press',3,8), ex('Machine shoulder press',3,10),
-        ex('Dumbbell lateral raise',4,12), ex('Cable lateral raise',3,15),
-        ex('Machine lateral raise',3,12), ex('Leaning cable lateral raise',3,15),
-        ex('Dumbbell front raise',3,12), ex('Plate front raise',3,12),
-        ex('Rear delt dumbbell flye',3,15), ex('Reverse pec deck',3,15),
-        ex('Cable face pull',4,15), ex('Barbell upright row',3,10), ex('Barbell shrug',4,10) ],
-      home: [ nl('Pike press-up',4,10), nl('Elevated pike press-up',3,8), nl('Wall walk',3,5),
-        nl('Band overhead press',3,15), nl('Band lateral raise',3,20), nl('Band front raise',3,15),
-        nl('Band face pull',3,20), nl('Band pull-apart',3,20),
-        ex('Backpack shoulder press',3,12), ex('Backpack lateral raise',3,15) ]
+      all: [
+        rng('Barbell overhead press', 3, 5, 3, 8),
+        rng('Dumbbell shoulder press', 3, 4, 6, 10),
+        rng('Single-arm dumbbell overhead press', 3, 4, 6, 10, {perSide: true}),
+        rng('Landmine press', 3, 4, 6, 10, {perSide: true}),
+        rng('Arnold press', 3, 4, 8, 12),
+        rng('Dumbbell lateral raise', 3, 4, 10, 15),
+        rng('Cable lateral raise', 3, 4, 10, 15),
+        rng('Face pulls', 3, 4, 12, 20),
+        rng('Cable external rotation', 2, 3, 12, 20, {perSide: true}),
+        rng('Dumbbell rear delt fly', 3, 4, 10, 15),
+        rng('Reverse pec deck', 3, 4, 10, 15),
+        rng('Plate front raise', 2, 3, 10, 15),
+        rng('Medicine-ball overhead throw', 3, 5, 3, 6),
+        rng('Medicine-ball rotational throw', 3, 5, 3, 6, {perSide: true}),
+        rng('Battle ropes', 3, 5, 20, 30, {unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Dumbbell / barbell shrugs', 3, 4, 8, 15)
+      ]
     }
   };
+
   var SECTIONS = [
     CHEST,
     SHOULDERS,

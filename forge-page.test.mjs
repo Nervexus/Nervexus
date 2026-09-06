@@ -754,17 +754,29 @@ t('Chest lists its session, in order, with no split it does not have', async () 
   ok(body.includes('TRAINING PRIORITY'), 'the training priority is not on the page');
 });
 
-t('a section with two lists still shows its tabs', async () => {
+t('a section with two lists shows its tabs', async () => {
+  /* No section ships two lists any more — both filled ones are a single ordered session. The
+     machinery that builds the tabs from whatever lists a section has is still there, so it is
+     tested against a section given two lists at runtime rather than left unexercised. */
   await openChest();
-  await page.evaluate(() => window.__nvx.setForgeSection('shoulders'));
+  await page.evaluate(() => {
+    const neck = window.ForgeTraining.section('neck');
+    neck.part = 'Shoulders';
+    neck.pool = {
+      gym: [{ name: 'Neck harness extension', sets: 3, reps: 12 },
+            { name: 'Neck harness flexion', sets: 3, reps: 12 }],
+      home: [{ name: 'Towel neck iso', sets: 3, reps: 20, noLoad: true }] };
+    window.__nvx.setForgeSection('neck');
+    window.__nvx.setForgePool('gym');
+  });
   await page.waitForTimeout(800);
-  eq((await poolTabs()).join(','), 'GYM,HOME', 'shoulders lost its gym/home tabs');
-  const D = await page.evaluate(() => window.ForgeTraining.section('shoulders').pool);
-  eq(await addBtns(), D.gym.length, 'the gym list did not render one block each');
+  eq((await poolTabs()).join(','), 'GYM,HOME', 'a two-list section did not get its tabs');
+  eq(await addBtns(), 2, 'the gym list did not render one block each');
   await page.evaluate(() => window.__nvx.setForgePool('home'));
   await page.waitForTimeout(700);
-  eq(await addBtns(), D.home.length, 'the home list did not render one block each');
-  ok(!(await text()).includes(D.gym[0].name), 'the gym list is still showing under HOME');
+  eq(await addBtns(), 1, 'the home list did not render one block each');
+  ok(!(await text()).includes('Neck harness extension'), 'the gym list is still showing under HOME');
+  await page.evaluate(() => { const n = window.ForgeTraining.section('neck'); delete n.pool; delete n.part; });
 });
 
 t('a range is offered as a range', async () => {
@@ -1227,7 +1239,7 @@ t('the shoulders pool renders and adds like chest', async () => {
   await page.evaluate(() => window.__nvx.setForgeSection('shoulders'));
   await page.waitForTimeout(800);
   const D = await page.evaluate(() => window.ForgeTraining.section('shoulders').pool);
-  eq(await addBtns(), D.gym.length, 'the shoulders gym list did not render one block each');
+  eq(await addBtns(), D.all.length, 'the shoulders list did not render one block each');
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
       .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD')[0].click();
@@ -1238,24 +1250,80 @@ t('the shoulders pool renders and adds like chest', async () => {
   eq(items[0].part, 'Shoulders', 'it did not log against Shoulders');
 });
 
-t('a home exercise you can load still gets its weight stepper', async () => {
-  /* Chest at home is all bodyweight and bands; shoulders has the backpack lifts, which you
-     really do load — so the stepper follows the exercise, not the GYM/HOME tab. */
+t('timed work is offered in seconds and logged as time', async () => {
+  /* Battle ropes are rounds of seconds, not reps. The training log records minutes, so the
+     block has to say seconds and the session has to convert — otherwise the number lands in
+     the log as a rep count, which it is not. */
   await openChest();
   await page.evaluate(() => window.__nvx.setForgeSection('shoulders'));
-  await page.evaluate(() => window.__nvx.setForgePool('home'));
   await page.waitForTimeout(800);
-  const D = await page.evaluate(() => window.ForgeTraining.section('shoulders').pool.home);
-  const loaded = D.filter(x => !x.noLoad);
-  ok(loaded.length > 0, 'no loadable home exercise to test with');
-  const w = await page.evaluate(() => [...document.querySelectorAll('span')]
-    .filter(e => e.children.length === 0 && e.textContent.trim() === 'WEIGHT').length);
-  eq(w, loaded.length, 'the wrong number of home blocks carry a weight stepper');
-  const src = loaded[0];
-  eq(await stepVal(src.name, 'WEIGHT'), '—', 'a loadable exercise should start unset');
-  await stepClick(src.name, 'WEIGHT', '+');
-  await page.waitForTimeout(500);
-  eq(await stepVal(src.name, 'WEIGHT'), '2.5', 'a loaded backpack could not be set');
+  const src = await page.evaluate(() =>
+    window.ForgeTraining.section('shoulders').pool.all.find(x => x.unit === 'sec'));
+  ok(src, 'no timed exercise in the shoulders list');
+
+  const body = await text();
+  ok(body.includes(src.sets + '–' + src.setsMax + ' ROUNDS'), 'it is not counted in rounds');
+  ok(body.includes('SEC'), 'the block does not say the numbers are seconds');
+  const labels = await page.evaluate((n) => {
+    const title = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === n);
+    return [...title.closest('.cc-glowcard').querySelectorAll('span')]
+      .filter(e => e.children.length === 0).map(e => e.textContent.trim());
+  }, src.name);
+  ok(labels.includes('SECS'), 'the stepper is not labelled in seconds');
+  ok(!labels.includes('REPS'), 'the stepper still says reps');
+  ok(!labels.includes('WEIGHT'), 'a rope has no weight to dial');
+
+  await page.evaluate((n) => {
+    const title = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === n);
+    [...title.closest('.cc-glowcard').querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD').click();
+  }, src.name);
+  await page.waitForTimeout(700);
+  const it = await page.evaluate(() => window.__nvx.state.forgeFB.items[0]);
+  eq(it.reps, 0, 'seconds were carried into the log as reps');
+  eq(it.minutes, Math.max(1, Math.round(src.sets * src.reps / 60)),
+    'the rounds did not become minutes');
+
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(700);
+  await tick(src.name);
+  await page.waitForTimeout(800);
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 1, 'ticking the ropes logged nothing');
+  ok(w[0].min > 0, 'it reached the log with no time on it');
+});
+
+t('the same exercise on two body parts can both be added', async () => {
+  /* A landmine press is on the Chest list and on the Shoulders list. The session matched on
+     name alone, so whichever was added second silently refused. */
+  await openChest();
+  const shared = await page.evaluate(() => {
+    const names = (k) => window.ForgeTraining.section(k).pool.all.map(x => x.name.toLowerCase());
+    const c = names('chest'), s = names('shoulders');
+    return c.find(n => s.includes(n)) || null;
+  });
+  ok(shared, 'no exercise is on two lists, so nothing is being tested');
+
+  const add = (n) => page.evaluate((name) => {
+    const title = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim().toLowerCase() === name);
+    if (!title) throw new Error('no block for ' + name);
+    [...title.closest('.cc-glowcard').querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD').click();
+  }, n);
+
+  await add(shared);
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.__nvx.setForgeSection('shoulders'));
+  await page.waitForTimeout(800);
+  await add(shared);
+  await page.waitForTimeout(700);
+  const items = await page.evaluate(() => window.__nvx.state.forgeFB.items);
+  eq(items.length, 2, 'the second one refused to add');
+  eq([...new Set(items.map(i => i.part))].sort().join(','), 'Chest,Shoulders',
+    'they did not go in against different body parts');
 });
 
 t('the pool does not appear on a section that has none', async () => {

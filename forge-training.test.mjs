@@ -33,7 +33,7 @@ t('a section can be found by key, and an unknown key returns null', () => {
    against. A section is added here the moment it gets a pool. */
 const FILLED = [
   ['chest','Chest', {all:12}],
-  ['shoulders','Shoulders', {gym:20, home:10}],
+  ['shoulders','Shoulders', {all:16}],
 ];
 
 t('each filled section carries the lists it is meant to', () => {
@@ -104,18 +104,35 @@ t('no home list needs a gym', () => {
   }
 });
 
-t('no exercise name is shared between two sections', () => {
-  /* The session refuses a second exercise of the same name, so the same name in two
-     sections would let one of them silently fail to add. */
+t('a name shared between sections is at least a different body part', () => {
+  /* A landmine press is genuinely on both the Chest and the Shoulders list, so the session
+     tells items apart by body part as well as name. Two sections sharing both would still
+     collide, and one of them would silently refuse to add. */
   const seen={};
   for(const sec of T.SECTIONS){
     if(!sec.pool) continue;
     for(const where of Object.keys(sec.pool)){
       for(const x of sec.pool[where]){
-        const k=x.name.toLowerCase();
-        if(seen[k] && seen[k]!==sec.name) throw new Error('"'+x.name+'" is in both '+seen[k]+' and '+sec.name);
+        const k=x.name.toLowerCase()+' @ '+sec.part;
+        if(seen[k] && seen[k]!==sec.name) throw new Error('"'+x.name+'" is in both '+seen[k]+' and '+sec.name+' against the same body part');
         seen[k]=sec.name;
       }
+    }
+  }
+});
+
+t('timed work says so, and is loggable as time', () => {
+  /* The training log records minutes, not seconds. An exercise measured in seconds has to
+     carry the unit so the block can say so and the session can convert it — otherwise the
+     numbers land in the log as reps, which they are not. */
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    for(const where of Object.keys(sec.pool)) for(const x of sec.pool[where]){
+      if(!x.unit) continue;
+      if(x.unit!=='sec') throw new Error(x.name+': unknown unit '+x.unit);
+      if(!(x.reps>0)) throw new Error(x.name+' is timed but carries no duration');
+      const mins=Math.max(1, Math.round((x.sets||1)*x.reps/60));
+      if(!(mins>0)) throw new Error(x.name+' converts to no time at all');
     }
   }
 });
