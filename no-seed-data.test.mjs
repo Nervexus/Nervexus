@@ -120,20 +120,23 @@ t('height starts blank, and BMI waits for it', async () => {
   ok(await page.evaluate(() => window.HealthKit.bmi({ heightCm: 180 }, 82) > 0), 'BMI should still work once a height is given');
 });
 
-t('the body page shows a dash for BMI rather than a made-up one', async () => {
+t('BMI is withheld rather than invented when no height is known', async () => {
+  /* This was checked on the body page, which has gone with Health & Productivity. The
+     guarantee is not about the page: it is that nothing supplies a height nobody entered.
+     A default of 181cm once produced a confident BMI from a stranger's height, so it is
+     asserted against the engine, where it will hold whatever page reads it next. */
   await fresh();
-  await page.evaluate(() => window.__nvx.setState({ scene: 'health', healthSub: 'body', perfCheckinOpen: false }));
-  await page.waitForTimeout(800);
-  const txt = await body();
-  ok(/BMI/i.test(txt), 'the body page should still offer BMI');
-  ok(!/BMI[^\n]*\d/.test(txt), 'a BMI number is showing with no height entered: '
-     + (txt.match(/BMI[^\n]*/) || [])[0]);
-  const h = await page.evaluate(() => {
-    const i = [...document.querySelectorAll('input')].find(x => /Height/i.test(x.placeholder || '')
-      || /Height/i.test((x.previousElementSibling || {}).textContent || ''));
-    return i ? i.value : null;
+  const got = await page.evaluate(() => {
+    const K = window.HealthKit, H = window.__nvx.state.health || {};
+    return { height: H.heightCm === undefined ? 'missing' : H.heightCm,
+             bmiNoHeight: K.bmi({ heightCm: null }, 82),
+             bmiWithHeight: K.bmi({ heightCm: 180 }, 81) };
   });
-  ok(h === null || h === '', 'the height field is pre-filled with ' + h);
+  ok(got.height === null || got.height === '' || got.height === 'missing',
+    'a height nobody entered is on file: ' + got.height);
+  eq(got.bmiNoHeight, null, 'a BMI was produced with no height');
+  ok(got.bmiWithHeight > 24 && got.bmiWithHeight < 26,
+    'BMI is wrong when a height is known: ' + got.bmiWithHeight);
 });
 
 t('an empty account scores nothing rather than scoring zero', async () => {

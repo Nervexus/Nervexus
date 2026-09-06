@@ -2296,385 +2296,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </sc-if>
 
       <!-- ===== HEALTH CENTRE ===== -->
-      <sc-if value="{{ isHealth }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Health" style="animation:rise .5s ease both;">
-        <div style="display:flex; gap:8px; margin-bottom:14px;">
-          <sc-for list="{{ fitTabs }}" as="t" hint-placeholder-count="2"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
-        </div>
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <span onClick="{{ goHealthView }}" style="font-size:11.5px; font-weight:600; color:{{ healthViewC }}; border:1px solid {{ healthViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ healthViewBg }};">🩺 Health</span>
-          <span onClick="{{ goProdView }}" style="font-size:11.5px; font-weight:600; color:{{ prodViewC }}; border:1px solid {{ prodViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ prodViewBg }};">📊 Productivity</span>
-        </div>
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
-          <div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; color:#C9C9CE; font-size:11px; letter-spacing:3px; margin-bottom:7px;">◆ FITNESS HQ · HEALTH CENTRE</div>
-            <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Body &amp; Health Tracking</h1>
-          </div>
-          <div style="display:flex; gap:22px; font-family:'JetBrains Mono',monospace;">
-            <div><div style="font-size:10px; color:#7c7c84; letter-spacing:1px;">HEALTH SCORE</div><div style="font-size:21px; color:#6cffba;">{{ healthScore }}</div></div>
-            <div><div style="font-size:10px; color:#7c7c84; letter-spacing:1px;">WEIGHT</div><div style="font-size:21px; color:#eef0f2;">{{ curWeightU }}</div></div>
-            <div><div style="font-size:10px; color:#7c7c84; letter-spacing:1px;">BODY FAT</div><div style="font-size:21px; color:#eef0f2;">{{ bodyFat }}%</div></div>
-          </div>
-        </div>
-
-
-        <!-- ============ OVERVIEW ============ -->
-        <sc-if value="{{ hOverview }}" hint-placeholder-val="{{ true }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div class="cc-stat4" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px;">
-              <div style="display:flex; flex-direction:column; align-items:center; text-align:center;"><canvas data-hgauge="recovery" style="width:112px; height:112px;"></canvas><div style="font-size:13px; font-weight:600; color:#eef0f2; margin-top:8px;">Recovery</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:2px;">Optimal to train</div></div>
-              <div style="display:flex; flex-direction:column; align-items:center; text-align:center;"><canvas data-hgauge="sleep" style="width:112px; height:112px;"></canvas><div style="font-size:13px; font-weight:600; color:#eef0f2; margin-top:8px;">Sleep</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:2px;">{{ lastSleep }}h last night</div></div>
-              <div style="display:flex; flex-direction:column; align-items:center; text-align:center;"><canvas data-hgauge="kcal" style="width:112px; height:112px;"></canvas><div style="font-size:13px; font-weight:600; color:#eef0f2; margin-top:8px;">Calories</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:2px;">{{ kcalTotal }} / {{ kcalGoal }}</div></div>
-              <div style="display:flex; flex-direction:column; align-items:center; text-align:center;"><canvas data-hgauge="water" style="width:112px; height:112px;"></canvas><div style="font-size:13px; font-weight:600; color:#eef0f2; margin-top:8px;">Hydration</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:2px;">{{ hydTodayLabel }}</div></div>
-            </div>
-          </div>
-
-          <!-- Today's Stats -->
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">Today's Stats</span><span onClick="{{ toggleStatsEdit }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#FFFFFF; cursor:pointer; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:5px 11px;" style-hover="{ background:'rgba(255,255,255,0.1)' }">{{ statsEditLabel }}</span></div>
-            <sc-if value="{{ statsEdit }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
-                <sc-for list="{{ statToggles }}" as="s" hint-placeholder-count="10"><span onClick="{{ s.toggle }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ s.c }}; border:1px solid {{ s.bd }}; border-radius:8px; padding:6px 11px; cursor:pointer; background:{{ s.bg }};">{{ s.check }} {{ s.label }}</span></sc-for>
-              </div>
-            </sc-if>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px;">
-              <sc-for list="{{ statTiles }}" as="t" hint-placeholder-count="8"><div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px 14px;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:600; color:{{ t.c }};">{{ t.val }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:3px;">{{ t.label }}</div></div></sc-for>
-            </div>
-          </div>
-
-          <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">Sleep · last 14 nights</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa2;">avg {{ avgSleep }}h</span></div>
-              <canvas data-chart="ovSleep" style="width:100%; height:120px; display:block;"></canvas>
-              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:14px;">
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">CONSISTENCY</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:{{ slpConsColor }}; margin-top:2px;">{{ slpConsistency }}</div></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">WEEKLY AVG</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#eef0f2; margin-top:2px;">{{ slpWeekAvg }}h</div></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">MONTHLY AVG</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#eef0f2; margin-top:2px;">{{ slpMonthAvg }}h</div></div>
-              </div>
-            </div>
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">Hydration · this week</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#5aa0dc;">{{ hydPct }}% today</span></div>
-              <canvas data-chart="ovHyd" style="width:100%; height:120px; display:block;"></canvas>
-              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:14px;">
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">TODAY</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#eef0f2; margin-top:2px;">{{ hydTodayShort }}</div></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">REMAINING</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:{{ hydRemainColor }}; margin-top:2px;">{{ hydRemaining }}</div></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">GOAL</div><div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:#eef0f2; margin-top:2px;">{{ hydGoalShort }}</div></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; padding:22px;">
-            <div style="display:flex; align-items:center; gap:11px; margin-bottom:12px;">
-              <div style="width:36px; height:36px; border-radius:11px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; font-size:16px;">✚</div>
-              <div><div style="font-size:14px; font-weight:700;">AI Health Specialist</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; letter-spacing:1px;">READS YOUR LOGGED SLEEP · HYDRATION · BODY DATA</div></div>
-            </div>
-            <p style="font-size:14px; line-height:1.6; color:#d6d6da;">{{ healthAdvice }}</p>
-            <div style="display:flex; gap:9px; margin-top:14px; flex-wrap:wrap;">
-              <sc-for list="{{ healthChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.ask }}" style="font-size:12px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.3); border-radius:10px; padding:8px 13px; cursor:pointer; background:rgba(255,255,255,0.08);" style-hover="{ background:'rgba(255,255,255,0.18)' }">{{ c.label }}</span></sc-for>
-            </div>
-          </div>
-        </sc-if>
-
-        </sc-if>
-        <!-- ============ BODY METRICS ============ -->
-        <!-- Sits directly under the training log rather than far down the page, because this is
-             where Loura files a spoken weight and you need to see that it landed. Stripped to the
-             three figures that actually get kept up: the fifteen tape measurements that used to
-             follow made a snapshot feel like it needed a full measuring session first. -->
-        <sc-if value="{{ hBody }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-              <div><div style="font-size:13px; font-weight:600; color:#eef0f2;">Body metrics</div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-top:3px;">{{ bodyFormTitle }}</div></div>
-              <div style="display:flex; gap:14px; align-items:center;">
-                <div style="display:flex; gap:5px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">MASS</span><sc-for list="{{ massUnitChips }}" as="u" hint-placeholder-count="2"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:4px 8px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div>
-                <div style="display:flex; gap:5px; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HEIGHT</span><sc-for list="{{ lenUnitChips }}" as="u" hint-placeholder-count="2"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:4px 8px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div>
-              </div>
-            </div>
-            <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px; padding:14px; border:1px solid rgba(255,255,255,0.15); border-radius:14px; background:rgba(255,255,255,0.03); margin-bottom:14px;">
-              <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">BMI (auto)</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#6cffba;">{{ bmiLive }}</div></div>
-              <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">LEAN MASS (auto)</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#eef0f2;">{{ leanLive }}</div></div>
-            </div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px;">
-              <sc-for list="{{ bodyBasic }}" as="f" hint-placeholder-count="3"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ f.label }}</div><input value="{{ f.val }}" onInput="{{ f.set }}" placeholder="{{ f.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
-            </div>
-            <div style="display:flex; gap:9px; margin-top:18px;"><span onClick="{{ saveBody }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer; border:none;">{{ bodySaveLabel }}</span><sc-if value="{{ bodyEditing }}" hint-placeholder-val="{{ false }}"><span onClick="{{ cancelBodyEdit }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Cancel edit</span></sc-if><span onClick="{{ clearBodyDraft }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Clear</span></div>
-          </div>
-        </sc-if>
-
-
-        <!-- ============ DIET ============ -->
-        <sc-if value="{{ hDiet }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:6px;">
-              <span style="font-size:13px; font-weight:600; color:#eef0f2;">Diet Checklist</span>
-              <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ dietDoneToday }} / {{ dietTotalToday }} eaten today</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#e8b45a;">🔒 {{ dietLockedCount }} locked</span>
-                <span onClick="{{ toggleDietEdit }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:{{ dietEditBtnColor }}; border:1px solid {{ dietEditBtnBdr }}; border-radius:8px; padding:6px 12px; cursor:pointer; background:{{ dietEditBtnBg }};">{{ dietEditBtnLabel }}</span>
-              </div>
-            </div>
-            <div style="font-size:11.5px; color:#8a8a92; line-height:1.5;">Check off what you eat today. Tap the lock to pin a food as a permanent staple — locked items stay checked every day and survive the daily reset.<sc-if value="{{ dietEdit }}" hint-placeholder-val="{{ false }}"> Customizing: rename or remove sections, add or delete foods.</sc-if></div>
-            <sc-if value="{{ dietEdit }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; gap:9px; margin-top:14px;">
-                <input value="{{ newCatName }}" onInput="{{ setNewCatName }}" placeholder="New section name…" style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box;">
-                <span onClick="{{ addDietCat }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer;">+ Add Section</span>
-              </div>
-            </sc-if>
-          </div>
-          <sc-for list="{{ dietGroups }}" as="g" hint-placeholder-count="7">
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:18px 20px; margin-bottom:14px;">
-              <div onClick="{{ g.toggleExpand }}" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
-                <span style="font-size:11px; color:#7c7c84; transform:{{ g.chevronRot }}; transition:transform .15s;">›</span>
-                <sc-if value="{{ g.renaming }}" hint-placeholder-val="{{ false }}">
-                  <input value="{{ g.renameVal }}" onInput="{{ g.setRenameVal }}" style="font-size:12.5px; font-weight:600; color:#eef0f2; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.4); border-radius:7px; padding:4px 8px; outline:none;">
-                  <span onClick="{{ g.confirmRename }}" style="font-size:11px; color:#6cffba; cursor:pointer;">✓ save</span>
-                  <span onClick="{{ g.cancelRename }}" style="font-size:11px; color:#75757d; cursor:pointer;">cancel</span>
-                </sc-if>
-                <span style="font-size:12.5px; font-weight:600; color:#eef0f2;">{{ g.cat }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#75757d;">{{ g.done }}/{{ g.total }}</span>
-                <sc-if value="{{ dietEdit }}" hint-placeholder-val="{{ false }}">
-                  <span onClick="{{ g.startRename }}" style="font-size:11px; color:#8a8a92; cursor:pointer; margin-left:auto;">rename</span>
-                  <span onClick="{{ g.removeCat }}" style="font-size:11px; color:#FFFFFF; cursor:pointer;">delete section</span>
-                </sc-if>
-              </div>
-              <sc-if value="{{ g.expanded }}" hint-placeholder-val="{{ false }}">
-              <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px 18px; margin-top:12px;">
-                <sc-for list="{{ g.items }}" as="d" hint-placeholder-count="8">
-                  <div style="display:flex; align-items:center; gap:10px; padding:6px 0;">
-                    <span onClick="{{ d.toggle }}" style="width:19px; height:19px; flex:0 0 19px; border-radius:6px; border:1.5px solid {{ d.bdr }}; background:{{ d.fill }}; display:flex; align-items:center; justify-content:center; font-size:11px; color:#0c0c0d; cursor:pointer;">{{ d.check }}</span>
-                    <span style="flex:1; min-width:0; font-size:13px; color:{{ d.txt }}; text-decoration:{{ d.strike }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ d.name }}</span>
-                    <span onClick="{{ d.toggleLock }}" title="Lock in place" style="cursor:pointer; font-size:13px; color:{{ d.lockColor }};">{{ d.lockIcon }}</span>
-                    <sc-if value="{{ dietEdit }}" hint-placeholder-val="{{ false }}"><span onClick="{{ d.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px;" style-hover="{ color:'#FFFFFF' }">×</span></sc-if>
-                  </div>
-                </sc-for>
-              </div>
-              <sc-if value="{{ dietEdit }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.06);">
-                  <input value="{{ g.addName }}" onInput="{{ g.setAddName }}" placeholder="Add a food…" style="flex:1; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
-                  <span onClick="{{ g.addFood }}" style="padding:8px 14px; border-radius:9px; border:1px solid rgba(255,255,255,0.35); background:rgba(255,255,255,0.1); color:#F4F4F5; font-size:12px; font-weight:600; cursor:pointer;">+ Add</span>
-                </div>
-              </sc-if>
-              </sc-if>
-            </div>
-          </sc-for>
-        </sc-if>
-
-        <!-- ============ ENERGY ============ -->
-        <sc-if value="{{ hEnergy }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:14px;">Log Today's Energy</div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
-              <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#75757d;">MORNING</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:{{ eMornC }};">{{ eMorn }}/10</span></div>
-                <input type="range" min="1" max="10" step="1" value="{{ eMorn }}" onInput="{{ setEMorn }}" style="width:100%; accent-color:#FFFFFF;">
-                <input value="{{ eMornNote }}" onInput="{{ setEMornNote }}" placeholder="Note (optional)" style="width:100%; margin-top:8px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
-              </div>
-              <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#75757d;">MIDDAY</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:{{ eMidC }};">{{ eMid }}/10</span></div>
-                <input type="range" min="1" max="10" step="1" value="{{ eMid }}" onInput="{{ setEMid }}" style="width:100%; accent-color:#FFFFFF;">
-                <input value="{{ eMidNote }}" onInput="{{ setEMidNote }}" placeholder="Note (optional)" style="width:100%; margin-top:8px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
-              </div>
-              <div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#75757d;">EVENING</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:{{ eEveC }};">{{ eEve }}/10</span></div>
-                <input type="range" min="1" max="10" step="1" value="{{ eEve }}" onInput="{{ setEEve }}" style="width:100%; accent-color:#FFFFFF;">
-                <input value="{{ eEveNote }}" onInput="{{ setEEveNote }}" placeholder="Note (optional)" style="width:100%; margin-top:8px; padding:9px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none; box-sizing:border-box;">
-              </div>
-            </div>
-            <div style="margin-top:16px;"><span onClick="{{ saveEnergy }}" class="cc-glowbtn" style="padding:10px 18px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer;">{{ energySaveLabel }}</span></div>
-          </div>
-
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:14px;">Today's Summary</div>
-            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px;">
-              <sc-for list="{{ todaySummary }}" as="t" hint-placeholder-count="3"><div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ t.label }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:600; color:{{ t.c }}; margin-top:4px;">{{ t.val }}</div></div></sc-for>
-            </div>
-            <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;">
-              <span style="font-size:12.5px; color:#9a9aa2;">Average Energy Today</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:600; color:{{ todayAvgC }};">{{ todayAvg }} / 10</span>
-            </div>
-          </div>
-
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">Statistics</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;">
-              <sc-for list="{{ energyStatTiles }}" as="t" hint-placeholder-count="6"><div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#75757d;">{{ t.label }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600; color:{{ t.c }}; margin-top:5px;">{{ t.val }}</div></div></sc-for>
-            </div>
-          </div>
-
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">History</div>
-            <sc-for list="{{ energyHist }}" as="h" hint-placeholder-count="5">
-              <div style="padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; font-weight:600;">{{ h.dateLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ h.avgC }};">avg {{ h.avg }}</span></div>
-                <div style="display:flex; gap:20px;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#9a9aa2;">Morning <span style="color:#eef0f2;">{{ h.morning }}</span></span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#9a9aa2;">Midday <span style="color:#eef0f2;">{{ h.midday }}</span></span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#9a9aa2;">Evening <span style="color:#eef0f2;">{{ h.evening }}</span></span>
-                </div>
-              </div>
-            </sc-for>
-            <sc-if value="{{ energyHistEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:#75757d; text-align:center; padding:24px;">NO ENERGY LOGGED YET</div></sc-if>
-          </div>
-        </sc-if>
-
-        <!-- ============ SLEEP ============ -->
-        <sc-if value="{{ hSleep }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-grid2" style="display:grid; grid-template-columns:1.05fr 1fr; gap:18px; margin-bottom:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ slpFormTitle }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ slpFormDate }}</span></div>
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">HOURS</div><input value="{{ slp.h }}" onInput="{{ setSlpH }}" placeholder="7" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">MINUTES</div><input value="{{ slp.m }}" onInput="{{ setSlpM }}" placeholder="30" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">BEDTIME</div><input type="time" value="{{ slp.bed }}" onInput="{{ setSlpBed }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">WAKE</div><input type="time" value="{{ slp.wake }}" onInput="{{ setSlpWake }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div>
-              </div>
-              <div style="margin-top:14px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">SLEEP QUALITY</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#6cffba;">{{ slp.qual }}/10</span></div><input type="range" min="1" max="10" step="1" value="{{ slp.qual }}" onInput="{{ setSlpQual }}" style="width:100%; accent-color:#FFFFFF;"></div>
-              <div style="margin-top:12px;"><div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">ENERGY ON WAKING</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#5bb8e8;">{{ slp.energy }}/10</span></div><input type="range" min="1" max="10" step="1" value="{{ slp.energy }}" onInput="{{ setSlpEnergy }}" style="width:100%; accent-color:#FFFFFF;"></div>
-              <input value="{{ slp.notes }}" onInput="{{ setSlpNotes }}" placeholder="Notes (optional)" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; margin-top:14px;">
-              <div style="display:flex; gap:9px; margin-top:14px;"><span onClick="{{ saveSleep }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer; border:none;">{{ slpSaveLabel }}</span><sc-if value="{{ slpEditing }}" hint-placeholder-val="{{ false }}"><span onClick="{{ cancelSleepEdit }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Cancel</span></sc-if></div>
-            </div>
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">TODAY</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#eef0f2; margin-top:3px;">{{ slpTodayLabel }}</div></div>
-                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">WEEKLY AVG</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#eef0f2; margin-top:3px;">{{ slpWeekAvg }}h</div></div>
-                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">MONTHLY AVG</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:#eef0f2; margin-top:3px;">{{ slpMonthAvg }}h</div></div>
-                <div style="border:1px solid rgba(255,255,255,0.07); border-radius:13px; padding:13px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">CONSISTENCY</div><div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:{{ slpConsColor }}; margin-top:3px;">{{ slpConsShort }}</div></div>
-              </div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:8px;">DURATION · LAST 30 NIGHTS</div>
-              <canvas data-chart="slpTrend" style="width:100%; height:120px; display:block;"></canvas>
-            </div>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">Recent nights</div>
-            <sc-for list="{{ slpEntries }}" as="e" hint-placeholder-count="6"><div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa2; flex:0 0 92px;">{{ e.date }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#eef0f2; flex:0 0 70px;">{{ e.dur }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6cffba; flex:0 0 56px;">Q {{ e.quality }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#5bb8e8; flex:0 0 52px;">E {{ e.energy }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; flex:1;">{{ e.window }}</span><span onClick="{{ e.edit }}" style="cursor:pointer; color:#8a8a92; font-size:12px;" style-hover="{ color:'#F4F4F5' }">edit</span><span onClick="{{ e.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px;" style-hover="{ color:'#FFFFFF' }">×</span></div></sc-for>
-            <sc-if value="{{ slpEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; text-align:center; padding:24px;">NO SLEEP LOGGED YET</div></sc-if>
-          </div>
-        </sc-if>
-
-        <!-- ============ HYDRATION ============ -->
-        <sc-if value="{{ hHydration }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">Log water</span><div style="display:flex; gap:5px;"><sc-for list="{{ hydUnitChips }}" as="u" hint-placeholder-count="3"><span onClick="{{ u.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ u.c }}; border:1px solid {{ u.bd }}; border-radius:7px; padding:5px 9px; cursor:pointer; background:{{ u.bg }};">{{ u.label }}</span></sc-for></div></div>
-              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
-                <sc-for list="{{ hydQuick }}" as="q" hint-placeholder-count="3"><span onClick="{{ q.add }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px;" style-hover="{ borderColor:'rgba(90,160,220,0.5)', color:'#fff' }">+ {{ q.label }}</span></sc-for>
-              </div>
-              <div style="display:flex; gap:9px;"><input value="{{ hydAmt }}" onInput="{{ setHydAmt }}" onKeyDown="{{ hydAddKey }}" placeholder="Custom {{ hydUnit }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; flex:1; font-family:'JetBrains Mono',monospace;"><span onClick="{{ addHyd }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer; border:none; background:#FFFFFF;">Add</span></div>
-              <div style="margin-top:18px; border-top:1px solid rgba(255,255,255,0.08); padding-top:14px;"><div style="display:flex; justify-content:space-between; align-items:center;"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">DAILY GOAL</span><div style="display:flex; gap:8px;"><input value="{{ hydGoalInput }}" onInput="{{ setHydGoalInput }}" placeholder="{{ hydGoalPh }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:110px; font-family:'JetBrains Mono',monospace;"><span onClick="{{ saveHydGoal }}" style="padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#cfcfd4; font-size:12px; cursor:pointer;">Set</span></div></div></div>
-            </div>
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-              <canvas data-hgauge="hydBig" style="width:150px; height:150px;"></canvas>
-              <div style="display:flex; gap:20px; margin-top:12px; font-family:'JetBrains Mono',monospace;">
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">CURRENT</div><div style="font-size:16px; color:#5bb8e8; margin-top:3px;">{{ hydTodayShort }}</div></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">REMAINING</div><div style="font-size:16px; color:{{ hydRemainColor }}; margin-top:3px;">{{ hydRemaining }}</div></div>
-                <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">GOAL</div><div style="font-size:16px; color:#eef0f2; margin-top:3px;">{{ hydGoalShort }}</div></div>
-              </div>
-              <sc-if value="{{ hydUnder }}" hint-placeholder-val="{{ false }}"><div style="margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.3); border-radius:9px; padding:8px 12px; background:rgba(232,180,90,0.07);">◔ {{ hydReminder }}</div></sc-if>
-            </div>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">Today's intake</div>
-            <sc-for list="{{ hydEntries }}" as="e" hint-placeholder-count="4"><div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; flex:0 0 60px;">{{ e.time }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:14px; color:#5bb8e8; flex:1;">{{ e.amt }}</span><span onClick="{{ e.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px;" style-hover="{ color:'#FFFFFF' }">×</span></div></sc-for>
-            <sc-if value="{{ hydEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; text-align:center; padding:20px;">NOTHING LOGGED TODAY</div></sc-if>
-          </div>
-          <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;"><div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">This week</div><canvas data-chart="hydWeek" style="width:100%; height:130px; display:block;"></canvas></div>
-            <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;"><div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">30-day trend</div><canvas data-chart="hydMonth" style="width:100%; height:130px; display:block;"></canvas></div>
-          </div>
-        </sc-if>
-
-
-        <!-- ============ PROGRESS ============ -->
-        <sc-if value="{{ hProgress }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-              <div style="display:flex; gap:6px; flex-wrap:wrap;"><sc-for list="{{ progMetrics }}" as="m" hint-placeholder-count="5"><span onClick="{{ m.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ m.c }}; border:1px solid {{ m.bd }}; border-radius:8px; padding:6px 11px; cursor:pointer; background:{{ m.bg }};">{{ m.label }}</span></sc-for></div>
-              <div style="display:flex; gap:5px;"><sc-for list="{{ progRanges }}" as="r" hint-placeholder-count="3"><span onClick="{{ r.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ r.c }}; border:1px solid {{ r.bd }}; border-radius:7px; padding:5px 9px; cursor:pointer; background:{{ r.bg }};">{{ r.label }}</span></sc-for></div>
-            </div>
-            <canvas data-chart="progMain" style="width:100%; height:240px; display:block;"></canvas>
-          </div>
-          <div class="cc-stat4" style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:18px;">
-            <sc-for list="{{ progDeltas }}" as="d" hint-placeholder-count="3"><div class="cc-glowcard" style="border-radius:16px; background:#17191d; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ d.label }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:22px; color:{{ d.c }}; margin:6px 0 2px;">{{ d.val }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84;">{{ d.sub }}</div></div></sc-for>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">Compare two dates</div>
-            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
-              <select value="{{ cmpA }}" onChange="{{ setCmpA }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; flex:1; min-width:150px;"><sc-for list="{{ dateOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
-              <span style="align-self:center; color:#6f6f78;">→</span>
-              <select value="{{ cmpB }}" onChange="{{ setCmpB }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; flex:1; min-width:150px;"><sc-for list="{{ dateOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
-            </div>
-            <sc-for list="{{ cmpRows }}" as="r" hint-placeholder-count="5"><div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span style="font-size:12.5px; color:#cfcfd4; flex:1;">{{ r.label }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#9a9aa2; flex:0 0 84px; text-align:right;">{{ r.a }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; flex:0 0 84px; text-align:right;">{{ r.b }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ r.dc }}; flex:0 0 84px; text-align:right;">{{ r.delta }}</span></div></sc-for>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">Measurement history</div>
-            <div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); border-bottom:1px solid rgba(255,255,255,0.12);"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; flex:0 0 92px;">DATE</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; flex:1;">WEIGHT</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; flex:1;">FAT</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; flex:1;">MUSCLE</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; flex:1;">WAIST</span><span style="flex:0 0 70px;"></span></div>
-            <sc-for list="{{ bodyHistory }}" as="h" hint-placeholder-count="6"><div style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);"><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa2; flex:0 0 92px;">{{ h.date }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; flex:1;">{{ h.weight }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; flex:1;">{{ h.fat }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; flex:1;">{{ h.muscle }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; flex:1;">{{ h.waist }}</span><span style="flex:0 0 70px; display:flex; gap:9px; justify-content:flex-end;"><span onClick="{{ h.edit }}" style="cursor:pointer; color:#8a8a92; font-size:11px;" style-hover="{ color:'#F4F4F5' }">edit</span><span onClick="{{ h.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span></span></div></sc-for>
-          </div>
-        </sc-if>
-
-        <!-- ============ PHOTOS ============ -->
-        <sc-if value="{{ hPhotos }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-              <span style="font-size:13px; font-weight:600; color:#eef0f2;">Upload progress photo</span>
-              <div style="display:flex; gap:5px;"><sc-for list="{{ photoViewChips }}" as="v" hint-placeholder-count="3"><span onClick="{{ v.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ v.c }}; border:1px solid {{ v.bd }}; border-radius:8px; padding:6px 12px; cursor:pointer; background:{{ v.bg }};">{{ v.label }}</span></sc-for></div>
-            </div>
-            <label onDrop="{{ onDropPhoto }}" onDragOver="{{ onPhotoDragOver }}" onDragLeave="{{ onPhotoDragLeave }}" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:32px; border:1px dashed {{ photoDragBd }}; border-radius:14px; background:{{ photoDragBg }}; cursor:pointer; text-align:center; transition:background .2s;">
-              <span style="font-size:26px; color:#FFFFFF;">⬍</span>
-              <span style="font-size:13px; color:#c8c8ce;">Drop a <b>{{ photoView }}</b> photo or <span style="color:#F4F4F5; text-decoration:underline;">browse</span></span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">STORED PRIVATELY IN THIS BROWSER · JPG/PNG</span>
-              <input type="file" accept="image/*" onChange="{{ importPhoto }}" style="display:none;">
-            </label>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:14px;">Timeline · {{ photoViewCap }}</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:12px;">
-              <sc-for list="{{ photoTimeline }}" as="p" hint-placeholder-count="0"><div style="position:relative;"><img ref="{{ p.setImg }}" onClick="{{ p.open }}" style="width:100%; height:150px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:zoom-in; display:block;"><span style="position:absolute; bottom:6px; left:6px; font-family:'JetBrains Mono',monospace; font-size:9px; color:#fff; background:rgba(0,0,0,0.6); border-radius:6px; padding:2px 6px;">{{ p.date }}</span><span onClick="{{ p.remove }}" style="position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:13px;" style-hover="{ background:'#FFFFFF' }">×</span></div></sc-for>
-            </div>
-            <sc-if value="{{ photoEmpty }}" hint-placeholder-val="{{ true }}"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; text-align:center; padding:26px;">NO {{ photoViewUpper }} PHOTOS YET</div></sc-if>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:12px;">Compare</div>
-            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
-              <select value="{{ cmpPA }}" onChange="{{ setCmpPA }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; flex:1; min-width:140px;"><sc-for list="{{ photoDateOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
-              <select value="{{ cmpPB }}" onChange="{{ setCmpPB }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; flex:1; min-width:140px;"><sc-for list="{{ photoDateOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-              <div style="text-align:center;"><sc-if value="{{ cmpPhotoA }}" hint-placeholder-val="{{ false }}"><img ref="{{ setCmpImgA }}" onClick="{{ openCmpA }}" style="width:100%; height:280px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:zoom-in;"></sc-if><sc-if value="{{ cmpPhotoAEmpty }}" hint-placeholder-val="{{ true }}"><div style="height:280px; border:1px dashed rgba(255,255,255,0.12); border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">SELECT A DATE</div></sc-if><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; margin-top:6px;">{{ cmpPALabel }}</div></div>
-              <div style="text-align:center;"><sc-if value="{{ cmpPhotoB }}" hint-placeholder-val="{{ false }}"><img ref="{{ setCmpImgB }}" onClick="{{ openCmpB }}" style="width:100%; height:280px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,0.1); cursor:zoom-in;"></sc-if><sc-if value="{{ cmpPhotoBEmpty }}" hint-placeholder-val="{{ true }}"><div style="height:280px; border:1px dashed rgba(255,255,255,0.12); border-radius:12px; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">SELECT A DATE</div></sc-if><div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; margin-top:6px;">{{ cmpPBLabel }}</div></div>
-            </div>
-          </div>
-        </sc-if>
-
-        <!-- ============ GOALS ============ -->
-        <sc-if value="{{ hGoals }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-            <div style="font-size:13px; font-weight:600; color:#eef0f2; margin-bottom:14px;">Set your targets</div>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;">
-              <sc-for list="{{ goalInputs }}" as="g" hint-placeholder-count="10"><div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:5px;">{{ g.label }}</div><input value="{{ g.val }}" onInput="{{ g.set }}" placeholder="{{ g.ph }}" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; box-sizing:border-box; width:100%; font-family:'JetBrains Mono',monospace;"></div></sc-for>
-            </div>
-            <div style="margin-top:16px;"><span onClick="{{ saveGoals }}" class="cc-glowbtn" style="padding:10px 16px; border-radius:10px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer; border:none;">Save targets</span></div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <sc-for list="{{ goalProgress }}" as="g" hint-placeholder-count="5"><div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; padding:16px 20px;"><div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ g.label }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa2;">{{ g.current }} → {{ g.target }}</span></div><div style="height:9px; border-radius:6px; background:rgba(255,255,255,0.07); overflow:hidden;"><div style="height:100%; width:{{ g.pct }}; background:{{ g.barC }}; border-radius:6px; transition:width .5s;"></div></div><div style="display:flex; justify-content:space-between; margin-top:7px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:{{ g.pctC }};">{{ g.pctLabel }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84;">{{ g.eta }}</span></div></div></sc-for>
-          </div>
-        </sc-if>
-
-        <!-- fullscreen photo modal -->
-        <sc-if value="{{ photoModalOpen }}" hint-placeholder-val="{{ false }}">
-          <div onClick="{{ closePhotoModal }}" style="position:fixed; inset:0; z-index:120; background:rgba(4,4,6,0.92); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; backdrop-filter:blur(6px);">
-            <div style="overflow:hidden; max-width:90vw; max-height:74vh; border-radius:14px; border:1px solid rgba(255,255,255,0.12);"><img ref="{{ setModalImg }}" style="max-width:90vw; max-height:74vh; transform:scale({{ photoZoom }}); transition:transform .2s; display:block;"></div>
-            <div onClick="{{ stopProp }}" style="display:flex; align-items:center; gap:12px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#c8c8ce;">
-              <span onClick="{{ zoomOut }}" style="width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;">−</span>
-              <span style="width:64px; text-align:center;">{{ photoZoomPct }}</span>
-              <span onClick="{{ zoomIn }}" style="width:40px; height:40px; border-radius:50%; border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px;">+</span>
-              <span onClick="{{ closePhotoModal }}" style="margin-left:14px; padding:9px 18px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); cursor:pointer;">Close</span>
-            </div>
-          </div>
-        </sc-if>
-
-      </div>
-      </sc-if>
 
       <!-- ===== FINANCE PLANNER ===== -->
       <!-- ===== FINANCE TERMINAL ===== -->
@@ -2931,127 +2552,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
       </sc-if>
 
-      <!-- ===== PRODUCTIVITY ===== -->
-      <sc-if value="{{ isProd }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <sc-for list="{{ fitTabs }}" as="t" hint-placeholder-count="3"><span onClick="{{ t.go }}" style="display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600; color:{{ t.c }}; border:1px solid {{ t.bd }}; border-radius:11px; padding:9px 18px; cursor:pointer; background:{{ t.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ t.name }}</span></sc-for>
-        </div>
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <span onClick="{{ goHealthView }}" style="font-size:11.5px; font-weight:600; color:{{ healthViewC }}; border:1px solid {{ healthViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ healthViewBg }};">🩺 Health</span>
-          <span onClick="{{ goProdView }}" style="font-size:11.5px; font-weight:600; color:{{ prodViewC }}; border:1px solid {{ prodViewBd }}; border-radius:9px; padding:7px 15px; cursor:pointer; background:{{ prodViewBg }};">📊 Productivity</span>
-        </div>
-        <div style="margin-bottom:20px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ PRODUCTIVITY OS</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Trackers &amp; Activity</h1>
-        </div>
-        <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-bottom:18px;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ whTodayEyebrow }}</div>
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
-              <span style="font-size:13px; font-weight:600;">Work Hours</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84;">{{ whGoalPct }}% OF AN 8H DAY</span>
-            </div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px;">
-              <sc-for list="{{ whTypes }}" as="t" hint-placeholder-count="5"><span onClick="{{ t.pick }}" style="font-size:11.5px; color:{{ t.c }}; background:{{ t.bg }}; border:1px solid {{ t.bd }}; border-radius:9px; padding:6px 12px; cursor:pointer;">{{ t.name }}</span></sc-for>
-            </div>
-            <div class="cc-actrow" style="display:flex; gap:9px; flex-wrap:wrap;">
-              <input value="{{ whText }}" onInput="{{ setWhText }}" onKeyDown="{{ addWorkHoursKey }}" placeholder="What did you work on?" style="flex:1 1 190px; min-width:150px; padding:11px 14px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none;">
-              <input value="{{ whHr }}" onInput="{{ setWhHr }}" onKeyDown="{{ addWorkHoursKey }}" type="number" placeholder="hr" style="width:56px; flex:0 0 56px; padding:11px 10px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none;">
-              <input value="{{ whMin }}" onInput="{{ setWhMin }}" onKeyDown="{{ addWorkHoursKey }}" type="number" placeholder="min" style="width:56px; flex:0 0 56px; padding:11px 10px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none;">
-              <span onClick="{{ addWorkHours }}" class="cc-glowbtn" style="flex:1 1 auto; text-align:center; padding:11px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0c0c0d; font-size:12.5px; font-weight:700; cursor:pointer;">Log Work</span>
-            </div>
-
-            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84; margin:18px 0 8px;">WORK TASKS · {{ whTasksDone }}/{{ whTasksTotal }}</div>
-            <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:10px;">
-              <input value="{{ whTaskDraft }}" onInput="{{ setWhTaskDraft }}" onKeyDown="{{ addWorkTaskKey }}" placeholder="Add a work task" style="flex:1 1 190px; min-width:150px; padding:10px 14px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:12.5px; outline:none;">
-              <span onClick="{{ addWorkTask }}" style="padding:10px 16px; border-radius:11px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer;">Add</span>
-            </div>
-            <sc-if value="{{ hasWhTasks }}" hint-placeholder-val="{{ false }}">
-              <sc-for list="{{ whTasks }}" as="t" hint-placeholder-count="3">
-                <div onClick="{{ t.toggle }}" style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
-                  <span style="width:18px; height:18px; flex:0 0 18px; border-radius:6px; border:1px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:11px; color:{{ t.col }};">{{ t.mark }}</span>
-                  <span style="flex:1; font-size:12.5px; color:{{ t.col }};">{{ t.label }}</span>
-                </div>
-              </sc-for>
-            </sc-if>
-            <sc-if value="{{ hasWhEntries }}" hint-placeholder-val="{{ false }}">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84; margin:18px 0 8px;">LOGGED TODAY</div>
-              <sc-for list="{{ whEntries }}" as="e" hint-placeholder-count="3">
-                <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#7c7c84; border:1px solid rgba(255,255,255,0.14); border-radius:6px; padding:2px 7px; white-space:nowrap;">{{ e.sub }}</span>
-                  <span style="flex:1; font-size:12.5px; color:#dbdbe0;">{{ e.text }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">{{ e.mins }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#6f6f78;">{{ e.time }}</span>
-                </div>
-              </sc-for>
-            </sc-if>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-          <div style="font-size:13px; font-weight:600; margin-bottom:6px;">Trackers</div>
-          <sc-for list="{{ trackers }}" as="t" hint-placeholder-count="4">
-            <div onClick="{{ t.pick }}" style="display:flex; align-items:center; gap:14px; padding:12px 4px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.03)' }">
-              <canvas data-ring="{{ t.val }}" data-ringc="{{ t.color }}" style="width:52px; height:52px; flex:0 0 52px;"></canvas>
-              <div style="flex:1; min-width:0;">
-                <div style="font-size:13px; color:#dbdbe0; font-weight:600;">{{ t.name }}</div>
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; margin-top:2px;">{{ t.sub }}</div>
-              </div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF; white-space:nowrap;">🔥 {{ t.streak }}d</div>
-            </div>
-          </sc-for>
-        </div>
-        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; margin-bottom:18px;">
-          <div style="font-size:13px; font-weight:600; margin-bottom:14px;">Weekly Overview</div>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <sc-for list="{{ weeklyOverview }}" as="w" hint-placeholder-count="4">
-              <div style="display:flex; align-items:center; gap:12px;">
-                <span style="font-size:12px; color:#c3c3ca; width:90px; flex:0 0 90px;">{{ w.name }}</span>
-                <div style="flex:1; height:8px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden;">
-                  <div style="height:100%; width:{{ w.pct }}; background:{{ w.color }}; border-radius:4px;"></div>
-                </div>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; width:60px; flex:0 0 60px; text-align:right;">{{ w.display }}</span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-        <div class="cc-grid2" style="display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; backdrop-filter:blur(16px); padding:20px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; flex-wrap:wrap; gap:8px;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ SUGGESTED TASKS</span>
-              <span onClick="{{ generateAiTasks }}" style="font-size:10px; color:#F4F4F5; cursor:pointer; font-family:'JetBrains Mono',monospace; white-space:nowrap;" style-hover="{ color:'#fff' }">{{ aiTasksBtnLabel }}</span>
-            </div>
-            <div style="font-size:9px; color:#8a8a92; font-family:'JetBrains Mono',monospace; margin-bottom:12px;">{{ aiTasksSourceLabel }}</div>
-            <sc-if value="{{ aiTasksErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff6b76; margin-bottom:10px; line-height:1.4;">⚠ {{ aiTasksErr }}</div></sc-if>
-            <sc-for list="{{ recTasks }}" as="r" hint-placeholder-count="4">
-              <div style="display:flex; align-items:flex-start; gap:11px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                <div style="flex:1;">
-                  <div style="font-size:13px; color:#eef0f2; font-weight:600;">{{ r.label }}</div>
-                  <div style="font-size:11px; color:#9a9aa2; margin-top:2px; line-height:1.4;">{{ r.why }}</div>
-                </div>
-                <span onClick="{{ r.add }}" style="cursor:pointer; font-size:10px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); border-radius:8px; padding:5px 10px; white-space:nowrap;" style-hover="{ background:'rgba(255,255,255,0.15)' }">+ Add</span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
-        <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;"><span style="font-size:13px; font-weight:600;">Time Distribution</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">◉ LIVE · BY TIME LOGGED</span></div>
-          <div style="display:flex; align-items:center; gap:28px; flex-wrap:wrap;">
-            <canvas data-chart="catPie" style="width:190px; height:190px; flex:0 0 190px;"></canvas>
-            <div style="flex:1; min-width:220px; display:flex; flex-direction:column;">
-              <sc-for list="{{ catPie }}" as="c" hint-placeholder-count="4">
-                <div style="display:flex; align-items:center; gap:13px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                  <span style="width:10px; height:10px; border-radius:3px; flex:0 0 10px; background:{{ c.color }}; box-shadow:0 0 8px {{ c.color }};"></span>
-                  <span style="font-size:13px; color:#dbdbe0; width:86px;">{{ c.cat }}</span>
-                  <div style="flex:1; height:6px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden;"><div style="height:100%; width:{{ c.pct }}; background:{{ c.color }}; border-radius:4px;"></div></div>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:12.5px; color:#eef0f2; width:50px; text-align:right;">{{ c.hrs }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8a8a92; width:42px; text-align:right;">{{ c.pct }}</span>
-                </div>
-              </sc-for>
-              <sc-if value="{{ noCatPie }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:10px 0;">Log activities with minutes to see your time breakdown.</div></sc-if>
-            </div>
-          </div>
-        </div>
-      </div>
-      </sc-if>
 
       <!-- ===== NOTIFICATION TESTING PANEL ===== -->
       <sc-if value="{{ isNotifTest }}" hint-placeholder-val="{{ false }}">
@@ -9638,7 +9138,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-279 · v11.279 girevoy';
+const NOTIF_BUILD_VERSION = '2026.09.06-280 · v11.280 forge-home';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10247,6 +9747,9 @@ activities: this._mergeShipLog(s.activities),
     box.scrollTop=Math.max(0, row.offsetTop-box.clientHeight/2+row.clientHeight/2);
   }
   componentDidUpdate(prevProps){ this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs();
+    /* Health & Productivity is gone. A notification, a deep link or an old saved scene can
+       still ask for it, and there is nothing left to render — send those to Fitness. */
+    if(this.state.scene==='health') this.setState({scene:'fitness'});
     this._scrollRankLadder();
     /* Only once the profile has actually arrived. This runs on the first render after every
        reload, and until Supabase answers, profile is null and _isOwner() falls back to
@@ -14277,6 +13780,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.280', date:'Sep 6, 2026', major:true, notes:[
+      'The Forge\u2019s Home is the working half of Fitness HQ: Log Training, Muscle Training Split, Move and the Strength Chart. Same log, not a copy — anything you record on either page shows on both.',
+      'The anatomy model is deliberately not on it. It loads a 3D model, and this page should open the moment you ask for it; the split\u2019s own figures say the same thing without the wait. Fitness HQ still has it.',
+      'Health & Productivity is gone — the page, both its tabs and all nine of its sub-pages. Anything that still points at it, an old link or a notification, lands on Fitness instead of a blank screen.',
+      'Your health data is untouched. It still feeds your health score and the Forge; it just no longer has a page nobody opened.',
+    ]},
     {version:'v11.279', date:'Sep 6, 2026', major:true, notes:[
       'The kettlebell wrist and grip block in Arms is thirteen deep now — bottoms-up clean, horn and towel holds, pinch-grip hold, radial and ulnar deviation, and the finger walk.',
       'Kettlebells has a Soviet · Girevoy Sport block: the three competition lifts — jerk, snatch and long cycle — plus the pressing and lifting work that sat around them, from the military press and clean and press to the bent press, side press, Sots press, two-hands anyhow and the juggling cast. Fifteen in all.',
@@ -16708,7 +16217,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         };
       });
       const dietDashList=dietList.slice(0,8).map(mkDietRow);
-      const goHealthDiet=()=>this.setState({scene:'health', healthSub:'diet'});
+      const goHealthDiet=()=>this.setState({scene:'fitness'});
       const toggleDietEdit=()=>this.setState(s=>({dietEdit:!s.dietEdit}));
       const newCatName=S.newCatName||'';
       const setNewCatName=(e)=>this.setState({newCatName:e.target.value});
@@ -18356,7 +17865,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* The Forge used to sit under Fitness in the sidebar, so it lit the Fitness entry.
        It is its own top-level page now and lights itself — leaving both clauses in would
        highlight two entries at once. */
-    const navActive=(id)=> id===scene || (id==='fitness' && scene==='health') || (id==='briefing' && scene==='voice');
+    const navActive=(id)=> id===scene || (id==='briefing' && scene==='voice');
     const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='requests'?(S.requests||[]).filter(r=>r.status==='pending').length:0), hasBadge:(n.id==='requests'&&(S.requests||[]).some(r=>r.status==='pending')), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
     // Mobile-first set: Home, Tasks (Command dashboard — missions/checklist/notes-adjacent),
     // Calendar, Fitness (also reaches Health/Productivity-Notes/Music via its own sub-tabs),
@@ -19446,16 +18955,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           incSaveAmt:S.incSaveAmt||'', setIncSaveAmt:(e)=>this.setState({incSaveAmt:e.target.value}),
         };
       })(),
-      fitTabs:[['Fitness HQ','fitness'],['Health & Productivity','health'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
+      fitTabs:[['Fitness HQ','fitness'],['Music','music']].map(t=>({ label:t[1], name:t[0], go:go(t[1]), c:scene===t[1]?'#F4F4F5':'#9a9aa2', bg:scene===t[1]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', bd:scene===t[1]?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)' })),
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
-      goHealthDiet:()=>this.setState({scene:'health', healthSub:'diet'}),
-      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isForge:scene==='forge', isHealth:scene==='health' && S.healthProdView!=='productivity', isBiz:scene==='business', isProd:scene==='health' && S.healthProdView==='productivity', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
-      healthProdView: S.healthProdView==='productivity'?'productivity':'health',
-      goHealthView:()=>this.setState({scene:'health', healthProdView:'health'}),
-      goProdView:()=>this.setState({scene:'health', healthProdView:'productivity'}),
-      healthViewC: (S.healthProdView!=='productivity')?'#F4F4F5':'#9a9aa2', healthViewBg: (S.healthProdView!=='productivity')?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', healthViewBd: (S.healthProdView!=='productivity')?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)',
-      prodViewC: (S.healthProdView==='productivity')?'#F4F4F5':'#9a9aa2', prodViewBg: (S.healthProdView==='productivity')?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)', prodViewBd: (S.healthProdView==='productivity')?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.08)',
+      goHealthDiet:()=>this.setState({scene:'fitness'}),
+      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isForge:scene==='forge', isBiz:scene==='business', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
       noteEditorOpen: !!S.noteEditor, noteEditorLabel: S.noteEditor?S.noteEditor.label:'', noteEditorDraft: S.noteEditor?S.noteEditor.draft:'',
       setNoteEditorDraft:(e)=>this.setEntryNoteDraft(e), saveNoteEditor:()=>this.saveEntryNote(), closeNoteEditor:()=>this.closeEntryNote(), clearNoteEditor:()=>this.clearEntryNote(),
       ...this._safe(()=>{

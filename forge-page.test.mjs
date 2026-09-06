@@ -187,7 +187,10 @@ t('the Forge opens on its home', async () => {
   await boot({ forgeCentre: 'home' });
   const body = await text();
   ok(/HOME/.test(body), 'a HOME tab should sit alongside TRAINING, MENTAL and HEALTH');
-  ok(/Nothing here yet/.test(body), 'the Home is cleared, so it lands on the empty state');
+  /* The Home carries the working half of Fitness HQ now, so it is no longer an empty page. */
+  for (const panel of ['Log Training', 'Muscle Training Split', 'MOVE', 'Strength Chart'])
+    ok(body.includes(panel), 'the Home is missing ' + panel);
+  ok(!/Nothing here yet/.test(body), 'the Home is still showing the empty state');
 });
 
 t('the 3D anatomy is revealed before anything measures it', async () => {
@@ -281,13 +284,13 @@ t('the unit score header is gone', async () => {
 
 /* ---- the three cleared centres ---- */
 
-t('Home, Mental and Health are empty pages', async () => {
-  for (const [centre, label] of [['home', 'HOME'], ['mental', 'MENTAL'], ['health', 'HEALTH']]) {
+t('Mental and Health are still empty pages', async () => {
+  for (const [centre, label] of [['mental', 'MENTAL'], ['health', 'HEALTH']]) {
     await boot({ forgeCentre: centre });
     const body = await text();
     ok(body.includes(label), label + ' should still name itself on its empty page');
     ok(/Nothing here yet/.test(body), label + ' is not showing its empty state');
-    /* Everything the three centres used to carry, gone from all of them. */
+    /* The Home's panels belong to the Home. Nothing leaks into the centres beside it. */
     for (const ghost of ['Muscle Training Split', 'Anatomy', 'Log Training', 'Strength Chart',
                          'FROM YOUR LOGS', 'PROGRESS', 'WEAKEST LINKS', 'THE TOOLS',
                          'Hand Training', 'RECORD ASSESSMENT']) {
@@ -1648,7 +1651,7 @@ t('one sidebar row is lit, and it is the section that is open', async () => {
 
 t('the four centres still switch', async () => {
   await boot({ forgeCentre: 'home' });
-  for (const [tab, probe] of [['TRAINING', 'Chest'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Nothing here yet']]) {
+  for (const [tab, probe] of [['TRAINING', 'Chest'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Muscle Training Split']]) {
     await page.evaluate((t) => {
       const el = [...document.querySelectorAll('span')].find(e =>
         e.children.length === 0 && e.textContent.trim() === t);
