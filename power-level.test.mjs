@@ -408,6 +408,40 @@ t('no card for a gain that stays inside the level', async () => {
     'a gain inside the level should still float a chip');
 });
 
+t('Power Level opens on a phone', async () => {
+  /* It used to be bounced straight home under 900px, and hidden from the More sheet — which
+     is where both streaks now live. */
+  await page.setViewportSize({ width: 390, height: 840 });
+  await boot({ scene: 'power' });
+  await page.waitForTimeout(600);
+  eq(await page.evaluate(() => window.__nvx.state.scene), 'power',
+    'asking for Power Level on a phone sent you somewhere else');
+  const body = await text();
+  ok(body.includes('DAY STREAK'), 'the stats did not render on a phone');
+  ok(body.includes('LEARNING STREAK'), 'the learning streak is missing on a phone');
+  ok(body.includes('RANK PROGRESSION'), 'the rank ladder did not render on a phone');
+  const over = await page.evaluate(() => {
+    const sc = document.querySelector('.cc-scene') || document.scrollingElement;
+    return sc.scrollWidth - sc.clientWidth;
+  });
+  ok(over <= 1, 'the page scrolls sideways on a phone by ' + over + 'px');
+  await page.setViewportSize({ width: 1400, height: 1200 });
+});
+
+t('Power Level is reachable from the mobile More sheet', async () => {
+  await page.setViewportSize({ width: 390, height: 840 });
+  await boot({ scene: 'dashboard' });
+  const listed = await page.evaluate(() => {
+    window.__nvx.setState({ mobMoreOpen: true });
+    return new Promise(r => setTimeout(() => r(
+      [...document.querySelectorAll('div,span')]
+        .some(e => e.children.length === 0 && e.textContent.trim() === 'Power Level')), 500));
+  });
+  ok(listed, 'Power Level is not offered anywhere on a phone');
+  await page.evaluate(() => window.__nvx.setState({ mobMoreOpen: false }));
+  await page.setViewportSize({ width: 1400, height: 1200 });
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });

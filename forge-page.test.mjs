@@ -1166,6 +1166,32 @@ t('on a wide screen the section list still pins beside the exercises', async () 
   eq(pos, 'sticky', 'the section list stopped pinning on desktop too');
 });
 
+t('the add button stays on the right whatever the block carries', async () => {
+  /* A block with a weight as well as reps used to wrap the button underneath, where it sat
+     on the left — so two blocks in the same list disagreed about where their button was. */
+  await page.setViewportSize({ width: 390, height: 780 });
+  await openChest();
+  const rows = await page.evaluate(() => {
+    const out = [];
+    for (const inner of document.querySelectorAll('span')) {
+      if (inner.children.length || inner.textContent.trim() !== 'ADD') continue;
+      const btn = inner.classList.contains('sc-interp') ? inner.parentElement : inner;
+      const card = btn.closest('.cc-glowcard');
+      const name = (card.querySelector('div') || {}).textContent.trim();
+      const b = btn.getBoundingClientRect(), c = card.getBoundingClientRect();
+      out.push({ name, rightGap: Math.round(c.right - b.right), leftGap: Math.round(b.left - c.left) });
+    }
+    return out;
+  });
+  ok(rows.length >= 12, 'only ' + rows.length + ' blocks found');
+  for (const r of rows)
+    ok(r.rightGap < r.leftGap, r.name + ': the button is on the left, not the right');
+  /* And they all agree — a weighted block and a bodyweight one line up. */
+  eq(new Set(rows.map(r => r.rightGap)).size, 1,
+    'the buttons do not line up with each other');
+  await page.setViewportSize({ width: 1280, height: 1400 });
+});
+
 t('the blocks and the button are curved', async () => {
   await openChest();
   const r = await page.evaluate(() => {

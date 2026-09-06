@@ -3747,8 +3747,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                           <div style="font-size:13.5px; color:#eef0f2; line-height:1.3;">{{ x.name }}</div>
                           <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ x.targetInk }}; white-space:nowrap;">{{ x.target }}</span>
                         </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-                          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                        <!-- The action row never wraps: the button stays on the right whatever
+                             happens. It is the steppers inside it that stack, so a block with a
+                             weight as well as reps reads the same as one with reps alone —
+                             the button used to drop underneath and sit on the left. -->
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:nowrap;">
+                          <div style="display:flex; align-items:center; gap:14px 12px; flex-wrap:wrap; flex:1 1 auto; min-width:0;">
                             <sc-for list="{{ x.steps }}" as="st" hint-placeholder-count="2">
                               <span style="display:flex; align-items:center; gap:4px;">
                                 <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.1px; color:#6f6f78; margin-right:2px;">{{ st.label }}</span>
@@ -3758,7 +3762,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                               </span>
                             </sc-for>
                           </div>
-                          <span onClick="{{ x.add }}" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; letter-spacing:1px; padding:7px 18px; border-radius:999px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
+                          <span onClick="{{ x.add }}" style="flex:0 0 auto; text-align:center; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; letter-spacing:1px; padding:7px 18px; border-radius:999px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
                         </div>
                       </div>
                     </sc-for>
@@ -9418,7 +9422,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-266 · v11.266 learning-stats';
+const NOTIF_BUILD_VERSION = '2026.09.06-267 · v11.267 power-mobile';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10029,7 +10033,10 @@ activities: this._mergeShipLog(s.activities),
   componentDidUpdate(prevProps){ this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs();
     this._scrollRankLadder();
     if(this.state.prefs.theme==='Ultra' && !this._hasUltraAccess() && !this._ultraRevoking){ this._ultraRevoking=true; this.setPref('theme','Lime'); this.showToast('system','Ultra access revoked','Your Ultra access was removed — reverted to the default theme.'); setTimeout(()=>{ this._ultraRevoking=false; },500); }
-    if(typeof window!=='undefined' && window.innerWidth<=900 && ['power','requests'].includes(this.state.scene)) this.setState({scene:'home'});
+    // Power Level used to be bounced home on a phone. Every grid on it already carries
+    // cc-grid2 or cc-stat5, both of which fold to one column under 900px, so there was
+    // nothing left for the redirect to protect — and it is where both streaks live.
+    if(typeof window!=='undefined' && window.innerWidth<=900 && ['requests'].includes(this.state.scene)) this.setState({scene:'home'});
     if(this.state.prefs.homeBg==='Black Hole'){ const cv=this.root && this.root.querySelector('[data-chart="bhStars"]'); if(cv && !this._bhStarsStarted) this.startBHStars(cv); }
     if(this.state.loggedIn && this.state.scene==='settings' && this.state.settingsTab==='Notifications' && !this._pvSeeded && window.NotifEngine){ this._pvSeeded=true; this.genPreview(); }
     if(this.state.loggedIn && this._isOwner() && this.state.scene==='settings' && this.state.settingsTab==='Performance Terminal' && !this._perfTeamReseeded && this._sbOn()){ this._perfTeamReseeded=true; this._sbPullPerfTeam(); }
@@ -14006,6 +14013,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.267', date:'Sep 6, 2026', major:true, notes:[
+      'Power Level works on a phone. It used to be sent straight home under 900px and hidden from the More menu — which is where both your streaks now live.',
+      'On an exercise block the add button now stays on the right whatever the block carries. A block with a weight as well as reps used to wrap it underneath on the left, so two blocks in the same list disagreed about where their button was.',
+    ]},
     {version:'v11.266', date:'Sep 6, 2026', major:true, notes:[
       'The stats bar on every Learning Centre subject is down to the three figures worth reading — accuracy, total questions, hours studied. XP today and the 7d/30d test count are gone from it. You still earn the XP; it just does not need a slot on nine subject hubs.',
       'The learning streak has moved to Power Level, beside your day streak. It is the same real figure it always was — consecutive days with a logged learning session, held on yesterday until today is used.',
@@ -18000,13 +18011,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // Mobile-first set: Home, Tasks (Command dashboard — missions/checklist/notes-adjacent),
     // Calendar, Fitness (also reaches Health/Productivity-Notes/Music via its own sub-tabs),
     // Voice. Lower-priority/desktop-oriented screens (World Intel, Finance, Power, Learning,
-    // Briefing, Settings, Requests) fall through to "More" automatically via mobMoreList below.
+    // Briefing, Settings) fall through to "More" automatically via mobMoreList below.
     const mobIds=['dashboard','learning','business','globe','fitness','calendar']; const mobLab={dashboard:'Command',learning:'Learning',business:'Finance',globe:'Intel',fitness:'Fitness',calendar:'Calendar'};
     const mobNav=mobIds.map(id=>({id,label:mobLab[id],go:go(id),c:id===scene?'#FFFFFF':'#8a8a92',dotOp:id===scene?1:0}));
     const mobMoreActive=!mobIds.includes(scene);
     const mobMoreActiveColor=mobMoreActive?'#FFFFFF':'#8a8a92';
     const toggleMobMore=()=>this.setState(s=>({mobMoreOpen:!s.mobMoreOpen}));
-    const mobHidden=['power','requests','voice'];
+    const mobHidden=['requests','voice'];
     const mobMoreList=nav.filter(n=>!mobIds.includes(n.id) && !mobHidden.includes(n.id)).map(n=>({...n,go:()=>{ n.go(); this.setState({mobMoreOpen:false}); }}));
     const toggleMobDrawer=()=>this.setState(s=>({mobDrawerOpen:!s.mobDrawerOpen}));
     const mobDrawerList=nav.filter(n=>!mobHidden.includes(n.id)).map(n=>({...n,go:()=>{ n.go(); this.setState({mobDrawerOpen:false}); }}));
