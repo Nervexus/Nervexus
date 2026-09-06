@@ -1127,6 +1127,45 @@ t('the add button follows every raiment', async () => {
   await page.waitForTimeout(400);
 });
 
+t('on a phone the section list does not sit under the exercises', async () => {
+  /* The list is sticky so it stays beside the exercises on a wide screen. On a phone the
+     grid folds to one column and it is above them — pinned there it stayed put while the
+     blocks scrolled over it, and its rows read through the gaps between them. */
+  await page.setViewportSize({ width: 390, height: 780 });
+  await openChest();
+  const overlapAfterScrolling = await page.evaluate(async () => {
+    const scroller = document.querySelector('.cc-scene') || document.scrollingElement;
+    const hit = () => {
+      const nav = document.querySelector('.forge-secnav');
+      if (!nav) return 'no section list';
+      const n = nav.getBoundingClientRect();
+      const cards = [...document.querySelectorAll('.cc-glowcard')].filter(c => c !== nav);
+      for (const c of cards) {
+        const r = c.getBoundingClientRect();
+        if (r.height < 10) continue;
+        if (r.top < n.bottom - 2 && r.bottom > n.top + 2) return 'overlap';
+      }
+      return '';
+    };
+    for (const y of [0, 300, 700, 1200]) {
+      scroller.scrollTop = y;
+      await new Promise(r => setTimeout(r, 220));
+      const bad = hit();
+      if (bad) return bad + ' at scrollTop ' + y;
+    }
+    return '';
+  });
+  eq(overlapAfterScrolling, '', 'the section list is under the exercise blocks');
+  await page.setViewportSize({ width: 1280, height: 1400 });
+});
+
+t('on a wide screen the section list still pins beside the exercises', async () => {
+  await openChest();
+  const pos = await page.evaluate(() =>
+    getComputedStyle(document.querySelector('.forge-secnav')).position);
+  eq(pos, 'sticky', 'the section list stopped pinning on desktop too');
+});
+
 t('the blocks and the button are curved', async () => {
   await openChest();
   const r = await page.evaluate(() => {

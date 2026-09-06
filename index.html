@@ -384,6 +384,14 @@
      desktop sizing or disabling the user's own pinch-zoom. */
   input, textarea, select { font-size:16px !important; }
   .cc-grid2, .cc-grid-globe, .cc-grid-fit, .cc-grid-fin { grid-template-columns: 1fr !important; }
+  /* The section list is sticky so it stays beside the exercises while they scroll. Under
+     900px the grid folds to one column and it is above them instead — pinned there it stayed
+     put while the blocks slid over the top of it, and its rows showed through the gaps
+     between them. Beside the content it pins; above it, it scrolls away like anything else. */
+  @media (max-width:900px){
+    .forge-secnav{ position:static !important; top:auto !important; }
+  }
+
   /* Multiple-choice answer grids (every subject's practice + test screens) forced a
      minimum 160px column, which on a phone often still fits 2 columns — fine for short
      answers, but several subjects (especially Gentleman's Etiquette) use full-sentence
@@ -3696,7 +3704,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                under 900px on the cc-grid2 media rule, same as every other split on the app. -->
           <div class="cc-grid2" style="display:grid; grid-template-columns:224px 1fr; gap:16px; align-items:start;">
 
-            <div class="cc-glowcard" style="border-radius:16px; padding:8px; position:sticky; top:14px;">
+            <div class="cc-glowcard forge-secnav" style="border-radius:16px; padding:8px; position:sticky; top:14px;">
               <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="13">
                 <div onClick="{{ p.go }}" style="position:relative; display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:11px; cursor:pointer; background:{{ p.bg }};" style-hover="{ background:'rgba(255,255,255,0.06)' }">
                   <span style="position:absolute; left:0; top:11px; bottom:11px; width:2px; border-radius:2px; background:#E7D8A6; opacity:{{ p.barOpacity }};"></span>
@@ -9491,7 +9499,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-264 · v11.264 raiment-add-button';
+const NOTIF_BUILD_VERSION = '2026.09.06-265 · v11.265 mobile-secnav';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14079,6 +14087,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.265', date:'Sep 6, 2026', major:true, notes:[
+      'Fixed the section list sitting under the exercise blocks on a phone. It is pinned in place so it stays beside them on a wide screen, but on a phone it is above them instead — pinned there it stayed put while the blocks scrolled over the top of it, and its rows showed through the gaps between them. On a phone it now scrolls away with the page.',
+    ]},
     {version:'v11.264', date:'Sep 6, 2026', major:true, notes:[
       'The exercise blocks, the number fields and the add button are curved again.',
       'The add button now takes its colour from whichever raiment you are wearing — oxblood on Ultra X, warm grey on Noir, blue on Maison Élysée, champagne on Maison Éverpine — instead of carrying one theme\u2019s colour everywhere.',
