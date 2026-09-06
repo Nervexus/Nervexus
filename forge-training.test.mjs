@@ -31,16 +31,33 @@ t('a section can be found by key, and an unknown key returns null', () => {
 
 /* Every section that has been filled in so far, and the body part its exercises log
    against. A section is added here the moment it gets a pool. */
-const FILLED = [['chest','Chest'], ['shoulders','Shoulders']];
+const FILLED = [
+  ['chest','Chest', {all:12}],
+  ['shoulders','Shoulders', {gym:20, home:10}],
+];
 
-t('each filled section carries 20 gym and 10 home exercises', () => {
-  for(const [key, part] of FILLED){
+t('each filled section carries the lists it is meant to', () => {
+  for(const [key, part, want] of FILLED){
     const c = T.section(key);
     if(!c) throw new Error('no section called '+key);
     if(!c.pool) throw new Error(key+' has no exercise pool');
-    if(c.pool.gym.length !== 20) throw new Error(key+': expected 20 gym exercises, got '+c.pool.gym.length);
-    if(c.pool.home.length !== 10) throw new Error(key+': expected 10 home exercises, got '+c.pool.home.length);
+    const got=Object.keys(c.pool).sort().join(',');
+    if(got !== Object.keys(want).sort().join(',')) throw new Error(key+' has lists '+got);
+    for(const k of Object.keys(want))
+      if(c.pool[k].length !== want[k]) throw new Error(key+'/'+k+': expected '+want[k]+', got '+c.pool[k].length);
     if(c.part !== part) throw new Error(key+' must log against '+part+', not '+c.part);
+  }
+});
+
+t('a range runs the right way round', () => {
+  /* The block shows the low end and offers the range as the target, so a max below the min
+     would print backwards and start the user above their own top of range. */
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    for(const where of Object.keys(sec.pool)) for(const x of sec.pool[where]){
+      if(x.setsMax!=null && x.setsMax < x.sets) throw new Error(x.name+': sets range runs backwards');
+      if(x.repsMax!=null && x.repsMax < x.reps) throw new Error(x.name+': reps range runs backwards');
+    }
   }
 });
 

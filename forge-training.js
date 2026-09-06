@@ -31,51 +31,35 @@
      shows reps only rather than a stepper that would sit at BW forever. */
   function nl(name, sets, reps) { var e = ex(name, sets, reps); e.noLoad = true; return e; }
 
+  /* Ranges rather than fixed numbers, ordered by priority: this is a fighter's chest
+     session, not a bodybuilding split. Strength first, then explosiveness, then unilateral
+     stability, then endurance — the order of the list is the order of the priority. */
+  function rng(name, setsLo, setsHi, repsLo, repsHi, opt) {
+    var e = { name: name, sets: setsLo, setsMax: setsHi, reps: repsLo, repsMax: repsHi };
+    if (opt && opt.noLoad) e.noLoad = true;
+    if (opt && opt.perSide) e.perSide = true;
+    return e;
+  }
   var CHEST = {
-    key: 'chest', name: 'Chest', tag: 'CHEST',
-    part: 'Chest',
+    key: 'chest', name: 'Chest', tag: 'CHEST', part: 'Chest',
+    priority: 'Strength → Explosiveness → Unilateral stability → Muscular endurance',
     pool: {
-      gym: [
-        ex('Barbell bench press', 4, 6),
-        ex('Incline barbell press', 4, 8),
-        ex('Decline barbell press', 3, 8),
-        ex('Dumbbell bench press', 4, 8),
-        ex('Incline dumbbell press', 4, 10),
-        ex('Decline dumbbell press', 3, 10),
-        ex('Dumbbell flye', 3, 12),
-        ex('Incline dumbbell flye', 3, 12),
-        ex('Cable crossover, high to low', 3, 15),
-        ex('Cable crossover, low to high', 3, 15),
-        ex('Cable flye, mid', 3, 12),
-        ex('Pec deck', 3, 12),
-        ex('Machine chest press', 3, 10),
-        ex('Incline machine press', 3, 10),
-        ex('Smith machine bench press', 3, 8),
-        ex('Weighted dip', 4, 8),
-        ex('Landmine press', 3, 10),
-        ex('Floor press', 3, 8),
-        ex('Svend press', 3, 15),
-        ex('Dumbbell pullover', 3, 12)
-      ],
-      home: [
-        nl('Press-up', 4, 15),
-        nl('Incline press-up', 3, 15),
-        nl('Decline press-up', 3, 12),
-        nl('Diamond press-up', 3, 12),
-        nl('Wide press-up', 3, 15),
-        nl('Archer press-up', 3, 8),
-        nl('Explosive press-up', 4, 8),
-        nl('Chair dip', 3, 12),
-        nl('Band chest press', 3, 15),
-        nl('Band flye', 3, 15)
+      all: [
+        rng('Barbell bench press', 3, 5, 3, 8),
+        rng('Dumbbell bench press', 3, 4, 6, 10),
+        rng('Incline dumbbell press', 3, 4, 6, 10),
+        rng('Weighted dips', 3, 4, 5, 10),
+        rng('Push-ups', 3, 4, 10, 30, {noLoad: true}),
+        rng('Explosive / clap push-ups', 3, 5, 3, 6, {noLoad: true}),
+        rng('Medicine-ball chest pass', 3, 5, 3, 6),
+        rng('Cable chest press', 3, 4, 8, 12),
+        rng('Single-arm cable press', 3, 4, 6, 12, {perSide: true}),
+        rng('Landmine press', 3, 4, 6, 10, {perSide: true}),
+        rng('Cable fly', 2, 3, 10, 15),
+        rng('Dumbbell squeeze press', 3, 3, 8, 12)
       ]
     }
   };
-
-  /* The Training centre's sections, in the order they are worked through. None of them have
-     content yet — each is a key, a name and a label, and the page renders it as an empty
-     page. A stub with an empty work array would read as built-and-broken rather than
-     not-started, so they carry nothing else at all. */
   function stub(key, name) { return { key: key, name: name, tag: name.toUpperCase() }; }
 
   var SHOULDERS = {

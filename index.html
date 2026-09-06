@@ -333,7 +333,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=9"></script>
+  <script src="forge-training.js?v=10"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -3718,6 +3718,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </sc-for>
                     <span style="font-size:11.5px; color:#6f6f78;">{{ sec.poolHint }}</span>
                   </div>
+                  <sc-if value="{{ sec.hasPriority }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; align-items:baseline; gap:9px; margin:-4px 0 12px; flex-wrap:wrap;">
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.6px; color:#E7D8A6;">TRAINING PRIORITY</span>
+                      <span style="font-size:11.5px; color:#8f8f99;">{{ sec.priority }}</span>
+                    </div>
+                  </sc-if>
                   <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(318px,1fr)); gap:8px;">
                     <sc-for list="{{ sec.poolList }}" as="x" hint-placeholder-count="20">
                       <div class="cc-glowcard" style="border-radius:2px; padding:13px 15px; display:flex; flex-direction:column; gap:10px;">
@@ -3731,12 +3737,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                               <span style="display:flex; align-items:center; gap:4px;">
                                 <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.1px; color:#6f6f78; margin-right:2px;">{{ st.label }}</span>
                                 <span onClick="{{ st.dec }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:2px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">&#8722;</span>
-                                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ st.valInk }}; min-width:40px; text-align:center;">{{ st.val }}</span>
+                                <input value="{{ st.val }}" onInput="{{ st.type }}" placeholder="{{ st.ph }}" type="number" inputmode="decimal" style="font-family:'JetBrains Mono',monospace; font-size:11px; width:46px; padding:5px 4px; text-align:center; border-radius:2px; border:1px solid {{ st.bd }}; background:rgba(255,255,255,0.04); color:{{ st.valInk }}; outline:none; box-sizing:border-box;">
                                 <span onClick="{{ st.inc }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:2px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">+</span>
                               </span>
                             </sc-for>
                           </div>
-                          <span onClick="{{ x.add }}" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12px; letter-spacing:3px; padding:7px 16px; border-radius:2px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
+                          <span onClick="{{ x.add }}" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; letter-spacing:1px; padding:7px 18px; border-radius:2px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
                         </div>
                       </div>
                     </sc-for>
@@ -9477,7 +9483,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-262 · v11.262 shoulders-blocks';
+const NOTIF_BUILD_VERSION = '2026.09.06-263 · v11.263 chest-fighter';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9567,7 +9573,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      levelUp:null, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      levelUp:null, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -14065,6 +14071,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.263', date:'Sep 6, 2026', major:true, notes:[
+      'Chest is now the fighter/wrestler session: twelve exercises in priority order — strength, then explosiveness, then unilateral stability, then endurance — with real ranges rather than one fixed number. The block starts at the bottom of the range; the top is what you work up to.',
+      'It is one ordered list, so Chest shows no gym/home tabs. Sections that genuinely have two lists, like Shoulders, still do — the tabs come from what the section actually has.',
+      'You can type the weight and the reps straight into the block instead of stepping to them. The buttons are still there for a nudge.',
+      'Tightened the letter-spacing on the add button.',
+    ]},
     {version:'v11.262', date:'Sep 6, 2026', major:true, notes:[
       'Shoulders is filled in — twenty gym exercises and ten for home, same as Chest.',
       'The exercise blocks are rectangles now, with the weight and reps steppers on one line and the add button in the Ultra X colours.',
@@ -15995,7 +16007,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      keeps. The programme content itself never lives here. */
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
-  setForgeSection(k){ this.setState({forgeSection:k}); }
+  setForgeSection(k){ this._resetPoolText(); this.setState({forgeSection:k}); }
   _fbToday(){ return window.HealthKit ? window.HealthKit.today() : new Date().toLocaleDateString('en-CA'); }
   _fbLocal(d){ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } }
   // Monday, so a week rolls over on the day people restart a programme rather than mid-weekend.
@@ -16123,7 +16135,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({forgeFB:{...f, items:[...(f.items||[]), it], w}});
     this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it)+(weight>0?' · '+weight+'kg':''));
   }
-  setForgePool(k){ this.setState({forgePool:k}); }
+  setForgePool(k){ this._resetPoolText(); this.setState({forgePool:k}); }
   /* The numbers on a pool block are yours to set before you add it — nothing is prescribed.
      Once the exercise is in the session the same buttons drive the session item itself, so
      the block and the checklist can never show different numbers. Once it is ticked they
@@ -16142,26 +16154,62 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const d=(this.state.poolDraft||{})[this._poolKey(secKey, ex.name)]||{};
     return { reps:d.reps!=null?d.reps:(ex.reps||0), weight:d.weight!=null?d.weight:0 };
   }
-  stepPool(secKey, ex, item, field, dir){
-    const step=this.POOL_STEP(field)*dir;
+  /* One writer for both the buttons and the field. In the session it drives the session item
+     itself so the block and the checklist cannot disagree; before that it is a draft. */
+  /* Every write here goes through a functional setState. Typing fires input and blur in the
+     same tick, and reading this.state between them saw the value before the keystroke — the
+     blur clamp then ran on a stale number and the text buffer it was meant to clear survived,
+     so the field showed whatever had been typed however far out of range it was. */
+  _poolWrite(secKey, ex, item, field, value){
     if(item){
-      const f=this._fb();
-      if((f.done||{})[item.id]) return;   // logged already — untick it to change the numbers
-      if(field==='weight'){
-        const v=this._poolClamp('weight', (parseFloat((f.w||{})[item.id])||0)+step);
-        this.setState({forgeFB:{...f, w:{...(f.w||{}), [item.id]: v>0?String(v):''}}});
-      } else {
-        const v=this._poolClamp('reps', (item.reps||0)+step);
-        this.setState({forgeFB:{...f, items:(f.items||[]).map(i=>i.id===item.id?{...i, reps:v}:i)}});
-      }
+      this.setState(st=>{
+        const f=st.forgeFB||{};
+        if((f.done||{})[item.id]) return {};   // logged already — untick it to change the numbers
+        if(field==='weight') return {forgeFB:{...f, w:{...(f.w||{}), [item.id]: value>0?String(value):''}}};
+        return {forgeFB:{...f, items:(f.items||[]).map(i=>i.id===item.id?{...i, reps:value}:i)}};
+      });
       return;
     }
     const key=this._poolKey(secKey, ex.name);
-    const cur=(this.state.poolDraft||{})[key]||{};
-    const base=(field==='weight') ? (cur.weight!=null?cur.weight:0) : (cur.reps!=null?cur.reps:(ex.reps||0));
-    const v=this._poolClamp(field, base+step);
-    this.setState(st=>({poolDraft:{...(st.poolDraft||{}), [key]:{...cur, [field]:v}}}));
+    this.setState(st=>({poolDraft:{...(st.poolDraft||{}),
+      [key]:{...((st.poolDraft||{})[key]||{}), [field]:value}}}));
   }
+  stepPool(secKey, ex, item, field, dir){
+    const v=this.poolVals(secKey, ex, item);
+    const base=(field==='weight')?v.weight:v.reps;
+    this._clearPoolText(secKey, ex, field);
+    this._poolWrite(secKey, ex, item, field, this._poolClamp(field, base + this.POOL_STEP(field)*dir));
+  }
+  /* Typed as well as stepped — the buttons nudge, the field is for when you know the number.
+     What is typed is held as text so the field can be emptied to retype it; clamping on every
+     keystroke would put a 1 back the moment you deleted the last digit. The clamp lands when
+     the field is left, and again on the way into the session. */
+  _poolTextKey(secKey, ex, field){ return this._poolKey(secKey, ex.name)+'|'+field; }
+  _clearPoolText(secKey, ex, field){
+    const k=this._poolTextKey(secKey, ex, field);
+    this.setState(st=>{ const t={...(st.poolText||{})}; delete t[k]; return {poolText:t}; });
+  }
+  typePoolVal(secKey, ex, item, field, e){
+    const raw=(e&&e.target)?e.target.value:e;
+    let str=String(raw==null?'':raw).replace(/[^0-9.]/g,'').slice(0,6);
+    const max=(field==='weight')?500:100;
+    const num=str===''?0:(parseFloat(str)||0);
+    /* The value behind the field is always in range; the text is only rewritten when what
+       was typed is out of range, so a half-finished decimal like "62." survives long enough
+       to become 62.5. An emptied field keeps showing empty while the value sits at its
+       minimum — that is what lets a number be deleted and retyped, where clamping the text
+       on every keystroke put a 1 back the instant the last digit went. */
+    const over=num>max;
+    const text=over?String(max):str;
+    const value=this._poolClamp(field, over?max:(field==='weight'?num:Math.round(num)));
+    const k=this._poolTextKey(secKey, ex, field);
+    this.setState(st=>({poolText:{...(st.poolText||{}), [k]:text}}));
+    this._poolWrite(secKey, ex, item, field, value);
+  }
+  /* Cleared whenever the block stops being the thing in front of you, so a half-typed number
+     is never left on screen disagreeing with the value behind it. onBlur would be the natural
+     place, but this runtime does not wire it on these inputs. */
+  _resetPoolText(){ if(Object.keys(this.state.poolText||{}).length) this.setState({poolText:{}}); }
   removeForgeFBItem(id){
     const f=this._fb(), done={...(f.done||{})};
     // Take its logged rows with it, or the log keeps sets belonging to an exercise that is gone.
@@ -18408,20 +18456,27 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
         const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
-        const dr0=S.fbDraft||{}, pool=S.forgePool||'gym';
+        const dr0=S.fbDraft||{}, pool0=S.forgePool||'gym', pt=S.poolText||{};
+        const POOL_LABEL={gym:'GYM', home:'HOME', all:'ALL'};
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
+          const poolKeys=Object.keys(sec.pool||{});
+          const pool=(poolKeys.indexOf(pool0)>=0)?pool0:(poolKeys[0]||'gym');
           const list=(sec.key==='full-body') ? (fb.items||[]) : (sec.checklist||[]);
           const n=list.filter(it=>fbDone[it.id]).length;
           return {
             key:sec.key, name:sec.name, tag:sec.tag,
             empty:sec.key!=='full-body' && !list.length && !sec.pool,
             hasPool:!!sec.pool,
-            pools:[['gym','GYM'],['home','HOME']].map(q=>({
-              label:q[1], go:()=>this.setForgePool(q[0]),
-              ink:pool===q[0]?'#0d0d10':'#9a9aa2',
-              bg:pool===q[0]?'#eef0f2':'transparent',
-              bd:pool===q[0]?'#eef0f2':'rgba(255,255,255,0.12)' })),
+            /* The tabs are whatever lists the section actually has. Chest is one ordered
+               list — a fighter's session, in priority order — so it shows no tabs at all
+               rather than a GYM/HOME split it does not have. */
+            pools:(poolKeys.length>1?poolKeys:[]).map(q=>({
+              label:POOL_LABEL[q]||q.toUpperCase(), go:()=>this.setForgePool(q),
+              ink:pool===q?'#0d0d10':'#9a9aa2',
+              bg:pool===q?'#eef0f2':'transparent',
+              bd:pool===q?'#eef0f2':'rgba(255,255,255,0.12)' })),
             poolHint:'Adds to your Full Body session',
+            hasPriority:!!sec.priority, priority:sec.priority||'',
             poolList:((sec.pool||{})[pool]||[]).map(x=>{
               const item=(fb.items||[]).find(i=>i.name.toLowerCase()===x.name.toLowerCase());
               const inSession=!!item, ticked=!!(item && fbDone[item.id]);
@@ -18430,24 +18485,33 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
                  editing them here would leave the two disagreeing. */
               const stepIt=(field,dir)=>()=>{ if(!ticked) this.stepPool(sec.key, x, item, field, dir); };
               /* A press-up or a band pull has nothing to load, so it gets reps alone rather
-                 than a weight stepper that would sit at BW for ever. */
+                 than a weight stepper that would sit unset for ever. */
               const raw=[];
-              if(!x.noLoad) raw.push(['weight','WEIGHT', v.weight>0?(v.weight+'kg'):'\u2014']);
-              raw.push(['reps','REPS', String(v.reps)]);
-              const steps=raw.map(st=>({ label:st[1], val:st[2],
-                valInk:ticked?'#7c7c84':'#eef0f2',
-                ink:ticked?'#4a4a52':'#c9c9d2',
-                bd:ticked?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.16)',
-                cursor:ticked?'default':'pointer',
-                dec:stepIt(st[0],-1), inc:stepIt(st[0],1) }));
+              if(!x.noLoad) raw.push(['weight','WEIGHT','kg', v.weight>0?String(v.weight):'']);
+              raw.push(['reps','REPS','reps', String(v.reps)]);
+              const steps=raw.map(st=>{
+                const tk=this._poolTextKey(sec.key, x, st[0]);
+                const typed=pt[tk];
+                return { label:st[1], ph:st[2], val:typed!=null?typed:st[3],
+                  valInk:ticked?'#7c7c84':'#eef0f2',
+                  ink:ticked?'#4a4a52':'#c9c9d2',
+                  bd:ticked?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.16)',
+                  cursor:ticked?'default':'pointer',
+                  type:(e)=>{ if(!ticked) this.typePoolVal(sec.key, x, item, st[0], e); },
+                  dec:stepIt(st[0],-1), inc:stepIt(st[0],1) };
+              });
+              const setsTxt=(x.setsMax && x.setsMax>x.sets) ? (x.sets+'\u2013'+x.setsMax) : String(x.sets||1);
+              const repsTxt=(x.repsMax && x.repsMax>x.reps) ? (' \u00d7 '+x.reps+'\u2013'+x.repsMax) : '';
+              const side=x.perSide?' \u00b7 PER SIDE':'';
               return { name:x.name, steps,
-                target:ticked?'LOGGED':((x.sets||1)+' SETS'),
+                target:ticked?'LOGGED':(setsTxt+' SETS'+repsTxt+side),
                 targetInk:ticked?'#E7D8A6':'#8f8f99',
                 label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
                 ink:inSession?'#E7D8A6':'#F5F1E8',
                 bg:inSession?'transparent':'#5B1A1A',
                 bd:inSession?'rgba(231,216,166,0.5)':'#5B1A1A',
-                add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part, v); } };
+                add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part,
+                  {weight:this._poolClamp('weight', v.weight), reps:this._poolClamp('reps', v.reps)}); } };
             }),
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
