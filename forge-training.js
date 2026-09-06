@@ -173,7 +173,13 @@
       rng('Towel pull-up', 3, 4, 3, 8, {group: 'FIGHTER-SPECIFIC', noLoad: true}),
       rng('Bear crawl', 3, 5, 20, 40, {group: 'FIGHTER-SPECIFIC', unit: 'm', noLoad: true}),
       rng('Sandbag over-shoulder throw', 3, 5, 3, 6, {group: 'FIGHTER-SPECIFIC', perSide: true}),
-      rng('Renegade row', 3, 4, 6, 10, {group: 'FIGHTER-SPECIFIC', perSide: true})
+      rng('Renegade row', 3, 4, 6, 10, {group: 'FIGHTER-SPECIFIC', perSide: true}),
+
+      rng('Band pull-apart', 3, 4, 15, 25, {group: 'BANDS', noLoad: true}),
+      rng('Band lat pulldown', 3, 4, 12, 20, {group: 'BANDS', noLoad: true}),
+      rng('Band seated row', 3, 4, 12, 20, {group: 'BANDS', noLoad: true}),
+      rng('Band single-arm row', 3, 4, 12, 20, {group: 'BANDS', perSide: true, noLoad: true}),
+      rng('Band deadlift', 3, 4, 15, 25, {group: 'BANDS', noLoad: true})
     ] }
   };
 

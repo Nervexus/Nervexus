@@ -35,7 +35,7 @@ const FILLED = [
   ['chest','Chest', {all:12}],
   ['shoulders','Shoulders', {all:16}],
   ['arms','Arms', {all:31}],
-  ['back','Back', {all:19}],
+  ['back','Back', {all:24}],
   ['core','Core', {all:16}],
   ['hips','Legs', {all:12}],
   ['quads','Legs', {all:12}],
