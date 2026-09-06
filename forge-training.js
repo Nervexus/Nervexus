@@ -44,6 +44,8 @@
        sets — rounds, on the ropes. */
     if (opt && opt.unit) e.unit = opt.unit;
     if (opt && opt.setsLabel) e.setsLabel = opt.setsLabel;
+    // Which block of the session it belongs to. A section without groups renders as one list.
+    if (opt && opt.group) e.group = opt.group;
     return e;
   }
   var CHEST = {
@@ -93,10 +95,52 @@
     }
   };
 
+  /* Twenty-five, in four blocks. Three of the list as given could not stand: weighted dips
+     were already on Chest and battle ropes already on Shoulders, and hammer curls appeared
+     twice in the same list under two names. Each is replaced in its own slot by a movement
+     doing the same job — a bodyweight triceps press, a fighter's grip-and-arm conditioning
+     round, and the forearm curl the second hammer curl was standing in for. */
+  var ARMS = {
+    key: 'arms', name: 'Arms', tag: 'ARMS', part: 'Arms',
+    priority: 'Arm strength → Grip strength → Forearm strength → Triceps power → Biceps strength → Muscular endurance',
+    pool: {
+      all: [
+        rng('Barbell curl', 3, 4, 6, 10, {group: 'BICEPS'}),
+        rng('Dumbbell hammer curl', 3, 4, 8, 12, {group: 'BICEPS'}),
+        rng('Incline dumbbell curl', 3, 3, 8, 12, {group: 'BICEPS'}),
+        rng('Cable curl', 3, 3, 10, 15, {group: 'BICEPS'}),
+        rng('Preacher curl', 3, 3, 8, 12, {group: 'BICEPS'}),
+        rng('Reverse curl', 3, 3, 10, 15, {group: 'BICEPS'}),
+
+        rng('Close-grip bench press', 3, 5, 4, 8, {group: 'TRICEPS'}),
+        rng('Diamond press-up', 3, 4, 8, 15, {group: 'TRICEPS', noLoad: true}),
+        rng('Cable triceps pushdown', 3, 4, 8, 15, {group: 'TRICEPS'}),
+        rng('Overhead cable triceps extension', 3, 3, 10, 15, {group: 'TRICEPS'}),
+        rng('Dumbbell skull crushers', 3, 3, 8, 12, {group: 'TRICEPS'}),
+        rng('Single-arm cable triceps extension', 3, 3, 10, 15, {group: 'TRICEPS', perSide: true}),
+
+        rng("Farmer's carries", 3, 5, 20, 40, {group: 'FOREARMS & GRIP', unit: 'm'}),
+        rng('Heavy dumbbell holds', 3, 5, 20, 45, {group: 'FOREARMS & GRIP', unit: 'sec'}),
+        rng('Wrist curls', 3, 3, 12, 20, {group: 'FOREARMS & GRIP'}),
+        rng('Reverse wrist curls', 3, 3, 12, 20, {group: 'FOREARMS & GRIP'}),
+        rng('Zottman curl', 3, 4, 8, 12, {group: 'FOREARMS & GRIP'}),
+        rng('Plate pinch holds', 3, 5, 20, 45, {group: 'FOREARMS & GRIP', unit: 'sec'}),
+        rng('Towel cable curls', 3, 3, 8, 12, {group: 'FOREARMS & GRIP'}),
+        rng('Dead hangs', 3, 5, 20, 60, {group: 'FOREARMS & GRIP', unit: 'sec', noLoad: true}),
+
+        rng('Rope climbs', 1, 1, 3, 5, {group: 'FIGHTER-SPECIFIC', unit: 'climb', noLoad: true}),
+        rng('Sledgehammer tyre strikes', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Sled pulls', 3, 5, 20, 40, {group: 'FIGHTER-SPECIFIC', unit: 'm', setsLabel: 'ROUNDS'}),
+        rng('Heavy bag straight-punch intervals', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Cable isometric holds', 3, 4, 15, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec'})
+      ]
+    }
+  };
+
   var SECTIONS = [
     CHEST,
     SHOULDERS,
-    stub('arms', 'Arms'),
+    ARMS,
     stub('back', 'Back'),
     stub('core', 'Core'),
     stub('hips', 'Hips & Glutes'),

@@ -1373,6 +1373,105 @@ t('the same exercise on two body parts can both be added', async () => {
   await page.waitForFunction(() => !!window.__nvx, null, { timeout: 20000 });
 });
 
+t('Arms renders in its blocks, in order', async () => {
+  await openChest();
+  await page.evaluate(() => window.__nvx.setForgeSection('arms'));
+  await page.waitForTimeout(900);
+  const D = await page.evaluate(() => window.ForgeTraining.section('arms').pool.all);
+  eq(await addBtns(), D.length, 'the arms list did not render one block each');
+
+  const wanted = D.map(x => x.group).filter((g, i, a) => i === 0 || a[i - 1] !== g);
+  /* Interpolated text renders inside a span.sc-interp, so the leaf carrying the label may be
+     that span rather than the div around it. */
+  const shown = await page.evaluate((labels) => [...document.querySelectorAll('div,span')]
+    .filter(e => e.children.length === 0 && labels.includes(e.textContent.trim()))
+    .map(e => e.textContent.trim()), wanted);
+  eq(shown.join(' | '), wanted.join(' | '), 'the group headings are missing or out of order');
+
+  /* Each heading has to come above its own blocks, not float somewhere else on the page. */
+  const order = await page.evaluate((names) => {
+    const y = (t) => {
+      const el = [...document.querySelectorAll('div,span')]
+        .find(e => e.children.length === 0 && e.textContent.trim() === t);
+      return el ? el.getBoundingClientRect().top : null;
+    };
+    return names.map(([h, first]) => ({ h, head: y(h), first: y(first) }));
+  }, wanted.map(g => [g, D.find(x => x.group === g).name]));
+  for (const o of order)
+    ok(o.head != null && o.first != null && o.head < o.first,
+      o.h + ' does not sit above its own blocks');
+});
+
+t('a section with no groups gets no stray heading', async () => {
+  await openChest();
+  const D = await page.evaluate(() => window.ForgeTraining.section('chest').pool.all);
+  ok(D.every(x => !x.group), 'chest has picked up groups, so this proves nothing');
+  eq(await addBtns(), D.length, 'chest did not render one block each');
+  const arms = await page.evaluate(() =>
+    [...new Set(window.ForgeTraining.section('arms').pool.all.map(x => x.group))]);
+  const body = await text();
+  for (const g of arms) ok(!body.includes(g), 'chest is showing the heading ' + g);
+});
+
+t('metres are offered as metres and logged as a distance', async () => {
+  /* The log records a distance. As reps, 30 metres would go in as thirty repetitions. */
+  await openChest();
+  await page.evaluate(() => window.__nvx.setForgeSection('arms'));
+  await page.waitForTimeout(900);
+  const src = await page.evaluate(() =>
+    window.ForgeTraining.section('arms').pool.all.find(x => x.unit === 'm'));
+  ok(src, 'nothing in the arms list is measured in metres');
+  ok((await text()).includes(src.reps + '–' + src.repsMax + ' M'), 'the target is not in metres');
+
+  const labels = await page.evaluate((n) => {
+    const t = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === n);
+    return [...t.closest('.cc-glowcard').querySelectorAll('span')]
+      .filter(e => e.children.length === 0).map(e => e.textContent.trim());
+  }, src.name);
+  ok(labels.includes('METRES'), 'the stepper is not labelled in metres');
+  ok(!labels.includes('REPS'), 'the stepper still says reps');
+
+  await page.evaluate((n) => {
+    const t = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === n);
+    [...t.closest('.cc-glowcard').querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD').click();
+  }, src.name);
+  await page.waitForTimeout(700);
+  const it = await page.evaluate(() => window.__nvx.state.forgeFB.items[0]);
+  eq(it.reps, 0, 'the metres were carried into the log as reps');
+  eq(it.dist, src.reps, 'the metres did not become a distance');
+  eq(it.distUnit, 'm', 'the distance has the wrong unit');
+
+  await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
+  await page.waitForTimeout(700);
+  await tick(src.name);
+  await page.waitForTimeout(800);
+  const w = await page.evaluate(() => window.__nvx.state.workouts);
+  eq(w.length, 1, 'ticking the carry logged nothing');
+  ok(w[0].dist > 0, 'it reached the log with no distance on it');
+});
+
+t('a single set of something counted in its own unit reads as the count alone', async () => {
+  /* "3–5 CLIMBS", not "1 SETS × 3–5 CLIMBS". */
+  await openChest();
+  await page.evaluate(() => window.__nvx.setForgeSection('arms'));
+  await page.waitForTimeout(900);
+  const src = await page.evaluate(() =>
+    window.ForgeTraining.section('arms').pool.all.find(x => x.unit === 'climb'));
+  ok(src, 'nothing in the arms list is counted in climbs');
+  const target = await page.evaluate((n) => {
+    const t = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === n);
+    const card = t.closest('.cc-glowcard');
+    return [...card.querySelectorAll('span')]
+      .filter(e => e.children.length === 0)
+      .map(e => e.textContent.trim()).find(x => /CLIMBS/.test(x));
+  }, src.name);
+  eq(target, src.reps + '–' + src.repsMax + ' CLIMBS', 'the target reads wrong');
+});
+
 t('the pool does not appear on a section that has none', async () => {
   await boot({ forgeCentre: 'training' });
   for (const key of ['neck', 'calves']) {

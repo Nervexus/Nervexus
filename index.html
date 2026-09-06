@@ -347,7 +347,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=12"></script>
+  <script src="forge-training.js?v=13"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -3746,8 +3746,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       <span style="font-size:11.5px; color:#8f8f99;">{{ sec.priority }}</span>
                     </div>
                   </sc-if>
+                  <sc-for list="{{ sec.poolGroups }}" as="g" hint-placeholder-count="4">
+                  <sc-if value="{{ g.showLabel }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--forge-accent); margin:14px 0 8px;">{{ g.label }}</div>
+                  </sc-if>
                   <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(318px,1fr)); gap:8px;">
-                    <sc-for list="{{ sec.poolList }}" as="x" hint-placeholder-count="20">
+                    <sc-for list="{{ g.list }}" as="x" hint-placeholder-count="20">
                       <div class="cc-glowcard" style="border-radius:15px; padding:13px 15px; display:flex; flex-direction:column; gap:10px;">
                         <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px;">
                           <div style="font-size:13.5px; color:#eef0f2; line-height:1.3;">{{ x.name }}</div>
@@ -3773,6 +3777,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       </div>
                     </sc-for>
                   </div>
+                  </sc-for>
                 </sc-if>
 
                 <!-- A checklist that writes through to the training log rather than keeping its
@@ -9536,7 +9541,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-273 · v11.273 forge-accent';
+const NOTIF_BUILD_VERSION = '2026.09.06-274 · v11.274 arms';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14172,6 +14177,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.274', date:'Sep 6, 2026', major:true, notes:[
+      'Arms is in — twenty-five exercises in four blocks: Biceps, Triceps, Forearms & Grip, and Fighter-specific, with the priority line underneath.',
+      'Three of the list could not stand as given. Weighted dips were already on Chest and battle ropes already on Shoulders, and hammer curls were in the list twice under two names. Each is replaced in its own slot: a diamond press-up for the bodyweight triceps work, sledgehammer tyre strikes for the fighter round, and a Zottman curl for the forearm curl.',
+      'Carries and sled pulls are in metres, holds and intervals in seconds, rope climbs in climbs. Each one is converted on the way into your log rather than dropped into the nearest field — metres become a distance, seconds become minutes, a climb is a rep.',
+    ]},
     {version:'v11.273', date:'Sep 6, 2026', major:true, notes:[
       'The Forge\u2019s accent follows your raiment instead of being champagne on all of them: red on Ultra X, white on Noir, blue on Maison Élysée. Éverpine keeps the champagne, since that is its own accent, and so do the base themes because the page is dark under them.',
       'That is the crest, the wordmark, the section tag, the lit rail on the section list, the training priority label, a scheduled day on the week, and the outline on a block already in your session — all one colour, so they move together.',
@@ -16281,19 +16291,33 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const o=over||{};
     const reps=o.reps!=null?o.reps:(ex.reps||0);
     const weight=o.weight!=null?o.weight:0;
-    /* Timed work goes into the log as minutes, which is what it records — seconds a round
-       across the rounds, never rounded away to nothing. */
-    const timed=ex.unit==='sec';
+    /* The log records reps, minutes and a distance. Work measured in anything else is
+       converted on the way in rather than dropped into the nearest field and mislabelled:
+       seconds become minutes across the sets, never rounded away to nothing; metres become a
+       distance; a climb is a rep. */
+    const timed=ex.unit==='sec', far=ex.unit==='m';
     const it={ id:this._uuid(), name:ex.name, part:asPart,
-      sets:ex.sets||0, reps:timed?0:reps,
+      sets:ex.sets||0, reps:(timed||far)?0:reps,
       minutes:timed?Math.max(1, Math.round((ex.sets||1)*reps/60)):(ex.minutes||0),
-      dist:0, distUnit:'m' };
+      dist:far?reps:0, distUnit:'m' };
     // The weight rides in the session's weight map, which is where ticking reads it from.
     const w={...(f.w||{})}; if(weight>0 && !timed) w[it.id]=String(weight);
     this.setState({forgeFB:{...f, items:[...(f.items||[]), it], w}});
     this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it)+(weight>0?' · '+weight+'kg':''));
   }
   setForgePool(k){ this._resetPoolText(); this.setState({forgePool:k}); }
+  /* Blocks of a session — biceps, triceps, grip — kept in the order the list gives them.
+     A section whose exercises carry no group comes back as one unlabelled block, so the
+     page draws the same thing either way. */
+  _poolGroups(list){
+    const out=[], at={};
+    (list||[]).forEach(x=>{
+      const g=x.group||'';
+      if(at[g]==null){ at[g]=out.length; out.push({label:g, showLabel:!!g, list:[]}); }
+      out[at[g]].list.push(x);
+    });
+    return out;
+  }
   /* The numbers on a pool block are yours to set before you add it — nothing is prescribed.
      Once the exercise is in the session the same buttons drive the session item itself, so
      the block and the checklist can never show different numbers. Once it is ticked they
@@ -18619,6 +18643,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
         const dr0=S.fbDraft||{}, pool0=S.forgePool||'gym', pt=S.poolText||{};
         const POOL_LABEL={gym:'GYM', home:'HOME', all:'ALL'};
+        /* What the numbers are, wherever they are shown. The log itself only knows reps,
+           minutes and distance — these are the words for what was actually done. */
+        const UNIT_STEP={sec:'SECS', m:'METRES', climb:'CLIMBS'};
+        const UNIT_PH={sec:'sec', m:'m', climb:'climbs'};
+        const UNIT_TARGET={sec:' SEC', m:' M', climb:' CLIMBS'};
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
           const poolKeys=Object.keys(sec.pool||{});
           const pool=(poolKeys.indexOf(pool0)>=0)?pool0:(poolKeys[0]||'gym');
@@ -18638,7 +18667,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               bd:pool===q?'#eef0f2':'rgba(255,255,255,0.12)' })),
             poolHint:'Adds to your Full Body session',
             hasPriority:!!sec.priority, priority:sec.priority||'',
-            poolList:((sec.pool||{})[pool]||[]).map(x=>{
+            poolGroups:this._poolGroups(((sec.pool||{})[pool]||[]).map(x=>{
               const asPart=(this.FB_PARTS().indexOf(sec.part)>=0?sec.part:'Full');
               const item=(fb.items||[]).find(i=>this._fbSame(i, {name:x.name, part:asPart}));
               const inSession=!!item, ticked=!!(item && fbDone[item.id]);
@@ -18650,7 +18679,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
                  than a weight stepper that would sit unset for ever. */
               const raw=[];
               if(!x.noLoad) raw.push(['weight','WEIGHT','kg', v.weight>0?String(v.weight):'']);
-              raw.push(['reps', x.unit==='sec'?'SECS':'REPS', x.unit==='sec'?'sec':'reps', String(v.reps)]);
+              raw.push(['reps', UNIT_STEP[x.unit]||'REPS', UNIT_PH[x.unit]||'reps', String(v.reps)]);
               const steps=raw.map(st=>{
                 const tk=this._poolTextKey(sec.key, x, st[0]);
                 const typed=pt[tk];
@@ -18663,19 +18692,25 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
                   dec:stepIt(st[0],-1), inc:stepIt(st[0],1) };
               });
               const setsTxt=(x.setsMax && x.setsMax>x.sets) ? (x.sets+'\u2013'+x.setsMax) : String(x.sets||1);
-              const repsTxt=(x.repsMax && x.repsMax>x.reps) ? (' \u00d7 '+x.reps+'\u2013'+x.repsMax) : '';
-              const unitTxt=x.unit==='sec'?' SEC':'';
+              const repsTxt=(x.repsMax && x.repsMax>x.reps) ? (x.reps+'\u2013'+x.repsMax) : String(x.reps||0);
+              const unitTxt=UNIT_TARGET[x.unit]||'';
               const side=x.perSide?' \u00b7 PER SIDE':'';
+              /* A single set of something counted in its own unit reads as the count alone —
+                 "3–5 CLIMBS", not "1 SETS × 3–5 CLIMBS". */
+              const onlyOne=x.unit && (x.sets||1)===1 && (x.setsMax||1)===1;
+              const target=onlyOne ? (repsTxt+unitTxt)
+                : (setsTxt+' '+(x.setsLabel||'SETS')+' \u00d7 '+repsTxt+unitTxt);
               return { name:x.name, steps,
-                target:ticked?'LOGGED':(setsTxt+' '+(x.setsLabel||'SETS')+repsTxt+unitTxt+side),
+                target:ticked?'LOGGED':(target+side),
                 targetInk:ticked?'var(--forge-accent)':'#8f8f99',
                 label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
                 ink:inSession?'var(--forge-add-on)':'var(--forge-add-ink)',
                 bg:inSession?'transparent':'var(--forge-add-bg)',
                 bd:inSession?'var(--forge-add-on)':'var(--forge-add-bg)',
+                group:x.group||'',
                 add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part,
                   {weight:this._poolClamp('weight', v.weight), reps:this._poolClamp('reps', v.reps)}); } };
-            }),
+            })),
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
             modes:[['day','DAILY'],['date','SCHEDULED']].map(m=>({

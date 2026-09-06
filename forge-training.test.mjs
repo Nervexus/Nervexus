@@ -34,6 +34,7 @@ t('a section can be found by key, and an unknown key returns null', () => {
 const FILLED = [
   ['chest','Chest', {all:12}],
   ['shoulders','Shoulders', {all:16}],
+  ['arms','Arms', {all:25}],
 ];
 
 t('each filled section carries the lists it is meant to', () => {
@@ -122,18 +123,57 @@ t('no exercise name appears in two sections', () => {
   }
 });
 
-t('timed work says so, and is loggable as time', () => {
-  /* The training log records minutes, not seconds. An exercise measured in seconds has to
-     carry the unit so the block can say so and the session can convert it — otherwise the
-     numbers land in the log as reps, which they are not. */
+t('every unit is one the page and the log both know', () => {
+  /* The training log records reps, minutes and a distance. Anything measured in another unit
+     has to name it, so the page can label it and the session can convert — otherwise metres
+     or seconds land in the log as a rep count, which they are not. */
+  const KNOWN = ['sec', 'm', 'climb'];
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    for(const where of Object.keys(sec.pool)) for(const x of sec.pool[where]){
+      if(x.unit && KNOWN.indexOf(x.unit)<0) throw new Error(x.name+': unknown unit '+x.unit);
+    }
+  }
+});
+
+t('a section is either grouped throughout or not grouped at all', () => {
+  /* Half a section carrying groups would render one labelled block and then a headless one. */
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    for(const where of Object.keys(sec.pool)){
+      const list=sec.pool[where];
+      const withGroup=list.filter(x=>x.group).length;
+      if(withGroup && withGroup!==list.length)
+        throw new Error(sec.name+'/'+where+': '+withGroup+' of '+list.length+' carry a group');
+    }
+  }
+});
+
+t('a group is contiguous — it does not come back later', () => {
+  /* The page draws a heading the first time it sees a group. A group split in two would get
+     two headings with the same name. */
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    for(const where of Object.keys(sec.pool)){
+      const seq=sec.pool[where].map(x=>x.group||'').filter((g,i,a)=>i===0||a[i-1]!==g);
+      if(new Set(seq).size!==seq.length) throw new Error(sec.name+'/'+where+': a group is split up');
+    }
+  }
+});
+
+t('work in another unit still lands in the log as something', () => {
+  /* Seconds become minutes across the sets, metres become a distance, a climb is a rep. Each
+     has to come out greater than zero — an exercise that converts to nothing adds to the
+     session, ticks, and records silence. */
   for(const sec of T.SECTIONS){
     if(!sec.pool) continue;
     for(const where of Object.keys(sec.pool)) for(const x of sec.pool[where]){
       if(!x.unit) continue;
-      if(x.unit!=='sec') throw new Error(x.name+': unknown unit '+x.unit);
-      if(!(x.reps>0)) throw new Error(x.name+' is timed but carries no duration');
-      const mins=Math.max(1, Math.round((x.sets||1)*x.reps/60));
-      if(!(mins>0)) throw new Error(x.name+' converts to no time at all');
+      if(!(x.reps>0)) throw new Error(x.name+' is measured in '+x.unit+' but carries no amount');
+      if(x.unit==='sec'){
+        const mins=Math.max(1, Math.round((x.sets||1)*x.reps/60));
+        if(!(mins>0)) throw new Error(x.name+' converts to no time at all');
+      }
     }
   }
 });
