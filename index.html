@@ -9530,7 +9530,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-269 · v11.269 learning-dropdowns';
+const NOTIF_BUILD_VERSION = '2026.09.06-270 · v11.270 xp-rebalance';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14020,17 +14020,34 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   startRingOnly(cv,val,color){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
   startTrend(cv,vals,color){ const {ctx,w,h}=this.prep(cv); const n=vals.length; this.loop((ts)=>{ const grow=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); ctx.strokeStyle='rgba(255,255,255,0.05)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } const pts=vals.map((v,i)=>({x:(i/(n-1))*w, y:h-(v*grow*0.8+0.1)*h})); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,this.hexA(color,0.3)); g.addColorStop(1,this.hexA(color,0)); ctx.fillStyle=g; ctx.fill(); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=this.hexA(color,0.7); ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0; const last=pts[pts.length-1]; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); }); }
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
-    const ev=[]; s.workouts.forEach(w=>ev.push({xp:30+(+w.min||0),ts:w.ts})); s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); }); if(this._isOwner()) this._ownerShipXP().forEach(e=>ev.push(e)); s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
+    const ev=[];
+    /* Training pays per exercise per day plus the minutes actually spent — not per row. The
+       training log writes one row per set, so a single arm session wrote eighteen rows, and
+       at a flat rate each that one session out-earned everything else on the page put
+       together: 374 rows across 16 days, but only 71 exercise-days behind them. */
+    const exDay={};
+    s.workouts.forEach(w=>{
+      const key=this._locDateFromTs(w.ts)+'|'+String(w.exercise||w.part||'').trim().toLowerCase();
+      if(exDay[key]==null || w.ts<exDay[key]) exDay[key]=w.ts;
+      const m=+w.min||0; if(m>0) ev.push({xp:m, ts:w.ts});
+    });
+    Object.keys(exDay).forEach(k=>ev.push({xp:25, ts:exDay[k]}));
+    s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); });
+    /* Shipping a build used to be worth 500 XP to the owner. 113 of them had landed, which
+       was 72% of the whole score — the Life Performance Index was mostly a count of how
+       often the app had been deployed, and it went up while the owner did nothing. */
+    s.income.forEach(i=>ev.push({xp:25,ts:i.ts})); s.events.forEach(e=>ev.push({xp:10,ts:e.ts||now})); (s.missionHistory||[]).forEach(h=>{ let t=now; try{ const d=new Date(h.date+'T'+((h.time||'00:00'))+':00'); if(!isNaN(d.getTime())) t=d.getTime(); }catch(_){} ev.push({xp:+h.xp||0,ts:t}); });
     (s.loginXPLog||[]).forEach(l=>ev.push({xp:+l.xp||0, ts:l.ts}));
-    const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const XP_STEP=5, XP_BASE=100; const T=(L)=>XP_STEP*(L-1)*L/2 + XP_BASE*(L-1);  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
-    // Level curve. The cost of the next level grows linearly — XP_STEP*L + XP_BASE — so
-    // level 2 costs 105 and level 1000 costs 5,095, and the whole ladder to Titan comes to
-    // 2,597,400 XP: on the order of a decade of consistent logging rather than the 182 years
-    // the old 50*(L-1)*L curve implied. That curve compounded, so it wanted 49,950,000 XP for
-    // Titan and 1,990,000 for Elite I, which left the top two thirds of the ranks unreachable.
-    // XP_BASE is 100 rather than something larger so the bottom of the ladder still costs what
-    // it always did — the fix belongs at the top, and making early levels dearer would have
-    // pushed every attribute down a rung or two on day one.
+    const doneXP=s.checklist.reduce((a,c)=>a+(c.xpAwarded?20:0),0); const missDone=(s.missionHistory||[]).length; const XP_STEP=27, XP_BASE=300; const T=(L)=>XP_STEP*(L-1)*L/2 + XP_BASE*(L-1);  const totalXP=doneXP+ev.reduce((a,e)=>a+e.xp,0); /* no floor: earned XP only */ const sum=(f)=>ev.filter(e=>e.ts>=f).reduce((a,e)=>a+e.xp,0);
+    // Level curve. The cost of the next level grows linearly — XP_STEP*L + XP_BASE.
+    //
+    // It was 5 and 100, which was calibrated against an inflow that was mostly noise: a build
+    // shipping was worth 500 and every logged set another 30, so a month of use read as level
+    // 158 and Specialist III. With both of those corrected the real inflow is around 370 a
+    // day, and the ladder is set against that: a month is roughly level 20, a year around 90,
+    // Specialist early in year two, Elite around year four or five. The families above that
+    // are prestige — reachable in principle, not on a schedule. Retuning moves everyone's
+    // level, which is the point: the old number was measuring the wrong thing.
     let level=1; while(T(level+1)<=totalXP) level++; const xpIn=totalXP-T(level), xpNext=T(level+1)-T(level);
     const toRoman=(n)=>{ const vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let r=''; for(const [v,s] of vals){ while(n>=v){ r+=s; n-=v; } } return r; };
     // One band every 20 levels, all the way up: the ladder used to widen to 100-level bands
@@ -14137,14 +14154,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // everything already in the changelog is worth SHIP_XP_OLD. The changelog holds hundreds
   // of entries, so paying them all at the new rate made shipped updates 86% of the account's
   // total XP and buried every workout, mission and login underneath them.
-  _ownerShipXP(){
-    const SHIP_XP_NEW=500, SHIP_XP_OLD=50, SHIP_XP_CUTOFF='v11.139';
-    const vn=(v)=>{ const p=String(v||'').replace(/^v/,'').split('.'); return (+p[0]||0)*100000+(+p[1]||0); };
-    const cut=vn(SHIP_XP_CUTOFF), log=this._changelog(), out=[];
-    log.forEach(c=>out.push({ xp: vn(c.version)>=cut ? SHIP_XP_NEW : SHIP_XP_OLD,
-      ts:this._parseChangelogDate(c.date), shipXP:true }));
-    return out;
-  }
   // ===== What's New =====
   // Newest entry first. Each {version, date, notes:[]}.
   //
@@ -14157,6 +14166,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.270', date:'Sep 6, 2026', major:true, notes:[
+      'Your Power Level was measuring the wrong things, so it has been rebuilt. It will drop a long way — that is the fix, not a side effect.',
+      'Shipping a build used to pay 500 XP. 113 of them had landed, which was 72% of your entire score: the index went up whenever the app was deployed, whether or not you had done anything. That is gone.',
+      'Training paid per row, and the log writes one row per set — so a single arm session of eighteen sets earned more than everything else on the page put together. It now pays per exercise per day, plus the minutes you actually spent.',
+      'With both corrected the curve is set against what you really log: about a month to level 20, a year to around 90, Specialist early in year two, Elite around year four. The ranks above that are prestige rather than a schedule.',
+    ]},
     {version:'v11.269', date:'Sep 6, 2026', major:true, notes:[
       'Learning Tools, Practice by Skill and More Ways to Train are drop-downs now, on every subject, web and phone. The name stays on the bar; tap it to open. What you open on one subject stays open on that subject and does not follow you to another.',
       'Whichever look you pick now stays picked. Preferences sync to the server and the server copy is merged over the local one on the way back in, so an older copy could put the theme back on the next load. The look is now stamped when you choose it, and the newer of the two wins wherever it was chosen — so it only changes when somebody changes it.',

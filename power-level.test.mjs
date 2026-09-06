@@ -273,6 +273,115 @@ t('an entry logged before the 06:00 rule existed still blocks a second award', a
     'today was awarded twice over an entry that was already there');
 });
 
+/* ---- what XP is actually paid for ---- */
+
+const clearAll = () => page.evaluate(() => window.__nvx.setState({
+  workouts: [], activities: [], income: [], expenses: [], events: [], missionHistory: [],
+  loginXPLog: [], checklist: [], savings: [], levelUp: null }));
+
+const totalXP = () => page.evaluate(() => window.__nvx.computePower().totalXP);
+
+t('shipping a build is worth nothing', async () => {
+  /* It used to pay the owner 500 a time. 113 builds had landed, which was 72% of the whole
+     score — the index went up while the owner did nothing at all. */
+  await boot();
+  await clearAll();
+  await page.waitForTimeout(500);
+  eq(await totalXP(), 0, 'an empty log is not worth zero, so something is paying by itself');
+  const versions = await page.evaluate(() => window.__nvx._changelog().length);
+  ok(versions > 50, 'the changelog is too short for this test to mean anything');
+  ok(!(await page.evaluate(() => typeof window.__nvx._ownerShipXP === 'function')),
+    'the ship-XP generator is still there');
+});
+
+t('training pays by the exercise you did, not by the row', async () => {
+  /* The log writes one row per set. At a flat rate each, one arm session out-earned
+     everything else on the page put together. */
+  await boot();
+  await clearAll();
+  await page.waitForTimeout(400);
+  const noon = await page.evaluate(() => { const d = new Date(); d.setHours(12, 0, 0, 0); return d.getTime(); });
+  await page.evaluate((ts) => window.__nvx.setState({
+    workouts: Array.from({ length: 18 }, (_, i) => ({
+      id: 'r' + i, ts: ts + i, part: 'Arms', exercise: 'Barbell curl',
+      weight: 20, sets: 1, reps: 10, min: 0 })) }), noon);
+  await page.waitForTimeout(600);
+  const eighteenSets = await totalXP();
+
+  await page.evaluate((ts) => window.__nvx.setState({
+    workouts: [{ id: 'r0', ts, part: 'Arms', exercise: 'Barbell curl', weight: 20, sets: 1, reps: 10, min: 0 }] }), noon);
+  await page.waitForTimeout(600);
+  eq(eighteenSets, await totalXP(), 'eighteen sets of one exercise paid more than one');
+});
+
+t('a second exercise, and a second day, each count', async () => {
+  await boot();
+  await clearAll();
+  await page.waitForTimeout(400);
+  const noon = await page.evaluate(() => { const d = new Date(); d.setHours(12, 0, 0, 0); return d.getTime(); });
+
+  await page.evaluate((ts) => window.__nvx.setState({ workouts: [
+    { id: 'a', ts, part: 'Arms', exercise: 'Barbell curl', sets: 1, reps: 10, min: 0 }] }), noon);
+  await page.waitForTimeout(500);
+  const one = await totalXP();
+
+  await page.evaluate((ts) => window.__nvx.setState({ workouts: [
+    { id: 'a', ts, part: 'Arms', exercise: 'Barbell curl', sets: 1, reps: 10, min: 0 },
+    { id: 'b', ts: ts + 1, part: 'Chest', exercise: 'Bench press', sets: 1, reps: 5, min: 0 }] }), noon);
+  await page.waitForTimeout(500);
+  eq(await totalXP(), one * 2, 'a second exercise on the same day was not counted');
+
+  await page.evaluate((ts) => window.__nvx.setState({ workouts: [
+    { id: 'a', ts, part: 'Arms', exercise: 'Barbell curl', sets: 1, reps: 10, min: 0 },
+    { id: 'c', ts: ts - 86400000, part: 'Arms', exercise: 'Barbell curl', sets: 1, reps: 10, min: 0 }] }), noon);
+  await page.waitForTimeout(500);
+  eq(await totalXP(), one * 2, 'the same exercise on a different day was not counted');
+});
+
+t('minutes are still paid, per row', async () => {
+  /* A 45-minute run and a 5-minute one are not the same session, so the time counts even
+     though the exercise only counts once. */
+  await boot();
+  await clearAll();
+  await page.waitForTimeout(400);
+  const noon = await page.evaluate(() => { const d = new Date(); d.setHours(12, 0, 0, 0); return d.getTime(); });
+  await page.evaluate((ts) => window.__nvx.setState({ workouts: [
+    { id: 'a', ts, part: 'Cardio', exercise: 'Run', sets: 0, reps: 0, min: 0 }] }), noon);
+  await page.waitForTimeout(500);
+  const base = await totalXP();
+  await page.evaluate((ts) => window.__nvx.setState({ workouts: [
+    { id: 'a', ts, part: 'Cardio', exercise: 'Run', sets: 0, reps: 0, min: 45 }] }), noon);
+  await page.waitForTimeout(500);
+  eq(await totalXP(), base + 45, 'the minutes were not paid');
+});
+
+t('a month of real logging is a couple of dozen levels, not a hundred and fifty', async () => {
+  /* The guard against re-inflating any of it: whatever the sources are worth, the curve has
+     to be set against them. A month read as level 158 and Specialist III before. */
+  await boot();
+  await clearAll();
+  await page.waitForTimeout(400);
+  await page.evaluate(() => {
+    const noon = (d) => { const x = new Date(); x.setHours(12, 0, 0, 0); return x.getTime() - d * 86400000; };
+    const workouts = [], logins = [], acts = [], missions = [];
+    for (let d = 0; d < 30; d++) {
+      logins.push({ id: 'l' + d, xp: 250, ts: noon(d) });
+      if (d % 2 === 0) for (const ex of ['Bench press', 'Barbell curl', 'Back squat'])
+        for (let set = 0; set < 4; set++)
+          workouts.push({ id: 'w' + d + ex + set, ts: noon(d) + set, part: 'Chest', exercise: ex, sets: 1, reps: 8, min: 0 });
+      if (d % 3 === 0) acts.push({ id: 'a' + d, text: 'study', cat: 'Learning', ts: noon(d), min: 30 });
+      if (d % 2 === 0) missions.push({ missionId: 'm' + d, date: new Date(noon(d)).toLocaleDateString('en-CA'), time: '09:00', xp: 40 });
+    }
+    window.__nvx.setState({ workouts, loginXPLog: logins, activities: acts, missionHistory: missions });
+  });
+  await page.waitForTimeout(900);
+  const P = await page.evaluate(() => { const p = window.__nvx.computePower();
+    return { xp: p.totalXP, level: p.level, rank: p.rank.n }; });
+  ok(P.level >= 10 && P.level <= 40,
+    'a month of solid logging came out at level ' + P.level + ' (' + P.xp + ' XP), which is not a month of progress');
+  ok(/^Recruit/.test(P.rank), 'a month in and already ' + P.rank);
+});
+
 /* ---- the XP effect and the level-up card ---- */
 
 t('a gain floats a chip and it clears itself up', async () => {
