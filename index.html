@@ -9422,7 +9422,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-267 · v11.267 power-mobile';
+const NOTIF_BUILD_VERSION = '2026.09.06-268 · v11.268 theme-persist';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10032,7 +10032,14 @@ activities: this._mergeShipLog(s.activities),
   }
   componentDidUpdate(prevProps){ this.drawIcons(); this.applyAvatars(); this.sync(); this.initNotifs();
     this._scrollRankLadder();
-    if(this.state.prefs.theme==='Ultra' && !this._hasUltraAccess() && !this._ultraRevoking){ this._ultraRevoking=true; this.setPref('theme','Lime'); this.showToast('system','Ultra access revoked','Your Ultra access was removed — reverted to the default theme.'); setTimeout(()=>{ this._ultraRevoking=false; },500); }
+    /* Only once the profile has actually arrived. This runs on the first render after every
+       reload, and until Supabase answers, profile is null and _isOwner() falls back to
+       comparing two emails that need not match — so a not-yet-known state was being read as
+       "access removed", and the answer to that was to overwrite the user's theme and persist
+       it. An update forces a reload, which is when it bit. If the profile never loads the
+       theme simply stays as chosen: failing open on something cosmetic beats destroying a
+       setting on a guess. */
+    if(this.state.prefs.theme==='Ultra' && this.state.profile && !this._hasUltraAccess() && !this._ultraRevoking){ this._ultraRevoking=true; this.setPref('theme','Lime'); this.showToast('system','Ultra access revoked','Your Ultra access was removed — reverted to the default theme.'); setTimeout(()=>{ this._ultraRevoking=false; },500); }
     // Power Level used to be bounced home on a phone. Every grid on it already carries
     // cc-grid2 or cc-stat5, both of which fold to one column under 900px, so there was
     // nothing left for the redirect to protect — and it is where both streaks live.
@@ -12502,11 +12509,22 @@ activities: this._mergeShipLog(s.activities),
   // index.html on a plain reload.
   async _hardReload(){
     try{ this.save(); }catch(e){}
+    /* Prefs are pushed to Supabase on a 300ms debounce, and on the way back in the server
+       copy beats the local one. A reload fired before that debounce landed threw the write
+       away and then read the stale server copy back — so changing a theme and taking an
+       update reverted the theme, which looked like the update changing it by itself.
+       Flush, then wait for the prefs write specifically, since that is the one that shows. */
+    try{ this._flushDebounced(); }catch(e){}
+    try{
+      if(this._sbOn()) await window.SB.update('profiles', this.state.authUserId, {prefs:this.state.prefs});
+    }catch(e){}
     try{ if(window.caches){ const keys=await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); } }catch(e){}
     try{ if('serviceWorker' in navigator){ const reg=await navigator.serviceWorker.getRegistration(); if(reg) await reg.update(); } }catch(e){}
-    try{ const u=new URL(location.href); u.searchParams.set('_r', String(Date.now())); location.replace(u.toString()); }
+    try{ const u=new URL(location.href); u.searchParams.set('_r', String(Date.now())); this._navigate(u.toString()); }
     catch(e){ location.reload(); }
   }
+  // A seam, so a test can watch the order of what happens before the page goes.
+  _navigate(url){ location.replace(url); }
   startRefresh(){
     if(this.state.refreshing) return;
     clearInterval(this._refreshTimer);
@@ -14013,6 +14031,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.268', date:'Sep 6, 2026', major:true, notes:[
+      'Taking an update no longer changes your theme. Two separate causes, both of which only bit on a reload — which is what an update does.',
+      'First: the Ultra access check runs on the first render after a reload, before the profile has come back from the server. Until it does, the app falls back to comparing two emails that need not match — so a state it did not yet know read as "access removed", and the response to that was to overwrite your theme and save it. It now waits until it actually knows, and if the profile never loads your theme simply stays as you set it.',
+      'Second: preferences are pushed to the server on a short delay, and on the way back in the server copy wins. A reload fired before that delay elapsed threw the write away and read the stale copy back. A refresh now waits for it.',
+    ]},
     {version:'v11.267', date:'Sep 6, 2026', major:true, notes:[
       'Power Level works on a phone. It used to be sent straight home under 900px and hidden from the More menu — which is where both your streaks now live.',
       'On an exercise block the add button now stays on the right whatever the block carries. A block with a weight as well as reps used to wrap it underneath on the left, so two blocks in the same list disagreed about where their button was.',
