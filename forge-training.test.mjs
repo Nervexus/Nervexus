@@ -6,9 +6,10 @@ import T from './forge-training.js';
 
 const TESTS=[]; const t=(n,f)=>TESTS.push([n,f]);
 
-t('all thirteen sections are listed, in order', () => {
+t('all fourteen sections are listed, in order', () => {
   const want = ['Chest','Shoulders','Arms','Back','Core','Hips & Glutes','Quads',
-                'Hamstrings','Calves','Feet & Ankles','Neck','Hands & Forearms','Full Body'];
+                'Hamstrings','Calves','Feet & Ankles','Neck','Hands & Forearms',
+                'Kettlebells','Full Body'];
   const got = T.SECTIONS.map(x=>x.name);
   if(got.join(' | ')!==want.join(' | '))
     throw new Error('section list is wrong:\n  got  '+got.join(', ')+'\n  want '+want.join(', '));
@@ -36,10 +37,11 @@ const FILLED = [
   ['shoulders','Shoulders', {all:16}],
   ['arms','Arms', {all:31}],
   ['back','Back', {all:24}],
+  ['kettlebells','Full', {all:40}],
   ['core','Core', {all:16}],
-  ['hips','Legs', {all:12}],
+  ['hips','Legs', {all:11}],
   ['quads','Legs', {all:12}],
-  ['hamstrings','Legs', {all:10}],
+  ['hamstrings','Legs', {all:9}],
   ['calves','Legs', {all:10}],
   ['feet','Legs', {all:10}],
   ['neck','Neck', {all:10}],
@@ -74,7 +76,7 @@ t('a range runs the right way round', () => {
 t('a filled section logs against a body part the log knows', () => {
   /* addPoolToSession falls back to "Full" for anything outside this list, so a typo here
      would quietly send every set of that section to the wrong place. */
-  const PARTS = ['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Cardio'];
+  const PARTS = ['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Full','Cardio'];
   for(const sec of T.SECTIONS){
     if(!sec.pool) continue;
     if(PARTS.indexOf(sec.part) < 0) throw new Error(sec.name+' logs against "'+sec.part+'", which the training log does not have');

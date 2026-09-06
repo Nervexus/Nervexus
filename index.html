@@ -347,7 +347,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=16"></script>
+  <script src="forge-training.js?v=17"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -9541,7 +9541,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-277 · v11.277 back-bands';
+const NOTIF_BUILD_VERSION = '2026.09.06-278 · v11.278 kettlebells';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14177,6 +14177,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.278', date:'Sep 6, 2026', major:true, notes:[
+      'A Kettlebells section — forty movements in five blocks: Total Body, Upper Body, Core, Back and Lower Body.',
+      'It is a section by equipment rather than by body part, so it deliberately covers ground the body-part sections do too. Three exercises that would have been named twice moved into it: the swing came out of Hips & Glutes, the single-leg deadlift out of Hamstrings, and the figure eight out of the Arms kettlebell block, which gains a bottoms-up walk in its place.',
+      '"Full" is now a body part the training log knows, so a whole-body kettlebell set is filed as one rather than guessed at.',
+    ]},
     {version:'v11.277', date:'Sep 6, 2026', major:true, notes:[
       'Back had no band work at all, so it has a Bands block now: pull-apart, lat pulldown, seated row, single-arm row and deadlift. It sits last, since bands are the accessory and travel end of the list rather than the strength end.',
     ]},
@@ -16270,7 +16275,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   /* Neck joined the list when the Neck section landed: without it every set from that
      section would have been filed under "Full", which is not where it belongs and not what
      the section says it is. */
-  FB_PARTS(){ return ['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Cardio']; }
+  FB_PARTS(){ return ['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Full','Cardio']; }
   fbTarget(it){
     const bits=[];
     if(it.reps>0) bits.push((it.sets>0?it.sets:1)+' × '+it.reps);

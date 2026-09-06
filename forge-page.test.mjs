@@ -301,7 +301,7 @@ t('no section has kept anything from the page this replaced', async () => {
      level filter. None of that should surface on any section. */
   await boot({ forgeCentre: 'training' });
   const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.key));
-  eq(S.length, 13, 'thirteen sections');
+  eq(S.length, 14, 'fourteen sections');
   for (const key of S) {
     await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
     await page.waitForTimeout(380);
@@ -349,7 +349,7 @@ t('every section is listed, marked with the house crest and not a number', async
                  drawn: !!svg && svg.querySelectorAll('path,circle,rect').length >= 3 };
       }));
   const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.name));
-  eq(S.length, 13, 'thirteen sections in the data');
+  eq(S.length, 14, 'fourteen sections in the data');
   for (const name of S) {
     const row = picker.find(p => p.text === name);
     ok(row, 'section not in the picker: ' + name);

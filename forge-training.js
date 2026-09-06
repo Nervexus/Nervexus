@@ -133,7 +133,7 @@
         rng('Kettlebell levering', 3, 4, 6, 10, {group: 'KETTLEBELL WRIST & GRIP', perSide: true}),
         rng('Kettlebell bottoms-up hold', 3, 5, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec', perSide: true}),
         rng('Kettlebell rack hold', 3, 4, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec'}),
-        rng('Kettlebell figure-eight', 3, 4, 10, 20, {group: 'KETTLEBELL WRIST & GRIP'}),
+        rng('Kettlebell bottoms-up walk', 3, 4, 20, 40, {group: 'KETTLEBELL WRIST & GRIP', unit: 'm', perSide: true}),
 
         rng('Rope climbs', 1, 1, 3, 5, {group: 'FIGHTER-SPECIFIC', unit: 'climb', noLoad: true}),
         rng('Sledgehammer tyre strikes', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
@@ -219,7 +219,6 @@
       rng('Bulgarian split squat', 3, 4, 6, 12, {perSide: true}),
       rng('Reverse lunge', 3, 4, 8, 12, {perSide: true}),
       rng('Walking lunge', 3, 4, 20, 40, {unit: 'm'}),
-      rng('Kettlebell swing', 3, 5, 10, 20),
       rng('Glute bridge', 3, 3, 10, 20, {noLoad: true}),
       rng('Lateral band walk', 3, 3, 12, 20, {perSide: true, noLoad: true}),
       rng('Cossack squat', 3, 3, 6, 12, {perSide: true, noLoad: true}),
@@ -254,7 +253,6 @@
       rng('Romanian deadlift', 3, 4, 6, 10),
       rng('Stiff-leg deadlift', 3, 4, 6, 10),
       rng('Single-leg Romanian deadlift', 3, 3, 8, 12, {perSide: true}),
-      rng('Kettlebell single-leg deadlift', 3, 3, 8, 12, {perSide: true}),
       rng('Nordic hamstring curl', 3, 4, 4, 8, {noLoad: true}),
       rng('Glute-ham raise', 3, 4, 5, 10, {noLoad: true}),
       rng('Lying leg curl', 3, 4, 8, 15),
@@ -333,6 +331,60 @@
     ] }
   };
 
+  /* A section by implement rather than by body part, so it re-expresses movements the
+     body-part sections already cover — that is the point of it, and every name is its own.
+     Names taken from a wall chart; the chart's own artwork is not used anywhere. */
+  var KETTLEBELLS = {
+    key: 'kettlebells', name: 'Kettlebells', tag: 'KETTLEBELLS', part: 'Full',
+    priority: 'Technique → Ballistic power → Overhead strength → Core control → Grip and carry endurance',
+    pool: { all: [
+      rng('Kettlebell Turkish get-up', 3, 5, 1, 3, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell clean', 3, 5, 5, 10, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell double-arm swing', 3, 5, 10, 20, {group: 'TOTAL BODY'}),
+      rng('Kettlebell single-arm swing', 3, 5, 8, 15, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell wood chop', 3, 4, 8, 15, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell windmill', 3, 3, 5, 8, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell snatch', 3, 5, 5, 10, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell atlas swing', 3, 4, 8, 12, {group: 'TOTAL BODY'}),
+      rng('Kettlebell sumo high pull', 3, 4, 8, 15, {group: 'TOTAL BODY'}),
+      rng('Kettlebell thruster', 3, 5, 5, 12, {group: 'TOTAL BODY'}),
+      rng('Kettlebell side plank row', 3, 3, 6, 12, {group: 'TOTAL BODY', perSide: true}),
+
+      rng('Kettlebell shoulder press', 3, 4, 5, 10, {group: 'UPPER BODY', perSide: true}),
+      rng('Kettlebell deficit push-up', 3, 4, 8, 15, {group: 'UPPER BODY', noLoad: true}),
+      rng('Kettlebell chest press', 3, 4, 6, 12, {group: 'UPPER BODY'}),
+      rng('Kettlebell pull-over', 3, 3, 8, 12, {group: 'UPPER BODY'}),
+      rng('Kettlebell halo', 3, 3, 8, 12, {group: 'UPPER BODY'}),
+      rng('Kettlebell curl', 3, 4, 8, 12, {group: 'UPPER BODY'}),
+      rng('Kettlebell triceps extension', 3, 3, 8, 15, {group: 'UPPER BODY'}),
+      rng('Kettlebell side raise', 3, 3, 10, 15, {group: 'UPPER BODY'}),
+      rng('Kettlebell front raise', 3, 3, 10, 15, {group: 'UPPER BODY'}),
+      rng('Kettlebell side bend', 3, 3, 10, 15, {group: 'UPPER BODY', perSide: true}),
+
+      rng('Kettlebell sidewinder', 3, 3, 8, 12, {group: 'CORE', perSide: true}),
+      rng('Kettlebell around-the-body', 3, 3, 8, 15, {group: 'CORE', perSide: true}),
+      rng('Kettlebell half Turkish get-up', 3, 4, 3, 6, {group: 'CORE', perSide: true}),
+      rng('Kettlebell overhead sit-up', 3, 3, 8, 15, {group: 'CORE'}),
+      rng('Kettlebell Russian twist', 3, 3, 12, 20, {group: 'CORE'}),
+      rng('Kettlebell side plank', 3, 3, 20, 45, {group: 'CORE', unit: 'sec', perSide: true}),
+      rng('Kettlebell figure eight', 3, 4, 10, 20, {group: 'CORE'}),
+      rng('Kettlebell leg raise', 3, 3, 8, 15, {group: 'CORE'}),
+      rng('Kettlebell torso twist', 3, 3, 10, 20, {group: 'CORE'}),
+
+      rng('Kettlebell bent-over row', 3, 4, 8, 12, {group: 'BACK', perSide: true}),
+      rng('Kettlebell renegade row', 3, 4, 6, 10, {group: 'BACK', perSide: true}),
+
+      rng('Kettlebell deadlift', 3, 5, 6, 12, {group: 'LOWER BODY'}),
+      rng("Kettlebell farmer's walk", 3, 5, 20, 40, {group: 'LOWER BODY', unit: 'm'}),
+      rng('Kettlebell single-leg deadlift', 3, 4, 8, 12, {group: 'LOWER BODY', perSide: true}),
+      rng('Kettlebell weighted lunge', 3, 4, 8, 12, {group: 'LOWER BODY', perSide: true}),
+      rng('Kettlebell lunge pass', 3, 4, 8, 12, {group: 'LOWER BODY', perSide: true}),
+      rng('Kettlebell squat', 3, 4, 8, 15, {group: 'LOWER BODY'}),
+      rng('Kettlebell squat flip', 3, 4, 6, 12, {group: 'LOWER BODY'}),
+      rng('Kettlebell overhead squat', 3, 3, 5, 10, {group: 'LOWER BODY', perSide: true})
+    ] }
+  };
+
   var SECTIONS = [
     CHEST,
     SHOULDERS,
@@ -346,6 +398,7 @@
     FEET,
     NECK,
     HANDS,
+    KETTLEBELLS,
     stub('full-body', 'Full Body')
   ];
 
