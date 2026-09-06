@@ -1092,6 +1092,56 @@ t('typed numbers are held to the same limits as the buttons', async () => {
   eq(parseFloat(st.w[st.items[0].id]), 500, 'an out-of-range weight reached the session');
 });
 
+t('the add button follows every raiment', async () => {
+  /* Asserted on the colour the browser actually paints, not on the CSS being present: the
+     token could resolve to nothing and the button would silently fall back to transparent. */
+  await openChest();
+  const paint = (style) => page.evaluate((st) => {
+    window.__nvx.setPref('theme', st === 'base' ? 'Lime' : 'Ultra');
+    if (st !== 'base') window.__nvx.setPref('ultraStyle', st);
+    return new Promise(r => setTimeout(() => {
+      const b = [...document.querySelectorAll('span')]
+        .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD');
+      if (!b) return r(null);
+      /* The label renders inside a span.sc-interp; the styling is on its parent. */
+      const cs = getComputedStyle(b.classList.contains('sc-interp') ? b.parentElement : b);
+      r({ bg: cs.backgroundColor, ink: cs.color });
+    }, 500));
+  }, style);
+
+  const seen = {};
+  for (const st of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine', 'base']) {
+    const got = await paint(st);
+    ok(got, 'no add button under ' + st);
+    ok(/^rgb/.test(got.bg) && !/rgba\(0, 0, 0, 0\)/.test(got.bg),
+      st + ' left the add button with no background: ' + got.bg);
+    ok(/^rgb/.test(got.ink), st + ' left the add button with no ink');
+    seen[st] = got.bg;
+  }
+  /* The four raiments must not all paint the same button — that would mean the token never
+     resolved and everything fell through to one default. */
+  const raiments = ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine'].map(k => seen[k]);
+  eq(new Set(raiments).size, 4, 'the raiments paint the add button ' +
+    new Set(raiments).size + ' different ways, not 4');
+  await page.evaluate(() => window.__nvx.setPref('theme', 'Lime'));
+  await page.waitForTimeout(400);
+});
+
+t('the blocks and the button are curved', async () => {
+  await openChest();
+  const r = await page.evaluate(() => {
+    const inner = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD');
+    const b = inner.classList.contains('sc-interp') ? inner.parentElement : inner;
+    const card = b.closest('.cc-glowcard');
+    const px = (el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+    return { card: px(card), btn: px(b), input: px(card.querySelector('input')) };
+  });
+  ok(r.card >= 10, 'the block is not curved: ' + r.card + 'px');
+  ok(r.btn >= 10, 'the add button is not curved: ' + r.btn + 'px');
+  ok(r.input >= 6, 'the fields are not curved: ' + r.input + 'px');
+});
+
 t('an exercise with nothing to load shows reps only', async () => {
   /* A press-up has no weight to dial; a weight stepper on it would sit unset for ever. */
   await openChest();
