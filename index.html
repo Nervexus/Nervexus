@@ -4170,7 +4170,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -4197,10 +4202,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ mtTopicCards }}" as="t" hint-placeholder-count="4">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -4213,10 +4224,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">More Ways to Train</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcMoreGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcMoreGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">More Ways to Train</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcMoreLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcMoreRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcMoreOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ startQuickfire }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">60 SECONDS</div>
@@ -4240,6 +4257,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="height:5px; border-radius:3px; background:rgba(91,26,26,0.12); overflow:hidden; margin-top:10px;"><div style="height:100%; width:{{ mtLevelProgressPct }}%; background:#5B1A1A;"></div></div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <sc-if value="{{ mtHasProgress }}" hint-placeholder-val="{{ false }}">
@@ -4784,7 +4802,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ startPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">12 QUESTIONS · 10 MIN</div>
@@ -4811,10 +4834,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
                         <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; font-weight:600; color:#3A2A20;">Vocabulary</div>
@@ -4835,6 +4864,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
 
                   <sc-if value="{{ enHasHistory }}" hint-placeholder-val="{{ false }}">
@@ -5436,7 +5466,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goSciPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -5463,10 +5498,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ sciTopicCards }}" as="t" hint-placeholder-count="6">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -5479,6 +5520,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
                 </sc-if>
 
@@ -5850,7 +5892,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goGraPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -5877,10 +5924,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ graTopicCards }}" as="t" hint-placeholder-count="6">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -5893,6 +5946,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
                 </sc-if>
 
@@ -6264,7 +6318,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goHisPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -6291,10 +6350,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ hisTopicCards }}" as="t" hint-placeholder-count="6">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -6307,6 +6372,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
                 </sc-if>
 
@@ -6673,7 +6739,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goSpkCoach }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">AI-POWERED</div>
@@ -6706,6 +6777,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -7054,7 +7126,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goPhyPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -7081,10 +7158,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ phyTopicCardsMain }}" as="t" hint-placeholder-count="6">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -7097,6 +7180,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
                 </sc-if>
 
@@ -7562,7 +7646,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goMoneyPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -7589,10 +7678,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ moneyTopicCards }}" as="t" hint-placeholder-count="8">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -7605,6 +7700,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
                 </sc-if>
 
@@ -8000,7 +8096,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Learning Tools</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
                       <div onClick="{{ goGentPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
@@ -8045,10 +8146,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">Open</div>
                       </div>
                     </div>
+                    </sc-if>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20; margin-bottom:14px;">Practice by Skill</div>
+                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
+                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
+                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
+                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
+                    </div>
+                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
                       <sc-for list="{{ gentTopicCards }}" as="t" hint-placeholder-count="8">
                         <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
@@ -8061,6 +8168,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    </sc-if>
                   </div>
                 </sc-if>
 
@@ -9422,7 +9530,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-268 · v11.268 theme-persist';
+const NOTIF_BUILD_VERSION = '2026.09.06-269 · v11.269 learning-dropdowns';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9512,7 +9620,7 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
-      levelUp:null, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      levelUp:null, lcOpen:{}, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -10540,7 +10648,15 @@ activities: this._mergeShipLog(s.activities),
       aiBriefProvider:S.aiBriefProvider||'', aiBriefStamp:S.aiBriefStamp||'', synthLabel:S.aiBriefLoading?'SYNTHESIZING…':(S.aiBrief?'RE-SYNTHESIZE LIVE':'SYNTHESIZE LIVE'), briefProviderName:((PD.byId((S.prefs.routing&&S.prefs.routing.briefings)||S.prefs.aiDefault||'anthropic')||{}).name||'AI')
     };
   }
-  setPref(k,v){ this.mut(s=>({prefs:{...s.prefs,[k]:v}})); }
+  /* The look is the one preference the server must never win on its own. Prefs sync to
+     Supabase and the server copy is merged over the local one on the way back in, so a stale
+     server copy — a write that never landed, or a change made on another device earlier —
+     could put the theme back on the next load. Stamping when the look was last chosen means
+     the newer of the two wins wherever it was picked, and the theme only changes when
+     somebody changes it. */
+  THEME_KEYS(){ return ['theme','ultraStyle']; }
+  setPref(k,v){ const stamp=this.THEME_KEYS().indexOf(k)>=0;
+    this.mut(s=>({prefs:{...s.prefs, [k]:v, ...(stamp?{_themeAt:Date.now()}:{})}})); }
   setCoach(k,v){ this.mut(s=>({prefs:{...s.prefs, coaching:{...(s.prefs.coaching||{}), [k]:v}}})); }
   setFinanceBudget(cat,v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeBudgets:{...(s.prefs.financeBudgets||{}), [cat]:n}}, financeBudgetDraft:{...(s.financeBudgetDraft||{}), [cat]:undefined}})); }
   /* Income categories used to be a hard-coded list, which is why Log Income still showed all
@@ -12792,7 +12908,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   }
   async _sbCompleteLogin(session){
     const uid=session.user.id; const profile=await this._sbFetchProfile(uid);
-    const prefsPatch=(profile && profile.prefs && Object.keys(profile.prefs).length) ? {prefs:{...this._defaultPrefs(), ...this.state.prefs, ...profile.prefs}} : {};
+    let prefsPatch={};
+    if(profile && profile.prefs && Object.keys(profile.prefs).length){
+      const merged={...this._defaultPrefs(), ...this.state.prefs, ...profile.prefs};
+      // Everything else takes the server's word; the look takes whichever was chosen last.
+      const mine=this.state.prefs||{}, theirs=profile.prefs||{};
+      if((mine._themeAt||0) > (theirs._themeAt||0)){
+        this.THEME_KEYS().forEach(k=>{ if(mine[k]!=null) merged[k]=mine[k]; });
+        merged._themeAt=mine._themeAt;
+      }
+      prefsPatch={prefs:merged};
+    }
     let accountPatch={};
     if(profile){
       const merged={...this.state.account};
@@ -14031,6 +14157,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.269', date:'Sep 6, 2026', major:true, notes:[
+      'Learning Tools, Practice by Skill and More Ways to Train are drop-downs now, on every subject, web and phone. The name stays on the bar; tap it to open. What you open on one subject stays open on that subject and does not follow you to another.',
+      'Whichever look you pick now stays picked. Preferences sync to the server and the server copy is merged over the local one on the way back in, so an older copy could put the theme back on the next load. The look is now stamped when you choose it, and the newer of the two wins wherever it was chosen — so it only changes when somebody changes it.',
+    ]},
     {version:'v11.268', date:'Sep 6, 2026', major:true, notes:[
       'Taking an update no longer changes your theme. Two separate causes, both of which only bit on a reload — which is what an update does.',
       'First: the Ultra access check runs on the first render after a reload, before the profile has come back from the server. Until it does, the app falls back to comparing two emails that need not match — so a state it did not yet know read as "access removed", and the response to that was to overwrite your theme and save it. It now waits until it actually knows, and if the profile never loads your theme simply stays as you set it.',
@@ -15988,6 +16118,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
   setForgeSection(k){ this._resetPoolText(); this.setState({forgeSection:k}); }
+  /* Which panels on a Learning Centre hub are folded open. Keyed by subject as well as
+     section, so opening Practice by Skill on Maths does not open it on History. */
+  toggleLcSection(sec){ const k=(this.state.learningTab||'Maths')+'|'+sec;
+    this.setState(s=>({lcOpen:{...(s.lcOpen||{}), [k]:!(s.lcOpen||{})[k]}})); }
   _fbToday(){ return window.HealthKit ? window.HealthKit.today() : new Date().toLocaleDateString('en-CA'); }
   _fbLocal(d){ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } }
   // Monday, so a week rolls over on the day people restart a programme rather than mid-weekend.
@@ -20173,6 +20307,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           tutorListenBtnLabel:S.tutorListening?'Listening… tap to stop':'🎙 Speak your question',
         };
       }, {}),
+      /* Three sets of bindings serve all nine subjects: only the open subject's hub is
+         rendered, so they always describe the panel actually on screen. */
+      ...(()=>{ const out={};
+        [['lcTools','Learning Tools'],['lcSkill','Practice by Skill'],['lcMore','More Ways to Train']].forEach(([k,sec])=>{
+          const on=!!(S.lcOpen||{})[(S.learningTab||'Maths')+'|'+sec];
+          out[k+'Open']=on;
+          out[k+'Go']=()=>this.toggleLcSection(sec);
+          out[k+'Label']=on?'Hide':'Show';
+          out[k+'Rot']=on?'0deg':'-90deg';
+          out[k+'Gap']=on?'14px':'0px';
+        });
+        return out; })(),
       learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money','Gentleman’s Etiquette'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
       homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, homeWordmark:(S.prefs.ultraStyle||'Ultra X'), powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',

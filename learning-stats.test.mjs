@@ -146,6 +146,125 @@ t('the streak is no longer duplicated on a subject hub', async () => {
   eq(rows, 0, 'the stats bar still carries its own STREAK cell');
 });
 
+/* ---- the hub panels as drop-downs ---- */
+
+const SECTIONS = ['Learning Tools', 'Practice by Skill', 'More Ways to Train'];
+
+const panels = () => page.evaluate((names) => {
+  const out = [];
+  for (const el of document.querySelectorAll('div')) {
+    if (el.children.length || !names.includes(el.textContent.trim())) continue;
+    if (!el.getBoundingClientRect().height) continue;
+    const head = el.parentElement;              // the clickable row
+    const card = head && head.parentElement;    // the panel
+    if (!card) continue;
+    const body = [...card.children].find(c => c !== head);
+    out.push({ name: el.textContent.trim(),
+               nameShown: el.getBoundingClientRect().height > 0,
+               bodyShown: !!(body && body.getBoundingClientRect().height > 0) });
+  }
+  return out;
+}, SECTIONS);
+
+const openPanel = (name) => page.evaluate((n) => {
+  const el = [...document.querySelectorAll('div')]
+    .find(e => e.children.length === 0 && e.textContent.trim() === n);
+  if (!el) throw new Error('no panel called ' + n);
+  el.click();
+}, name);
+
+t('every hub panel is a drop-down, shut, with its name still on it', async () => {
+  await boot({ scene: 'learning' });
+  const bad = [];
+  for (const raiment of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
+    await page.evaluate((r) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', r); }, raiment);
+    for (const s of SUBJECTS) {
+      await page.evaluate((x) => window.__nvx.setState({ learningTab: x, mtMode: 'hub' }), s);
+      await page.waitForTimeout(400);
+      const found = await panels();
+      ok(found.length > 0, raiment + '/' + s + ' has no panels at all');
+      for (const p of found) {
+        if (!p.nameShown) bad.push(raiment + '/' + s + '/' + p.name + ': name hidden');
+        if (p.bodyShown) bad.push(raiment + '/' + s + '/' + p.name + ': open when it should be shut');
+      }
+    }
+  }
+  eq(bad.join(' | '), '', 'panels are wrong');
+});
+
+t('opening one shows it and leaves the others shut', async () => {
+  await boot({ scene: 'learning' });
+  await page.evaluate(() => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', 'Ultra X'); });
+  await page.evaluate(() => window.__nvx.setState({ learningTab: 'Maths', mtMode: 'hub' }));
+  await page.waitForTimeout(500);
+  await openPanel('Learning Tools');
+  await page.waitForTimeout(500);
+  const after = await panels();
+  const tools = after.find(p => p.name === 'Learning Tools');
+  ok(tools && tools.bodyShown, 'Learning Tools did not open');
+  for (const p of after.filter(p => p.name !== 'Learning Tools'))
+    ok(!p.bodyShown, p.name + ' opened as well');
+  const body = await text();
+  ok(body.includes('Formula Library'), 'the contents did not come with it');
+
+  /* And it shuts again. */
+  await openPanel('Learning Tools');
+  await page.waitForTimeout(500);
+  ok(!(await panels()).find(p => p.name === 'Learning Tools').bodyShown, 'it would not shut again');
+});
+
+t('what is open on one subject does not open on another', async () => {
+  await boot({ scene: 'learning' });
+  await page.evaluate(() => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', 'Ultra X'); });
+  await page.evaluate(() => window.__nvx.setState({ learningTab: 'Maths', mtMode: 'hub' }));
+  await page.waitForTimeout(500);
+  await openPanel('Learning Tools');
+  await page.waitForTimeout(500);
+  await page.evaluate(() => window.__nvx.setState({ learningTab: 'History', mtMode: 'hub' }));
+  await page.waitForTimeout(600);
+  const onHistory = (await panels()).find(p => p.name === 'Learning Tools');
+  ok(onHistory && !onHistory.bodyShown, 'History opened because Maths was open');
+  await page.evaluate(() => window.__nvx.setState({ learningTab: 'Maths', mtMode: 'hub' }));
+  await page.waitForTimeout(600);
+  ok((await panels()).find(p => p.name === 'Learning Tools').bodyShown, 'Maths forgot it was open');
+});
+
+t('the drop-down wears the raiment it is on', async () => {
+  /* Not a check that the CSS is present: the header is read back as the browser paints it,
+     and the four raiments must not all paint it the same. */
+  await boot({ scene: 'learning' });
+  await page.evaluate(() => window.__nvx.setState({ learningTab: 'Maths', mtMode: 'hub' }));
+  const seen = {};
+  for (const raiment of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
+    seen[raiment] = await page.evaluate((r) => {
+      window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', r);
+      return new Promise(res => setTimeout(() => {
+        const el = [...document.querySelectorAll('div')]
+          .find(e => e.children.length === 0 && e.textContent.trim() === 'Learning Tools');
+        const chev = el.parentElement.querySelector('span');
+        res(getComputedStyle(el).color + '|' + getComputedStyle(chev).color);
+      }, 550));
+    }, raiment);
+    ok(/^rgb/.test(seen[raiment]), raiment + ' left the header unpainted');
+  }
+  ok(new Set(Object.values(seen)).size >= 2,
+    'every raiment paints the drop-down identically, so it is not following the theme');
+});
+
+t('a drop-down works on a phone', async () => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await boot({ scene: 'learning' });
+  await page.evaluate(() => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', 'Ultra X'); });
+  await page.evaluate(() => window.__nvx.setState({ learningTab: 'Maths', mtMode: 'hub' }));
+  await page.waitForTimeout(600);
+  const shut = await panels();
+  ok(shut.length > 0 && shut.every(p => !p.bodyShown), 'the panels are not shut on a phone');
+  await openPanel('Practice by Skill');
+  await page.waitForTimeout(600);
+  ok((await panels()).find(p => p.name === 'Practice by Skill').bodyShown, 'it would not open on a phone');
+  await page.setViewportSize({ width: 1280, height: 1100 });
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });
