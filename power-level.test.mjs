@@ -261,19 +261,32 @@ t('a real gain fires the effect, a late history load does not', async () => {
     'a bulk history load was announced as if the user had just earned it');
 });
 
+/* Every test here shares one browser profile, and mut() writes through to localStorage, so
+   whatever an earlier test logged is still there on the next boot. These two care about the
+   exact level, so they clear the XP-bearing logs first and then size the gain to the level
+   they actually find themselves on. A fixed 300 minutes passed only while the leftovers
+   happened to leave the level cheap. */
+const clearXPLogs = () => page.evaluate(() => window.__nvx.setState({
+  workouts: [], activities: [], income: [], expenses: [], events: [], missionHistory: [],
+  loginXPLog: [], checklist: [], savings: [], levelUp: null }));
+
 t('crossing a level opens the card, and it names the level and rank', async () => {
   await boot();
-  await page.evaluate(() => {
-    window.__nvx._xpSeen = null; window.__nvx._xpLive = false;
-    window.__nvx.setState({ workouts: [], levelUp: null });
-  });
-  await page.waitForTimeout(400);
+  await clearXPLogs();
+  await page.waitForTimeout(500);
+  await page.evaluate(() => { window.__nvx._xpSeen = null; window.__nvx._xpLive = false; });
   await page.evaluate(() => { window.__nvx._xpWatch(); window.__nvx._xpLive = true; });
-  const before = (await power()).level;
+  const p0 = await page.evaluate(() => {
+    const P = window.__nvx.computePower();
+    return { level: P.level, need: P.xpForNext - P.xpInLevel };
+  });
+  const before = p0.level;
+  ok(p0.need < 2000, 'this level needs ' + p0.need + ' XP, past what one action can plausibly give');
 
-  /* Enough to cross at least one level from a standing start, in one plausible action. */
-  await page.evaluate(() => window.__nvx.mut(s => ({ workouts: [...(s.workouts || []),
-    { id: 'lvl', ts: Date.now(), part: 'Chest', exercise: 'Bench', weight: 60, sets: 3, reps: 5, min: 300 }] })));
+  /* A logged session is worth 30 + its minutes, so this crosses exactly one level. */
+  await page.evaluate((min) => window.__nvx.mut(s => ({ workouts: [...(s.workouts || []),
+    { id: 'lvl', ts: Date.now(), part: 'Chest', exercise: 'Bench', weight: 60, sets: 3, reps: 5, min }] })),
+    Math.max(1, p0.need - 30 + 5));
   await page.waitForTimeout(700);
   const lu = await page.evaluate(() => window.__nvx.state.levelUp);
   ok(lu, 'crossing a level did not open the card');
@@ -297,27 +310,25 @@ t('crossing a level opens the card, and it names the level and rank', async () =
 
 t('no card for a gain that stays inside the level', async () => {
   await boot();
-  await page.evaluate(() => {
-    window.__nvx._xpSeen = null; window.__nvx._xpLive = false;
-    window.__nvx.setState({ workouts: [], levelUp: null });
-  });
-  await page.waitForTimeout(400);
+  await clearXPLogs();
+  await page.waitForTimeout(500);
+  await page.evaluate(() => { window.__nvx._xpSeen = null; window.__nvx._xpLive = false; });
   await page.evaluate(() => { window.__nvx._xpWatch(); window.__nvx._xpLive = true; });
-  /* Push to just inside a level, clear the card, then add a token amount. */
-  await page.evaluate(() => window.__nvx.mut(s => ({ workouts: [...(s.workouts || []),
-    { id: 'a', ts: Date.now(), part: 'Chest', exercise: 'Bench', weight: 60, sets: 3, reps: 5, min: 1 }] })));
-  await page.waitForTimeout(600);
-  await page.evaluate(() => window.__nvx.setState({ levelUp: null }));
-  await page.waitForTimeout(300);
+  const need = await page.evaluate(() => {
+    const P = window.__nvx.computePower(); return P.xpForNext - P.xpInLevel;
+  });
+  ok(need > 15, 'no room left in this level to test a gain that stays inside it');
+
+  /* A calendar event is worth 10 XP — comfortably short of the next level. */
   const lvl = (await power()).level;
   await page.evaluate(() => window.__nvx.mut(s => ({ events: [...(s.events || []),
     { id: 'e1', title: 'x', date: '2026-01-01', time: '09:00', repeat: [], kind: 'general' }] })));
-  await page.waitForTimeout(600);
-  const after = await power();
-  if (after.level === lvl) {
-    eq(await page.evaluate(() => window.__nvx.state.levelUp), null,
-      'the card opened without a level actually being crossed');
-  }
+  await page.waitForTimeout(700);
+  eq((await power()).level, lvl, 'the setup gain crossed a level after all');
+  eq(await page.evaluate(() => window.__nvx.state.levelUp), null,
+    'the card opened without a level actually being crossed');
+  ok(await page.evaluate(() => document.querySelectorAll('.xpfx-chip').length > 0),
+    'a gain inside the level should still float a chip');
 });
 
 t('nothing threw through any of it', async () => {
