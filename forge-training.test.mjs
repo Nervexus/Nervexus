@@ -35,9 +35,9 @@ t('a section can be found by key, and an unknown key returns null', () => {
 const FILLED = [
   ['chest','Chest', {all:12}],
   ['shoulders','Shoulders', {all:16}],
-  ['arms','Arms', {all:31}],
+  ['arms','Arms', {all:38}],
   ['back','Back', {all:24}],
-  ['kettlebells','Full', {all:40}],
+  ['kettlebells','Full', {all:55}],
   ['core','Core', {all:16}],
   ['hips','Legs', {all:11}],
   ['quads','Legs', {all:12}],

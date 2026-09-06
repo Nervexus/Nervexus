@@ -347,7 +347,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=17"></script>
+  <script src="forge-training.js?v=18"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -9541,7 +9541,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-278 · v11.278 kettlebells';
+const NOTIF_BUILD_VERSION = '2026.09.06-279 · v11.279 girevoy';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14177,6 +14177,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.279', date:'Sep 6, 2026', major:true, notes:[
+      'The kettlebell wrist and grip block in Arms is thirteen deep now — bottoms-up clean, horn and towel holds, pinch-grip hold, radial and ulnar deviation, and the finger walk.',
+      'Kettlebells has a Soviet · Girevoy Sport block: the three competition lifts — jerk, snatch and long cycle — plus the pressing and lifting work that sat around them, from the military press and clean and press to the bent press, side press, Sots press, two-hands anyhow and the juggling cast. Fifteen in all.',
+    ]},
     {version:'v11.278', date:'Sep 6, 2026', major:true, notes:[
       'A Kettlebells section — forty movements in five blocks: Total Body, Upper Body, Core, Back and Lower Body.',
       'It is a section by equipment rather than by body part, so it deliberately covers ground the body-part sections do too. Three exercises that would have been named twice moved into it: the swing came out of Hips & Glutes, the single-leg deadlift out of Hamstrings, and the figure eight out of the Arms kettlebell block, which gains a bottoms-up walk in its place.',

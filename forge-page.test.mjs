@@ -1221,7 +1221,10 @@ t('on a phone the section list does not sit under the exercises', async () => {
       const nav = document.querySelector('.forge-secnav');
       if (!nav) return 'no section list';
       const n = nav.getBoundingClientRect();
-      const cards = [...document.querySelectorAll('.cc-glowcard')].filter(c => c !== nav);
+      /* Only the cards the list actually shares a grid with. Scanning the whole document
+         caught the Performance Terminal check-in, which re-opens on its own timer and is
+         meant to cover the page — an overlay overlapping things is not a layout fault. */
+      const cards = [...nav.parentElement.querySelectorAll('.cc-glowcard')].filter(c => c !== nav);
       for (const c of cards) {
         const r = c.getBoundingClientRect();
         if (r.height < 10) continue;
@@ -1242,6 +1245,9 @@ t('on a phone the section list does not sit under the exercises', async () => {
 });
 
 t('on a wide screen the section list still pins beside the exercises', async () => {
+  /* Set explicitly rather than relying on the previous test having put it back — if that one
+     fails it never reaches its cleanup, and this reports a second failure that is not real. */
+  await page.setViewportSize({ width: 1280, height: 1400 });
   await openChest();
   const pos = await page.evaluate(() =>
     getComputedStyle(document.querySelector('.forge-secnav')).position);

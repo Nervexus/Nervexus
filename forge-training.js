@@ -134,6 +134,13 @@
         rng('Kettlebell bottoms-up hold', 3, 5, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec', perSide: true}),
         rng('Kettlebell rack hold', 3, 4, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec'}),
         rng('Kettlebell bottoms-up walk', 3, 4, 20, 40, {group: 'KETTLEBELL WRIST & GRIP', unit: 'm', perSide: true}),
+        rng('Kettlebell bottoms-up clean', 3, 4, 6, 10, {group: 'KETTLEBELL WRIST & GRIP', perSide: true}),
+        rng('Kettlebell horn hold', 3, 4, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec'}),
+        rng('Kettlebell towel hold', 3, 4, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec'}),
+        rng('Kettlebell pinch-grip hold', 3, 4, 15, 30, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec', perSide: true}),
+        rng('Kettlebell radial deviation', 3, 3, 10, 15, {group: 'KETTLEBELL WRIST & GRIP', perSide: true}),
+        rng('Kettlebell ulnar deviation', 3, 3, 10, 15, {group: 'KETTLEBELL WRIST & GRIP', perSide: true}),
+        rng('Kettlebell finger walk', 3, 3, 8, 15, {group: 'KETTLEBELL WRIST & GRIP', perSide: true}),
 
         rng('Rope climbs', 1, 1, 3, 5, {group: 'FIGHTER-SPECIFIC', unit: 'climb', noLoad: true}),
         rng('Sledgehammer tyre strikes', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
@@ -381,7 +388,28 @@
       rng('Kettlebell lunge pass', 3, 4, 8, 12, {group: 'LOWER BODY', perSide: true}),
       rng('Kettlebell squat', 3, 4, 8, 15, {group: 'LOWER BODY'}),
       rng('Kettlebell squat flip', 3, 4, 6, 12, {group: 'LOWER BODY'}),
-      rng('Kettlebell overhead squat', 3, 3, 5, 10, {group: 'LOWER BODY', perSide: true})
+      rng('Kettlebell overhead squat', 3, 3, 5, 10, {group: 'LOWER BODY', perSide: true}),
+
+      /* Girevoy sport — the Soviet kettlebell discipline: competitions from the late 1940s,
+         codified as a sport in 1985. The three competition lifts are the jerk, the snatch and
+         the long cycle; the rest are the classic pressing and lifting work that sat around
+         them. Sets in the sport are timed rather than counted, so the timed pieces are here
+         in seconds and the lifts in reps. */
+      rng('Kettlebell biathlon jerk', 3, 5, 10, 30, {group: 'SOVIET · GIREVOY SPORT'}),
+      rng('Kettlebell long cycle clean and jerk', 3, 5, 8, 20, {group: 'SOVIET · GIREVOY SPORT'}),
+      rng('Kettlebell biathlon snatch', 3, 5, 10, 30, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell half snatch', 3, 4, 8, 15, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell timed set', 3, 4, 60, 300, {group: 'SOVIET · GIREVOY SPORT', unit: 'sec'}),
+      rng('Kettlebell military press', 3, 5, 5, 10, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell clean and press', 3, 5, 5, 10, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell push press', 3, 4, 6, 12, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell see-saw press', 3, 4, 8, 12, {group: 'SOVIET · GIREVOY SPORT'}),
+      rng('Kettlebell bent press', 3, 4, 3, 6, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell side press', 3, 4, 5, 8, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell Sots press', 3, 3, 5, 10, {group: 'SOVIET · GIREVOY SPORT'}),
+      rng('Kettlebell two-hands anyhow', 3, 3, 3, 6, {group: 'SOVIET · GIREVOY SPORT', perSide: true}),
+      rng('Kettlebell rack walk', 3, 4, 20, 40, {group: 'SOVIET · GIREVOY SPORT', unit: 'm'}),
+      rng('Kettlebell juggling cast', 3, 4, 8, 15, {group: 'SOVIET · GIREVOY SPORT'})
     ] }
   };
 
