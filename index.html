@@ -1836,8 +1836,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="text-align:center; font-size:11.5px; color:#7c7c84; margin-top:10px;">Next rank: <b style="color:#FFFFFF;">{{ nextRankName }}</b> at Level {{ nextRankLevel }}</div>
           </div>
         </div>
-        <div class="cc-stat4" style="display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:18px;">
-          <sc-for list="{{ powerStats }}" as="s" hint-placeholder-count="4">
+        <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(5,1fr); gap:18px; margin-bottom:18px;">
+          <sc-for list="{{ powerStats }}" as="s" hint-placeholder-count="5">
             <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
               <div style="font-size:11px; letter-spacing:1px; color:#7c7c84;">{{ s.label }}</div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; margin-top:8px; color:{{ s.c }};">{{ s.value }}</div>
@@ -4160,15 +4160,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ mtQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ mtQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ mtQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ dashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ dashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ dashWeekly }} / {{ dashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -4300,11 +4294,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ mtQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ mtQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ mtQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ dashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ dashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ dashWeekly }} / {{ dashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -4783,15 +4774,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ qtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ qtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ qtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ enDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ enDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ enDashWeekly }} / {{ enDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -4893,11 +4878,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ qtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ qtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ qtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ enDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ enDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ enDashWeekly }} / {{ enDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -5444,15 +5426,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ sciQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ sciQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ sciQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ sciDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ sciDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ sciDashWeekly }} / {{ sciDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -5531,11 +5507,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ sciQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ sciQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ sciQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ sciDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ sciDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ sciDashWeekly }} / {{ sciDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -5867,15 +5840,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ graQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ graQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ graQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ graDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ graDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ graDashWeekly }} / {{ graDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -5954,11 +5921,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ graQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ graQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ graQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ graDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ graDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ graDashWeekly }} / {{ graDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -6290,15 +6254,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ hisQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ hisQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ hisQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ hisDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ hisDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ hisDashWeekly }} / {{ hisDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -6377,11 +6335,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ hisQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ hisQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ hisQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ hisDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ hisDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ hisDashWeekly }} / {{ hisDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -6708,15 +6663,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ spkQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ spkQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ spkQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ spkDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ spkDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ spkDashWeekly }} / {{ spkDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -6797,11 +6746,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ spkQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ spkQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ spkQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ spkDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ spkDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ spkDashWeekly }} / {{ spkDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -7098,15 +7044,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ phyQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ phyQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ phyQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ phyDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ phyDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ phyDashWeekly }} / {{ phyDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -7185,11 +7125,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ phyQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ phyQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ phyQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ phyDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ phyDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ phyDashWeekly }} / {{ phyDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -7615,15 +7552,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ moneyQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ moneyQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ moneyQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ moneyDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ moneyDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ moneyDashWeekly }} / {{ moneyDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -7702,11 +7633,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ moneyQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ moneyQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ moneyQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ moneyDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ moneyDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ moneyDashWeekly }} / {{ moneyDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -8062,15 +7990,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentQtTodayXP }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">🔥 {{ gentQtStreak }}d</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                     <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
                     <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentDashWeekly }} / {{ gentDashMonthly }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                   </div>
 
                   <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
@@ -8182,11 +8104,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentQtTodayXP }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">XP TODAY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">🔥 {{ gentQtStreak }}d</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">STREAK</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
                   <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentDashWeekly }} / {{ gentDashMonthly }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">7D / 30D TESTS</div></div>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
@@ -9499,7 +9418,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-265 · v11.265 mobile-secnav';
+const NOTIF_BUILD_VERSION = '2026.09.06-266 · v11.266 learning-stats';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14087,6 +14006,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.266', date:'Sep 6, 2026', major:true, notes:[
+      'The stats bar on every Learning Centre subject is down to the three figures worth reading — accuracy, total questions, hours studied. XP today and the 7d/30d test count are gone from it. You still earn the XP; it just does not need a slot on nine subject hubs.',
+      'The learning streak has moved to Power Level, beside your day streak. It is the same real figure it always was — consecutive days with a logged learning session, held on yesterday until today is used.',
+    ]},
     {version:'v11.265', date:'Sep 6, 2026', major:true, notes:[
       'Fixed the section list sitting under the exercise blocks on a phone. It is pinned in place so it stays beside them on a wide screen, but on a phone it is above them instead — pinned there it stayed put while the blocks scrolled over the top of it, and its rows showed through the gaps between them. On a phone it now scrolls away with the page.',
     ]},
@@ -18266,7 +18189,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
       profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
       powerLevel:P.level, rankName:P.rank.n, rankDesc:P.rank.d, powerPct:P.pct+'%', xpIn:P.xpInLevel, xpNext:P.xpForNext, nextRankName:P.next?P.next.n:'MAX RANK', nextRankLevel:P.next?P.next.min:'—',
-      powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'#ff5563'},{label:'WEEKLY XP',value:'+'+P.week,c:'#eef0f2'},{label:'TOTAL XP',value:P.totalXP,c:'#eef0f2'},{label:'DAY STREAK',value:P.streak+'d',c:'#ff5563'}],
+      /* The learning streak moved here off the Learning Centre's stats bar. It is the same
+         real figure it always was — consecutive days with a logged Learning activity — and
+         it belongs beside the other streak rather than on one subject's hub. */
+      powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'#ff5563'},{label:'WEEKLY XP',value:'+'+P.week,c:'#eef0f2'},{label:'TOTAL XP',value:P.totalXP,c:'#eef0f2'},{label:'DAY STREAK',value:P.streak+'d',c:'#ff5563'},{label:'LEARNING STREAK',value:this._streakFor('Learning')+'d',c:'#eef0f2'}],
       powerCats:P.categories.map(c=>({name:c.name,level:c.level,pct:c.pct+'%'})),
       powerRanks:P.ranks.map(r=>{ const cur=r.n===P.rank.n, locked=P.level<r.min, passed=!cur&&!locked; return {n:r.n,d:r.d,min:r.min,isCur:cur?'1':'0',op:locked?0.45:1,bd:cur?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',numC:cur?'#ff5563':(passed?'#eef0f2':'#75757d'),nameC:locked?'#9a9aa2':'#eef0f2',tag:cur?'CURRENT':(passed?'UNLOCKED':'LOCKED'),tagC:cur?'#F4F4F5':(passed?'#9a9aa2':'#6f6f78'),tagBd:cur?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)'}; }),
       powerAch:P.achievements.map(a=>({name:a.name,desc:a.desc,icon:a.u?'✓':'🔒',op:a.u?1:0.42,c:a.u?'#ff5563':'#6f6f78',bd:a.u?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.06)'})),
