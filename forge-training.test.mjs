@@ -29,12 +29,29 @@ t('a section can be found by key, and an unknown key returns null', () => {
   if(T.section('not-a-section')) throw new Error('an unknown key must return null, not a guess');
 });
 
-t('Chest carries a gym pool and a home pool', () => {
-  const c = T.section('chest');
-  if(!c.pool) throw new Error('chest has no exercise pool');
-  if(c.pool.gym.length !== 20) throw new Error('expected 20 gym exercises, got '+c.pool.gym.length);
-  if(c.pool.home.length !== 10) throw new Error('expected 10 home exercises, got '+c.pool.home.length);
-  if(c.part !== 'Chest') throw new Error('the pool must say which body part it logs against');
+/* Every section that has been filled in so far, and the body part its exercises log
+   against. A section is added here the moment it gets a pool. */
+const FILLED = [['chest','Chest'], ['shoulders','Shoulders']];
+
+t('each filled section carries 20 gym and 10 home exercises', () => {
+  for(const [key, part] of FILLED){
+    const c = T.section(key);
+    if(!c) throw new Error('no section called '+key);
+    if(!c.pool) throw new Error(key+' has no exercise pool');
+    if(c.pool.gym.length !== 20) throw new Error(key+': expected 20 gym exercises, got '+c.pool.gym.length);
+    if(c.pool.home.length !== 10) throw new Error(key+': expected 10 home exercises, got '+c.pool.home.length);
+    if(c.part !== part) throw new Error(key+' must log against '+part+', not '+c.part);
+  }
+});
+
+t('a filled section logs against a body part the log knows', () => {
+  /* addPoolToSession falls back to "Full" for anything outside this list, so a typo here
+     would quietly send every set of that section to the wrong place. */
+  const PARTS = ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio'];
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    if(PARTS.indexOf(sec.part) < 0) throw new Error(sec.name+' logs against "'+sec.part+'", which the training log does not have');
+  }
 });
 
 t('every pooled exercise can actually be logged', () => {
@@ -60,11 +77,30 @@ t('no exercise is listed twice', () => {
   }
 });
 
-t('the home list needs no gym', () => {
+t('no home list needs a gym', () => {
   /* Half a gym list is useless at home; the home pool is the one you fall back on. */
-  const home=T.section('chest').pool.home.map(x=>x.name.toLowerCase()).join(' | ');
-  for(const kit of ['barbell','cable','machine','smith','pec deck','landmine'])
-    if(home.includes(kit)) throw new Error('the home list needs a '+kit);
+  for(const sec of T.SECTIONS){
+    if(!sec.pool || !sec.pool.home) continue;
+    const home=sec.pool.home.map(x=>x.name.toLowerCase()).join(' | ');
+    for(const kit of ['barbell','cable','machine','smith','pec deck','landmine'])
+      if(home.includes(kit)) throw new Error(sec.name+"'s home list needs a "+kit);
+  }
+});
+
+t('no exercise name is shared between two sections', () => {
+  /* The session refuses a second exercise of the same name, so the same name in two
+     sections would let one of them silently fail to add. */
+  const seen={};
+  for(const sec of T.SECTIONS){
+    if(!sec.pool) continue;
+    for(const where of Object.keys(sec.pool)){
+      for(const x of sec.pool[where]){
+        const k=x.name.toLowerCase();
+        if(seen[k] && seen[k]!==sec.name) throw new Error('"'+x.name+'" is in both '+seen[k]+' and '+sec.name);
+        seen[k]=sec.name;
+      }
+    }
+  }
 });
 
 t('no section carries an empty container', () => {

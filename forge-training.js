@@ -27,6 +27,9 @@
      Sets and reps are a sensible starting point, not a prescription: they land in the session
      where they can be changed, and nothing is added until you press the button. */
   function ex(name, sets, reps) { return { name: name, sets: sets, reps: reps }; }
+  /* Nothing to load: press-ups, holds and band work have no weight to dial, so the block
+     shows reps only rather than a stepper that would sit at BW forever. */
+  function nl(name, sets, reps) { var e = ex(name, sets, reps); e.noLoad = true; return e; }
 
   var CHEST = {
     key: 'chest', name: 'Chest', tag: 'CHEST',
@@ -55,16 +58,16 @@
         ex('Dumbbell pullover', 3, 12)
       ],
       home: [
-        ex('Press-up', 4, 15),
-        ex('Incline press-up', 3, 15),
-        ex('Decline press-up', 3, 12),
-        ex('Diamond press-up', 3, 12),
-        ex('Wide press-up', 3, 15),
-        ex('Archer press-up', 3, 8),
-        ex('Explosive press-up', 4, 8),
-        ex('Chair dip', 3, 12),
-        ex('Band chest press', 3, 15),
-        ex('Band flye', 3, 15)
+        nl('Press-up', 4, 15),
+        nl('Incline press-up', 3, 15),
+        nl('Decline press-up', 3, 12),
+        nl('Diamond press-up', 3, 12),
+        nl('Wide press-up', 3, 15),
+        nl('Archer press-up', 3, 8),
+        nl('Explosive press-up', 4, 8),
+        nl('Chair dip', 3, 12),
+        nl('Band chest press', 3, 15),
+        nl('Band flye', 3, 15)
       ]
     }
   };
@@ -75,9 +78,27 @@
      not-started, so they carry nothing else at all. */
   function stub(key, name) { return { key: key, name: name, tag: name.toUpperCase() }; }
 
+  var SHOULDERS = {
+    key: 'shoulders', name: 'Shoulders', tag: 'SHOULDERS', part: 'Shoulders',
+    pool: {
+      gym: [ ex('Standing barbell overhead press',4,6), ex('Seated barbell overhead press',4,8),
+        ex('Seated dumbbell shoulder press',4,8), ex('Standing dumbbell shoulder press',3,10),
+        ex('Arnold press',3,10), ex('Push press',4,5), ex('Z press',3,8),
+        ex('Smith machine shoulder press',3,8), ex('Machine shoulder press',3,10),
+        ex('Dumbbell lateral raise',4,12), ex('Cable lateral raise',3,15),
+        ex('Machine lateral raise',3,12), ex('Leaning cable lateral raise',3,15),
+        ex('Dumbbell front raise',3,12), ex('Plate front raise',3,12),
+        ex('Rear delt dumbbell flye',3,15), ex('Reverse pec deck',3,15),
+        ex('Cable face pull',4,15), ex('Barbell upright row',3,10), ex('Barbell shrug',4,10) ],
+      home: [ nl('Pike press-up',4,10), nl('Elevated pike press-up',3,8), nl('Wall walk',3,5),
+        nl('Band overhead press',3,15), nl('Band lateral raise',3,20), nl('Band front raise',3,15),
+        nl('Band face pull',3,20), nl('Band pull-apart',3,20),
+        ex('Backpack shoulder press',3,12), ex('Backpack lateral raise',3,15) ]
+    }
+  };
   var SECTIONS = [
     CHEST,
-    stub('shoulders', 'Shoulders'),
+    SHOULDERS,
     stub('arms', 'Arms'),
     stub('back', 'Back'),
     stub('core', 'Core'),

@@ -333,7 +333,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=8"></script>
+  <script src="forge-training.js?v=9"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -3718,23 +3718,25 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </sc-for>
                     <span style="font-size:11.5px; color:#6f6f78;">{{ sec.poolHint }}</span>
                   </div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(204px,1fr)); gap:10px;">
+                  <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(318px,1fr)); gap:8px;">
                     <sc-for list="{{ sec.poolList }}" as="x" hint-placeholder-count="20">
-                      <div class="cc-glowcard" style="border-radius:13px; padding:13px 14px; display:flex; flex-direction:column; gap:7px;">
-                        <div style="font-size:13px; color:#eef0f2; line-height:1.35;">{{ x.name }}</div>
-                        <sc-for list="{{ x.steps }}" as="st" hint-placeholder-count="2">
-                          <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
-                            <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.1px; color:#6f6f78;">{{ st.label }}</span>
-                            <span style="display:flex; align-items:center; gap:3px;">
-                              <span onClick="{{ st.dec }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:6px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">&#8722;</span>
-                              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ st.valInk }}; min-width:44px; text-align:center;">{{ st.val }}</span>
-                              <span onClick="{{ st.inc }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:6px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">+</span>
-                            </span>
+                      <div class="cc-glowcard" style="border-radius:2px; padding:13px 15px; display:flex; flex-direction:column; gap:10px;">
+                        <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px;">
+                          <div style="font-size:13.5px; color:#eef0f2; line-height:1.3;">{{ x.name }}</div>
+                          <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ x.targetInk }}; white-space:nowrap;">{{ x.target }}</span>
+                        </div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                          <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                            <sc-for list="{{ x.steps }}" as="st" hint-placeholder-count="2">
+                              <span style="display:flex; align-items:center; gap:4px;">
+                                <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.1px; color:#6f6f78; margin-right:2px;">{{ st.label }}</span>
+                                <span onClick="{{ st.dec }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:2px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">&#8722;</span>
+                                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ st.valInk }}; min-width:40px; text-align:center;">{{ st.val }}</span>
+                                <span onClick="{{ st.inc }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:2px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">+</span>
+                              </span>
+                            </sc-for>
                           </div>
-                        </sc-for>
-                        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ x.targetInk }};">{{ x.target }}</span>
-                          <span onClick="{{ x.add }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.8px; padding:5px 9px; border-radius:7px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
+                          <span onClick="{{ x.add }}" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12px; letter-spacing:3px; padding:7px 16px; border-radius:2px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
                         </div>
                       </div>
                     </sc-for>
@@ -9475,7 +9477,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-261 · v11.261 login-day-6am';
+const NOTIF_BUILD_VERSION = '2026.09.06-262 · v11.262 shoulders-blocks';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12644,7 +12646,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const days=new Set((log||[]).map(l=>this._loginDayKey(l.ts)));
     // Stepped by calendar date from midday rather than by subtracting 24h at a time, so the
     // hour the clocks change cannot make a day repeat itself or go missing.
-    let streak=0, cur=new Date(this._loginDayKey()+'T12:00:00');
+    let cur=new Date(this._loginDayKey()+'T12:00:00');
+    /* Today counts from the moment it is awarded, not before it. Anchoring on today alone
+       read 0 for a month-long streak every morning between six o'clock and whenever the
+       award landed — and stayed at 0 for good if the award never ran. A streak is only
+       broken by a day actually missed, so it survives on yesterday until today is used. */
+    if(!days.has(this._locDateFromTs(cur.getTime()))) cur.setDate(cur.getDate()-1);
+    let streak=0;
     for(let i=0;i<3650;i++){
       if(!days.has(this._locDateFromTs(cur.getTime()))) break;
       streak++; cur.setDate(cur.getDate()-1);
@@ -14057,6 +14065,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.262', date:'Sep 6, 2026', major:true, notes:[
+      'Shoulders is filled in — twenty gym exercises and ten for home, same as Chest.',
+      'The exercise blocks are rectangles now, with the weight and reps steppers on one line and the add button in the Ultra X colours.',
+      'No weight stepper on anything with nothing to load — press-ups, holds and band work show reps only. A loaded home exercise like the backpack press keeps its weight, so the stepper follows the exercise rather than the GYM/HOME tab.',
+      'A weighted exercise starts unset rather than showing BW: the app is not going to guess what you can lift.',
+      'Your streak read 0 first thing this morning because it anchored on today, and today had not been used yet. A streak is broken by a day missed, not by a day not yet started — it now holds on yesterday until the day is used.',
+    ]},
     {version:'v11.261', date:'Sep 6, 2026', major:true, notes:[
       'The login day now starts at 06:00 rather than midnight. Finishing at half past midnight is the same session, not a new day — the next 250 XP comes due at six the following morning.',
       'The daily login is a flat 250 XP, and it lands once per login day however many times you open the app.',
@@ -18414,22 +18429,24 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               /* Frozen once ticked: the set is in the training log with these numbers, and
                  editing them here would leave the two disagreeing. */
               const stepIt=(field,dir)=>()=>{ if(!ticked) this.stepPool(sec.key, x, item, field, dir); };
-              const steps=[
-                {label:'WEIGHT', val:v.weight>0?(v.weight+'kg'):'BW'},
-                {label:'REPS', val:String(v.reps)}
-              ].map((st,i)=>({ label:st.label, val:st.val,
+              /* A press-up or a band pull has nothing to load, so it gets reps alone rather
+                 than a weight stepper that would sit at BW for ever. */
+              const raw=[];
+              if(!x.noLoad) raw.push(['weight','WEIGHT', v.weight>0?(v.weight+'kg'):'\u2014']);
+              raw.push(['reps','REPS', String(v.reps)]);
+              const steps=raw.map(st=>({ label:st[1], val:st[2],
                 valInk:ticked?'#7c7c84':'#eef0f2',
                 ink:ticked?'#4a4a52':'#c9c9d2',
                 bd:ticked?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.16)',
                 cursor:ticked?'default':'pointer',
-                dec:stepIt(i===0?'weight':'reps',-1), inc:stepIt(i===0?'weight':'reps',1) }));
+                dec:stepIt(st[0],-1), inc:stepIt(st[0],1) }));
               return { name:x.name, steps,
                 target:ticked?'LOGGED':((x.sets||1)+' SETS'),
-                targetInk:ticked?'#6cffba':'#8f8f99',
-                label:inSession?'ADDED':'+ ADD', cursor:inSession?'default':'pointer',
-                ink:inSession?'#6cffba':'#0d0d10',
-                bg:inSession?'transparent':'#eef0f2',
-                bd:inSession?'rgba(108,255,186,0.45)':'#eef0f2',
+                targetInk:ticked?'#E7D8A6':'#8f8f99',
+                label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
+                ink:inSession?'#E7D8A6':'#F5F1E8',
+                bg:inSession?'transparent':'#5B1A1A',
+                bd:inSession?'rgba(231,216,166,0.5)':'#5B1A1A',
                 add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part, v); } };
             }),
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,

@@ -150,6 +150,25 @@ t('a missed day breaks the streak and older days do not count', async () => {
   eq(got.loginStreak, 3, 'days on the far side of a break were counted');
 });
 
+t('a streak that has not been used yet today still stands', async () => {
+  /* The morning after a month of logins, before the day's award lands, the ladder read 0 —
+     and stayed at 0 for good if the award never ran. A streak is broken by a day missed,
+     not by a day not yet used. */
+  await boot();
+  const log = await logFor(20);
+  const upToYesterday = log.slice(1);
+  const got = await page.evaluate((l) => window.__nvx._deriveLoginStreak(l), upToYesterday);
+  eq(got.loginStreak, 19, 'a streak with no entry yet today read as ' + got.loginStreak);
+});
+
+t('two days without a login does break it', async () => {
+  await boot();
+  const log = await logFor(20);
+  const upToTwoDaysAgo = log.slice(2);
+  const got = await page.evaluate((l) => window.__nvx._deriveLoginStreak(l), upToTwoDaysAgo);
+  eq(got.loginStreak, 0, 'a whole day missed should end the streak');
+});
+
 t('the streak survives a Supabase load that has not landed yet', async () => {
   /* The old counter did newStreak = (lastLoginDate === yesterday) ? streak + 1 : 1, reading
      state that the Supabase load fills in. Any award that ran first reset a month-long

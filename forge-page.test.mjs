@@ -296,16 +296,18 @@ t('Home, Mental and Health are empty pages', async () => {
   }
 });
 
-t('every section is an empty page', async () => {
+t('every section not yet filled in is an empty page', async () => {
   await boot({ forgeCentre: 'training' });
   const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.key));
+  const filled = await page.evaluate(() =>
+    window.ForgeTraining.SECTIONS.filter(x => x.pool).map(x => x.key));
   eq(S.length, 13, 'thirteen sections');
   for (const key of S) {
     await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
     await page.waitForTimeout(400);
     const body = await text();
     if (key === 'full-body') { ok(/THE SESSION/.test(body), 'Full Body should carry its checklist'); continue; }
-    if (key === 'chest') { ok(/GYM/.test(body), 'Chest should carry its exercise pool'); continue; }
+    if (filled.includes(key)) { ok(/GYM/.test(body), key + ' should carry its exercise pool'); continue; }
     ok(/Nothing here yet/.test(body), key + ' is not showing its empty state');
     for (const ghost of ['THE TOOLS', 'THE STANDARD', 'EASY', 'BRUTAL', 'Rice bucket', 'Dead hang']) {
       ok(!body.includes(ghost), key + ' is still showing ' + ghost);
@@ -690,7 +692,23 @@ t('the list survives the day rolling over', async () => {
 
 const addBtns = () => page.evaluate(() =>
   [...document.querySelectorAll('span')]
-    .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD').length);
+    .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD').length);
+
+/* A stepper group is a span, not a div, so the row is found by looking for the element that
+   holds both the label and a minus button rather than by tag. */
+async function installRowFinder() {
+  await page.evaluate(() => {
+    window.findRow = (card, label) => {
+      if (!card) return null;
+      return [...card.querySelectorAll('div,span')].find(r => {
+        const s = r.querySelector('span');
+        if (!s || s.textContent.trim() !== label) return false;
+        return [...r.querySelectorAll('span')]
+          .some(e => e.children.length === 0 && e.textContent.trim() === '−');
+      }) || null;
+    };
+  });
+}
 
 async function openChest() {
   await boot({ forgeCentre: 'training' });
@@ -699,6 +717,7 @@ async function openChest() {
     forgeFB: { period: '', mode: 'day', on: '', evId: '', items: [], done: {}, w: {} },
     workouts: [], events: [] }));
   await page.waitForTimeout(700);
+  await installRowFinder();
 }
 
 t('Chest lists its gym and home exercises', async () => {
@@ -720,7 +739,7 @@ t('adding one puts it in the Full Body daily session', async () => {
   await openChest();
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD');
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD');
     b[0].click();
   });
   await page.waitForTimeout(700);
@@ -742,7 +761,7 @@ t('an added exercise reads as added and cannot be added twice', async () => {
   await openChest();
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD');
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD');
     b[0].click();
   });
   await page.waitForTimeout(700);
@@ -765,7 +784,7 @@ t('an added exercise ticks and logs like any other', async () => {
   await openChest();
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD');
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD');
     b[0].click();
   });
   await page.waitForTimeout(600);
@@ -789,8 +808,7 @@ const stepClick = (name, label, sign) => page.evaluate(([n, l, g]) => {
     .find(e => e.children.length === 0 && e.textContent.trim() === n);
   if (!title) throw new Error('no block for ' + n);
   const card = title.closest('.cc-glowcard');
-  const row = [...card.querySelectorAll('div')]
-    .find(r => { const s = r.querySelector('span'); return s && s.textContent.trim() === l; });
+  const row = findRow(card, l);
   if (!row) throw new Error('no ' + l + ' row on ' + n);
   const btn = [...row.querySelectorAll('span')]
     .filter(e => e.children.length === 0 && e.textContent.trim() === g)[0];
@@ -801,9 +819,9 @@ const stepClick = (name, label, sign) => page.evaluate(([n, l, g]) => {
 const stepVal = (name, label) => page.evaluate(([n, l]) => {
   const title = [...document.querySelectorAll('span')]
     .find(e => e.children.length === 0 && e.textContent.trim() === n);
-  const card = title.closest('.cc-glowcard');
-  const row = [...card.querySelectorAll('div')]
-    .find(r => { const s = r.querySelector('span'); return s && s.textContent.trim() === l; });
+  if (!title) throw new Error('no block for ' + n);
+  const row = findRow(title.closest('.cc-glowcard'), l);
+  if (!row) throw new Error('no ' + l + ' row on ' + n);
   const spans = [...row.querySelectorAll('span')].filter(e => e.children.length === 0);
   const i = spans.findIndex(e => e.textContent.trim() === '−');
   return spans[i + 1].textContent.trim();
@@ -826,7 +844,7 @@ t('every pool block carries a weight and a reps stepper', async () => {
      no business guessing what the user can lift. */
   const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
   eq(await stepVal(src.name, 'REPS'), String(src.reps), 'reps did not start on the pool figure');
-  eq(await stepVal(src.name, 'WEIGHT'), 'BW', 'weight did not start at bodyweight');
+  eq(await stepVal(src.name, 'WEIGHT'), '—', 'the app should not guess what someone can lift');
 });
 
 t('stepping sets the numbers the exercise is added with', async () => {
@@ -841,7 +859,7 @@ t('stepping sets the numbers the exercise is added with', async () => {
 
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD')[0].click();
   });
   await page.waitForTimeout(700);
   const st = await page.evaluate(() => window.__nvx.state.forgeFB);
@@ -859,7 +877,7 @@ t('the chosen weight is what gets logged', async () => {
   await page.waitForTimeout(500);
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD')[0].click();
   });
   await page.waitForTimeout(600);
   await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
@@ -877,7 +895,7 @@ t('weight will not step below bodyweight and reps will not reach zero', async ()
   await stepClick(src.name, 'WEIGHT', MINUS);
   await stepClick(src.name, 'WEIGHT', MINUS);
   await page.waitForTimeout(500);
-  eq(await stepVal(src.name, 'WEIGHT'), 'BW', 'the weight went negative');
+  eq(await stepVal(src.name, 'WEIGHT'), '—', 'the weight went negative');
   for (let i = 0; i < src.reps + 3; i++) await stepClick(src.name, 'REPS', MINUS);
   await page.waitForTimeout(500);
   eq(await stepVal(src.name, 'REPS'), '1', 'reps stepped down past one');
@@ -890,7 +908,7 @@ t('once added the steppers drive the session item itself', async () => {
   const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD')[0].click();
   });
   await page.waitForTimeout(700);
   await stepClick(src.name, 'REPS', '+');
@@ -913,7 +931,7 @@ t('the steppers freeze once the set is in the log', async () => {
   const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.gym[0]);
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
-      .filter(e => e.children.length === 0 && e.textContent.trim() === '+ ADD')[0].click();
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD')[0].click();
   });
   await page.waitForTimeout(600);
   await page.evaluate(() => window.__nvx.setForgeSection('full-body'));
@@ -935,19 +953,56 @@ t('the steppers freeze once the set is in the log', async () => {
   eq(w[0].reps, src.reps, 'the logged entry drifted from what was logged');
 });
 
-t('the home list gets the same steppers', async () => {
+t('an exercise with nothing to load shows reps only', async () => {
+  /* A press-up has no weight to dial; a weight stepper on it would sit at BW for ever. */
   await openChest();
   await page.evaluate(() => window.__nvx.setForgePool('home'));
   await page.waitForTimeout(700);
-  const n = await addBtns();
+  const counts = await page.evaluate(() => {
+    const t = (s) => [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === s).length;
+    return { w: t('WEIGHT'), r: t('REPS'),
+             noLoad: window.ForgeTraining.section('chest').pool.home.filter(x => x.noLoad).length,
+             total: window.ForgeTraining.section('chest').pool.home.length };
+  });
+  eq(counts.r, counts.total, 'every block should still have its reps');
+  eq(counts.w, counts.total - counts.noLoad, 'a weight stepper appeared on something with nothing to load');
+});
+
+t('the shoulders pool renders and adds like chest', async () => {
+  await openChest();
+  await page.evaluate(() => window.__nvx.setForgeSection('shoulders'));
+  await page.waitForTimeout(800);
+  const D = await page.evaluate(() => window.ForgeTraining.section('shoulders').pool);
+  eq(await addBtns(), D.gym.length, 'the shoulders gym list did not render one block each');
+  await page.evaluate(() => {
+    [...document.querySelectorAll('span')]
+      .filter(e => e.children.length === 0 && e.textContent.trim() === 'ADD')[0].click();
+  });
+  await page.waitForTimeout(700);
+  const items = await page.evaluate(() => window.__nvx.state.forgeFB.items);
+  eq(items.length, 1, 'nothing was added to the session');
+  eq(items[0].part, 'Shoulders', 'it did not log against Shoulders');
+});
+
+t('a home exercise you can load still gets its weight stepper', async () => {
+  /* Chest at home is all bodyweight and bands; shoulders has the backpack lifts, which you
+     really do load — so the stepper follows the exercise, not the GYM/HOME tab. */
+  await openChest();
+  await page.evaluate(() => window.__nvx.setForgeSection('shoulders'));
+  await page.evaluate(() => window.__nvx.setForgePool('home'));
+  await page.waitForTimeout(800);
+  const D = await page.evaluate(() => window.ForgeTraining.section('shoulders').pool.home);
+  const loaded = D.filter(x => !x.noLoad);
+  ok(loaded.length > 0, 'no loadable home exercise to test with');
   const w = await page.evaluate(() => [...document.querySelectorAll('span')]
     .filter(e => e.children.length === 0 && e.textContent.trim() === 'WEIGHT').length);
-  eq(w, n, 'the home blocks are missing their steppers');
-  const src = await page.evaluate(() => window.ForgeTraining.section('chest').pool.home[0]);
-  eq(await stepVal(src.name, 'WEIGHT'), 'BW', 'a bodyweight exercise should start at BW');
+  eq(w, loaded.length, 'the wrong number of home blocks carry a weight stepper');
+  const src = loaded[0];
+  eq(await stepVal(src.name, 'WEIGHT'), '—', 'a loadable exercise should start unset');
   await stepClick(src.name, 'WEIGHT', '+');
   await page.waitForTimeout(500);
-  eq(await stepVal(src.name, 'WEIGHT'), '2.5kg', 'a weighted press-up could not be set');
+  eq(await stepVal(src.name, 'WEIGHT'), '2.5kg', 'a loaded backpack could not be set');
 });
 
 t('the pool does not appear on a section that has none', async () => {
@@ -957,7 +1012,7 @@ t('the pool does not appear on a section that has none', async () => {
     await page.waitForTimeout(500);
     const body = await text();
     ok(/Nothing here yet/.test(body), key + ' should still be empty');
-    ok(!/\+ ADD/.test(body), key + ' is showing an exercise pool');
+    ok(!/\bADD\b/.test(body) && !/GYM/.test(body), key + ' is showing an exercise pool');
   }
 });
 
