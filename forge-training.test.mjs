@@ -34,7 +34,7 @@ t('a section can be found by key, and an unknown key returns null', () => {
 const FILLED = [
   ['chest','Chest', {all:12}],
   ['shoulders','Shoulders', {all:16}],
-  ['arms','Arms', {all:25}],
+  ['arms','Arms', {all:31}],
   ['back','Back', {all:19}],
   ['core','Core', {all:16}],
   ['hips','Legs', {all:12}],
@@ -43,7 +43,7 @@ const FILLED = [
   ['calves','Legs', {all:10}],
   ['feet','Legs', {all:10}],
   ['neck','Neck', {all:10}],
-  ['hands','Arms', {all:12}],
+  ['hands','Arms', {all:11}],
 ];
 
 t('each filled section carries the lists it is meant to', () => {

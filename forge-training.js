@@ -102,7 +102,7 @@
      round, and the forearm curl the second hammer curl was standing in for. */
   var ARMS = {
     key: 'arms', name: 'Arms', tag: 'ARMS', part: 'Arms',
-    priority: 'Arm strength → Grip strength → Forearm strength → Triceps power → Biceps strength → Muscular endurance',
+    priority: 'Arm strength → Grip strength → Forearm and wrist strength → Triceps power → Biceps strength → Muscular endurance',
     pool: {
       all: [
         rng('Barbell curl', 3, 4, 6, 10, {group: 'BICEPS'}),
@@ -127,6 +127,13 @@
         rng('Plate pinch holds', 3, 5, 20, 45, {group: 'FOREARMS & GRIP', unit: 'sec'}),
         rng('Towel cable curls', 3, 3, 8, 12, {group: 'FOREARMS & GRIP'}),
         rng('Dead hangs', 3, 5, 20, 60, {group: 'FOREARMS & GRIP', unit: 'sec', noLoad: true}),
+
+        rng('Kettlebell finger curl', 3, 4, 8, 15, {group: 'KETTLEBELL WRIST & GRIP'}),
+        rng('Kettlebell wrist flip', 3, 4, 8, 15, {group: 'KETTLEBELL WRIST & GRIP'}),
+        rng('Kettlebell levering', 3, 4, 6, 10, {group: 'KETTLEBELL WRIST & GRIP', perSide: true}),
+        rng('Kettlebell bottoms-up hold', 3, 5, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec', perSide: true}),
+        rng('Kettlebell rack hold', 3, 4, 20, 45, {group: 'KETTLEBELL WRIST & GRIP', unit: 'sec'}),
+        rng('Kettlebell figure-eight', 3, 4, 10, 20, {group: 'KETTLEBELL WRIST & GRIP'}),
 
         rng('Rope climbs', 1, 1, 3, 5, {group: 'FIGHTER-SPECIFIC', unit: 'climb', noLoad: true}),
         rng('Sledgehammer tyre strikes', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
@@ -309,7 +316,6 @@
       rng('Gripper close', 3, 5, 5, 12),
       rng('Thick-bar hold', 3, 5, 20, 45, {unit: 'sec'}),
       rng('Pinch block lift', 3, 5, 15, 30, {unit: 'sec'}),
-      rng('Kettlebell finger curl', 3, 4, 8, 15),
       rng('Wrist roller', 3, 3, 3, 5),
       rng('Hammer wrist rotation', 3, 3, 10, 15, {perSide: true}),
       rng('Fingertip press-up', 3, 3, 5, 12, {noLoad: true}),
