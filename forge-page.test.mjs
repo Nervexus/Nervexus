@@ -1104,6 +1104,48 @@ t('typed numbers are held to the same limits as the buttons', async () => {
   eq(parseFloat(st.w[st.items[0].id]), 500, 'an out-of-range weight reached the session');
 });
 
+t('the Forge accent follows the raiment', async () => {
+  /* The page was champagne on every raiment. Read back as the browser paints it, per element,
+     because a token that fails to resolve leaves the text black rather than obviously wrong. */
+  await openChest();
+  const paint = (style) => page.evaluate((st) => {
+    window.__nvx.setPref('theme', st === 'base' ? 'Lime' : 'Ultra');
+    if (st !== 'base') window.__nvx.setPref('ultraStyle', st);
+    return new Promise(r => setTimeout(() => {
+      const find = (t) => [...document.querySelectorAll('div,span')]
+        .find(e => e.children.length === 0 && e.textContent.trim() === t);
+      const wordmark = find('❖ THE FORGE'), tag = find('CHEST'), pri = find('TRAINING PRIORITY');
+      r({ wordmark: wordmark && getComputedStyle(wordmark).color,
+          tag: tag && getComputedStyle(tag).color,
+          priority: pri && getComputedStyle(pri).color });
+    }, 550));
+  }, style);
+
+  const rgb = (s) => (s.match(/\d+/g) || []).map(Number);
+  const seen = {};
+  for (const st of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine', 'base']) {
+    const got = await paint(st);
+    for (const k of ['wordmark', 'tag', 'priority'])
+      ok(got[k] && /^rgb/.test(got[k]), st + ': the ' + k + ' is not painted (' + got[k] + ')');
+    /* All three carry the same accent, so a swap that missed one shows up here. */
+    eq(new Set([got.wordmark, got.tag, got.priority]).size, 1,
+      st + ': the accent is not the same on every element that wears it');
+    seen[st] = got.tag;
+  }
+
+  const [r1, g1, b1] = rgb(seen['Ultra X']);
+  ok(r1 > g1 + 40 && r1 > b1 + 40, 'Ultra X is not red: ' + seen['Ultra X']);
+  const [r2, g2, b2] = rgb(seen['Maison Élysée']);
+  ok(b2 > r2 + 30, 'Maison is not blue: ' + seen['Maison Élysée']);
+  const [r3, g3, b3] = rgb(seen['Noir']);
+  ok(r3 > 230 && g3 > 230 && b3 > 230, 'Noir is not white: ' + seen['Noir']);
+  const [r4, g4, b4] = rgb(seen['Maison Éverpine']);
+  ok(r4 > 200 && g4 > 190 && b4 < 190, 'Éverpine lost its champagne: ' + seen['Maison Éverpine']);
+
+  await page.evaluate(() => window.__nvx.setPref('theme', 'Lime'));
+  await page.waitForTimeout(400);
+});
+
 t('the add button follows every raiment', async () => {
   /* Asserted on the colour the browser actually paints, not on the CSS being present: the
      token could resolve to nothing and the button would silently fall back to transparent. */

@@ -113,10 +113,16 @@
      carrying one theme's hex, so it matches whichever of the four is on. Keyed off raiment-*
      instead of theme-*: theme-everpine is only stamped on the home screen, so an Éverpine
      user on any other page would otherwise get the Ultra X oxblood. */
-  .cc-shell{ --forge-add-bg:#5B1A1A; --forge-add-ink:#F5F1E8; --forge-add-on:#E7D8A6; }
-  .cc-shell.raiment-noir{ --forge-add-bg:#625B50; --forge-add-ink:#F2EFE9; --forge-add-on:#E0C583; }
-  .cc-shell.raiment-maison{ --forge-add-bg:#4E6E96; --forge-add-ink:#F6F0E4; --forge-add-on:#8FAAC9; }
-  .cc-shell.raiment-everpine{ --forge-add-bg:#E7D8A6; --forge-add-ink:#16211A; --forge-add-on:#E7D8A6; }
+  /* The Forge's accent — the crest, the wordmark, the section tag, the lit sidebar rail, the
+     priority label, a scheduled day, a logged block — follows the raiment rather than being
+     champagne everywhere. Éverpine keeps the champagne, because that is its own accent, and
+     the base themes keep it too since the page is dark under them. The add button's ADDED
+     outline is the accent as well, so a block that is in your session matches the page. */
+  .cc-shell{ --forge-accent:#E7D8A6; --forge-add-bg:#5B1A1A; --forge-add-ink:#F5F1E8; --forge-add-on:var(--forge-accent); }
+  .cc-shell.raiment-x{ --forge-accent:#5B1A1A; }
+  .cc-shell.raiment-noir{ --forge-accent:#FFFFFF; --forge-add-bg:#625B50; --forge-add-ink:#F2EFE9; }
+  .cc-shell.raiment-maison{ --forge-accent:#3C5A7D; --forge-add-bg:#4E6E96; --forge-add-ink:#F6F0E4; }
+  .cc-shell.raiment-everpine{ --forge-accent:#E7D8A6; --forge-add-bg:#E7D8A6; --forge-add-ink:#16211A; }
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
   .theme-ultra.theme-noir{ --u-bg:#121212; --u-card:rgba(30,30,30,0.86); --u-ink:#C4BDB0; --u-muted:#968F82; --u-line:rgba(150,143,130,0.28); --u-accent:#C4BDB0; }
   .theme-ultra, .theme-ultra .cc-scene, .theme-ultra .cc-top, .theme-ultra .cc-side{ background:var(--u-bg) !important; color:var(--u-ink) !important; font-family:'Cormorant Garamond',serif !important; }
@@ -3675,9 +3681,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <!-- the house crest: Éverpine's double rule around its own lozenge -->
           <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
             <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
-            <span style="width:27px; height:27px; color:#E7D8A6; display:flex; position:relative;" data-icon="forge"></span>
+            <span style="width:27px; height:27px; color:var(--forge-accent); display:flex; position:relative;" data-icon="forge"></span>
           </div>
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#E7D8A6;">❖ THE FORGE</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--forge-accent);">❖ THE FORGE</div>
         </div>
 
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
@@ -3707,7 +3713,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div class="cc-glowcard forge-secnav" style="border-radius:16px; padding:8px; position:sticky; top:14px;">
               <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="13">
                 <div onClick="{{ p.go }}" style="position:relative; display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:11px; cursor:pointer; background:{{ p.bg }};" style-hover="{ background:'rgba(255,255,255,0.06)' }">
-                  <span style="position:absolute; left:0; top:11px; bottom:11px; width:2px; border-radius:2px; background:#E7D8A6; opacity:{{ p.barOpacity }};"></span>
+                  <span style="position:absolute; left:0; top:11px; bottom:11px; width:2px; border-radius:2px; background:var(--forge-accent); opacity:{{ p.barOpacity }};"></span>
                   <span style="width:17px; height:17px; flex:0 0 17px; display:flex; color:{{ p.mark }};" data-icon="forge"></span>
                   <span style="font-size:13px; color:{{ p.ink }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.name }}</span>
                 </div>
@@ -3716,7 +3722,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
             <div>
               <sc-for list="{{ trainSections }}" as="sec" hint-placeholder-count="1">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:#E7D8A6; margin-bottom:6px;">{{ sec.tag }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.8px; color:var(--forge-accent); margin-bottom:6px;">{{ sec.tag }}</div>
                 <h2 style="font-size:22px; font-weight:700; letter-spacing:-.3px; margin:0 0 14px;">{{ sec.name }}</h2>
 
                 <sc-if value="{{ sec.empty }}" hint-placeholder-val="{{ true }}">
@@ -3736,7 +3742,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
                   <sc-if value="{{ sec.hasPriority }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex; align-items:baseline; gap:9px; margin:-4px 0 12px; flex-wrap:wrap;">
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.6px; color:#E7D8A6;">TRAINING PRIORITY</span>
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.6px; color:var(--forge-accent);">TRAINING PRIORITY</span>
                       <span style="font-size:11.5px; color:#8f8f99;">{{ sec.priority }}</span>
                     </div>
                   </sc-if>
@@ -3802,14 +3808,14 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                             <div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.8px; color:{{ d.dowInk }};">{{ d.dow }}</div>
                             <div style="font-family:'JetBrains Mono',monospace; font-size:15px; color:{{ d.numInk }}; margin-top:2px;">{{ d.day }}</div>
                             <div style="height:6px; margin-top:5px; display:flex; gap:3px; justify-content:center;">
-                              <sc-if value="{{ d.scheduled }}" hint-placeholder-val="{{ false }}"><span style="width:5px; height:5px; border-radius:50%; background:#E7D8A6;"></span></sc-if>
+                              <sc-if value="{{ d.scheduled }}" hint-placeholder-val="{{ false }}"><span style="width:5px; height:5px; border-radius:50%; background:var(--forge-accent);"></span></sc-if>
                               <sc-if value="{{ d.didLog }}" hint-placeholder-val="{{ false }}"><span style="width:5px; height:5px; border-radius:50%; background:#6cffba;"></span></sc-if>
                             </div>
                           </div>
                         </sc-for>
                       </div>
                       <div style="display:flex; gap:14px; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#6f6f78; padding-bottom:12px;">
-                        <span><span style="color:#E7D8A6;">●</span> SCHEDULED</span>
+                        <span><span style="color:var(--forge-accent);">●</span> SCHEDULED</span>
                         <span><span style="color:#6cffba;">●</span> LOGGED</span>
                         <sc-if value="{{ sec.weekHint }}" hint-placeholder-val="{{ false }}"><span>{{ sec.weekHint }}</span></sc-if>
                       </div>
@@ -9530,7 +9536,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-272 · v11.272 no-dupes';
+const NOTIF_BUILD_VERSION = '2026.09.06-273 · v11.273 forge-accent';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14166,6 +14172,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.273', date:'Sep 6, 2026', major:true, notes:[
+      'The Forge\u2019s accent follows your raiment instead of being champagne on all of them: red on Ultra X, white on Noir, blue on Maison Élysée. Éverpine keeps the champagne, since that is its own accent, and so do the base themes because the page is dark under them.',
+      'That is the crest, the wordmark, the section tag, the lit rail on the section list, the training priority label, a scheduled day on the week, and the outline on a block already in your session — all one colour, so they move together.',
+    ]},
     {version:'v11.272', date:'Sep 6, 2026', major:true, notes:[
       'The landmine press was on both the Chest and the Shoulders list. It stays on Shoulders, where it sits in the pressing block; Chest gets a single-arm dumbbell floor press in its place — same slot, same job, unilateral pressing. Both lists keep their length.',
       'No exercise name may now appear on two lists at all, and there is a check that keeps it that way.',
@@ -18603,7 +18613,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const trainPicker=secs.map(x=>({
           name:x.name, go:()=>this.setForgeSection(x.key),
           ink:x.key===secKey?'#ffffff':'#aeaeb6',
-          mark:x.key===secKey?'#E7D8A6':'#7c7c84',
+          mark:x.key===secKey?'var(--forge-accent)':'#7c7c84',
           bg:x.key===secKey?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
         const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
@@ -18658,7 +18668,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               const side=x.perSide?' \u00b7 PER SIDE':'';
               return { name:x.name, steps,
                 target:ticked?'LOGGED':(setsTxt+' '+(x.setsLabel||'SETS')+repsTxt+unitTxt+side),
-                targetInk:ticked?'#E7D8A6':'#8f8f99',
+                targetInk:ticked?'var(--forge-accent)':'#8f8f99',
                 label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
                 ink:inSession?'var(--forge-add-on)':'var(--forge-add-ink)',
                 bg:inSession?'transparent':'var(--forge-add-bg)',
@@ -18686,9 +18696,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               cursor:fbMode==='date'?'pointer':'default',
               pick:()=>{ if(fbMode==='date') this.setForgeFBDate(d.date); },
               bg:d.selected?'rgba(231,216,166,0.16)':(d.isToday?'rgba(255,255,255,0.05)':'rgba(0,0,0,0)'),
-              bd:d.selected?'#E7D8A6':(d.isToday?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.08)'),
+              bd:d.selected?'var(--forge-accent)':(d.isToday?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.08)'),
               dowInk:d.isToday?'#c9c9ce':'#6f6f78',
-              numInk:d.selected?'#E7D8A6':(d.isToday?'#eef0f2':'#9a9aa2') })),
+              numInk:d.selected?'var(--forge-accent)':(d.isToday?'#eef0f2':'#9a9aa2') })),
             parts:this.FB_PARTS(),
             dName:dr0.name||'', dPart:dr0.part||'Chest', dSets:dr0.sets||'', dReps:dr0.reps||'', dMins:dr0.minutes||'',
             setDName:(e)=>this.setFbDraft('name',e), setDPart:(e)=>this.setFbDraft('part',e),
