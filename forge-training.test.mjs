@@ -35,6 +35,15 @@ const FILLED = [
   ['chest','Chest', {all:12}],
   ['shoulders','Shoulders', {all:16}],
   ['arms','Arms', {all:25}],
+  ['back','Back', {all:19}],
+  ['core','Core', {all:16}],
+  ['hips','Legs', {all:12}],
+  ['quads','Legs', {all:12}],
+  ['hamstrings','Legs', {all:10}],
+  ['calves','Legs', {all:10}],
+  ['feet','Legs', {all:10}],
+  ['neck','Neck', {all:10}],
+  ['hands','Arms', {all:12}],
 ];
 
 t('each filled section carries the lists it is meant to', () => {
@@ -65,7 +74,7 @@ t('a range runs the right way round', () => {
 t('a filled section logs against a body part the log knows', () => {
   /* addPoolToSession falls back to "Full" for anything outside this list, so a typo here
      would quietly send every set of that section to the wrong place. */
-  const PARTS = ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio'];
+  const PARTS = ['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Cardio'];
   for(const sec of T.SECTIONS){
     if(!sec.pool) continue;
     if(PARTS.indexOf(sec.part) < 0) throw new Error(sec.name+' logs against "'+sec.part+'", which the training log does not have');
@@ -176,6 +185,12 @@ t('work in another unit still lands in the log as something', () => {
       }
     }
   }
+});
+
+t('every training section is filled in', () => {
+  /* Full Body is the session the others feed, so it carries no pool of its own. */
+  const empty=T.SECTIONS.filter(s=>s.key!=='full-body' && !s.pool).map(s=>s.name);
+  if(empty.length) throw new Error('still empty: '+empty.join(', '));
 });
 
 t('no section carries an empty container', () => {

@@ -347,7 +347,7 @@
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
 <script src="forge-engine.js?v=1"></script>
-  <script src="forge-training.js?v=13"></script>
+  <script src="forge-training.js?v=14"></script>
 <script src="xp-fx.js?v=1"></script>
 <script src="https://www.youtube.com/iframe_api"></script>
 <link rel="preconnect" href="https://unpkg.com" crossorigin="">
@@ -9541,7 +9541,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-274 · v11.274 arms';
+const NOTIF_BUILD_VERSION = '2026.09.06-275 · v11.275 all-sections';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14177,6 +14177,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.275', date:'Sep 6, 2026', major:true, notes:[
+      'Every training section in the Forge is filled in — 164 exercises across twelve sections. Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck and Hands & Forearms all landed together.',
+      'These nine lists were written for you rather than supplied, in the same shape as the first three: a fighter\u2019s session in priority order, real ranges, and the unit the work is actually measured in. Swap any of them for your own and I will drop them straight in.',
+      'Back and Core are grouped like Arms. Hands & Forearms is hand and finger work rather than a second copy of the grip block already inside Arms.',
+      'Neck is now a body part the training log knows, so those sets are filed as neck work instead of being lumped in as "Full".',
+    ]},
     {version:'v11.274', date:'Sep 6, 2026', major:true, notes:[
       'Arms is in — twenty-five exercises in four blocks: Biceps, Triceps, Forearms & Grip, and Fighter-specific, with the priority line underneath.',
       'Three of the list could not stand as given. Weighted dips were already on Chest and battle ropes already on Shoulders, and hammer curls were in the list twice under two names. Each is replaced in its own slot: a diamond press-up for the bodyweight triceps work, sledgehammer tyre strikes for the fighter round, and a Zottman curl for the forearm curl.',
@@ -16254,7 +16260,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({forgeFB:{...f, w:{...(f.w||{}), [id]:v}}}); }
   /* The session is whatever the user puts in it. A prescribed list shipped here once and it
      was invented, so there is no default — you add what you actually do. */
-  FB_PARTS(){ return ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio']; }
+  /* Neck joined the list when the Neck section landed: without it every set from that
+     section would have been filed under "Full", which is not where it belongs and not what
+     the section says it is. */
+  FB_PARTS(){ return ['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Cardio']; }
   fbTarget(it){
     const bits=[];
     if(it.reps>0) bits.push((it.sets>0?it.sets:1)+' × '+it.reps);

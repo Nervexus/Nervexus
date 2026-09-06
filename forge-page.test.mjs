@@ -296,25 +296,45 @@ t('Home, Mental and Health are empty pages', async () => {
   }
 });
 
-t('every section not yet filled in is an empty page', async () => {
+t('no section has kept anything from the page this replaced', async () => {
+  /* The Training centre was a Hand Training page once, with its own tools, standards and
+     level filter. None of that should surface on any section. */
   await boot({ forgeCentre: 'training' });
   const S = await page.evaluate(() => window.ForgeTraining.SECTIONS.map(x => x.key));
-  const filled = await page.evaluate(() =>
-    window.ForgeTraining.SECTIONS.filter(x => x.pool).map(x => x.key));
   eq(S.length, 13, 'thirteen sections');
   for (const key of S) {
     await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(380);
     const body = await text();
     if (key === 'full-body') { ok(/THE SESSION/.test(body), 'Full Body should carry its checklist'); continue; }
-    if (filled.includes(key)) { ok(/\bADD\b/.test(body), key + ' should carry its exercise pool'); continue; }
-    ok(/Nothing here yet/.test(body), key + ' is not showing its empty state');
-    for (const ghost of ['THE TOOLS', 'THE STANDARD', 'EASY', 'BRUTAL', 'Rice bucket', 'Dead hang']) {
+    ok(/\bADD\b/.test(body), key + ' should carry its exercise pool');
+    /* "Rice bucket" was on this list as a leftover of the old page; it is a real grip
+       exercise on Hands & Forearms now, so it is no longer evidence of anything. */
+    for (const ghost of ['THE TOOLS', 'THE STANDARD', 'BRUTAL'])
       ok(!body.includes(ghost), key + ' is still showing ' + ghost);
-    }
   }
+});
+
+t('a section with nothing in it still says so', async () => {
+  /* Every section is written now, so the empty state has nothing left to render — it is kept
+     covered against a section added later by emptying one here and putting it straight back. */
+  await boot({ forgeCentre: 'training' });
+  await page.evaluate(() => {
+    const s = window.ForgeTraining.section('calves');
+    window.__nvxSavedCalves = { pool: s.pool, priority: s.priority };
+    delete s.pool; delete s.priority;
+    window.__nvx.setForgeSection('calves');
+  });
+  await page.waitForTimeout(600);
+  const body = await text();
+  ok(/Nothing here yet/.test(body), 'a section with no pool did not show the empty state');
+  ok(!/\bADD\b/.test(body), 'an emptied section is still offering blocks');
   const cards = await page.evaluate(() => document.querySelectorAll('.cc-scene .cc-glowcard').length);
-  eq(cards, 2, 'a section should be the sidebar and one empty card, got ' + cards);
+  eq(cards, 2, 'an empty section should be the sidebar and one card, got ' + cards);
+  await page.evaluate(() => {
+    const s = window.ForgeTraining.section('calves'), was = window.__nvxSavedCalves;
+    s.pool = was.pool; s.priority = was.priority;
+  });
 });
 
 t('every section is listed, marked with the house crest and not a number', async () => {
@@ -760,23 +780,31 @@ t('a section with two lists shows its tabs', async () => {
      tested against a section given two lists at runtime rather than left unexercised. */
   await openChest();
   await page.evaluate(() => {
+    /* Borrowed, then put back exactly as it was — every section carries a real pool now, and
+       leaving a stub behind would quietly change what the rest of this run is testing. */
     const neck = window.ForgeTraining.section('neck');
+    window.__nvxSavedNeck = { pool: neck.pool, part: neck.part, priority: neck.priority };
     neck.part = 'Shoulders';
+    delete neck.priority;
     neck.pool = {
-      gym: [{ name: 'Neck harness extension', sets: 3, reps: 12 },
-            { name: 'Neck harness flexion', sets: 3, reps: 12 }],
-      home: [{ name: 'Towel neck iso', sets: 3, reps: 20, noLoad: true }] };
+      gym: [{ name: 'Two-list probe A', sets: 3, reps: 12 },
+            { name: 'Two-list probe B', sets: 3, reps: 12 }],
+      home: [{ name: 'Two-list probe C', sets: 3, reps: 20, noLoad: true }] };
     window.__nvx.setForgeSection('neck');
     window.__nvx.setForgePool('gym');
   });
   await page.waitForTimeout(800);
   eq((await poolTabs()).join(','), 'GYM,HOME', 'a two-list section did not get its tabs');
-  eq(await addBtns(), 2, 'the gym list did not render one block each');
+  eq(await addBtns(), 2, 'the two-list gym side did not render one block each');
   await page.evaluate(() => window.__nvx.setForgePool('home'));
   await page.waitForTimeout(700);
-  eq(await addBtns(), 1, 'the home list did not render one block each');
-  ok(!(await text()).includes('Neck harness extension'), 'the gym list is still showing under HOME');
-  await page.evaluate(() => { const n = window.ForgeTraining.section('neck'); delete n.pool; delete n.part; });
+  eq(await addBtns(), 1, 'the two-list home side did not render one block each');
+  ok(!(await text()).includes('Two-list probe A'), 'the gym list is still showing under HOME');
+  await page.evaluate(() => {
+    const n = window.ForgeTraining.section('neck'), was = window.__nvxSavedNeck;
+    n.pool = was.pool; n.part = was.part; if (was.priority) n.priority = was.priority;
+    window.__nvx.setForgePool('gym');
+  });
 });
 
 t('a range is offered as a range', async () => {
@@ -1472,14 +1500,27 @@ t('a single set of something counted in its own unit reads as the count alone', 
   eq(target, src.reps + '–' + src.repsMax + ' CLIMBS', 'the target reads wrong');
 });
 
-t('the pool does not appear on a section that has none', async () => {
+t('every training section carries its own session', async () => {
+  /* All twelve are filled now, so the empty state is only for a section that has not been
+     written yet — and there are none. Each one has to render its own list, not the last one. */
   await boot({ forgeCentre: 'training' });
-  for (const key of ['neck', 'calves']) {
+  /* An exercise already in the session reads ADDED rather than ADD, so the session is
+     emptied first — otherwise this counts one block short for every one a previous test
+     added and reports it as a rendering fault. */
+  await page.evaluate(() => window.__nvx.setState({
+    forgeFB: { period: '', mode: 'day', on: '', evId: '', items: [], done: {}, w: {} } }));
+  await page.waitForTimeout(500);
+  const keys = await page.evaluate(() =>
+    window.ForgeTraining.SECTIONS.filter(x => x.key !== 'full-body').map(x => x.key));
+  for (const key of keys) {
     await page.evaluate((k) => window.__nvx.setForgeSection(k), key);
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(450);
+    const want = await page.evaluate((k) => window.ForgeTraining.section(k).pool.all, key);
+    eq(await addBtns(), want.length, key + ' rendered the wrong number of blocks');
     const body = await text();
-    ok(/Nothing here yet/.test(body), key + ' should still be empty');
-    ok(!/\bADD\b/.test(body) && !/GYM/.test(body), key + ' is showing an exercise pool');
+    ok(!/Nothing here yet/.test(body), key + ' is showing the empty state');
+    ok(body.includes(want[0].name), key + ' is not showing its own first exercise');
+    ok(body.includes('TRAINING PRIORITY'), key + ' has no training priority');
   }
 });
 
@@ -1631,12 +1672,21 @@ t('nothing on the page is rendered twice', async () => {
      the heading — so count the heading element rather than the text. */
   const headings = await page.evaluate(() => document.querySelectorAll('h2').length);
   eq(headings, 1, 'the section heading rendered ' + headings + ' times');
-  /* Training opens on Chest now, which has a pool rather than an empty state, so the empty
-     state is checked on a section that still has one. */
-  await page.evaluate(() => window.__nvx.setForgeSection('neck'));
+  /* Every section carries a pool now, so the empty state is looked at on one emptied for the
+     purpose and put straight back. */
+  await page.evaluate(() => {
+    const sec = window.ForgeTraining.section('neck');
+    window.__nvxSavedNeck2 = { pool: sec.pool, priority: sec.priority };
+    delete sec.pool; delete sec.priority;
+    window.__nvx.setForgeSection('neck');
+  });
   await page.waitForTimeout(600);
   const emptyBody = await text();
   eq(emptyBody.split('Nothing here yet').length - 1, 1, 'the empty state rendered more than once');
+  await page.evaluate(() => {
+    const sec = window.ForgeTraining.section('neck'), was = window.__nvxSavedNeck2;
+    sec.pool = was.pool; sec.priority = was.priority;
+  });
   for (const once of ['❖ THE FORGE']) {
     const n = (body.match(new RegExp(once.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
     eq(n, 1, once + ' appears ' + n + ' times');
