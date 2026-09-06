@@ -121,14 +121,16 @@ t('the rank ladder is scrollable and opens on where you are', async () => {
 
 const DAY = 86400000;
 const logFor = (n, gapAfter) => page.evaluate(([count, gap]) => {
-  /* count consecutive days ending today, optionally preceded by a gap. */
+  /* count consecutive login days ending today, optionally preceded by a gap. Timestamps sit
+     at midday so a 24-hour step cannot land either side of the 06:00 boundary. */
   const out = [];
+  const noon = new Date(window.__nvx._loginDayKey() + 'T12:00:00');   // midday of the current login day
   for (let i = 0; i < count; i++) {
-    const ts = Date.now() - i * 86400000;
+    const ts = noon.getTime() - i * 86400000;
     out.push({ id: 'l' + i, xp: 250, ts, date: new Date(ts).toLocaleDateString('en-CA') });
   }
   if (gap) {
-    const ts = Date.now() - (count + gap) * 86400000;
+    const ts = noon.getTime() - (count + gap) * 86400000;
     out.push({ id: 'old', xp: 250, ts, date: new Date(ts).toLocaleDateString('en-CA') });
   }
   return out;
@@ -194,6 +196,62 @@ t('the same day is never awarded twice', async () => {
   await page.waitForTimeout(700);
   const n = await page.evaluate(() => (window.__nvx.state.loginXPLog || []).length);
   eq(n, 1, 'the day was awarded ' + n + ' times');
+});
+
+t('the login day starts at 06:00, not midnight', async () => {
+  await boot();
+  const k = (y, mo, d, h, mi) => page.evaluate(([a, b, c, e, f]) =>
+    window.__nvx._loginDayKey(new Date(a, b, c, e, f).getTime()), [y, mo, d, h, mi]);
+  eq(await k(2026, 8, 6, 5, 59), '2026-09-05', 'five to six in the morning started a new day');
+  eq(await k(2026, 8, 6, 6, 0), '2026-09-06', 'six o’clock did not start the new day');
+  eq(await k(2026, 8, 6, 23, 30), '2026-09-06', 'late evening fell into the wrong day');
+  eq(await k(2026, 8, 6, 0, 10), '2026-09-05', 'ten past midnight should still be the night before');
+});
+
+t('a late night and the small hours are one login day, not two', async () => {
+  /* The point of the 06:00 boundary: finishing at half past midnight is the same session,
+     so it must not read as a second day of the streak. */
+  await boot();
+  const log = await page.evaluate(() => ([
+    { id: 'a', xp: 250, ts: new Date(2026, 8, 5, 23, 10).getTime() },
+    { id: 'b', xp: 250, ts: new Date(2026, 8, 6, 0, 40).getTime() },
+  ]));
+  const days = await page.evaluate((l) =>
+    l.map(x => window.__nvx._loginDayKey(x.ts)), log);
+  eq(days[0], days[1], 'either side of midnight counted as two different days');
+});
+
+t('the award is 250 and comes once per login day', async () => {
+  await boot();
+  eq(await page.evaluate(() => window.__nvx.LOGIN_XP()), 250, 'the daily login is not 250 XP');
+  await page.evaluate(() => {
+    window.__nvx._dailyLoginAwarded = null;
+    window.__nvx.setState({ loginXPLog: [], loginStreak: 0, lastLoginDate: '' });
+  });
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx._awardDailyLogin());
+  await page.waitForTimeout(600);
+  const got = await page.evaluate(() => (window.__nvx.state.loginXPLog || []).map(l => l.xp));
+  eq(got.join(','), '250', 'the award was not a single 250');
+});
+
+t('an entry logged before the 06:00 rule existed still blocks a second award', async () => {
+  /* Old entries carry a plain calendar date beside them, which is a different day from the
+     one the rule works in — so the check has to read the timestamp, not that field. */
+  await boot();
+  const seeded = await page.evaluate(() => {
+    const ts = Date.now();
+    return [{ id: 'old', xp: 200, ts, date: new Date(ts).toLocaleDateString('en-CA') }];
+  });
+  await page.evaluate((l) => {
+    window.__nvx._dailyLoginAwarded = null;
+    window.__nvx.setState({ loginXPLog: l, loginStreak: 1, lastLoginDate: '' });
+  }, seeded);
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx._awardDailyLogin());
+  await page.waitForTimeout(600);
+  eq(await page.evaluate(() => (window.__nvx.state.loginXPLog || []).length), 1,
+    'today was awarded twice over an entry that was already there');
 });
 
 /* ---- the XP effect and the level-up card ---- */

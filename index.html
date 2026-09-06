@@ -9475,7 +9475,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.05-260 · v11.260 xp-streak-ranks';
+const NOTIF_BUILD_VERSION = '2026.09.06-261 · v11.261 login-day-6am';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12631,11 +12631,24 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this._syncedLoginXPIds=curIds;
   }
   _locDateFromTs(ts){ const tz=(this.state&&this.state.account&&this.state.account.timezone)||'auto'; try{ return new Date(ts).toLocaleDateString('en-CA', tz==='auto'?{}:{timeZone:tz}); }catch(_){ return new Date(ts).toLocaleDateString('en-CA'); } }
+  /* The login day starts at 06:00, not midnight: opening the app at one in the morning is
+     still that night's session, and the next 250 comes due at six. Every key here is simply
+     the local date six hours back, so the whole thing — the award, the once-a-day check and
+     the streak — reads off one definition of "day". */
+  LOGIN_DAY_HOUR(){ return 6; }
+  LOGIN_XP(){ return 250; }
+  _loginDayKey(ts){ return this._locDateFromTs((ts!=null?ts:Date.now()) - this.LOGIN_DAY_HOUR()*3600000); }
   // loginStreak/lastLoginDate are derived from the log entries themselves (there's no separate
   // column for them in the real table), so they self-heal from whatever's actually synced.
   _deriveLoginStreak(log){
-    const dateSet=new Set((log||[]).map(l=>new Date(l.ts).toDateString()));
-    let streak=0; for(let i=0;i<3650;i++){ const d=new Date(Date.now()-i*86400000).toDateString(); if(dateSet.has(d)) streak++; else break; }
+    const days=new Set((log||[]).map(l=>this._loginDayKey(l.ts)));
+    // Stepped by calendar date from midday rather than by subtracting 24h at a time, so the
+    // hour the clocks change cannot make a day repeat itself or go missing.
+    let streak=0, cur=new Date(this._loginDayKey()+'T12:00:00');
+    for(let i=0;i<3650;i++){
+      if(!days.has(this._locDateFromTs(cur.getTime()))) break;
+      streak++; cur.setDate(cur.getDate()-1);
+    }
     const last=(log||[]).slice().sort((a,b)=>b.ts-a.ts)[0];
     return { loginStreak:streak, lastLoginDate: last?this._locDateFromTs(last.ts):'' };
   }
@@ -14044,6 +14057,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.261', date:'Sep 6, 2026', major:true, notes:[
+      'The login day now starts at 06:00 rather than midnight. Finishing at half past midnight is the same session, not a new day — the next 250 XP comes due at six the following morning.',
+      'The daily login is a flat 250 XP, and it lands once per login day however many times you open the app.',
+    ]},
     {version:'v11.260', date:'Sep 5, 2026', major:true, notes:[
       'Your login streak was being lost. The award only ran when the app started up, so leaving it open past midnight — a pinned tab, or the app on your phone — never recorded the new day. The log has 5–17 August and then holes; those days were used, they just were never written. It now records the day when the date turns and when you come back to the app, and the streak is counted back through the log instead of being carried in a number a slow sync could reset to 1.',
       'Your streak has been restored from 4 August, and 1,000 XP added.',
@@ -15533,7 +15550,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      day. That is why the log shows 5-17 Aug and then holes: the days were used, they were
      just never written. Now the day-rollover timer and the return-to-foreground both ask. */
   _awardDailyLogin(){ if(!this.state.loggedIn) return;
-    const today=this._todayStr();
+    const today=this._loginDayKey();
     if(this._dailyLoginAwarded===today) return;
     if(!this._isOwner()) return;
     // The account once collected 37 login awards on 6 Aug and 37 more on 7 Aug, because
@@ -15541,9 +15558,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // committed — or before the Supabase load restored it — awarded again. The latch
     // blocks repeats inside one session; the log check survives a stale or not-yet-loaded
     // lastLoginDate, since the awards themselves carry the date.
-    if((this.state.loginXPLog||[]).some(l=>l.date===today)) return;
+    // Matched on the entry's own timestamp rather than the date written beside it: entries
+    // logged before this existed carry a plain calendar date, which is a different day.
+    if((this.state.loginXPLog||[]).some(l=>this._loginDayKey(l.ts)===today)) return;
     this._dailyLoginAwarded=today;
-    const xp=250;   /* owner daily login */
+    const xp=this.LOGIN_XP();
     // The streak is counted back through the log rather than carried as a number. The
     // counter read lastLoginDate out of state, so any call that landed before the Supabase
     // load had restored it saw a blank and reset the streak to 1. Deriving it means the
