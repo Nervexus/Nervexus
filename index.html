@@ -3272,22 +3272,33 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
           </div>
 
-          <!-- Anatomy. Deferred: the mount carries data-anatomy-defer, so the model is not
-               fetched until the panel is actually on screen — the page opens instantly and
-               the model is there by the time you have scrolled to it. -->
+          <!-- Anatomy. Tap to open: the model is a download and a WebGL scene, so it stays out
+               of the page until it is asked for and the Forge home opens instantly. The muscles
+               you have trained are listed either way, so the panel still says something shut.
+               The mount also keeps data-anatomy-defer, which holds the load until it is on
+               screen — opening it and immediately scrolling away costs nothing. -->
           <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-top:18px;">
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+            <div onClick="{{ forgeAnatGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap; cursor:pointer;">
               <span style="font-size:13px; font-weight:600;">Anatomy</span>
-              <div class="cc-anatomy-views" style="display:flex; gap:6px;">
-                <span onClick="{{ setAnatomyFront }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyFrontC }}; border:1px solid {{ anatomyFrontBd }}; background:{{ anatomyFrontBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">FRONT{{ anatomyFrontCount }}</span>
-                <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
-              </div>
+              <span style="display:flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--forge-accent);">{{ forgeAnatLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ forgeAnatRot }});">&#9662;</span></span>
             </div>
-            <div data-anatomy3d="1" data-anatomy-defer="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:420px; margin:0 auto; padding:4px 0 2px;"></div>
-            <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
-            <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px;">
+            <!-- The muscles you have trained show whether the model is open or not, so the
+                 panel says something useful shut. The model itself is behind the tap: while
+                 it is closed these mounts are not in the page at all, and nothing is fetched
+                 or rendered. -->
+            <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin:2px 0 4px;">
               <sc-for list="{{ anatomyActive }}" as="a" hint-placeholder-count="0"><span style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#ffb3ba; border:1px solid rgba(255,85,99,0.35); border-radius:20px; padding:4px 10px;"><span style="width:6px; height:6px; border-radius:50%; background:#ff3b4a; box-shadow:0 0 7px #ff3b4a;"></span>{{ a.name }} · {{ a.ago }}</span></sc-for>
             </div>
+            <sc-if value="{{ forgeAnatOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-bottom:8px; flex-wrap:wrap;">
+                <div class="cc-anatomy-views" style="display:flex; gap:6px;">
+                  <span onClick="{{ setAnatomyFront }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyFrontC }}; border:1px solid {{ anatomyFrontBd }}; background:{{ anatomyFrontBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">FRONT{{ anatomyFrontCount }}</span>
+                  <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
+                </div>
+              </div>
+              <div data-anatomy3d="1" data-anatomy-defer="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:420px; margin:0 auto; padding:4px 0 2px;"></div>
+              <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
+            </sc-if>
           </div>
 
           <div style="margin-top:18px;">
@@ -9160,7 +9171,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-283 · v11.283 forge-anatomy';
+const NOTIF_BUILD_VERSION = '2026.09.07-284 · v11.284 anatomy-tap';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9218,6 +9229,9 @@ class Component extends DCLogic {
       // 'moneynews'/'lawnews' bundles — no key, no rate limit. Cached in state for 20 min so
       // re-entering the dashboard doesn't refetch; the ↻ button forces a fresh pull.
       anatomyView:'front',
+      // The Forge's anatomy panel is a tap to open. The model is a download and a WebGL
+      // scene, so it stays out of the page until it is asked for.
+      forgeAnatOpen:false,
       moneyNews:[], lawNews:[], moneyNewsAt:0, lawNewsAt:0,
       wiNews:[], wiNewsAt:0, wiNewsLoading:false, wiNewsErr:'',
       moneyNewsLoading:false, lawNewsLoading:false, moneyNewsErr:'', lawNewsErr:'',
@@ -13896,6 +13910,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.284', date:'Sep 7, 2026', major:false, notes:[
+      'The anatomy on the Forge home is a tap to open. Nothing about the model is in the page until you ask for it, so the Forge home opens with no download and no WebGL scene behind it.',
+      'The muscles you have trained are listed whether the model is open or shut, so the panel still tells you something with the model away.',
+      'Closing it keeps the scene rather than throwing it away, so opening it a second time is instant — it is paused on the way out, which is the part that costs.',
+      'Front/Back now sits inside the panel. It only ever applied to the drawn figure, and shut it was a control with nothing to control.',
+    ]},
     {version:'v11.283', date:'Sep 6, 2026', major:true, notes:[
       'The anatomy model is back on the Forge home, below the split — and the page still opens instantly.',
       'The model no longer renders when you cannot see it. It used to run its loop whether or not it was on screen, so a spinning model was a full render every frame for a canvas nobody was looking at. It now stops when you scroll past it or leave the page, and picks up where it left off when you come back.',
@@ -15962,6 +15982,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      section, so opening Practice by Skill on Maths does not open it on History. */
   toggleLcSection(sec){ const k=(this.state.learningTab||'Maths')+'|'+sec;
     this.setState(s=>({lcOpen:{...(s.lcOpen||{}), [k]:!(s.lcOpen||{})[k]}})); }
+  /* The Forge's anatomy panel. Shut, the mounts are not in the page at all, so nothing is
+     fetched and nothing renders — only the muscle chips show. Once it has been opened the
+     scene is kept, so closing and re-opening is instant; it is paused on the way out rather
+     than thrown away, because a scene drawing to a canvas nobody can see is the whole cost. */
+  toggleForgeAnatomy(){
+    const open=!this.state.forgeAnatOpen;
+    this.setState({forgeAnatOpen:open});
+    try{ const A3=window.NervexusAnatomy3D;
+      if(A3 && A3.setPaused && A3.hasScene && A3.hasScene()) A3.setPaused(!open);
+    }catch(e){}
+  }
   _fbToday(){ return window.HealthKit ? window.HealthKit.today() : new Date().toLocaleDateString('en-CA'); }
   _fbLocal(d){ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } }
   // Monday, so a week rolls over on the day people restart a programme rather than mid-weekend.
@@ -18390,7 +18421,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const BACK=['traps','delts_rear','lats','triceps','forearms','lower_back','glutes','hamstrings','calves'];
         const lit=Object.keys(glow);
         const nF=lit.filter(m=>FRONT.indexOf(m)>=0).length, nB=lit.filter(m=>BACK.indexOf(m)>=0).length;
+        const fao=!!S.forgeAnatOpen;
         return { anatomyView:view,
+          forgeAnatOpen:fao, forgeAnatGo:()=>this.toggleForgeAnatomy(),
+          forgeAnatLabel: fao?'HIDE':'SHOW MODEL', forgeAnatRot: fao?'0deg':'-90deg',
           setAnatomyFront:()=>this.setState({anatomyView:'front'}), setAnatomyBack:()=>this.setState({anatomyView:'back'}),
           anatomyFrontC:f.c, anatomyFrontBd:f.bd, anatomyFrontBg:f.bg,
           anatomyBackC:bk.c, anatomyBackBd:bk.bd, anatomyBackBg:bk.bg,

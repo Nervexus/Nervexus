@@ -1375,13 +1375,49 @@ const anat = () => page.evaluate(() => {
     paused: !!(A && A.isPaused && A.isPaused()),
   };
 });
+/* The panel is a tap to open, so every one of these has to open it first — that is the
+   point of the change: nothing about the model is in the page until it is asked for. */
+const tapAnatomy = () => page.evaluate(() => {
+  const h = [...document.querySelectorAll('span')]
+    .find(e => e.children.length === 0 && e.textContent.trim() === 'Anatomy');
+  if (!h) return false;
+  const row = (h.classList.contains('sc-interp') ? h.parentElement : h).parentElement;
+  row.click();
+  return true;
+});
+const openAnatomy = async () => {
+  if (await page.evaluate(() => !!document.querySelector('[data-anatomy3d]'))) return;
+  ok(await tapAnatomy(), 'there is no Anatomy panel on the Forge home to tap');
+  await page.waitForTimeout(400);
+};
 const seeAnatomy = async () => {
+  await openAnatomy();
   await page.evaluate(() => {
     const m = document.querySelector('[data-anatomy3d]');
     if (m) m.scrollIntoView({ block: 'center' });
   });
   await page.waitForTimeout(1200);
 };
+
+t('the anatomy costs nothing until it is tapped', async () => {
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  await page.waitForTimeout(2500);
+  const shut = await anat();
+  eq(shut.mounts3d, 0, 'the model mount is in the page before anyone asked for it');
+  eq(shut.mountsSvg, 0, 'the drawn figure is in the page before anyone asked for it');
+  ok(!shut.scene, 'a WebGL scene was built on load, which is the cost this avoids');
+  const label = await page.evaluate(() => document.body.innerText.includes('SHOW MODEL'));
+  ok(label, 'the panel does not say it can be opened');
+
+  ok(await tapAnatomy(), 'there is no Anatomy panel on the Forge home to tap');
+  await page.waitForTimeout(600);
+  const open = await anat();
+  eq(open.mounts3d, 1, 'tapping did not put the model in the page');
+
+  await tapAnatomy();
+  await page.waitForTimeout(500);
+  eq((await anat()).mounts3d, 0, 'tapping again did not put the model away');
+});
 
 t('only one anatomy shows, and it is the model', async () => {
   /* Two mounts ship: the model, and a drawn figure for when WebGL is missing. Both are in
