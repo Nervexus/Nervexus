@@ -9142,7 +9142,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-281 · v11.281 bulk-import';
+const NOTIF_BUILD_VERSION = '2026.09.06-282 · v11.282 work-log';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12422,7 +12422,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(wiRoutesRes && wiRoutesRes.data && wiRoutesRes.data[0]){ patch.wiRoutes=wiRoutesRes.data[0].data||[]; this._lastSyncedWiRoutes=patch.wiRoutes; }
       if(memoriesRes && memoriesRes.data) patch.memories=memoriesRes.data.map(r=>({id:r.id,fact:r.fact,category:r.category||'general',source:r.source||'user',ts:new Date(r.created_at).getTime()}));
       if(musicRes && musicRes.data) patch.musicLibrary=musicRes.data.map(r=>({id:r.video_id,title:r.title||'YouTube Track',thumb:r.thumb||'',addedAt:new Date(r.created_at).getTime()}));
-      if(activitiesRes && activitiesRes.data){ const mapped=activitiesRes.data.map(r=>({id:r.id, text:r.text, cat:r.category, ts:new Date(r.occurred_at).getTime(), min:r.minutes||0})); patch.activities=mapped; this._lastSyncedActivities=mapped; this._syncedActivityIds=new Set(mapped.map(a=>a.id)); }
+      if(activitiesRes && activitiesRes.data){ const mapped=activitiesRes.data.map(r=>({id:r.id, text:r.text, cat:r.category, ts:new Date(r.occurred_at).getTime(), min:r.minutes||0})); /* Merged back in, or the Work Log loses every update a second after the page
+        loads: the pull replaces activities wholesale with the rows the database holds, and
+        the ship entries are derived from the changelog rather than stored. */
+        patch.activities=this._mergeShipLog(mapped); this._lastSyncedActivities=mapped; this._syncedActivityIds=new Set(mapped.map(a=>a.id)); }
       if(loginXPRes && loginXPRes.data){ const mapped=loginXPRes.data.map(r=>({id:r.id, xp:r.xp||0, ts:new Date(r.created_at).getTime(), date:this._locDateFromTs(r.created_at)})); patch.loginXPLog=mapped; this._lastSyncedLoginXP=mapped; this._syncedLoginXPIds=new Set(mapped.map(l=>l.id)); const derived=this._deriveLoginStreak(mapped); patch.loginStreak=derived.loginStreak; patch.lastLoginDate=derived.lastLoginDate; }
       const healthPatch={};
       if(meals && meals.data) healthPatch.meals=meals.data.map(r=>({id:r.id,name:r.name,kcal:r.kcal||0,protein:r.protein||0}));
@@ -13758,11 +13761,28 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const hh = m[4]!=null ? +m[4] : 12, mi = m[5]!=null ? +m[5] : 0;   /* date-only entries land at midday, not "now" */
     return Date.UTC(+m[3],mo,+m[2],hh,mi) - 3600000;
   }
-  // Work Hours ship log: one entry per changelog version, timestamped to match that
-  // version's actual UK ship time — always in sync with the changelog by construction,
-  // so it can never drift into showing an impossible "X ago" for a past release.
+  /* The ship log in the Work Log: one entry per released version, carrying what actually
+     changed rather than only the number. Derived from the changelog rather than stored, so
+     it is in sync by construction, cannot drift, and cannot be written twice — the entries
+     carry no id, and _syncActivities skips anything without one, so none of this reaches the
+     database or comes back as a duplicate.
+
+     The minutes are gone. They were 23 + (i * 8) % 25 — a made-up figure between 23 and 48
+     minutes per release, sitting in a work log as though someone had timed it. */
+  SHIP_LOG_DAYS(){ return 30; }
+  _shipHeadline(c){
+    const n=String((c.notes||[])[0]||'').trim();
+    if(!n) return 'shipped';
+    const first=(n.split(/(?<=[.!?])\s/)[0]||n).trim();
+    return first.length>120 ? first.slice(0,117).replace(/\s+\S*$/,'')+'…' : first;
+  }
   _shipLog(){
-    return this._changelog().map((c,i)=>({ text:'Shipped update '+c.version, cat:'Work', ts:this._parseChangelogDate(c.date), min:23+((i*8)%25), seeded:true }));
+    const cut=Date.now() - this.SHIP_LOG_DAYS()*86400000;
+    return this._changelog()
+      .map(c=>({c, ts:this._parseChangelogDate(c.date)}))
+      .filter(x=>x.ts>=cut)
+      .map(({c,ts})=>({ text:c.version+' — '+this._shipHeadline(c), cat:'Work', ts, min:0,
+                        seeded:true, ship:true, notes:(c.notes||[]).slice() }));
   }
   _mergeShipLog(existing){
     const manual=(existing||[]).filter(a=>!a.seeded);
@@ -13784,6 +13804,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.282', date:'Sep 6, 2026', major:true, notes:[
+      'Every update now shows in the Work Log in the Command Center, and says what changed rather than only its number. The last month is there; set the range to Week for the last seven days.',
+      'They were being written and then thrown away: the sync replaces your activities with what the server holds, and these are worked out from the changelog rather than stored, so they disappeared a second after the page loaded. They survive the sync now.',
+      'The minutes have gone. Each entry claimed between 23 and 48 minutes, from a formula rather than a clock — a made-up figure sitting in a work log. They are markers of a release, not time anybody spent.',
+      'They earn no XP and build no work streak. Shipping was 72% of your whole score before that was removed, and this does not put it back by another door.',
+    ]},
     {version:'v11.281', date:'Sep 6, 2026', major:true, notes:[
       'Bulk Import works on the Forge. The panel lived inside the Fitness page, so pressing the button on the Forge set the flag and nothing appeared — it is an overlay now and opens wherever you press it, without leaving the page you are on.',
       'It also knows your exercises. All 234 in the Forge state the body part they train, and that is now the first thing consulted — so a pasted "Battle ropes", "Farmer\u2019s carries" or "Bear crawl" is filed correctly instead of landing in Mixed. Where the Forge and the general index disagree, like a landmine press or a sumo deadlift, the Forge wins; where the Forge has never heard of something the index still answers.',
@@ -16437,7 +16463,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const weekCount=(cat)=>acts.filter(a=>a.cat===cat && a.ts>=weekStart).length;
     const weekMin=(cat)=>acts.filter(a=>a.cat===cat && a.ts>=weekStart).reduce((s,a)=>s+(+a.min||0),0);
     return {todayMin,weekCount,weekMin}; }
-  _streakFor(cat){ const acts=(this.state.activities||[]).filter(a=>a.cat===cat); if(!acts.length) return 0;
+  /* Seeded entries are not turning up and doing the work — the ship log is one per release,
+     so counting them would build a Work streak out of deploys. */
+  _streakFor(cat){ const acts=(this.state.activities||[]).filter(a=>a.cat===cat && !a.seeded); if(!acts.length) return 0;
     const hasDay=(i)=>{ const s=this._dayStart(i), e=s+86400000; return acts.some(a=>a.ts>=s&&a.ts<e); };
     let streak=0, i=hasDay(0)?0:1;
     while(hasDay(i)){ streak++; i++; if(streak>365) break; } return streak; }
