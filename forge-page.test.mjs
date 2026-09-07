@@ -1357,6 +1357,114 @@ t('the split has a bucket for every part the Forge can log', async () => {
   }
 });
 
+/* ---- the anatomy model on the Forge home ---- */
+
+const anat = () => page.evaluate(() => {
+  const A = window.NervexusAnatomy3D;
+  const m3 = document.querySelector('[data-anatomy3d]');
+  const sv = document.querySelector('[data-anatomy]');
+  return {
+    mounts3d: document.querySelectorAll('[data-anatomy3d]').length,
+    mountsSvg: document.querySelectorAll('[data-anatomy]').length,
+    canvases: m3 ? m3.querySelectorAll('canvas').length : 0,
+    m3: m3 ? getComputedStyle(m3).display : null,
+    sv: sv ? getComputedStyle(sv).display : null,
+    views: (() => { const v = document.querySelector('.cc-anatomy-views');
+                    return v ? getComputedStyle(v).display : null; })(),
+    scene: !!(A && A.hasScene && A.hasScene()),
+    paused: !!(A && A.isPaused && A.isPaused()),
+  };
+});
+const seeAnatomy = async () => {
+  await page.evaluate(() => {
+    const m = document.querySelector('[data-anatomy3d]');
+    if (m) m.scrollIntoView({ block: 'center' });
+  });
+  await page.waitForTimeout(1200);
+};
+
+t('only one anatomy shows, and it is the model', async () => {
+  /* Two mounts ship: the model, and a drawn figure for when WebGL is missing. Both are in
+     the markup, so the failure to watch for is both of them showing at once — and the model
+     mounting twice, which would leave an orphaned canvas behind the live one. */
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  await page.waitForTimeout(2500);
+  await seeAnatomy();
+  const a = await anat();
+  eq(a.mounts3d, 1, 'there are ' + a.mounts3d + ' model mounts on the page');
+  eq(a.mountsSvg, 1, 'there are ' + a.mountsSvg + ' drawn-figure mounts on the page');
+  if (a.scene) {
+    eq(a.canvases, 1, 'the model mounted ' + a.canvases + ' canvases');
+    eq(a.m3, 'block', 'the model is not showing');
+    eq(a.sv, 'none', 'the drawn figure is showing behind the model');
+    eq(a.views, 'none', 'the front/back toggle belongs to the drawn figure only');
+  } else {
+    eq(a.sv, 'block', 'with no model, the drawn figure has to be the one showing');
+  }
+});
+
+t('switching pages does not leave a second model behind', async () => {
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  await page.waitForTimeout(2000);
+  await seeAnatomy();
+  for (const s of ['fitness', 'forge', 'dashboard', 'forge']) {
+    await page.evaluate((x) => window.__nvx.setState({ scene: x, forgeCentre: 'home' }), s);
+    await page.waitForTimeout(900);
+  }
+  await seeAnatomy();
+  const a = await anat();
+  eq(a.mounts3d, 1, 'left ' + a.mounts3d + ' model mounts after switching around');
+  if (a.scene) eq(a.canvases, 1, 'left ' + a.canvases + ' canvases stacked up');
+});
+
+t('the model stops rendering when it is not on screen', async () => {
+  /* This is the whole cost of the panel. The loop used to run whether or not anyone could
+     see it, and with the model spinning that is a WebGL render every frame for nothing. */
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  await page.waitForTimeout(2500);
+  await seeAnatomy();
+  if (!(await anat()).scene) return;          // no WebGL here; nothing to pause
+
+  await page.evaluate(() => {
+    const sc = document.querySelector('.cc-scene') || document.scrollingElement;
+    sc.scrollTop = 0;
+  });
+  await page.waitForTimeout(1200);
+  const away = await anat();
+  const off = await page.evaluate(() => {
+    const r = document.querySelector('[data-anatomy3d]').getBoundingClientRect();
+    return r.top > (window.innerHeight || 800) + 250;
+  });
+  if (off) ok(away.paused, 'the model kept rendering with nothing on screen to render for');
+
+  await seeAnatomy();
+  ok(!(await anat()).paused, 'it did not start again when scrolled back to');
+
+  await page.evaluate(() => window.__nvx.setState({ scene: 'dashboard' }));
+  await page.waitForTimeout(1000);
+  ok((await anat()).paused, 'the model kept rendering after leaving the page entirely');
+  await page.evaluate(() => window.__nvx.setState({ scene: 'forge', forgeCentre: 'home' }));
+  await page.waitForTimeout(900);
+});
+
+t('the spin is an introduction, not a permanent cost', async () => {
+  /* Measured: 10fps while it span against 60 with it still, on the same page. It turns once
+     to show it can be turned, then settles — dragging still works. */
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  await page.waitForTimeout(2500);
+  await seeAnatomy();
+  if (!(await anat()).scene) return;
+  /* Asserted on the engine's own state rather than on a frame rate: fps here depends on the
+     machine and on software rendering, and would fail for reasons that are nothing to do
+     with whether the spin stopped. The frame rate is what this buys — 10fps spinning against
+     60 still, measured — but the spin flag is what is actually being tested. */
+  const spinning = await page.evaluate(() => window.NervexusAnatomy3D.isSpinning());
+  ok(spinning, 'it never span at all, so there is no introduction');
+  await page.waitForTimeout(7500);
+  const after = await page.evaluate(() => window.NervexusAnatomy3D.isSpinning());
+  ok(!after, 'the model is still spinning, which costs a WebGL render every frame for ever');
+});
+
 t('the blocks and the button are curved', async () => {
   await openChest();
   const r = await page.evaluate(() => {

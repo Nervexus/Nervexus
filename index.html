@@ -3272,6 +3272,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
           </div>
 
+          <!-- Anatomy. Deferred: the mount carries data-anatomy-defer, so the model is not
+               fetched until the panel is actually on screen — the page opens instantly and
+               the model is there by the time you have scrolled to it. -->
+          <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; margin-top:18px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+              <span style="font-size:13px; font-weight:600;">Anatomy</span>
+              <div class="cc-anatomy-views" style="display:flex; gap:6px;">
+                <span onClick="{{ setAnatomyFront }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyFrontC }}; border:1px solid {{ anatomyFrontBd }}; background:{{ anatomyFrontBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">FRONT{{ anatomyFrontCount }}</span>
+                <span onClick="{{ setAnatomyBack }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ anatomyBackC }}; border:1px solid {{ anatomyBackBd }}; background:{{ anatomyBackBg }}; border-radius:8px; padding:5px 11px; cursor:pointer;">BACK{{ anatomyBackCount }}</span>
+              </div>
+            </div>
+            <div data-anatomy3d="1" data-anatomy-defer="1" data-anatomy-view="{{ anatomyView }}" style="display:none; width:100%; max-width:420px; margin:0 auto; padding:4px 0 2px;"></div>
+            <div data-anatomy="1" data-anatomy-view="{{ anatomyView }}" style="display:block; width:100%; max-width:300px; margin:0 auto; padding:4px 0 2px;"></div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:10px;">
+              <sc-for list="{{ anatomyActive }}" as="a" hint-placeholder-count="0"><span style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:#ffb3ba; border:1px solid rgba(255,85,99,0.35); border-radius:20px; padding:4px 10px;"><span style="width:6px; height:6px; border-radius:50%; background:#ff3b4a; box-shadow:0 0 7px #ff3b4a;"></span>{{ a.name }} · {{ a.ago }}</span></sc-for>
+            </div>
+          </div>
+
           <div style="margin-top:18px;">
                 <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
                   <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:4px; flex-wrap:wrap;"><span style="font-size:13px; font-weight:600;">Strength Chart</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:{{ strengthTrendColor }};">{{ strengthTrendLabel }}</span></div>
@@ -9142,7 +9160,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-282 · v11.282 work-log';
+const NOTIF_BUILD_VERSION = '2026.09.06-283 · v11.283 forge-anatomy';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11980,11 +11998,78 @@ activities: this._mergeShipLog(s.activities),
       }, 60);
     });
   }
+  /* A mount marked data-anatomy-defer does not fetch the model until it is near the
+     viewport. The Forge home should open the instant it is asked for, and the model is a
+     download and a WebGL scene — worth waiting for, not worth waiting for up front. Once it
+     has a scene the deferral is over: every later render reattaches the canvas it already
+     built rather than loading anything again. */
+  _anatomyNear(mount3d){
+    try{
+      const r=mount3d.getBoundingClientRect();
+      const h=(window.innerHeight||800);
+      return r.top < h + 250 && r.bottom > -250;
+    }catch(e){ return true; }
+  }
+  /* Watches the mount and does two things with the answer. Before there is a scene it decides
+     whether to load one at all — a mount marked data-anatomy-defer waits until it is near the
+     viewport, so the Forge home opens without fetching a model. After there is a scene it
+     pauses the render loop whenever the canvas is off screen, which is the part that actually
+     costs: the model spins continuously, so an unwatched canvas was still rendering every
+     frame. Also paused with the tab, for the same reason. */
+  _anatomyDeferred(mount3d){
+    if(!mount3d) return false;
+    const A3=window.NervexusAnatomy3D;
+    const live=!!(A3 && A3.hasScene && A3.hasScene());
+    const near=this._anatomyNear(mount3d);
+
+    if(!this._anatObs && typeof IntersectionObserver!=='undefined'){
+      this._anatObs=new IntersectionObserver((es)=>{
+        const on=es.some(e=>e.isIntersecting);
+        this._anatSeen=on;
+        const E=window.NervexusAnatomy3D;
+        if(E && E.setPaused && E.hasScene && E.hasScene()) E.setPaused(!on || document.hidden);
+        else if(on) this._syncAnatomy();
+      }, {rootMargin:'250px'});
+      if(!this._anatHidden){
+        this._anatHidden=true;
+        document.addEventListener('visibilitychange', ()=>{
+          const E=window.NervexusAnatomy3D;
+          if(E && E.setPaused && E.hasScene && E.hasScene())
+            E.setPaused(document.hidden || this._anatSeen===false);
+        });
+      }
+    }
+    if(this._anatObs && this._anatWatching!==mount3d){
+      try{ this._anatObs.disconnect(); this._anatObs.observe(mount3d); this._anatWatching=mount3d; }catch(e){}
+    }
+    /* The page scrolls inside .cc-scene rather than the window, and the observer does not
+       reliably report that. A rect read on scroll, throttled to one a frame, does — and it is
+       the difference between the model rendering while it is off screen and not. */
+    if(!this._anatScrollWired){
+      this._anatScrollWired=true;
+      const check=()=>{
+        this._anatTick=false;
+        const m=this.root && this.root.querySelector('[data-anatomy3d]');
+        const E=window.NervexusAnatomy3D;
+        if(!m || !E || !E.setPaused || !(E.hasScene && E.hasScene())) return;
+        E.setPaused(document.hidden || !this._anatomyNear(m));
+      };
+      const onScroll=()=>{ if(this._anatTick) return; this._anatTick=true; requestAnimationFrame(check); };
+      const sc=this.root && this.root.querySelector('.cc-scene');
+      if(sc) sc.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('scroll', onScroll, {passive:true});
+      this._anatScrollCheck=check;
+    }
+    if(live && A3.setPaused) A3.setPaused(!near || document.hidden);
+    if(live) return false;
+    return mount3d.getAttribute('data-anatomy-defer')==='1' && !near;
+  }
   _syncAnatomy(){
     if(!this.root) return;
     const svgMount=this.root.querySelector('[data-anatomy]');
     const mount3d=this.root.querySelector('[data-anatomy3d]');
     if(!svgMount && !mount3d) return;
+    if(this._anatomyDeferred(mount3d)) return;
     const view=(svgMount||mount3d).getAttribute('data-anatomy-view')==='back' ? 'back' : 'front';
     const glow=this._activeMuscleGlow();
     const strengths={}; Object.keys(glow).forEach(k=>{ strengths[k]=glow[k].strength; });
@@ -12021,7 +12106,14 @@ activities: this._mergeShipLog(s.activities),
           show3d();
           const phone=(typeof window!=='undefined' && window.innerWidth<=900);
           A3.setAspect(phone?1.25:1.5);
-          A3.setAutoSpin(true);           // endless rotation everywhere; drag overrides it
+          /* A turn to show it is a model you can spin, then it settles. The rotation used to
+             be endless, and that is the whole cost of this panel: measured on the Forge home,
+             10fps while it spun against 60 with it still — the scene only renders when
+             something changes, and spinning changes something every frame. Drag still turns
+             it whenever you want. */
+          A3.setAutoSpin(true);
+          clearTimeout(this._anatSpinStop);
+          this._anatSpinStop=setTimeout(()=>{ try{ A3.setAutoSpin(false); }catch(e){} }, 6000);
           A3.setGlow(strengths);
         }).catch((e)=>{
           // Stay on the SVG rather than showing an empty box.
@@ -13804,6 +13896,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.283', date:'Sep 6, 2026', major:true, notes:[
+      'The anatomy model is back on the Forge home, below the split — and the page still opens instantly.',
+      'The model no longer renders when you cannot see it. It used to run its loop whether or not it was on screen, so a spinning model was a full render every frame for a canvas nobody was looking at. It now stops when you scroll past it or leave the page, and picks up where it left off when you come back.',
+      'The spin is an introduction rather than forever. It turns once when you reach it and then settles, and you can still drag it round whenever you like. Measured on the Forge home: 10 frames a second while it span, 60 with it still.',
+      'A mount that is off screen when the page opens does not fetch the model at all until you scroll near it.',
+    ]},
     {version:'v11.282', date:'Sep 6, 2026', major:true, notes:[
       'Every update now shows in the Work Log in the Command Center, and says what changed rather than only its number. The last month is there; set the range to Week for the last seven days.',
       'They were being written and then thrown away: the sync replaces your activities with what the server holds, and these are worked out from the changelog rather than stored, so they disappeared a second after the page loaded. They survive the sync now.',

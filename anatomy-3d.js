@@ -203,8 +203,13 @@
     });
   }
 
+  /* Paused means no frames at all, not a still frame: the loop used to keep running whether
+     or not the canvas was on screen, and with the model spinning that is a WebGL render every
+     frame for something nobody is looking at. Measured at 6fps against 21 with the scene
+     absent, on the same page. */
   function frame() {
     if (S.disposed) return;
+    if (S.paused) { S.raf = null; return; }
     S.raf = requestAnimationFrame(frame);
     if (S.spin && !S.dragging && Date.now() >= S.spinResumeAt) {
       // Continuous, never-ending rotation. Kept slow enough to read the muscles as they pass.
@@ -421,6 +426,16 @@
     supported: supported, isMounted: function () { return S.mounted && attached(); },
     hasScene: function () { return !!(S.mounted && S.renderer); },
     setAutoSpin: function (on) { S.spin = !!on; S.dirty = true; },
+    setPaused: function (on) {
+      var was = !!S.paused;
+      S.paused = !!on;
+      if (was && !S.paused && !S.raf && !S.disposed && S.renderer) {
+        S.dirty = true;
+        S.raf = requestAnimationFrame(frame);
+      }
+    },
+    isPaused: function () { return !!S.paused; },
+    isSpinning: function () { return !!S.spin; },
     setAspect: function (r) { S.aspect = r || 1.5; fit(); },
     debugZones: debugZones,
     CREDIT: 'Model: “man muscle human body” by Rena — CC Attribution',
