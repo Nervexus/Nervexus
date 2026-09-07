@@ -1283,6 +1283,80 @@ t('the add button stays on the right whatever the block carries', async () => {
   await page.setViewportSize({ width: 1280, height: 1400 });
 });
 
+t('Bulk Import opens on the Forge, without leaving it', async () => {
+  /* The modal lived inside the Fitness scene, so the button on the Forge set the flag and
+     nothing rendered — there was no modal on that page to open. */
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  await page.waitForTimeout(600);
+  await page.evaluate(() => {
+    const el = [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && /Bulk Import/.test(e.textContent));
+    if (!el) throw new Error('no Bulk Import button on the Forge home');
+    el.click();
+  });
+  await page.waitForTimeout(700);
+  eq(await page.evaluate(() => window.__nvx.state.scene), 'forge',
+    'opening Bulk Import navigated away from the Forge');
+  const shown = await page.evaluate(() => !![...document.querySelectorAll('div')]
+    .find(d => d.textContent.trim().startsWith('Bulk Import Workout')
+            && d.getBoundingClientRect().height > 0));
+  ok(shown, 'the Bulk Import panel did not render on the Forge');
+
+  /* And still on Fitness, where it always worked. */
+  await page.evaluate(() => window.__nvx.setState({ woImportOpen: false, scene: 'fitness' }));
+  await page.waitForTimeout(600);
+  await page.evaluate(() => {
+    [...document.querySelectorAll('span')]
+      .find(e => e.children.length === 0 && /Bulk Import/.test(e.textContent)).click();
+  });
+  await page.waitForTimeout(700);
+  ok(await page.evaluate(() => !![...document.querySelectorAll('div')]
+    .find(d => d.textContent.trim().startsWith('Bulk Import Workout')
+            && d.getBoundingClientRect().height > 0)),
+    'moving it broke it on Fitness');
+  await page.evaluate(() => window.__nvx.setState({ woImportOpen: false }));
+});
+
+t('an imported exercise is filed where the Forge says it belongs', async () => {
+  /* Every exercise in the Forge states its body part. That beats guessing from the wording:
+     "Battle ropes" matched no pattern at all and fell through to Mixed. */
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  const wrong = await page.evaluate(() => {
+    const bad = [];
+    const T = window.ForgeTraining;
+    for (const sec of T.SECTIONS) {
+      if (!sec.pool || !sec.part) continue;
+      for (const x of sec.pool.all) {
+        const got = window.__nvx._guessBodyPart(x.name);
+        if (got !== sec.part) bad.push(x.name + ' -> ' + got + ' (should be ' + sec.part + ')');
+      }
+    }
+    return bad;
+  });
+  eq(wrong.length, 0, 'misfiled: ' + wrong.slice(0, 6).join(' | '));
+
+  /* A pasted line carries its numbers, and the longest matching name has to win. */
+  const line = await page.evaluate(() => window.__nvx._guessBodyPart('Barbell bench press 60kg x8'));
+  eq(line, 'Chest', 'a pasted line with weights did not classify');
+  eq(await page.evaluate(() => window.__nvx._guessBodyPart('qwerty flumox')), 'Mixed',
+    'something nobody can classify should say so rather than picking a part');
+});
+
+t('the split has a bucket for every part the Forge can log', async () => {
+  /* Neck and Full arrived with the Forge. Without a bucket each, that training was logged
+     correctly and then shown nowhere on the split. */
+  await boot({ scene: 'forge', forgeCentre: 'home' });
+  const parts = await page.evaluate(() => [...new Set(window.ForgeTraining.SECTIONS
+    .filter(s => s.pool && s.part).map(s => s.part))]);
+  const labels = await page.evaluate(() =>
+    window.__nvx.render ? null : null) || null;
+  const shown = await page.evaluate(() => document.body.innerText);
+  for (const p of parts) {
+    const label = p === 'Shoulders' ? 'DELTS' : p === 'Full' ? 'FULL BODY' : p.toUpperCase();
+    ok(shown.includes(label), 'the split has no bucket for ' + p + ' (looked for ' + label + ')');
+  }
+});
+
 t('the blocks and the button are curved', async () => {
   await openChest();
   const r = await page.evaluate(() => {

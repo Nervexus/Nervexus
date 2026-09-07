@@ -650,6 +650,59 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
   <!-- Level up. Fired by _xpWatch when the computed level rises, so it covers every route
        XP can arrive by rather than only the ones that remembered to raise it. -->
+  <!-- Bulk Import. It used to sit inside the Fitness scene, so the button on the Forge set
+       the flag and nothing rendered — the modal was not on that page to open. It is an
+       overlay, so it belongs out here with the others and works wherever it is opened from. -->
+    <sc-if value="{{ woImportOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeWoImport }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
+        <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:85vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:24px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:16px; font-weight:700;">Bulk Import Workout</span>
+            <span onClick="{{ closeWoImport }}" style="cursor:pointer; color:#8a8a92; font-size:18px; line-height:1;">×</span>
+          </div>
+          <div style="font-size:12px; color:#8a8a92; margin-bottom:14px; line-height:1.5;">Paste your whole session. Regularly-formatted logs (exercise name, then "reps x weight kg" per set) parse instantly, no AI needed — freer-form notes fall back to AI to work out the details. You review every row before anything is added.</div>
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">{{ importDayLabel }}</span>
+            <span onClick="{{ setImportToday }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; padding:5px 10px; border-radius:7px; cursor:pointer; color:{{ isImportToday ? '#0a0a0b' : '#c3c3ca' }}; background:{{ isImportToday ? '#F4F4F5' : 'rgba(255,255,255,0.08)' }};">TODAY</span>
+            <span onClick="{{ setImportYesterday }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; padding:5px 10px; border-radius:7px; cursor:pointer; color:{{ isImportYesterday ? '#0a0a0b' : '#c3c3ca' }}; background:{{ isImportYesterday ? '#F4F4F5' : 'rgba(255,255,255,0.08)' }};">YESTERDAY</span>
+            <span style="flex:1;"></span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">YOUR WEIGHT</span>
+            <input value="{{ woImportBodyWeight }}" onInput="{{ setWoImportBodyWeight }}" type="number" placeholder="kg" title="Used as the load for BW rows, and synced to Health" style="width:60px; padding:5px 8px; border-radius:7px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none;">
+          </div>
+          <sc-if value="{{ noWoImportRows }}" hint-placeholder-val="{{ true }}">
+            <textarea value="{{ woImportText }}" onInput="{{ setWoImportText }}" placeholder="e.g.&#10;Bench press 80kg 4x8&#10;Incline dumbbell press 30kg 3x10&#10;Squats 100kg 5x5&#10;Treadmill 20 min" style="width:100%; min-height:160px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:inherit;"></textarea>
+            <sc-if value="{{ hasWoImportErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-top:10px;">⚠ {{ woImportErr }}</div></sc-if>
+            <div onClick="{{ parseWoImport }}" class="cc-glowbtn" style="margin-top:14px; display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">{{ woImportBtnLabel }}</div>
+          </sc-if>
+          <sc-if value="{{ hasWoImportRows }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:10px;">{{ woImportRowCount }} EXERCISES FOUND — REVIEW BEFORE ADDING</div>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+              <sc-for list="{{ woImportRows }}" as="r" hint-placeholder-count="4">
+                <div style="border-radius:12px; background:#1b1d21; padding:12px 14px;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <input value="{{ r.exercise }}" onInput="{{ r.setExercise }}" style="flex:1; min-width:0; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+                    <span onClick="{{ r.cyclePart }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#c3d2e6; border:1px solid rgba(120,150,200,0.28); border-radius:7px; padding:5px 9px; cursor:pointer; white-space:nowrap;">{{ r.part }}</span>
+                    <span onClick="{{ r.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px;" style-hover="{ color:'#ff6b76' }">×</span>
+                  </div>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <input value="{{ r.weight }}" onInput="{{ r.setWeight }}" type="number" placeholder="kg" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+                    <span onClick="{{ r.toggleUnit }}" title="Mark this row as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:{{ r.unitC }}; border:1px solid {{ r.unitBd }}; border-radius:7px; padding:0 9px; display:flex; align-items:center; cursor:pointer; background:{{ r.unitBg }};">{{ r.unit }}</span>
+                    <input value="{{ r.sets }}" onInput="{{ r.setSets }}" type="number" placeholder="Sets" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+                    <input value="{{ r.reps }}" onInput="{{ r.setReps }}" type="number" placeholder="Reps" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
+                    <sc-if value="{{ r.isCardio }}" hint-placeholder-val="{{ false }}"><input value="{{ r.minutes }}" onInput="{{ r.setMinutes }}" type="number" placeholder="Min" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <span onClick="{{ closeWoImport }}" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13px;">Cancel</span>
+              <span onClick="{{ confirmWoImport }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">Add All ({{ woImportRowCount }})</span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
   <sc-if value="{{ levelUpOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; inset:0; z-index:1000; background:rgba(6,6,9,0.72); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:24px;">
       <div class="cc-glowcard lu-card" style="width:100%; max-width:420px; border-radius:24px; background:#101014; border:1px solid rgba(231,216,166,0.34); padding:34px 28px 26px; text-align:center; box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 60px rgba(231,216,166,0.09); animation:luPop 520ms cubic-bezier(.2,.9,.3,1) both; position:relative; overflow:hidden;">
@@ -2243,55 +2296,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
 
-        <sc-if value="{{ woImportOpen }}" hint-placeholder-val="{{ false }}">
-          <div onClick="{{ closeWoImport }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
-            <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:85vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:24px;">
-              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
-                <span style="font-size:16px; font-weight:700;">Bulk Import Workout</span>
-                <span onClick="{{ closeWoImport }}" style="cursor:pointer; color:#8a8a92; font-size:18px; line-height:1;">×</span>
-              </div>
-              <div style="font-size:12px; color:#8a8a92; margin-bottom:14px; line-height:1.5;">Paste your whole session. Regularly-formatted logs (exercise name, then "reps x weight kg" per set) parse instantly, no AI needed — freer-form notes fall back to AI to work out the details. You review every row before anything is added.</div>
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">{{ importDayLabel }}</span>
-                <span onClick="{{ setImportToday }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; padding:5px 10px; border-radius:7px; cursor:pointer; color:{{ isImportToday ? '#0a0a0b' : '#c3c3ca' }}; background:{{ isImportToday ? '#F4F4F5' : 'rgba(255,255,255,0.08)' }};">TODAY</span>
-                <span onClick="{{ setImportYesterday }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; padding:5px 10px; border-radius:7px; cursor:pointer; color:{{ isImportYesterday ? '#0a0a0b' : '#c3c3ca' }}; background:{{ isImportYesterday ? '#F4F4F5' : 'rgba(255,255,255,0.08)' }};">YESTERDAY</span>
-                <span style="flex:1;"></span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">YOUR WEIGHT</span>
-                <input value="{{ woImportBodyWeight }}" onInput="{{ setWoImportBodyWeight }}" type="number" placeholder="kg" title="Used as the load for BW rows, and synced to Health" style="width:60px; padding:5px 8px; border-radius:7px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11px; outline:none;">
-              </div>
-              <sc-if value="{{ noWoImportRows }}" hint-placeholder-val="{{ true }}">
-                <textarea value="{{ woImportText }}" onInput="{{ setWoImportText }}" placeholder="e.g.&#10;Bench press 80kg 4x8&#10;Incline dumbbell press 30kg 3x10&#10;Squats 100kg 5x5&#10;Treadmill 20 min" style="width:100%; min-height:160px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:inherit;"></textarea>
-                <sc-if value="{{ hasWoImportErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-top:10px;">⚠ {{ woImportErr }}</div></sc-if>
-                <div onClick="{{ parseWoImport }}" class="cc-glowbtn" style="margin-top:14px; display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">{{ woImportBtnLabel }}</div>
-              </sc-if>
-              <sc-if value="{{ hasWoImportRows }}" hint-placeholder-val="{{ false }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:10px;">{{ woImportRowCount }} EXERCISES FOUND — REVIEW BEFORE ADDING</div>
-                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
-                  <sc-for list="{{ woImportRows }}" as="r" hint-placeholder-count="4">
-                    <div style="border-radius:12px; background:#1b1d21; padding:12px 14px;">
-                      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
-                        <input value="{{ r.exercise }}" onInput="{{ r.setExercise }}" style="flex:1; min-width:0; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-                        <span onClick="{{ r.cyclePart }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#c3d2e6; border:1px solid rgba(120,150,200,0.28); border-radius:7px; padding:5px 9px; cursor:pointer; white-space:nowrap;">{{ r.part }}</span>
-                        <span onClick="{{ r.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px;" style-hover="{ color:'#ff6b76' }">×</span>
-                      </div>
-                      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <input value="{{ r.weight }}" onInput="{{ r.setWeight }}" type="number" placeholder="kg" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
-                        <span onClick="{{ r.toggleUnit }}" title="Mark this row as bodyweight" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:{{ r.unitC }}; border:1px solid {{ r.unitBd }}; border-radius:7px; padding:0 9px; display:flex; align-items:center; cursor:pointer; background:{{ r.unitBg }};">{{ r.unit }}</span>
-                        <input value="{{ r.sets }}" onInput="{{ r.setSets }}" type="number" placeholder="Sets" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
-                        <input value="{{ r.reps }}" onInput="{{ r.setReps }}" type="number" placeholder="Reps" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
-                        <sc-if value="{{ r.isCardio }}" hint-placeholder-val="{{ false }}"><input value="{{ r.minutes }}" onInput="{{ r.setMinutes }}" type="number" placeholder="Min" style="width:64px; padding:7px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"></sc-if>
-                      </div>
-                    </div>
-                  </sc-for>
-                </div>
-                <div style="display:flex; gap:10px;">
-                  <span onClick="{{ closeWoImport }}" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13px;">Cancel</span>
-                  <span onClick="{{ confirmWoImport }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">Add All ({{ woImportRowCount }})</span>
-                </div>
-              </sc-if>
-            </div>
-          </div>
-        </sc-if>
       </div>
       </sc-if>
 
@@ -9138,7 +9142,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.06-280 · v11.280 forge-home';
+const NOTIF_BUILD_VERSION = '2026.09.06-281 · v11.281 bulk-import';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13780,6 +13784,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.281', date:'Sep 6, 2026', major:true, notes:[
+      'Bulk Import works on the Forge. The panel lived inside the Fitness page, so pressing the button on the Forge set the flag and nothing appeared — it is an overlay now and opens wherever you press it, without leaving the page you are on.',
+      'It also knows your exercises. All 234 in the Forge state the body part they train, and that is now the first thing consulted — so a pasted "Battle ropes", "Farmer\u2019s carries" or "Bear crawl" is filed correctly instead of landing in Mixed. Where the Forge and the general index disagree, like a landmine press or a sumo deadlift, the Forge wins; where the Forge has never heard of something the index still answers.',
+      'Muscle Training Split gained Neck and Full Body buckets. Those parts arrived with the Forge, so that training was being logged correctly and then shown nowhere.',
+    ]},
     {version:'v11.280', date:'Sep 6, 2026', major:true, notes:[
       'The Forge\u2019s Home is the working half of Fitness HQ: Log Training, Muscle Training Split, Move and the Strength Chart. Same log, not a copy — anything you record on either page shows on both.',
       'The anatomy model is deliberately not on it. It loads a 3D model, and this page should open the moment you ask for it; the split\u2019s own figures say the same thing without the wait. Fitness HQ still has it.',
@@ -15637,7 +15646,39 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // Consulted first so an explicit classification always beats the keyword patterns below,
   // which stay as the fallback for anything not on the list. Used by voice, by manual
   // entry and by bulk import alike, so all three agree.
+  /* Every exercise in the Forge already states the body part it is trained for — 234 of
+     them across fourteen sections. That is a definitive answer where the patterns below are
+     a guess, so it is asked first. Without it a bulk-imported "Battle ropes" fell through
+     every pattern to Mixed, and "Farmer's carries" matched nothing at all. */
+  _normEx(n){ return String(n||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }
+  _forgePartIndex(){
+    if(this._forgePartIdx) return this._forgePartIdx;
+    const m={}, T=window.ForgeTraining;
+    if(T && T.SECTIONS) T.SECTIONS.forEach(sec=>{
+      if(!sec.pool || !sec.part) return;
+      Object.keys(sec.pool).forEach(k=>sec.pool[k].forEach(x=>{ m[this._normEx(x.name)]=sec.part; }));
+    });
+    this._forgePartIdx=m;
+    return m;
+  }
+  _forgePartFor(exercise){
+    const F=this._forgePartIndex(), key=this._normEx(exercise);
+    if(!key) return null;
+    if(F[key]) return F[key];
+    /* A pasted line carries the numbers with it — "barbell bench press 60kg x8". Match the
+       longest name the text contains, so "bench press" never beats "barbell bench press". */
+    let best='';
+    for(const k in F){ if(k.length>best.length && key.indexOf(k)>=0) best=k; }
+    return (best && best.length>=7) ? F[best] : null;
+  }
   _guessBodyPart(exercise){
+    /* The Forge first, then the general index, then the patterns. The index is broad but
+       generic — it files a landmine press under Chest and a sumo deadlift under Back — while
+       the Forge says where that exercise sits in this app's own sessions. Where the two
+       disagree the curated list is the right answer, and where the Forge has never heard of
+       something the index still answers for it. */
+    const fromForge=this._forgePartFor(exercise);
+    if(fromForge) return fromForge;
     if(window.EXERCISE_INDEX){ const hit=window.EXERCISE_INDEX.lookup(exercise); if(hit) return hit.group; }
     const t=(exercise||'').toLowerCase();
     if(/bench|chest|push.?up|fly|dip/.test(t)) return 'Chest';
@@ -18199,8 +18240,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // Muscle Training Split is now the numbers only — the bar chart it used to draw is gone,
       // replaced by the anatomy model below it.
       muscleSplitStats:(()=>{ const {vol:pv, weighted:pw}=this.partVolume();
-        const order=['Chest','Back','Shoulders','Arms','Legs','Core','Cardio'];
-        const labels={Shoulders:'DELTS'};
+        /* Neck and Full arrived with the Forge's sections. Without a bucket each, that work
+           was logged correctly and then shown nowhere. */
+        const order=['Chest','Back','Shoulders','Arms','Legs','Core','Neck','Full','Cardio'];
+        const labels={Shoulders:'DELTS', Full:'FULL BODY'};
         return order.map(k=>{ const v=pv[k]||0; const on=v>0;
           return { label:labels[k]||k.toUpperCase(),
             val: on ? (k==='Cardio' ? (v+'m') : (v.toLocaleString()+(pw[k]?'kg':' BW'))) : '—',
