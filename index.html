@@ -2245,7 +2245,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
             <div class="cc-grid2" style="display:grid; grid-template-columns:1.2fr 1fr; gap:18px;">
               <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:18px;">
-                <canvas data-chart="fitRings" style="width:150px; height:150px; flex:0 0 150px;"></canvas>
+                <canvas data-chart="fitRings" style="width:176px; aspect-ratio:1; flex:0 1 176px; min-width:0;"></canvas>
                 <div style="display:flex; flex-direction:column; gap:12px;">
                   <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">MOVE</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#FFFFFF;">{{ moveKcal }}</div></div>
                   <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">TRAIN TODAY</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#eef0f2;">{{ trainToday }}m</div></div>
@@ -3263,7 +3263,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
             </div>
                   <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:18px;">
-                    <canvas data-chart="fitRings" style="width:150px; height:150px; flex:0 0 150px;"></canvas>
+                    <canvas data-chart="fitRings" style="width:176px; aspect-ratio:1; flex:0 1 176px; min-width:0;"></canvas>
                     <div style="display:flex; flex-direction:column; gap:12px;">
                       <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">MOVE</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#FFFFFF;">{{ moveKcal }}</div></div>
                       <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">TRAIN TODAY</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#eef0f2;">{{ trainToday }}m</div></div>
@@ -9171,7 +9171,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.07-284 · v11.284 anatomy-tap';
+const NOTIF_BUILD_VERSION = '2026.09.07-285 · v11.285 move-rings';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12998,7 +12998,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _pruneOrbMounts(){ if(this._orbEl && !this._orbEl.isConnected && !(this.root && this.root.querySelector('[data-orb-mount="voice"]'))) this._unmountVoiceOrb(); if(this._floatOrbEl && !this._floatOrbEl.isConnected) this._unmountFloatOrb(); if(this._miniOrbEl && !this._miniOrbEl.isConnected) this._unmountMiniOrb(); }
 
   loop(fn){ let id; const t=(ts)=>{ fn(ts); id=requestAnimationFrame(t); }; id=requestAnimationFrame(t); this.loops.push(()=>cancelAnimationFrame(id)); }
-  prep(cv){ const r=cv.getBoundingClientRect(); const dpr=Math.min(2,window.devicePixelRatio||1); cv.width=Math.max(1,r.width*dpr); cv.height=Math.max(1,r.height*dpr); const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w:r.width,h:r.height}; }
+  prep(cv,maxDpr){ const r=cv.getBoundingClientRect(); const dpr=Math.min(maxDpr||2,window.devicePixelRatio||1); cv.width=Math.max(1,r.width*dpr); cv.height=Math.max(1,r.height*dpr); const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w:r.width,h:r.height}; }
   hexA(hex,a){ const m=hex.replace('#',''); const r=parseInt(m.substring(0,2),16),g=parseInt(m.substring(2,4),16),b=parseInt(m.substring(4,6),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
   ago(ts){ const d=(Date.now()-ts)/86400000; if(d<0.04) return 'now'; if(d<1) return Math.max(1,Math.floor(d*24))+'h ago'; if(d<2) return 'yesterday'; return Math.floor(d)+'d ago'; }
 
@@ -13019,7 +13019,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this._wireLessonCarousels();
     this._syncAnatomy();
     this._syncConstellation();
-    const key=(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.forgeCentre+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode+'|'+this.state.moneyCalY;
+    /* The raiment is part of the signature: every chart picks its palette when it is drawn,
+       so switching raiment has to redraw them or they keep the colours of the one before. */
+    const P=this.state.prefs||{};
+    const key=P.theme+'|'+P.ultraStyle+'|'+(this.state.loggedIn?this.state.scene:'__login')+'|'+this.state.forgeCentre+'|'+this.state.bodySex+'|'+this.state.healthSub+'|'+this.state.progMetric+'|'+this.state.progRange+'|'+this.state.photoView+'|'+this.state.learningTab+'|'+this.state.mtMode+'|'+this.state.moneyCalY;
     const sig=key+'|'+this.dataSig();
     if(sig===this._sig) return;
     this._sig=sig;
@@ -13133,11 +13136,57 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     });
   }
 
-  startRingSet(cv,vals,cols,lw,gap){ const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir'; const uPal=isNoir?['#E0C583','#C9A24A','#9C6B3E']:['#5B1A1A','#7A2626','#9C6B3E']; if(isU) cols=cols.map((c,i)=>vals.length>1?uPal[i%uPal.length]:this._ultraRingColor(c)); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2;
+  /* The three rings, per raiment. Each raiment names its own trio rather than everything
+     that is not Noir sharing one, which is how Maison Élysée ended up wearing Ultra X's
+     oxblood. `light` says the card underneath is pale, which is what decides whether a
+     near-white ring needs an outline to be seen at all. */
+  RING_PALETTE(){
+    const P=this.state.prefs||{};
+    if(P.theme!=='Ultra') return null;
+    if(P.ultraStyle==='Noir')            return {cols:['#FFFFFF','#C9A24A','#8B8578'], light:false};
+    if(P.ultraStyle==='Maison Élysée')   return {cols:['#4E6E96','#1E2F4A','#FFFFFF'], light:true};
+    /* Éverpine's dark-green card is the home scene only — everywhere a ring set lives it is
+       wearing the ivory card, so its champagne needs the same backing Ultra X's white does. */
+    if(P.ultraStyle==='Maison Éverpine') return {cols:['#E7D8A6','#C2A76A','#7E9080'], light:true};
+    return {cols:['#8E1F1F','#FFFFFF','#1C1917'], light:true};        // Ultra X
+  }
+  _ringPale(hex){ const h=String(hex||'').replace('#',''); if(h.length!==6) return false;
+    const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+    return (0.299*r + 0.587*g + 0.114*b) > 200; }
+  startRingSet(cv,vals,cols,lw,gap){ const pal=this.RING_PALETTE(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir';
+    if(pal) cols=cols.map((c,i)=>vals.length>1?pal.cols[i%pal.cols.length]:this._ultraRingColor(c));
+    /* Drawn at up to 3x rather than the 2x every other chart caps at. This one is 150px of
+       thick curved stroke, so the stair-stepping shows; the extra pixels are cheap on a
+       canvas this size. */
+    const {ctx,w,h}=this.prep(cv,3); const cx=w/2,cy=h/2;
+    /* The rings were drawn hard against the edge of the canvas while glowing 14px outward,
+       so the glow was cut off square on all four sides and the whole thing looked boxed in.
+       The blur is now part of the radius sum: the outermost ring starts far enough in that
+       its glow lands inside the canvas instead of against the wall. */
+    const n=vals.length||1;
+    let L=lw, G=gap, B=Math.min(10, L*0.7);
+    /* Fit the whole set — glow, strokes, gaps and an open centre — inside the canvas, rather
+       than trusting the numbers the caller passed to suit the box it ended up in. The stroke
+       width shrinks with the canvas, so the rings stay rings on a narrow phone instead of
+       the innermost one closing into a disc. */
+    for(let it=0; it<3; it++){
+      const avail=w/2 - B*0.8 - 1;
+      const need=n*L + (n-1)*G + L*0.9;
+      if(need>avail){ const k=avail/need; L*=k; G*=k; }
+      B=Math.min(10, L*0.7);
+    }
+    const blur=B, pad=L/2 + B*0.8 + 1;
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const grow=0.4+0.6*Math.min(1,ts*0.0007);
-      vals.forEach((v,i)=>{ const r=(w/2-lw/2-2)-i*(lw+gap); const prog=Math.min(1,v)*grow;
+      vals.forEach((v,i)=>{ const lw=L, gap=G; const r=(w/2-pad)-i*(lw+gap); if(r<lw*0.55) return; const prog=Math.min(1,v)*grow;
+        ctx.lineCap='butt'; ctx.shadowBlur=0;
         ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isNoir?'rgba(150,143,130,0.1)':isU?'rgba(41,37,36,0.1)':'rgba(255,255,255,0.06)'; ctx.lineWidth=lw; ctx.stroke();
-        ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=cols[i]; ctx.lineWidth=lw; ctx.lineCap='round'; ctx.shadowColor=cols[i]; ctx.shadowBlur=14; ctx.stroke(); ctx.shadowBlur=0; });
+        // A white ring on an ivory card is invisible on its own, and two of these raiments
+        // ask for one. It gets a hairline of the card's own ink under it, rather than being
+        // quietly darkened into a colour nobody asked for.
+        const pale=!!(pal && pal.light && this._ringPale(cols[i]));
+        ctx.lineCap='round';
+        if(pale){ ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle='rgba(41,37,36,0.28)'; ctx.lineWidth=lw+2; ctx.stroke(); }
+        ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=cols[i]; ctx.lineWidth=lw; ctx.shadowColor=pale?'rgba(41,37,36,0.30)':cols[i]; ctx.shadowBlur=blur; ctx.stroke(); ctx.shadowBlur=0; });
     });
   }
   startProgRing(cv,val,color){ if(this.state.prefs.theme==='Ultra') color=this._ultraRingColor(color); const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-8; const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU && this.state.prefs.ultraStyle==='Noir';
@@ -13680,7 +13729,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   /* The Forge home carries the same rings canvas, and init_ is dispatched by scene name, so
      without this the ring sits blank on that page. Same routine, not a second copy of it. */
   init_forge(){ this.init_fitness(); }
-  init_fitness(){ const today=this.todayMin(); const move=Math.min(1,(today*8)/700); const r=this.root.querySelector('[data-chart="fitRings"]'); if(r) this.startRingSet(r,[move, Math.min(1,today/45), 0.9],['#FFFFFF','#eef0f2','#7a7a82'],15,7);  }
+  /* The three targets the rings are measured against. They match the three rows beside them:
+     MOVE, TRAIN TODAY, WEEK TOTAL. */
+  MOVE_GOAL(){ return 700; }          // kcal
+  DAY_TRAIN_GOAL(){ return 45; }      // minutes
+  WEEK_TRAIN_GOAL(){ return 225; }    // minutes — five sessions
+  init_fitness(){ const today=this.todayMin(); const week=this.weekMin();
+    const r=this.root.querySelector('[data-chart="fitRings"]');
+    /* The third ring was the literal 0.9. It sat at 90% on an account that had never logged
+       anything, which is a number the app made up about the person using it. It is the week
+       against the weekly target now, like the row it sits next to. */
+    if(r) this.startRingSet(r,[Math.min(1,(today*8)/this.MOVE_GOAL()), Math.min(1,today/this.DAY_TRAIN_GOAL()), Math.min(1,week/this.WEEK_TRAIN_GOAL())],['#FFFFFF','#eef0f2','#7a7a82'],15,7);
+  }
   init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
   startPowerHills(cv){ const {ctx,w,h}=this.prep(cv); const rows=10;
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const t=ts*0.00035;
@@ -13910,6 +13970,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.285', date:'Sep 7, 2026', major:false, notes:[
+      'The MOVE rings were boxed in. They were drawn hard against the edge of their canvas while glowing outward, so the glow was cut off square on all four sides — the whole thing looked trapped in an invisible box. The rings now leave room for their own glow, and the set is drawn larger and sharper.',
+      'Each raiment wears its own three ring colours: red, white and black on Ultra X; white, gold and grey on Noir; blue, navy and white on Maison Élysée; champagne, gold and sage on Éverpine. Everything that was not Noir used to share one palette, which is how Maison ended up wearing Ultra X\u2019s oxblood.',
+      'A white ring on an ivory card was invisible, so a pale ring now gets a hairline of the card\u2019s own ink under it rather than being quietly darkened into a colour nobody asked for.',
+      'Switching raiment repaints the rings. Every chart picks its colours when it is drawn, and the check that decides whether to redraw never looked at the raiment, so the rings kept the colours of whichever one you had on before.',
+      'The third ring was the number 0.9, written into the page. It sat at 90% on an account that had never logged a workout. It is the week against a weekly target now, like the row it sits beside.',
+    ]},
     {version:'v11.284', date:'Sep 7, 2026', major:false, notes:[
       'The anatomy on the Forge home is a tap to open. Nothing about the model is in the page until you ask for it, so the Forge home opens with no download and no WebGL scene behind it.',
       'The muscles you have trained are listed whether the model is open or shut, so the panel still tells you something with the model away.',
