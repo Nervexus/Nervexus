@@ -284,19 +284,28 @@ t('the unit score header is gone', async () => {
 
 /* ---- the three cleared centres ---- */
 
-t('Mental and Health are still empty pages', async () => {
-  for (const [centre, label] of [['mental', 'MENTAL'], ['health', 'HEALTH']]) {
-    await boot({ forgeCentre: centre });
-    const body = await text();
-    ok(body.includes(label), label + ' should still name itself on its empty page');
-    ok(/Nothing here yet/.test(body), label + ' is not showing its empty state');
-    /* The Home's panels belong to the Home. Nothing leaks into the centres beside it. */
-    for (const ghost of ['Muscle Training Split', 'Anatomy', 'Log Training', 'Strength Chart',
-                         'FROM YOUR LOGS', 'PROGRESS', 'WEAKEST LINKS', 'THE TOOLS',
-                         'Hand Training', 'RECORD ASSESSMENT']) {
-      ok(!body.includes(ghost), ghost + ' is still on the ' + centre + ' page');
-    }
-  }
+/* The Home's panels belong to the Home. Nothing leaks into the centres beside it. */
+const GHOSTS = ['Muscle Training Split', 'Anatomy', 'Log Training', 'Strength Chart',
+                'FROM YOUR LOGS', 'PROGRESS', 'WEAKEST LINKS', 'THE TOOLS',
+                'Hand Training', 'RECORD ASSESSMENT'];
+
+t('Mental is still an empty page', async () => {
+  await boot({ forgeCentre: 'mental' });
+  const body = await text();
+  ok(body.includes('MENTAL'), 'MENTAL should still name itself on its empty page');
+  ok(/Nothing here yet/.test(body), 'MENTAL is not showing its empty state');
+  for (const ghost of GHOSTS) ok(!body.includes(ghost), ghost + ' is still on the mental page');
+});
+
+t('Health is a page of its own, and borrows nothing from the Home', async () => {
+  /* Health used to be the empty state too. It carries the day's three targets now — see
+     forge-health.test.mjs for what they are and where the numbers come from; this only holds
+     the line the empty-page test held, that a centre shows its own content and no other. */
+  await boot({ forgeCentre: 'health' });
+  const body = await text();
+  ok(!/Nothing here yet/.test(body), 'the Health centre fell back to the empty state');
+  ok(body.includes('HYDRATION'), 'the Health centre is not showing its rings');
+  for (const ghost of GHOSTS) ok(!body.includes(ghost), ghost + ' is still on the health page');
 });
 
 t('no section has kept anything from the page this replaced', async () => {

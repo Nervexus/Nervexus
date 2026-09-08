@@ -3324,6 +3324,55 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </sc-if>
 
+        <!-- HEALTH — the day's three targets on the same ring card the Forge home uses for
+             training, so the two centres read as one app. The rings take their colours from
+             the raiment, like every chart does now.
+
+             The logging row underneath is the reason the card is not decoration: nothing else
+             left in the app writes a meal or a glass of water, so without it these rings could
+             only ever read zero. Both methods already existed and already sync. -->
+        <sc-if value="{{ forgeShowHealth }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-grid2" style="display:grid; grid-template-columns:1.3fr 1fr; gap:18px;">
+            <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+              <canvas data-chart="healthRings" style="width:176px; aspect-ratio:1; flex:0 1 176px; min-width:0;"></canvas>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">FUEL</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#FFFFFF;">{{ hrFuel }}</div></div>
+                <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">PROTEIN</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#eef0f2;">{{ hrProtein }}</div></div>
+                <div><div style="font-size:10px; letter-spacing:1px; color:#7c7c84;">HYDRATION</div><div style="font-family:'JetBrains Mono',monospace; font-size:16px; color:#9a9aa2;">{{ hrWater }}</div></div>
+              </div>
+            </div>
+            <div class="cc-glowcard" style="border-radius:20px; background:#17191d; padding:20px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; flex-wrap:wrap;">
+                <span style="font-size:13px; font-weight:600;">Log Today</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#6f6f78;">{{ hrDate }}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+                <span onClick="{{ hydMinus }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:1; color:{{ hydMinusInk }}; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:9px 14px; cursor:pointer; background:rgba(255,255,255,0.03);">−</span>
+                <span onClick="{{ hydPlus }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; color:var(--forge-add-ink); background:var(--forge-add-bg); border-radius:10px; padding:10px 16px; cursor:pointer;">+ 250 ml</span>
+                <span style="font-size:11.5px; color:#8a8a92;">{{ hrWaterHint }}</span>
+              </div>
+              <input value="{{ mealName }}" onInput="{{ setMealName }}" onKeyDown="{{ addMealKey }}" placeholder="Meal (e.g. Chicken and rice)" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <input value="{{ mealKcal }}" onInput="{{ setMealKcal }}" onKeyDown="{{ addMealKey }}" type="number" placeholder="kcal" style="width:74px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+                <input value="{{ mealProtein }}" onInput="{{ setMealProtein }}" onKeyDown="{{ addMealKey }}" type="number" placeholder="protein g" style="width:88px; padding:11px 10px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+                <span onClick="{{ addMeal }}" style="flex:1; min-width:78px; text-align:center; font-size:13px; font-weight:700; color:var(--forge-add-ink); background:var(--forge-add-bg); border-radius:11px; padding:11px 16px; cursor:pointer;">Add</span>
+              </div>
+              <div style="margin-top:14px; max-height:150px; overflow-y:auto;">
+                <sc-for list="{{ hrMeals }}" as="m" hint-placeholder-count="0">
+                  <div style="display:flex; align-items:center; gap:12px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span style="font-size:13px; color:#dbdbe0; flex:1;">{{ m.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#eef0f2;">{{ m.detail }}</span>
+                    <span onClick="{{ m.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ hrNoMeals }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px; color:#6f6f78; font-style:italic; margin-top:12px;">Nothing logged today. The rings read your logs, so they stay empty until there is something in them.</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
         <sc-if value="{{ forgeShowEmpty }}" hint-placeholder-val="{{ false }}">
           <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
             <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">{{ forgeEmptyLabel }}</div>
@@ -9171,7 +9220,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.07-285 · v11.285 move-rings';
+const NOTIF_BUILD_VERSION = '2026.09.08-286 · v11.286 forge-health';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12488,7 +12537,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         window.SB.list('expenses',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,recurring,amount,occurred_at'}),
         window.SB.list('savings',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,amount,occurred_at'}),
         window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,sets,reps,occurred_at'}),
-        window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,name,kcal,protein'}),
+        window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,name,kcal,protein,logged_date'}),
         window.SB.list('sleep_logs',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,hours,bed_time,wake_time,quality,energy,notes'}),
         window.SB.list('hydration_logs',{match:{user_id:uid},order:{column:'logged_at',ascending:true},columns:'id,log_date,amount,logged_at'}),
         window.SB.list('body_metrics',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,extra,weight,body_fat,muscle_mass,waist'}),
@@ -12534,7 +12583,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         patch.activities=this._mergeShipLog(mapped); this._lastSyncedActivities=mapped; this._syncedActivityIds=new Set(mapped.map(a=>a.id)); }
       if(loginXPRes && loginXPRes.data){ const mapped=loginXPRes.data.map(r=>({id:r.id, xp:r.xp||0, ts:new Date(r.created_at).getTime(), date:this._locDateFromTs(r.created_at)})); patch.loginXPLog=mapped; this._lastSyncedLoginXP=mapped; this._syncedLoginXPIds=new Set(mapped.map(l=>l.id)); const derived=this._deriveLoginStreak(mapped); patch.loginStreak=derived.loginStreak; patch.lastLoginDate=derived.lastLoginDate; }
       const healthPatch={};
-      if(meals && meals.data) healthPatch.meals=meals.data.map(r=>({id:r.id,name:r.name,kcal:r.kcal||0,protein:r.protein||0}));
+      if(meals && meals.data) healthPatch.meals=meals.data.map(r=>({id:r.id,name:r.name,kcal:r.kcal||0,protein:r.protein||0,date:r.logged_date||''}));
       if(sleepLogs && sleepLogs.data) healthPatch.sleepLog=sleepLogs.data.map(r=>({id:r.id,date:r.log_date,hours:Math.floor(+r.hours||0),minutes:Math.round(((+r.hours||0)%1)*60),bedtime:r.bed_time||'',wake:r.wake_time||'',quality:r.quality||7,energy:r.energy||7,notes:r.notes||''}));
       if(hydrationLogs && hydrationLogs.data) healthPatch.hydrationLog=hydrationLogs.data.map(r=>({id:r.id,date:r.log_date,ml:r.amount,time:new Date(r.logged_at).toTimeString().slice(0,5)}));
       if(bodyMetrics && bodyMetrics.data) healthPatch.bodyLog=bodyMetrics.data.map(r=>{ const o={id:r.id,date:r.log_date, ...(r.extra||{})}; if(r.weight!=null) o.weightKg=+r.weight; if(r.body_fat!=null) o.bodyFatPct=+r.body_fat; if(r.muscle_mass!=null) o.muscleKg=+r.muscle_mass; if(r.waist!=null) o.waist=+r.waist; return o; });
@@ -13728,7 +13777,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   init_dashboard(){ this.loadDashNews('money'); this.loadDashNews('law'); const m=this.root.querySelector('[data-chart="dashMain"]'); if(m) this.startArea(m, this.productivitySeries().series); const today=this._todayStr(); const st0=(()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })(); const fc={Work:1,Learning:1,Business:1}; const fMin=(this.state.activities||[]).filter(a=>a.ts>=st0&&fc[a.cat]).reduce((x,a)=>x+(+a.min||0),0); const focusProg=Math.min(1,fMin/360); const mv=this.state.move||{}; const kcalProg=Math.min(1,(this.todayMin()*8)/700); const moveRing=(mv.last===today)?Math.max(0.4,kcalProg):kcalProg; const tm=(this.state.missions||[]).filter(x=>x.recurring||x.dayKey===today); const md=tm.filter(x=>x.lastCompleted===today).length; const goalsProg=tm.length?md/tm.length:0; const r=this.root.querySelector('[data-chart="dashRings"]'); if(r) this.startRingSet(r,[focusProg, moveRing, goalsProg],['#FFFFFF','#eef0f2','#7a7a82'],9,5); this.root.querySelectorAll('[data-spark]').forEach(c=>{ if(c.dataset.spark!=='load') this.startSpark(c, this.state.prefs.theme==='Ultra'?(this.state.prefs.ultraStyle==='Noir'?'#C9A24A':'#5B1A1A'):(c.dataset.spark.includes('mov')?'#eef0f2':'#FFFFFF')); }); }
   /* The Forge home carries the same rings canvas, and init_ is dispatched by scene name, so
      without this the ring sits blank on that page. Same routine, not a second copy of it. */
-  init_forge(){ this.init_fitness(); }
+  init_forge(){
+    this.init_fitness();
+    /* The Health centre's rings. Same set as the training ones, so they take their colours
+       from the raiment the same way; the values are the day against its targets. */
+    const c=this.root.querySelector('[data-chart="healthRings"]');
+    if(c){ const H=this.state.health||{}, M=this._mealsToday();
+      const frac=(v,goal)=>(goal>0?Math.min(1,v/goal):0);
+      this.startRingSet(c,[
+        frac(M.reduce((a,m)=>a+(+m.kcal||0),0), +H.kcalGoal||0),
+        frac(M.reduce((a,m)=>a+(+m.protein||0),0), +H.proteinGoal||0),
+        frac(this._waterToday(), +H.waterGoal||0),
+      ],['#FFFFFF','#eef0f2','#7a7a82'],15,7);
+    }
+  }
   /* The three targets the rings are measured against. They match the three rows beside them:
      MOVE, TRAIN TODAY, WEEK TOTAL. */
   MOVE_GOAL(){ return 700; }          // kcal
@@ -13970,6 +14032,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.286', date:'Sep 8, 2026', major:true, notes:[
+      'The Forge\u2019s HEALTH centre is a page now instead of \u201cNothing here yet\u201d. It carries the same ring card the Forge home uses for training \u2014 fuel, protein and hydration against the day\u2019s targets \u2014 in whichever raiment you are wearing.',
+      'It comes with the smallest thing that can feed it: a glass of water and a meal, logged from the card. Nothing else left in the app wrote either, so without it the rings could only ever read zero.',
+      'Meals now carry the day they were eaten. They never did \u2014 the day was sent to the server and thrown away here \u2014 so anything adding up \u201ctoday\u201d was adding up every meal ever logged. Old meals with no day on them count as history, not as today.',
+      'Today\u2019s water is worked out from the hydration log rather than read off a running count that is only rewritten when you drink something. On a day you had not yet, it was still showing yesterday\u2019s.',
+      'Removing a meal removes the one you tapped. The list is today\u2019s and the store is every day, so removing by position could take out a meal from another day.',
+    ]},
     {version:'v11.285', date:'Sep 7, 2026', major:false, notes:[
       'The MOVE rings were boxed in. They were drawn hard against the edge of their canvas while glowing outward, so the glow was cut off square on all four sides — the whole thing looked trapped in an invisible box. The rings now leave room for their own glow, and the set is drawn larger and sharper.',
       'Each raiment wears its own three ring colours: red, white and black on Ultra X; white, gold and grey on Noir; blue, navy and white on Maison Élysée; champagne, gold and sage on Éverpine. Everything that was not Noir used to share one palette, which is how Maison ended up wearing Ultra X\u2019s oxblood.',
@@ -15839,6 +15908,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(this._sbOn()){ const row={user_id:this.state.authUserId,log_date:prevDate,hours:hours+minutes/60,bed_time:entry.bedtime,wake_time:entry.wake,quality:entry.quality,energy:entry.energy,notes:entry.notes}; if(isNew) window.SB.insert('sleep_logs',{id:finalId,...row}); else window.SB.update('sleep_logs',finalId,row); } }
   removeSleep(id){ this._setH({ sleepLog: this.state.health.sleepLog.filter(x=>x.id!==id) }); if(this._sbOn()) window.SB.remove('sleep_logs',id); }
   addHydMl(ml){ const K=window.HealthKit; if(!K||!ml||ml<=0) return; const id=this._uuid(), date=K.today(), roundedMl=Math.round(ml), time=new Date().toTimeString().slice(0,5); const e={id, date, ml:roundedMl, time}; const log=[...this.state.health.hydrationLog, e]; this._setH({ hydrationLog: log, water: Math.round(K.dayHydration({hydrationLog:log}, K.today())/250) }); this.showToast('fitness','Water logged', K.fmtVol(ml,this._hUnit('volume'))); if(this._sbOn()) window.SB.insert('hydration_logs',{id,user_id:this.state.authUserId,log_date:date,amount:roundedMl}); }
+  /* Takes back the last 250ml logged today. The glass count is derived from the log rather
+     than kept alongside it, so it is recomputed rather than decremented — the two cannot
+     drift apart that way. */
+  undoHydGlass(){ const K=window.HealthKit; if(!K) return; const H=this.state.health||{}; const date=K.today();
+    const log=(H.hydrationLog||[]).slice();
+    let idx=-1; for(let i=log.length-1;i>=0;i--){ if(log[i].date===date){ idx=i; break; } }
+    if(idx<0) return;
+    const gone=log[idx]; log.splice(idx,1);
+    this._setH({ hydrationLog:log, water:Math.round(K.dayHydration({hydrationLog:log}, date)/250) });
+    if(this._sbOn() && gone && gone.id) window.SB.remove('hydration_logs', gone.id);
+  }
   addHydCustom(){ const K=window.HealthKit; if(!K) return; const v=+this.state.hydAmt; if(!v) return; const ml=K.toCanonical('volume', v, this._hUnit('volume')); this.addHydMl(ml); this.setState({hydAmt:''}); }
   removeHyd(id){ this._setH({ hydrationLog: this.state.health.hydrationLog.filter(x=>x.id!==id) }); if(this._sbOn()) window.SB.remove('hydration_logs',id); }
   saveHydGoal(){ const K=window.HealthKit; if(!K) return; const v=+this.state.hydGoalInput; if(!v) return; const ml=K.toCanonical('volume', v, this._hUnit('volume')); this._setH({hydrationGoalMl:Math.round(ml), waterGoal:Math.round(ml/250)}); this.setState({hydGoalInput:''}); }
@@ -16383,12 +16463,25 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const food=(this.state.expenses||[]).filter(e=>e.ts>=mo && /food|grocer|shop|meal|eat|lunch|dinner|tesco|aldi|lidl|sainsbury|asda|morrison/i.test(e.label||''));
     const total=food.reduce((a,e)=>a+(+e.amount||0),0);
     return { total:Math.round(total*100)/100, count:food.length, perDay:Math.round((total/30)*100)/100 }; }
+  /* Today's meals, and only today's. A meal with no day on it came from before the day was
+     stored — it is history, not today, so it does not count toward the day's targets. */
+  _mealsToday(){ const t=this._fbToday(); return ((this.state.health||{}).meals||[]).filter(m=>m.date===t); }
+  /* Glasses drunk today, worked out from the hydration log rather than read off health.water.
+     That field is a running count that is only rewritten when something is logged, so on a day
+     nothing has been drunk yet it still holds yesterday's number. */
+  _waterToday(){ const K=window.HealthKit, H=this.state.health||{};
+    if(!K || !H.hydrationLog) return +H.water||0;
+    return Math.round(K.dayHydration(H, this._fbToday())/250); }
   addMeal(opts){ const o=opts||{}, S=this.state;
     const n=(o.name!=null?o.name:S.mealName||'').trim();
     const k=o.kcal!=null?(+o.kcal||0):(+S.mealKcal||0);
     if(!n||!k) return;
     const id=this._uuid(), protein=o.protein!=null?(+o.protein||0):(+S.mealProtein||0);
-    this.mut(s=>({health:{...s.health,meals:[...s.health.meals,{id,name:n,kcal:k,protein}]},mealName:'',mealKcal:'',mealProtein:''}));
+    /* The day is stored on the meal. It was only ever sent to Supabase and never kept here,
+       so the local list was every meal ever eaten and anything calling it "today" was adding
+       up a lifetime. */
+    const date=this._fbToday();
+    this.mut(s=>({health:{...s.health,meals:[...s.health.meals,{id,name:n,kcal:k,protein,date}]},mealName:'',mealKcal:'',mealProtein:''}));
     this.showToast('fitness','Meal logged',n+' · '+k+' kcal');
     if(this._sbOn()) window.SB.insert('meals',{id,user_id:this.state.authUserId,name:n,kcal:k,protein,logged_date:(window.HealthKit?window.HealthKit.today():new Date().toLocaleDateString('en-CA'))}); }
   addNote(title,body){ const S=this.state;
@@ -18676,15 +18769,37 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const prevEntry=hist.length>1?hist[hist.length-2]:null;
         const moved=prevEntry?F.movement(prevEntry.scores, hist[hist.length-1].scores):[];
         const dScore=pts.length>1?(pts[pts.length-1].score-pts[pts.length-2].score):null;
+        /* HEALTH. The three rings are the day against its targets, and every figure is read
+           back out of the same logs — no goal is invented and nothing is assumed. */
+        const HH=S.health||{}; const hMeals=this._mealsToday();
+        const hKcal=hMeals.reduce((a,m)=>a+(+m.kcal||0),0);
+        const hPro=hMeals.reduce((a,m)=>a+(+m.protein||0),0);
+        const hWater=this._waterToday(), hWaterGoal=+HH.waterGoal||8;
         return {
           forgeCentres:centres,
           forgeShowHome:centre==='home',
+          forgeShowHealth:centre==='health',
           forgeShowTraining:centre==='training' && !!trainSections.length,
-          forgeShowEmpty:centre!=='home' && !(centre==='training' && trainSections.length),
+          hrFuel:hKcal+' / '+(HH.kcalGoal||0)+' kcal',
+          hrProtein:hPro+' / '+(HH.proteinGoal||0)+' g',
+          hrWater:hWater+' / '+hWaterGoal+' glasses',
+          hrWaterHint:(hWater>=hWaterGoal?'Target met':(hWaterGoal-hWater)+' to go'),
+          hrDate:this._fbToday(),
+          hydPlus:()=>this.addHydMl(250), hydMinus:()=>this.undoHydGlass(),
+          hydMinusInk:hWater>0?'#eef0f2':'#5c5c64',
+          addMealKey:enterKey(()=>this.addMeal()),
+          /* Removed by id. The list shown is today's, so an index into it is not an index into
+             the stored array and would delete somebody else's dinner. */
+          hrMeals:hMeals.map(m=>({ name:m.name, detail:(+m.kcal||0)+' kcal'+((+m.protein)?(' \u00b7 '+m.protein+'g'):''),
+            remove:()=>{ this.mut(st=>({health:{...st.health, meals:(st.health.meals||[]).filter(x=>x.id!==m.id)}}));
+                         if(this._sbOn() && m.id) window.SB.remove('meals',m.id); } })),
+          hrNoMeals:!hMeals.length,
+          forgeShowEmpty:centre!=='home' && centre!=='health' && !(centre==='training' && trainSections.length),
           forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
           trainSections:trainSections, trainPicker:trainPicker
         };
-      }, { forgeCentres:[], forgeShowHome:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[] }),
+      }, { forgeCentres:[], forgeShowHome:false, forgeShowHealth:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[],
+           hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'#5c5c64', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
