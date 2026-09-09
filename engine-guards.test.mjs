@@ -41,6 +41,7 @@ const ENGINES = [
   ['learning-speaking.js','LearningSpeaking'],
   // These two already carried guards; the list simply did not know about them.
   ['finance-import.js','FinanceImport'],
+  ['rota-import.js','RotaImport'],
   ['ai-gateway.js','AIGateway'],
   // The Forge — training/mental/health standards data.
   ['forge-engine.js','Forge'],

@@ -342,6 +342,7 @@
 <script src="anatomy-3d.js?v=9"></script>
 <script src="exercise-index.js?v=4"></script>
 <script src="finance-import.js?v=2"></script>
+<script src="rota-import.js?v=1"></script>
 <script src="ai-gateway.js?v=2"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -653,6 +654,55 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
   <!-- Bulk Import. It used to sit inside the Fitness scene, so the button on the Forge set
        the flag and nothing rendered — the modal was not on that page to open. It is an
        overlay, so it belongs out here with the others and works wherever it is opened from. -->
+    <!-- Import a work rota. A rota is not a calendar: it lists everybody, and only some of
+         the rows are you. The name field is what tells it which — it is prefilled from the
+         account, and every shift is reviewed before anything is written. -->
+    <sc-if value="{{ rotaOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeRota }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
+        <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:85vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:24px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:16px; font-weight:700;">Import work rota</span>
+            <span onClick="{{ closeRota }}" style="cursor:pointer; color:#8a8a92; font-size:18px; line-height:1;">×</span>
+          </div>
+          <div style="font-size:12px; color:#8a8a92; margin-bottom:14px; line-height:1.5;">Paste the whole rota — everyone on it. It keeps the shifts against your name and records who you overlap with on each one. Grids, day-by-day lists and one-line-per-shift all read locally, with no AI needed.</div>
+          <sc-if value="{{ noRotaRows }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">YOUR NAME ON THE ROTA</span>
+              <input value="{{ rotaMe }}" onInput="{{ setRotaMe }}" placeholder="e.g. Madoxs" style="flex:1; min-width:120px; padding:7px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
+            </div>
+            <textarea value="{{ rotaText }}" onInput="{{ setRotaText }}" placeholder="e.g.&#10;Name     Mon 14       Tue 15       Wed 16&#10;Madoxs   09:00-17:00  OFF          12:00-20:00&#10;Sarah    12:00-20:00  09:00-17:00  OFF" style="width:100%; min-height:170px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box; resize:vertical; font-family:'JetBrains Mono',monospace;"></textarea>
+            <sc-if value="{{ hasRotaErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-top:10px; line-height:1.5;">⚠ {{ rotaErr }}</div></sc-if>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap;">
+              <div onClick="{{ parseRota }}" class="cc-glowbtn" style="display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">Find my shifts</div>
+              <label style="display:flex; align-items:center; gap:7px; padding:11px 16px; border-radius:11px; border:1px dashed rgba(255,255,255,0.2); color:#c3c3ca; font-size:12.5px; cursor:pointer;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">
+                <input type="file" accept="image/*" onChange="{{ onRotaPhoto }}" style="display:none;" />
+                {{ rotaPhotoLabel }}
+              </label>
+            </div>
+          </sc-if>
+          <sc-if value="{{ hasRotaRows }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84; margin-bottom:10px;">{{ rotaFoundLabel }}</div>
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+              <sc-for list="{{ rotaRows }}" as="r" hint-placeholder-count="4">
+                <div style="border-radius:12px; background:#1b1d21; padding:12px 14px; opacity:{{ r.opacity }};">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span onClick="{{ r.toggle }}" title="Leave this shift out" style="width:18px; height:18px; flex:0 0 18px; border-radius:6px; border:1px solid {{ r.tickBd }}; background:{{ r.tickBg }}; color:#0a0a0b; font-size:12px; line-height:16px; text-align:center; cursor:pointer;">{{ r.tick }}</span>
+                    <span style="font-size:13px; color:#eef0f2; flex:1; min-width:0;">{{ r.day }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#eef0f2; white-space:nowrap;">{{ r.hours }}</span>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92; margin-top:6px; padding-left:28px;">{{ r.withLabel }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <span onClick="{{ backToRotaText }}" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13px;">Back</span>
+              <span onClick="{{ confirmRota }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">{{ rotaAddLabel }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
     <sc-if value="{{ woImportOpen }}" hint-placeholder-val="{{ false }}">
       <div onClick="{{ closeWoImport }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
         <div onClick="{{ stopProp }}" style="width:100%; max-width:640px; max-height:85vh; overflow-y:auto; border-radius:20px; background:#141416; border:1px solid rgba(255,255,255,0.12); padding:24px;">
@@ -3602,6 +3652,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 {{ calImportLabel }}
               </label>
               <sc-if value="{{ calImportErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff5563; margin:-2px 0 10px;">⚠ {{ calImportErr }}</div></sc-if>
+              <div onClick="{{ openRota }}" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; border-radius:11px; border:1px dashed rgba(255,255,255,0.2); color:#c3c3ca; font-size:12.5px; cursor:pointer; margin-bottom:10px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">⬆ Import work rota</div>
               <input value="{{ evTitle }}" onInput="{{ setEvTitle }}" onKeyDown="{{ addEventKey }}" placeholder="Event title" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
                 <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78;">REPEATS</span>
@@ -9220,7 +9271,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.08-286 · v11.286 forge-health';
+const NOTIF_BUILD_VERSION = '2026.09.09-287 · v11.287 rota-import';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9294,6 +9345,7 @@ class Component extends DCLogic {
       workouts: s.workouts || [],
       woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
+      rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false,
       // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
       income: s.income || [],
       // No seeded expenses. Was $92,300 of invented costs, analysed as though they were yours.
@@ -14032,6 +14084,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.287', date:'Sep 9, 2026', major:true, notes:[
+      'The calendar takes a work rota. Paste the whole thing \u2014 everyone on it \u2014 put your name in, and it keeps the shifts that are yours and drops the rest.',
+      'Each shift records who you are on with. Not everyone rostered that day: the people whose hours actually overlap yours, with the times they are in, so a closer on 17:00\u201301:00 does not show up on your six-till-two.',
+      'It reads the shapes a rota actually comes in \u2014 a grid with days across the top, a heading per day with people under it, or one shift per line \u2014 and the ways hours get written: 09:00-17:00, 9-5, 9am-5pm, 0900-1700. OFF, REST, A/L and a bare dash are days off. 12-8 is an afternoon; 22-6 is a night shift.',
+      'It runs locally, with no AI key needed. There is a photo option that transcribes a picture of the rota, and even that hands the text to the same reader and the same review \u2014 the AI transcribes, it does not decide which shifts are yours.',
+      'Every shift is reviewed before anything is written, and can be unticked. Re-importing an amended rota does not double up what is already on the calendar.',
+      'Shifts land as work events with a start, a finish and who you are with, so the day reads as the time it actually takes.',
+    ]},
     {version:'v11.286', date:'Sep 8, 2026', major:true, notes:[
       'The Forge\u2019s HEALTH centre is a page now instead of \u201cNothing here yet\u201d. It carries the same ring card the Forge home uses for training \u2014 fuel, protein and hydration against the day\u2019s targets \u2014 in whichever raiment you are wearing.',
       'It comes with the smallest thing that can feed it: a glass of water and a meal, logged from the card. Nothing else left in the app wrote either, so without it the rings could only ever read zero.',
@@ -16818,6 +16878,66 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     }); return {vol:v, weighted}; }
   // ===== Bulk workout import — paste a whole session, AI splits it into rows and
   // classifies each exercise's muscle group, reviewed before anything is actually logged. =====
+  /* ---- work rota import ----------------------------------------------------------------
+     A rota lists everybody. rota-import.js does the reading; this holds the review step and
+     the write, and the name is what decides which rows are the user's. It defaults to the
+     account name because that is almost always what is printed on the sheet, and stays
+     editable because sometimes it is not. */
+  openRotaImport(){ this.setState({ rotaOpen:true, rotaText:'', rotaErr:'', rotaRows:[], rotaSkip:{},
+    rotaMe:(this.state.rotaMe||((this.state.account&&this.state.account.name)||'').trim()) }); }
+  closeRotaImport(){ this.setState({rotaOpen:false, rotaPhotoLoading:false}); }
+  setRotaText(e){ this.setState({rotaText:e.target.value, rotaErr:''}); }
+  setRotaMe(e){ this.setState({rotaMe:e.target.value, rotaErr:''}); }
+  backToRotaText(){ this.setState({rotaRows:[], rotaSkip:{}, rotaErr:''}); }
+  toggleRotaRow(i){ this.setState(s=>({rotaSkip:{...(s.rotaSkip||{}), [i]:!(s.rotaSkip||{})[i]}})); }
+  parseRotaText(){
+    const RI=window.RotaImport;
+    if(!RI){ this.setState({rotaErr:'The rota reader did not load. Reload the page and try again.'}); return; }
+    const out=RI.parse(this.state.rotaText||'', { me:this.state.rotaMe||'', todayKey:this._fbToday() });
+    if(!out.rows.length){ this.setState({rotaErr:out.warn||'No shifts found.', rotaRows:[]}); return; }
+    this.setState({rotaRows:out.rows, rotaSkip:{}, rotaErr:''});
+  }
+  /* A rota is as often a photo as it is text. The picture goes to the vision model to be
+     turned back into lines, and those lines then go through the same local parser and the
+     same review — so the AI transcribes, it does not decide what is yours. */
+  async importRotaPhoto(file){
+    if(!file) return;
+    if(!window.claude){ this.setState({rotaErr:'No AI provider is connected, so a photo cannot be read. Pasting the rota as text works with no key.'}); return; }
+    this.setState({rotaPhotoLoading:true, rotaErr:''});
+    try{
+      const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+      const b64=dataUrl.split(',')[1]; const mediaType=file.type||'image/png';
+      const sys='You transcribe photographs of staff work rotas into plain text. Reproduce the rota exactly as a table: one line per person, columns separated by two or more spaces, and a first line of column headings giving the day and date of each column. Keep every name and every cell, including days marked OFF. Use 24-hour times written as HH:MM-HH:MM. Return ONLY the table, no prose and no markdown fences.';
+      const text=await window.claude.complete({ role:'image', system:sys, messages:[{role:'user', content:[
+        {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
+        {type:'text', text:'Transcribe this work rota as the plain-text table described.'}
+      ]}], max_tokens:2000});
+      const clean=String(text||'').replace(/^```[a-z]*\n?|```$/g,'').trim();
+      if(!clean){ this.setState({rotaPhotoLoading:false, rotaErr:'Nothing readable came back from that photo.'}); return; }
+      this.setState({rotaText:clean, rotaPhotoLoading:false});
+      this.parseRotaText();
+    }catch(e){ this.setState({rotaPhotoLoading:false, rotaErr:'Could not read that photo.'}); }
+  }
+  confirmRotaImport(){
+    const RI=window.RotaImport;
+    const skip=this.state.rotaSkip||{};
+    const keep=(this.state.rotaRows||[]).filter((r,i)=>!skip[i]);
+    if(!keep.length){ this.setState({rotaErr:'Every shift is unticked, so there is nothing to add.'}); return; }
+    /* A shift already on the calendar is not added twice. Re-importing a rota after it has
+       been amended is the normal case, not the exception. */
+    const have={}; (this.state.events||[]).forEach(e=>{ have[e.date+'|'+e.time]=1; });
+    const evs=keep.filter(r=>!have[r.date+'|'+r.start]).map(r=>({
+      id:this._uuid(), title:'Work', date:r.date, time:r.start, repeat:[], kind:'work',
+      endTime:r.end, attendees:(RI?RI.withLabel(r):'')||null, estMins:null }));
+    if(!evs.length){ this.setState({rotaErr:'Those shifts are already on the calendar.'}); return; }
+    this.mut(s=>({events:[...s.events,...evs], calSel:evs[0].date}));
+    if(this._sbOn()) evs.forEach(e=>window.SB.insert('events',{id:e.id,user_id:this.state.authUserId,
+      title:e.title,event_date:e.date,event_time:e.time,repeat_days:[],kind:'work',
+      end_time:e.endTime,attendees:e.attendees,est_minutes:null}));
+    const skipped=keep.length-evs.length;
+    this.setState({rotaOpen:false, rotaRows:[], rotaSkip:{}, rotaText:''});
+    this.showToast('system','Rota imported', evs.length+' shift'+(evs.length===1?'':'s')+' added'+(skipped?(' \u00b7 '+skipped+' already there'):''));
+  }
   openWoImport(){ this.setState({woImportOpen:true, woImportText:'', woImportErr:'', woImportRows:[], woImportDayOffset:0}); }
   closeWoImport(){ this.setState({woImportOpen:false}); }
   setWoImportText(e){ this.setState({woImportText:e.target.value}); }
@@ -20801,6 +20921,36 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       dayEvents, noDayEvents:dayEvents.length===0, dayEventCount:dayEvents.length, selDayLabel, selShort, selShortUpper:selShort.toUpperCase(), evTitle:S.evTitle, evTime:S.evTime,
       setEvTitle:(e)=>this.setState({evTitle:e.target.value}), setEvTime:(e)=>this.setState({evTime:e.target.value}),
       onCalScreenshot:(e)=>{ const f=e.target.files&&e.target.files[0]; if(f) this.importCalendarScreenshot(f); e.target.value=''; },
+      /* Work rota import. The review list is the whole point of the feature: a rota is read,
+         not trusted, and every shift can be dropped before anything reaches the calendar. */
+      ...(()=>{
+        const RI=window.RotaImport;
+        const rows=S.rotaRows||[], skip=S.rotaSkip||{};
+        const kept=rows.filter((r,i)=>!skip[i]).length;
+        const dayName=(key)=>{ try{ const d=new Date(key+'T12:00:00');
+          return d.toLocaleDateString('en-GB',{weekday:'short', day:'numeric', month:'short'}); }catch(e){ return key; } };
+        return {
+          rotaOpen:!!S.rotaOpen, openRota:()=>this.openRotaImport(), closeRota:()=>this.closeRotaImport(),
+          rotaText:S.rotaText||'', setRotaText:(e)=>this.setRotaText(e),
+          rotaMe:S.rotaMe||'', setRotaMe:(e)=>this.setRotaMe(e),
+          parseRota:()=>this.parseRotaText(), confirmRota:()=>this.confirmRotaImport(),
+          backToRotaText:()=>this.backToRotaText(),
+          rotaErr:S.rotaErr||'', hasRotaErr:!!S.rotaErr,
+          hasRotaRows:!!rows.length, noRotaRows:!rows.length,
+          rotaFoundLabel:rows.length+' SHIFT'+(rows.length===1?'':'S')+' AGAINST YOUR NAME \u2014 UNTICK ANY YOU DO NOT WANT',
+          rotaAddLabel:'Add '+kept+' shift'+(kept===1?'':'s'),
+          onRotaPhoto:(e)=>{ const f=e.target.files&&e.target.files[0]; if(f) this.importRotaPhoto(f); e.target.value=''; },
+          rotaPhotoLabel:S.rotaPhotoLoading?'Reading photo\u2026':'\u2b06 Photo of the rota',
+          rotaRows:rows.map((r,i)=>{
+            const on=!skip[i];
+            return { day:dayName(r.date), hours:r.start+'\u2013'+r.end+(r.overnight?' +1':''),
+              withLabel:(RI&&RI.withLabel(r))||'On your own',
+              toggle:()=>this.toggleRotaRow(i), tick:on?'\u2713':'',
+              tickBg:on?'#F4F4F5':'transparent', tickBd:on?'#F4F4F5':'rgba(255,255,255,0.25)',
+              opacity:on?'1':'0.42' };
+          }),
+        };
+      })(),
       calImportLabel:S.calImportLoading?'Reading screenshot…':'Upload calendar screenshot',
       calImportErr:S.calImportErr||'',
       evDowChips, evRepeatSummary,
