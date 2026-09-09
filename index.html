@@ -321,7 +321,7 @@
      login and sync still work. document.write is deliberate — it blocks the parser here,
      which keeps supabase-client.js below from running before the library exists. -->
 <script>if(!window.supabase){document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"><\/script>');}</script>
-<script src="supabase-client.js?v=1"></script>
+<script src="supabase-client.js?v=2"></script>
 <script src="countries-data.js"></script>
 <script src="notif-engine.js?v=1"></script>
 <script src="voice-engine.js?v=3"></script>
@@ -343,7 +343,7 @@
 <script src="exercise-index.js?v=4"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
-<script src="ai-gateway.js?v=2"></script>
+<script src="ai-gateway.js?v=3"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
 <script src="void-orb-engine.js?v=6"></script>
@@ -3650,12 +3650,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-if value="{{ noDayEvents }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 0;">No events yet on this day.</div></sc-if>
               <div style="height:1px; background:rgba(255,255,255,0.08); margin:16px 0 14px;"></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78; margin-bottom:10px;">ADD TO {{ selShortUpper }}</div>
+              <!-- The rota import first: it is the one that keeps hours and who you are on
+                   with. The screenshot import below it is the general one — it makes plain
+                   dated events, which is the wrong shape for a shift. -->
+              <div onClick="{{ openRota }}" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; border-radius:11px; border:1px dashed rgba(255,255,255,0.2); color:#c3c3ca; font-size:12.5px; cursor:pointer; margin-bottom:10px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">⬆ Import work rota</div>
               <label style="display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; border-radius:11px; border:1px dashed rgba(255,255,255,0.2); color:#c3c3ca; font-size:12.5px; cursor:pointer; margin-bottom:10px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">
                 <input type="file" accept="image/*" onChange="{{ onCalScreenshot }}" style="display:none;" />
                 {{ calImportLabel }}
               </label>
               <sc-if value="{{ calImportErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff5563; margin:-2px 0 10px;">⚠ {{ calImportErr }}</div></sc-if>
-              <div onClick="{{ openRota }}" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; border-radius:11px; border:1px dashed rgba(255,255,255,0.2); color:#c3c3ca; font-size:12.5px; cursor:pointer; margin-bottom:10px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">⬆ Import work rota</div>
               <input value="{{ evTitle }}" onInput="{{ setEvTitle }}" onKeyDown="{{ addEventKey }}" placeholder="Event title" style="width:100%; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; margin-bottom:9px;">
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
                 <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78;">REPEATS</span>
@@ -9274,7 +9277,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.09-289 · v11.289 rota-spreadsheet';
+const NOTIF_BUILD_VERSION = '2026.09.09-290 · v11.290 vision-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10188,9 +10191,27 @@ activities: this._mergeShipLog(s.activities),
       async complete(opts){
         opts=opts||{};
         const sys=(opts.system||'').trim();
-        const convo=Array.isArray(opts.messages) ? opts.messages.map(m=>(m.role==='assistant'?'Assistant: ':'User: ')+(typeof m.content==='string'?m.content:JSON.stringify(m.content))).join('\n\n') : '';
+        /* A message's content can be a string or a list of blocks, and a vision call sends
+           the picture as a block. This used to JSON.stringify the whole list into the text,
+           so every image call sent a wall of base64 to a text endpoint — which is why the
+           calendar and rota photo imports had never once worked. The image comes out as its
+           own field now; only the words go into the prompt. */
+        let image=null;
+        const flat=(c)=>{
+          if(typeof c==='string') return c;
+          if(!Array.isArray(c)) return '';
+          return c.map(b=>{
+            if(!b || typeof b!=='object') return '';
+            if(b.type==='text') return b.text||'';
+            if(b.type==='image' && b.source && b.source.type==='base64' && !image){
+              image={ media_type:b.source.media_type||'image/png', data:b.source.data||'' };
+            }
+            return '';
+          }).filter(Boolean).join('\n');
+        };
+        const convo=Array.isArray(opts.messages) ? opts.messages.map(m=>(m.role==='assistant'?'Assistant: ':'User: ')+flat(m.content)).filter(l=>l.trim().length>6).join('\n\n') : '';
         const prompt=(sys?sys+'\n\n':'')+convo;
-        const res=await window.AIGateway.ask(opts.role||'writing', prompt, {live:!!opts.live});
+        const res=await window.AIGateway.ask(opts.role||'writing', prompt, {live:!!opts.live, image});
         // These call sites are written around try/catch, so a failure has to throw
         // rather than resolve to an error object.
         if(res.error) throw new Error(res.error);
@@ -11798,9 +11819,9 @@ activities: this._mergeShipLog(s.activities),
       backupId:()=>self.state.prefs.aiBackup||'',
       failover:()=>!!self.state.prefs.failover,
       online:()=>self._sbOn(),
-      call:(id,prompt,model)=>{
+      call:(id,prompt,model,image)=>{
         if(!window.SB || !window.SB.callAI) return Promise.resolve({error:'Backend client is not loaded yet.'});
-        return window.SB.callAI(id,prompt,model);
+        return window.SB.callAI(id,prompt,model,image);
       },
       // Resolved per call, not once at configure time. supabase-client.js can still be
       // loading when this runs, and capturing `window.SB.callAIStream` here would pin
@@ -14087,6 +14108,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.290', date:'Sep 9, 2026', major:true, notes:[
+      'Reading a picture works. Every feature in the app that offered to look at a screenshot \u2014 the calendar import, the rota photo \u2014 was sending the image as text: the layer behind them folded the picture into the written prompt as raw base64 and posted it to a text endpoint. It could never have worked, for anyone, and the answer was always \u201ccould not read that image\u201d.',
+      'A picture is now its own thing all the way through to the provider, built into whichever shape Claude, ChatGPT or Gemini expects. If none of those three is connected it says exactly that instead of failing vaguely, and a provider that cannot see is never sent one.',
+      'A transcribed rota kept its blank leading cells. The heading row of a rota starts with the empty cells above the date and weekday columns, and tidying the text away removed them \u2014 which slid every person one column left, so the shifts read back belonged to somebody else.',
+      'Import work rota now sits above Upload calendar screenshot, and the screenshot button says what it is for. They are different jobs: a screenshot makes plain dated events, a rota keeps the hours and who you are on with.',
+    ]},
     {version:'v11.289', date:'Sep 9, 2026', major:false, notes:[
       'The rota import now reads the layout a spreadsheet actually uses: the dates down the side, the weekday beside them, and a column for each person with a running hours count in between. It only understood the other way round \u2014 names down, days across \u2014 which is not how most rotas are built.',
       'The hours columns between the people, the weekly total rows and a month divider are all read as what they are, so none of them turns up as somebody you are working with.',
@@ -16933,7 +16960,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
         {type:'text', text:'Transcribe this work rota as the plain-text table described.'}
       ]}], max_tokens:2000});
-      const clean=String(text||'').replace(/^```[a-z]*\n?|```$/g,'').trim();
+      /* Fences off, but NOT a trim: a rota's heading row starts with the empty cells that sit
+         above the date and weekday columns, and trimming the text ate those two tabs and slid
+         every person one column to the left — so the shifts read back were the wrong person's.
+         Only the fence lines and trailing blank lines come off. */
+      const clean=String(text||'')
+        .replace(/^[ \t]*```[a-z]*[ \t]*\r?\n/, '')
+        .replace(/\r?\n[ \t]*```[ \t]*$/, '')
+        .replace(/\s+$/, '');
       if(!clean){ this.setState({rotaPhotoLoading:false, rotaErr:'Nothing readable came back from that photo.'}); return; }
       this.setState({rotaText:clean, rotaPhotoLoading:false});
       this.parseRotaText();
@@ -20989,7 +21023,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           }),
         };
       })(),
-      calImportLabel:S.calImportLoading?'Reading screenshot…':'Upload calendar screenshot',
+      calImportLabel:S.calImportLoading?'Reading screenshot…':'Upload calendar screenshot (appointments, not shifts)',
       calImportErr:S.calImportErr||'',
       evDowChips, evRepeatSummary,
       /* One save path shared by the button and the Enter key. They used to be two identical

@@ -104,12 +104,23 @@
     return out;
   }
 
-  function candidates(role, live) {
+  /* The providers that can be sent a picture. Kept here rather than inferred, and matching
+     exactly what the proxy knows how to build a multimodal request for — a candidate list
+     that includes a provider which will reject the image is a guaranteed failover. */
+  var VISION = { anthropic: 1, openai: 1, google: 1 };
+
+  function candidates(role, live, vision) {
     if (!H) return [];
     var open = order(role, live).filter(connected);
+    if (vision) open = open.filter(function (id) { return VISION[id]; });
     var fit = open.filter(healthy);
     // Benched providers are a last resort, never a reason to report nothing connected.
     return fit.length ? fit : open;
+  }
+
+  function noVisionError() {
+    return { error: 'Reading a picture needs Claude, ChatGPT or Gemini connected in the AI centre — none of them is, so there is nothing here that can look at an image.',
+             code: 'no-vision-provider' };
   }
 
   function noneError(live) {
@@ -135,8 +146,12 @@
     }
 
     var live = !!opts.live;
-    var list = candidates(role, live);
-    if (!list.length) return Promise.resolve(noneError(live));
+    /* An image goes as its own field, never folded into the prompt. It used to be
+       JSON.stringify'd into the text by the caller, which sent a wall of base64 to a
+       text endpoint and could only ever fail. */
+    var image = opts.image || null;
+    var list = candidates(role, live, !!image);
+    if (!list.length) return Promise.resolve(image ? noVisionError() : noneError(live));
 
     var tries = H.failover() ? Math.min(MAX_TRIES, list.length) : 1;
     var i = 0, lastErr = '', lastId = '';
@@ -152,11 +167,13 @@
       var started = false;
       var wrap = onDelta ? function (d) { started = true; onDelta(d); } : null;
 
-      var streaming = !!(wrap && H.stream);
+      // Nothing streams a vision request here: the proxy builds those on the whole-response
+      // path, and a picture is sent once rather than read out token by token.
+      var streaming = !!(wrap && H.stream && !image);
       var p;
       try {
         p = streaming ? H.stream(id, prompt, wrap, H.model(id))
-                      : H.call(id, prompt, H.model(id));
+                      : H.call(id, prompt, H.model(id), image);
       } catch (e) {
         p = Promise.resolve({ error: (e && e.message) || 'Request failed' });
       }
@@ -170,7 +187,7 @@
         // than burning a candidate.
         if (streaming && res == null) {
           streaming = false;
-          return H.call(id, prompt, H.model(id)).catch(function (e) {
+          return H.call(id, prompt, H.model(id), image).catch(function (e) {
             return { error: (e && e.message) || 'Request failed' };
           });
         }
@@ -205,6 +222,8 @@
 
     /* ask(role, prompt, opts) -> { text, citations, provider } | { error, code }
        opts.live    require a web-searching provider
+       opts.image   {media_type, data} — base64, no data: prefix. Narrows the candidates to
+                    the providers that can read one, and never streams.
        Roles are PROVIDERS_DATA.AI_FEATURES ids. An unknown role is not an error — it
        simply has no routing preference and falls through to default/backup. */
     ask: function (role, prompt, opts) { return run(role, prompt, opts, null); },

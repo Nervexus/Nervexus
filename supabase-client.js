@@ -85,7 +85,10 @@ if (!window.SB) window.SB = {
   // is what makes the model picker in Settings -> AI Providers actually do something: it
   // used to be collected in the UI and never sent anywhere, so every call silently used
   // whichever model the edge function had hardcoded regardless of what was selected.
-  async callAI(provider, prompt, model){ return window.SB._providerFn({ action:'call', provider, prompt, model }); },
+  /* `image` is optional: {media_type, data} with data base64 and no data: prefix. It goes as
+     its own field rather than inside the prompt — the proxy builds the provider's own
+     multimodal shape from it. */
+  async callAI(provider, prompt, model, image){ return window.SB._providerFn({ action:'call', provider, prompt, model, ...(image?{image}:{}) }); },
   // Streaming counterpart of callAI — reads the proxy's SSE body as it arrives so the
   // caller (voice assistant) can act on partial text before the full reply is done.
   // onDelta(deltaText) fires per chunk. Resolves {result, citations} or {error}, same

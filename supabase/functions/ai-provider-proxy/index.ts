@@ -698,7 +698,19 @@ Deno.serve(async (req) => {
     // {delta} chunks, one final {done, citations} frame, or {error}. Only for the
     // providers 'call' already supports below; falls through to the non-streamed
     // path for everything else (unchanged).
-    if (body.stream && ['openai', 'anthropic', 'perplexity', 'xai', 'google'].includes(provider)) {
+    /* An image comes as its own field — { media_type, data }, base64 with no data: prefix —
+       and is turned into whichever multimodal shape the provider wants below. It used to be
+       stringified into the prompt by the client, which is why every "read this screenshot"
+       feature in the app has always failed. */
+    const image = body.image && body.image.data
+      ? { media_type: String(body.image.media_type || 'image/png'), data: String(body.image.data) }
+      : null;
+    if (image && !['openai', 'anthropic', 'google'].includes(provider)) {
+      return json({ error: 'That provider cannot read images — Claude, ChatGPT and Gemini can.' }, 400);
+    }
+    // Vision goes on the whole-response path: the picture is sent once, not read out in
+    // deltas, and streamCall builds text-only bodies.
+    if (body.stream && !image && ['openai', 'anthropic', 'perplexity', 'xai', 'google'].includes(provider)) {
       return streamCall(provider, candidateKeys, prompt, model, admin, uid);
     }
 
@@ -712,7 +724,9 @@ Deno.serve(async (req) => {
         if (provider === 'openai') {
           const r = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST', headers: { Authorization: `Bearer ${k}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: usedModel, messages: [{ role: 'user', content: prompt }] }),
+            body: JSON.stringify({ model: usedModel, messages: [{ role: 'user', content: image
+              ? [{ type: 'text', text: prompt }, { type: 'image_url', image_url: { url: `data:${image.media_type};base64,${image.data}` } }]
+              : prompt }] }),
           });
           if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
           const j = await r.json();
@@ -723,7 +737,9 @@ Deno.serve(async (req) => {
         } else if (provider === 'anthropic') {
           const r = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST', headers: { 'x-api-key': k, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: usedModel, max_tokens: MAX_TOKENS, messages: [{ role: 'user', content: prompt }] }),
+            body: JSON.stringify({ model: usedModel, max_tokens: MAX_TOKENS, messages: [{ role: 'user', content: image
+              ? [{ type: 'image', source: { type: 'base64', media_type: image.media_type, data: image.data } }, { type: 'text', text: prompt }]
+              : prompt }] }),
           });
           if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
           const j = await r.json();
@@ -740,7 +756,11 @@ Deno.serve(async (req) => {
           // three free keys effectively triple the daily quota before anything needs paying for.
           const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${usedModel}:generateContent?key=${k}`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
+            /* Search grounding is dropped when there is a picture: the two together make
+               Gemini reject the request, and reading a screenshot needs no web search. */
+            body: JSON.stringify(image
+              ? { contents: [{ parts: [{ inline_data: { mime_type: image.media_type, data: image.data } }, { text: prompt }] }] }
+              : { contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] }),
           });
           if (r.status === 429) { await markCooldown(admin, candidateKeys[i].poolId, retryAfterSeconds(r)); lastErr = 'Rate limited (429)'; continue; }
           const j = await r.json();

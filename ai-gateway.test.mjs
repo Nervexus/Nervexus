@@ -9,14 +9,14 @@ new Function('window', fs.readFileSync('/home/user/Nervexus/ai-gateway.js','utf8
 const G=root.AIGateway;
 
 const PROVS=[{id:'anthropic',name:'Claude'},{id:'google',name:'Gemini',live:true},{id:'openai',name:'OpenAI'}];
-let calls=[];
+let calls=[]; let seen=[];
 function host(o={}){
   const cfg=o.cfg||{anthropic:{saved:1,on:true},google:{saved:1,on:true},openai:{saved:1,on:true}};
   return {
     providers:()=>PROVS, cfg:(id)=>cfg[id]||{}, model:(id)=>id+'-m',
     routing:()=>o.routing||{}, defaultId:()=>o.def||'', backupId:()=>o.bk||'',
     failover:()=>o.failover!==false, online:()=>o.online!==false,
-    call:(id,p,m)=>{ calls.push(id); const f=(o.fail||[]).includes(id);
+    call:(id,p,m,img)=>{ calls.push(id); seen.push({id, prompt:p, image:img||null}); const f=(o.fail||[]).includes(id);
       return Promise.resolve(f?{error:'boom '+id}:{result:'ok from '+id}); },
     stream:o.stream===false?null:((id,p,onD,m)=>{ calls.push('s:'+id);
       if((o.fail||[]).includes(id)) return Promise.resolve({error:'boom '+id});
@@ -123,6 +123,59 @@ t('chain({includeBenched}) keeps a paused provider, behind the healthy ones', as
 t('unconfigured gateway does not throw', async()=>{
   const g2={}; new Function('window', fs.readFileSync('/home/user/Nervexus/ai-gateway.js','utf8'))(g2);
   eq((await g2.AIGateway.ask('voice','hi')).code,'unconfigured');
+});
+
+/* ---- pictures ------------------------------------------------------------------------
+   Every "read this screenshot" feature in the app was written against a shim that folded
+   the image into the text prompt, so a wall of base64 went to a text endpoint and the
+   answer was always a failure. The image is its own argument now, and these hold that. */
+
+t('an image is handed to the provider as its own argument, not folded into the prompt', async()=>{
+  calls=[]; seen=[]; G.clearHealth(); G.configure(host({def:'anthropic'}));
+  const img={media_type:'image/png', data:'AAAA'};
+  const r=await G.ask('image','read this rota',{image:img});
+  eq(r.text,'ok from anthropic','the call should have gone through');
+  eq(seen.length,1,'one call');
+  eq(seen[0].image,img,'the image did not reach the provider');
+  eq(seen[0].prompt,'read this rota','the prompt should be words only');
+  if(/AAAA/.test(seen[0].prompt)) throw new Error('the base64 leaked into the prompt');
+});
+
+t('a picture never streams', async()=>{
+  calls=[]; seen=[]; G.clearHealth(); G.configure(host({def:'anthropic'}));
+  await G.stream('image','read this',(d)=>{},{image:{media_type:'image/png',data:'AAAA'}});
+  eq(calls,['anthropic'],'it should have gone down the whole-response path, got '+JSON.stringify(calls));
+});
+
+t('only the providers that can read a picture are tried', async()=>{
+  /* Perplexity is connected and first in line for the role, and cannot take an image. It
+     must not be attempted at all — a guaranteed rejection is not a failover worth making. */
+  calls=[]; seen=[]; G.clearHealth();
+  const h=host({routing:{image:'perplexity'}, def:'anthropic'});
+  const provs=[...PROVS,{id:'perplexity',name:'Perplexity'}];
+  h.providers=()=>provs; const c=h.cfg; h.cfg=(id)=>id==='perplexity'?{saved:1,on:true}:c(id);
+  G.configure(h);
+  const r=await G.ask('image','read this',{image:{media_type:'image/png',data:'AAAA'}});
+  eq(r.text,'ok from anthropic','it should have fallen to one that can see');
+  if(calls.includes('perplexity')) throw new Error('a text-only provider was sent a picture');
+});
+
+t('with nothing that can see, it says so rather than failing obscurely', async()=>{
+  calls=[]; seen=[]; G.clearHealth();
+  const h=host({cfg:{}});
+  h.providers=()=>[{id:'perplexity',name:'Perplexity'}];
+  h.cfg=()=>({saved:1,on:true});
+  G.configure(h);
+  const r=await G.ask('image','read this',{image:{media_type:'image/png',data:'AAAA'}});
+  if(!r.error) throw new Error('it should not have claimed success');
+  eq(r.code,'no-vision-provider','the reason should name the actual problem');
+  if(!/Claude, ChatGPT or Gemini/.test(r.error)) throw new Error('and say what to connect: '+r.error);
+});
+
+t('a text request is unaffected by any of it', async()=>{
+  calls=[]; seen=[]; G.clearHealth(); G.configure(host({def:'anthropic'}));
+  await G.ask('writing','hello');
+  eq(seen[0].image,null,'a text call must not gain an image argument');
 });
 
 let pass=0, fail=0;

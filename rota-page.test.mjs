@@ -206,6 +206,65 @@ t('a spreadsheet paste without the names row says so', async () => {
   eq(await page.evaluate(() => window.__nvx.state.events.length), 0, 'and guess nothing');
 });
 
+t('a photo is sent as a picture, not as base64 in the prompt', async () => {
+  /* The defect behind every failed screenshot import in this app: the shim that backs
+     window.claude flattened a message's content with JSON.stringify, so a vision call sent
+     a wall of base64 to a text endpoint. Nothing about it could ever have worked. */
+  await boot({ rotaOpen: true, rotaMe: 'Madoxs' });
+  const seen = await page.evaluate(async () => {
+    const got = [];
+    const real = window.AIGateway.ask;
+    window.AIGateway.ask = (role, prompt, opts) => { got.push({ role, prompt, opts }); return Promise.resolve({ text: 'x' }); };
+    await window.claude.complete({
+      role: 'image', system: 'SYSTEM LINE',
+      messages: [{ role: 'user', content: [
+        { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: 'QUJDREVGRw' } },
+        { type: 'text', text: 'Transcribe this rota.' },
+      ] }],
+    });
+    window.AIGateway.ask = real;
+    return got;
+  });
+  eq(seen.length, 1, 'the gateway was not called');
+  const { prompt, opts } = seen[0];
+  ok(opts && opts.image, 'the image never reached the gateway as an image');
+  eq(opts.image.media_type, 'image/jpeg', 'the media type was lost');
+  eq(opts.image.data, 'QUJDREVGRw', 'the image data was lost');
+  ok(!/QUJDREVGRw/.test(prompt), 'the base64 is still being folded into the prompt');
+  ok(prompt.includes('SYSTEM LINE'), 'the system line should still lead the prompt');
+  ok(prompt.includes('Transcribe this rota.'), 'and the words of the message should survive');
+});
+
+t('a photo of the rota goes through the reader and the review, not straight to the calendar', async () => {
+  /* Whatever a model gives back is text, and text goes through the same parser and the same
+     review as a paste. The AI transcribes; it does not decide which shifts are yours. */
+  const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x; };
+  const uk = (n) => { const x = d(n); return String(x.getDate()).padStart(2, '0') + '/' + String(x.getMonth() + 1).padStart(2, '0') + '/' + x.getFullYear(); };
+  const sheet = ['\t\tChristine\t\tMadoxs',
+                 uk(1) + '\tMonday\t8-6\t9\t9-5\t7',
+                 uk(2) + '\tTuesday\tD/O\t0\tHOL\t7'].join('\n');
+  await boot({ rotaOpen: true, rotaMe: 'Madoxs' });
+  await page.evaluate(async (text) => {
+    window.claude = { complete: () => Promise.resolve('```\n' + text + '\n```') };
+    await window.__nvx.importRotaPhoto(new File(['x'], 'rota.jpg', { type: 'image/jpeg' }));
+  }, sheet);
+  await page.waitForTimeout(700);
+  const st = await page.evaluate(() => ({
+    rows: window.__nvx.state.rotaRows.length,
+    off: window.__nvx.state.rotaOff.map(x => x.cell),
+    events: window.__nvx.state.events.length,
+    err: window.__nvx.state.rotaErr,
+  }));
+  eq(st.err, '', 'it should have read cleanly: ' + st.err);
+  eq(st.rows, 1, 'one shift — the HOL day is not one');
+  /* The leading empty cells of the heading row have to survive whatever the model wrapped
+     its answer in. Trimming them slid every person one column left, so the shifts read back
+     were somebody else's — this is the assertion that catches that. */
+  eq(st.off.join(','), 'HOL', 'and the holiday is reported as a day off — a D/O here means the columns are misaligned');
+  eq(st.events, 0, 'nothing may reach the calendar before it has been reviewed');
+  ok((await text()).includes('1 SHIFT AGAINST YOUR NAME'), 'the review should be showing');
+});
+
 t('a photo says what it needs rather than failing silently', async () => {
   /* The calendar's screenshot import answers "AI unavailable in this environment" and stops.
      This one has a text path that always works, so it says so. */
