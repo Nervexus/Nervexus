@@ -150,6 +150,62 @@ t('a name that is not on the rota is said, with the names that are', async () =>
   eq(await page.evaluate(() => window.__nvx.state.events.length), 0, 'nothing should have been written');
 });
 
+t('the real rota goes in from a spreadsheet paste', async () => {
+  /* The layout the feature was built for: dates down column A, a person per column, tabs
+     between the cells. Dated forward from today so it stays inside the import window
+     whenever this runs. */
+  const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x; };
+  const uk = (n) => { const x = d(n); return String(x.getDate()).padStart(2, '0') + '/' + String(x.getMonth() + 1).padStart(2, '0') + '/' + x.getFullYear(); };
+  const key = (n) => { const x = d(n); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
+  const wd = (n) => d(n).toLocaleDateString('en-GB', { weekday: 'long' });
+  const sheet = [
+    '\t\tChristine\t\tHarriette\t\tTony\t\tAbbie\t\tMadoxs\t\tChris 2 (Moore)\t\t\tOvertime & Lieu Days',
+    uk(1) + '\t' + wd(1) + '\t8-6\t9\tD/O\t0\t9-5\t7\tD/O\t0\t8-6\t9\tD/O\t0\t\t3',
+    uk(2) + '\t' + wd(2) + '\t9-5\t7\t9-5\t7\tD/O\t0\t9-5\t7\tHOL\t7\t9-5\t7\t\t5',
+    '\t\t\t40\t\t40\t\t40\t\t40\t\t40\t\t40',
+    uk(3) + '\t' + wd(3) + '\tD/O\t0\t10-4\t6\t10-4\t6\t10-4\t6\t10-4\t6\t10-4\t6\t\t5',
+  ].join('\n');
+
+  await boot({ rotaOpen: true, rotaMe: 'Mr Madoxs Harvey', rotaText: sheet });
+  await page.evaluate(() => window.__nvx.parseRotaText());
+  await page.waitForTimeout(500);
+  const st = await page.evaluate(() => ({
+    rows: window.__nvx.state.rotaRows,
+    off: window.__nvx.state.rotaOff.map(x => x.cell),
+    err: window.__nvx.state.rotaErr,
+  }));
+  eq(st.err, '', 'it should have read cleanly: ' + st.err);
+  eq(st.rows.length, 2, 'two shifts — the HOL day is not one');
+  eq(st.rows[0].date, key(1), 'the first shift is the first dated row');
+  eq(st.rows[0].start + '-' + st.rows[0].end, '08:00-18:00', '8-6 is an eight till six');
+  eq(st.rows[1].start + '-' + st.rows[1].end, '10:00-16:00', '10-4 is a ten till four');
+  eq(st.off.join(','), 'HOL', 'the holiday is a day off');
+  /* The hours columns between the people are not people, and the weekly-total row is not a
+     day: neither may turn up as somebody he is working with. */
+  eq(RI_withLabel(st.rows[0]), 'Christine 08:00-18:00 · Tony 09:00-17:00', 'wrong company on the first day');
+
+  await clickText('Add 2 shifts');
+  await page.waitForTimeout(700);
+  const evs = await page.evaluate(() => window.__nvx.state.events);
+  eq(evs.length, 2, 'both shifts should be on the calendar');
+  eq(evs[0].kind, 'work', 'and filed as work');
+  eq(evs[0].attendees, 'Christine 08:00-18:00 · Tony 09:00-17:00', 'carrying who he is on with');
+});
+const RI_withLabel = (r) => (r.with || []).map(w => w.name + ' ' + w.start + '-' + w.end).join(' · ');
+
+t('a spreadsheet paste without the names row says so', async () => {
+  /* A sheet freezes the names at the top, so copying a block of weeks leaves them behind. */
+  const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x; };
+  const uk = (n) => { const x = d(n); return String(x.getDate()).padStart(2, '0') + '/' + String(x.getMonth() + 1).padStart(2, '0') + '/' + x.getFullYear(); };
+  const noHead = [uk(1) + '\tMonday\t8-6\t9\tD/O\t0\t9-5\t7', uk(2) + '\tTuesday\t9-5\t7\t9-5\t7\tD/O\t0'].join('\n');
+  await boot({ rotaOpen: true, rotaMe: 'Madoxs', rotaText: noHead });
+  await page.evaluate(() => window.__nvx.parseRotaText());
+  await page.waitForTimeout(500);
+  const b = await text();
+  ok(/row with everyone/.test(b), 'it should name what is missing: ' + b.slice(0, 400));
+  eq(await page.evaluate(() => window.__nvx.state.events.length), 0, 'and guess nothing');
+});
+
 t('a photo says what it needs rather than failing silently', async () => {
   /* The calendar's screenshot import answers "AI unavailable in this environment" and stops.
      This one has a text path that always works, so it says so. */

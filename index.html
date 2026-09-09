@@ -342,7 +342,7 @@
 <script src="anatomy-3d.js?v=9"></script>
 <script src="exercise-index.js?v=4"></script>
 <script src="finance-import.js?v=2"></script>
-<script src="rota-import.js?v=2"></script>
+<script src="rota-import.js?v=3"></script>
 <script src="ai-gateway.js?v=2"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -664,7 +664,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <span style="font-size:16px; font-weight:700;">Import work rota</span>
             <span onClick="{{ closeRota }}" style="cursor:pointer; color:#8a8a92; font-size:18px; line-height:1;">×</span>
           </div>
-          <div style="font-size:12px; color:#8a8a92; margin-bottom:14px; line-height:1.5;">Paste the whole rota — everyone on it. It keeps the shifts against your name and records who you overlap with on each one. Grids, day-by-day lists and one-line-per-shift all read locally, with no AI needed.</div>
+          <div style="font-size:12px; color:#8a8a92; margin-bottom:14px; line-height:1.5;">Paste the whole rota — everyone on it. It keeps the shifts against your name and records who you overlap with on each one.<br><br>If it is a spreadsheet, select the rows and copy them straight out, <b style="color:#c3c3ca;">including the row with everyone's names</b> — that row is what says which column is yours. Dates down the side or days across the top both work, and so do day-by-day lists and one line per shift. It all reads locally, with no AI needed.</div>
           <sc-if value="{{ noRotaRows }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
               <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">YOUR NAME ON THE ROTA</span>
@@ -9274,7 +9274,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.09-288 · v11.288 rota-days-off';
+const NOTIF_BUILD_VERSION = '2026.09.09-289 · v11.289 rota-spreadsheet';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14087,6 +14087,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.289', date:'Sep 9, 2026', major:false, notes:[
+      'The rota import now reads the layout a spreadsheet actually uses: the dates down the side, the weekday beside them, and a column for each person with a running hours count in between. It only understood the other way round \u2014 names down, days across \u2014 which is not how most rotas are built.',
+      'The hours columns between the people, the weekly total rows and a month divider are all read as what they are, so none of them turns up as somebody you are working with.',
+      '8-6, 9-5, 10-4 and 8-5 all read correctly, and D/O, HOL and Bank Holiday are days out.',
+      'If you copy a block of weeks and leave the frozen row of names behind, it says so rather than guessing which column is yours \u2014 that row is what tells it.',
+      'Photo import asks for the sheet back exactly as laid out rather than reshaped, and when it fails it now says why instead of only \u201ccould not read that photo\u201d. Copying the cells out of the spreadsheet is still the reliable way in.',
+    ]},
     {version:'v11.288', date:'Sep 9, 2026', major:false, notes:[
       'The rota import knows a day off when it sees one: HOL, D/O, A/L, B/H, TOIL, LIEU, REST, X, a dash, an empty cell.',
       'And the rule behind it, which matters more than the list \u2014 a day with no hours on it is a day out. That covers the shift codes a rota uses without saying when they are, E or LATE or N: they cannot go in a diary as a time, so nothing is added for them. They are named back to you instead, so you can add the hours and import again.',
@@ -16917,7 +16924,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     try{
       const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
       const b64=dataUrl.split(',')[1]; const mediaType=file.type||'image/png';
-      const sys='You transcribe photographs of staff work rotas into plain text. Reproduce the rota exactly as a table: one line per person, columns separated by two or more spaces, and a first line of column headings giving the day and date of each column. Keep every name and every cell, including days marked OFF. Use 24-hour times written as HH:MM-HH:MM. Return ONLY the table, no prose and no markdown fences.';
+      /* Transcribe, do not interpret. The prompt asks for the sheet's own layout back —
+         including the one with the dates down the side — because the parser already knows how
+         to read both, and a model asked to reshape a rota starts inventing columns. Cells are
+         copied verbatim, D/O and HOL included, so the same rules decide what is a shift. */
+      const sys='You transcribe photographs of staff work rotas into plain text, exactly as laid out. Use a TAB between every column and one line per row, keeping empty columns as empty cells so every column stays aligned with its heading. Include the heading row that names the people. Copy each cell verbatim — do not convert, expand or tidy them: "8-6", "9-5", "D/O", "HOL" and "Bank Holiday" must come back exactly as written. Keep the date column exactly as printed. Do not add, merge, reorder or omit any row or column. Return ONLY the table, no prose and no markdown fences.';
       const text=await window.claude.complete({ role:'image', system:sys, messages:[{role:'user', content:[
         {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
         {type:'text', text:'Transcribe this work rota as the plain-text table described.'}
@@ -16926,7 +16937,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(!clean){ this.setState({rotaPhotoLoading:false, rotaErr:'Nothing readable came back from that photo.'}); return; }
       this.setState({rotaText:clean, rotaPhotoLoading:false});
       this.parseRotaText();
-    }catch(e){ this.setState({rotaPhotoLoading:false, rotaErr:'Could not read that photo.'}); }
+    }catch(e){
+      /* The reason was being swallowed, which left "Could not read that photo" as the answer
+         to a quota, a timeout and a corrupt file alike. */
+      const why=(e&&e.message)?(' \u2014 '+String(e.message).slice(0,140)):'';
+      this.setState({rotaPhotoLoading:false, rotaErr:'Could not read that photo'+why+'. Copying the cells straight out of the spreadsheet is more reliable than a picture of one: select the rows you want, including the row with everyone\u2019s names, and paste them here.'});
+    }
   }
   confirmRotaImport(){
     const RI=window.RotaImport;

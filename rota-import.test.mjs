@@ -260,6 +260,127 @@ Madoxs 09:00-17:00`);
   eq(r.offDays[0].date, '2026-09-14', 'and it is the Monday');
 });
 
+/* ---- the real thing ----------------------------------------------------------------
+   Transcribed from the rota this feature was built for: a Google Sheet with the dates down
+   column A, the weekday in B, and a person per column with a running hours count between
+   each pair. Tab-separated, which is what copying cells out of a sheet gives you. */
+const REAL = [
+  '\t\tChristine\t\tHarriette\t\tTony\t\tAbbie\t\tMadoxs\t\tChris 2 (Moore)\t\t\tOvertime & Lieu Days',
+  '03/09/2026\tThursday\tD/O\t0\tBank Holiday\t9\t8-6\t9\tD/O\t0\t8-6\t9\t8-5\t8\t\t3',
+  '04/09/2026\tFriday\tBank Holiday\t9\tD/O\t0\t8-6\t9\t8-6\t9\t8-6\t9\t8-6\t9\t\t4',
+  '05/09/2026\tSaturday\t9-5\t7\t9-5\t7\tD/O\t0\t9-5\t7\t9-5\t7\t9-5\t7\t\t5',
+  '\t\t\t40\t\t40\t\t40\t\t40\t\t40\t\t40',
+  '06/09/2026\tSunday\t10-4\t6\t10-4\t6\tD/O\t0\t10-4\t6\t10-4\t6\t10-4\t6\t\t5',
+  '07/09/2026\tMonday\t8-6\t9\t8-5\t8\tBank Holiday\t8\t8-6\t9\t8-6\t9\tBank Holiday\t9\t\t4',
+  '08/09/2026\tTuesday\tD/O 9am\t0\t8-6\t9\t8-6\t9\t8-6\t9\tD/O\t0\t8-6\t9\t\t3',
+  '09/09/2026\tWednesday\t8-6\t9\tD/O\t0\t9-5\t7\tD/O\t0\t8-6\t9\tD/O\t0\t\t3',
+  '10/09/2026\tThursday\t8-6\t9\t8-5\t8\tD/O\t0\tD/O\t0\tD/O\t0\t8-6\t9\t\t3',
+  '11/09/2026\tFriday\tD/O\t0\t8-6\t9\t8-6\t9\tBank Holiday\t9\t8-6\t9\tD/O\t0\t\t3',
+  '12/09/2026\tSaturday\t9-5\t7\tD/O\t0\t9-5\t7\t9-5\t7\t9-5\t7\t9-5\t7\t\t5',
+  '\t\t\t40\t\t40\t\t40\t\t40\t\t40\t\t40',
+  '13/09/2026\tSunday\t10-4\t6\t10-4\t6\t10-4\t6\tD/O\t0\t10-4\t6\t10-4\t6\t\t5',
+  '14/09/2026\tMonday\tD/O\t0\t8-6\t9\t8-6\t9\t9-5\t7\tD/O\t0\tD/O\t0\t\t3',
+  '15/09/2026\tTuesday\t8-6 08:30\t9\t8/6\t9\tD/O\t0\t8-6\t9\tBank Holiday\t9\t8-6\t9\t\t4',
+  '16/09/2026\tWednesday\t8-6\t9\tD/O\t0\t8-6\t9\t8-5\t8\t8-6\t9\tD/O\t0\t\t4',
+  '19/09/2026\tSaturday\tHOL\t7\t9-5\t7\t9-5\t7\t9-5\t7\t9-5\t7\t9-5\t7\t\t5',
+  '\t\t\t40\t\t40\t\t40\t\t40\t\t40\t\t40',
+  'October',
+  '01/10/2026\tThursday\tD/O\t0\t8-6\t9\t8-6\t9\tD/O\t0\tHOL\t9\t8-6\t9\t\t3',
+  '02/10/2026\tFriday\t8-6\t9\tD/O\t0\tD/O\t0\t8-6\t9\tHOL\t9\tD/O\t0\t\t2',
+  '03/10/2026\tSaturday\t9-5\t7\t9-5\t7\t9-5\t7\t9-5\t7\tHOL\t7\t9-5\t7\t\t5',
+].join('\n');
+/* Today is fixed at the Wednesday in the middle of it, as the app would see it. */
+const R = (me = 'Mr Madoxs Harvey') => RI.parse(REAL, { me, todayKey: '2026-09-09' });
+
+t('the real rota: dates down the side, a person per column', async () => {
+  const r = R();
+  eq(r.shape, 'grid-down', 'read as the wrong shape');
+  const days = r.rows.map(x => x.date + ' ' + x.start + '-' + x.end);
+  eq(days.join('\n'), [
+    '2026-09-03 08:00-18:00',
+    '2026-09-04 08:00-18:00',
+    '2026-09-05 09:00-17:00',
+    '2026-09-06 10:00-16:00',
+    '2026-09-07 08:00-18:00',
+    '2026-09-09 08:00-18:00',
+    '2026-09-11 08:00-18:00',
+    '2026-09-12 09:00-17:00',
+    '2026-09-13 10:00-16:00',
+    '2026-09-16 08:00-18:00',
+    '2026-09-19 09:00-17:00',
+  ].join('\n'), 'the shifts against Madoxs are wrong');
+});
+
+t('the real rota: the name on the account is not the name on the sheet', async () => {
+  /* The sheet says "Madoxs"; the account says "Mr Madoxs Harvey". */
+  eq(R().rows.length, 11, 'the full name should still find the column');
+  eq(R('Madoxs').rows.length, 11, 'and so should the bare one');
+  /* Christine's column is a different column, not a different reading of the same one:
+     she is in on the Thursday he has off, and off on the Friday he is in. */
+  const c = R('Christine').rows.map(x => x.date);
+  ok(c.includes('2026-09-10'), 'Christine works the Thursday');
+  ok(!R().rows.some(x => x.date === '2026-09-10'), 'and Madoxs has it off');
+  ok(!c.includes('2026-09-11'), 'Christine has the Friday off');
+  ok(R().rows.some(x => x.date === '2026-09-11'), 'and Madoxs works it');
+});
+
+t('the real rota: D/O, HOL and Bank Holiday are all days out', async () => {
+  const r = R();
+  const off = r.offDays.map(x => x.date + ' ' + x.cell);
+  ok(off.includes('2026-09-08 D/O'), 'a D/O should be a day off: ' + off.join(', '));
+  ok(off.includes('2026-09-10 D/O'), 'and the Thursday');
+  ok(off.includes('2026-09-15 Bank Holiday'), 'and the bank holiday');
+  ok(off.includes('2026-10-01 HOL'), 'and the annual leave in October');
+  eq(r.untimed.length, 0, 'nothing of his is untimed — every cell says either hours or a day out');
+  const dates = r.rows.map(x => x.date);
+  ok(!dates.includes('2026-09-15'), 'a bank holiday must not become a shift');
+  ok(!dates.includes('2026-10-01'), 'and neither must a holiday');
+});
+
+t('the real rota: who he is on with, on a real day', async () => {
+  const r = R();
+  /* Wednesday 9 September: Madoxs 8-6, Christine 8-6, Tony 9-5. Harriette, Abbie and Chris
+     are all D/O, and the hours columns are not people. */
+  const wed = r.rows.find(x => x.date === '2026-09-09');
+  ok(wed, 'the Wednesday is missing');
+  eq(RI.withLabel(wed), 'Christine 08:00-18:00 · Tony 09:00-17:00', 'wrong company on the Wednesday');
+  const sun = r.rows.find(x => x.date === '2026-09-06');
+  eq(RI.withLabel(sun), 'Abbie 10:00-16:00 · Chris 2 (Moore) 10:00-16:00 · Christine 10:00-16:00 · Harriette 10:00-16:00',
+    'the Sunday should be everyone but Tony, who is D/O');
+});
+
+t('the real rota: the hours columns and the total rows are not people', async () => {
+  const r = R();
+  ok(r.people.indexOf('40') < 0, 'a weekly total is not a colleague');
+  ok(!r.people.some(p => /^\d+$/.test(p)), 'an hours count is not a colleague: ' + r.people.join(','));
+  eq(r.people.sort().join(','), 'Abbie,Chris 2 (Moore),Christine,Harriette,Madoxs,Tony',
+    'the cast should be the six people and nothing else');
+});
+
+t('the real rota: a month divider and a blank week do not derail it', async () => {
+  const r = R();
+  ok(r.rows.some(x => x.date.startsWith('2026-09')), 'September survived');
+  ok(r.offDays.some(x => x.date.startsWith('2026-10')), 'and October was still read');
+});
+
+t('the real rota: the heading row has to be in the paste, and it says so', async () => {
+  /* A sheet keeps the names frozen at the top, so copying a block of weeks leaves them
+     behind — and without them nothing says which column is yours. */
+  const noHead = REAL.split('\n').slice(1).join('\n');
+  const r = RI.parse(noHead, { me: 'Madoxs', todayKey: '2026-09-09' });
+  eq(r.rows.length, 0, 'it must not guess a column');
+  ok(/names is not in what you pasted/.test(r.warn), 'the message should say what is missing: ' + r.warn);
+  ok(/including that row/.test(r.warn), 'and what to do about it');
+});
+
+t('the real rota: a cell with a note but no range is handed back, not guessed at', async () => {
+  /* "D/O 9am" is Christine's, and it is neither a clean day off nor a time range. */
+  const r = R('Christine');
+  const un = r.untimed.map(x => x.cell);
+  ok(un.includes('D/O 9am'), 'it should be reported rather than read as either thing: ' + un.join(', '));
+  ok(!r.rows.some(x => x.date === '2026-09-08'), 'and nothing should be added for that day');
+});
+
 t('everyone on the rota is reported, so a misspelling can be spotted', async () => {
   const r = P(`Name    Mon 14
 Madoxs  09:00-17:00

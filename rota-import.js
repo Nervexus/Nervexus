@@ -246,6 +246,60 @@
 
   /* ---- the three shapes ------------------------------------------------ */
 
+  /* The other grid, and the one a spreadsheet actually produces: dates down the first
+     column, a person per column, with the days of the week beside the dates and a running
+     hours count between each pair of people.
+
+              A            B          C          D   E          F   ...
+       1                              Christine      Harriette
+       2      03/09/2026   Thursday   D/O        0   Bank Hol    9
+       3      04/09/2026   Friday     8-6        9   D/O         0
+
+     The person's column comes from the heading row, so that row has to be in the paste —
+     without it there is nothing saying which column is yours. Copying the cells straight out
+     of the sheet gives tab-separated text, which keeps the empty columns and so keeps every
+     column lined up with its heading. */
+  function parseGridDown(lines, todayKey) {
+    var rows = lines.map(function (l) { return cells(l); });
+    var dated = [];
+    for (var i = 0; i < rows.length; i++)
+      if (rows[i].length >= 2 && !readTimes(rows[i][0]) && readDate(rows[i][0], todayKey)) dated.push(i);
+    if (dated.length < 2) return null;
+
+    /* The heading row is the nearest row above the dates that names people: words, with no
+       dates, hours or bare numbers among them. Weekly-total rows (40, 40, 40) and a month
+       divider are neither, so neither is mistaken for it. */
+    var head = null;
+    for (var h = dated[0] - 1; h >= 0; h--) {
+      var named = 0, bad = 0;
+      for (var j = 1; j < rows[h].length; j++) {
+        var c = rows[h][j];
+        if (!c) continue;
+        if (readTimes(c) || readDate(c, todayKey) || /^[\d.,%]+$/.test(c)) { bad++; continue; }
+        if (/[a-z]{2,}/i.test(c)) named++;
+      }
+      if (named >= 1 && named >= bad) { head = rows[h]; break; }
+    }
+    if (!head) return { shifts: [], blanks: [], needHeader: true };
+
+    var shifts = [], blanks = [], used = false;
+    for (var d = 0; d < dated.length; d++) {
+      var row = rows[dated[d]];
+      var date = readDate(row[0], todayKey);
+      for (var k = 1; k < head.length; k++) {
+        var who = head[k];
+        if (!who || !/[a-z]{2,}/i.test(who)) continue;      // an hours column has no heading
+        var cell = row[k];
+        if (cell == null || cell === '') continue;
+        if (DOW[String(cell).toLowerCase()] != null) continue;   // the weekday column
+        if (/^[\d.,%]+$/.test(cell)) continue;                   // an hours count, not a shift
+        var t = readTimes(cell);
+        if (t) { shifts.push({ who: who, date: date, start: t.start, end: t.end, overnight: t.overnight, raw: lines[dated[d]] }); used = true; }
+        else blanks.push({ who: who, date: date, cell: cell, off: OFF.test(cell) });
+      }
+    }
+    return used ? { shifts: shifts, blanks: blanks } : (blanks.length ? { shifts: [], blanks: blanks } : null);
+  }
   function parseGrid(lines, todayKey) {
     var shifts = [], blanks = [], header = null, used = false;
     for (var i = 0; i < lines.length; i++) {
@@ -348,8 +402,13 @@
     if (!tokens(me).filter(function (t) { return t.length >= 3; }).length)
       return empty('Put your name in first — the rota has everyone on it, and that is how it knows which shifts are yours.');
 
-    var shape = 'grid';
-    var got = parseGrid(lines, todayKey);
+    /* Dates-down is tried first. A dated row with nothing in it reads as a heading to the
+       names-down parser, so letting that one go first would take the sheet apart wrongly. */
+    var shape = 'grid-down';
+    var got = parseGridDown(lines, todayKey);
+    if (got && got.needHeader)
+      return empty('That looks like a rota with the dates down the side and a column each for the people — but the row with everyone\u2019s names is not in what you pasted, so there is nothing to say which column is yours. Copy it again including that row.');
+    if (!got) { shape = 'grid'; got = parseGrid(lines, todayKey); }
     if (!got) { shape = 'blocks'; got = parseBlocks(lines, todayKey); }
     if (!got) { shape = 'lines'; got = parseLines(lines, todayKey); }
     if (!got) return empty('Could not find any shifts in that. A rota needs a date and a time range — "Mon 14  09:00-17:00" — and a name against each one.');
