@@ -352,17 +352,27 @@ async function sweepCalendarEvents(admin: any, userId: string, name: string, pre
          anything more than a general one, and if a work event has neither it reads exactly
          like a general task, because that is all that is known about it. */
       const isWork = (e.kind || 'general') === 'work';
-      const when = e.end_time ? `from ${e.event_time} till ${e.end_time}` : `at ${e.event_time}`;
-      const withWho = e.attendees ? ` with ${e.attendees}` : '';
+      const hours = e.end_time ? `${e.event_time}\u2013${e.end_time}` : e.event_time;
+      /* A shift imported from a rota is titled "Work", so repeating it reads as "you have
+         Work from 09:00". A title that says nothing beyond what the section already says is
+         left out; a real one — "Team meeting" — is kept. */
+      const generic = /^(?:work|shift|rota|working)$/i.test((e.title || '').trim());
+      const withWho = e.attendees ? ` You are on with ${e.attendees}.` : '';
       const takes = e.est_minutes ? ` This should take about ${humanMins(e.est_minutes)}.` : '';
       const line = isWork
-        ? `For tomorrow you have ${e.title} ${when}${withWho}.`
+        ? (e.end_time
+            ? (generic ? `Tomorrow you are working ${hours}.${withWho}`
+                       : `Tomorrow you have ${e.title}, ${hours}.${withWho}`)
+            : `Tomorrow you have ${e.title} at ${e.event_time}.${withWho}`)
         : `For tomorrow you have ${e.title} at ${e.event_time}, which you have set for yourself to do.${takes}`;
       sent += await collect(admin, bundle, {
-        section: 'calendar',
+        /* Work goes in the Work section. A shift is not an appointment: it is the shape of
+           the day everything else has to fit around. */
+        section: isWork ? 'work' : 'calendar',
         line,
-        subject: (name ? 'Hey ' + name + ' — ' : '') + 'tomorrow: ' + e.title,
-        meta: (e.end_time ? e.event_time + '\u2013' + e.end_time : e.event_time) + ' tomorrow',
+        subject: (name ? 'Hey ' + name + ' — ' : '')
+          + (isWork && generic && e.end_time ? 'tomorrow: ' + hours + ' shift' : 'tomorrow: ' + e.title),
+        meta: hours + ' tomorrow',
         priority: 'normal',
         category: 'calendar', sourceType: 'event',
         dedupeKey: 'calendar-email:' + e.id + ':' + todayStr,

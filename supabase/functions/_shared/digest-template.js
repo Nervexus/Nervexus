@@ -17,6 +17,9 @@
    say comes first because it is the only category with a deadline attached to it. */
 var SECTIONS = [
   { key: 'performance', label: 'Performance Terminal' },
+  /* Work is its own section rather than a line under Calendar. A shift is not an appointment
+     — it decides what is left of the day around it — so it is read first and separately. */
+  { key: 'work',        label: 'Work' },
   /* Daily Checklists and Tasks & Missions were two sections saying the same thing, and the
      owner said so outright. One section, one line, one count. */
   { key: 'tasks',       label: 'Daily Tasks' },

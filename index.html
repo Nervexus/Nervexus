@@ -342,7 +342,7 @@
 <script src="anatomy-3d.js?v=9"></script>
 <script src="exercise-index.js?v=4"></script>
 <script src="finance-import.js?v=2"></script>
-<script src="rota-import.js?v=1"></script>
+<script src="rota-import.js?v=2"></script>
 <script src="ai-gateway.js?v=2"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -694,6 +694,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
               </sc-for>
             </div>
+            <sc-if value="{{ rotaHasNote }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11.5px; color:#8a8a92; line-height:1.55; margin:-6px 0 16px;">{{ rotaNote }}</div>
+            </sc-if>
             <div style="display:flex; gap:10px;">
               <span onClick="{{ backToRotaText }}" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13px;">Back</span>
               <span onClick="{{ confirmRota }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">{{ rotaAddLabel }}</span>
@@ -9271,7 +9274,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.09-287 · v11.287 rota-import';
+const NOTIF_BUILD_VERSION = '2026.09.09-288 · v11.288 rota-days-off';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9345,7 +9348,7 @@ class Component extends DCLogic {
       workouts: s.workouts || [],
       woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
-      rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false,
+      rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
       // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
       income: s.income || [],
       // No seeded expenses. Was $92,300 of invented costs, analysed as though they were yours.
@@ -14084,6 +14087,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.288', date:'Sep 9, 2026', major:false, notes:[
+      'The rota import knows a day off when it sees one: HOL, D/O, A/L, B/H, TOIL, LIEU, REST, X, a dash, an empty cell.',
+      'And the rule behind it, which matters more than the list \u2014 a day with no hours on it is a day out. That covers the shift codes a rota uses without saying when they are, E or LATE or N: they cannot go in a diary as a time, so nothing is added for them. They are named back to you instead, so you can add the hours and import again.',
+      'The review now says what it left out: how many days off, and which days were on your rota with no time given.',
+      'Shifts have their own Work section in the evening email, rather than sitting under Calendar \u2014 a shift is not an appointment, it is the shape of the day everything else fits around.',
+      'The night-before email reads as a shift: "Tomorrow you are working 09:00\u201317:00. You are on with Sarah 12:00-20:00." The subject says the hours instead of the word Work. It goes at 9pm the evening before, in the same one email as everything else outstanding.',
+    ]},
     {version:'v11.287', date:'Sep 9, 2026', major:true, notes:[
       'The calendar takes a work rota. Paste the whole thing \u2014 everyone on it \u2014 put your name in, and it keeps the shifts that are yours and drops the rest.',
       'Each shift records who you are on with. Not everyone rostered that day: the people whose hours actually overlap yours, with the times they are in, so a closer on 17:00\u201301:00 does not show up on your six-till-two.',
@@ -16883,19 +16893,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      the write, and the name is what decides which rows are the user's. It defaults to the
      account name because that is almost always what is printed on the sheet, and stays
      editable because sometimes it is not. */
-  openRotaImport(){ this.setState({ rotaOpen:true, rotaText:'', rotaErr:'', rotaRows:[], rotaSkip:{},
+  openRotaImport(){ this.setState({ rotaOpen:true, rotaText:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaOff:[], rotaUntimed:[],
     rotaMe:(this.state.rotaMe||((this.state.account&&this.state.account.name)||'').trim()) }); }
   closeRotaImport(){ this.setState({rotaOpen:false, rotaPhotoLoading:false}); }
   setRotaText(e){ this.setState({rotaText:e.target.value, rotaErr:''}); }
   setRotaMe(e){ this.setState({rotaMe:e.target.value, rotaErr:''}); }
-  backToRotaText(){ this.setState({rotaRows:[], rotaSkip:{}, rotaErr:''}); }
+  backToRotaText(){ this.setState({rotaRows:[], rotaSkip:{}, rotaErr:'', rotaOff:[], rotaUntimed:[]}); }
   toggleRotaRow(i){ this.setState(s=>({rotaSkip:{...(s.rotaSkip||{}), [i]:!(s.rotaSkip||{})[i]}})); }
   parseRotaText(){
     const RI=window.RotaImport;
     if(!RI){ this.setState({rotaErr:'The rota reader did not load. Reload the page and try again.'}); return; }
     const out=RI.parse(this.state.rotaText||'', { me:this.state.rotaMe||'', todayKey:this._fbToday() });
-    if(!out.rows.length){ this.setState({rotaErr:out.warn||'No shifts found.', rotaRows:[]}); return; }
-    this.setState({rotaRows:out.rows, rotaSkip:{}, rotaErr:''});
+    if(!out.rows.length){ this.setState({rotaErr:out.warn||'No shifts found.', rotaRows:[], rotaOff:[], rotaUntimed:[]}); return; }
+    this.setState({rotaRows:out.rows, rotaSkip:{}, rotaErr:'', rotaOff:out.offDays||[], rotaUntimed:out.untimed||[]});
   }
   /* A rota is as often a photo as it is text. The picture goes to the vision model to be
      turned back into lines, and those lines then go through the same local parser and the
@@ -16935,7 +16945,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       title:e.title,event_date:e.date,event_time:e.time,repeat_days:[],kind:'work',
       end_time:e.endTime,attendees:e.attendees,est_minutes:null}));
     const skipped=keep.length-evs.length;
-    this.setState({rotaOpen:false, rotaRows:[], rotaSkip:{}, rotaText:''});
+    this.setState({rotaOpen:false, rotaRows:[], rotaSkip:{}, rotaText:'', rotaOff:[], rotaUntimed:[]});
     this.showToast('system','Rota imported', evs.length+' shift'+(evs.length===1?'':'s')+' added'+(skipped?(' \u00b7 '+skipped+' already there'):''));
   }
   openWoImport(){ this.setState({woImportOpen:true, woImportText:'', woImportErr:'', woImportRows:[], woImportDayOffset:0}); }
@@ -20939,6 +20949,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hasRotaRows:!!rows.length, noRotaRows:!rows.length,
           rotaFoundLabel:rows.length+' SHIFT'+(rows.length===1?'':'S')+' AGAINST YOUR NAME \u2014 UNTICK ANY YOU DO NOT WANT',
           rotaAddLabel:'Add '+kept+' shift'+(kept===1?'':'s'),
+          /* Days on your rota that carry no hours. Nothing is added for them — there is no
+             time to add — but they are named rather than silently dropped, because one of
+             them being an untimed shift rather than a day off is the user's to know. */
+          ...(()=>{
+            const off=S.rotaOff||[], un=S.rotaUntimed||[];
+            const list=(a)=>a.map(x=>dayName(x.date)+' '+x.cell).join(' \u00b7 ');
+            const parts=[];
+            if(off.length) parts.push(off.length+' day'+(off.length===1?'':'s')+' off: '+list(off));
+            if(un.length) parts.push(un.length+' with no hours given: '+list(un));
+            return { rotaHasNote:!!parts.length,
+              rotaNote:parts.join('  \u2014  ')+(un.length?'. Nothing was added for those \u2014 add the times to the rota and import again if any of them are shifts.':'.') };
+          })(),
           onRotaPhoto:(e)=>{ const f=e.target.files&&e.target.files[0]; if(f) this.importRotaPhoto(f); e.target.value=''; },
           rotaPhotoLabel:S.rotaPhotoLoading?'Reading photo\u2026':'\u2b06 Photo of the rota',
           rotaRows:rows.map((r,i)=>{

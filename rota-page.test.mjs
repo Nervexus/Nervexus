@@ -41,6 +41,15 @@ const ROTA = await (async () => {
   };
 })();
 
+/* The same week, with the day-off codes a real rota uses instead of hours. */
+const OFFROTA = await (async () => {
+  const d = (n) => { const x = new Date(); x.setDate(x.getDate() + n); return x; };
+  const col = (n) => { const x = d(n); return x.toLocaleDateString('en-GB', { weekday: 'short' }) + ' ' + x.getDate(); };
+  return ['Name      ' + col(3) + '      ' + col(4) + '      ' + col(5) + '      ' + col(6),
+          'Madoxs    HOL          D/O          E            09:00-17:00',
+          'Sarah     09:00-17:00  09:00-17:00  09:00-17:00  09:00-17:00'].join('\n');
+})();
+
 async function boot(patch) {
   await page.goto('http://127.0.0.1:' + PORT + '/index.html', { waitUntil: 'load' });
   await page.waitForFunction(() => !!window.__nvx, null, { timeout: 20000 });
@@ -153,6 +162,44 @@ t('a photo says what it needs rather than failing silently', async () => {
   const err = await page.evaluate(() => window.__nvx.state.rotaErr);
   ok(/no ai provider/i.test(err), 'it should name the reason: ' + err);
   ok(/text/i.test(err), 'and point at the path that does work without a key: ' + err);
+});
+
+t('a day with no hours on it is a day out, and is named', async () => {
+  /* HOL and D/O are days off; E names a shift without saying when it is, which cannot go in
+     a diary as a time. None of them are added, and all of them are reported. */
+  await boot({ rotaOpen: true, rotaMe: 'Madoxs', rotaText: OFFROTA });
+  await page.evaluate(() => window.__nvx.parseRotaText());
+  await page.waitForTimeout(500);
+  const st = await page.evaluate(() => ({
+    rows: window.__nvx.state.rotaRows.length,
+    off: window.__nvx.state.rotaOff.map(x => x.cell),
+    untimed: window.__nvx.state.rotaUntimed.map(x => x.cell),
+  }));
+  eq(st.rows, 1, 'only the day with hours on it is a shift');
+  eq(st.off.join(','), 'HOL,D/O', 'the two days off should be recognised');
+  eq(st.untimed.join(','), 'E', 'a shift code with no hours is untimed, not a day off');
+  const b = await text();
+  ok(/2 days off/.test(b), 'the review should say how many days off: ' + b.slice(0, 400));
+  ok(/1 with no hours given/.test(b), 'and name the untimed one');
+  ok(/import again/.test(b), 'and say what to do about it — add the times and re-import');
+
+  await clickText('Add 1 shift');
+  await page.waitForTimeout(600);
+  const evs = await page.evaluate(() => window.__nvx.state.events);
+  eq(evs.length, 1, 'nothing should be written for a day with no hours');
+});
+
+t('an imported shift shows on the calendar as work', async () => {
+  await boot({ rotaOpen: true, rotaMe: 'Madoxs', rotaText: ROTA.text });
+  await page.evaluate(() => window.__nvx.parseRotaText());
+  await page.waitForTimeout(400);
+  await clickText('Add 2 shifts');
+  await page.waitForTimeout(700);
+  // The import selects the first shift's day, so the day panel is already showing it.
+  const b = await text();
+  ok(b.includes('WORK'), 'the shift should be tagged WORK on the calendar: ' + b.slice(0, 400));
+  ok(/09:00[–-]17:00/.test(b), 'the day panel should show the hours');
+  ok(/with Sarah 12:00-20:00/.test(b), 'and who he is on with');
 });
 
 t('nothing threw through any of it', async () => {

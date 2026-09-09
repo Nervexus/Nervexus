@@ -255,9 +255,43 @@ async function calLine(ev){
 
 t('a work event reads with its end time and who is there', async()=>{
   const body=await calLine(tomorrowEvent({ kind:'work', end_time:'17:00', attendees:'Dan and Priya' }));
-  if(!body.includes('from 09:00 till 17:00')) throw new Error('no time range:\n'+body);
+  if(!body.includes('09:00\u201317:00')) throw new Error('no time range:\n'+body);
   if(!body.includes('with Dan and Priya')) throw new Error('no attendees:\n'+body);
+  if(!body.includes('Client review')) throw new Error('a work event with a real title should keep it:\n'+body);
   if(/set for yourself to do/.test(body)) throw new Error('used the general wording for a work event');
+});
+
+/* A shift imported from a rota. Title "Work", an end time, and the people whose hours
+   overlap — the email is the whole reason the attendees are kept at import. */
+t('a rota shift reads as a shift, with who is on it', async()=>{
+  const body=await calLine(tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00',
+    attendees:'Sarah 12:00-20:00 \u00b7 Tom 09:00-17:00' }));
+  if(!/Tomorrow you are working 09:00\u201317:00/.test(body)) throw new Error('not the shift wording:\n'+body);
+  if(!body.includes('Sarah 12:00-20:00')) throw new Error('lost who is on with him:\n'+body);
+  if(!body.includes('Tom 09:00-17:00')) throw new Error('lost the second name:\n'+body);
+  // "you have Work from 09:00" — the title says nothing the section has not already said.
+  if(/have Work/.test(body)) throw new Error('repeated the generic title:\n'+body);
+});
+
+/* Section headings are upper-cased in the plain-text part. */
+t('a shift is filed under Work, not under Calendar', async()=>{
+  const body=await calLine(tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00', attendees:'Sarah 12:00-20:00' }));
+  if(!/^WORK$/m.test(body)) throw new Error('no Work section:\n'+body);
+  if(/^CALENDAR$/m.test(body)) throw new Error('a shift should not also be under Calendar:\n'+body);
+});
+
+t('a general event is still filed under Calendar', async()=>{
+  const body=await calLine(tomorrowEvent({ kind:'general' }));
+  if(!/^CALENDAR$/m.test(body)) throw new Error('a general event belongs under Calendar:\n'+body);
+  if(/^WORK$/m.test(body)) throw new Error('a general event should not be under Work:\n'+body);
+});
+
+t('the subject names the shift rather than the word Work', async()=>{
+  reset();
+  const admin=makeAdmin(calTables(tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00', attendees:'Sarah 12:00-20:00' })));
+  await sweepUser(admin,UID,'Sam',calPrefs());
+  const subj=email.sends[0].subject;
+  if(!/09:00\u201317:00 shift/.test(subj)) throw new Error('subject should say the hours: '+subj);
 });
 
 t('a general task reads with its rough duration', async()=>{

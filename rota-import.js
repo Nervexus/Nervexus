@@ -44,10 +44,16 @@
               wed:3, weds:3, wednesday:3, we:3, thu:4, thur:4, thurs:4, thursday:4, th:4,
               fri:5, friday:5, fr:5, sat:6, saturday:6, sa:6 };
 
-  /* A cell that means "not working". `-` and `x` are here because that is what a printed
-     rota uses for a day off; they are only read this way when they are the whole cell, so a
-     time range keeps its hyphen. */
-  var OFF = /^(?:off|o|x{1,2}|-{1,3}|–|—|rest|r\/?d|rd|hol|hols|holiday|a\/?l|al|leave|annual leave|sick|s|n\/?a|nil|none|not working|day off|free)$/i;
+  /* The rule about a day with no hours is simple and it is not this list: a cell with no
+     readable time range is not a shift, whatever it says. That covers HOL, D/O, a blank, and
+     equally the shift codes some rotas use — E, L, N — which name a shift without saying
+     when it is. None of them can be put in a diary as a time, so none of them are.
+
+     This vocabulary exists only to tell the two apart when reporting back: a cell that says
+     A/L is a day off and that is the end of it, while a cell that says something else with no
+     hours is a shift the rota has not given a time for, and is worth naming so the hours can
+     be added and the rota re-imported. */
+  var OFF = /^(?:off|o|x{1,2}|-{1,3}|–|—|rest|r\/?d|rd|d\/?o|do|day ?off|days? out|hol|hols|holiday|holidays|b\/?h|bank ?hol(?:iday)?|a\/?l|al|ann(?:ual)? ?leave|leave|lieu|toil|sick|s\/?l|sl|unpaid|mat(?:ernity)? ?leave|pat(?:ernity)? ?leave|n\/?a|nil|none|not working|free|unavail(?:able)?)$/i;
 
   /* Words a rota header uses for the person column, so it is not mistaken for a name. */
   var NAME_HEADER = /^(?:name|names|staff|employee|employees|team|member|colleague|person|who|rota|shift|shifts)$/i;
@@ -241,7 +247,7 @@
   /* ---- the three shapes ------------------------------------------------ */
 
   function parseGrid(lines, todayKey) {
-    var shifts = [], header = null, used = false;
+    var shifts = [], blanks = [], header = null, used = false;
     for (var i = 0; i < lines.length; i++) {
       var h = headerDates(lines[i], todayKey);
       if (h) {
@@ -264,25 +270,32 @@
         var date = header[j];
         if (!date) continue;
         var cell = c[j];
-        if (!cell || OFF.test(cell)) continue;
-        var t = readTimes(cell);
-        if (!t) continue;
-        shifts.push({ who: who, date: date, start: t.start, end: t.end, overnight: t.overnight, raw: lines[i] });
-        used = true;
+        var t = cell ? readTimes(cell) : null;
+        if (t) {
+          shifts.push({ who: who, date: date, start: t.start, end: t.end, overnight: t.overnight, raw: lines[i] });
+          used = true;
+        } else if (cell) {
+          blanks.push({ who: who, date: date, cell: cell, off: OFF.test(cell) });
+        }
       }
     }
-    return used ? shifts : null;
+    return used ? { shifts: shifts, blanks: blanks } : null;
   }
 
   function parseBlocks(lines, todayKey) {
-    var shifts = [], day = null, sawHeading = false;
+    var shifts = [], blanks = [], day = null, sawHeading = false;
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       var t = readTimes(line);
       if (!t) {
-        // No hours on the line at all — if it reads as a date, it opens a day.
+        // No hours on the line at all — if it reads as a date, it opens a day. Otherwise it
+        // is somebody down for that day with nothing said about when.
         var d = readDate(line, todayKey);
-        if (d && !isLongLine(line)) { day = d; sawHeading = true; }
+        if (d && !isLongLine(line)) { day = d; sawHeading = true; continue; }
+        if (day && !isLongLine(line)) {
+          var w = tidyName(line.replace(new RegExp('\\b(?:' + OFF.source.replace(/^\^\(\?:|\)\$$/g, '') + ')\\b', 'i'), ' '));
+          blanks.push({ who: w || tidyName(line), date: day, cell: tidyName(line), off: OFF.test(tidyName(line.replace(/^\s*\S+\s*/, ''))) || /\b(?:off|hol|a\/?l|d\/?o|rest|leave|sick)\b/i.test(line) });
+        }
         continue;
       }
       if (!day) continue;
@@ -290,18 +303,22 @@
       if (!who) continue;
       shifts.push({ who: who, date: day, start: t.start, end: t.end, overnight: t.overnight, raw: line });
     }
-    return (sawHeading && shifts.length) ? shifts : null;
+    return (sawHeading && shifts.length) ? { shifts: shifts, blanks: blanks } : null;
   }
   // A heading is short. "Monday I am on 9-5 with Sarah in the back" is not a heading.
   function isLongLine(line) { return tokens(line).length > 6; }
 
   function parseLines(lines, todayKey) {
-    var shifts = [];
+    var shifts = [], blanks = [];
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       var t = readTimes(line);
-      if (!t) continue;
       var d = readDate(line, todayKey);
+      if (!t) {
+        // A dated line with no hours: somebody is down for that day, time unknown.
+        if (d && !isLongLine(line)) blanks.push({ who: line, date: d, cell: tidyName(line), off: /\b(?:off|hols?|holiday|a\/?l|d\/?o|rest|leave|sick|b\/?h|lieu|toil)\b/i.test(line) });
+        continue;
+      }
       if (!d) continue;
       /* Strip the date and the hours; whatever is left is who. Several names on one line
          means several people on that shift, so each becomes a row of its own. */
@@ -315,7 +332,7 @@
       for (var j = 0; j < names.length; j++)
         shifts.push({ who: names[j], date: d, start: t.start, end: t.end, overnight: t.overnight, raw: line });
     }
-    return shifts.length ? shifts : null;
+    return shifts.length ? { shifts: shifts, blanks: blanks } : null;
   }
 
   /* ---- the whole job --------------------------------------------------- */
@@ -332,10 +349,11 @@
       return empty('Put your name in first — the rota has everyone on it, and that is how it knows which shifts are yours.');
 
     var shape = 'grid';
-    var all = parseGrid(lines, todayKey);
-    if (!all) { shape = 'blocks'; all = parseBlocks(lines, todayKey); }
-    if (!all) { shape = 'lines'; all = parseLines(lines, todayKey); }
-    if (!all) return empty('Could not find any shifts in that. A rota needs a date and a time range — "Mon 14  09:00-17:00" — and a name against each one.');
+    var got = parseGrid(lines, todayKey);
+    if (!got) { shape = 'blocks'; got = parseBlocks(lines, todayKey); }
+    if (!got) { shape = 'lines'; got = parseLines(lines, todayKey); }
+    if (!got) return empty('Could not find any shifts in that. A rota needs a date and a time range — "Mon 14  09:00-17:00" — and a name against each one.');
+    var all = got.shifts, blanks = got.blanks || [];
 
     // Anything wildly outside the window is a misread date, not a shift booked in 2031.
     var lo = addDays(todayKey, -BACK_DAYS), hi = addDays(todayKey, AHEAD_DAYS);
@@ -348,6 +366,17 @@
     var people = [];
     var seen = {};
     all.forEach(function (s) { var k = s.who.toLowerCase(); if (!seen[k]) { seen[k] = 1; people.push(s.who); } });
+
+    /* Your days with no hours on them. A rota says HOL or D/O or leaves the cell empty, and
+       there is nothing to put in a diary either way — but the ones that are not a recognised
+       day off are worth handing back, because they are shifts the rota has not timed yet. */
+    var offDays = [], untimed = [];
+    blanks.forEach(function (b) {
+      if (!isMe(b.who, me)) return;
+      if (b.date < lo || b.date > hi) return;
+      (b.off ? offDays : untimed).push({ date: b.date, cell: b.cell });
+    });
+    offDays = dedupeDays(offDays); untimed = dedupeDays(untimed);
 
     var mine = all.filter(function (s) { return isMe(s.who, me); });
     var rows = mine.map(function (s) {
@@ -370,13 +399,22 @@
 
     return {
       rows: out, people: people, shape: shape,
+      offDays: offDays, untimed: untimed,
       total: all.length, outOfRange: outOfRange,
-      warn: out.length ? '' : (people.length
+      warn: out.length ? '' : ((offDays.length || untimed.length)
+        ? 'No shifts with hours against that name — every day it names is ' + (untimed.length ? 'without a time' : 'a day off') + '.'
+        : people.length
         ? 'Found ' + all.length + ' shift' + (all.length === 1 ? '' : 's') + ' but none against that name. The rota has: ' + people.slice(0, 8).join(', ') + (people.length > 8 ? '…' : '') + '.'
         : 'Could not find any shifts in that.')
     };
   }
-  function empty(warn) { return { rows: [], people: [], shape: null, total: 0, outOfRange: 0, warn: warn }; }
+  function empty(warn) { return { rows: [], people: [], shape: null, offDays: [], untimed: [], total: 0, outOfRange: 0, warn: warn }; }
+  function dedupeDays(list) {
+    var had = {}, out = [];
+    list.forEach(function (x) { if (!had[x.date]) { had[x.date] = 1; out.push(x); } });
+    out.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    return out;
+  }
 
   /* How a row reads on the event: "Sarah 12:00-20:00 · Tom 09:00-17:00", or '' if you are on
      your own. The calendar keeps one line of text for who you are with. */

@@ -203,6 +203,63 @@ t('a tab-separated grid pasted out of a spreadsheet', async () => {
   eq(RI.withLabel(r.rows[1]), '', 'Tuesday on his own');
 });
 
+t('the day-off codes a rota actually uses', async () => {
+  const r = P(`Name    Mon 14  Tue 15  Wed 16  Thu 17  Fri 18  Sat 19  Sun 20
+Madoxs  HOL     D/O     A/L     B/H     TOIL    LIEU    09:00-17:00`);
+  eq(r.rows.length, 1, 'only the Sunday has hours on it, got ' + r.rows.map(x => x.date).join(','));
+  eq(r.offDays.length, 6, 'the other six should come back as days off, got ' + r.offDays.map(x => x.cell).join(','));
+  eq(r.untimed.length, 0, 'a recognised day off is not an untimed shift');
+});
+
+t('anything with no hours is a day out, whatever the cell says', async () => {
+  /* The rule, and it is not a vocabulary list: a shift code that names a shift without
+     saying when it is cannot go in a diary as a time, so it does not go in at all. It comes
+     back named instead, so the hours can be added and the rota re-imported. */
+  const r = P(`Name    Mon 14  Tue 15  Wed 16  Thu 17
+Madoxs  E       LATE    ?       09:00-17:00`);
+  eq(r.rows.length, 1, 'only the Thursday is a shift');
+  eq(r.untimed.length, 3, 'the three coded days should be handed back as untimed');
+  eq(r.untimed.map(x => x.cell).join(','), 'E,LATE,?', 'and named as the rota wrote them');
+  eq(r.offDays.length, 0, 'none of those is a day off — they are shifts with no time yet');
+});
+
+t('a week that is entirely off says so, rather than failing to parse', async () => {
+  const r = P(`Name    Mon 14  Tue 15
+Madoxs  HOL     HOL
+Sarah   09:00-17:00  09:00-17:00`);
+  eq(r.rows.length, 0, 'nothing to add');
+  eq(r.offDays.length, 2, 'both days are holiday');
+  ok(/day off/.test(r.warn), 'and it should say that rather than "none against that name": ' + r.warn);
+});
+
+t('somebody else being on holiday is not your holiday', async () => {
+  const r = P(`Name    Mon 14
+Madoxs  09:00-17:00
+Sarah   HOL`);
+  eq(r.offDays.length, 0, 'Sarah\u2019s holiday is not yours');
+  eq(r.untimed.length, 0, 'and it is not an untimed shift of yours either');
+  eq(r.rows.length, 1, 'your shift is still your shift');
+});
+
+t('an empty cell is a day off, not a parse failure', async () => {
+  const r = P('Name\tMon 14\tTue 15\nMadoxs\t\t09:00-17:00');
+  eq(r.rows.length, 1, 'the Tuesday only');
+  eq(r.rows[0].start, '09:00', 'and it is the one with hours');
+});
+
+t('a day off in the day-by-day shape is picked up too', async () => {
+  const r = P(`Monday 14 September
+Madoxs OFF
+Sarah 09:00-17:00
+
+Tuesday 15 September
+Madoxs 09:00-17:00`);
+  eq(r.rows.length, 1, 'one shift');
+  eq(r.rows[0].date, '2026-09-15', 'the Tuesday');
+  eq(r.offDays.length, 1, 'Monday is a day off');
+  eq(r.offDays[0].date, '2026-09-14', 'and it is the Monday');
+});
+
 t('everyone on the rota is reported, so a misspelling can be spotted', async () => {
   const r = P(`Name    Mon 14
 Madoxs  09:00-17:00
