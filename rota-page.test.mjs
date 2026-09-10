@@ -62,6 +62,12 @@ async function boot(patch) {
   await page.waitForTimeout(600);
 }
 const text = () => page.evaluate(() => document.body.innerText);
+/* The control is an arrow span plus its words, so it is no longer a childless element. */
+const clickRotaImport = () => page.evaluate(() => {
+  const el = [...document.querySelectorAll('div,label')].find(e => e.textContent.trim() === 'Import work rota');
+  if (!el) throw new Error('no rota import control on the calendar');
+  el.click();
+});
 const clickText = (s) => page.evaluate((want) => {
   const el = [...document.querySelectorAll('div,span')]
     .find(e => e.children.length === 0 && e.textContent.trim() === want);
@@ -72,7 +78,7 @@ const clickText = (s) => page.evaluate((want) => {
 t('the calendar offers a rota import', async () => {
   await boot();
   ok((await text()).includes('Import work rota'), 'there is no rota import on the calendar');
-  await clickText('⬆ Import work rota');
+  await clickRotaImport();
   await page.waitForTimeout(500);
   const b = await text();
   ok(b.includes('YOUR NAME ON THE ROTA'), 'the modal did not open');
@@ -313,7 +319,9 @@ t('an imported shift shows on the calendar as work', async () => {
   // The import selects the first shift's day, so the day panel is already showing it.
   const b = await text();
   ok(b.includes('WORK'), 'the shift should be tagged WORK on the calendar: ' + b.slice(0, 400));
-  ok(/09:00[–-]17:00/.test(b), 'the day panel should show the hours');
+  /* Start and finish are stacked in the time column now rather than printed as one range,
+     so both have to be there — not the string that used to join them. */
+  ok(/09:00/.test(b) && /17:00/.test(b), 'the day panel should show both ends of the shift');
   ok(/with Sarah 12:00-20:00/.test(b), 'and who he is on with');
 });
 

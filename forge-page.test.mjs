@@ -1301,7 +1301,8 @@ t('Bulk Import opens on the Forge, without leaving it', async () => {
   await page.waitForTimeout(600);
   await page.evaluate(() => {
     const el = [...document.querySelectorAll('span')]
-      .find(e => e.children.length === 0 && /Bulk Import/.test(e.textContent));
+      /* The chip carries a drawn arrow now, so it has one element child rather than none. */
+      .find(e => e.children.length <= 1 && e.textContent.trim() === 'Bulk Import');
     if (!el) throw new Error('no Bulk Import button on the Forge home');
     el.click();
   });
@@ -1318,7 +1319,7 @@ t('Bulk Import opens on the Forge, without leaving it', async () => {
   await page.waitForTimeout(600);
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
-      .find(e => e.children.length === 0 && /Bulk Import/.test(e.textContent)).click();
+      .find(e => e.children.length <= 1 && e.textContent.trim() === 'Bulk Import').click();
   });
   await page.waitForTimeout(700);
   ok(await page.evaluate(() => !![...document.querySelectorAll('div')]

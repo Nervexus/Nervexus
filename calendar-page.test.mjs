@@ -197,6 +197,99 @@ t('the type toggle is the raiment colour, not a black button', async () => {
   ok(st.accent, 'the raiment accent token should be defined');
 });
 
+const dropZone = (label) => page.evaluate((want) => {
+  const el = [...document.querySelectorAll('div,label')].find(e => e.textContent.trim() === want);
+  if (!el) return null;
+  const cs = getComputedStyle(el);
+  const icon = el.querySelector('[data-icon]');
+  return {
+    ink: cs.color, border: cs.borderTopColor, style: cs.borderTopStyle,
+    icon: icon ? getComputedStyle(icon).color : null,
+    emoji: /[⬀-⯿←-⇿️]/.test(el.textContent),
+    lines: Math.round(el.getBoundingClientRect().height),
+  };
+}, label);
+
+t('the import controls take the raiment, not a hard-coded dark-theme grey', async () => {
+  /* They were a white dashed border and #c3c3ca text — written for a dark background and
+     very nearly invisible on an ivory card. */
+  await boot();
+  for (const [style, want] of [['Ultra X', 'rgb(91, 26, 26)'], ['Maison Élysée', 'rgb(60, 90, 125)'], ['Noir', 'rgb(196, 189, 176)']]) {
+    await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
+    await page.waitForTimeout(900);
+    const z = await dropZone('Import work rota');
+    ok(z, 'the rota import is missing on ' + style);
+    eq(z.ink, want, style + ': the label is not the raiment ink');
+    eq(z.style, 'dashed', style + ': it should still read as a drop zone');
+    ok(z.border !== 'rgba(255, 255, 255, 0.2)', style + ': the border is still the dark-theme white');
+  }
+});
+
+t('the arrow is the same colour as the words beside it', async () => {
+  /* The Ultra sheet paints every [data-icon] the theme accent with !important, which is right
+     for the nav — where the icon is the control — and wrong inside a button with its own ink:
+     the arrow came out near-black against an oxblood label. */
+  await boot();
+  await page.evaluate(() => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', 'Ultra X'); });
+  await page.waitForTimeout(900);
+  for (const label of ['Import work rota', 'Calendar screenshot · appointments only']) {
+    const z = await dropZone(label);
+    ok(z, label + ' is missing');
+    eq(z.icon, z.ink, label + ': the arrow does not match its own label');
+  }
+});
+
+t('the arrow is drawn, not an emoji the platform colours itself', async () => {
+  /* ⬆ renders as a blue iOS glyph that cannot take the colour of the control it sits in. */
+  await boot();
+  for (const label of ['Import work rota', 'Calendar screenshot · appointments only']) {
+    const z = await dropZone(label);
+    eq(z.emoji, false, label + ' still carries an emoji arrow');
+    ok(z.icon !== null, label + ' has no drawn icon at all');
+  }
+  /* Scoped to what is actually rendered: outerHTML also carries the source comment that
+     explains why the emoji went, which is not an emoji on the page. */
+  const shown = await page.evaluate(() => document.body.innerText);
+  ok(!/\u2b06/.test(shown), 'an emoji arrow is still being rendered somewhere');
+});
+
+t('a shift shows when it ends, not only when it starts', async () => {
+  /* The end time was already on the event and the only place it appeared was buried in the
+     line beside who you are with. The time column had room for it all along. */
+  const d = day(1);
+  await boot({ events: [
+    { id: 'w', title: 'Work', date: d, time: '08:00', repeat: [], kind: 'work', endTime: '18:00', attendees: 'Christine 08:00-18:00' },
+    { id: 'g', title: 'Dentist', date: d, time: '15:00', repeat: [], kind: 'general', estMins: 45 },
+  ], calSel: d });
+  /* Climb from the title to the first ancestor that also carries a clock time: the row's
+     depth is a detail of the markup and not what is being tested. */
+  const rowOf = (title) => {
+    let el = [...document.querySelectorAll('div,span')].find(e => e.children.length === 0 && e.textContent.trim() === title);
+    while (el && !/^\d\d:\d\d$/m.test(el.innerText || '')) el = el.parentElement;
+    return el ? el.innerText : null;
+  };
+  const rows = await page.evaluate((fn) => ({ text: eval('(' + fn + ')')('Work') }), rowOf.toString());
+  ok(/08:00/.test(rows.text) && /18:00/.test(rows.text), 'the shift row should carry both times: ' + JSON.stringify(rows.text));
+  /* Stacked, not side by side: the finish sits on its own line under the start. */
+  ok(/08:00\s*\n\s*18:00/.test(rows.text), 'the end time should sit under the start: ' + JSON.stringify(rows.text));
+  ok(/with Christine/.test(rows.text), 'and who he is on with is still there');
+  /* And the detail line no longer opens with the hours it used to repeat. Christine's own
+     08:00-18:00 stays — that is her shift, not his, and it is the point of the field. */
+  const detail = rows.text.split('\n').find(l => /Christine/.test(l));
+  ok(/^with /.test(detail), 'the detail line should lead with who, not with the hours: ' + JSON.stringify(detail));
+});
+
+t('an event with no end time shows one time and no empty line', async () => {
+  const d = day(1);
+  await boot({ events: [{ id: 'g', title: 'Dentist', date: d, time: '15:00', repeat: [], kind: 'general' }], calSel: d });
+  const row = await page.evaluate(() => {
+    let el = [...document.querySelectorAll('div,span')].find(e => e.children.length === 0 && e.textContent.trim() === 'Dentist');
+    while (el && !/^\d\d:\d\d$/m.test(el.innerText || '')) el = el.parentElement;
+    return el ? el.innerText : '';
+  });
+  eq((row.match(/\d\d:\d\d/g) || []).length, 1, 'a general event with no duration has exactly one time: ' + JSON.stringify(row));
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });
