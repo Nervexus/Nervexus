@@ -118,6 +118,18 @@
      champagne everywhere. Éverpine keeps the champagne, because that is its own accent, and
      the base themes keep it too since the page is dark under them. The add button's ADDED
      outline is the accent as well, so a block that is in your session matches the page. */
+  /* The calendar is one size. It sat in a grid row with the day panel beside it, so grid
+     stretched it to whatever the panel happened to be — selecting a busy day made the month
+     taller and selecting an empty one shrank it back. align-items:start stops the panel
+     driving the row, and a min-height keeps the month itself steady whether it falls over
+     five weeks or six. The panel scrolls inside itself rather than growing. */
+  @media (min-width:901px){
+    .cc-cal-hero{ min-height:760px; }
+    .cc-cal-daylist{ max-height:300px; overflow-y:auto; }
+  }
+  /* The accent a control takes when it is the selected one. Same source as the Forge's, so
+     one raiment change moves both; named for what it does rather than for the Forge. */
+  .cc-shell{ --sel-bg:var(--forge-add-bg); --sel-ink:var(--forge-add-ink); }
   .cc-shell{ --forge-accent:#E7D8A6; --forge-add-bg:#5B1A1A; --forge-add-ink:#F5F1E8; --forge-add-on:var(--forge-accent); }
   .cc-shell.raiment-x{ --forge-accent:#5B1A1A; }
   .cc-shell.raiment-noir{ --forge-accent:#FFFFFF; --forge-add-bg:#625B50; --forge-add-ink:#F2EFE9; }
@@ -3611,7 +3623,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <span onClick="{{ nextMonth }}" style="cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; color:#cfcfd4; font-size:16px;" style-hover="{ background:'rgba(255,255,255,0.05)' }">›</span>
           </div>
         </div>
-        <div class="cc-grid-cal" style="display:grid; grid-template-columns:1fr 340px; gap:18px;">
+        <div class="cc-grid-cal" style="display:grid; grid-template-columns:1fr 340px; gap:18px; align-items:start;">
           <div class="cc-glowcard cc-cal-hero" style="border-radius:20px; background:#16181c; padding:20px; display:flex; flex-direction:column;">
             <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:8px; flex:0 0 auto;">
               <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7"><div style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; letter-spacing:1px;">{{ d }}</div></sc-for>
@@ -3621,7 +3633,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <div onClick="{{ c.select }}" style="width:100%; height:100%; border-radius:10px; border:1px solid {{ c.border }}; background:{{ c.bg }}; box-shadow:{{ c.ring }}; padding:6px; cursor:{{ c.cursor }}; display:flex; flex-direction:column; position:relative;" style-hover="{ borderColor:'rgba(255,255,255,0.3)' }">
                   <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ c.numColor }};">{{ c.d }}</span>
                   <div style="display:flex; gap:3px; margin-top:auto; flex-wrap:wrap;">
-                    <sc-for list="{{ c.dots }}" as="dt" hint-placeholder-count="0"><span style="width:5px; height:5px; border-radius:50%; background:#FFFFFF;"></span></sc-for>
+                    <sc-for list="{{ c.dots }}" as="dt" hint-placeholder-count="0"><span style="width:5px; height:5px; border-radius:50%; background:{{ dt.c }};"></span></sc-for>
                   </div>
                 </div>
               </sc-for>
@@ -3631,10 +3643,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
               <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:12px;">
                 <span style="font-size:13px; font-weight:600;">{{ selDayLabel }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; white-space:nowrap;">{{ dayEventCount }} EVENTS</span>
+                <span style="display:flex; align-items:baseline; gap:10px; white-space:nowrap;">
+                  <sc-if value="{{ hasDayEvents }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearDay }}" title="Remove every event on this day" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#ff8a8a; cursor:pointer; border:1px solid rgba(255,138,138,0.3); border-radius:6px; padding:3px 7px;" style-hover="{ background:'rgba(255,138,138,0.12)' }">{{ clearDayLabel }}</span></sc-if>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84;">{{ dayEventCount }} EVENTS</span>
+                </span>
               </div>
+              <div class="cc-cal-daylist">
               <sc-for list="{{ dayEvents }}" as="e" hint-placeholder-count="3">
                 <div style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <span onClick="{{ e.cycleColor }}" title="{{ e.colorTitle }}" style="width:9px; height:9px; flex:0 0 9px; border-radius:50%; background:{{ e.color }}; cursor:{{ e.colorCursor }};"></span>
                   <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#FFFFFF; width:46px;">{{ e.time }}</span>
                   <div style="flex:1; min-width:0;">
                     <div style="display:flex; align-items:center; gap:7px; min-width:0;">
@@ -3647,6 +3664,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <span onClick="{{ e.remove }}" title="{{ e.removeTitle }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#FFFFFF' }">×</span>
                 </div>
               </sc-for>
+              </div>
               <sc-if value="{{ noDayEvents }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 0;">No events yet on this day.</div></sc-if>
               <div style="height:1px; background:rgba(255,255,255,0.08); margin:16px 0 14px;"></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78; margin-bottom:10px;">ADD TO {{ selShortUpper }}</div>
@@ -3679,6 +3697,19 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <span onClick="{{ setEvKindGeneral }}" style="flex:1; text-align:center; padding:8px 0; border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; cursor:pointer; color:{{ evKindGenC }}; background:{{ evKindGenBg }}; border:1px solid {{ evKindGenBd }};">GENERAL</span>
                 <span onClick="{{ setEvKindWork }}" style="flex:1; text-align:center; padding:8px 0; border-radius:8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; cursor:pointer; color:{{ evKindWorkC }}; background:{{ evKindWorkBg }}; border:1px solid {{ evKindWorkBd }};">WORK</span>
               </div>
+              <!-- A general event's colour is the user's to choose; a work one takes the
+                   raiment's accent, so there is nothing to pick and the row is not shown. -->
+              <sc-if value="{{ evKindIsGeneral }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:7px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78;">COLOUR</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ evColorName }}</span>
+              </div>
+              <div style="display:flex; gap:7px; margin-bottom:10px;">
+                <sc-for list="{{ evColorSwatches }}" as="sw" hint-placeholder-count="6">
+                  <span onClick="{{ sw.pick }}" title="{{ sw.name }}" style="flex:1; height:26px; border-radius:8px; cursor:pointer; background:{{ sw.swatch }}; border:2px solid {{ sw.ring }};"></span>
+                </sc-for>
+              </div>
+              </sc-if>
 
               <!-- Work events carry an end time and who is there; a general task carries a
                    rough duration. Each set only appears for the type that uses it, so the
@@ -9277,7 +9308,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.09-290 · v11.290 vision-fix';
+const NOTIF_BUILD_VERSION = '2026.09.10-291 · v11.291 calendar-colour';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13124,6 +13155,73 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
   loop(fn){ let id; const t=(ts)=>{ fn(ts); id=requestAnimationFrame(t); }; id=requestAnimationFrame(t); this.loops.push(()=>cancelAnimationFrame(id)); }
   prep(cv,maxDpr){ const r=cv.getBoundingClientRect(); const dpr=Math.min(maxDpr||2,window.devicePixelRatio||1); cv.width=Math.max(1,r.width*dpr); cv.height=Math.max(1,r.height*dpr); const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,w:r.width,h:r.height}; }
+  /* ---- calendar colour ------------------------------------------------------------------
+     Six named colours, used both for highlighting a day and for colouring a general event's
+     dot. They are the colours as chosen; what changes per theme is only how they are drawn,
+     never which colour it is. */
+  DAY_COLORS(){ return [['Grey','#8A8A92'],['Black','#1C1917'],['Navy','#1E2F4A'],
+                        ['Dark Yellow','#B8860B'],['Red','#9B1C1C'],['Pink','#D6488F']]; }
+  _rgb(hex){ const m=String(hex||'').replace('#',''); if(m.length!==6) return null;
+    return [parseInt(m.slice(0,2),16), parseInt(m.slice(2,4),16), parseInt(m.slice(4,6),16)]; }
+  _lum(hex){ const c=this._rgb(hex); return c ? (0.299*c[0]+0.587*c[1]+0.114*c[2]) : 128; }
+  /* Toward white for a positive amount, toward black for a negative one. */
+  _shade(hex,amt){ const c=this._rgb(hex); if(!c) return hex;
+    const f=(v)=>Math.max(0,Math.min(255,Math.round(amt>=0 ? v+(255-v)*amt : v*(1+amt))));
+    return '#'+c.map(v=>f(v).toString(16).padStart(2,'0')).join(''); }
+  // Is the surface under the calendar a pale one? Ultra is, except Noir. Éverpine's dark
+  // green is the home scene only, so everywhere a calendar lives it is wearing the ivory card.
+  _lightSurface(){ const P=this.state.prefs||{}; return P.theme==='Ultra' && P.ultraStyle!=='Noir'; }
+  /* How well a colour will show, which is not the same as how bright it is. Luminance
+     underweights red badly — a deep red reads perfectly well on a dark card while scoring
+     lower than a navy that barely does — so the strongest channel carries most of the weight
+     and luminance only tempers it. */
+  _visStrength(hex){ const c=this._rgb(hex); if(!c) return 128;
+    return 0.6*Math.max(c[0],c[1],c[2]) + 0.4*this._lum(hex); }
+  /* The drawable version of a colour: black on a dark app and white on an ivory one are both
+     invisible, so those extremes are pulled toward the middle far enough to be seen. The
+     colour the user picked is what the swatch shows; this is only what gets drawn against a
+     surface that would otherwise swallow it, and most colours come back untouched. */
+  _hlInk(hex){ const v=this._visStrength(hex), light=this._lightSurface();
+    if(light && v>210) return this._shade(hex,-0.42);
+    if(!light && v<50) return this._shade(hex,0.52);
+    return hex; }
+  // A general event's colour is the user's pick, kept in prefs so it syncs with everything
+  // else; a work event takes the raiment's accent and is not pickable.
+  EV_DEFAULT_COLOR(){ return '#8A8A92'; }
+  _evColor(e){
+    if((e.kind||'general')==='work') return 'var(--forge-accent)';
+    const map=(this.state.prefs||{}).evColors||{};
+    return this._hlInk(map[e.id] || this.EV_DEFAULT_COLOR());
+  }
+  setEvColor(id,color){
+    if(!id) return;
+    this.mut(s=>({prefs:{...s.prefs, evColors:{...((s.prefs||{}).evColors||{}), [id]:color}}}));
+  }
+  cycleEvColor(id){
+    const list=this.DAY_COLORS().map(c=>c[1]);
+    const cur=((this.state.prefs||{}).evColors||{})[id] || this.EV_DEFAULT_COLOR();
+    const i=list.indexOf(cur);
+    this.setEvColor(id, list[(i+1)%list.length]);
+  }
+  // An event that is gone should not leave its colour behind in prefs for ever.
+  _dropEvColor(id){
+    if(!id || !((this.state.prefs||{}).evColors||{})[id]) return;
+    this.mut(s=>{ const m={...((s.prefs||{}).evColors||{})}; delete m[id]; return {prefs:{...s.prefs, evColors:m}}; });
+  }
+  /* Every event on the selected day, gone. Repeating events are removed outright rather than
+     skipped for the day: the day list is what it removes, and it says how many. */
+  clearDay(){
+    const day=this.state.calSel;
+    const gone=(this.state.events||[]).filter(e=>this._eventOccursOn(e,day));
+    if(!gone.length) return;
+    const ids={}; gone.forEach(e=>{ ids[e.id]=1; });
+    this.mut(s=>{
+      const m={...((s.prefs||{}).evColors||{})}; Object.keys(ids).forEach(id=>delete m[id]);
+      return { events:(s.events||[]).filter(e=>!ids[e.id]), prefs:{...s.prefs, evColors:m} };
+    });
+    if(this._sbOn()) gone.forEach(e=>{ if(e.id) window.SB.remove('events',e.id); });
+    this.showToast('system','Day cleared', gone.length+' event'+(gone.length===1?'':'s')+' removed');
+  }
   hexA(hex,a){ const m=hex.replace('#',''); const r=parseInt(m.substring(0,2),16),g=parseInt(m.substring(2,4),16),b=parseInt(m.substring(4,6),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
   ago(ts){ const d=(Date.now()-ts)/86400000; if(d<0.04) return 'now'; if(d<1) return Math.max(1,Math.floor(d*24))+'h ago'; if(d<2) return 'yesterday'; return Math.floor(d)+'d ago'; }
 
@@ -14108,6 +14206,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.291', date:'Sep 10, 2026', major:true, notes:[
+      'A day you are not working is a blank day. The general screenshot import will no longer read a staff rota \u2014 pointed at one it returned a row per person per day, which put six colleagues\u2019 shifts and days off on a calendar that should hold one person\u2019s. It now says so and sends you to Import work rota, which keeps only your own.',
+      'The month stays one size. It shared a grid row with the day panel, so selecting a busy day stretched it and an empty one shrank it back.',
+      'CLEAR ALL on the selected day, next to the event count \u2014 it clears that day and nothing else, and disappears once the day is empty.',
+      'The Work / General buttons take your raiment\u2019s colour instead of being a flat white pill that Ultra then repainted near-black.',
+      'Every event now has a coloured dot on the month and beside it in the day list. A work shift takes your raiment\u2019s accent; a general event is yours to colour, chosen when you add it or by tapping its dot afterwards. It is kept with the rest of your settings, so it syncs and survives a reload.',
+      'The day-highlight colours are now Grey, Black, Navy Blue, Dark Yellow, Red and Pink. They are drawn as chosen; only black is lifted, and only on a dark theme, where it would otherwise be invisible.',
+    ]},
     {version:'v11.290', date:'Sep 9, 2026', major:true, notes:[
       'Reading a picture works. Every feature in the app that offered to look at a screenshot \u2014 the calendar import, the rota photo \u2014 was sending the image as text: the layer behind them folded the picture into the written prompt as raw base64 and posted it to a text endpoint. It could never have worked, for anyone, and the answer was always \u201ccould not read that image\u201d.',
       'A picture is now its own thing all the way through to the provider, built into whichever shape Claude, ChatGPT or Gemini expects. If none of those three is connected it says exactly that instead of failing vaguely, and a provider that cannot see is never sent one.',
@@ -15950,11 +16056,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const b64=dataUrl.split(',')[1]; const mediaType=file.type||'image/png';
       if(!window.claude){ this.setState({calImportLoading:false, calImportErr:'AI unavailable in this environment'}); return; }
       const nowY=new Date().getFullYear();
-      const sys='You read screenshots of calendars, schedules, or itineraries and extract every event into structured data. Return ONLY a JSON array, no prose, no markdown fences: [{"title":"...","date":"YYYY-MM-DD","time":"HH:MM"}]. Use 24-hour time. If a year is not visible, assume '+nowY+'. If a specific time is not visible, use "09:00". Skip anything that is not a dated event.';
+      /* A staff rota is refused rather than read. Fed one, this returns a row per person per
+         day — six colleagues' shifts and days off on a calendar that should hold one
+         person's. The rota importer exists for exactly that image and keeps only your own
+         shifts, so it is pointed at instead. */
+      const sys='You read screenshots of calendars, schedules, or itineraries and extract every event into structured data. FIRST: if the image is a staff work rota — a grid listing several different people against dates, with shift times or codes like D/O, OFF or HOL against each of them — reply with exactly the word ROTA and nothing else. Otherwise return ONLY a JSON array, no prose, no markdown fences: [{"title":"...","date":"YYYY-MM-DD","time":"HH:MM"}]. Use 24-hour time. If a year is not visible, assume '+nowY+'. If a specific time is not visible, use "09:00". Skip anything that is not a dated event.';
       const text=await window.claude.complete({ role:'image', system:sys, messages:[{role:'user', content:[
         {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
         {type:'text', text:'Extract every event from this calendar screenshot as the JSON array described.'}
       ]}], max_tokens:1500});
+      if(/^\s*ROTA\s*$/i.test(String(text||''))){
+        this.setState({calImportLoading:false, calImportErr:'That is a work rota, not a calendar — reading it here would put every one of your colleagues\u2019 shifts and days off on your calendar. Use Import work rota above: it keeps the shifts against your name and records who you are on with.'});
+        return;
+      }
       const arr=this._extractJSONArray(text);
       const clean=(arr||[]).filter(e=>e&&e.title&&e.date).map(e=>({id:this._uuid(), title:String(e.title).slice(0,120), date:String(e.date), time:/^\d{1,2}:\d{2}$/.test(e.time||'')?e.time:'09:00', repeat:[]}));
       if(!clean.length){ this.setState({calImportLoading:false, calImportErr:'No events found in that image'}); return; }
@@ -16217,8 +16331,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const attendees= kind==='work' ? ((S.evAttendees||'').trim()||null) : null;
     const estMins  = kind==='general' ? (parseInt(S.evEstMins,10)>0?parseInt(S.evEstMins,10):null) : null;
     const ev={id,title:t,date:S.calSel,time,repeat,kind,endTime,attendees,estMins};
+    /* A general event keeps the colour chosen for it; a work one takes the raiment and has
+       none of its own to store. */
+    const color = kind==='general' ? ((S.prefs||{}).evNewColor || this.EV_DEFAULT_COLOR()) : null;
     this.mut(s=>({events:[...s.events,ev], evTitle:'', evTime:'', evRepeatDays:[],
-      evEndTime:'', evAttendees:'', evEstMins:''}));
+      evEndTime:'', evAttendees:'', evEstMins:'',
+      prefs: color ? {...s.prefs, evColors:{...((s.prefs||{}).evColors||{}), [id]:color}} : s.prefs}));
     if(this._sbOn()) window.SB.insert('events',{id,user_id:this.state.authUserId,title:t,
       event_date:S.calSel,event_time:time,repeat_days:repeat,
       kind,end_time:endTime,attendees,est_minutes:estMins}); }
@@ -18472,8 +18590,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const y=S.calY, m=S.calM; const monthLabel=new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'});
     const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const daysIn=new Date(y,m+1,0).getDate(); const _tz=(S.account&&S.account.timezone)||'auto'; let todayStr; try{ todayStr=new Date().toLocaleDateString('en-CA',_tz==='auto'?{}:{timeZone:_tz}); }catch(e){ todayStr=new Date().toLocaleDateString('en-CA'); }
     const calCells=[]; for(let i=0;i<startDow;i++) calCells.push({d:'',dots:[],bg:'transparent',border:'transparent',numColor:'transparent',cursor:'default',select:()=>{}});
-    for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const isNoir=isU && S.prefs.ultraStyle==='Noir'; const bg=today?(isNoir?'rgba(196,189,176,0.18)':isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.16):(isNoir?'rgba(150,143,130,0.05)':isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isNoir?'#C4BDB0':isU?'#5B1A1A':'#FFFFFF'):(hl?this.hexA(hl,0.55):(isNoir?'rgba(150,143,130,0.18)':isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?(isNoir?'#C4BDB0':'#ff5563'):(hl?hl:(isNoir?'#968F82':isU?'#52525b':'#b8b8c0')); const ring=sel?(isNoir?'0 0 0 3px #FFFFFF inset':(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset')):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(()=>1), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
-    const _hlDefs=[['Amber','#ffb020'],['Green','#2fce86'],['Cyan','#38bdf8'],['Blue','#4f7bff'],['Purple','#a855f7'],['Pink','#ff5fa2']]; const _curHl=(S.dayColors||{})[S.calSel]; const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], ring:_curHl===c[1]?'#ffffff':'rgba(255,255,255,0.15)', glow:_curHl===c[1]?'0 0 10px '+this.hexA(c[1],0.7):'none', pick:()=>{ const day=S.calSel, color=c[1]; this.mut(st=>{ const dc={...(st.dayColors||{})}; dc[day]=color; return {dayColors:dc}; }); if(this._sbOn()) window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } })); const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
+    for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const isNoir=isU && S.prefs.ultraStyle==='Noir'; const hlInk=hl?this._hlInk(hl):null; const bg=today?(isNoir?'rgba(196,189,176,0.18)':isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.26):(isNoir?'rgba(150,143,130,0.05)':isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isNoir?'#C4BDB0':isU?'#5B1A1A':'#FFFFFF'):(hlInk?this.hexA(hlInk,0.7):(isNoir?'rgba(150,143,130,0.18)':isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?(isNoir?'#C4BDB0':'#ff5563'):(hlInk?hlInk:(isNoir?'#968F82':isU?'#52525b':'#b8b8c0')); const ring=sel?(isNoir?'0 0 0 3px #FFFFFF inset':(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset')):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(e=>({c:this._evColor(e)})), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
+    const _hlDefs=this.DAY_COLORS(); const _curHl=(S.dayColors||{})[S.calSel]; const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], ring:_curHl===c[1]?'#ffffff':'rgba(255,255,255,0.15)', glow:_curHl===c[1]?'0 0 10px '+this.hexA(c[1],0.7):'none', pick:()=>{ const day=S.calSel, color=c[1]; this.mut(st=>{ const dc={...(st.dayColors||{})}; dc[day]=color; return {dayColors:dc}; }); if(this._sbOn()) window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } })); const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
     const dayEvents=S.events.filter(e=>this._eventOccursOn(e,S.calSel)).sort((a,b)=>a.time.localeCompare(b.time)).map(e=>{ const idx=S.events.indexOf(e); const rl=this._repeatLabel(e.repeat); /* The detail line: a work event reads "09:00-17:00 with Dan", a general task
          "09:00 - about 45 min". Empty when neither was filled in, so an event created
          before these fields existed simply shows its time as it always did. */
@@ -18481,7 +18599,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const _det=_isWork
         ? [(e.endTime?e.time+'\u2013'+e.endTime:e.time), e.attendees?('with '+e.attendees):''].filter(Boolean).join(' ')
         : [e.time, e.estMins?('about '+e.estMins+' min'):''].filter(Boolean).join(' \u00b7 ');
-      return {title:e.title,time:e.time,kindLabel:_isWork?'WORK':'',detail:_det,isWork:_isWork,repeatLabel:rl,removeTitle:rl?'Remove this repeating series':'Remove event',remove:()=>{ this.mut(s=>({events:s.events.filter((_,j)=>j!==idx)})); if(this._sbOn() && e.id) window.SB.remove('events',e.id); }}; });
+      return {title:e.title,time:e.time,kindLabel:_isWork?'WORK':'',detail:_det,isWork:_isWork,repeatLabel:rl,
+        /* The dot in front of a row is the colour that day's cell shows for it. A work event
+           takes the raiment and cannot be changed; a general one steps through the six on a
+           tap, which is the whole of the picker for an event that already exists. */
+        color:this._evColor(e), colorCursor:_isWork?'default':'pointer',
+        colorTitle:_isWork?'Work events take the theme colour':'Tap to change this event\u2019s colour',
+        cycleColor:_isWork?(()=>{}):(()=>this.cycleEvColor(e.id)),
+        removeTitle:rl?'Remove this repeating series':'Remove event',
+        remove:()=>{ this.mut(s=>({events:s.events.filter((_,j)=>j!==idx)})); this._dropEvColor(e.id); if(this._sbOn() && e.id) window.SB.remove('events',e.id); }}; });
     const evRepeatDays=S.evRepeatDays||[]; const _dowAll=['MON','TUE','WED','THU','FRI','SAT','SUN']; const evDowChips=_dowAll.map(code=>{ const on=evRepeatDays.indexOf(code)!==-1; return { l:code[0], c:on?'#0a0a0b':'#9a9aa2', bg:on?'#FFFFFF':'rgba(255,255,255,0.05)', bd:on?'#FFFFFF':'rgba(255,255,255,0.14)', toggle:()=>this.setState({evRepeatDays:on?evRepeatDays.filter(c=>c!==code):[...evRepeatDays,code]}) }; });
     const evRepeatSummary=evRepeatDays.length?this._repeatLabel(evRepeatDays):'Doesn\u2019t repeat';
     const selD=new Date(S.calSel+'T00:00:00'); const selDayLabel=selD.toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric'}); const selShort=selD.toLocaleString('en-US',{month:'short',day:'numeric'});
@@ -20977,6 +21103,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       closeNoteRead:()=>this.setState({noteRead:null}),
 
       // calendar
+      hasDayEvents:dayEvents.length>0,
+      clearDay:()=>this.clearDay(),
+      clearDayLabel:'CLEAR ALL',
+      /* The colour a general event will be given when it is added. Kept in prefs like every
+         other choice, so it syncs and survives a reload rather than resetting each visit. */
+      ...(()=>{
+        const P=S.prefs||{}; const cur=P.evNewColor || this.EV_DEFAULT_COLOR();
+        const defs=this.DAY_COLORS();
+        const found=defs.find(c=>c[1]===cur);
+        return { evKindIsGeneral:(S.evKind!=='work'),
+          evColorName:(found?found[0]:'Grey'),
+          evColorSwatches:defs.map(c=>({ name:c[0], swatch:this._hlInk(c[1]),
+            ring:cur===c[1]?'#FFFFFF':'rgba(255,255,255,0.15)',
+            pick:()=>this.setPref('evNewColor', c[1]) })) };
+      })(),
       dows:['MON','TUE','WED','THU','FRI','SAT','SUN'], monthLabel, calCells, hlColors, clearHighlight, prevMonth:()=>this.setState(s=>{ let mm=s.calM-1,yy=s.calY; if(mm<0){mm=11;yy--;} return {calM:mm,calY:yy}; }), nextMonth:()=>this.setState(s=>{ let mm=s.calM+1,yy=s.calY; if(mm>11){mm=0;yy++;} return {calM:mm,calY:yy}; }),
       dayEvents, noDayEvents:dayEvents.length===0, dayEventCount:dayEvents.length, selDayLabel, selShort, selShortUpper:selShort.toUpperCase(), evTitle:S.evTitle, evTime:S.evTime,
       setEvTitle:(e)=>this.setState({evTitle:e.target.value}), setEvTime:(e)=>this.setState({evTime:e.target.value}),
@@ -21034,8 +21175,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       evKind:S.evKind||'general',
       evIsWork:(S.evKind||'general')==='work', evIsGeneral:(S.evKind||'general')!=='work',
       setEvKindWork:()=>this.setState({evKind:'work'}), setEvKindGeneral:()=>this.setState({evKind:'general'}),
-      evKindWorkC:(S.evKind==='work')?'#0a0a0b':'#9a9aa2', evKindWorkBg:(S.evKind==='work')?'#FFFFFF':'rgba(255,255,255,0.05)', evKindWorkBd:(S.evKind==='work')?'#FFFFFF':'rgba(255,255,255,0.14)',
-      evKindGenC:(S.evKind!=='work')?'#0a0a0b':'#9a9aa2', evKindGenBg:(S.evKind!=='work')?'#FFFFFF':'rgba(255,255,255,0.05)', evKindGenBd:(S.evKind!=='work')?'#FFFFFF':'rgba(255,255,255,0.14)',
+      /* The chosen side takes the raiment's own accent. It used to be a hard white pill,
+         which the Ultra sheet then repainted near-black — a black button on an ivory card,
+         matching nothing. */
+      evKindWorkC:(S.evKind==='work')?'var(--sel-ink)':'#9a9aa2', evKindWorkBg:(S.evKind==='work')?'var(--sel-bg)':'rgba(255,255,255,0.05)', evKindWorkBd:(S.evKind==='work')?'var(--sel-bg)':'rgba(255,255,255,0.14)',
+      evKindGenC:(S.evKind!=='work')?'var(--sel-ink)':'#9a9aa2', evKindGenBg:(S.evKind!=='work')?'var(--sel-bg)':'rgba(255,255,255,0.05)', evKindGenBd:(S.evKind!=='work')?'var(--sel-bg)':'rgba(255,255,255,0.14)',
       evEndTime:S.evEndTime||'', setEvEndTime:(e)=>this.setState({evEndTime:e.target.value}),
       evAttendees:S.evAttendees||'', setEvAttendees:(e)=>this.setState({evAttendees:e.target.value}),
       evEstMins:S.evEstMins||'', setEvEstMins:(e)=>this.setState({evEstMins:e.target.value}),
