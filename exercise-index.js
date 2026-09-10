@@ -66,6 +66,7 @@
     'close grip lat pulldown':               ['Back',       'Back',      'Close-Grip Lat Pulldown'],
     'neutral grip lat pulldown':             ['Back',       'Back',      'Neutral-Grip Lat Pulldown'],
     'straight arm pulldown':                 ['Back',       'Back',      'Straight-Arm Pulldown'],
+    'seated row':                            ['Back',       'Back',      'Seated Row'],
     'barbell row':                           ['Back',       'Back',      'Barbell Row'],
     'pendlay row':                           ['Back',       'Back',      'Pendlay Row'],
     'yates row':                             ['Back',       'Back',      'Yates Row'],
@@ -85,6 +86,21 @@
     'deadlift':                              ['Back',       'Back',      'Deadlift'],
     'sumo deadlift':                         ['Back',       'Back',      'Sumo Deadlift'],
     'trap bar deadlift':                     ['Back',       'Back',      'Trap Bar Deadlift'],
+    /* Kettlebell shoulder work: an overhead or racked hold is time under load rather than
+       reps, and a halo is a circle around the head — both are shoulder work whatever the
+       clock says, so they file with the presses. */
+    /* Two full-body lifts, filed under Shoulders rather than the 'Mixed' group: Mixed is a
+       valid label here but the Fitness page has no bucket that renders it, so a row sent
+       there would vanish. The overhead half is the limiting part of both, which is also how
+       people write them down. */
+    'clean and press':                       ['Shoulders',  'Shoulders', 'Clean and Press'],
+    'turkish get up':                        ['Shoulders',  'Shoulders', 'Turkish Get-Up'],
+    'kettlebell shoulder hold':              ['Shoulders',  'Shoulders', 'Kettlebell Shoulder Hold'],
+    'kettlebell overhead hold':              ['Shoulders',  'Shoulders', 'Kettlebell Overhead Hold'],
+    'kettlebell rack hold':                  ['Shoulders',  'Shoulders', 'Kettlebell Rack Hold'],
+    'kettlebell halo':                       ['Shoulders',  'Shoulders', 'Kettlebell Halo'],
+    'seated halo':                           ['Shoulders',  'Shoulders', 'Seated Halo'],
+    'halo':                                  ['Shoulders',  'Shoulders', 'Halo'],
     'overhead press':                        ['Shoulders',  'Shoulders', 'Overhead Press'],
     'barbell shoulder press':                ['Shoulders',  'Shoulders', 'Barbell Shoulder Press'],
     'dumbbell shoulder press':               ['Shoulders',  'Shoulders', 'Dumbbell Shoulder Press'],
@@ -163,12 +179,22 @@
     'wrist roller':                          ['Forearms',   'Arms',      'Wrist Roller'],
     'gripper':                               ['Forearms',   'Arms',      'Gripper'],
     'finger curl':                           ['Forearms',   'Arms',      'Finger Curl'],
+    'kettlebell wrist curl':                 ['Forearms',   'Arms',      'Kettlebell Wrist Curl'],
+    'kettlebell wrist flip':                 ['Forearms',   'Arms',      'Kettlebell Wrist Flip'],
+    'kettlebell finger curl':                ['Forearms',   'Arms',      'Kettlebell Finger Curl'],
+    'bottoms up kettlebell hold':            ['Forearms',   'Arms',      'Bottoms-Up Kettlebell Hold'],
     'crunch':                                ['Abs',        'Core',      'Crunch'],
     'sit up':                                ['Abs',        'Core',      'Sit-Up'],
     'decline sit up':                        ['Abs',        'Core',      'Decline Sit-Up'],
     'weighted sit up':                       ['Abs',        'Core',      'Weighted Sit-Up'],
     'cable crunch':                          ['Abs',        'Core',      'Cable Crunch'],
     'machine crunch':                        ['Abs',        'Core',      'Machine Crunch'],
+    /* The bare names. The list carried "side plank" and "hanging leg raise" but not "plank"
+       or "leg raise" — so the two most-written core exercises in any log found nothing and
+       were filed by a regex guess. Same story for "calf raise" and "seated row". */
+    'plank':                                 ['Abs',        'Core',      'Plank'],
+    'leg raise':                             ['Abs',        'Core',      'Leg Raise'],
+    'lying leg raise':                       ['Abs',        'Core',      'Lying Leg Raise'],
     'hanging leg raise':                     ['Abs',        'Core',      'Hanging Leg Raise'],
     'hanging knee raise':                    ['Abs',        'Core',      'Hanging Knee Raise'],
     'captain\'s chair leg raise':            ['Abs',        'Core',      'Captain\'s Chair Leg Raise'],
@@ -205,9 +231,22 @@
     'hip thrust':                            ['Glutes',     'Legs',      'Hip Thrust'],
     'barbell hip thrust':                    ['Glutes',     'Legs',      'Barbell Hip Thrust'],
     'dumbbell hip thrust':                   ['Glutes',     'Legs',      'Dumbbell Hip Thrust'],
+    'kettlebell swing':                      ['Glutes',     'Legs',      'Kettlebell Swing'],
+    'sled push':                             ['Quads',      'Legs',      'Sled Push'],
+    'box jump':                              ['Quads',      'Legs',      'Box Jump'],
     'glute bridge':                          ['Glutes',     'Legs',      'Glute Bridge'],
     'single leg glute bridge':               ['Glutes',     'Legs',      'Single-Leg Glute Bridge'],
     'glute kickback machine':                ['Glutes',     'Legs',      'Glute Kickback Machine'],
+    /* The two machines that sit side by side in every gym. Abduction is the glute medius
+       taking the leg out; adduction is the inner thigh bringing it back. Both are listed
+       under the several names a machine's sticker actually uses. */
+    'leg abductor':                          ['Glutes',     'Legs',      'Leg Abductor'],
+    'hip abduction':                         ['Glutes',     'Legs',      'Hip Abduction'],
+    'seated hip abduction':                  ['Glutes',     'Legs',      'Seated Hip Abduction'],
+    'abductor machine':                      ['Glutes',     'Legs',      'Abductor Machine'],
+    'leg adductor':                          ['Adductors',  'Legs',      'Leg Adductor'],
+    'hip adduction':                         ['Adductors',  'Legs',      'Hip Adduction'],
+    'adductor machine':                      ['Adductors',  'Legs',      'Adductor Machine'],
     'donkey kick':                           ['Glutes',     'Legs',      'Donkey Kick'],
     'fire hydrant':                          ['Glutes',     'Legs',      'Fire Hydrant'],
     'bulgarian split squat':                 ['Glutes',     'Legs',      'Bulgarian Split Squat'],
@@ -224,6 +263,7 @@
     'hack squat':                            ['Quads',      'Legs',      'Hack Squat'],
     'leg press':                             ['Quads',      'Legs',      'Leg Press'],
     'narrow stance leg press':               ['Quads',      'Legs',      'Narrow-Stance Leg Press'],
+    'seated leg press':                      ['Quads',      'Legs',      'Seated Leg Press'],
     'leg extension':                         ['Quads',      'Legs',      'Leg Extension'],
     'front foot elevated split squat':       ['Quads',      'Legs',      'Front-Foot Elevated Split Squat'],
     'forward lunge':                         ['Quads',      'Legs',      'Forward Lunge'],
@@ -246,6 +286,7 @@
     'stability ball leg curl':               ['Hamstrings', 'Legs',      'Stability Ball Leg Curl'],
     'slider leg curl':                       ['Hamstrings', 'Legs',      'Slider Leg Curl'],
     'razor curl':                            ['Hamstrings', 'Legs',      'Razor Curl'],
+    'calf raise':                            ['Calves',     'Legs',      'Calf Raise'],
     'standing calf raise':                   ['Calves',     'Legs',      'Standing Calf Raise'],
     'seated calf raise':                     ['Calves',     'Legs',      'Seated Calf Raise'],
     'leg press calf raise':                  ['Calves',     'Legs',      'Leg Press Calf Raise'],
@@ -263,6 +304,11 @@
     'cossack squat':                         ['Adductors',  'Legs',      'Cossack Squat'],
     'lateral lunge':                         ['Adductors',  'Legs',      'Lateral Lunge'],
     'side lunge':                            ['Adductors',  'Legs',      'Side Lunge'],
+    /* Conditioning the list had no entry for. A burpee is not a chest exercise and a box jump
+       is not cardio — each files where the work actually lands. */
+    'burpee':                                ['Cardio',     'Cardio',    'Burpee'],
+    'jumping jack':                          ['Cardio',     'Cardio',    'Jumping Jack'],
+    'battle ropes':                          ['Cardio',     'Cardio',    'Battle Ropes'],
     'running':                               ['Cardio',     'Cardio',    'Running'],
     'jogging':                               ['Cardio',     'Cardio',    'Jogging'],
     'sprinting':                             ['Cardio',     'Cardio',    'Sprinting'],
@@ -316,13 +362,34 @@
 
   var GROUPS = ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
 
+  /* Equipment people write as two words and the list writes as one. A log is typed on a
+     phone between sets, and "kettle bell wrist flip" has to find "kettlebell wrist flip" —
+     without this it found nothing and the row was filed by a regex guess instead. */
+  var JOINED = [
+    [/\bkettle\s+bells?\b/g, 'kettlebell'],
+    [/\bdumb\s+bells?\b/g,   'dumbbell'],
+    [/\bbar\s+bell\b/g,      'barbell'],
+    [/\bbody\s+weight\b/g,   'bodyweight'],
+    [/\bpull\s+up\b/g,       'pullup'],
+    [/\bchin\s+up\b/g,       'chinup'],
+    [/\bpush\s+up\b/g,       'pushup'],
+    [/\bsit\s+up\b/g,        'situp'],
+  ];
   function norm(s) {
-    return String(s || '').toLowerCase()
+    var out = String(s || '').toLowerCase()
       .replace(/\u2019/g, "'")
       .replace(/-/g, ' ')
       .replace(/[^a-z0-9' ]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+    for (var i = 0; i < JOINED.length; i++) out = out.replace(JOINED[i][0], JOINED[i][1]);
+    /* Both spellings have to resolve, so the one-word forms collapse the same way: the list
+       says "pull up", a phone says "pullup", and neither should miss. */
+    return out.replace(/\bkettlebells?\b/g, 'kettlebell')
+              .replace(/\bpullups?\b/g, 'pull up')
+              .replace(/\bchinups?\b/g, 'chin up')
+              .replace(/\bpushups?\b/g, 'push up')
+              .replace(/\bsitups?\b/g, 'sit up');
   }
 
   /* Spoken input rarely matches the written name exactly: "push-ups" for Push-Up,

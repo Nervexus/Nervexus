@@ -1328,6 +1328,60 @@ t('Bulk Import opens on the Forge, without leaving it', async () => {
   await page.evaluate(() => window.__nvx.setState({ woImportOpen: false }));
 });
 
+/* A real session, pasted exactly as it was typed on a phone — trailing spaces, blank lines,
+   "Kettle bell" as two words, and holds written in seconds. None of it parsed: a held set was
+   read as an exercise name, so the log came back as a list of exercises called "30sec x 6kg". */
+const REAL_LOG = [
+  'Kettle bell shoulder hold ', '30sec x 6kg ', '30sec x 6kg ', '30sec x 6kg ', '30sec x 6kg ', '', '',
+  'Seated halo ', '10x6kg', '10x6kg', '',
+  'Dead hang ', '30sec', '30sec', '',
+  'Kettle bell wrist flip ', '10x16kg', '10x16kg', '10x16kg', '10x16kg', '10x16kg', '10x16kg', '',
+  'Kettle bell wrist curls ', '10x16kg', '10x16kg', '', '',
+  'Leg abductor', '20x22kg', '20x22kg', '',
+  'Seated Leg press ', '30x50kg', '30x50kg', '30x90kg', '20x90kg', '10x90kg', '10x90kg', '10x110kg', '10x90kg', '10x90kg',
+].join('\n');
+
+t('a real pasted session parses set for set', async () => {
+  await boot();
+  const rows = await page.evaluate((t) => window.__nvx._localParseWorkoutText(t), REAL_LOG);
+  eq(rows.length, 27, 'every set should be a row — got ' + rows.length);
+  const counts = {};
+  rows.forEach(r => { counts[r.exercise] = (counts[r.exercise] || 0) + 1; });
+  eq(JSON.stringify(counts), JSON.stringify({
+    'Kettle bell shoulder hold': 4, 'Seated halo': 2, 'Dead hang': 2,
+    'Kettle bell wrist flip': 6, 'Kettle bell wrist curls': 2,
+    'Leg abductor': 2, 'Seated Leg press': 9,
+  }), 'the sets did not land under the right exercises');
+  /* And nothing became an exercise called after its own set line. */
+  ok(!Object.keys(counts).some(k => /^\d/.test(k)), 'a set line was read as an exercise: ' + Object.keys(counts).join(' | '));
+});
+
+t('a held set is logged as time, with whatever was being held', async () => {
+  await boot();
+  const rows = await page.evaluate((t) => window.__nvx._localParseWorkoutText(t), REAL_LOG);
+  const hold = rows.find(r => r.exercise === 'Kettle bell shoulder hold');
+  eq(hold.minutes, 0.5, '30 seconds is half a minute');
+  eq(hold.weight, 6, 'the bell was 6kg');
+  eq(hold.unit, 'kg', 'and it was kilograms');
+  eq(hold.reps, 0, 'a hold has no reps');
+  const hang = rows.find(r => r.exercise === 'Dead hang');
+  eq(hang.minutes, 0.5, 'a bare 30sec is still half a minute');
+  eq(hang.unit, 'BW', 'hanging off a bar is bodyweight');
+  eq(hang.weight, 0, 'with no load to record');
+});
+
+t('every exercise in that session is filed to the right body part', async () => {
+  await boot();
+  const rows = await page.evaluate((t) => window.__nvx._localParseWorkoutText(t), REAL_LOG);
+  const part = {};
+  rows.forEach(r => { part[r.exercise] = r.part; });
+  eq(JSON.stringify(part), JSON.stringify({
+    'Kettle bell shoulder hold': 'Shoulders', 'Seated halo': 'Shoulders', 'Dead hang': 'Arms',
+    'Kettle bell wrist flip': 'Arms', 'Kettle bell wrist curls': 'Arms',
+    'Leg abductor': 'Legs', 'Seated Leg press': 'Legs',
+  }), 'wrong body parts');
+});
+
 t('an imported exercise is filed where the Forge says it belongs', async () => {
   /* Every exercise in the Forge states its body part. That beats guessing from the wording:
      "Battle ropes" matched no pattern at all and fell through to Mixed. */

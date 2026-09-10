@@ -352,7 +352,7 @@
 <script src="orb-engine.js?v=8"></script>
 <script src="notification-engine.js?v=1"></script>
 <script src="anatomy-3d.js?v=9"></script>
-<script src="exercise-index.js?v=4"></script>
+<script src="exercise-index.js?v=5"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
 <script src="ai-gateway.js?v=3"></script>
@@ -9336,7 +9336,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.10-293 · v11.293 phone-bar';
+const NOTIF_BUILD_VERSION = '2026.09.10-294 · v11.294 log-parsing';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14250,6 +14250,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.294', date:'Sep 10, 2026', major:true, notes:[
+      'Bulk Import reads a held set. \u201c30sec\u201d and \u201c30sec x 6kg\u201d were understood by nothing \u2014 a hold was taken for an exercise name, so a session of kettlebell holds came back as a list of exercises called \u201c30sec x 6kg\u201d. They now log as time, with whatever was in your hand.',
+      'Equipment written the way you type it. \u201ckettle bell\u201d finds \u201ckettlebell\u201d, and so do \u201cdumb bell\u201d, \u201cbar bell\u201d, \u201cpullup\u201d and \u201cpushup\u201d \u2014 nobody spells them out mid-session, and until now a space meant the exercise was not found at all.',
+      'Added to the exercise list: kettlebell shoulder hold, overhead hold, rack hold, halo and seated halo, kettlebell wrist curl, wrist flip and finger curl, bottoms-up hold, seated leg press, and the abductor and adductor machines under all the names their stickers use.',
+      'And the plain names the list somehow never had: plank, leg raise, calf raise, seated row, kettlebell swing, burpee, jumping jack, battle ropes, sled push, box jump, clean and press, Turkish get-up. It carried \u201cside plank\u201d but not \u201cplank\u201d, so the most-written core exercise in any log was being filed by guesswork.',
+    ]},
     {version:'v11.292', date:'Sep 10, 2026', major:true, notes:[
       'The sidebar is reordered: Home, Command, The Forge, Gentlemen Center, Fitness, Calendar, Finance, Learning, Power Level, Voice Core, World Intel, AI Command Center, Settings.',
       'A Gentlemen Center page, empty for now \u2014 the shell, its own mark, and the same \u201cnothing here yet\u201d the Forge\u2019s Mental centre carries.',
@@ -17194,6 +17200,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const bwRe=/^(.+?)\s+[x×]\s*(\d+(?:\.\d+)?)\s*(?:reps?|rep)?\s*$/i;
     // A bare data line under an existing header, e.g. "10x30kg" (reps x weight kg).
     const setLineRe=/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(kg|kgs|lb|lbs|pounds)?\s*$/i;
+    /* A held set, written the way a hold is written: "30sec", or "30sec x 6kg" when there is
+       a bell in your hand. Neither was read at all — the first was taken for an exercise name
+       and the second for nothing, so a whole session of kettlebell holds came back as a list
+       of exercises called "30sec x 6kg". Seconds only, deliberately: "5 min" keeps its own
+       branch below, where a cardio block is minutes rather than a set. */
+    const holdLineRe=/^(\d+(?:\.\d+)?)\s*(?:s|sec|secs|second|seconds)\b(?:\s*(?:[x×@]|at)?\s*(\d+(?:\.\d+)?)\s*(kg|kgs|lb|lbs|pounds|bw|bodyweight)?)?\s*$/i;
     const minsRe=/^(\d+(?:\.\d+)?)\s*(?:min|mins|minutes)\b/i;
     const rows=[]; let curNames=[];
     const pushRow=(names,weight,unit,sets,reps,minutes)=>{
@@ -17213,6 +17225,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }
       if((m=stripped.match(setLineRe))){
         if(curNames.length) pushRow(curNames, +m[2]||0, normUnit(m[3]), 1, +m[1]||0, 0);
+        return;
+      }
+      if((m=stripped.match(holdLineRe))){
+        // Held for seconds, logged in minutes, with whatever was being held.
+        if(curNames.length){
+          const u=m[2]?normUnit(m[3]):'BW';
+          pushRow(curNames, u==='BW'?0:(+m[2]||0), u, 1, 0, Math.round((+m[1]||0)/60*100)/100);
+        }
         return;
       }
       const mm=stripped.match(minsRe);
