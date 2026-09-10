@@ -104,13 +104,15 @@ t('the Forge is no longer a tab inside Fitness', async () => {
   ok(tabs.includes('Fitness HQ') && tabs.includes('Music'), 'the other tabs must survive: ' + tabs.join(' | '));
 });
 
-t('the sidebar lists The Forge directly above the AI Command Center', async () => {
+t('the sidebar puts The Forge third, under Home and Command', async () => {
+  /* It used to sit above the AI Command Center; the rail was reordered in v11.292 and the
+     Forge now leads the group you are in every day. nav-order.test.mjs holds the whole
+     order — this only holds the Forge's own place in it. */
   await boot();
   const ids = await page.evaluate(() =>
     [...document.querySelectorAll('.cc-side span[data-icon]')].map(s => s.dataset.icon));
-  const ai = ids.indexOf('ai');
-  ok(ai > 0, 'the AI Command Center is not in the sidebar');
-  eq(ids[ai - 1], 'forge', 'the entry above AI Command Center — full order: ' + ids.join(' > '));
+  eq(ids.indexOf('forge'), 2, 'the Forge should be third — full order: ' + ids.join(' > '));
+  eq(ids[3], 'gentlemen', 'and the Gentlemen Center directly under it');
 });
 
 t('the Forge is the only nav entry lit while you are on it', async () => {
@@ -148,18 +150,18 @@ t('the Forge nav entry actually draws its mark', async () => {
   eq(drawn.dots, 2, 'the base rule carries the house divider\'s paired end dots');
 });
 
-t('the Forge is reachable on mobile through More', async () => {
-  await boot({ mobMoreOpen: true });
-  /* The mobile bar carries six fixed entries and everything else falls through to the More
-     sheet, which is only in the DOM while it is open. Promoting the Forge in the sidebar
-     does not put it on that bar, so the only thing that matters here is that it has not
-     become unreachable on a phone. */
-  const inMore = await page.evaluate(() => {
-    const more = [...document.querySelectorAll('*')].filter(e =>
-      e.children.length === 0 && e.textContent.trim() === 'The Forge' && !e.closest('.cc-side'));
-    return more.length > 0;
-  });
-  ok(inMore, 'The Forge appears nowhere outside the desktop sidebar — check mobMoreList');
+t('the Forge is on the phone bar itself, not buried under More', async () => {
+  /* It used to fall through to the More sheet. The bottom bar was reordered with the rail,
+     so the Forge is now one of the six on it — the assertion that matters either way is that
+     it is reachable on a phone without the desktop sidebar. */
+  await boot();
+  await page.setViewportSize({ width: 390, height: 840 });
+  await page.waitForTimeout(600);
+  const onBar = await page.evaluate(() =>
+    [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon));
+  await page.setViewportSize({ width: 1280, height: 1400 });
+  await page.waitForTimeout(400);
+  ok(onBar.includes('forge'), 'the Forge is not on the phone bar: ' + onBar.join(' > '));
 });
 
 t('the page wears the Éverpine crest in champagne', async () => {

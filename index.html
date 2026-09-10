@@ -8403,6 +8403,29 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
       </sc-if>
 
+      <!-- ===== GENTLEMEN CENTRE ===== -->
+      <!-- The shell, and nothing in it yet — the same empty state the Forge's Mental centre
+           carries. It is a page so that the nav order is real; what goes in it is the next
+           conversation, not a guess made here. -->
+      <sc-if value="{{ isGentlemen }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Gentlemen Center" style="animation:rise .5s ease both;">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+          <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
+            <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
+            <span style="width:27px; height:27px; color:var(--forge-accent); display:flex; position:relative;" data-icon="gentlemen"></span>
+          </div>
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--forge-accent); margin-bottom:5px;">◆ GENTLEMEN CENTER</div>
+            <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Gentlemen Center</h1>
+          </div>
+        </div>
+        <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">GENTLEMEN CENTER</div>
+          <div style="font-size:12.5px; color:#6f6f78; margin-top:10px;">Nothing here yet.</div>
+        </div>
+      </div>
+      </sc-if>
+
       <!-- ===== ACCOUNT REQUESTS ===== -->
       <sc-if value="{{ isRequests }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Account Requests" style="animation:rise .5s ease both;">
@@ -9112,7 +9135,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;" class="cc-stat4">
                 <sc-for list="{{ adminStats }}" as="s" hint-placeholder-count="4"><div style="border-radius:13px; padding:13px; background:rgba(23,25,29,0.92);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:22px; color:#eef0f2; margin-top:3px;">{{ s.v }}</div></div></sc-for>
               </div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 10px;">USER MANAGEMENT · {{ pendingCount }} PENDING SIGN-UP REQUEST{{ pendingCountPlural }} — review under Account Requests</div>
+              <!-- Account Requests came off the main rail: it is an owner's admin job, not a
+                   place you go. The page itself is unchanged and this is now the way in. -->
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin:2px 0 10px; flex-wrap:wrap;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">USER MANAGEMENT · {{ pendingCount }} PENDING SIGN-UP REQUEST{{ pendingCountPlural }}</span>
+                <span onClick="{{ goRequests }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:var(--sel-ink); background:var(--sel-bg); border-radius:8px; padding:7px 13px; cursor:pointer; white-space:nowrap;">REVIEW ACCOUNT REQUESTS</span>
+              </div>
               <sc-if value="{{ noAdminUsers }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:32px 20px; text-align:center; color:#75757d; font-size:12.5px;">No other accounts yet. Approved sign-ups will appear here for suspension and Ultra-access control.</div></sc-if>
               <sc-for list="{{ adminUsers }}" as="u" hint-placeholder-count="6">
                 <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
@@ -9308,7 +9336,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.10-291 · v11.291 calendar-colour';
+const NOTIF_BUILD_VERSION = '2026.09.10-292 · v11.292 nav-order';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9484,13 +9512,26 @@ activities: this._mergeShipLog(s.activities),
     this.loops=[];
   }
 
+  /* The order of the rail, and it is the running order of a day rather than the order these
+     pages happened to be built in: what you are, then what you are doing, then what you are
+     learning, then the machinery behind it.
+
+     Account Requests is not here. It is an owner's admin job, not a place you go — it lives
+     under Settings → Admin, which is where the rest of user management already was. */
   navDefs=[
     {id:'home',label:'Home'},
-    {id:'dashboard',label:'Command'},{id:'forge',label:'The Forge'},{id:'ai',label:'AI Command Center'},{id:'learning',label:'Learning'},{id:'business',label:'Finance Terminal'},{id:'power',label:'Power Level'},{id:'voice',label:'Voice Core'},
-    {id:'globe',label:'World Intel'},
+    {id:'dashboard',label:'Command'},
+    {id:'forge',label:'The Forge'},
+    {id:'gentlemen',label:'Gentlemen Center'},
     {id:'fitness',label:'Fitness'},
     {id:'calendar',label:'Calendar'},
-    {id:'requests',label:'Account Requests',owner:true},{id:'settings',label:'Settings'},
+    {id:'business',label:'Finance Terminal'},
+    {id:'learning',label:'Learning'},
+    {id:'power',label:'Power Level'},
+    {id:'voice',label:'Voice Core'},
+    {id:'globe',label:'World Intel'},
+    {id:'ai',label:'AI Command Center'},
+    {id:'settings',label:'Settings'},
   ];
 
   // Re-fetches just the learning_progress row and merges it in — used when a tab that was
@@ -13906,6 +13947,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       voice:'<rect x="6.8" y="1.6" width="4.4" height="8" rx="2.2"/><path d="M4.3 8.6a4.7 4.7 0 0 0 9.4 0"/><path d="M9 13.3v3.1M6.7 16.4h4.6"/>', requests:'<circle cx="6.5" cy="6" r="3"/><path d="M1.5 15.5c0-2.8 2.2-4.8 5-4.8 1 0 1.9.3 2.7.8"/><path d="M12.5 10.5v5M10 13h5"/>',
       flame:'<path d="M9 16.2c-3.4 0-5.9-2.4-5.9-5.7 0-2.1 1-3.7 2.2-5.4.3 1.4 1 2.1 1.8 2.1-.2-2.9 1-5.5 3.5-7-.4 2.1.1 3.7 1.4 5 1.5 1.5 3 3.1 3 5.3 0 3.3-2.5 5.7-5.9 5.7z"/><path d="M9 13.6c-1.3 0-2.3-.9-2.3-2.2 0-.9.5-1.5 1-2.1.1.6.4.9.8.9-.1-1.1.4-2 1.3-2.6-.1.8 0 1.4.5 1.9.6.6 1.1 1.1 1.1 1.9 0 1.3-1 2.2-2.4 2.2z" opacity="0.4"/>',
       trending:'<path d="M2 14l4.5-5 3 3L16 4"/><path d="M11.5 4H16v4.5"/>',
+      /* A top hat: brim, crown, band. Drawn rather than a bow tie because at 19px a bow tie
+         collapses into a smudge, and the hat keeps a silhouette. */
+      gentlemen:'<path d="M2.6 13.4h12.8"/><path d="M5.8 13.4V4.1a1.2 1.2 0 0 1 1.2-1.2h4a1.2 1.2 0 0 1 1.2 1.2v9.3"/><rect x="5.8" y="9.1" width="6.4" height="1.9" fill="currentColor" stroke="none"/>',
       /* The Forge wears Maison Éverpine's mark: the champagne lozenge inside its own
          outline, struck onto a ruled base with the paired end-dots from the house
          divider. Everything else on this page is drawn at 19px, so the ornament had to
@@ -14206,6 +14250,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.292', date:'Sep 10, 2026', major:true, notes:[
+      'The sidebar is reordered: Home, Command, The Forge, Gentlemen Center, Fitness, Calendar, Finance, Learning, Power Level, Voice Core, World Intel, AI Command Center, Settings.',
+      'A Gentlemen Center page, empty for now \u2014 the shell, its own mark, and the same \u201cnothing here yet\u201d the Forge\u2019s Mental centre carries.',
+      'Account Requests is off the main rail. It is an owner\u2019s admin job rather than a place you go, so it now opens from Settings \u2192 Admin, where the rest of user management already was. The page is unchanged; the pending count moved with it and shows on Settings, so nothing waiting goes unnoticed.',
+      'The phone bar leads with the same pages the sidebar does \u2014 Command, Forge, Gentlemen, Fitness, Calendar, Finance \u2014 instead of the old set, with everything else under More.',
+    ]},
     {version:'v11.291', date:'Sep 10, 2026', major:true, notes:[
       'A day you are not working is a blank day. The general screenshot import will no longer read a staff rota \u2014 pointed at one it returned a row per person per day, which put six colleagues\u2019 shifts and days off on a calendar that should hold one person\u2019s. It now says so and sends you to Import work rota, which keeps only your own.',
       'The month stays one size. It shared a grid row with the day panel, so selecting a busy day stretched it and an empty one shrank it back.',
@@ -18522,12 +18572,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
        It is its own top-level page now and lights itself — leaving both clauses in would
        highlight two entries at once. */
     const navActive=(id)=> id===scene || (id==='briefing' && scene==='voice');
-    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='requests'?(S.requests||[]).filter(r=>r.status==='pending').length:0), hasBadge:(n.id==='requests'&&(S.requests||[]).some(r=>r.status==='pending')), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
-    // Mobile-first set: Home, Tasks (Command dashboard — missions/checklist/notes-adjacent),
-    // Calendar, Fitness (also reaches Health/Productivity-Notes/Music via its own sub-tabs),
-    // Voice. Lower-priority/desktop-oriented screens (World Intel, Finance, Power, Learning,
-    // Briefing, Settings) fall through to "More" automatically via mobMoreList below.
-    const mobIds=['dashboard','learning','business','globe','fitness','calendar']; const mobLab={dashboard:'Command',learning:'Learning',business:'Finance',globe:'Intel',fitness:'Fitness',calendar:'Calendar'};
+    /* The pending-requests badge moved to Settings with the page it counts. Taking Account
+       Requests off the rail would otherwise have taken the only sign that anyone is waiting. */
+    const _pending=this._isOwner() ? (S.requests||[]).filter(r=>r.status==='pending').length : 0;
+    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
+    /* The six on the bottom bar, in the same priority as the rail — a phone shows the top of
+       the list, and everything below it falls through to More. */
+    const mobIds=['dashboard','forge','gentlemen','fitness','calendar','business'];
+    const mobLab={dashboard:'Command',forge:'Forge',gentlemen:'Gentlemen',fitness:'Fitness',calendar:'Calendar',business:'Finance'};
     const mobNav=mobIds.map(id=>({id,label:mobLab[id],go:go(id),c:id===scene?'#FFFFFF':'#8a8a92',dotOp:id===scene?1:0}));
     const mobMoreActive=!mobIds.includes(scene);
     const mobMoreActiveColor=mobMoreActive?'#FFFFFF':'#8a8a92';
@@ -20790,6 +20842,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       sessRole:(this._role()||'Owner').toUpperCase(),
       isOwner:this._isOwner(),
       isRequests:scene==='requests' && this._isOwner(),
+      goRequests:()=>this.setState({scene:'requests'}),
+      isGentlemen:scene==='gentlemen',
       showReqBanner:this._isOwner() && scene==='dashboard' && (S.requests||[]).some(r=>r.status==='pending'),
       goRequests:go('requests'),
       pendingReqCount:(S.requests||[]).filter(r=>r.status==='pending').length,
