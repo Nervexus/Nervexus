@@ -194,7 +194,6 @@
        were filed by a regex guess. Same story for "calf raise" and "seated row". */
     'plank':                                 ['Abs',        'Core',      'Plank'],
     'leg raise':                             ['Abs',        'Core',      'Leg Raise'],
-    'lying leg raise':                       ['Abs',        'Core',      'Lying Leg Raise'],
     'hanging leg raise':                     ['Abs',        'Core',      'Hanging Leg Raise'],
     'hanging knee raise':                    ['Abs',        'Core',      'Hanging Knee Raise'],
     'captain\'s chair leg raise':            ['Abs',        'Core',      'Captain\'s Chair Leg Raise'],
@@ -232,6 +231,110 @@
     'barbell hip thrust':                    ['Glutes',     'Legs',      'Barbell Hip Thrust'],
     'dumbbell hip thrust':                   ['Glutes',     'Legs',      'Dumbbell Hip Thrust'],
     'kettlebell swing':                      ['Glutes',     'Legs',      'Kettlebell Swing'],
+
+    /* ---- KETTLEBELL, in full -------------------------------------------------------------
+       The hundred movements, supplied as a list and filed by what each actually trains rather
+       than by the section it was listed under. Three calls worth stating, because they are
+       judgements and not facts:
+
+         a swing, a clean and a deadlift are all a hip hinge, so they file to Glutes however
+         high the bell finishes — an American swing is not shoulder work;
+
+         a snatch is driven by the hips but limited by the overhead lockout, so it files to
+         Shoulders, which is also where a training log wants to see it;
+
+         a complex is several lifts in one set and no single muscle owns it, so those file to
+         Full — the bucket the Fitness page renders for whole-body work.
+
+       Anything already on the list above keeps its existing entry; nothing here overwrites. */
+    'two hand kettlebell swing':             ['Glutes',      'Legs',       'Two-Hand Kettlebell Swing'],
+    'two hand swing':                        ['Glutes',      'Legs',       'Two-Hand Swing'],
+    'single arm kettlebell swing':           ['Glutes',      'Legs',       'Single-Arm Kettlebell Swing'],
+    'single arm swing':                      ['Glutes',      'Legs',       'Single-Arm Swing'],
+    'alternating hand swing':                ['Glutes',      'Legs',       'Alternating-Hand Swing'],
+    'american swing':                        ['Glutes',      'Legs',       'American Swing'],
+    'double kettlebell swing':               ['Glutes',      'Legs',       'Double Kettlebell Swing'],
+    'hand to hand swing':                    ['Glutes',      'Legs',       'Hand-to-Hand Swing'],
+    'suitcase swing':                        ['Glutes',      'Legs',       'Suitcase Swing'],
+    'kneeling swing':                        ['Glutes',      'Legs',       'Kneeling Swing'],
+    'single leg swing':                      ['Glutes',      'Legs',       'Single-Leg Swing'],
+    'sumo swing':                            ['Glutes',      'Legs',       'Sumo Swing'],
+    'kettlebell clean':                      ['Glutes',      'Legs',       'Kettlebell Clean'],
+    'single arm clean':                      ['Glutes',      'Legs',       'Single-Arm Clean'],
+    'double kettlebell clean':               ['Glutes',      'Legs',       'Double Kettlebell Clean'],
+    'alternating clean':                     ['Glutes',      'Legs',       'Alternating Clean'],
+    'hang clean':                            ['Glutes',      'Legs',       'Hang Clean'],
+    'clean and jerk':                        ['Shoulders',   'Shoulders',  'Clean and Jerk'],
+    'squat clean':                           ['Quads',       'Legs',       'Squat Clean'],
+    'tall clean':                            ['Glutes',      'Legs',       'Tall Clean'],
+    'kettlebell snatch':                     ['Shoulders',   'Shoulders',  'Kettlebell Snatch'],
+    'single arm snatch':                     ['Shoulders',   'Shoulders',  'Single-Arm Snatch'],
+    'double kettlebell snatch':              ['Shoulders',   'Shoulders',  'Double Kettlebell Snatch'],
+    'alternating snatch':                    ['Shoulders',   'Shoulders',  'Alternating Snatch'],
+    'hang snatch':                           ['Shoulders',   'Shoulders',  'Hang Snatch'],
+    'snatch to overhead squat':              ['Shoulders',   'Shoulders',  'Snatch to Overhead Squat'],
+    'half snatch':                           ['Shoulders',   'Shoulders',  'Half Snatch'],
+    'snatch balance':                        ['Shoulders',   'Shoulders',  'Snatch Balance'],
+    'single arm overhead press':             ['Shoulders',   'Shoulders',  'Single-Arm Overhead Press'],
+    'double kettlebell press':               ['Shoulders',   'Shoulders',  'Double Kettlebell Press'],
+    'push press':                            ['Shoulders',   'Shoulders',  'Push Press'],
+    'push jerk':                             ['Shoulders',   'Shoulders',  'Push Jerk'],
+    'bottoms up press':                      ['Shoulders',   'Shoulders',  'Bottoms-Up Press'],
+    'alternating press':                     ['Shoulders',   'Shoulders',  'Alternating Press'],
+    'z press':                               ['Shoulders',   'Shoulders',  'Z-Press'],
+    'floor press':                           ['Chest',       'Chest',      'Floor Press'],
+    'kettlebell floor press':                ['Chest',       'Chest',      'Kettlebell Floor Press'],
+    'half kneeling press':                   ['Shoulders',   'Shoulders',  'Half-Kneeling Press'],
+    'tall kneeling press':                   ['Shoulders',   'Shoulders',  'Tall-Kneeling Press'],
+    'seated press':                          ['Shoulders',   'Shoulders',  'Seated Press'],
+    'viking press':                          ['Shoulders',   'Shoulders',  'Viking Press'],
+    'double kettlebell front squat':         ['Quads',       'Legs',       'Double Kettlebell Front Squat'],
+    'single arm front squat':                ['Quads',       'Legs',       'Single-Arm Front Squat'],
+    'single kettlebell front squat':         ['Quads',       'Legs',       'Single-Kettlebell Front Squat'],
+    'racked squat':                          ['Quads',       'Legs',       'Racked Squat'],
+    'overhead squat':                        ['Quads',       'Legs',       'Overhead Squat'],
+    'zercher squat':                         ['Quads',       'Legs',       'Zercher Squat'],
+    'pause squat':                           ['Quads',       'Legs',       'Pause Squat'],
+    'suitcase squat':                        ['Quads',       'Legs',       'Suitcase Squat'],
+    'box squat':                             ['Quads',       'Legs',       'Box Squat'],
+    'goblet reverse lunge':                  ['Quads',       'Legs',       'Goblet Reverse Lunge'],
+    'racked forward lunge':                  ['Quads',       'Legs',       'Racked Forward Lunge'],
+    'overhead lunge':                        ['Quads',       'Legs',       'Overhead Lunge'],
+    'suitcase lunge':                        ['Quads',       'Legs',       'Suitcase Lunge'],
+    'cossack lunge':                         ['Adductors',   'Legs',       'Cossack Lunge'],
+    'skater squat':                          ['Quads',       'Legs',       'Skater Squat'],
+    'two hand deadlift':                     ['Glutes',      'Legs',       'Two-Hand Deadlift'],
+    'single arm deadlift':                   ['Glutes',      'Legs',       'Single-Arm Deadlift'],
+    'double kettlebell deadlift':            ['Glutes',      'Legs',       'Double Kettlebell Deadlift'],
+    'suitcase deadlift':                     ['Glutes',      'Legs',       'Suitcase Deadlift'],
+    'deficit deadlift':                      ['Glutes',      'Legs',       'Deficit Deadlift'],
+    'staggered stance deadlift':             ['Glutes',      'Legs',       'Staggered-Stance Deadlift'],
+    'kettlebell deadlift':                   ['Glutes',      'Legs',       'Kettlebell Deadlift'],
+    'single arm bent over row':              ['Back',        'Back',       'Single-Arm Bent-Over Row'],
+    'double kettlebell row':                 ['Back',        'Back',       'Double Kettlebell Row'],
+    'high pull':                             ['Back',        'Back',       'High Pull'],
+    'gorilla row':                           ['Back',        'Back',       'Gorilla Row'],
+    'plank row':                             ['Back',        'Back',       'Plank Row'],
+    'renegade row':                          ['Back',        'Back',       'Renegade Row'],
+    'kneeling single arm row':               ['Back',        'Back',       'Kneeling Single-Arm Row'],
+    'windmill':                              ['Obliques',    'Core',       'Windmill'],
+    'kettlebell sit up':                     ['Abs',         'Core',       'Kettlebell Sit-Up'],
+    'plank drag':                            ['Abs',         'Core',       'Plank Drag'],
+    'around the world':                      ['Abs',         'Core',       'Around the World'],
+    'figure 8':                              ['Abs',         'Core',       'Figure-8'],
+    'figure 8 to hold':                      ['Abs',         'Core',       'Figure-8 to Hold'],
+    'around the body pass':                  ['Abs',         'Core',       'Around-the-Body Pass'],
+    'overhead carry':                        ['Shoulders',   'Shoulders',  'Overhead Carry'],
+    'bottoms up carry':                      ['Forearms',    'Arms',       'Bottoms-Up Carry'],
+    'thruster':                              ['Quads',       'Full',       'Thruster'],
+    'squat to press':                        ['Quads',       'Full',       'Squat to Press'],
+    'reverse lunge to press':                ['Quads',       'Full',       'Reverse Lunge to Press'],
+    'swing to clean to press':               ['Glutes',      'Full',       'Swing to Clean to Press'],
+    'clean and squat':                       ['Quads',       'Full',       'Clean and Squat'],
+    'man maker':                             ['Chest',       'Full',       'Man Maker'],
+    'devils press':                          ['Chest',       'Full',       'Devil\'s Press'],
+    'devil\'s press':                        ['Chest',       'Full',       'Devil\'s Press'],
+
     'sled push':                             ['Quads',      'Legs',      'Sled Push'],
     'box jump':                              ['Quads',      'Legs',      'Box Jump'],
     'glute bridge':                          ['Glutes',     'Legs',      'Glute Bridge'],
@@ -357,10 +460,16 @@
     /* Past tense, because people report training in it: "I benched 80 kilos". Unlike bare
        "row" and "squat" this one is not ambiguous — nothing else is called benching. */
     'benched':'bench press', 'benching':'bench press',
-    'treadmill run':'treadmill', 'cross-trainer':'cross trainer'
+    'treadmill run':'treadmill', 'cross-trainer':'cross trainer',
+    /* Named after somebody, or with the equipment sitting in the middle of the name — either
+       way the words are not consecutive, so the longest-match rule cannot reach the entry. */
+    'arnold style press':'arnold press', 'arnold style kettlebell press':'arnold press',
+    'meadows style row':'meadows row', 'renegade rows':'renegade row'
   };
 
-  var GROUPS = ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Mixed'];
+  /* 'Full', not 'Mixed': Mixed was never rendered anywhere — the Fitness page's buckets are
+     these, and a row filed to a bucket that does not exist is a row nobody sees. */
+  var GROUPS = ['Chest','Back','Shoulders','Arms','Legs','Core','Cardio','Full'];
 
   /* Equipment people write as two words and the list writes as one. A log is typed on a
      phone between sets, and "kettle bell wrist flip" has to find "kettlebell wrist flip" —

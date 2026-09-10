@@ -88,6 +88,57 @@ t('a bare name does not steal a qualified one', async () => {
   eq(I.lookup('narrow stance leg press').key, 'narrow stance leg press', 'narrow-stance leg press');
 });
 
+/* The hundred kettlebell movements, exactly as the list was supplied — including the
+   hyphens, the possessives and the names with the equipment in the middle. */
+const KB100 = `Two-Hand Kettlebell Swing|Single-Arm Kettlebell Swing|Alternating-Hand Swing|American Swing|Double Kettlebell Swing|Hand-to-Hand Swing|Suitcase Swing|Kneeling Swing|Single-Leg Swing|Sumo Swing|Single-Arm Clean|Double Kettlebell Clean|Alternating Clean|Hang Clean|Clean and Press|Clean and Jerk|Squat Clean|Tall Clean|Single-Arm Snatch|Double Kettlebell Snatch|Alternating Snatch|Hang Snatch|Snatch to Overhead Squat|Half Snatch|Snatch Balance|Single-Arm Overhead Press|Double Kettlebell Press|Push Press|Push Jerk|Bottoms-Up Press|Alternating Press|Z-Press|Floor Press|Half-Kneeling Press|Tall-Kneeling Press|Seated Press|Viking Press|Arnold-Style Kettlebell Press|Goblet Squat|Double Kettlebell Front Squat|Single-Arm Front Squat|Racked Squat|Sumo Squat|Overhead Squat|Pistol Squat|Cossack Squat|Zercher Squat|Pause Squat|Squat to Press|Single-Kettlebell Front Squat|Suitcase Squat|Box Squat with Kettlebell|Goblet Reverse Lunge|Racked Forward Lunge|Walking Lunge|Overhead Lunge|Suitcase Lunge|Lateral Lunge|Curtsy Lunge|Bulgarian Split Squat|Step-Up|Single-Leg Deadlift|Skater Squat with Kettlebell|Reverse Lunge to Press|Cossack Lunge|Two-Hand Deadlift|Single-Arm Deadlift|Sumo Deadlift|Single-Leg Romanian Deadlift|Double Kettlebell Deadlift|Suitcase Deadlift|Deficit Deadlift|Good Morning|Staggered-Stance Deadlift|Single-Arm Bent-Over Row|Double Kettlebell Row|Renegade Row|High Pull|Gorilla Row|Plank Row|Meadows-Style Row|Kneeling Single-Arm Row|Turkish Get-Up|Windmill|Halo|Russian Twist|Kettlebell Sit-Up|Plank Drag|Suitcase Carry|Farmer's Carry|Overhead Carry|Bottoms-Up Carry|Swing to Clean to Press|Clean and Squat|Figure-8|Figure-8 to Hold|Around-the-Body Pass|Thruster|Man Maker|Devil's Press`.split('|');
+
+t('all one hundred kettlebell movements resolve', async () => {
+  eq(KB100.length, 100, 'the list itself should be a hundred');
+  const missing = KB100.filter(n => !I.lookup(n));
+  eq(missing.length, 0, 'these found nothing: ' + missing.join(', '));
+});
+
+t('the hinge files to the hips however high the bell finishes', async () => {
+  /* A judgement worth pinning: an American swing goes overhead but it is not shoulder work. */
+  for (const q of ['two hand kettlebell swing', 'american swing', 'single leg swing',
+                   'single arm clean', 'hang clean', 'suitcase deadlift'])
+    eq(find(q), 'Legs/Glutes', q);
+});
+
+t('a snatch files to the shoulder that has to hold it', async () => {
+  for (const q of ['single arm snatch', 'hang snatch', 'half snatch', 'snatch balance'])
+    eq(find(q), 'Shoulders/Shoulders', q);
+});
+
+t('a complex belongs to no single muscle', async () => {
+  /* Full is the Fitness page's whole-body bucket. It used to be labelled Mixed here, which
+     that page has no bucket for — a row sent there is a row nobody sees. */
+  for (const q of ['thruster', 'man maker', "devil's press", 'clean and squat', 'swing to clean to press'])
+    eq(I.lookup(q).group, 'Full', q);
+  ok(I.groups.includes('Full'), 'Full should be a declared group');
+  ok(!I.groups.includes('Mixed'), 'Mixed renders nowhere and should not be offered');
+});
+
+t('a name with the equipment in the middle of it still resolves', async () => {
+  /* The lookup matches consecutive words, so "Arnold-Style Kettlebell Press" cannot reach
+     "arnold press" on its own — these go through the alias map instead. */
+  eq(I.lookup('Arnold-Style Kettlebell Press').key, 'arnold press', 'arnold-style');
+  eq(I.lookup('Meadows-Style Row').key, 'meadows row', 'meadows-style');
+  eq(I.lookup('Box Squat with Kettlebell').key, 'box squat', 'box squat with kettlebell');
+  eq(I.lookup('Skater Squat with Kettlebell').key, 'skater squat', 'skater squat with kettlebell');
+});
+
+t('the file has no repeated keys', async () => {
+  /* A repeated key in an object literal is silently the last one, which is how a
+     classification changes without anybody editing it. */
+  const src = fs.readFileSync('./exercise-index.js', 'utf8');
+  const keys = [...src.matchAll(/^ {4}'((?:[^'\\]|\\.)*)':/gm)].map(m => m[1]);
+  const seen = {}, dupes = [];
+  keys.forEach(k => { if (seen[k]) dupes.push(k); seen[k] = 1; });
+  eq(dupes.join(','), '', 'duplicate keys');
+  ok(keys.length > 380, 'the list should have grown, got ' + keys.length);
+});
+
 t('nothing that used to resolve stopped resolving', async () => {
   /* The normaliser was changed, which is the kind of change that quietly breaks the other
      257 entries. A spot check across every group. */
