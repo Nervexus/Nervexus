@@ -100,21 +100,46 @@ t('Settings carries the pending count that used to sit on the rail', async () =>
   else eq(badge, null, 'only the owner sees a request count');
 });
 
-t('the phone bar leads with the same pages the rail does', async () => {
-  await boot();
-  const ids = await page.evaluate(() => window.__nvx.state && [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon));
-  /* Rendered only under the mobile breakpoint, so this asserts on the list it is built from
-     when the bar itself is not on the page. */
-  const mob = ids && ids.length ? ids : null;
-  const want = ['dashboard', 'forge', 'gentlemen', 'fitness', 'calendar', 'business'];
-  if (mob) eq(mob.join(','), want.join(','), 'the phone bar is in the old order');
-  else {
-    await page.setViewportSize({ width: 390, height: 840 });
-    await page.waitForTimeout(600);
-    const m2 = await page.evaluate(() => [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon));
-    eq(m2.join(','), want.join(','), 'the phone bar is in the old order');
-    await page.setViewportSize({ width: 1440, height: 1100 });
-  }
+t('the phone bar keeps its own six', async () => {
+  /* The bar is deliberately not the top of the rail: it is the screens used from a phone,
+     which is a different question from how the app is arranged. Reordering the sidebar must
+     leave it exactly as it was.
+
+     Asserted on the rendered nodes rather than on visible text: under the mobile breakpoint a
+     later rule hides both the bar and the More sheet — the ☰ drawer is what a phone actually
+     navigates with — so nothing here is on screen to read. What is being held is the list
+     each is built from. */
+  await page.setViewportSize({ width: 390, height: 840 });
+  await boot({ mobMoreOpen: true });
+  const m = await page.evaluate(() => ({
+    bar: [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon),
+    more: [...document.querySelectorAll('.cc-mobsheet-backdrop [data-icon]')].map(e => e.dataset.icon),
+  }));
+  eq(m.bar.join(','), 'dashboard,learning,business,globe,fitness,calendar', 'the phone bar changed');
+  /* Everything not on the bar has to be somewhere, or reordering the rail has stranded it. */
+  for (const id of ['forge', 'gentlemen', 'power', 'ai', 'settings'])
+    ok(m.more.includes(id), id + ' is on neither the bar nor More: ' + m.more.join(' > '));
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.waitForTimeout(400);
+});
+
+t('the drawer lists every page in rail order', async () => {
+  /* The ☰ drawer is the nav a phone actually uses, so it is the one that has to carry the
+     new order — the six on the bar are a shortcut, not the list. */
+  await page.setViewportSize({ width: 390, height: 840 });
+  await boot({ mobDrawerOpen: true });
+  /* The drawer is its own overlay with no class of its own; ALL PAGES heads it. */
+  const ids = await page.evaluate(() => {
+    const head = [...document.querySelectorAll('div,span')]
+      .find(e => e.children.length === 0 && e.textContent.trim() === 'ALL PAGES');
+    if (!head) return null;
+    return [...head.parentElement.querySelectorAll('[data-icon]')].map(e => e.dataset.icon);
+  });
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.waitForTimeout(400);
+  /* Voice is deliberately left out of the drawer, as it was before. */
+  ok(ids, 'the drawer did not open');
+  eq(ids.join(','), WANT.filter(x => x !== 'voice').join(','), 'the drawer is not in rail order');
 });
 
 t('nothing threw through any of it', async () => {

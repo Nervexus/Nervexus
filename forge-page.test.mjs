@@ -150,18 +150,18 @@ t('the Forge nav entry actually draws its mark', async () => {
   eq(drawn.dots, 2, 'the base rule carries the house divider\'s paired end dots');
 });
 
-t('the Forge is on the phone bar itself, not buried under More', async () => {
-  /* It used to fall through to the More sheet. The bottom bar was reordered with the rail,
-     so the Forge is now one of the six on it — the assertion that matters either way is that
-     it is reachable on a phone without the desktop sidebar. */
-  await boot();
-  await page.setViewportSize({ width: 390, height: 840 });
-  await page.waitForTimeout(600);
-  const onBar = await page.evaluate(() =>
-    [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon));
-  await page.setViewportSize({ width: 1280, height: 1400 });
-  await page.waitForTimeout(400);
-  ok(onBar.includes('forge'), 'the Forge is not on the phone bar: ' + onBar.join(' > '));
+t('the Forge is reachable on mobile through More', async () => {
+  await boot({ mobMoreOpen: true });
+  /* The mobile bar carries six fixed entries of its own and everything else falls through to
+     the More sheet, which is only in the DOM while it is open. Reordering the sidebar does
+     not put anything on that bar, so the only thing that matters here is that the Forge has
+     not become unreachable on a phone. */
+  const inMore = await page.evaluate(() => {
+    const more = [...document.querySelectorAll('*')].filter(e =>
+      e.children.length === 0 && e.textContent.trim() === 'The Forge' && !e.closest('.cc-side'));
+    return more.length > 0;
+  });
+  ok(inMore, 'The Forge appears nowhere outside the desktop sidebar — check mobMoreList');
 });
 
 t('the page wears the Éverpine crest in champagne', async () => {

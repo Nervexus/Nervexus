@@ -9336,7 +9336,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.10-292 · v11.292 nav-order';
+const NOTIF_BUILD_VERSION = '2026.09.10-293 · v11.293 phone-bar';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14254,7 +14254,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       'The sidebar is reordered: Home, Command, The Forge, Gentlemen Center, Fitness, Calendar, Finance, Learning, Power Level, Voice Core, World Intel, AI Command Center, Settings.',
       'A Gentlemen Center page, empty for now \u2014 the shell, its own mark, and the same \u201cnothing here yet\u201d the Forge\u2019s Mental centre carries.',
       'Account Requests is off the main rail. It is an owner\u2019s admin job rather than a place you go, so it now opens from Settings \u2192 Admin, where the rest of user management already was. The page is unchanged; the pending count moved with it and shows on Settings, so nothing waiting goes unnoticed.',
-      'The phone bar leads with the same pages the sidebar does \u2014 Command, Forge, Gentlemen, Fitness, Calendar, Finance \u2014 instead of the old set, with everything else under More.',
+      'The phone bar keeps its own six \u2014 Command, Learning, Finance, Intel, Fitness, Calendar \u2014 unchanged. It is the screens used from a phone, which is a different question from how the app is arranged. The \u2630 drawer carries every page, in the new order.',
     ]},
     {version:'v11.291', date:'Sep 10, 2026', major:true, notes:[
       'A day you are not working is a blank day. The general screenshot import will no longer read a staff rota \u2014 pointed at one it returned a row per person per day, which put six colleagues\u2019 shifts and days off on a calendar that should hold one person\u2019s. It now says so and sends you to Import work rota, which keeps only your own.',
@@ -18576,10 +18576,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
        Requests off the rail would otherwise have taken the only sign that anyone is waiting. */
     const _pending=this._isOwner() ? (S.requests||[]).filter(r=>r.status==='pending').length : 0;
     const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
-    /* The six on the bottom bar, in the same priority as the rail — a phone shows the top of
-       the list, and everything below it falls through to More. */
-    const mobIds=['dashboard','forge','gentlemen','fitness','calendar','business'];
-    const mobLab={dashboard:'Command',forge:'Forge',gentlemen:'Gentlemen',fitness:'Fitness',calendar:'Calendar',business:'Finance'};
+    /* The bottom bar keeps its own six, deliberately — it is not the top of the rail. These
+       are the screens that are actually used from a phone; the rail's order is about how the
+       app is arranged, which is a different question. Everything else falls through to More.
+     */
+    const mobIds=['dashboard','learning','business','globe','fitness','calendar'];
+    const mobLab={dashboard:'Command',learning:'Learning',business:'Finance',globe:'Intel',fitness:'Fitness',calendar:'Calendar'};
     const mobNav=mobIds.map(id=>({id,label:mobLab[id],go:go(id),c:id===scene?'#FFFFFF':'#8a8a92',dotOp:id===scene?1:0}));
     const mobMoreActive=!mobIds.includes(scene);
     const mobMoreActiveColor=mobMoreActive?'#FFFFFF':'#8a8a92';
