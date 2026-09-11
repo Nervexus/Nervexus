@@ -266,60 +266,78 @@
     h ^= h >>> 13; h = Math.imul(h, 1274126177); h ^= h >>> 16;
     return h >>> 0;
   }
-  /* The draw is over every question at once rather than category-then-question, so a category
-     with more questions in it is more likely to come up — which is the honest reading of "a
-     random question from across all four categories". */
-  function dailyQuestion(dateKey) {
-    if (!QUESTIONS.length) return null;
-    var i = seed(dateKey) % QUESTIONS.length;
-    var q = QUESTIONS[i];
-    /* The options are shuffled per day too, from the same seed — the correct answer is
-       written first in the source, and a test whose answer is always the first button is not
-       a test. */
-    var order = [0, 1, 2, 3].slice(0, q.a.length);
-    var r = seed(dateKey + '|' + i);
-    for (var k = order.length - 1; k > 0; k--) {
-      r = (Math.imul(r, 48271) + 11) >>> 0;
-      var j = r % (k + 1), t = order[k]; order[k] = order[j]; order[j] = t;
+  /* ---- one concept per card ------------------------------------------------------------
+     Every line is its own card. A section's heading rides along on each of its cards rather
+     than being a card of its own, so "peak lapel or shawl collar" is never read without
+     "Black Tie" above it — that was the reason the first cut kept whole sections together,
+     and carrying the heading solves it without putting four rules on one screen.
+
+     Pacing over density, deliberately: Dress Code is twenty-two cards rather than six. */
+  function cards(key) {
+    var src = null, eyebrow = '';
+    for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) {
+      src = [{ name: SUBJECTS[i].name, note: '', lines: SUBJECTS[i].lines }];
+      eyebrow = SUBJECTS[i].eyebrow;
     }
-    return {
-      index: i, cat: q.cat, q: q.q, why: q.why,
-      options: order.map(function (o) { return q.a[o]; }),
-      correct: order.indexOf(q.c),
-    };
+    if (!src && key === 'dress') { src = DRESS; eyebrow = 'BY OCCASION'; }
+    if (!src && key === 'dining') { src = DINING; eyebrow = 'SECOND NATURE, NOT PERFORMED'; }
+    if (!src) return [];
+
+    var out = [];
+    src.forEach(function (sec) {
+      sec.lines.forEach(function (line, li) {
+        out.push({
+          eyebrow: eyebrow, title: sec.name, note: sec.note || '', text: line,
+          /* Where you are inside the section as well as inside the deck: four rules under one
+             heading should read as four, not as an undifferentiated run of cards. */
+          step: li + 1, steps: sec.lines.length,
+        });
+      });
+    });
+    out.forEach(function (c, i) { c.n = i + 1; c.of = out.length; });
+    return out;
   }
 
-  /* ---- one idea per card ---------------------------------------------------------------
-     The pages are read a card at a time rather than scrolled, so the content has to be cut
-     into cards — and where the cut falls is a judgement about the material, not a layout
-     detail, which is why it lives here with the content.
-
-     A subject area is cut per line: each is a complete idea and stands alone. Dress and
-     dining are cut per heading, because "peak lapel or shawl collar" is useless without
-     "black tie" above it — splitting those per line would produce cards that are true and
-     meaningless. */
-  function cards(key) {
-    var subj = null;
-    for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) subj = SUBJECTS[i];
-    if (subj) {
-      return subj.lines.map(function (t, n) {
-        return { eyebrow: subj.eyebrow, title: subj.name, note: '', lines: [t],
-                 n: n + 1, of: subj.lines.length };
-      });
+  /* ---- the daily test ------------------------------------------------------------------
+     Four questions, one from each category, one per card. The set is drawn for the day and
+     is the same all day on every device, and the order of the categories moves too — a test
+     that always opens on Events is a rotation wearing a different hat. */
+  function dailySet(dateKey) {
+    var cats = CATEGORIES.slice();
+    var r = seed(String(dateKey) + '#order');
+    for (var k = cats.length - 1; k > 0; k--) {
+      r = (Math.imul(r, 48271) + 11) >>> 0;
+      var j = r % (k + 1), t = cats[k]; cats[k] = cats[j]; cats[j] = t;
     }
-    var src = key === 'dress' ? DRESS : key === 'dining' ? DINING : null;
-    if (!src) return [];
-    var eyebrow = key === 'dress' ? 'BY OCCASION' : 'SECOND NATURE, NOT PERFORMED';
-    return src.map(function (b, n) {
-      return { eyebrow: eyebrow, title: b.name, note: b.note || '', lines: b.lines.slice(),
-               n: n + 1, of: src.length };
-    });
+    return cats.map(function (cat) {
+      var pool = QUESTIONS.filter(function (q) { return q.cat === cat; });
+      if (!pool.length) return null;
+      var q = pool[seed(String(dateKey) + '#' + cat) % pool.length];
+      var order = q.a.map(function (_, i) { return i; });
+      var rr = seed(String(dateKey) + '#' + cat + '#opt');
+      for (var m = order.length - 1; m > 0; m--) {
+        rr = (Math.imul(rr, 48271) + 11) >>> 0;
+        var jj = rr % (m + 1), tt = order[m]; order[m] = order[jj]; order[jj] = tt;
+      }
+      return {
+        cat: cat, q: q.q, why: q.why,
+        options: order.map(function (o) { return q.a[o]; }),
+        correct: order.indexOf(q.c),
+      };
+    }).filter(Boolean);
+  }
+
+  /* Kept because the single-question draw is still the honest answer to "one question from
+     across all four categories", and the set is built on the same seeding. */
+  function dailyQuestion(dateKey) {
+    var set = dailySet(dateKey);
+    return set.length ? set[0] : null;
   }
 
   root.GentlemenEtiquette = {
     SUBJECTS: SUBJECTS, DRESS: DRESS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
-    dailyQuestion: dailyQuestion, cards: cards, _seed: seed,
+    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, _seed: seed,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.GentlemenEtiquette;
 })(typeof window !== 'undefined' ? window : this);

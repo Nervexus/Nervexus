@@ -48,25 +48,44 @@ t('dining covers the meal from sitting down to the last glass', async () => {
     ok(all.includes(phrase), 'the dining line about "' + phrase + '" is missing');
 });
 
-t('the pages are cut into cards, one idea at a time', async () => {
-  /* Where the cut falls is a judgement about the material. A subject area splits per line —
-     each is a complete idea. Dress and dining split per heading, because "peak lapel or shawl
-     collar" is true and meaningless without "black tie" above it. */
+t('every line is its own card, with its heading carried on it', async () => {
+  /* One concept per card, and the section's heading rides along rather than being a card of
+     its own — "peak lapel or shawl collar" must never be read without "Black Tie" above it. */
   for (const s of G.SUBJECTS) {
     const c = G.cards(s.key);
     eq(c.length, s.lines.length, s.key + ' should be one card per line');
     c.forEach((card, i) => {
-      eq(card.lines.length, 1, s.key + ' card ' + i + ' should carry one idea');
-      eq(card.title, s.name, s.key + ' card ' + i + ' lost its title');
-      eq(card.of, s.lines.length, s.key + ' card ' + i + ' has the wrong count');
+      eq(card.text, s.lines[i], s.key + ' card ' + i + ' has the wrong line');
+      eq(card.title, s.name, s.key + ' card ' + i + ' lost its heading');
+      ok(card.eyebrow, s.key + ' card ' + i + ' lost its eyebrow');
     });
   }
-  eq(G.cards('dress').length, 6, 'six occasions, six cards');
-  eq(G.cards('dining').length, 5, 'five stages, five cards');
-  const blackTie = G.cards('dress')[0];
-  eq(blackTie.title, 'Black Tie / Formal Evening', 'the first dress card');
-  ok(blackTie.lines.length >= 4, 'an occasion card keeps all of its lines, not one');
-  ok(blackTie.note, 'and the note that says when it applies');
+  /* Pacing over density, deliberately: the six occasions are twenty-two cards. */
+  const dress = G.cards('dress');
+  eq(dress.length, G.DRESS.reduce((a, d) => a + d.lines.length, 0), 'dress should be one card per line');
+  ok(dress.length > 20, 'only ' + dress.length + ' dress cards — that is still a reference, not a read');
+  eq(G.cards('dining').length, G.DINING.reduce((a, d) => a + d.lines.length, 0), 'dining too');
+
+  const lapel = dress.find(c => /Peak lapel/.test(c.text));
+  ok(lapel, 'the lapel rule is missing');
+  eq(lapel.title, 'Black Tie / Formal Evening', 'it must carry the occasion it belongs to');
+  eq(lapel.note, 'Evening, invitation-led', 'and the note that says when that applies');
+});
+
+t('a card knows where it is, in its section and in the deck', async () => {
+  for (const key of ['money', 'dress', 'dining']) {
+    const c = G.cards(key);
+    c.forEach((card, i) => {
+      eq(card.n, i + 1, key + ': card ' + i + ' is numbered wrongly in the deck');
+      eq(card.of, c.length, key + ': card ' + i + ' has the wrong deck total');
+      ok(card.step >= 1 && card.step <= card.steps, key + ': card ' + i + ' has a bad step ' + card.step + '/' + card.steps);
+    });
+  }
+  const dress = G.cards('dress');
+  eq(dress[0].step, 1, 'the first card of the first occasion');
+  eq(dress[0].steps, 4, 'black tie has four rules');
+  eq(dress[4].step, 1, 'the fifth card starts the second occasion');
+  eq(dress[4].title, 'Business Formal', 'and that occasion is business formal');
 });
 
 t('a card deck for something that is not a page is empty, not broken', async () => {
@@ -75,13 +94,53 @@ t('a card deck for something that is not a page is empty, not broken', async () 
   eq(G.cards('').length, 0, 'an empty key');
 });
 
-t('every card knows where it is in its deck', async () => {
-  for (const key of ['money', 'history', 'taste', 'conversation', 'foundation', 'dress', 'dining']) {
-    const c = G.cards(key);
-    c.forEach((card, i) => {
-      eq(card.n, i + 1, key + ': card ' + i + ' is numbered wrongly');
-      eq(card.of, c.length, key + ': card ' + i + ' has the wrong total');
-    });
+/* ---- the daily set ---------------------------------------------------------------------- */
+t('the day deals four questions, one from each category', async () => {
+  for (const d of days(30)) {
+    const set = G.dailySet(d);
+    eq(set.length, 4, d + ' dealt ' + set.length + ' questions');
+    eq(new Set(set.map(q => q.cat)).size, 4, d + ' repeated a category');
+    for (const q of set) {
+      eq(q.options.length, 4, d + ': four options');
+      ok(q.correct >= 0 && q.correct < 4, d + ': the answer index is out of range');
+      ok(q.why && q.q, d + ': a question is missing its text or its reason');
+    }
+  }
+});
+
+t('the same day deals the same four, every time', async () => {
+  for (const d of days(20)) {
+    const a = G.dailySet(d), b = G.dailySet(d);
+    eq(JSON.stringify(a), JSON.stringify(b), d + ' dealt a different set the second time');
+  }
+});
+
+t('the order of the categories moves too', async () => {
+  /* A test that always opens on Events is a rotation wearing a different hat. */
+  const first = new Set(days(40).map(d => G.dailySet(d)[0].cat));
+  eq(first.size, 4, 'only ' + first.size + ' categories ever come first');
+});
+
+t('the four are not the same four every day', async () => {
+  const sigs = days(30).map(d => G.dailySet(d).map(q => q.q).sort().join('|'));
+  ok(new Set(sigs).size > 20, 'only ' + new Set(sigs).size + ' distinct sets in thirty days');
+});
+
+t('a shuffled option really is its question’s own', async () => {
+  for (const d of days(30)) {
+    for (const q of G.dailySet(d)) {
+      const src = G.QUESTIONS.find(x => x.q === q.q);
+      ok(src, d + ': ' + q.q + ' is not in the bank');
+      eq(q.options.slice().sort().join('|'), src.a.slice().sort().join('|'), d + ': the options are not the source options');
+      eq(q.options[q.correct], src.a[src.c], d + ': the correct index does not point at the correct answer');
+    }
+  }
+});
+
+t('the single-question draw still works, and is the first of the set', async () => {
+  for (const d of days(10)) {
+    const q = G.dailyQuestion(d);
+    eq(JSON.stringify(q), JSON.stringify(G.dailySet(d)[0]), d + ': the single draw drifted from the set');
   }
 });
 
@@ -102,45 +161,13 @@ t('all four categories are drawn from', async () => {
   for (const c of G.CATEGORIES) ok(seen[c] >= 5, c + ' has only ' + (seen[c] || 0) + ' questions');
 });
 
-t('the same day gives the same question, every time', async () => {
-  /* The whole point of seeding by the date: reloading must not deal a new hand. */
-  for (const d of days(20)) {
-    const a = G.dailyQuestion(d), b = G.dailyQuestion(d);
-    eq(a.index, b.index, d + ' gave two different questions');
-    eq(a.options.join('|'), b.options.join('|'), d + ' shuffled the options differently');
-    eq(a.correct, b.correct, d + ' moved the correct answer');
-  }
-});
-
-t('consecutive days are not consecutive questions', async () => {
-  /* "Not a fixed rotation" — a day-number modulo would walk the list in order. */
-  const idx = days(30).map(d => G.dailyQuestion(d).index);
-  let inOrder = 0;
-  for (let i = 1; i < idx.length; i++) if (idx[i] === (idx[i - 1] + 1) % G.QUESTIONS.length) inOrder++;
-  ok(inOrder <= 3, 'the questions are walking the list in order (' + inOrder + ' of ' + (idx.length - 1) + ' steps)');
-});
-
-t('a month of days reaches every category', async () => {
-  const cats = new Set(days(60).map(d => G.dailyQuestion(d).cat));
-  for (const c of G.CATEGORIES) ok(cats.has(c), c + ' never came up in sixty days');
-});
-
 t('the right answer is not always the first button', async () => {
   /* It is written first in the source. Without shuffling, the test is answerable without
      reading it. */
   const spread = {};
-  days(120).forEach(d => { const q = G.dailyQuestion(d); spread[q.correct] = (spread[q.correct] || 0) + 1; });
+  days(120).forEach(d => G.dailySet(d).forEach(q => { spread[q.correct] = (spread[q.correct] || 0) + 1; }));
   eq(Object.keys(spread).length, 4, 'the answer only ever lands in ' + Object.keys(spread).length + ' positions');
-  for (const k of Object.keys(spread)) ok(spread[k] > 8, 'position ' + k + ' only came up ' + spread[k] + ' times in 120 days');
-});
-
-t('the shuffled options really are the question’s own', async () => {
-  for (const d of days(40)) {
-    const q = G.dailyQuestion(d), src = G.QUESTIONS[q.index];
-    eq(q.options.slice().sort().join('|'), src.a.slice().sort().join('|'), d + ': the options are not the source options');
-    eq(q.options[q.correct], src.a[src.c], d + ': the correct index does not point at the correct answer');
-    eq(q.cat, src.cat, d + ': the category does not match');
-  }
+  for (const k of Object.keys(spread)) ok(spread[k] > 40, 'position ' + k + ' only came up ' + spread[k] + ' times in 480 questions');
 });
 
 t('a missing or odd date does not throw', async () => {
