@@ -231,10 +231,59 @@ t('each occasion is drawn differently from the others', async () => {
      notch cuts a wedge; if those ever became the same path the drawing would stop teaching
      the one thing it is there to teach. */
   const peak = G.art('black-tie'), notch = G.art('business-formal');
-  ok(/M52 28 L40 50 L28 42/.test(peak), 'black tie is not drawn with a peak lapel');
-  ok(/M52 28 L42 46 L36 44 L38 52/.test(notch), 'business formal is not drawn with a notch lapel');
-  ok(!/M28 42/.test(notch), 'business formal picked up the peak');
-  ok(!/no jacket/.test(G.art('day-to-day')) && !/A_NOTCH/.test(G.art('day-to-day')), 'day to day should have no lapel at all');
+  ok(/M63 22 L52 44 L40 36/.test(peak), 'black tie is not drawn with a peak lapel');
+  ok(/M63 22 L53 40 L46 37 L49 46/.test(notch), 'business formal is not drawn with a notch lapel');
+  ok(!/L40 36/.test(notch), 'business formal picked up the peak');
+  /* No jacket is the whole tell for day-to-day, so neither lapel may appear on it. */
+  const day = G.art('day-to-day');
+  ok(!/M63 22/.test(day), 'day to day was given a lapel');
+});
+
+
+/* The complaint that produced these: four of the six were a jacket seen from the chest up, and
+   at the size they are actually read that is the same drawing four times. What separates the
+   middle of the range is not the collar, it is the trousers and the shoes — so every drawing is
+   a whole outfit, and these hold it that way. */
+t('every drawing is a whole outfit, not a torso', async () => {
+  for (const d of G.DRESS) {
+    const svg = G.art(d.key);
+    const vb = (svg.match(/viewBox="([^"]+)"/) || [])[1];
+    eq(vb, '0 0 140 260', d.key + ' is not drawn on the full-length field');
+    /* Something has to be down at the shoe line, or the figure stops at the waist. */
+    ok(/2[34]\d(?:\.\d+)?[ ,]/.test(svg.replace(/viewBox="[^"]+"/, '')) || / 240/.test(svg),
+       d.key + ' has nothing drawn below the knee');
+    ok(/var\(--art-shoe\)|A_SHOE|M41 224|M34 234/.test(svg), d.key + ' has no shoes');
+  }
+});
+
+t('the middle of the range is told apart by the trousers, not only by the collar', async () => {
+  /* A suit wears the jacket's own cloth below the waist; the odd combination does not. This is
+     the difference between business smart and smart casual, and it has to be in the drawing. */
+  const legs = k => (G.art(k).match(/M44 126 L41 224 L62 224 L67 150 L67 126 Z" fill="([^"]+)"/) || [])[1];
+  eq(legs('black-tie'), 'var(--art-cloth)', 'black tie is not drawn as a matching suit');
+  eq(legs('business-formal'), 'var(--art-cloth)', 'business formal is not drawn as a matching suit');
+  eq(legs('business-smart'), 'var(--art-cloth)', 'business smart is not drawn as a matching suit');
+  eq(legs('smart-casual'), 'var(--art-shirt)', 'smart casual is drawn as a matching suit, which is the one thing it is not');
+  ok(legs('smart-casual') !== legs('business-smart'),
+     'smart casual and business smart wear the same trousers, so nothing tells them apart below the waist');
+});
+
+t('no two of the six share a silhouette', async () => {
+  /* Stripped of colour tokens, two drawings that differ only in a token would still look alike.
+     Compare the geometry itself. */
+  const shape = k => G.art(k).replace(/fill="[^"]*"/g, '').replace(/stroke-opacity="[^"]*"/g, '');
+  const seen = {};
+  for (const d of G.DRESS) {
+    const g = shape(d.key);
+    ok(!seen[g], d.key + ' has the same geometry as ' + seen[g]);
+    seen[g] = d.key;
+  }
+  /* And the four jackets each carry something the others do not. */
+  ok(/M67 31 L55 24/.test(G.art('black-tie')), 'black tie has no bow tie');
+  ok(/M66 38 L74 38/.test(G.art('business-formal')), 'business formal has no tie');
+  ok((G.art('business-smart').match(/stroke-opacity="0\.26"/g) || []).length >= 8, 'business smart has no pattern');
+  ok(/<rect x="45" y="96"/.test(G.art('smart-casual')), 'smart casual has no patch pockets');
+  ok(!/<rect x="45" y="96"/.test(G.art('business-smart')), 'business smart picked up the patch pockets');
 });
 
 let pass = 0, fail = 0;

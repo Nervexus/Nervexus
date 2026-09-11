@@ -278,82 +278,117 @@
      actually name: peak lapels and a bow tie for black tie, a notch and a tie for business
      formal, patch pockets and an open placket for smart casual, no jacket at all for
      day-to-day, a shawl collar and a belt for home. */
-  var A_OPEN = '<svg viewBox="0 0 120 160" width="100%" height="100%" fill="none" ' +
-               'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">';
-  /* Sleeves first, then the body over them: the shoulder seam then reads as a seam rather
-     than as an outline, and the silhouette is a garment instead of a slab. */
-  var A_SLEEVES = '<path d="M32 31 L14 52 L12 108 L28 112 L30 64 Z" fill="var(--art-cloth)"/>' +
-                  '<path d="M88 31 L106 52 L108 108 L92 112 L90 64 Z" fill="var(--art-cloth)"/>';
-  var A_BODY = '<path d="M50 26 L32 31 L30 64 L26 150 L94 150 L90 64 L88 31 L70 26 Q60 35 50 26 Z" fill="var(--art-cloth)"/>';
-  var A_SHIRTV = '<path d="M50 26 Q60 35 70 26 L63 104 L57 104 Z" fill="var(--art-shirt)"/>';
-  var A_CLOSE = '<path d="M60 102 V150"/><circle cx="60" cy="102" r="2.6" fill="currentColor" stroke="none"/>';
-  /* The one shape that separates the two codes the rules name. A peak lapel turns a single
-     point up and out toward the shoulder; a notch cuts a small wedge out of the same edge.
-     Both are one path per side, so the difference is the silhouette and survives 170px. */
-  var A_PEAK = '<path d="M52 28 L40 50 L28 42 L38 62 L47 102 L57 102 L54 40 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>' +
-               '<path d="M68 28 L80 50 L92 42 L82 62 L73 102 L63 102 L66 40 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>';
-  var A_NOTCH = '<path d="M52 28 L42 46 L36 44 L38 52 L34 60 L47 102 L57 102 L54 40 Z" fill="var(--art-cloth)"/>' +
-                '<path d="M68 28 L78 46 L84 44 L82 52 L86 60 L73 102 L63 102 L66 40 Z" fill="var(--art-cloth)"/>';
-  var A_OPENCOLLAR = '<path d="M50 26 L46 35 L57 48 L60 33 Z" fill="var(--art-shirt)"/>' +
-                     '<path d="M70 26 L74 35 L63 48 L60 33 Z" fill="var(--art-shirt)"/>';
+  var A_OPEN = '<svg viewBox="0 0 140 260" width="100%" height="100%" fill="none" ' +
+               'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+
+  /* A torso alone could not carry these. Four of the six codes are a jacket, and a jacket seen
+     from the chest up is the same drawing four times over however carefully the lapel is cut —
+     the difference between business smart and smart casual is not in the collar, it is that one
+     is a suit and the other is a jacket with different trousers under it. So each drawing is a
+     whole outfit: jacket, trousers, shoes. Trousers in the jacket's own cloth read as a suit;
+     trousers in the lighter tone read as the odd combination the rules name. */
+  var A_TROUSERS = function (tone) {
+    return '<path d="M44 126 L41 224 L62 224 L67 150 L67 126 Z" fill="' + tone + '"/>' +
+           '<path d="M96 126 L99 224 L78 224 L73 150 L73 126 Z" fill="' + tone + '"/>';
+  };
+  var A_SHOE_DRESS = '<path d="M41 224 L62 224 L63 234 Q63 240 56 240 L38 240 Q34 240 34 234 Z" fill="var(--art-shoe)"/>' +
+                     '<path d="M99 224 L78 224 L77 234 Q77 240 84 240 L102 240 Q106 240 106 234 Z" fill="var(--art-shoe)"/>';
+  /* A loafer has no laces and a lower, rounder throat; a sneaker is the same last on a visible
+     sole. One line each, which is all the difference needs to be at this size. */
+  var A_SHOE_LOAFER = A_SHOE_DRESS + '<path d="M40 231 H57" stroke-opacity="0.55"/><path d="M100 231 H83" stroke-opacity="0.55"/>';
+  var A_SHOE_SNEAK = '<path d="M41 224 L62 224 L63 233 L63 240 L34 240 L34 233 Z" fill="var(--art-shirt)"/>' +
+                     '<path d="M99 224 L78 224 L77 233 L77 240 L106 240 L106 233 Z" fill="var(--art-shirt)"/>' +
+                     '<path d="M34 234 H63" /><path d="M106 234 H77"/>';
+  var A_SLEEVES = '<path d="M44 28 L29 48 L27 108 L42 112 L42 58 Z" fill="var(--art-cloth)"/>' +
+                  '<path d="M96 28 L111 48 L113 108 L98 112 L98 58 Z" fill="var(--art-cloth)"/>';
+  var A_BODY = '<path d="M61 20 L44 28 L42 58 L40 128 L100 128 L98 58 L96 28 L79 20 Q70 28 61 20 Z" fill="var(--art-cloth)"/>';
+  var A_SHIRTV = '<path d="M61 20 Q70 28 79 20 L74 98 L66 98 Z" fill="var(--art-shirt)"/>';
+  var A_CLOSE = '<path d="M70 92 V128"/><circle cx="70" cy="92" r="2.6" fill="currentColor" stroke="none"/>';
+  /* The one shape the rules name apart. A peak lapel turns a single point up and out toward the
+     shoulder; a notch cuts a small wedge out of the same edge. One path per side either way. */
+  var A_PEAK = '<path d="M63 22 L52 44 L40 36 L50 58 L57 92 L68 92 L65 33 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>' +
+               '<path d="M77 22 L88 44 L100 36 L90 58 L83 92 L72 92 L75 33 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>';
+  var A_NOTCH = '<path d="M63 22 L53 40 L46 37 L49 46 L44 56 L57 92 L68 92 L65 33 Z" fill="var(--art-cloth)"/>' +
+                '<path d="M77 22 L87 40 L94 37 L91 46 L96 56 L83 92 L72 92 L75 33 Z" fill="var(--art-cloth)"/>';
+  var A_OPENCOLLAR = '<path d="M61 20 L57 30 L68 43 L70 27 Z" fill="var(--art-shirt)"/>' +
+                     '<path d="M79 20 L83 30 L72 43 L70 27 Z" fill="var(--art-shirt)"/>';
 
   var ART = {
-    'black-tie': A_OPEN + A_SLEEVES + A_BODY + A_SHIRTV + A_PEAK +
-      '<circle cx="60" cy="58" r="2.1" fill="currentColor" stroke="none"/>' +
-      '<circle cx="60" cy="76" r="2.1" fill="currentColor" stroke="none"/>' +
-      '<circle cx="60" cy="88" r="2.1" fill="currentColor" stroke="none"/>' +
-      '<path d="M57 38 L44 30 L44 46 Z" fill="var(--forge-accent)"/>' +
-      '<path d="M63 38 L76 30 L76 46 Z" fill="var(--forge-accent)"/>' +
-      '<rect x="55.5" y="32.5" width="9" height="11" rx="3" fill="var(--forge-accent)"/>' +
+    /* Black tie: the suit is the darkest thing in the set, the lapel is faced, the neckwear is
+       a bow, and the shoe is patent. */
+    'black-tie': A_OPEN + A_TROUSERS('var(--art-cloth)') + A_SHOE_DRESS + A_SLEEVES + A_BODY + A_SHIRTV + A_PEAK +
+      '<circle cx="70" cy="48" r="2.2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="62" r="2.2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="76" r="2.2" fill="currentColor" stroke="none"/>' +
+      '<path d="M67 31 L55 24 L55 40 Z" fill="var(--forge-accent)"/>' +
+      '<path d="M73 31 L85 24 L85 40 Z" fill="var(--forge-accent)"/>' +
+      '<rect x="66.5" y="25.5" width="7" height="11" rx="2.5" fill="var(--forge-accent)"/>' +
       A_CLOSE + '</svg>',
 
-    'business-formal': A_OPEN + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH +
-      '<path d="M55 31 L65 31 L66 44 L54 44 Z" fill="var(--forge-accent)"/>' +
-      '<path d="M56 45 L64 45 L63 88 L60 96 L57 88 Z" fill="var(--forge-accent)"/>' +
+    /* Business formal: matching trousers, notch lapel, a tie, and a laced shoe. */
+    'business-formal': A_OPEN + A_TROUSERS('var(--art-cloth)') + A_SHOE_DRESS + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH +
+      '<path d="M65 24 L75 24 L76 37 L64 37 Z" fill="var(--forge-accent)"/>' +
+      '<path d="M66 38 L74 38 L73 80 L70 88 L67 80 Z" fill="var(--forge-accent)"/>' +
+      '<path d="M38 232 H58" stroke-opacity="0.5"/><path d="M102 232 H82" stroke-opacity="0.5"/>' +
       A_CLOSE + '</svg>',
 
-    /* The pattern is the tell the rules name for this one — pinstripe or birdseye — so it is
-       drawn under the lapels where a stripe actually runs. */
-    'business-smart': A_OPEN + A_SLEEVES + A_BODY +
-      '<path d="M38 34 V148" stroke-opacity="0.28"/><path d="M48 32 V148" stroke-opacity="0.28"/>' +
-      '<path d="M82 34 V148" stroke-opacity="0.28"/><path d="M72 32 V148" stroke-opacity="0.28"/>' +
-      '<path d="M20 56 V106" stroke-opacity="0.28"/><path d="M100 56 V106" stroke-opacity="0.28"/>' +
+    /* Business smart: still a suit — trousers in the same cloth — but patterned, open at the
+       collar, and on a loafer, which is exactly what the rules allow and formal does not. */
+    'business-smart': A_OPEN + A_TROUSERS('var(--art-cloth)') +
+      '<path d="M48 130 V222" stroke-opacity="0.26"/><path d="M58 130 V222" stroke-opacity="0.26"/>' +
+      '<path d="M92 130 V222" stroke-opacity="0.26"/><path d="M82 130 V222" stroke-opacity="0.26"/>' +
+      A_SHOE_LOAFER + A_SLEEVES + A_BODY +
+      '<path d="M50 30 V126" stroke-opacity="0.26"/><path d="M60 26 V126" stroke-opacity="0.26"/>' +
+      '<path d="M90 30 V126" stroke-opacity="0.26"/><path d="M80 26 V126" stroke-opacity="0.26"/>' +
+      '<path d="M33 54 V104" stroke-opacity="0.26"/><path d="M107 54 V104" stroke-opacity="0.26"/>' +
       A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
-      '<circle cx="60" cy="60" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="50" r="2" fill="currentColor" stroke="none"/>' +
       A_CLOSE + '</svg>',
 
-    'smart-casual': A_OPEN + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
-      '<path d="M56 50 V78"/><path d="M64 50 V78"/>' +
-      '<circle cx="60" cy="57" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="60" cy="71" r="2" fill="currentColor" stroke="none"/>' +
-      '<rect x="32" y="112" width="23" height="22" rx="3"/>' +
-      '<rect x="65" y="112" width="23" height="22" rx="3"/>' +
-      A_CLOSE + '</svg>',
-
-    /* No jacket at all: a slimmer body, the collar leaves open, the placket and its buttons
-       down the front. The absence of a lapel is the point of the drawing. */
-    'day-to-day': A_OPEN +
-      '<path d="M36 30 L20 50 L18 104 L32 108 L34 62 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M84 30 L100 50 L102 104 L88 108 L86 62 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M50 26 L36 30 L34 62 L30 150 L90 150 L86 62 L84 30 L70 26 Q60 35 50 26 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M50 26 L45 36 L57 50 L60 34 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M70 26 L75 36 L63 50 L60 34 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M56 40 V150" stroke-opacity="0.5"/><path d="M64 40 V150" stroke-opacity="0.5"/>' +
-      '<circle cx="60" cy="62" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="60" cy="82" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="60" cy="102" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="60" cy="122" r="2" fill="currentColor" stroke="none"/>' +
-      '<rect x="36" y="64" width="20" height="17" rx="2"/>' +
+    /* Smart casual: the odd combination. The trousers are plainly not the jacket's cloth, the
+       jacket carries patch pockets rather than a welt, and the shoe is a clean sneaker. */
+    'smart-casual': A_OPEN + A_TROUSERS('var(--art-shirt)') + A_SHOE_SNEAK + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
+      '<path d="M66 44 V70"/><path d="M74 44 V70"/>' +
+      '<circle cx="70" cy="50" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="63" r="2" fill="currentColor" stroke="none"/>' +
+      '<rect x="45" y="96" width="19" height="21" rx="3"/>' +
+      '<rect x="76" y="96" width="19" height="21" rx="3"/>' +
       '</svg>',
 
-    /* A shawl collar is one unbroken curve with no notch and no peak — the third of the three
-       collar shapes in the subject, and the reason home wear gets a drawing at all. */
-    home: A_OPEN + A_SLEEVES + A_BODY +
-      '<path d="M56 38 L60 45 L64 38 L66 142 L54 142 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M52 27 C42 52 38 92 38 134 L54 134 C54 98 56 60 60 42 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
-      '<path d="M68 27 C78 52 82 92 82 134 L66 134 C66 98 64 60 60 42 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
-      '<rect x="26" y="108" width="68" height="11" rx="5.5" fill="var(--forge-accent)" fill-opacity="0.34"/>' +
-      '<circle cx="60" cy="113.5" r="6" fill="var(--forge-accent)" fill-opacity="0.55"/>' +
+    /* Day-to-day: no jacket at all, which is the whole tell. A shirt with its placket and
+       buttons on show, tucked into chinos, on a sneaker. */
+    'day-to-day': A_OPEN + A_TROUSERS('var(--art-cloth)') + A_SHOE_SNEAK +
+      '<path d="M48 26 L34 46 L32 100 L46 104 L46 56 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M92 26 L106 46 L108 100 L94 104 L94 56 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M61 20 L48 26 L46 56 L44 132 L96 132 L94 56 L92 26 L79 20 Q70 28 61 20 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M61 20 L56 31 L68 45 L70 28 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M79 20 L84 31 L72 45 L70 28 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M66 34 V132" stroke-opacity="0.5"/><path d="M74 34 V132" stroke-opacity="0.5"/>' +
+      '<circle cx="70" cy="52" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="70" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="88" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="70" cy="106" r="2" fill="currentColor" stroke="none"/>' +
+      '<rect x="48" y="52" width="16" height="15" rx="2"/>' +
+      '</svg>',
+
+    /* Home: a shawl collar is one unbroken curve with neither a notch nor a peak, the robe runs
+       past the hip where every jacket above it stops, and it is belted rather than buttoned. */
+    /* The robe's cloth is a tint, not an opaque fill, so anything drawn under it shows
+       through. Every other outfit's trousers start at the jacket hem; these have to start
+       below the robe's, or the loungewear reads as a panel printed on the robe. */
+    home: A_OPEN +
+      '<path d="M48 180 L45 224 L64 224 L68 196 L68 180 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M92 180 L95 224 L76 224 L72 196 L72 180 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M41 224 Q34 224 34 232 Q34 240 42 240 L60 240 Q64 240 64 234 L63 224 Z" fill="var(--art-shoe)"/>' +
+      '<path d="M99 224 Q106 224 106 232 Q106 240 98 240 L80 240 Q76 240 76 234 L77 224 Z" fill="var(--art-shoe)"/>' +
+      '<path d="M44 28 L29 48 L27 108 L42 112 L42 58 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M96 28 L111 48 L113 108 L98 112 L98 58 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M61 20 L44 28 L42 58 L38 186 L102 186 L98 58 L96 28 L79 20 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M65 32 L70 39 L75 32 L77 186 L63 186 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M63 21 C51 48 46 96 46 178 L64 178 C64 108 66 54 70 34 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
+      '<path d="M77 21 C89 48 94 96 94 178 L76 178 C76 108 74 54 70 34 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
+      '<rect x="36" y="104" width="68" height="11" rx="5.5" fill="var(--forge-accent)" fill-opacity="0.34"/>' +
+      '<circle cx="70" cy="109.5" r="6" fill="var(--forge-accent)" fill-opacity="0.55"/>' +
       '</svg>',
   };
 

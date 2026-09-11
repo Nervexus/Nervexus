@@ -187,16 +187,20 @@
   .cc-grow:first-child{ border-top:0; }
   /* Dress code puts the garment beside the rule. The drawing is line work in the raiment's
      ink — see gentlemen-etiquette.js for why it is drawn and not photographed. */
-  .cc-gdress{ display:grid; grid-template-columns:190px 1fr; gap:32px; align-items:center; flex:1; min-width:0; }
+  .cc-gdress{ display:grid; grid-template-columns:158px 1fr; gap:30px; align-items:center; flex:1; min-width:0; }
   .cc-gdress-solo{ grid-template-columns:1fr; }
   .cc-gart{ border:1px solid var(--quiet-line); border-radius:16px; background:var(--quiet-bg);
     padding:12px; color:var(--quiet-ink); }
   .cc-gart svg{ display:block; }
-  .cc-shell{ --art-cloth:rgba(255,255,255,0.07); --art-shirt:rgba(255,255,255,0.2); }
-  .cc-shell.raiment-x{ --art-cloth:rgba(91,26,26,0.09); --art-shirt:rgba(91,26,26,0.03); }
-  .cc-shell.raiment-noir{ --art-cloth:rgba(196,189,176,0.1); --art-shirt:rgba(196,189,176,0.24); }
-  .cc-shell.raiment-maison{ --art-cloth:rgba(60,90,125,0.1); --art-shirt:rgba(60,90,125,0.03); }
-  .cc-shell.raiment-everpine{ --art-cloth:rgba(124,106,56,0.11); --art-shirt:rgba(124,106,56,0.04); }
+  /* Three tones the drawings are built from. --art-cloth is the jacket; --art-shirt is the
+     lighter one, which is a shirt and is also the odd trouser that separates smart casual
+     from a suit; --art-shoe is the darkest. "Lighter" and "darker" run opposite ways on an
+     ivory card and a dark one, so each is written out per raiment rather than derived. */
+  .cc-shell{ --art-cloth:rgba(255,255,255,0.07); --art-shirt:rgba(255,255,255,0.2); --art-shoe:rgba(255,255,255,0.02); }
+  .cc-shell.raiment-x{ --art-cloth:rgba(91,26,26,0.09); --art-shirt:rgba(91,26,26,0.03); --art-shoe:rgba(91,26,26,0.34); }
+  .cc-shell.raiment-noir{ --art-cloth:rgba(196,189,176,0.1); --art-shirt:rgba(196,189,176,0.24); --art-shoe:rgba(196,189,176,0.03); }
+  .cc-shell.raiment-maison{ --art-cloth:rgba(60,90,125,0.1); --art-shirt:rgba(60,90,125,0.03); --art-shoe:rgba(60,90,125,0.34); }
+  .cc-shell.raiment-everpine{ --art-cloth:rgba(124,106,56,0.11); --art-shirt:rgba(124,106,56,0.04); --art-shoe:rgba(124,106,56,0.36); }
   /* BACK, position, NEXT. The dot row is the position on a wide screen; on a phone
      twenty-two dots wrapped onto their own line and shoved NEXT down with them, so there the
      position is a bar instead and the count in the card header carries the exact figure. */
@@ -215,8 +219,10 @@
     .cc-gfoot{ padding:12px 18px; }
     .cc-grow{ padding:12px 18px; }
     .cc-gstat{ padding:14px; }
-    .cc-gdress{ grid-template-columns:1fr; gap:20px; justify-items:center; }
-    .cc-gart{ width:168px; }
+    /* Beside the rule, not above it: stacked, a full-length figure would push the rule
+       and the controls off a phone screen. */
+    .cc-gdress{ grid-template-columns:104px 1fr; gap:16px; align-items:center; }
+    .cc-gart{ padding:8px; }
   }
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
   .theme-ultra.theme-noir{ --u-bg:#121212; --u-card:rgba(30,30,30,0.86); --u-ink:#C4BDB0; --u-muted:#968F82; --u-line:rgba(150,143,130,0.28); --u-accent:#C4BDB0; }
@@ -443,7 +449,7 @@
 <script src="exercise-index.js?v=6"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
-<script src="gentlemen-etiquette.js?v=4"></script>
+<script src="gentlemen-etiquette.js?v=5"></script>
 <script src="ai-gateway.js?v=3"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -9575,7 +9581,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.11-300 · v11.300 gent-layout';
+const NOTIF_BUILD_VERSION = '2026.09.11-301 · v11.301 dress-figures';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14504,6 +14510,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.301', date:'Sep 11, 2026', major:false, notes:[
+      'The Dress Code drawings are whole outfits now \u2014 jacket, trousers, shoes \u2014 rather than a figure seen from the chest up. Four of the six codes are a jacket, and from the chest up they were very nearly the same drawing four times over however carefully the lapel was cut.',
+      'What actually separates the middle of the range is below the waist. Business Smart is a suit: the trousers are the jacket\u2019s own cloth, patterned, over a loafer. Smart Casual is the odd combination the rule names: the trousers are plainly not the jacket\u2019s, the pockets are patch rather than welt, the shoe is a clean sneaker. Day-to-Day has no jacket at all, which is its whole tell.',
+      'Black Tie keeps the peak lapel, the faced satin, the bow and the studs, and now the patent shoe with them; Home is a belted robe that runs past the hip where every jacket above it stops.',
+    ]},
     {version:'v11.300', date:'Sep 11, 2026', major:false, notes:[
       'The Gentlemen\u2019s subpage row is one box now rather than eight loose chips. It is ruled between the eight, it takes the raiment\u2019s own line and accent instead of a fixed white, and on a phone it scrolls sideways rather than breaking into a ragged block that changed shape depending on which page you were on.',
       'Every card on the page wears the same frame: a ruled header carrying the section and your place in it, the body, and a ruled footer. Standing is one panel of four figures over a single cross rule, and all four are set in reading ink \u2014 two of them used to be a step quieter than the others, which read as two live figures and two dead ones.',
