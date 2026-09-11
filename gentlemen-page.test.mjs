@@ -68,22 +68,100 @@ t('every subpage renders its own content', async () => {
   };
   for (const label of Object.keys(want)) {
     await tab(label);
-    await page.waitForTimeout(400);
-    const b = await text();
-    ok(b.includes(want[label]), label + ' did not render its content — looked for "' + want[label] + '"');
+    await page.waitForTimeout(350);
+    /* One card at a time, so the phrase may be on any of them — step through the deck. */
+    let found = false;
+    const n = await page.evaluate(() => window.__nvx._gent().cards(window.__nvx.state.gentSub).length);
+    for (let i = 0; i < n && !found; i++) {
+      if ((await text()).includes(want[label])) { found = true; break; }
+      await page.evaluate(() => window.__nvx.gentStep(1));
+      await page.waitForTimeout(220);
+    }
+    ok(found, label + ' did not render its content — looked for "' + want[label] + '" across ' + n + ' cards');
   }
 });
 
-t('dress code shows every occasion and dining every stage', async () => {
+t('a page shows one card at a time, and every card in turn', async () => {
+  /* The pages are read a card at a time rather than scrolled, so what is on screen is one
+     occasion — and the ones either side of it are not. */
   await boot({ gentSub: 'dress' });
   let b = await text();
-  for (const h of ['Black Tie / Formal Evening', 'Business Formal', 'Business Smart',
-                   'Smart Casual', 'Day-to-Day', 'Home Wear'])
-    ok(b.includes(h), 'dress code is missing ' + h);
-  await boot({ gentSub: 'dining' });
+  ok(b.includes('Black Tie / Formal Evening'), 'it should open on the first card');
+  ok(b.includes('1 OF 6'), 'it should say where you are: ' + (b.match(/\d OF \d/) || ''));
+  ok(!b.includes('Home Wear'), 'the last card should not be on screen with the first');
+
+  const seen = ['Black Tie / Formal Evening'];
+  for (let i = 0; i < 5; i++) {
+    await page.evaluate(() => window.__nvx.gentStep(1));
+    await page.waitForTimeout(300);
+    const t2 = await text();
+    const title = ['Business Formal', 'Business Smart', 'Smart Casual', 'Day-to-Day', 'Home Wear'][i];
+    ok(t2.includes(title), 'card ' + (i + 2) + ' should be ' + title);
+    seen.push(title);
+  }
+  eq(seen.length, 6, 'six occasions');
   b = await text();
-  for (const h of ['Before the Meal', 'Cutlery', 'At the Table', 'Conversation & Conduct', 'Wine & Glasses'])
-    ok(b.includes(h), 'dining is missing ' + h);
+  ok(b.includes('6 OF 6'), 'the counter should have reached the end');
+  ok(b.includes('DONE'), 'the last card should say DONE rather than offer another');
+});
+
+t('dining is a deck too, and every stage is in it', async () => {
+  await boot({ gentSub: 'dining' });
+  const titles = [];
+  for (let i = 0; i < 5; i++) {
+    titles.push(await page.evaluate(() => window.__nvx._gent().cards('dining')[window.__nvx.state.gentIdx].title));
+    await page.evaluate(() => window.__nvx.gentStep(1));
+    await page.waitForTimeout(220);
+  }
+  eq(titles.join(','), 'Before the Meal,Cutlery,At the Table,Conversation & Conduct,Wine & Glasses', 'wrong stages');
+});
+
+t('the deck stops at both ends rather than wrapping', async () => {
+  await boot({ gentSub: 'dining' });
+  await page.evaluate(() => window.__nvx.gentStep(-1));
+  await page.waitForTimeout(250);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 0, 'going back from the first card should stay put');
+  await page.evaluate(() => { for (let i = 0; i < 20; i++) window.__nvx.gentStep(1); });
+  await page.waitForTimeout(300);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 4, 'going past the last card should stay on it');
+});
+
+t('switching subpage starts the new one at its first card', async () => {
+  await boot({ gentSub: 'dress' });
+  await page.evaluate(() => { window.__nvx.gentStep(1); window.__nvx.gentStep(1); });
+  await page.waitForTimeout(300);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 2, 'moved to the third card');
+  await tab('DINING');
+  await page.waitForTimeout(400);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 0, 'the new page should start at the beginning');
+  ok((await text()).includes('Before the Meal'), 'and show its first card');
+});
+
+t('the arrow keys move through the cards', async () => {
+  /* A carousel you have to reach for the mouse to advance is a carousel you stop reading. */
+  await boot({ gentSub: 'dress' });
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(400);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 2, 'right should move forward');
+  await page.keyboard.press('ArrowLeft');
+  await page.waitForTimeout(300);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 1, 'left should move back');
+  /* Not on the test, which is one question and has nowhere to go. */
+  await tab('DAILY TEST');
+  await page.waitForTimeout(400);
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(300);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 0, 'the arrows should do nothing on the test');
+});
+
+t('the dots say where you are and can be jumped to', async () => {
+  await boot({ gentSub: 'dress' });
+  await page.evaluate(() => window.__nvx.gentGoto(4));
+  await page.waitForTimeout(350);
+  const b = await text();
+  ok(b.includes('5 OF 6'), 'jumping should land on the fifth card');
+  ok(b.includes('Day-to-Day'), 'and show it');
 });
 
 t('the test asks one question, with four answers and no hint', async () => {

@@ -289,10 +289,37 @@
     };
   }
 
+  /* ---- one idea per card ---------------------------------------------------------------
+     The pages are read a card at a time rather than scrolled, so the content has to be cut
+     into cards — and where the cut falls is a judgement about the material, not a layout
+     detail, which is why it lives here with the content.
+
+     A subject area is cut per line: each is a complete idea and stands alone. Dress and
+     dining are cut per heading, because "peak lapel or shawl collar" is useless without
+     "black tie" above it — splitting those per line would produce cards that are true and
+     meaningless. */
+  function cards(key) {
+    var subj = null;
+    for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) subj = SUBJECTS[i];
+    if (subj) {
+      return subj.lines.map(function (t, n) {
+        return { eyebrow: subj.eyebrow, title: subj.name, note: '', lines: [t],
+                 n: n + 1, of: subj.lines.length };
+      });
+    }
+    var src = key === 'dress' ? DRESS : key === 'dining' ? DINING : null;
+    if (!src) return [];
+    var eyebrow = key === 'dress' ? 'BY OCCASION' : 'SECOND NATURE, NOT PERFORMED';
+    return src.map(function (b, n) {
+      return { eyebrow: eyebrow, title: b.name, note: b.note || '', lines: b.lines.slice(),
+               n: n + 1, of: src.length };
+    });
+  }
+
   root.GentlemenEtiquette = {
     SUBJECTS: SUBJECTS, DRESS: DRESS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
-    dailyQuestion: dailyQuestion, _seed: seed,
+    dailyQuestion: dailyQuestion, cards: cards, _seed: seed,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.GentlemenEtiquette;
 })(typeof window !== 'undefined' ? window : this);

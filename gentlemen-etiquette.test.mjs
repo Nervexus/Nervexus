@@ -48,6 +48,43 @@ t('dining covers the meal from sitting down to the last glass', async () => {
     ok(all.includes(phrase), 'the dining line about "' + phrase + '" is missing');
 });
 
+t('the pages are cut into cards, one idea at a time', async () => {
+  /* Where the cut falls is a judgement about the material. A subject area splits per line —
+     each is a complete idea. Dress and dining split per heading, because "peak lapel or shawl
+     collar" is true and meaningless without "black tie" above it. */
+  for (const s of G.SUBJECTS) {
+    const c = G.cards(s.key);
+    eq(c.length, s.lines.length, s.key + ' should be one card per line');
+    c.forEach((card, i) => {
+      eq(card.lines.length, 1, s.key + ' card ' + i + ' should carry one idea');
+      eq(card.title, s.name, s.key + ' card ' + i + ' lost its title');
+      eq(card.of, s.lines.length, s.key + ' card ' + i + ' has the wrong count');
+    });
+  }
+  eq(G.cards('dress').length, 6, 'six occasions, six cards');
+  eq(G.cards('dining').length, 5, 'five stages, five cards');
+  const blackTie = G.cards('dress')[0];
+  eq(blackTie.title, 'Black Tie / Formal Evening', 'the first dress card');
+  ok(blackTie.lines.length >= 4, 'an occasion card keeps all of its lines, not one');
+  ok(blackTie.note, 'and the note that says when it applies');
+});
+
+t('a card deck for something that is not a page is empty, not broken', async () => {
+  eq(G.cards('test').length, 0, 'the daily test is not a card deck');
+  eq(G.cards('nonsense').length, 0, 'an unknown key');
+  eq(G.cards('').length, 0, 'an empty key');
+});
+
+t('every card knows where it is in its deck', async () => {
+  for (const key of ['money', 'history', 'taste', 'conversation', 'foundation', 'dress', 'dining']) {
+    const c = G.cards(key);
+    c.forEach((card, i) => {
+      eq(card.n, i + 1, key + ': card ' + i + ' is numbered wrongly');
+      eq(card.of, c.length, key + ': card ' + i + ' has the wrong total');
+    });
+  }
+});
+
 t('every question has four answers, one right, and a reason', async () => {
   ok(G.QUESTIONS.length >= 30, 'only ' + G.QUESTIONS.length + ' questions');
   for (const q of G.QUESTIONS) {
