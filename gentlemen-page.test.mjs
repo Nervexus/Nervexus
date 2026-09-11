@@ -452,6 +452,52 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
   eq(m.n, 22, 'the dot row does not report all twenty-two cards');
 });
 
+
+t('a supplied photograph takes over from the drawing, one occasion at a time', async () => {
+  await boot({ gentSub: 'dress' });
+  /* Stand a real image in for one occasion only. The other five must keep their drawings —
+     the six will arrive one at a time and no card may go blank in between. */
+  await page.evaluate(() => {
+    const px = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    window.GentlemenEtiquette.PHOTO['black-tie'] = px;
+    window.__nvx.setState({ gentIdx: 0 });
+  });
+  await page.waitForTimeout(400);
+  const wired = await page.evaluate(() => ({
+    img: !!document.querySelector('.cc-gphoto'),
+    svg: !!document.querySelector('.cc-gart svg'),
+    alt: (document.querySelector('.cc-gphoto') || {}).alt || '' }));
+  ok(wired.img, 'the supplied photograph did not render');
+  ok(!wired.svg, 'the drawing is still there underneath the photograph');
+  ok(/Black Tie/.test(wired.alt), 'the photograph has no useful alt text: "' + wired.alt + '"');
+  /* And the next occasion along, which has no photograph, is untouched. */
+  await page.evaluate(() => window.__nvx.gentGoto(4));
+  await page.waitForTimeout(300);
+  const plain = await page.evaluate(() => ({
+    img: !!document.querySelector('.cc-gphoto'), svg: !!document.querySelector('.cc-gart svg') }));
+  ok(!plain.img, 'an occasion with no photograph rendered one anyway');
+  ok(plain.svg, 'an occasion with no photograph lost its drawing');
+});
+
+t('a photograph is fitted to the box rather than cropped or stretched', async () => {
+  await boot({ gentSub: 'dress' });
+  await page.evaluate(() => {
+    /* A deliberately square image: nothing supplied will arrive at the exact ratio the
+       drawings are built on, and the wrong answer is to stretch it. */
+    window.GentlemenEtiquette.PHOTO['black-tie'] =
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    window.__nvx.setState({ gentIdx: 0 });
+  });
+  await page.waitForTimeout(400);
+  const fit = await page.evaluate(() => {
+    const img = document.querySelector('.cc-gphoto'); const cs = getComputedStyle(img);
+    const r = img.getBoundingClientRect();
+    return { objectFit: cs.objectFit, ratio: +(r.width / r.height).toFixed(2) };
+  });
+  eq(fit.objectFit, 'contain', 'a supplied image is cropped or stretched to fit');
+  eq(fit.ratio, +(140 / 260).toFixed(2), 'the art box changed shape to suit the image');
+});
+
 let pass = 0, fail = 0;
 for (const [n, f] of T) {
   try { await f(); console.log('  PASS  ' + n); pass++; }

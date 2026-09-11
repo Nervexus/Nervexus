@@ -392,6 +392,23 @@
       '</svg>',
   };
 
+  /* ---- supplied photographs -------------------------------------------------------------
+     The drawings are a floor, not a ceiling. When a real image exists for an occasion its
+     path goes in here and the page shows that instead; until then the occasion keeps its
+     drawing, so a card is never missing a picture and never shows a broken one.
+
+     A path is only ever added at the same time as the file actually landing in
+     assets/dress/. Adding one ahead of the file would put a broken image on a card. */
+  var PHOTO = {
+    // 'black-tie':       'assets/dress/black-tie.webp',
+    // 'business-formal': 'assets/dress/business-formal.webp',
+    // 'business-smart':  'assets/dress/business-smart.webp',
+    // 'smart-casual':    'assets/dress/smart-casual.webp',
+    // 'day-to-day':      'assets/dress/day-to-day.webp',
+    // 'home':            'assets/dress/home.webp',
+  };
+  function photo(key) { return PHOTO[key] || ''; }
+
   function art(key) { return ART[key] || ''; }
 
   /* ---- one concept per card ------------------------------------------------------------
@@ -469,6 +486,7 @@
     SUBJECTS: SUBJECTS, DRESS: DRESS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
     dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, art: art, ART: ART,
+    photo: photo, PHOTO: PHOTO,
     _seed: seed,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.GentlemenEtiquette;

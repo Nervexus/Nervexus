@@ -286,6 +286,28 @@ t('no two of the six share a silhouette', async () => {
   ok(!/<rect x="45" y="96"/.test(G.art('business-smart')), 'business smart picked up the patch pockets');
 });
 
+
+/* ---- the slot a supplied photograph drops into --------------------------------------------
+   The drawings are a floor. When real images arrive each one gets a path here and takes over
+   for that occasion. These hold the slot honest: no path without a file behind it, and no path
+   pointing at an occasion that does not exist. */
+t('no photograph is claimed that is not actually there', async () => {
+  const fs = await import('fs');
+  for (const [key, path] of Object.entries(G.PHOTO)) {
+    ok(G.DRESS.some(d => d.key === key), 'PHOTO names "' + key + '", which is not an occasion');
+    ok(fs.existsSync(new URL('./' + path, import.meta.url)),
+       key + ' points at ' + path + ', which is not in the repo — that is a broken image on a card');
+  }
+});
+
+t('an occasion with no photograph still has its drawing', async () => {
+  for (const d of G.DRESS) {
+    if (!G.photo(d.key)) ok(G.art(d.key), d.key + ' has neither a photograph nor a drawing');
+  }
+  eq(G.photo('nonsense'), '', 'an unknown key resolved to a photograph');
+  eq(G.photo(''), '', 'an empty key resolved to a photograph');
+});
+
 let pass = 0, fail = 0;
 for (const [n, f] of T) {
   try { await f(); console.log('  PASS  ' + n); pass++; }
