@@ -137,6 +137,11 @@
      Éverpine's champagne in particular is an accent for dark green, and everywhere a
      drop zone appears it is wearing the ivory card instead. */
   .cc-shell{ --quiet-ink:#c3c3ca; --quiet-line:rgba(255,255,255,0.2); --quiet-bg:rgba(255,255,255,0.02); --quiet-hover:rgba(255,255,255,0.4); }
+  /* Reading ink, for pages that are mostly prose. The dark themes want body copy a step below
+     white; the ivory raiments already have an ink of their own and a fixed pale grey on them
+     is barely there — so on Ultra both simply follow the raiment. */
+  .cc-shell{ --head-ink:#eef0f2; --body-ink:#c9c9d0; }
+  .theme-ultra{ --head-ink:var(--u-ink); --body-ink:var(--u-muted); }
   .cc-shell.raiment-x{ --quiet-ink:#5B1A1A; --quiet-line:rgba(91,26,26,0.34); --quiet-bg:rgba(91,26,26,0.035); --quiet-hover:rgba(91,26,26,0.7); }
   .cc-shell.raiment-noir{ --quiet-ink:#C4BDB0; --quiet-line:rgba(196,189,176,0.3); --quiet-bg:rgba(196,189,176,0.035); --quiet-hover:rgba(196,189,176,0.62); }
   .cc-shell.raiment-maison{ --quiet-ink:#3C5A7D; --quiet-line:rgba(60,90,125,0.34); --quiet-bg:rgba(60,90,125,0.04); --quiet-hover:rgba(60,90,125,0.7); }
@@ -371,6 +376,7 @@
 <script src="exercise-index.js?v=6"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
+<script src="gentlemen-etiquette.js?v=1"></script>
 <script src="ai-gateway.js?v=3"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -8428,9 +8434,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </sc-if>
 
       <!-- ===== GENTLEMEN CENTRE ===== -->
-      <!-- The shell, and nothing in it yet — the same empty state the Forge's Mental centre
-           carries. It is a page so that the nav order is real; what goes in it is the next
-           conversation, not a guess made here. -->
+      <!-- Eight subpages over one dataset (gentlemen-etiquette.js): the daily test, the five
+           subject areas, and the two set out in full — dress and dining. The content is data,
+           so this is only the page that renders it. -->
       <sc-if value="{{ isGentlemen }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Gentlemen Center" style="animation:rise .5s ease both;">
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
@@ -8439,14 +8445,95 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <span style="width:27px; height:27px; color:var(--forge-accent); display:flex; position:relative;" data-icon="gentlemen"></span>
           </div>
           <div>
-            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--forge-accent); margin-bottom:5px;">◆ GENTLEMEN CENTER</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--forge-accent); margin-bottom:5px;">◆ GENTLEMEN'S ETIQUETTE</div>
             <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Gentlemen Center</h1>
           </div>
         </div>
-        <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">GENTLEMEN CENTER</div>
-          <div style="font-size:12.5px; color:#6f6f78; margin-top:10px;">Nothing here yet.</div>
+
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
+          <sc-for list="{{ gentTabs }}" as="t" hint-placeholder-count="8">
+            <span onClick="{{ t.go }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; padding:9px 15px; border-radius:9px; cursor:pointer; color:{{ t.ink }}; background:{{ t.bg }}; border:1px solid {{ t.bd }};">{{ t.label }}</span>
+          </sc-for>
         </div>
+
+        <!-- THE DAILY TEST. One question, drawn for the day and the same all day; there is
+             nothing to configure, which is the point of it. -->
+        <sc-if value="{{ gentShowTest }}" hint-placeholder-val="{{ true }}">
+          <div class="cc-grid2" style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px; align-items:start;">
+            <div class="cc-glowcard" style="border-radius:20px; padding:24px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:var(--forge-accent);">{{ gentCat }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7c7c84;">{{ gentDateLabel }}</span>
+              </div>
+              <div style="font-size:18px; font-weight:600; line-height:1.45; margin-bottom:18px;">{{ gentQ }}</div>
+              <div style="display:flex; flex-direction:column; gap:9px;">
+                <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
+                  <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:12px; padding:13px 15px; border-radius:12px; border:1px solid {{ o.bd }}; background:{{ o.bg }}; color:{{ o.ink }}; font-size:13.5px; cursor:{{ o.cursor }};">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; width:14px; flex:0 0 14px; opacity:.75;">{{ o.letter }}</span>
+                    <span style="flex:1; min-width:0;">{{ o.text }}</span>
+                    <span style="font-size:13px;">{{ o.mark }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ gentAnswered }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:18px; padding:15px 17px; border-radius:12px; background:var(--quiet-bg); border:1px solid var(--quiet-line);">
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:{{ gentVerdictInk }}; margin-bottom:7px;">{{ gentVerdict }}</div>
+                  <div style="font-size:13px; line-height:1.6; color:var(--body-ink);">{{ gentWhy }}</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ gentNotAnswered }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:16px; font-size:11.5px; color:#75757d; font-style:italic;">One question a day, drawn from all four categories. It does not change until tomorrow.</div>
+              </sc-if>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="cc-glowcard" style="border-radius:18px; padding:20px;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7c7c84; margin-bottom:14px;">STANDING</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                  <sc-for list="{{ gentStats }}" as="s" hint-placeholder-count="4">
+                    <div style="border-radius:12px; padding:13px; background:var(--quiet-bg); border:1px solid var(--quiet-line);">
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:20px; color:{{ s.c }}; margin-top:4px;">{{ s.v }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div class="cc-glowcard" style="border-radius:18px; padding:20px;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7c7c84; margin-bottom:12px;">DRAWN FROM</div>
+                <sc-for list="{{ gentCatRows }}" as="c" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                    <span style="font-size:12.5px; color:{{ c.ink }};">{{ c.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#75757d;">{{ c.n }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- Every other subpage is the same shape: a titled card, then headed blocks of
+             lines. Flattened to one list so there is no sc-for inside an sc-for. -->
+        <sc-if value="{{ gentShowPages }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:20px; padding:24px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:var(--forge-accent); margin-bottom:6px;">{{ gentPageEyebrow }}</div>
+            <div style="font-size:20px; font-weight:700; margin-bottom:18px;">{{ gentPageName }}</div>
+            <sc-for list="{{ gentBlocks }}" as="b" hint-placeholder-count="10">
+              <div>
+                <sc-if value="{{ b.isHead }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin:{{ b.headMargin }};">
+                    <span style="font-size:14.5px; font-weight:600; color:var(--head-ink);">{{ b.name }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#75757d;">{{ b.note }}</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ b.isLine }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; gap:11px; padding:5px 0;">
+                    <span style="width:5px; height:5px; flex:0 0 5px; border-radius:50%; background:var(--forge-accent); margin-top:8px;"></span>
+                    <span style="font-size:13.5px; line-height:1.6; color:var(--body-ink);">{{ b.text }}</span>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
       </div>
       </sc-if>
 
@@ -9360,7 +9447,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.10-296 · v11.296 quiet-controls';
+const NOTIF_BUILD_VERSION = '2026.09.11-297 · v11.297 gentlemen';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9435,6 +9522,7 @@ class Component extends DCLogic {
       woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
       rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
+      gentSub:'test',
       // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
       income: s.income || [],
       // No seeded expenses. Was $92,300 of invented costs, analysed as though they were yours.
@@ -14281,6 +14369,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.297', date:'Sep 11, 2026', major:true, notes:[
+      'The Gentlemen\u2019s Centre is built. Eight subpages: the daily test, the five subject areas \u2014 Money & Power, History & Culture, Taste & Discernment, Conversation, Foundation \u2014 and Dress Code and Dining set out in full.',
+      'Dress Code covers all six occasions, black tie down to home wear, because the standard does not fully drop at home. Dining runs from the napkin to the last glass.',
+      'A daily test, mandatory and with nothing to configure. One question, drawn at random across Events, History, Dress Code and Dining Manners \u2014 not a rotation, so there is no guessing which is due. The draw is seeded by the date, so it is the same question all day and on every device; reloading deals nothing new.',
+      'Every answer comes with a reason, and the correct one is marked whether or not you picked it \u2014 a test that only says \u201cwrong\u201d teaches nothing. One answer a day, no second attempt, and your streak counts the days you got it right.',
+      'The schedule now arrives as its own email rather than underneath a performance warning and a count of outstanding tasks. A shift is the shape of the day and is read on its own.',
+    ]},
     {version:'v11.296', date:'Sep 10, 2026', major:false, notes:[
       'The two import controls on the calendar take your raiment. They were a white dashed border and a pale grey label \u2014 written for a dark background, and very nearly invisible on an ivory card.',
       'The \u2b06 is gone. An emoji is painted by the platform in its own colours \u2014 a blue glyph sitting on an ivory card \u2014 and cannot take the colour of the button it is inside. It is a drawn arrow now, in the same ink as the words beside it, and the Bulk Import chips on the Forge got the same treatment.',
@@ -17139,6 +17234,44 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     }); return {vol:v, weighted}; }
   // ===== Bulk workout import — paste a whole session, AI splits it into rows and
   // classifies each exercise's muscle group, reviewed before anything is actually logged. =====
+  /* ---- the Gentlemen's Centre -----------------------------------------------------------
+     The daily test is one question a day and there is nothing to configure about it. The
+     record of what was answered lives in prefs, which is what already syncs and survives a
+     reload; the questions themselves are data in gentlemen-etiquette.js. */
+  _gent(){ return window.GentlemenEtiquette||null; }
+  setGentSub(k){ this.setState({gentSub:k}); }
+  _gentToday(){ return this._fbToday(); }
+  _gentLog(){ return ((this.state.prefs||{}).gentTest)||{}; }
+  _gentTodayRec(){ return this._gentLog()[this._gentToday()]||null; }
+  /* Days answered correctly, counting back from today — or from yesterday, so that a streak
+     is not reported as broken at one minute past midnight before the day has been had. */
+  _gentStreak(){
+    const log=this._gentLog(); let n=0;
+    const d=new Date(); d.setHours(12,0,0,0);
+    if(!(log[this._fbLocal(d)]||{}).correct) d.setDate(d.getDate()-1);
+    for(let i=0;i<400;i++){
+      const r=log[this._fbLocal(d)];
+      if(!r || !r.correct) break;
+      n++; d.setDate(d.getDate()-1);
+    }
+    return n;
+  }
+  answerGentTest(i){
+    const G=this._gent(); if(!G) return;
+    if(this._gentTodayRec()) return;           // one answer a day; it is not a practice screen
+    const day=this._gentToday(), q=G.dailyQuestion(day);
+    if(!q) return;
+    const correct=(i===q.correct);
+    /* Kept for a year and no longer: the streak needs history, a decade of it does not. */
+    const cut=new Date(); cut.setDate(cut.getDate()-400); const cutKey=this._fbLocal(cut);
+    this.mut(s=>{
+      const log={...(((s.prefs||{}).gentTest)||{})};
+      Object.keys(log).forEach(k=>{ if(k<cutKey) delete log[k]; });
+      log[day]={pick:i, correct, cat:q.cat};
+      return {prefs:{...s.prefs, gentTest:log}};
+    });
+    this.showToast('system', correct?'Correct':'Not quite', q.cat);
+  }
   /* ---- work rota import ----------------------------------------------------------------
      A rota lists everybody. rota-import.js does the reading; this holds the review step and
      the write, and the name is what decides which rows are the user's. It defaults to the
@@ -20912,6 +21045,78 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       isRequests:scene==='requests' && this._isOwner(),
       goRequests:()=>this.setState({scene:'requests'}),
       isGentlemen:scene==='gentlemen',
+      /* THE GENTLEMEN'S CENTRE. Eight subpages over gentlemen-etiquette.js: the daily test,
+         the five subject areas, and dress and dining in full. */
+      ...this._safe(()=>{
+        const G=this._gent(); if(!G) throw new Error('gentlemen engine missing');
+        const sub=S.gentSub||'test';
+        const PAGES=[['test','DAILY TEST'],['money','MONEY & POWER'],['history','HISTORY & CULTURE'],
+                     ['taste','TASTE'],['conversation','CONVERSATION'],['foundation','FOUNDATION'],
+                     ['dress','DRESS CODE'],['dining','DINING']];
+        const rec=this._gentTodayRec();
+        const day=this._gentToday();
+        const q=G.dailyQuestion(day);
+        const answered=!!rec;
+        const right=!!(rec&&rec.correct);
+
+        /* Blocks are flattened — heading, then its lines, then the next heading — so the page
+           renders with one sc-for rather than one nested inside another. */
+        const flatten=(list)=>{
+          const out=[];
+          list.forEach((b,bi)=>{
+            out.push({isHead:true, isLine:false, name:b.name, note:b.note||'', headMargin:bi?'22px 0 8px':'0 0 8px'});
+            (b.lines||[]).forEach(t=>out.push({isHead:false, isLine:true, name:'', note:'', headMargin:'0', text:t}));
+          });
+          return out;
+        };
+        const subj=G.SUBJECTS.find(x=>x.key===sub);
+        let blocks=[], pageName='', pageEyebrow='';
+        if(subj){ blocks=flatten([{name:subj.name, note:'', lines:subj.lines}]); pageName=subj.name; pageEyebrow=subj.eyebrow; }
+        else if(sub==='dress'){ blocks=flatten(G.DRESS); pageName='Dress Code'; pageEyebrow='BY OCCASION'; }
+        else if(sub==='dining'){ blocks=flatten(G.DINING); pageName='Dining & Table Manners'; pageEyebrow='SECOND NATURE, NOT PERFORMED'; }
+
+        const counts={}; G.QUESTIONS.forEach(x=>{ counts[x.cat]=(counts[x.cat]||0)+1; });
+        const done=Object.keys(this._gentLog()).length;
+        const won=Object.values(this._gentLog()).filter(r=>r&&r.correct).length;
+
+        return {
+          gentTabs:PAGES.map(p=>({ label:p[1], go:()=>this.setGentSub(p[0]),
+            ink:sub===p[0]?'var(--sel-ink)':'#9a9aa2',
+            bg:sub===p[0]?'var(--sel-bg)':'rgba(255,255,255,0.02)',
+            bd:sub===p[0]?'var(--sel-bg)':'rgba(255,255,255,0.08)' })),
+          gentShowTest:sub==='test',
+          gentShowPages:sub!=='test' && !!blocks.length,
+          gentPageName:pageName, gentPageEyebrow:pageEyebrow, gentBlocks:blocks,
+          gentCat:q?q.cat.toUpperCase():'', gentQ:q?q.q:'', gentWhy:q?q.why:'',
+          gentDateLabel:(()=>{ try{ return new Date(day+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short', day:'numeric', month:'short'}).toUpperCase(); }catch(e){ return ''; } })(),
+          gentAnswered:answered, gentNotAnswered:!answered,
+          gentVerdict:right?'CORRECT':'NOT QUITE', gentVerdictInk:right?'#6cffba':'#ff8a5b',
+          /* Before an answer every option is live and identical — nothing hints at which is
+             which. After one, the right answer is marked whether or not it was picked, and
+             the wrong pick is marked too; a test that only says "wrong" teaches nothing. */
+          gentOptions:(q?q.options:[]).map((t,i)=>{
+            const isRight=answered && i===q.correct;
+            const isPick=answered && rec && rec.pick===i;
+            return { text:t, letter:'ABCD'[i]||'', pick:answered?(()=>{}):(()=>this.answerGentTest(i)),
+              cursor:answered?'default':'pointer',
+              mark:isRight?'\u2713':(isPick?'\u2715':''),
+              ink:isRight?'#6cffba':(isPick?'#ff8a5b':'#dbdbe0'),
+              bd:isRight?'rgba(108,255,186,0.5)':(isPick?'rgba(255,138,91,0.5)':'var(--quiet-line)'),
+              bg:isRight?'rgba(108,255,186,0.08)':(isPick?'rgba(255,138,91,0.08)':'var(--quiet-bg)') };
+          }),
+          gentStats:[
+            {k:'STREAK', v:this._gentStreak()+'d', c:'#eef0f2'},
+            {k:'TODAY', v:answered?(right?'PASS':'MISS'):'OPEN', c:answered?(right?'#6cffba':'#ff8a5b'):'var(--forge-accent)'},
+            {k:'ANSWERED', v:String(done), c:'#9a9aa2'},
+            {k:'CORRECT', v:done?(Math.round(won/done*100)+'%'):'\u2014', c:'#9a9aa2'},
+          ],
+          gentCatRows:G.CATEGORIES.map(c=>({ name:c, n:(counts[c]||0)+' questions',
+            ink:(q&&q.cat===c)?'var(--forge-accent)':'#c3c3ca' })),
+        };
+      }, { gentTabs:[], gentShowTest:false, gentShowPages:false, gentPageName:'', gentPageEyebrow:'',
+           gentBlocks:[], gentCat:'', gentQ:'', gentWhy:'', gentDateLabel:'', gentAnswered:false,
+           gentNotAnswered:true, gentVerdict:'', gentVerdictInk:'#9a9aa2', gentOptions:[],
+           gentStats:[], gentCatRows:[] }),
       showReqBanner:this._isOwner() && scene==='dashboard' && (S.requests||[]).some(r=>r.status==='pending'),
       goRequests:go('requests'),
       pendingReqCount:(S.requests||[]).filter(r=>r.status==='pending').length,

@@ -62,11 +62,14 @@ t('every page in the rail can actually be opened', async () => {
   eq(pageErrors.length, 0, 'opening the pages threw: ' + pageErrors.slice(0, 3).join(' | '));
 });
 
-t('the Gentlemen Center is a real page, and an empty one', async () => {
+t('the Gentlemen Center is a real page, and no longer an empty one', async () => {
+  /* It shipped as a shell so the rail order was real; gentlemen-page.test.mjs holds what is
+     in it now. This only holds that it exists, is reachable, and is not the empty state. */
   await boot({ scene: 'gentlemen' });
   const b = await page.evaluate(() => document.body.innerText);
-  ok(b.includes('GENTLEMEN CENTER'), 'the page does not name itself');
-  ok(/Nothing here yet/.test(b), 'it should be the empty state until it is filled');
+  ok(b.includes('Gentlemen Center'), 'the page does not name itself');
+  ok(b.includes('DAILY TEST'), 'its subpages are not there');
+  ok(!/Nothing here yet/.test(b), 'it has content now and should not show the empty state');
   ok(await page.evaluate(() => !!document.querySelector('[data-screen-label="Gentlemen Center"]')),
     'the screen is not labelled, so search and the drawer cannot find it');
   /* The icon has to draw, or the rail shows a blank square where it sits. */
