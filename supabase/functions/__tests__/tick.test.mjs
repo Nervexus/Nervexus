@@ -85,7 +85,7 @@ t('a high-priority item forces the digest out immediately', async()=>{
   }));
   const r1=await sweepUser(admin,UID,'Sam',quiet);
   if(email.sends.length!==0) throw new Error('normal-priority items ignored the cadence');
-  if(r1.held!=='cadence') throw new Error('expected a cadence hold, got '+JSON.stringify(r1.held));
+  if(!/cadence/.test(r1.held||'')) throw new Error('expected a cadence hold, got '+JSON.stringify(r1.held));
 
   // Now make yesterday a miss, which produces a high-priority performance warning.
   reset();
@@ -286,6 +286,56 @@ t('a general event is still filed under Calendar', async()=>{
   if(/^WORK$/m.test(body)) throw new Error('a general event should not be under Work:\n'+body);
 });
 
+/* ---- two emails, not one ----------------------------------------------------------------
+   Tomorrow's shift used to arrive underneath a performance warning and a count of outstanding
+   tasks. The schedule is the shape of the day and is read on its own, so it sends on its own. */
+t('the schedule arrives as its own email, apart from everything else', async()=>{
+  reset();
+  const y=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const admin=makeAdmin(baseTables({
+    // A shift tomorrow, plus two things that belong in the other email.
+    events:[tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00', attendees:'Sarah 12:00-20:00' })],
+    performance_status:[{user_id:UID,miss_streak:2,banned:false,last_eval_date:y}],
+    profiles:[{id:UID,last_login_date:'2020-01-01'}],
+  }));
+  await sweepUser(admin,UID,'Sam',{...prefs, timezone:TZ_EVENING, lastSeenVersion:LATEST});
+  if(email.sends.length!==2) throw new Error('expected 2 emails, got '+email.sends.length+': '+email.sends.map(s=>s.subject).join(' | '));
+
+  const sched=email.sends.find(s=>/^WORK$/m.test(s.text)||/^CALENDAR$/m.test(s.text));
+  const other=email.sends.find(s=>s!==sched);
+  if(!sched) throw new Error('neither email carried the schedule:\n'+email.sends.map(s=>s.text).join('\n---\n'));
+  if(!/09:00\u201317:00/.test(sched.text)) throw new Error('the schedule email lost the hours:\n'+sched.text);
+  if(!/Sarah 12:00-20:00/.test(sched.text)) throw new Error('the schedule email lost who is on it:\n'+sched.text);
+  // And the schedule email carries ONLY the schedule.
+  for(const s of ['PERFORMANCE TERMINAL','DAILY TASKS','LOGS','APP UPDATE'])
+    if(sched.text.includes(s)) throw new Error(s+' should not be in the schedule email:\n'+sched.text);
+  // The other one carries the rest, and no schedule.
+  if(/^WORK$/m.test(other.text)||/^CALENDAR$/m.test(other.text)) throw new Error('the schedule leaked into the other email:\n'+other.text);
+  if(!/strike|Performance/i.test(other.text)) throw new Error('the other email lost its content:\n'+other.text);
+});
+
+t('a day with only a shift on it still gets the schedule', async()=>{
+  reset();
+  const admin=makeAdmin(calTables(tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00' })));
+  await sweepUser(admin,UID,'Sam',calPrefs());
+  if(email.sends.length!==1) throw new Error('expected exactly the schedule, got '+email.sends.length);
+  if(!/^WORK$/m.test(email.sends[0].text)) throw new Error('that one email was not the schedule:\n'+email.sends[0].text);
+});
+
+t('the two emails do not throttle each other', async()=>{
+  /* They share a four-hour cadence but not a bucket: a digest sent an hour ago must not
+     swallow tomorrow's shift, which is the whole reason the schedule is separate. */
+  reset();
+  const y=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  // A general digest went out a minute ago; the schedule has never been sent.
+  const tables=calTables(tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00' }));
+  tables.notifications=[{user_id:UID,source_type:'digest-email',created_at:new Date(Date.now()-60000).toISOString(),dedupe_key:'x'}];
+  const admin=makeAdmin(tables);
+  await sweepUser(admin,UID,'Sam',calPrefs());
+  if(email.sends.length!==1) throw new Error('the schedule was held by the other email\u2019s cadence, got '+email.sends.length);
+  if(!/^WORK$/m.test(email.sends[0].text)) throw new Error('wrong email came out:\n'+email.sends[0].text);
+});
+
 t('the subject names the shift rather than the word Work', async()=>{
   reset();
   const admin=makeAdmin(calTables(tomorrowEvent({ kind:'work', title:'Work', end_time:'17:00', attendees:'Sarah 12:00-20:00' })));
@@ -375,7 +425,7 @@ t('a release note alone does not send an email', async()=>{
     activities:[{id:'a',user_id:UID,occurred_at:today+'T10:00:00.000Z'}] }));
   const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:'older'});
   if(email.sends.length) throw new Error('emailed a release note on its own:\n'+email.sends[0].text);
-  if(r.held!=='low-priority only') throw new Error('expected a low-priority hold, got '+JSON.stringify(r.held));
+  if(!/low-priority only/.test(r.held||'')) throw new Error('expected a low-priority hold, got '+JSON.stringify(r.held));
   // and it must not be thrown away — no dedupe key burned, so it can ride along later
   const burned=admin._inserted.filter(x=>x.source_type==='version');
   if(burned.length) throw new Error('the release note was marked sent without being sent');

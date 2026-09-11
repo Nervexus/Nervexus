@@ -104,10 +104,43 @@ function forcesImmediateSend(items: DigestItem[]) {
   return items.some((i) => i.priority === 'critical' || i.priority === 'high');
 }
 
+/* Two emails, not one — and not five either.
+
+   Everything used to go into a single digest, which put tomorrow's shift underneath a
+   performance warning and a count of outstanding tasks. A shift is the shape of the day and
+   the owner reads it on its own, so the schedule now sends as its own email: work and calendar
+   in one, everything else in the other. Each keeps its own cadence, so a quiet day with only a
+   shift on it still gets the schedule, and a busy day does not send the schedule twice.
+
+   Everything the single flush guaranteed still holds, per email: a failed send burns no dedupe
+   key, a high-priority item skips the cadence, and a bundle of nothing but release notes waits
+   for something worth interrupting for. */
+const SCHEDULE_SECTIONS = ['work', 'calendar'];
+
 async function flushDigest(admin: any, userId: string, name: string, prefs: Record<string, any>, bundle: Bundle) {
   const items = bundle.items;
   if (!items.length) return { sent: 0, emailed: 0 };
   if (!(prefs.reminderEmailEnabled && prefs.reminderEmailAddr)) return { sent: 0, emailed: 0 };
+
+  const schedule = items.filter((i) => SCHEDULE_SECTIONS.includes(i.section));
+  const rest = items.filter((i) => !SCHEDULE_SECTIONS.includes(i.section));
+
+  const a = await sendBundle(admin, userId, name, prefs, schedule, 'digest-email-schedule');
+  const b = await sendBundle(admin, userId, name, prefs, rest, 'digest-email');
+
+  const held = [a.held, b.held].filter(Boolean).join('; ');
+  const error = a.error || b.error;
+  return {
+    sent: a.sent + b.sent, emailed: a.emailed + b.emailed,
+    ...(held ? { held } : {}), ...(error ? { error } : {}),
+  };
+}
+
+/* One email from one set of items. `kind` is both the cadence bucket and what the sent row is
+   filed under, which is what keeps the two emails from throttling each other. */
+async function sendBundle(admin: any, userId: string, name: string, prefs: Record<string, any>,
+                          items: DigestItem[], kind: string) {
+  if (!items.length) return { sent: 0, emailed: 0 };
 
   /* A digest of nothing but low-priority notes does not justify an email. The release note
      is the only 'low' item there is, and it fires whenever the live version string changes —
@@ -118,17 +151,17 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
      Nothing is discarded and no dedupe key is burned: the note simply waits, and goes out
      with the next digest that has real content. */
   if (items.every((i) => (i.priority || 'normal') === 'low')) {
-    return { sent: 0, emailed: 0, held: 'low-priority only' };
+    return { sent: 0, emailed: 0, held: kind + ': low-priority only' };
   }
 
   if (!forcesImmediateSend(items)) {
     const hour = localHour(new Date(), prefs.timezone || UK_TZ);
-    if (hour < 6 || hour >= 23) return { sent: 0, emailed: 0, held: 'outside 6am-11pm' };
+    if (hour < 6 || hour >= 23) return { sent: 0, emailed: 0, held: kind + ': outside 6am-11pm' };
     const { data: lastNotif } = await admin.from('notifications').select('created_at')
-      .eq('user_id', userId).eq('source_type', 'digest-email')
+      .eq('user_id', userId).eq('source_type', kind)
       .order('created_at', { ascending: false }).limit(1);
     const lastTs = (lastNotif && lastNotif[0]) ? new Date(lastNotif[0].created_at).getTime() : 0;
-    if (Date.now() - lastTs < DIGEST_FREQ_MIN * 60000 - 30000) return { sent: 0, emailed: 0, held: 'cadence' };
+    if (Date.now() - lastTs < DIGEST_FREQ_MIN * 60000 - 30000) return { sent: 0, emailed: 0, held: kind + ': cadence' };
   }
 
   const digest = buildDigest({
@@ -175,7 +208,7 @@ async function flushDigest(admin: any, userId: string, name: string, prefs: Reco
   rows.push({
     user_id: userId, title: digest.subject, body: 'Digest of ' + items.length + ' item(s)',
     category: 'system', priority: 'low', status: 'sent',
-    source_type: 'digest-email', dedupe_key: 'digest-email:' + userId + ':' + Date.now(), channels: ['email'],
+    source_type: kind, dedupe_key: kind + ':' + userId + ':' + Date.now(), channels: ['email'],
   } as any);
   await admin.from('notifications').insert(rows);
   return { sent: items.length, emailed: 1 };
