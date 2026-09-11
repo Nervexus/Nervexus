@@ -266,6 +266,99 @@
     h ^= h >>> 13; h = Math.imul(h, 1274126177); h ^= h >>> 16;
     return h >>> 0;
   }
+  /* ---- what the occasion looks like ----------------------------------------------------
+     Dress code is the one subject where a rule is hard to picture from the words: "peak lapel
+     or shawl collar" is a shape, and a shape should be shown. These are drawn — flat, front-on
+     garment sketches in the raiment's own ink — rather than photographed. A photograph would
+     be somebody else's property, it would carry its own lighting and its own colours into
+     every theme, and it would not change when the raiment does. Line work does.
+
+     One drawing per occasion, carried on all of that occasion's cards, so the rule in front of
+     you is always next to the thing it is a rule about. Each drawing shows the tells the rules
+     actually name: peak lapels and a bow tie for black tie, a notch and a tie for business
+     formal, patch pockets and an open placket for smart casual, no jacket at all for
+     day-to-day, a shawl collar and a belt for home. */
+  var A_OPEN = '<svg viewBox="0 0 120 160" width="100%" height="100%" fill="none" ' +
+               'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">';
+  /* Sleeves first, then the body over them: the shoulder seam then reads as a seam rather
+     than as an outline, and the silhouette is a garment instead of a slab. */
+  var A_SLEEVES = '<path d="M32 31 L14 52 L12 108 L28 112 L30 64 Z" fill="var(--art-cloth)"/>' +
+                  '<path d="M88 31 L106 52 L108 108 L92 112 L90 64 Z" fill="var(--art-cloth)"/>';
+  var A_BODY = '<path d="M50 26 L32 31 L30 64 L26 150 L94 150 L90 64 L88 31 L70 26 Q60 35 50 26 Z" fill="var(--art-cloth)"/>';
+  var A_SHIRTV = '<path d="M50 26 Q60 35 70 26 L63 104 L57 104 Z" fill="var(--art-shirt)"/>';
+  var A_CLOSE = '<path d="M60 102 V150"/><circle cx="60" cy="102" r="2.6" fill="currentColor" stroke="none"/>';
+  /* The one shape that separates the two codes the rules name. A peak lapel turns a single
+     point up and out toward the shoulder; a notch cuts a small wedge out of the same edge.
+     Both are one path per side, so the difference is the silhouette and survives 170px. */
+  var A_PEAK = '<path d="M52 28 L40 50 L28 42 L38 62 L47 102 L57 102 L54 40 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>' +
+               '<path d="M68 28 L80 50 L92 42 L82 62 L73 102 L63 102 L66 40 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>';
+  var A_NOTCH = '<path d="M52 28 L42 46 L36 44 L38 52 L34 60 L47 102 L57 102 L54 40 Z" fill="var(--art-cloth)"/>' +
+                '<path d="M68 28 L78 46 L84 44 L82 52 L86 60 L73 102 L63 102 L66 40 Z" fill="var(--art-cloth)"/>';
+  var A_OPENCOLLAR = '<path d="M50 26 L46 35 L57 48 L60 33 Z" fill="var(--art-shirt)"/>' +
+                     '<path d="M70 26 L74 35 L63 48 L60 33 Z" fill="var(--art-shirt)"/>';
+
+  var ART = {
+    'black-tie': A_OPEN + A_SLEEVES + A_BODY + A_SHIRTV + A_PEAK +
+      '<circle cx="60" cy="58" r="2.1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="60" cy="76" r="2.1" fill="currentColor" stroke="none"/>' +
+      '<circle cx="60" cy="88" r="2.1" fill="currentColor" stroke="none"/>' +
+      '<path d="M57 38 L44 30 L44 46 Z" fill="var(--forge-accent)"/>' +
+      '<path d="M63 38 L76 30 L76 46 Z" fill="var(--forge-accent)"/>' +
+      '<rect x="55.5" y="32.5" width="9" height="11" rx="3" fill="var(--forge-accent)"/>' +
+      A_CLOSE + '</svg>',
+
+    'business-formal': A_OPEN + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH +
+      '<path d="M55 31 L65 31 L66 44 L54 44 Z" fill="var(--forge-accent)"/>' +
+      '<path d="M56 45 L64 45 L63 88 L60 96 L57 88 Z" fill="var(--forge-accent)"/>' +
+      A_CLOSE + '</svg>',
+
+    /* The pattern is the tell the rules name for this one — pinstripe or birdseye — so it is
+       drawn under the lapels where a stripe actually runs. */
+    'business-smart': A_OPEN + A_SLEEVES + A_BODY +
+      '<path d="M38 34 V148" stroke-opacity="0.28"/><path d="M48 32 V148" stroke-opacity="0.28"/>' +
+      '<path d="M82 34 V148" stroke-opacity="0.28"/><path d="M72 32 V148" stroke-opacity="0.28"/>' +
+      '<path d="M20 56 V106" stroke-opacity="0.28"/><path d="M100 56 V106" stroke-opacity="0.28"/>' +
+      A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
+      '<circle cx="60" cy="60" r="2" fill="currentColor" stroke="none"/>' +
+      A_CLOSE + '</svg>',
+
+    'smart-casual': A_OPEN + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
+      '<path d="M56 50 V78"/><path d="M64 50 V78"/>' +
+      '<circle cx="60" cy="57" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="60" cy="71" r="2" fill="currentColor" stroke="none"/>' +
+      '<rect x="32" y="112" width="23" height="22" rx="3"/>' +
+      '<rect x="65" y="112" width="23" height="22" rx="3"/>' +
+      A_CLOSE + '</svg>',
+
+    /* No jacket at all: a slimmer body, the collar leaves open, the placket and its buttons
+       down the front. The absence of a lapel is the point of the drawing. */
+    'day-to-day': A_OPEN +
+      '<path d="M36 30 L20 50 L18 104 L32 108 L34 62 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M84 30 L100 50 L102 104 L88 108 L86 62 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M50 26 L36 30 L34 62 L30 150 L90 150 L86 62 L84 30 L70 26 Q60 35 50 26 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M50 26 L45 36 L57 50 L60 34 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M70 26 L75 36 L63 50 L60 34 Z" fill="var(--art-cloth)"/>' +
+      '<path d="M56 40 V150" stroke-opacity="0.5"/><path d="M64 40 V150" stroke-opacity="0.5"/>' +
+      '<circle cx="60" cy="62" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="60" cy="82" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="60" cy="102" r="2" fill="currentColor" stroke="none"/>' +
+      '<circle cx="60" cy="122" r="2" fill="currentColor" stroke="none"/>' +
+      '<rect x="36" y="64" width="20" height="17" rx="2"/>' +
+      '</svg>',
+
+    /* A shawl collar is one unbroken curve with no notch and no peak — the third of the three
+       collar shapes in the subject, and the reason home wear gets a drawing at all. */
+    home: A_OPEN + A_SLEEVES + A_BODY +
+      '<path d="M56 38 L60 45 L64 38 L66 142 L54 142 Z" fill="var(--art-shirt)"/>' +
+      '<path d="M52 27 C42 52 38 92 38 134 L54 134 C54 98 56 60 60 42 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
+      '<path d="M68 27 C78 52 82 92 82 134 L66 134 C66 98 64 60 60 42 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
+      '<rect x="26" y="108" width="68" height="11" rx="5.5" fill="var(--forge-accent)" fill-opacity="0.34"/>' +
+      '<circle cx="60" cy="113.5" r="6" fill="var(--forge-accent)" fill-opacity="0.55"/>' +
+      '</svg>',
+  };
+
+  function art(key) { return ART[key] || ''; }
+
   /* ---- one concept per card ------------------------------------------------------------
      Every line is its own card. A section's heading rides along on each of its cards rather
      than being a card of its own, so "peak lapel or shawl collar" is never read without
@@ -276,7 +369,7 @@
   function cards(key) {
     var src = null, eyebrow = '';
     for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) {
-      src = [{ name: SUBJECTS[i].name, note: '', lines: SUBJECTS[i].lines }];
+      src = [{ key: '', name: SUBJECTS[i].name, note: '', lines: SUBJECTS[i].lines }];
       eyebrow = SUBJECTS[i].eyebrow;
     }
     if (!src && key === 'dress') { src = DRESS; eyebrow = 'BY OCCASION'; }
@@ -288,6 +381,9 @@
       sec.lines.forEach(function (line, li) {
         out.push({
           eyebrow: eyebrow, title: sec.name, note: sec.note || '', text: line,
+          /* The drawing belongs to the occasion, not to the rule, so every card in a
+             section carries it. */
+          art: ART[sec.key] ? sec.key : '',
           /* Where you are inside the section as well as inside the deck: four rules under one
              heading should read as four, not as an undifferentiated run of cards. */
           step: li + 1, steps: sec.lines.length,
@@ -337,7 +433,8 @@
   root.GentlemenEtiquette = {
     SUBJECTS: SUBJECTS, DRESS: DRESS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
-    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, _seed: seed,
+    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, art: art, ART: ART,
+    _seed: seed,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.GentlemenEtiquette;
 })(typeof window !== 'undefined' ? window : this);

@@ -177,6 +177,66 @@ t('a missing or odd date does not throw', async () => {
   }
 });
 
+/* ---- the dress code drawings -------------------------------------------------------------
+   A rule about a shape needs the shape. These assert the drawings exist for every occasion,
+   that they are only where a shape is actually being described, and that they are line work
+   in the theme's own colours rather than something with its own palette baked in — the whole
+   reason they are drawn and not photographed. */
+t('every dress occasion has a drawing, and every one of its cards carries it', async () => {
+  for (const d of G.DRESS) ok(G.art(d.key), 'no drawing for ' + d.key);
+  const cards = G.cards('dress');
+  eq(cards.filter(c => c.art).length, cards.length, 'some dress cards have no drawing');
+  for (const c of cards) ok(G.art(c.art), 'card "' + c.text.slice(0, 30) + '" points at a drawing that is not there');
+});
+
+t('the drawing on a card is the drawing for that card’s occasion', async () => {
+  const cards = G.cards('dress');
+  for (const d of G.DRESS) {
+    const mine = cards.filter(c => c.title === d.name);
+    eq(mine.length, d.lines.length, d.name + ' has the wrong number of cards');
+    for (const c of mine) eq(c.art, d.key, d.name + ' card points at ' + c.art);
+  }
+});
+
+t('nothing else claims a drawing', async () => {
+  for (const key of ['dining', 'money', 'history', 'taste', 'conversation', 'foundation']) {
+    for (const c of G.cards(key)) eq(c.art, '', key + ' should carry no drawing');
+  }
+  eq(G.art('before'), '', 'a dining section resolved to a drawing');
+  eq(G.art(''), '', 'an empty key resolved to a drawing');
+  eq(G.art('nonsense'), '', 'an unknown key resolved to a drawing');
+});
+
+t('the drawings take the theme rather than bringing their own', async () => {
+  for (const d of G.DRESS) {
+    const svg = G.art(d.key);
+    ok(/^<svg /.test(svg) && /<\/svg>$/.test(svg), d.key + ' is not a complete svg');
+    ok(/stroke="currentColor"/.test(svg), d.key + ' does not draw in the inherited ink');
+    /* A literal colour would survive a raiment change and sit there in last month's palette. */
+    const literal = svg.match(/(?:fill|stroke)="(#[0-9a-f]{3,8}|rgb[^"]*|[a-z]+)"/gi) || [];
+    const bad = literal.filter(m => !/currentColor|none/i.test(m));
+    eq(bad.join(' '), '', d.key + ' has a hard-coded colour: ' + bad.join(' '));
+    ok(!/<image|xlink:href|data:image/i.test(svg), d.key + ' embeds a bitmap');
+  }
+});
+
+t('each occasion is drawn differently from the others', async () => {
+  const seen = {};
+  for (const d of G.DRESS) {
+    const svg = G.art(d.key);
+    ok(!seen[svg], d.key + ' is the same drawing as ' + seen[svg]);
+    seen[svg] = d.key;
+  }
+  /* The two the rules actually name apart. A peak lapel turns up toward the shoulder and a
+     notch cuts a wedge; if those ever became the same path the drawing would stop teaching
+     the one thing it is there to teach. */
+  const peak = G.art('black-tie'), notch = G.art('business-formal');
+  ok(/M52 28 L40 50 L28 42/.test(peak), 'black tie is not drawn with a peak lapel');
+  ok(/M52 28 L42 46 L36 44 L38 52/.test(notch), 'business formal is not drawn with a notch lapel');
+  ok(!/M28 42/.test(notch), 'business formal picked up the peak');
+  ok(!/no jacket/.test(G.art('day-to-day')) && !/A_NOTCH/.test(G.art('day-to-day')), 'day to day should have no lapel at all');
+});
+
 let pass = 0, fail = 0;
 for (const [n, f] of T) {
   try { await f(); console.log('  PASS  ' + n); pass++; }

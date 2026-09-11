@@ -151,6 +151,73 @@
   .cc-shell.raiment-noir{ --forge-accent:#FFFFFF; --forge-add-bg:#625B50; --forge-add-ink:#F2EFE9; }
   .cc-shell.raiment-maison{ --forge-accent:#3C5A7D; --forge-add-bg:#4E6E96; --forge-add-ink:#F6F0E4; }
   .cc-shell.raiment-everpine{ --forge-accent:#E7D8A6; --forge-add-bg:#E7D8A6; --forge-add-ink:#16211A; }
+  /* ===== THE GENTLEMEN'S CENTRE — one ruled chrome for every subpage =====
+     The subpage row was eight loose chips on a wrapping flex line: on a phone it broke into a
+     ragged two-three-three block whose shape changed with the active tab. It is one box now,
+     ruled between tabs, and when the labels do not fit it scrolls sideways rather than
+     reflowing — the row keeps the same shape at every width. Every line in here is the
+     raiment's own, so the box changes colour with the theme instead of being a fixed white. */
+  .cc-gtabs{ display:flex; align-items:stretch; border:1px solid var(--quiet-line); border-radius:14px;
+    background:var(--quiet-bg); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; margin-bottom:18px; }
+  .cc-gtabs::-webkit-scrollbar{ display:none; }
+  .cc-gtab{ flex:1 0 auto; white-space:nowrap; text-align:center; padding:13px 16px; cursor:pointer;
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.2px; line-height:1;
+    display:flex; align-items:center; justify-content:center; border-left:1px solid var(--quiet-line); }
+  .cc-gtab:first-child{ border-left:0; border-radius:13px 0 0 13px; }
+  .cc-gtab:last-child{ border-radius:0 13px 13px 0; }
+  /* A card is a header band, a body and a footer band, divided by rules rather than by gaps —
+     the same frame on the test, the result, a subject page and the standing panels, so the
+     eight subpages read as one thing. Doubled class because .cc-glowcard.cc-glowcard sets
+     border:none above and a single class would lose to it. */
+  .cc-gcard.cc-gcard{ border:1px solid var(--quiet-line); border-radius:20px; display:flex; flex-direction:column; }
+  .cc-ghead{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    padding:15px 26px; border-bottom:1px solid var(--quiet-line); background:var(--quiet-bg);
+    border-radius:19px 19px 0 0; }
+  .cc-gbody{ flex:1; padding:30px 30px 32px; display:flex; flex-direction:column; min-width:0; }
+  .cc-gfoot{ padding:13px 26px; border-top:1px solid var(--quiet-line); background:var(--quiet-bg);
+    border-radius:0 0 19px 19px; }
+  /* Four figures sharing one cross rule rather than four boxes floating in a grid. */
+  .cc-gstats{ display:grid; grid-template-columns:1fr 1fr; }
+  .cc-gstat{ padding:16px 18px; border-top:1px solid var(--quiet-line); border-left:1px solid var(--quiet-line); }
+  .cc-gstat:nth-child(-n+2){ border-top:0; }
+  .cc-gstat:nth-child(odd){ border-left:0; }
+  .cc-grow{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 26px; border-top:1px solid var(--quiet-line); }
+  .cc-grow:first-child{ border-top:0; }
+  /* Dress code puts the garment beside the rule. The drawing is line work in the raiment's
+     ink — see gentlemen-etiquette.js for why it is drawn and not photographed. */
+  .cc-gdress{ display:grid; grid-template-columns:190px 1fr; gap:32px; align-items:center; flex:1; min-width:0; }
+  .cc-gdress-solo{ grid-template-columns:1fr; }
+  .cc-gart{ border:1px solid var(--quiet-line); border-radius:16px; background:var(--quiet-bg);
+    padding:12px; color:var(--quiet-ink); }
+  .cc-gart svg{ display:block; }
+  .cc-shell{ --art-cloth:rgba(255,255,255,0.07); --art-shirt:rgba(255,255,255,0.2); }
+  .cc-shell.raiment-x{ --art-cloth:rgba(91,26,26,0.09); --art-shirt:rgba(91,26,26,0.03); }
+  .cc-shell.raiment-noir{ --art-cloth:rgba(196,189,176,0.1); --art-shirt:rgba(196,189,176,0.24); }
+  .cc-shell.raiment-maison{ --art-cloth:rgba(60,90,125,0.1); --art-shirt:rgba(60,90,125,0.03); }
+  .cc-shell.raiment-everpine{ --art-cloth:rgba(124,106,56,0.11); --art-shirt:rgba(124,106,56,0.04); }
+  /* BACK, position, NEXT. The dot row is the position on a wide screen; on a phone
+     twenty-two dots wrapped onto their own line and shoved NEXT down with them, so there the
+     position is a bar instead and the count in the card header carries the exact figure. */
+  .cc-gnav{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:16px; }
+  .cc-gdots{ display:flex; gap:7px; align-items:center; flex-wrap:wrap; justify-content:center; }
+  .cc-gprog{ display:none; flex:1; height:4px; border-radius:3px; background:var(--quiet-line); overflow:hidden; }
+  .cc-gprog > span{ display:block; height:100%; background:var(--forge-accent); }
+  @media (max-width:900px){
+    .cc-gdots{ display:none; }
+    .cc-gprog{ display:block; }
+    /* Natural widths and a sideways scroll: eight labels will not fit a phone, and stretching
+       them to fit would shrink the type below reading size. */
+    .cc-gtab{ flex:0 0 auto; padding:12px 14px; }
+    .cc-ghead{ padding:13px 18px; }
+    .cc-gbody{ padding:22px 20px 24px; }
+    .cc-gfoot{ padding:12px 18px; }
+    .cc-grow{ padding:12px 18px; }
+    .cc-gstat{ padding:14px; }
+    .cc-gdress{ grid-template-columns:1fr; gap:20px; justify-items:center; }
+    .cc-gart{ width:168px; }
+  }
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
   .theme-ultra.theme-noir{ --u-bg:#121212; --u-card:rgba(30,30,30,0.86); --u-ink:#C4BDB0; --u-muted:#968F82; --u-line:rgba(150,143,130,0.28); --u-accent:#C4BDB0; }
   .theme-ultra, .theme-ultra .cc-scene, .theme-ultra .cc-top, .theme-ultra .cc-side{ background:var(--u-bg) !important; color:var(--u-ink) !important; font-family:'Cormorant Garamond',serif !important; }
@@ -376,7 +443,7 @@
 <script src="exercise-index.js?v=6"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
-<script src="gentlemen-etiquette.js?v=3"></script>
+<script src="gentlemen-etiquette.js?v=4"></script>
 <script src="ai-gateway.js?v=3"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -8450,9 +8517,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
 
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
+        <div class="cc-gtabs">
           <sc-for list="{{ gentTabs }}" as="t" hint-placeholder-count="8">
-            <span onClick="{{ t.go }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; padding:9px 15px; border-radius:9px; cursor:pointer; color:{{ t.ink }}; background:{{ t.bg }}; border:1px solid {{ t.bd }};">{{ t.label }}</span>
+            <span onClick="{{ t.go }}" class="cc-gtab" style="color:{{ t.ink }}; background:{{ t.bg }};">{{ t.label }}</span>
           </sc-for>
         </div>
 
@@ -8464,11 +8531,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div class="cc-grid2" style="display:grid; grid-template-columns:1.5fr 1fr; gap:18px; align-items:start;">
             <div style="min-width:0;">
               <sc-if value="{{ gentQShow }}" hint-placeholder-val="{{ true }}">
-                <div class="cc-glowcard" style="border-radius:22px; padding:38px 40px; min-height:360px; display:flex; flex-direction:column;">
-                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
+                <div class="cc-glowcard cc-gcard" style="min-height:360px;">
+                  <div class="cc-ghead">
                     <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:var(--forge-accent);">{{ gentCat }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#75757d;">{{ gentQPos }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink);">{{ gentQPos }}</span>
                   </div>
+                  <div class="cc-gbody">
                   <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.3; color:var(--head-ink); margin-bottom:26px;">{{ gentQ }}</div>
                   <div style="display:flex; flex-direction:column; gap:11px;">
                     <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
@@ -8479,8 +8547,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       </div>
                     </sc-for>
                   </div>
+                  </div>
                   <sc-if value="{{ gentAnswered }}" hint-placeholder-val="{{ false }}">
-                    <div style="margin-top:24px; padding-top:22px; border-top:1px solid var(--quiet-line);">
+                    <div class="cc-gfoot">
                       <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:{{ gentVerdictInk }}; margin-bottom:11px;">{{ gentVerdict }}</div>
                       <div style="font-size:16.5px; line-height:1.65; color:var(--body-ink);">{{ gentWhy }}</div>
                     </div>
@@ -8488,49 +8557,59 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
               </sc-if>
               <sc-if value="{{ gentResultShow }}" hint-placeholder-val="{{ false }}">
-                <div class="cc-glowcard" style="border-radius:22px; padding:44px 40px; min-height:360px; display:flex; flex-direction:column; justify-content:center;">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:var(--forge-accent); margin-bottom:14px;">TODAY&#39;S TEST</div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:52px; font-weight:700; color:var(--head-ink); line-height:1;">{{ gentScore }}</div>
-                  <div style="font-size:18px; line-height:1.55; color:var(--body-ink); margin-top:18px; max-width:52ch;">{{ gentResultLine }}</div>
-                  <div style="margin-top:26px; display:flex; flex-direction:column; gap:9px;">
+                <div class="cc-glowcard cc-gcard" style="min-height:360px;">
+                  <div class="cc-ghead">
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:var(--forge-accent);">TODAY&#39;S TEST</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink);">{{ gentDateLabel }}</span>
+                  </div>
+                  <div class="cc-gbody" style="justify-content:center;">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:52px; font-weight:700; color:var(--head-ink); line-height:1;">{{ gentScore }}</div>
+                    <div style="font-size:18px; line-height:1.55; color:var(--body-ink); margin-top:18px; max-width:52ch;">{{ gentResultLine }}</div>
+                  </div>
+                  <div style="border-top:1px solid var(--quiet-line);">
                     <sc-for list="{{ gentReview }}" as="r" hint-placeholder-count="4">
-                      <div style="display:flex; align-items:center; gap:13px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                      <div class="cc-grow">
                         <span style="font-size:14px; color:{{ r.ink }}; width:16px; flex:0 0 16px;">{{ r.mark }}</span>
-                        <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#75757d; width:120px; flex:0 0 120px;">{{ r.cat }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink); width:120px; flex:0 0 120px;">{{ r.cat }}</span>
                         <span style="flex:1; min-width:0; font-size:13.5px; color:var(--body-ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.q }}</span>
                       </div>
                     </sc-for>
                   </div>
                 </div>
               </sc-if>
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:16px; flex-wrap:wrap;">
-                <span onClick="{{ gentTestBack }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentTBackCursor }}; opacity:{{ gentTBackOpacity }}; color:var(--quiet-ink); border:1px solid var(--quiet-line); background:var(--quiet-bg);">‹ BACK</span>
-                <div style="display:flex; gap:7px; align-items:center;">
+              <div class="cc-gnav">
+                <span onClick="{{ gentTestBack }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentTBackCursor }}; opacity:{{ gentTBackOpacity }}; color:var(--quiet-ink); border:1px solid var(--quiet-line); background:var(--quiet-bg); white-space:nowrap;">‹ BACK</span>
+                <div class="cc-gprog"><span style="width:{{ gentTestProgPct }};"></span></div>
+                <div class="cc-gdots">
                   <sc-for list="{{ gentTestDots }}" as="d" hint-placeholder-count="5">
                     <span title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; background:{{ d.bg }};"></span>
                   </sc-for>
                 </div>
-                <span onClick="{{ gentTestNext }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentTNextCursor }}; opacity:{{ gentTNextOpacity }}; color:var(--sel-ink); background:var(--sel-bg);">{{ gentTNextLabel }}</span>
+                <span onClick="{{ gentTestNext }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentTNextCursor }}; opacity:{{ gentTNextOpacity }}; color:var(--sel-ink); background:var(--sel-bg); white-space:nowrap;">{{ gentTNextLabel }}</span>
               </div>
             </div>
             <div style="display:flex; flex-direction:column; gap:16px;">
-              <div class="cc-glowcard" style="border-radius:18px; padding:22px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7c7c84; margin-bottom:14px;">STANDING</div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div class="cc-glowcard cc-gcard">
+                <div class="cc-ghead">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:var(--quiet-ink);">STANDING</span>
+                </div>
+                <div class="cc-gstats">
                   <sc-for list="{{ gentStats }}" as="s" hint-placeholder-count="4">
-                    <div style="border-radius:12px; padding:14px; background:var(--quiet-bg); border:1px solid var(--quiet-line);">
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div>
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:21px; color:{{ s.c }}; margin-top:4px;">{{ s.v }}</div>
+                    <div class="cc-gstat">
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:var(--quiet-ink);">{{ s.k }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:21px; color:{{ s.c }}; margin-top:5px;">{{ s.v }}</div>
                     </div>
                   </sc-for>
                 </div>
               </div>
-              <div class="cc-glowcard" style="border-radius:18px; padding:22px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7c7c84; margin-bottom:12px;">DRAWN FROM</div>
+              <div class="cc-glowcard cc-gcard">
+                <div class="cc-ghead">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:var(--quiet-ink);">DRAWN FROM</span>
+                </div>
                 <sc-for list="{{ gentCatRows }}" as="c" hint-placeholder-count="4">
-                  <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                  <div class="cc-grow">
                     <span style="font-size:13px; color:{{ c.ink }};">{{ c.name }}</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#75757d;">{{ c.n }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--quiet-ink);">{{ c.n }}</span>
                   </div>
                 </sc-for>
               </div>
@@ -8543,32 +8622,43 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
              is cut is a judgement about the material and not a layout detail. -->
         <sc-if value="{{ gentShowPages }}" hint-placeholder-val="{{ false }}">
           <div style="max-width:820px;">
-            <div class="cc-glowcard" style="border-radius:22px; padding:38px 40px; min-height:340px; display:flex; flex-direction:column;">
-              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+            <div class="cc-glowcard cc-gcard" style="min-height:340px;">
+              <div class="cc-ghead">
                 <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:var(--forge-accent);">{{ gentCardEyebrow }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#75757d;">{{ gentPos }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink);">{{ gentPos }}</span>
               </div>
-              <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:var(--head-ink);">{{ gentCardTitle }}</div>
-              <sc-if value="{{ gentCardNote }}" hint-placeholder-val="{{ false }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:#75757d; margin-top:8px;">{{ gentCardNote }}</div>
-              </sc-if>
-              <!-- One concept, set large. The heading above it is what keeps a rule readable
-                   on its own: "peak lapel or shawl collar" means nothing without "Black Tie". -->
-              <div style="flex:1; display:flex; align-items:center; padding:28px 0 8px;">
-                <div style="font-size:21px; line-height:1.65; color:var(--body-ink); max-width:44ch;">{{ gentCardText }}</div>
+              <div class="cc-gbody">
+                <!-- On Dress Code the drawing sits beside the rule; everywhere else the text
+                     takes the full width and the grid collapses to one column. -->
+                <div class="{{ gentBodyCls }}">
+                  <sc-if value="{{ gentCardHasArt }}" hint-placeholder-val="{{ false }}">
+                    <div class="cc-gart"><span data-dress-art="{{ gentCardArt }}" style="display:block;"></span></div>
+                  </sc-if>
+                  <div style="min-width:0;">
+                    <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:var(--head-ink);">{{ gentCardTitle }}</div>
+                    <sc-if value="{{ gentCardNote }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--quiet-ink); margin-top:8px;">{{ gentCardNote }}</div>
+                    </sc-if>
+                    <!-- One concept, set large. The heading above it is what keeps a rule
+                         readable on its own: "peak lapel or shawl collar" means nothing
+                         without "Black Tie". -->
+                    <div style="font-size:21px; line-height:1.65; color:var(--body-ink); max-width:44ch; margin-top:22px;">{{ gentCardText }}</div>
+                  </div>
+                </div>
               </div>
               <sc-if value="{{ gentCardHasStep }}" hint-placeholder-val="{{ false }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#75757d;">{{ gentCardStep }}</div>
+                <div class="cc-gfoot" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink);">{{ gentCardStep }}</div>
               </sc-if>
             </div>
-            <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:16px; flex-wrap:wrap;">
-              <span onClick="{{ gentPrev }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentPrevCursor }}; opacity:{{ gentPrevOpacity }}; color:var(--quiet-ink); border:1px solid var(--quiet-line); background:var(--quiet-bg);">‹ BACK</span>
-              <div style="display:flex; gap:7px; align-items:center;">
+            <div class="cc-gnav">
+              <span onClick="{{ gentPrev }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentPrevCursor }}; opacity:{{ gentPrevOpacity }}; color:var(--quiet-ink); border:1px solid var(--quiet-line); background:var(--quiet-bg); white-space:nowrap;">‹ BACK</span>
+              <div class="cc-gprog"><span style="width:{{ gentProgPct }};"></span></div>
+              <div class="cc-gdots">
                 <sc-for list="{{ gentDots }}" as="d" hint-placeholder-count="6">
                   <span onClick="{{ d.go }}" title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; cursor:pointer; background:{{ d.bg }};"></span>
                 </sc-for>
               </div>
-              <span onClick="{{ gentNext }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentNextCursor }}; opacity:{{ gentNextOpacity }}; color:var(--sel-ink); background:var(--sel-bg);">{{ gentNextLabel }}</span>
+              <span onClick="{{ gentNext }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; padding:11px 20px; border-radius:11px; cursor:{{ gentNextCursor }}; opacity:{{ gentNextOpacity }}; color:var(--sel-ink); background:var(--sel-bg); white-space:nowrap;">{{ gentNextLabel }}</span>
             </div>
           </div>
         </sc-if>
@@ -9485,7 +9575,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.11-299 · v11.299 gent-pacing';
+const NOTIF_BUILD_VERSION = '2026.09.11-300 · v11.300 gent-layout';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14113,6 +14203,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          survive that size — the anvil and the double-frame versions did not. */
       forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>' };
     this.root.querySelectorAll('[data-icon]').forEach(el=>{ const k=el.dataset.icon; if(el._k===k) return; el._k=k; el.innerHTML='<svg viewBox="0 0 18 18" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(ic[k]||'')+'</svg>'; });
+    /* Dress Code's garment drawings. Their own pass because they are full drawings on a
+       120x160 field rather than 18px marks, and they live in the engine beside the rules
+       they illustrate. Re-injected only when the occasion changes, so stepping through a
+       section's four rules does not redraw the same tuxedo four times. */
+    const G=window.GentlemenEtiquette;
+    this.root.querySelectorAll('[data-dress-art]').forEach(el=>{ const k=el.dataset.dressArt||'';
+      if(el._da===k) return; el._da=k; el.innerHTML=(G&&G.art)?G.art(k):''; });
   }
 
   // ===== SCENE INITS =====
@@ -14407,6 +14504,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.300', date:'Sep 11, 2026', major:false, notes:[
+      'The Gentlemen\u2019s subpage row is one box now rather than eight loose chips. It is ruled between the eight, it takes the raiment\u2019s own line and accent instead of a fixed white, and on a phone it scrolls sideways rather than breaking into a ragged block that changed shape depending on which page you were on.',
+      'Every card on the page wears the same frame: a ruled header carrying the section and your place in it, the body, and a ruled footer. Standing is one panel of four figures over a single cross rule, and all four are set in reading ink \u2014 two of them used to be a step quieter than the others, which read as two live figures and two dead ones.',
+      'Dress Code now shows the garment beside the rule. Six drawings, one per occasion, carried on all of that occasion\u2019s cards \u2014 a peak lapel and a bow tie for black tie, a notch and a tie for business formal, pinstripes for business smart, patch pockets and an open placket for smart casual, no jacket at all for day-to-day, a shawl collar and a belt for home.',
+      'They are drawn rather than photographed, in line work that takes the raiment\u2019s ink: deep red on Ultra X, bone on Noir, navy on Maison \u00c9lys\u00e9e, champagne on \u00c9verpine. A photograph would carry its own colours into every theme and would not change when you changed the raiment.',
+      'On a phone a twenty-two card deck is paced by a bar rather than by twenty-two dots, which used to wrap onto their own line and push NEXT down with them.',
+    ]},
     {version:'v11.299', date:'Sep 11, 2026', major:false, notes:[
       'The Gentlemen\u2019s cards are cut finer. Dress and dining no longer arrive as a heading with a list under it \u2014 every rule is its own block, with the heading and the occasion carried above it so a rule is never read without knowing what it applies to. Dress Code is 22 cards, Dining 18, and each says where it sits in its section.',
       'The daily test is a carousel too, and it is now four questions rather than one \u2014 one from each of Events, History, Dress Code and Dining Manners, one to a block. Answer to move on; you can look back but not change an answer.',
@@ -21174,9 +21278,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
         return {
           gentTabs:PAGES.map(p=>({ label:p[1], go:()=>this.setGentSub(p[0]),
-            ink:sub===p[0]?'var(--sel-ink)':'#9a9aa2',
-            bg:sub===p[0]?'var(--sel-bg)':'rgba(255,255,255,0.02)',
-            bd:sub===p[0]?'var(--sel-bg)':'rgba(255,255,255,0.08)' })),
+            ink:sub===p[0]?'var(--sel-ink)':'var(--quiet-ink)',
+            bg:sub===p[0]?'var(--sel-bg)':'transparent' })),
           gentShowTest:sub==='test',
           gentShowPages:sub!=='test' && !!cards.length,
           ...(()=>{
@@ -21184,6 +21287,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             return {
               gentCardEyebrow:c.eyebrow, gentCardTitle:c.title, gentCardNote:c.note,
               gentCardText:c.text,
+              /* Only Dress Code has drawings: an occasion is a shape, a dining rule is not.
+                 The column count follows the drawing rather than the subpage, so a section
+                 that gains art later needs no change here. */
+              gentCardArt:c.art||'', gentCardHasArt:!!(c.art && G.art && G.art(c.art)),
+              gentBodyCls:(c.art && G.art && G.art(c.art)) ? 'cc-gdress' : 'cc-gdress cc-gdress-solo',
               gentCardStep:c.steps>1?(c.step+' of '+c.steps+' in this section'):'',
               gentCardHasStep:c.steps>1,
               gentPos:cards.length?((idx+1)+' OF '+cards.length):'',
@@ -21197,6 +21305,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               gentPrevCursor:idx>0?'pointer':'default', gentPrevOpacity:idx>0?'1':'0.35',
               gentNextCursor:idx<cards.length-1?'pointer':'default', gentNextOpacity:idx<cards.length-1?'1':'0.35',
               gentNextLabel:idx<cards.length-1?'NEXT \u203a':'DONE',
+              gentProgPct:cards.length?(Math.round((idx+1)/cards.length*100)+'%'):'0%',
             };
           })(),
           gentQShow:!onResult, gentResultShow:onResult,
@@ -21224,6 +21333,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           gentTNextCursor:(!onResult&&answered)?'pointer':'default',
           gentTNextOpacity:(!onResult&&answered)?'1':'0.35',
           gentTNextLabel:onResult?'FINISHED':(at===set.length-1?'SEE RESULT \u203a':'NEXT \u203a'),
+          gentTestProgPct:Math.round((Math.min(at,set.length)+1)/(set.length+1)*100)+'%',
           gentTestDots:set.concat([null]).map((x,i)=>({ title:x?x.cat:'Result',
             w:i===at?'26px':'8px',
             bg:i===at?'var(--forge-accent)':(picks[i]!=null?'var(--quiet-hover)':'var(--quiet-line)') })),
@@ -21236,21 +21346,26 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           gentReview:set.map((x,i)=>({ cat:x.cat.toUpperCase(), q:x.q,
             mark:picks[i]==null?'\u2013':(picks[i]===x.correct?'\u2713':'\u2715'),
             ink:picks[i]==null?'#75757d':(picks[i]===x.correct?'#6cffba':'#ff8a5b') })),
+          /* All four figures carry the page's reading ink. Two of them were a step quieter
+             than the other two, which read as two live figures and two dead ones rather than
+             as one panel; only TODAY takes a colour, and only because it is a verdict. */
           gentStats:[
-            {k:'STREAK', v:this._gentStreak()+'d', c:'#eef0f2'},
+            {k:'STREAK', v:this._gentStreak()+'d', c:'var(--head-ink)'},
             {k:'TODAY', v:answeredCount>=set.length?(rightCount+'/'+set.length):(answeredCount?(answeredCount+'/'+set.length):'OPEN'),
              c:answeredCount>=set.length?(rightCount===set.length?'#6cffba':'#ff8a5b'):'var(--forge-accent)'},
-            {k:'DAYS DONE', v:String(doneDays), c:'#9a9aa2'},
-            {k:'CORRECT', v:asked?(Math.round(got/asked*100)+'%'):'\u2014', c:'#9a9aa2'},
+            {k:'DAYS DONE', v:String(doneDays), c:'var(--head-ink)'},
+            {k:'CORRECT', v:asked?(Math.round(got/asked*100)+'%'):'\u2014', c:'var(--head-ink)'},
           ],
           gentCatRows:G.CATEGORIES.map(c=>({ name:c, n:(counts[c]||0)+' questions',
-            ink:(q&&q.cat===c)?'var(--forge-accent)':'#c3c3ca' })),
+            ink:(q&&q.cat===c)?'var(--forge-accent)':'var(--body-ink)' })),
         };
       }, { gentTabs:[], gentShowTest:false, gentShowPages:false,
            gentCardEyebrow:'', gentCardTitle:'', gentCardNote:'', gentCardLines:[], gentPos:'',
            gentDots:[], gentPrev:()=>{}, gentNext:()=>{}, gentPrevCursor:'default',
            gentPrevOpacity:'0.35', gentNextCursor:'default', gentNextOpacity:'0.35', gentNextLabel:'',
            gentCardText:'', gentCardStep:'', gentCardHasStep:false,
+           gentCardArt:'', gentCardHasArt:false, gentBodyCls:'cc-gdress cc-gdress-solo',
+           gentProgPct:'0%', gentTestProgPct:'0%',
            gentQShow:true, gentResultShow:false, gentQPos:'',
            gentTestBack:()=>{}, gentTestNext:()=>{}, gentTBackCursor:'default', gentTBackOpacity:'0.35',
            gentTNextCursor:'default', gentTNextOpacity:'0.35', gentTNextLabel:'', gentTestDots:[],

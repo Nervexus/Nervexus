@@ -269,6 +269,189 @@ t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });
 
+/* ---- the layout ---------------------------------------------------------------------------
+   The subpage row used to be eight loose chips on a wrapping flex line; on a phone it broke
+   into a ragged block whose shape changed with the active tab. These hold the row to one box
+   and one line at every width, and hold the cards to one ruled frame. */
+t('the subpage row is one ruled box, not eight loose chips', async () => {
+  await boot();
+  const box = await page.evaluate(() => {
+    const r = document.querySelector('.cc-gtabs'); if (!r) throw new Error('no subpage row');
+    const cs = getComputedStyle(r);
+    const tabs = [...r.querySelectorAll('.cc-gtab')];
+    return { n: tabs.length, border: cs.borderTopWidth, radius: cs.borderTopLeftRadius,
+             /* every tab but the first carries the dividing line */
+             divided: tabs.slice(1).every(e => parseFloat(getComputedStyle(e).borderLeftWidth) > 0),
+             firstUndivided: parseFloat(getComputedStyle(tabs[0]).borderLeftWidth) === 0,
+             rows: new Set(tabs.map(e => Math.round(e.getBoundingClientRect().top))).size };
+  });
+  eq(box.n, 8, 'the row does not hold all eight subpages');
+  ok(parseFloat(box.border) > 0, 'the row has no box around it');
+  ok(parseFloat(box.radius) > 0, 'the box is not rounded');
+  ok(box.divided, 'the tabs are not divided by lines');
+  ok(box.firstUndivided, 'the first tab carries a line it should not');
+  eq(box.rows, 1, 'the row wrapped onto ' + box.rows + ' lines');
+});
+
+t('the row and its lines are the raiment’s, not a fixed white', async () => {
+  for (const [raiment, sub] of [['Ultra X', 'ultraStyle'], ['Maison Élysée', 'ultraStyle']]) {
+    await boot({ prefs: { ...(await page.evaluate(() => window.__nvx.state.prefs)), theme: 'Ultra', ultraStyle: raiment } });
+    const c = await page.evaluate(() => {
+      const r = document.querySelector('.cc-gtabs');
+      const on = [...document.querySelectorAll('.cc-gtab')].find(e => getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)');
+      return { line: getComputedStyle(r).borderTopColor, on: on ? getComputedStyle(on).backgroundColor : null };
+    });
+    ok(c.on, 'nothing in the row is marked as the page you are on (' + raiment + ')');
+    /* The fixed white the row used to wear. If it comes back the box stops belonging to the
+       theme, which is the whole point of the change. */
+    ok(!/^rgba?\(255, 255, 255/.test(c.line), raiment + ' draws the box in fixed white: ' + c.line);
+  }
+});
+
+t('every card is a ruled frame: a header band, a body, and the rule between them', async () => {
+  for (const sub of ['test', 'money', 'dress', 'dining']) {
+    await boot({ gentSub: sub });
+    const f = await page.evaluate(() => {
+      const card = document.querySelector('.cc-gcard');
+      if (!card) return null;
+      const head = card.querySelector('.cc-ghead');
+      return { border: parseFloat(getComputedStyle(card).borderTopWidth),
+               head: !!head, rule: head ? parseFloat(getComputedStyle(head).borderBottomWidth) : 0,
+               body: !!card.querySelector('.cc-gbody, .cc-gstats') };
+    });
+    ok(f, sub + ' has no card at all');
+    ok(f.border > 0, sub + ' card has no box around it');
+    ok(f.head, sub + ' card has no header band');
+    ok(f.rule > 0, sub + ' card header is not ruled off from the body');
+    ok(f.body, sub + ' card has no body');
+  }
+});
+
+t('standing is one ruled panel of four figures, all of them legible', async () => {
+  await boot();
+  const st = await page.evaluate(() => {
+    const cells = [...document.querySelectorAll('.cc-gstat')];
+    return cells.map(e => ({ text: e.innerText.replace(/\n/g, ' ').trim(),
+      top: parseFloat(getComputedStyle(e).borderTopWidth),
+      left: parseFloat(getComputedStyle(e).borderLeftWidth) }));
+  });
+  eq(st.length, 4, 'standing does not show four figures');
+  for (const c of st) ok(/\S/.test(c.text) && c.text.split(' ').length > 1, 'a figure has no value: "' + c.text + '"');
+  /* One cross rule rather than four floating boxes: the first two carry no top line and the
+     left column carries no left line. */
+  eq(st[0].top, 0, 'the top row is ruled off from nothing');
+  eq(st[1].top, 0, 'the top row is ruled off from nothing');
+  ok(st[2].top > 0 && st[3].top > 0, 'the bottom row is not ruled from the top');
+  eq(st[0].left, 0, 'the left column carries a line it should not');
+  ok(st[1].left > 0 && st[3].left > 0, 'the two columns are not divided');
+});
+
+/* ---- the dress code drawings ------------------------------------------------------------- */
+t('every dress code card shows the garment it is a rule about', async () => {
+  await boot({ gentSub: 'dress' });
+  const n = await page.evaluate(() => window.__nvx._gent().cards('dress').length);
+  eq(n, 22, 'dress code is not the deck it was');
+  const seen = new Set();
+  for (let i = 0; i < n; i++) {
+    await page.evaluate(x => window.__nvx.gentGoto(x), i);
+    await page.waitForTimeout(90);
+    const card = await page.evaluate(() => {
+      const svg = document.querySelector('.cc-gart svg');
+      const title = document.querySelector('.cc-gbody div[style*="26px"]');
+      return { marks: svg ? svg.querySelectorAll('path,rect,circle').length : 0,
+               key: document.querySelector('[data-dress-art]')?.getAttribute('data-dress-art') || '',
+               title: title ? title.innerText.trim() : '' };
+    });
+    ok(card.marks > 4, 'card ' + (i + 1) + ' has no drawing on it');
+    ok(card.key, 'card ' + (i + 1) + ' does not say which occasion it is drawing');
+    seen.add(card.key + '|' + card.title);
+  }
+  /* Six occasions, each drawn once however many rules it carries. */
+  eq(new Set([...seen].map(x => x.split('|')[0])).size, 6, 'the six occasions are not six drawings');
+});
+
+t('a subject or a dining rule gets no drawing — those are not shapes', async () => {
+  for (const sub of ['dining', 'money', 'history', 'taste', 'conversation', 'foundation']) {
+    await boot({ gentSub: sub });
+    const art = await page.evaluate(() => !!document.querySelector('.cc-gart'));
+    ok(!art, sub + ' put a garment drawing next to a rule that is not about one');
+    const solo = await page.evaluate(() => !!document.querySelector('.cc-gdress-solo'));
+    ok(solo, sub + ' still reserves the column the drawing would have sat in');
+  }
+});
+
+t('the drawing changes when the occasion does, not when the rule does', async () => {
+  await boot({ gentSub: 'dress' });
+  const at = async () => page.evaluate(() => document.querySelector('[data-dress-art]').getAttribute('data-dress-art'));
+  eq(await at(), 'black-tie', 'dress code does not open on black tie');
+  /* Black tie carries four rules; all four are the same garment. */
+  for (let i = 1; i < 4; i++) {
+    await page.evaluate(() => window.__nvx.gentStep(1));
+    await page.waitForTimeout(90);
+    eq(await at(), 'black-tie', 'the drawing changed part-way through black tie');
+  }
+  await page.evaluate(() => window.__nvx.gentStep(1));
+  await page.waitForTimeout(120);
+  eq(await at(), 'business-formal', 'the drawing did not move on with the occasion');
+});
+
+/* ---- the phone ---------------------------------------------------------------------------- */
+t('on a phone the subpage row is still one line, and the page does not scroll sideways', async () => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await boot({ gentSub: 'dress' });
+  const m = await page.evaluate(() => {
+    const r = document.querySelector('.cc-gtabs');
+    const tabs = [...document.querySelectorAll('.cc-gtab')];
+    return { rows: new Set(tabs.map(e => Math.round(e.getBoundingClientRect().top))).size,
+             scrolls: r.scrollWidth > r.clientWidth,
+             overflowX: getComputedStyle(r).overflowX,
+             bodyWide: document.body.scrollWidth > document.body.clientWidth + 1 };
+  });
+  eq(m.rows, 1, 'the row wrapped onto ' + m.rows + ' lines on a phone');
+  ok(m.scrolls && m.overflowX === 'auto', 'the row does not scroll sideways when it overflows');
+  ok(!m.bodyWide, 'the page itself scrolls sideways');
+  await page.setViewportSize({ width: 1440, height: 1200 });
+});
+
+t('on a phone the deck is paced by a bar, not by twenty-two dots on their own line', async () => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await boot({ gentSub: 'dress' });
+  const m = await page.evaluate(() => {
+    const nav = document.querySelector('.cc-gnav');
+    const kids = [...nav.children].filter(e => getComputedStyle(e).display !== 'none');
+    return { dots: getComputedStyle(document.querySelector('.cc-gdots')).display,
+             bar: getComputedStyle(document.querySelector('.cc-gprog')).display,
+             /* Centres, not tops: the row centres a 4px bar against a 40px button, so their
+                tops differ by design and only their middles should agree. */
+             rows: new Set(kids.map(e => { const r = e.getBoundingClientRect(); return Math.round(r.top + r.height / 2); })).size,
+             navH: Math.round(nav.getBoundingClientRect().height),
+             backH: Math.round(kids[0].getBoundingClientRect().height),
+             fill: document.querySelector('.cc-gprog > span').style.width };
+  });
+  eq(m.dots, 'none', 'the dot row is still shown on a phone');
+  ok(m.bar !== 'none', 'there is no progress bar on a phone');
+  eq(m.rows, 1, 'BACK, the bar and NEXT sit on ' + m.rows + ' lines');
+  ok(m.navH <= m.backH + 2, 'the nav is ' + m.navH + 'px tall against a ' + m.backH + 'px button \u2014 something wrapped');
+  eq(m.fill, '5%', 'the bar does not report the first of twenty-two');
+  /* And it moves. */
+  await page.evaluate(() => window.__nvx.gentGoto(21));
+  await page.waitForTimeout(150);
+  eq(await page.evaluate(() => document.querySelector('.cc-gprog > span').style.width), '100%', 'the bar does not fill by the last card');
+  await page.setViewportSize({ width: 1440, height: 1200 });
+});
+
+t('on a wide screen the dots come back and the bar goes away', async () => {
+  await page.setViewportSize({ width: 1440, height: 1200 });
+  await boot({ gentSub: 'dress' });
+  const m = await page.evaluate(() => ({
+    dots: getComputedStyle(document.querySelector('.cc-gdots')).display,
+    bar: getComputedStyle(document.querySelector('.cc-gprog')).display,
+    n: document.querySelectorAll('.cc-gdots > span').length }));
+  ok(m.dots !== 'none', 'the dots are hidden on a wide screen');
+  eq(m.bar, 'none', 'the phone bar is showing on a wide screen');
+  eq(m.n, 22, 'the dot row does not report all twenty-two cards');
+});
+
 let pass = 0, fail = 0;
 for (const [n, f] of T) {
   try { await f(); console.log('  PASS  ' + n); pass++; }
