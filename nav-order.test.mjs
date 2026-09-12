@@ -40,7 +40,7 @@ async function boot(patch) {
 const rail = () => page.evaluate(() =>
   [...document.querySelectorAll('.cc-side nav [data-icon]')].map(e => e.dataset.icon));
 
-const WANT = ['home', 'dashboard', 'forge', 'gentlemen', 'fitness', 'calendar',
+const WANT = ['home', 'dashboard', 'forge', 'gentlemen', 'calendar',
               'business', 'learning', 'power', 'voice', 'globe', 'ai', 'settings'];
 
 t('the rail is in the order asked for', async () => {
@@ -103,6 +103,8 @@ t('Settings carries the pending count that used to sit on the rail', async () =>
   else eq(badge, null, 'only the owner sees a request count');
 });
 
+/* Fitness HQ was one of the six; the page is gone and the Forge replaced it, so that slot
+   is the Forge rather than a button that opens nothing. The other five are untouched. */
 t('the phone bar keeps its own six', async () => {
   /* The bar is deliberately not the top of the rail: it is the screens used from a phone,
      which is a different question from how the app is arranged. Reordering the sidebar must
@@ -118,10 +120,13 @@ t('the phone bar keeps its own six', async () => {
     bar: [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon),
     more: [...document.querySelectorAll('.cc-mobsheet-backdrop [data-icon]')].map(e => e.dataset.icon),
   }));
-  eq(m.bar.join(','), 'dashboard,learning,business,globe,fitness,calendar', 'the phone bar changed');
-  /* Everything not on the bar has to be somewhere, or reordering the rail has stranded it. */
-  for (const id of ['forge', 'gentlemen', 'power', 'ai', 'settings'])
+  eq(m.bar.join(','), 'dashboard,learning,business,globe,forge,calendar', 'the phone bar changed');
+  /* Everything not on the bar has to be somewhere, or reordering the rail has stranded it.
+     The Forge is not in this list because it is now on the bar itself, in the slot Fitness HQ
+     held before that page was removed. */
+  for (const id of ['gentlemen', 'power', 'ai', 'settings'])
     ok(m.more.includes(id), id + ' is on neither the bar nor More: ' + m.more.join(' > '));
+  ok(m.bar.includes('forge'), 'the Forge is not on the phone bar');
   await page.setViewportSize({ width: 1440, height: 1100 });
   await page.waitForTimeout(400);
 });

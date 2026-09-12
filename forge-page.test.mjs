@@ -90,19 +90,6 @@ t('the Forge is its own scene, not a tab inside Fitness', async () => {
   ok(!/Body Systems/.test(body), 'the Fitness page rendered at the same time — the scenes are not exclusive');
 });
 
-t('the Forge is no longer a tab inside Fitness', async () => {
-  await boot({ scene: 'fitness' });
-  const tabs = await page.evaluate(() => {
-    const hq = [...document.querySelectorAll('*')].find(e =>
-      e.children.length === 0 && e.textContent.trim() === 'Fitness HQ');
-    if (!hq) return null;
-    return [...hq.parentElement.parentElement.querySelectorAll('*')]
-      .filter(e => e.children.length === 0).map(e => e.textContent.trim());
-  });
-  ok(tabs, 'the Fitness tab row did not render');
-  ok(!tabs.includes('The Forge'), 'the Forge is still a tab inside Fitness: ' + tabs.join(' | '));
-  ok(tabs.includes('Fitness HQ') && tabs.includes('Music'), 'the other tabs must survive: ' + tabs.join(' | '));
-});
 
 t('the sidebar puts The Forge third, under Home and Command', async () => {
   /* It used to sit above the AI Command Center; the rail was reordered in v11.292 and the
@@ -124,16 +111,6 @@ t('the Forge is the only nav entry lit while you are on it', async () => {
   eq(lit.join(','), 'forge', 'exactly one sidebar entry should be active, and it is this page');
 });
 
-t('Fitness still lights itself, and still owns Health', async () => {
-  for (const [scene, want] of [['fitness', 'fitness'], ['health', 'fitness']]) {
-    await boot({ scene });
-    const lit = await page.evaluate(() =>
-      [...document.querySelectorAll('.cc-side span[data-icon]')]
-        .filter(s => getComputedStyle(s).color === 'rgb(255, 255, 255)')
-        .map(s => s.dataset.icon));
-    eq(lit.join(','), want, 'active entry on the ' + scene + ' scene');
-  }
-});
 
 t('the Forge nav entry actually draws its mark', async () => {
   await boot();
@@ -152,16 +129,17 @@ t('the Forge nav entry actually draws its mark', async () => {
 
 t('the Forge is reachable on mobile through More', async () => {
   await boot({ mobMoreOpen: true });
-  /* The mobile bar carries six fixed entries of its own and everything else falls through to
-     the More sheet, which is only in the DOM while it is open. Reordering the sidebar does
-     not put anything on that bar, so the only thing that matters here is that the Forge has
-     not become unreachable on a phone. */
-  const inMore = await page.evaluate(() => {
-    const more = [...document.querySelectorAll('*')].filter(e =>
-      e.children.length === 0 && e.textContent.trim() === 'The Forge' && !e.closest('.cc-side'));
-    return more.length > 0;
-  });
-  ok(inMore, 'The Forge appears nowhere outside the desktop sidebar — check mobMoreList');
+  /* The mobile bar carries six fixed entries and everything else falls through to the More
+     sheet, which is only in the DOM while it is open. What matters is only that the Forge is
+     reachable on a phone at all — since Fitness HQ was removed the Forge took its slot on the
+     bar itself, so it is no longer in More, and either answer is a pass. */
+  const reach = await page.evaluate(() => ({
+    onBar: [...document.querySelectorAll('.cc-mobnav [data-icon]')].map(e => e.dataset.icon).includes('forge'),
+    inMore: [...document.querySelectorAll('*')].some(e =>
+      e.children.length === 0 && e.textContent.trim() === 'The Forge' && !e.closest('.cc-side')),
+  }));
+  ok(reach.onBar || reach.inMore,
+     'The Forge appears nowhere outside the desktop sidebar — on neither the phone bar nor More');
 });
 
 t('the page wears the Éverpine crest in champagne', async () => {
@@ -196,7 +174,12 @@ t('the Forge opens on its home', async () => {
 });
 
 t('the 3D anatomy is revealed before anything measures it', async () => {
-  await boot({ scene: 'fitness' });
+  await boot({ scene: 'forge' });
+  /* The anatomy sits behind a tap on the Forge — the model is a download and a WebGL scene,
+     so it stays out of the page until asked for. On Fitness HQ, where this test used to run,
+     the mount was always in the markup. Open it before stubbing the engine, or there is no
+     mount for _syncAnatomy to reach. */
+  await openAnatomy();
   /* The real defect: reattach() ran fit() while the mount was still display:none, so
      clientWidth was 0, the canvas locked to its 120px floor, and the model came back as a
      thumbnail against the left edge of a full-width card. Stub the engine and watch the
@@ -233,7 +216,12 @@ t('the 3D anatomy is revealed before anything measures it', async () => {
 });
 
 t('the drawn figure is put away whenever the model is up', async () => {
-  await boot({ scene: 'fitness' });
+  await boot({ scene: 'forge' });
+  /* The anatomy sits behind a tap on the Forge — the model is a download and a WebGL scene,
+     so it stays out of the page until asked for. On Fitness HQ, where this test used to run,
+     the mount was always in the markup. Open it before stubbing the engine, or there is no
+     mount for _syncAnatomy to reach. */
+  await openAnatomy();
   await page.evaluate(() => {
     window.NervexusAnatomy3D = {
       supported: () => true, hasScene: () => true, isMounted: () => false,
@@ -439,11 +427,11 @@ t('ticking an item writes it to the main training log', async () => {
   eq((await logged()).done, 1, 'the counter did not move');
 });
 
-t('the logged set shows up on Fitness HQ', async () => {
+t('the logged set shows up on the Forge', async () => {
   await openFullBody();
   await tick('Deadlift');
   await page.waitForTimeout(700);
-  await page.evaluate(() => window.__nvx.setState({ scene: 'fitness', woPart: 'Back' }));
+  await page.evaluate(() => window.__nvx.setState({ scene: 'forge', woPart: 'Back' }));
   await page.waitForTimeout(800);
   ok(/Deadlift/.test(await text()), 'Fitness HQ does not show the set logged on the Forge');
 });
@@ -494,8 +482,8 @@ t('ticking does not wipe what is half-typed in the Fitness HQ form', async () =>
   eq(await page.evaluate(() => window.__nvx.state.workouts.length), 1, 'and it should still have logged');
 });
 
-t('the Fitness HQ form still clears itself when it is the one logging', async () => {
-  await boot({ scene: 'fitness' });
+t('the Forge log form still clears itself when it is the one logging', async () => {
+  await boot({ scene: 'forge' });
   await page.evaluate(() => window.__nvx.setState({
     woPart: 'Chest', woEx: 'Incline press', woWeight: '60', woSets: '3', woReps: '8' }));
   await page.waitForTimeout(300);
@@ -1315,7 +1303,7 @@ t('Bulk Import opens on the Forge, without leaving it', async () => {
   ok(shown, 'the Bulk Import panel did not render on the Forge');
 
   /* And still on Fitness, where it always worked. */
-  await page.evaluate(() => window.__nvx.setState({ woImportOpen: false, scene: 'fitness' }));
+  await page.evaluate(() => window.__nvx.setState({ woImportOpen: false, scene: 'forge' }));
   await page.waitForTimeout(600);
   await page.evaluate(() => {
     [...document.querySelectorAll('span')]
@@ -1509,7 +1497,7 @@ t('switching pages does not leave a second model behind', async () => {
   await boot({ scene: 'forge', forgeCentre: 'home' });
   await page.waitForTimeout(2000);
   await seeAnatomy();
-  for (const s of ['fitness', 'forge', 'dashboard', 'forge']) {
+  for (const s of ['forge', 'dashboard', 'forge', 'dashboard']) {
     await page.evaluate((x) => window.__nvx.setState({ scene: x, forgeCentre: 'home' }), s);
     await page.waitForTimeout(900);
   }
@@ -1996,6 +1984,77 @@ t('nothing on the page is rendered twice', async () => {
 
 t('the page raised no errors while all of that happened', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
+});
+
+
+/* ---- Bulk Import -----------------------------------------------------------------------------
+   The importer advertises its own format in its placeholder, in three examples, and could not
+   read any of them: the lazy exercise name swallowed the weight, then took the set count for the
+   weight, so "Bench press 80kg 4x8" imported as an exercise called "Bench press 80kg" at 4kg for
+   one set of eight. The AI fallback never saved it, because the local parse "succeeded". */
+t('the importer reads the format its own placeholder advertises', async () => {
+  await boot({ scene: 'forge', forgeCentre: 'home', workouts: [] });
+  const placeholder = await page.evaluate(() => {
+    const el = [...document.querySelectorAll('span,div')].find(e => e.children.length <= 1 && e.textContent.trim() === 'Bulk Import');
+    (el.classList.contains('sc-interp') ? el.parentElement : el).click();
+    return null;
+  });
+  await page.waitForTimeout(500);
+  ok(await page.evaluate(() => !!window.__nvx.state.woImportOpen), 'Bulk Import did not open from the Forge');
+  eq(await page.evaluate(() => window.__nvx.state.scene), 'forge', 'importing took you off the Forge');
+
+  /* Lifted verbatim from the textarea's own placeholder. */
+  const example = await page.evaluate(() => {
+    const ta = document.querySelector('textarea[placeholder^="e.g."]');
+    return ta ? ta.getAttribute('placeholder').replace(/^e\.g\.\s*/, '') : null;
+  });
+  ok(example && /Bench press/.test(example), 'could not read the placeholder back: ' + example);
+
+  await page.evaluate((t) => window.__nvx.setState({ woImportText: t }), example);
+  await page.evaluate(() => window.__nvx.parseWoImport());
+  await page.waitForTimeout(1200);
+  const rows = await page.evaluate(() => window.__nvx.state.woImportRows || []);
+  eq(await page.evaluate(() => window.__nvx.state.woImportErr || ''), '', 'the importer errored on its own example');
+  eq(rows.length, 4, 'expected four exercises from the placeholder, got ' + rows.length);
+
+  const byName = {};
+  for (const r of rows) byName[r.exercise] = r;
+  ok(byName['Bench press'], 'the weight was left in the name: ' + rows.map(r => r.exercise).join(' | '));
+  eq(+byName['Bench press'].weight, 80, 'bench press weight');
+  eq(+byName['Bench press'].sets, 4, 'bench press sets');
+  eq(+byName['Bench press'].reps, 8, 'bench press reps');
+  eq(byName['Squats'] && +byName['Squats'].weight, 100, 'squat weight');
+  eq(byName['Squats'] && +byName['Squats'].sets, 5, 'squat sets');
+  eq(byName['Squats'] && +byName['Squats'].reps, 5, 'squat reps');
+  eq(byName['Treadmill'] && +byName['Treadmill'].minutes, 20, 'treadmill minutes');
+  /* And the part is guessed, not left blank. */
+  eq(byName['Squats'].part, 'Legs', 'squats filed under ' + byName['Squats'].part);
+  eq(byName['Treadmill'].part, 'Cardio', 'treadmill filed under ' + byName['Treadmill'].part);
+});
+
+t('a confirmed import lands in the log, on the Forge', async () => {
+  await boot({ scene: 'forge', forgeCentre: 'home', workouts: [] });
+  await page.evaluate(() => {
+    window.__nvx.setState({ woImportOpen: true, woImportText: 'Bench press 80kg 4x8\nSquats 100kg 5x5' });
+  });
+  await page.evaluate(() => window.__nvx.parseWoImport());
+  await page.waitForTimeout(1000);
+  await page.evaluate(() => window.__nvx.confirmWoImport());
+  await page.waitForTimeout(1000);
+  const w = await page.evaluate(() => window.__nvx.state.workouts || []);
+  eq(w.length, 2, 'expected two logged entries, got ' + w.length);
+  ok(w.every(x => x.exercise && x.sets > 0 && x.reps > 0), 'an entry landed incomplete: ' + JSON.stringify(w));
+  ok(await page.evaluate(() => !window.__nvx.state.woImportOpen), 'the importer stayed open after confirming');
+  eq(await page.evaluate(() => window.__nvx.state.scene), 'forge', 'confirming took you off the Forge');
+});
+
+t('the training log survives on the Forge, with Fitness HQ gone', async () => {
+  await boot({ scene: 'forge', forgeCentre: 'home', workouts: [
+    { id: 'w1', ts: Date.now() - 3 * 86400000, exercise: 'Bench Press', part: 'Chest', sets: 3, reps: 8, weight: 60, unit: 'kg', min: 0 },
+  ] });
+  await page.waitForTimeout(800);
+  ok(/Bench Press/.test(await page.evaluate(() => document.body.innerText)),
+     'a logged session is not shown anywhere on the Forge');
 });
 
 let pass = 0, fail = 0;
