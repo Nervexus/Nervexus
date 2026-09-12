@@ -63,8 +63,10 @@ t('HEALTH is no longer an empty page', async () => {
 t('the other centres are unchanged', async () => {
   await boot('mental');
   const b = await text();
-  ok(/Nothing here yet/.test(b), 'Mental should still be the empty state — only Health was built');
+  /* Mental is its own page now (Brain Rest), so what matters here is only that it is not
+     borrowing Health's. */
   ok(!(await rings()), 'the health rings are showing on the Mental centre');
+  ok(/Brain Rest/.test(b), 'Mental lost its own page');
   await boot('home');
   ok(!(await rings()), 'the health rings are showing on the Home centre');
   ok(await page.evaluate(() => !!document.querySelector('canvas[data-chart="fitRings"]')),

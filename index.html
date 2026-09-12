@@ -157,6 +157,16 @@
      ruled between tabs, and when the labels do not fit it scrolls sideways rather than
      reflowing — the row keeps the same shape at every width. Every line in here is the
      raiment's own, so the box changes colour with the theme instead of being a fixed white. */
+  /* Brain Rest takes the whole screen. The sheen is sized to the window rather than a card,
+     and the ring steps down on a phone so the clock, the line under it and the way out all
+     fit without scrolling — a sit you have to scroll during is not a sit. */
+  .lu-full .lu-sheen{ width:180px; }
+  @media (max-width:900px){
+    .lu-full{ padding:24px 18px; }
+    .lu-full .lu-frame{ inset:12px; }
+    .lu-bigring{ width:168px; height:168px; margin:18px auto 6px; }
+    .lu-full h2{ font-size:30px; margin-top:18px; }
+  }
   .cc-gtabs{ display:flex; align-items:stretch; border:1px solid var(--quiet-line); border-radius:14px;
     background:var(--quiet-bg); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
     scrollbar-width:none; margin-bottom:18px; }
@@ -840,6 +850,59 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
       </div>
     </sc-if>
+
+  <!-- BRAIN REST. Built on the level-up card deliberately: same frame, same champagne rule,
+       same sheen and the same ring, so the two moments in the app that ask you to stop and
+       look at one thing look like each other. Four stages in one overlay rather than three
+       separate popups — the card stays put and only its middle changes, so answering a gate
+       does not feel like being handed another dialogue. -->
+  <sc-if value="{{ brOpen }}" hint-placeholder-val="{{ false }}">
+    <!-- Full screen rather than a card in the middle of one. A five minute sit that leaves the
+         rest of the app visible around the edges is asking you to stop while showing you
+         everything you stopped doing. The level-up's language is kept — the champagne rule,
+         the ring, the sheen, the serif — but the rule is an inset frame here, because a border
+         on the window edge reads as browser chrome rather than as a card. -->
+    <div style="position:fixed; inset:0; z-index:1000; background:#0a0a0d; display:flex; align-items:center; justify-content:center; padding:0;">
+      <!-- Not a cc-glowcard: that class forces a translucent background, which at full screen
+           means the page you just walked away from shows faintly through the whole sit. It
+           also stamps the sovereign corner diamond, which belongs on a card and not on a
+           window edge. The ground here is opaque on purpose. -->
+      <div class="lu-card lu-full" style="width:100%; height:100%; max-width:none; border-radius:0; background:#0a0a0d; border:none; padding:40px 28px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; animation:luPop 520ms cubic-bezier(.2,.9,.3,1) both; position:relative; overflow:hidden;">
+        <div class="lu-frame" style="position:absolute; inset:18px; border:1px solid rgba(231,216,166,0.34); border-radius:10px; pointer-events:none;"></div>
+        <!-- The sheen runs on the gates and on the finish, and stops while you are sitting:
+             five silent minutes should not have something moving on the screen. -->
+        <sc-if value="{{ brSheen }}" hint-placeholder-val="{{ true }}">
+          <div class="lu-sheen" style="position:absolute; top:0; bottom:0; width:70px; background:linear-gradient(100deg, rgba(231,216,166,0) 0%, rgba(231,216,166,0.13) 50%, rgba(231,216,166,0) 100%); animation:luSheen 2600ms ease-in-out 380ms infinite; pointer-events:none;"></div>
+        </sc-if>
+
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:3px; color:#E7D8A6;">{{ brBanner }}</div>
+
+        <div class="lu-bigring" style="position:relative; width:214px; height:214px; margin:26px auto 8px;">
+          <sc-if value="{{ brHalo }}" hint-placeholder-val="{{ false }}">
+            <div class="lu-halo" style="position:absolute; inset:0; border-radius:50%; border:1px solid rgba(231,216,166,0.5); animation:luHalo 1500ms ease-out 240ms 2;"></div>
+          </sc-if>
+          <div class="lu-ring" style="position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(231,216,166,0.55); box-shadow:inset 0 0 30px rgba(231,216,166,0.14); display:flex; flex-direction:column; align-items:center; justify-content:center; animation:luRing 620ms cubic-bezier(.2,.9,.3,1) both;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:#8f8f99;">{{ brRingLabel }}</div>
+            <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:{{ brRingSize }}; line-height:1; color:#ffffff; margin-top:4px;">{{ brRingValue }}</div>
+          </div>
+        </div>
+
+        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:38px; font-weight:600; color:#eef0f2; margin:22px 0 2px;">{{ brTitle }}</h2>
+        <div style="font-size:15px; line-height:1.65; color:#9a9aa2; max-width:40ch; margin:12px auto 0;">{{ brBody }}</div>
+
+        <!-- A stage that offers only one action renders only one button. Rendering the other
+             with an empty label left a blank white bar across the card while you were sitting. -->
+        <div style="margin-top:34px; display:flex; gap:12px; align-items:stretch; width:100%; max-width:420px;">
+          <sc-if value="{{ brHasSecondary }}" hint-placeholder-val="{{ true }}">
+            <span onClick="{{ brSecondary }}" style="flex:{{ brSecondaryFlex }}; padding:14px 18px; border-radius:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.03); color:#c3c3ca; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.6px; display:flex; align-items:center; justify-content:center;">{{ brSecondaryLabel }}</span>
+          </sc-if>
+          <sc-if value="{{ brHasPrimary }}" hint-placeholder-val="{{ true }}">
+            <span onClick="{{ brPrimary }}" style="flex:1; min-width:0; padding:14px; border-radius:12px; cursor:pointer; background:#eef0f2; color:#0d0d10; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.4px; display:flex; align-items:center; justify-content:center;">{{ brPrimaryLabel }}</span>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 
   <sc-if value="{{ levelUpOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; inset:0; z-index:1000; background:rgba(6,6,9,0.72); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:24px;">
@@ -3136,6 +3199,21 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-if value="{{ hrNoMeals }}" hint-placeholder-val="{{ true }}">
                 <div style="font-size:11px; color:#6f6f78; font-style:italic; margin-top:12px;">Nothing logged today. The rings read your logs, so they stay empty until there is something in them.</div>
               </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- MENTAL. One thing on it: five minutes sitting in silence before anything else. -->
+        <sc-if value="{{ forgeShowMental }}" hint-placeholder-val="{{ false }}">
+          <div class="cc-glowcard" style="border-radius:20px; padding:0; overflow:hidden;">
+            <div style="padding:15px 26px; border-bottom:1px solid var(--quiet-line); background:var(--quiet-bg); display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:var(--forge-accent);">◆ MENTAL</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink);">5 MINUTES</span>
+            </div>
+            <div style="padding:34px 30px 32px;">
+              <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:var(--head-ink);">Brain Rest</div>
+              <div style="font-size:19px; line-height:1.6; color:var(--body-ink); max-width:46ch; margin-top:16px;">Five minutes sitting in silence. No music, no screen, nothing to finish first — it is there to clear the head before the work starts, not to fill the time.</div>
+              <div onClick="{{ openBrainRest }}" style="display:inline-block; margin-top:26px; padding:15px 28px; border-radius:12px; cursor:pointer; color:var(--sel-ink); background:var(--sel-bg); font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.4px;">BEGIN</div>
             </div>
           </div>
         </sc-if>
@@ -8659,6 +8737,10 @@ activities: this._mergeShipLog(s.activities),
       // No seeded events. These used to be five fictional meetings dated July 2026, which
       // showed up in a new user's calendar as though they were real appointments.
       events: s.events || [],
+      /* Brain Rest. brStage is the whole state machine: '' shut, then the two gates, then
+         the sit itself, then done. brEndsAt is the wall clock rather than a countdown, so a
+         backgrounded tab or a dropped frame cannot shorten five minutes. */
+      brStage:'', brEndsAt:0, brLeft:300,
       levelUp:null, lcOpen:{}, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
@@ -9414,7 +9496,7 @@ activities: this._mergeShipLog(s.activities),
   }
 
   applyAvatars(){ if(!this.root) return; const acc=this.state.account||{}, dr=this.state.acctDraft||acc; const mk=(n)=>((n||'U').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('')||'U').toUpperCase(); this.root.querySelectorAll('[data-avatar]').forEach(el=>{ const src=el.dataset.avatar==='settings'?dr:acc; if(src.avatar){ el.style.backgroundImage='url("'+src.avatar+'")'; el.textContent=''; } else { el.style.backgroundImage='none'; el.textContent=mk(src.name); } }); }
-  componentWillUnmount(){ this.killLoops(); if(this._orbLoops){ this._orbLoops.forEach(c=>c()); this._orbLoops.clear(); }
+  componentWillUnmount(){ this._brStop(); this.killLoops(); if(this._orbLoops){ this._orbLoops.forEach(c=>c()); this._orbLoops.clear(); }
     if(this._mlMap){ try{ this._mlMap.remove(); }catch(e){} this._mlMap=null; this._mlContainerEl=null; }
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
@@ -15691,6 +15773,33 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      keeps. The programme content itself never lives here. */
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
+
+  /* ---- BRAIN REST ---------------------------------------------------------------------
+     Five minutes sitting in silence, before anything else. Two gates before the clock
+     starts, because the point is the sitting and not the timer: you say you are ready, then
+     you say the devices are away. Neither is a checkbox that remembers itself — they are
+     asked every time, since the answer is about this five minutes and not about you.
+
+     The clock is an end timestamp, not a counter. A counter loses time whenever the tab is
+     backgrounded or the phone sleeps, which would quietly hand back a four-minute sit. */
+  BR_SECONDS(){ return 300; }
+  openBrainRest(){ this._brStop(); this.setState({brStage:'ready', brLeft:this.BR_SECONDS()}); }
+  brainRestReady(){ this.setState({brStage:'devices'}); }
+  brainRestBegin(){
+    const end=Date.now()+this.BR_SECONDS()*1000;
+    this.setState({brStage:'sitting', brEndsAt:end, brLeft:this.BR_SECONDS()});
+    this._brStop();
+    this._brTimer=setInterval(()=>{
+      const left=Math.max(0, Math.round((this.state.brEndsAt-Date.now())/1000));
+      if(left<=0){ this._brStop(); this.setState({brLeft:0, brStage:'done'}); return; }
+      if(left!==this.state.brLeft) this.setState({brLeft:left});
+    }, 250);
+  }
+  _brStop(){ if(this._brTimer){ clearInterval(this._brTimer); this._brTimer=null; } }
+  /* Leaving early ends it. There is no pause: a five minute sit you can pause is a four
+     minute sit with a gap in it. */
+  closeBrainRest(){ this._brStop(); this.setState({brStage:'', brEndsAt:0, brLeft:this.BR_SECONDS()}); }
+  _brClock(sec){ const m=Math.floor(sec/60), s2=sec%60; return m+':'+String(s2).padStart(2,'0'); }
   setForgeSection(k){ this._resetPoolText(); this.setState({forgeSection:k}); }
   /* Which panels on a Learning Centre hub are folded open. Keyed by subject as well as
      section, so opening Practice by Skill on Maths does not open it on History. */
@@ -18397,11 +18506,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             remove:()=>{ this.mut(st=>({health:{...st.health, meals:(st.health.meals||[]).filter(x=>x.id!==m.id)}}));
                          if(this._sbOn() && m.id) window.SB.remove('meals',m.id); } })),
           hrNoMeals:!hMeals.length,
-          forgeShowEmpty:centre!=='home' && centre!=='health' && !(centre==='training' && trainSections.length),
+          forgeShowMental:centre==='mental',
+          forgeShowEmpty:centre!=='home' && centre!=='health' && centre!=='mental' && !(centre==='training' && trainSections.length),
           forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
           trainSections:trainSections, trainPicker:trainPicker
         };
-      }, { forgeCentres:[], forgeShowHome:false, forgeShowHealth:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[],
+      }, { forgeCentres:[], forgeShowHome:false, forgeShowHealth:false, forgeShowMental:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[],
            hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'#5c5c64', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
@@ -18631,6 +18741,44 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // and their open-flags used to survive a logout — so a popup left open (or a stray daily
       // check-in timer firing right around logout) could render on top of the logged-out screen.
       // Gate rendering on S.loggedIn directly, on top of clearing both flags in logout() itself.
+      /* BRAIN REST. One card, four stages: the two gates, the sit, the finish. Everything the
+         card shows is chosen here so the markup stays one shape rather than four. */
+      ...(()=>{
+        const st=S.brStage||'';
+        const secs=S.brLeft==null?300:S.brLeft;
+        const clock=this._brClock(secs);
+        const M={
+          ready:{ banner:'\u25c6 BRAIN REST', ring:'MINUTES', value:'5', size:'86px', halo:false, sheen:true,
+            title:'Are you ready?', body:'Five minutes sitting in silence. Not a break between things \u2014 the thing itself.',
+            p:'I\u2019M READY', s:'NOT YET' },
+          devices:{ banner:'\u25c6 BRAIN REST', ring:'MINUTES', value:'5', size:'86px', halo:false, sheen:true,
+            title:'All devices away?', body:'Phone down and out of reach, watch off, nothing on that can interrupt you. Start when that is actually true.',
+            p:'THEY\u2019RE AWAY', s:'NOT YET' },
+          sitting:{ banner:'\u25c6 SITTING', ring:'REMAINING', value:clock, size:'64px', halo:false, sheen:false,
+            title:'Sit.', body:'Nothing to do and nothing to get right. Let it run.',
+            p:'', s:'END EARLY' },
+          done:{ banner:'\u25c6 DONE', ring:'MINUTES', value:'5', size:'86px', halo:true, sheen:true,
+            title:'Five minutes.', body:'That is the rest taken. Go and start the work.',
+            p:'CONTINUE', s:'' },
+        };
+        const m=M[st]||M.ready;
+        return {
+          brOpen:!!st && !!S.loggedIn,
+          brBanner:m.banner, brRingLabel:m.ring, brRingValue:m.value, brRingSize:m.size,
+          brHalo:m.halo, brSheen:m.sheen, brTitle:m.title, brBody:m.body,
+          /* While it is running there is no primary: the only thing on offer is to end it
+             early, and that sits where the quiet button always sits. */
+          brPrimaryLabel:m.p, brSecondaryLabel:m.s,
+          brHasPrimary:!!m.p, brHasSecondary:!!m.s,
+          /* Alone, the quiet button takes the full width rather than sitting in a corner. */
+          brSecondaryFlex:m.p?'0 0 auto':'1',
+          brPrimary:()=> st==='ready' ? this.brainRestReady()
+                      : st==='devices' ? this.brainRestBegin()
+                      : st==='done' ? this.closeBrainRest() : undefined,
+          brSecondary:()=> st==='sitting' || st==='ready' || st==='devices' ? this.closeBrainRest() : undefined,
+        };
+      })(),
+      openBrainRest:()=>this.openBrainRest(),
       levelUpOpen:!!S.levelUp && !!S.loggedIn,
       luBanner:(S.levelUp&&S.levelUp.rankUp)?'RANK UP':'LEVEL UP',
       luLevel:S.levelUp?String(S.levelUp.to):'',

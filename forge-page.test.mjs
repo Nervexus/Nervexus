@@ -287,11 +287,13 @@ const GHOSTS = ['Muscle Training Split', 'Anatomy', 'Log Training', 'Strength Ch
                 'FROM YOUR LOGS', 'PROGRESS', 'WEAKEST LINKS', 'THE TOOLS',
                 'Hand Training', 'RECORD ASSESSMENT'];
 
-t('Mental is still an empty page', async () => {
+t('Mental is a page now: Brain Rest, and nothing borrowed from elsewhere', async () => {
   await boot({ forgeCentre: 'mental' });
   const body = await text();
-  ok(body.includes('MENTAL'), 'MENTAL should still name itself on its empty page');
-  ok(/Nothing here yet/.test(body), 'MENTAL is not showing its empty state');
+  ok(body.includes('MENTAL'), 'MENTAL should still name itself');
+  ok(/Brain Rest/.test(body), 'Mental does not offer Brain Rest');
+  ok(!/Nothing here yet/.test(body), 'Mental is still showing the empty-page card');
+  /* The point of the ghost list: a new centre must not quietly inherit the training page. */
   for (const ghost of GHOSTS) ok(!body.includes(ghost), ghost + ' is still on the mental page');
 });
 
