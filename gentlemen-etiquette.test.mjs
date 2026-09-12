@@ -177,114 +177,14 @@ t('a missing or odd date does not throw', async () => {
   }
 });
 
-/* ---- the dress code drawings -------------------------------------------------------------
-   A rule about a shape needs the shape. These assert the drawings exist for every occasion,
-   that they are only where a shape is actually being described, and that they are line work
-   in the theme's own colours rather than something with its own palette baked in — the whole
-   reason they are drawn and not photographed. */
-t('every dress occasion has a drawing, and every one of its cards carries it', async () => {
-  for (const d of G.DRESS) ok(G.art(d.key), 'no drawing for ' + d.key);
-  const cards = G.cards('dress');
-  eq(cards.filter(c => c.art).length, cards.length, 'some dress cards have no drawing');
-  for (const c of cards) ok(G.art(c.art), 'card "' + c.text.slice(0, 30) + '" points at a drawing that is not there');
-});
-
-t('the drawing on a card is the drawing for that card’s occasion', async () => {
-  const cards = G.cards('dress');
-  for (const d of G.DRESS) {
-    const mine = cards.filter(c => c.title === d.name);
-    eq(mine.length, d.lines.length, d.name + ' has the wrong number of cards');
-    for (const c of mine) eq(c.art, d.key, d.name + ' card points at ' + c.art);
-  }
-});
-
-t('nothing else claims a drawing', async () => {
-  for (const key of ['dining', 'money', 'history', 'taste', 'conversation', 'foundation']) {
-    for (const c of G.cards(key)) eq(c.art, '', key + ' should carry no drawing');
-  }
-  eq(G.art('before'), '', 'a dining section resolved to a drawing');
-  eq(G.art(''), '', 'an empty key resolved to a drawing');
-  eq(G.art('nonsense'), '', 'an unknown key resolved to a drawing');
-});
-
-t('the drawings take the theme rather than bringing their own', async () => {
-  for (const d of G.DRESS) {
-    const svg = G.art(d.key);
-    ok(/^<svg /.test(svg) && /<\/svg>$/.test(svg), d.key + ' is not a complete svg');
-    ok(/stroke="currentColor"/.test(svg), d.key + ' does not draw in the inherited ink');
-    /* A literal colour would survive a raiment change and sit there in last month's palette. */
-    const literal = svg.match(/(?:fill|stroke)="(#[0-9a-f]{3,8}|rgb[^"]*|[a-z]+)"/gi) || [];
-    const bad = literal.filter(m => !/currentColor|none/i.test(m));
-    eq(bad.join(' '), '', d.key + ' has a hard-coded colour: ' + bad.join(' '));
-    ok(!/<image|xlink:href|data:image/i.test(svg), d.key + ' embeds a bitmap');
-  }
-});
-
-t('each occasion is drawn differently from the others', async () => {
-  const seen = {};
-  for (const d of G.DRESS) {
-    const svg = G.art(d.key);
-    ok(!seen[svg], d.key + ' is the same drawing as ' + seen[svg]);
-    seen[svg] = d.key;
-  }
-  /* The two the rules actually name apart. A peak lapel turns up toward the shoulder and a
-     notch cuts a wedge; if those ever became the same path the drawing would stop teaching
-     the one thing it is there to teach. */
-  const peak = G.art('black-tie'), notch = G.art('business-formal');
-  ok(/M63 22 L52 44 L40 36/.test(peak), 'black tie is not drawn with a peak lapel');
-  ok(/M63 22 L53 40 L46 37 L49 46/.test(notch), 'business formal is not drawn with a notch lapel');
-  ok(!/L40 36/.test(notch), 'business formal picked up the peak');
-  /* No jacket is the whole tell for day-to-day, so neither lapel may appear on it. */
-  const day = G.art('day-to-day');
-  ok(!/M63 22/.test(day), 'day to day was given a lapel');
-});
 
 
-/* The complaint that produced these: four of the six were a jacket seen from the chest up, and
-   at the size they are actually read that is the same drawing four times. What separates the
-   middle of the range is not the collar, it is the trousers and the shoes — so every drawing is
-   a whole outfit, and these hold it that way. */
-t('every drawing is a whole outfit, not a torso', async () => {
-  for (const d of G.DRESS) {
-    const svg = G.art(d.key);
-    const vb = (svg.match(/viewBox="([^"]+)"/) || [])[1];
-    eq(vb, '0 0 140 260', d.key + ' is not drawn on the full-length field');
-    /* Something has to be down at the shoe line, or the figure stops at the waist. */
-    ok(/2[34]\d(?:\.\d+)?[ ,]/.test(svg.replace(/viewBox="[^"]+"/, '')) || / 240/.test(svg),
-       d.key + ' has nothing drawn below the knee');
-    ok(/var\(--art-shoe\)|A_SHOE|M41 224|M34 234/.test(svg), d.key + ' has no shoes');
-  }
-});
 
-t('the middle of the range is told apart by the trousers, not only by the collar', async () => {
-  /* A suit wears the jacket's own cloth below the waist; the odd combination does not. This is
-     the difference between business smart and smart casual, and it has to be in the drawing. */
-  const legs = k => (G.art(k).match(/M44 126 L41 224 L62 224 L67 150 L67 126 Z" fill="([^"]+)"/) || [])[1];
-  eq(legs('black-tie'), 'var(--art-cloth)', 'black tie is not drawn as a matching suit');
-  eq(legs('business-formal'), 'var(--art-cloth)', 'business formal is not drawn as a matching suit');
-  eq(legs('business-smart'), 'var(--art-cloth)', 'business smart is not drawn as a matching suit');
-  eq(legs('smart-casual'), 'var(--art-shirt)', 'smart casual is drawn as a matching suit, which is the one thing it is not');
-  ok(legs('smart-casual') !== legs('business-smart'),
-     'smart casual and business smart wear the same trousers, so nothing tells them apart below the waist');
-});
 
-t('no two of the six share a silhouette', async () => {
-  /* Stripped of colour tokens, two drawings that differ only in a token would still look alike.
-     Compare the geometry itself. */
-  const shape = k => G.art(k).replace(/fill="[^"]*"/g, '').replace(/stroke-opacity="[^"]*"/g, '');
-  const seen = {};
-  for (const d of G.DRESS) {
-    const g = shape(d.key);
-    ok(!seen[g], d.key + ' has the same geometry as ' + seen[g]);
-    seen[g] = d.key;
-  }
-  /* And the four jackets each carry something the others do not. */
-  ok(/M67 31 L55 24/.test(G.art('black-tie')), 'black tie has no bow tie');
-  ok(/M66 38 L74 38/.test(G.art('business-formal')), 'business formal has no tie');
-  ok((G.art('business-smart').match(/stroke-opacity="0\.26"/g) || []).length >= 8, 'business smart has no pattern');
-  ok(/<rect x="45" y="96"/.test(G.art('smart-casual')), 'smart casual has no patch pockets');
-  ok(!/<rect x="45" y="96"/.test(G.art('business-smart')), 'business smart picked up the patch pockets');
-});
+
+
+
+
 
 
 /* ---- the slot a supplied photograph drops into --------------------------------------------
@@ -300,12 +200,27 @@ t('no photograph is claimed that is not actually there', async () => {
   }
 });
 
-t('an occasion with no photograph still has its drawing', async () => {
-  for (const d of G.DRESS) {
-    if (!G.photo(d.key)) ok(G.art(d.key), d.key + ' has neither a photograph nor a drawing');
-  }
+t('an occasion with no photograph simply has none', async () => {
+  /* The drawn sketches that used to stand in were removed. Nothing is a legitimate answer
+     now, so the only thing to hold is that a key that means nothing resolves to nothing
+     rather than to some other occasion's picture. */
   eq(G.photo('nonsense'), '', 'an unknown key resolved to a photograph');
   eq(G.photo(''), '', 'an empty key resolved to a photograph');
+  eq(typeof G.art, 'undefined', 'the drawings are still in the engine');
+  eq(typeof G.ART, 'undefined', 'the drawings are still in the engine');
+});
+
+t('every dress card still names the occasion a picture would belong to', async () => {
+  /* The hook the restructure and any supplied photograph both hang on. */
+  const cards = G.cards('dress');
+  for (const d of G.DRESS) {
+    const mine = cards.filter(c => c.title === d.name);
+    eq(mine.length, d.lines.length, d.name + ' has the wrong number of cards');
+    for (const c of mine) eq(c.occasion, d.key, d.name + ' card names ' + c.occasion);
+  }
+  for (const key of ['dining', 'money', 'history', 'taste', 'conversation', 'foundation']) {
+    for (const c of G.cards(key)) eq(c.occasion, '', key + ' should name no occasion');
+  }
 });
 
 let pass = 0, fail = 0;

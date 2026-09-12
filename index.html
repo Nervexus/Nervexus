@@ -185,25 +185,16 @@
   .cc-grow{ display:flex; align-items:center; justify-content:space-between; gap:10px;
     padding:12px 26px; border-top:1px solid var(--quiet-line); }
   .cc-grow:first-child{ border-top:0; }
-  /* Dress code puts the garment beside the rule. The drawing is line work in the raiment's
-     ink — see gentlemen-etiquette.js for why it is drawn and not photographed. */
+  /* Dress code can put a picture of the occasion beside the rule. Nothing fills it at the
+     moment — the drawn sketches that used to were removed — so every card takes the
+     solo column until a photograph is supplied. */
   .cc-gdress{ display:grid; grid-template-columns:158px 1fr; gap:30px; align-items:center; flex:1; min-width:0; }
   .cc-gdress-solo{ grid-template-columns:1fr; }
   .cc-gart{ border:1px solid var(--quiet-line); border-radius:16px; background:var(--quiet-bg);
     padding:12px; color:var(--quiet-ink); }
-  .cc-gart svg{ display:block; }
   /* A supplied photograph will not come at the ratio the drawings are drawn on, so the box
      keeps its shape and the image is fitted inside it rather than cropped or stretched. */
   .cc-gphoto{ display:block; width:100%; aspect-ratio:140/260; object-fit:contain; border-radius:9px; }
-  /* Three tones the drawings are built from. --art-cloth is the jacket; --art-shirt is the
-     lighter one, which is a shirt and is also the odd trouser that separates smart casual
-     from a suit; --art-shoe is the darkest. "Lighter" and "darker" run opposite ways on an
-     ivory card and a dark one, so each is written out per raiment rather than derived. */
-  .cc-shell{ --art-cloth:rgba(255,255,255,0.07); --art-shirt:rgba(255,255,255,0.2); --art-shoe:rgba(255,255,255,0.02); }
-  .cc-shell.raiment-x{ --art-cloth:rgba(91,26,26,0.09); --art-shirt:rgba(91,26,26,0.03); --art-shoe:rgba(91,26,26,0.34); }
-  .cc-shell.raiment-noir{ --art-cloth:rgba(196,189,176,0.1); --art-shirt:rgba(196,189,176,0.24); --art-shoe:rgba(196,189,176,0.03); }
-  .cc-shell.raiment-maison{ --art-cloth:rgba(60,90,125,0.1); --art-shirt:rgba(60,90,125,0.03); --art-shoe:rgba(60,90,125,0.34); }
-  .cc-shell.raiment-everpine{ --art-cloth:rgba(124,106,56,0.11); --art-shirt:rgba(124,106,56,0.04); --art-shoe:rgba(124,106,56,0.36); }
   /* BACK, position, NEXT. The dot row is the position on a wide screen; on a phone
      twenty-two dots wrapped onto their own line and shoved NEXT down with them, so there the
      position is a bar instead and the count in the card header carries the exact figure. */
@@ -452,7 +443,7 @@
 <script src="exercise-index.js?v=6"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
-<script src="gentlemen-etiquette.js?v=6"></script>
+<script src="gentlemen-etiquette.js?v=7"></script>
 <script src="ai-gateway.js?v=3"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -8640,14 +8631,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <!-- On Dress Code the drawing sits beside the rule; everywhere else the text
                      takes the full width and the grid collapses to one column. -->
                 <div class="{{ gentBodyCls }}">
-                  <sc-if value="{{ gentCardHasArt }}" hint-placeholder-val="{{ false }}">
+                  <sc-if value="{{ gentCardHasPhoto }}" hint-placeholder-val="{{ false }}">
                     <div class="cc-gart">
-                      <sc-if value="{{ gentCardHasPhoto }}" hint-placeholder-val="{{ false }}">
-                        <img src="{{ gentCardPhoto }}" alt="{{ gentCardPhotoAlt }}" class="cc-gphoto">
-                      </sc-if>
-                      <sc-if value="{{ gentCardHasDrawing }}" hint-placeholder-val="{{ true }}">
-                        <span data-dress-art="{{ gentCardArt }}" style="display:block;"></span>
-                      </sc-if>
+                      <img src="{{ gentCardPhoto }}" alt="{{ gentCardPhotoAlt }}" class="cc-gphoto">
                     </div>
                   </sc-if>
                   <div style="min-width:0;">
@@ -9591,7 +9577,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.11-302 · v11.302 dress-photo-slot';
+const NOTIF_BUILD_VERSION = '2026.09.12-303 · v11.303 dress-no-art';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14219,13 +14205,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          survive that size — the anvil and the double-frame versions did not. */
       forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>' };
     this.root.querySelectorAll('[data-icon]').forEach(el=>{ const k=el.dataset.icon; if(el._k===k) return; el._k=k; el.innerHTML='<svg viewBox="0 0 18 18" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(ic[k]||'')+'</svg>'; });
-    /* Dress Code's garment drawings. Their own pass because they are full drawings on a
-       120x160 field rather than 18px marks, and they live in the engine beside the rules
-       they illustrate. Re-injected only when the occasion changes, so stepping through a
-       section's four rules does not redraw the same tuxedo four times. */
-    const G=window.GentlemenEtiquette;
-    this.root.querySelectorAll('[data-dress-art]').forEach(el=>{ const k=el.dataset.dressArt||'';
-      if(el._da===k) return; el._da=k; el.innerHTML=(G&&G.art)?G.art(k):''; });
   }
 
   // ===== SCENE INITS =====
@@ -14520,6 +14499,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.303', date:'Sep 12, 2026', major:false, notes:[
+      'The drawn outfits are off the Dress Code cards. Six line drawings of a jacket told the occasions apart only barely \u2014 and the page is being restructured, so a card now carries its rule and nothing else.',
+      'The slot for real photographs stays, so supplied images still drop straight in without a card ever showing a broken one.',
+    ]},
     {version:'v11.302', date:'Sep 11, 2026', major:false, notes:[
       'Dress Code can now carry real photographs in place of the drawings. Nothing changes yet \u2014 the drawings are still what you see \u2014 but each occasion has a slot, and they can be filled one at a time without any card going blank in between.',
     ]},
@@ -21314,15 +21297,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               /* Only Dress Code has drawings: an occasion is a shape, a dining rule is not.
                  The column count follows the drawing rather than the subpage, so a section
                  that gains art later needs no change here. */
-              gentCardArt:c.art||'', gentCardHasArt:!!(c.art && G.art && G.art(c.art)),
-              /* A supplied photograph wins over the drawing for the same occasion; the drawing
-                 stays in place for every occasion that has not been photographed yet, so the
-                 six can arrive one at a time without a card ever going blank. */
-              gentCardPhoto:(c.art && G.photo) ? G.photo(c.art) : '',
-              gentCardHasPhoto:!!(c.art && G.photo && G.photo(c.art)),
-              gentCardHasDrawing:!!(c.art && G.art && G.art(c.art)) && !(c.art && G.photo && G.photo(c.art)),
+              /* Only an occasion that has actually been photographed gets a picture column.
+                 The drawn garment sketches that used to fill it were removed — six line
+                 drawings of outfits separated the occasions only barely. */
+              gentCardPhoto:(c.occasion && G.photo) ? G.photo(c.occasion) : '',
+              gentCardHasPhoto:!!(c.occasion && G.photo && G.photo(c.occasion)),
               gentCardPhotoAlt:c.title ? (c.title + ' \u2014 what the occasion looks like') : '',
-              gentBodyCls:(c.art && G.art && G.art(c.art)) ? 'cc-gdress' : 'cc-gdress cc-gdress-solo',
+              gentBodyCls:(c.occasion && G.photo && G.photo(c.occasion)) ? 'cc-gdress' : 'cc-gdress cc-gdress-solo',
               gentCardStep:c.steps>1?(c.step+' of '+c.steps+' in this section'):'',
               gentCardHasStep:c.steps>1,
               gentPos:cards.length?((idx+1)+' OF '+cards.length):'',
@@ -21395,8 +21376,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
            gentDots:[], gentPrev:()=>{}, gentNext:()=>{}, gentPrevCursor:'default',
            gentPrevOpacity:'0.35', gentNextCursor:'default', gentNextOpacity:'0.35', gentNextLabel:'',
            gentCardText:'', gentCardStep:'', gentCardHasStep:false,
-           gentCardArt:'', gentCardHasArt:false, gentBodyCls:'cc-gdress cc-gdress-solo',
-           gentCardPhoto:'', gentCardHasPhoto:false, gentCardHasDrawing:false, gentCardPhotoAlt:'',
+           gentBodyCls:'cc-gdress cc-gdress-solo',
+           gentCardPhoto:'', gentCardHasPhoto:false, gentCardPhotoAlt:'',
            gentProgPct:'0%', gentTestProgPct:'0%',
            gentQShow:true, gentResultShow:false, gentQPos:'',
            gentTestBack:()=>{}, gentTestNext:()=>{}, gentTBackCursor:'default', gentTBackOpacity:'0.35',

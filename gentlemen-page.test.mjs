@@ -346,55 +346,6 @@ t('standing is one ruled panel of four figures, all of them legible', async () =
   ok(st[1].left > 0 && st[3].left > 0, 'the two columns are not divided');
 });
 
-/* ---- the dress code drawings ------------------------------------------------------------- */
-t('every dress code card shows the garment it is a rule about', async () => {
-  await boot({ gentSub: 'dress' });
-  const n = await page.evaluate(() => window.__nvx._gent().cards('dress').length);
-  eq(n, 22, 'dress code is not the deck it was');
-  const seen = new Set();
-  for (let i = 0; i < n; i++) {
-    await page.evaluate(x => window.__nvx.gentGoto(x), i);
-    await page.waitForTimeout(90);
-    const card = await page.evaluate(() => {
-      const svg = document.querySelector('.cc-gart svg');
-      const title = document.querySelector('.cc-gbody div[style*="26px"]');
-      return { marks: svg ? svg.querySelectorAll('path,rect,circle').length : 0,
-               key: document.querySelector('[data-dress-art]')?.getAttribute('data-dress-art') || '',
-               title: title ? title.innerText.trim() : '' };
-    });
-    ok(card.marks > 4, 'card ' + (i + 1) + ' has no drawing on it');
-    ok(card.key, 'card ' + (i + 1) + ' does not say which occasion it is drawing');
-    seen.add(card.key + '|' + card.title);
-  }
-  /* Six occasions, each drawn once however many rules it carries. */
-  eq(new Set([...seen].map(x => x.split('|')[0])).size, 6, 'the six occasions are not six drawings');
-});
-
-t('a subject or a dining rule gets no drawing — those are not shapes', async () => {
-  for (const sub of ['dining', 'money', 'history', 'taste', 'conversation', 'foundation']) {
-    await boot({ gentSub: sub });
-    const art = await page.evaluate(() => !!document.querySelector('.cc-gart'));
-    ok(!art, sub + ' put a garment drawing next to a rule that is not about one');
-    const solo = await page.evaluate(() => !!document.querySelector('.cc-gdress-solo'));
-    ok(solo, sub + ' still reserves the column the drawing would have sat in');
-  }
-});
-
-t('the drawing changes when the occasion does, not when the rule does', async () => {
-  await boot({ gentSub: 'dress' });
-  const at = async () => page.evaluate(() => document.querySelector('[data-dress-art]').getAttribute('data-dress-art'));
-  eq(await at(), 'black-tie', 'dress code does not open on black tie');
-  /* Black tie carries four rules; all four are the same garment. */
-  for (let i = 1; i < 4; i++) {
-    await page.evaluate(() => window.__nvx.gentStep(1));
-    await page.waitForTimeout(90);
-    eq(await at(), 'black-tie', 'the drawing changed part-way through black tie');
-  }
-  await page.evaluate(() => window.__nvx.gentStep(1));
-  await page.waitForTimeout(120);
-  eq(await at(), 'business-formal', 'the drawing did not move on with the occasion');
-});
-
 /* ---- the phone ---------------------------------------------------------------------------- */
 t('on a phone the subpage row is still one line, and the page does not scroll sideways', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -453,10 +404,34 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
 });
 
 
-t('a supplied photograph takes over from the drawing, one occasion at a time', async () => {
+/* ---- pictures ------------------------------------------------------------------------------
+   Dress Code carried drawn garment sketches for a while and they were removed: six line
+   drawings of outfits told the occasions apart only barely. A card has no picture now unless
+   one is supplied, and these hold both halves of that. */
+t('no dress card carries a picture until one is supplied', async () => {
   await boot({ gentSub: 'dress' });
-  /* Stand a real image in for one occasion only. The other five must keep their drawings —
-     the six will arrive one at a time and no card may go blank in between. */
+  const n = await page.evaluate(() => window.__nvx._gent().cards('dress').length);
+  eq(n, 22, 'dress code is not the deck it was');
+  for (const i of [0, 4, 9, 15, 21]) {
+    await page.evaluate(x => window.__nvx.gentGoto(x), i);
+    await page.waitForTimeout(110);
+    const card = await page.evaluate(() => ({
+      box: !!document.querySelector('.cc-gart'),
+      img: !!document.querySelector('.cc-gphoto'),
+      svg: !!document.querySelector('.cc-gart svg'),
+      solo: !!document.querySelector('.cc-gdress-solo'),
+      text: (document.querySelector('.cc-gbody') || {}).innerText || '' }));
+    ok(!card.box, 'card ' + (i + 1) + ' still reserves a picture box');
+    ok(!card.img && !card.svg, 'card ' + (i + 1) + ' still has a picture on it');
+    /* And the rule takes the full width rather than leaving a column standing empty. */
+    ok(card.solo, 'card ' + (i + 1) + ' leaves the picture column standing empty');
+    ok(/\S/.test(card.text), 'card ' + (i + 1) + ' lost its rule along with its picture');
+  }
+});
+
+t('a supplied photograph appears, one occasion at a time', async () => {
+  await boot({ gentSub: 'dress' });
+  /* Stand a real image in for one occasion only; the rest must stay as they are. */
   await page.evaluate(() => {
     const px = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     window.GentlemenEtiquette.PHOTO['black-tie'] = px;
@@ -465,25 +440,24 @@ t('a supplied photograph takes over from the drawing, one occasion at a time', a
   await page.waitForTimeout(400);
   const wired = await page.evaluate(() => ({
     img: !!document.querySelector('.cc-gphoto'),
-    svg: !!document.querySelector('.cc-gart svg'),
+    solo: !!document.querySelector('.cc-gdress-solo'),
     alt: (document.querySelector('.cc-gphoto') || {}).alt || '' }));
   ok(wired.img, 'the supplied photograph did not render');
-  ok(!wired.svg, 'the drawing is still there underneath the photograph');
+  ok(!wired.solo, 'the picture rendered but the rule kept the full width underneath it');
   ok(/Black Tie/.test(wired.alt), 'the photograph has no useful alt text: "' + wired.alt + '"');
-  /* And the next occasion along, which has no photograph, is untouched. */
+  /* The next occasion along has no photograph and must not borrow this one. */
   await page.evaluate(() => window.__nvx.gentGoto(4));
   await page.waitForTimeout(300);
   const plain = await page.evaluate(() => ({
-    img: !!document.querySelector('.cc-gphoto'), svg: !!document.querySelector('.cc-gart svg') }));
-  ok(!plain.img, 'an occasion with no photograph rendered one anyway');
-  ok(plain.svg, 'an occasion with no photograph lost its drawing');
+    img: !!document.querySelector('.cc-gphoto'), box: !!document.querySelector('.cc-gart') }));
+  ok(!plain.img && !plain.box, 'an occasion with no photograph rendered one anyway');
 });
 
 t('a photograph is fitted to the box rather than cropped or stretched', async () => {
   await boot({ gentSub: 'dress' });
   await page.evaluate(() => {
-    /* A deliberately square image: nothing supplied will arrive at the exact ratio the
-       drawings are built on, and the wrong answer is to stretch it. */
+    /* A deliberately square image: nothing supplied will arrive at the exact ratio the box
+       is built on, and the wrong answer is to stretch it. */
     window.GentlemenEtiquette.PHOTO['black-tie'] =
       'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
     window.__nvx.setState({ gentIdx: 0 });

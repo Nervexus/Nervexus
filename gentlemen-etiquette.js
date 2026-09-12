@@ -266,139 +266,14 @@
     h ^= h >>> 13; h = Math.imul(h, 1274126177); h ^= h >>> 16;
     return h >>> 0;
   }
-  /* ---- what the occasion looks like ----------------------------------------------------
-     Dress code is the one subject where a rule is hard to picture from the words: "peak lapel
-     or shawl collar" is a shape, and a shape should be shown. These are drawn — flat, front-on
-     garment sketches in the raiment's own ink — rather than photographed. A photograph would
-     be somebody else's property, it would carry its own lighting and its own colours into
-     every theme, and it would not change when the raiment does. Line work does.
-
-     One drawing per occasion, carried on all of that occasion's cards, so the rule in front of
-     you is always next to the thing it is a rule about. Each drawing shows the tells the rules
-     actually name: peak lapels and a bow tie for black tie, a notch and a tie for business
-     formal, patch pockets and an open placket for smart casual, no jacket at all for
-     day-to-day, a shawl collar and a belt for home. */
-  var A_OPEN = '<svg viewBox="0 0 140 260" width="100%" height="100%" fill="none" ' +
-               'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
-
-  /* A torso alone could not carry these. Four of the six codes are a jacket, and a jacket seen
-     from the chest up is the same drawing four times over however carefully the lapel is cut —
-     the difference between business smart and smart casual is not in the collar, it is that one
-     is a suit and the other is a jacket with different trousers under it. So each drawing is a
-     whole outfit: jacket, trousers, shoes. Trousers in the jacket's own cloth read as a suit;
-     trousers in the lighter tone read as the odd combination the rules name. */
-  var A_TROUSERS = function (tone) {
-    return '<path d="M44 126 L41 224 L62 224 L67 150 L67 126 Z" fill="' + tone + '"/>' +
-           '<path d="M96 126 L99 224 L78 224 L73 150 L73 126 Z" fill="' + tone + '"/>';
-  };
-  var A_SHOE_DRESS = '<path d="M41 224 L62 224 L63 234 Q63 240 56 240 L38 240 Q34 240 34 234 Z" fill="var(--art-shoe)"/>' +
-                     '<path d="M99 224 L78 224 L77 234 Q77 240 84 240 L102 240 Q106 240 106 234 Z" fill="var(--art-shoe)"/>';
-  /* A loafer has no laces and a lower, rounder throat; a sneaker is the same last on a visible
-     sole. One line each, which is all the difference needs to be at this size. */
-  var A_SHOE_LOAFER = A_SHOE_DRESS + '<path d="M40 231 H57" stroke-opacity="0.55"/><path d="M100 231 H83" stroke-opacity="0.55"/>';
-  var A_SHOE_SNEAK = '<path d="M41 224 L62 224 L63 233 L63 240 L34 240 L34 233 Z" fill="var(--art-shirt)"/>' +
-                     '<path d="M99 224 L78 224 L77 233 L77 240 L106 240 L106 233 Z" fill="var(--art-shirt)"/>' +
-                     '<path d="M34 234 H63" /><path d="M106 234 H77"/>';
-  var A_SLEEVES = '<path d="M44 28 L29 48 L27 108 L42 112 L42 58 Z" fill="var(--art-cloth)"/>' +
-                  '<path d="M96 28 L111 48 L113 108 L98 112 L98 58 Z" fill="var(--art-cloth)"/>';
-  var A_BODY = '<path d="M61 20 L44 28 L42 58 L40 128 L100 128 L98 58 L96 28 L79 20 Q70 28 61 20 Z" fill="var(--art-cloth)"/>';
-  var A_SHIRTV = '<path d="M61 20 Q70 28 79 20 L74 98 L66 98 Z" fill="var(--art-shirt)"/>';
-  var A_CLOSE = '<path d="M70 92 V128"/><circle cx="70" cy="92" r="2.6" fill="currentColor" stroke="none"/>';
-  /* The one shape the rules name apart. A peak lapel turns a single point up and out toward the
-     shoulder; a notch cuts a small wedge out of the same edge. One path per side either way. */
-  var A_PEAK = '<path d="M63 22 L52 44 L40 36 L50 58 L57 92 L68 92 L65 33 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>' +
-               '<path d="M77 22 L88 44 L100 36 L90 58 L83 92 L72 92 L75 33 Z" fill="var(--forge-accent)" fill-opacity="0.25"/>';
-  var A_NOTCH = '<path d="M63 22 L53 40 L46 37 L49 46 L44 56 L57 92 L68 92 L65 33 Z" fill="var(--art-cloth)"/>' +
-                '<path d="M77 22 L87 40 L94 37 L91 46 L96 56 L83 92 L72 92 L75 33 Z" fill="var(--art-cloth)"/>';
-  var A_OPENCOLLAR = '<path d="M61 20 L57 30 L68 43 L70 27 Z" fill="var(--art-shirt)"/>' +
-                     '<path d="M79 20 L83 30 L72 43 L70 27 Z" fill="var(--art-shirt)"/>';
-
-  var ART = {
-    /* Black tie: the suit is the darkest thing in the set, the lapel is faced, the neckwear is
-       a bow, and the shoe is patent. */
-    'black-tie': A_OPEN + A_TROUSERS('var(--art-cloth)') + A_SHOE_DRESS + A_SLEEVES + A_BODY + A_SHIRTV + A_PEAK +
-      '<circle cx="70" cy="48" r="2.2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="70" cy="62" r="2.2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="70" cy="76" r="2.2" fill="currentColor" stroke="none"/>' +
-      '<path d="M67 31 L55 24 L55 40 Z" fill="var(--forge-accent)"/>' +
-      '<path d="M73 31 L85 24 L85 40 Z" fill="var(--forge-accent)"/>' +
-      '<rect x="66.5" y="25.5" width="7" height="11" rx="2.5" fill="var(--forge-accent)"/>' +
-      A_CLOSE + '</svg>',
-
-    /* Business formal: matching trousers, notch lapel, a tie, and a laced shoe. */
-    'business-formal': A_OPEN + A_TROUSERS('var(--art-cloth)') + A_SHOE_DRESS + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH +
-      '<path d="M65 24 L75 24 L76 37 L64 37 Z" fill="var(--forge-accent)"/>' +
-      '<path d="M66 38 L74 38 L73 80 L70 88 L67 80 Z" fill="var(--forge-accent)"/>' +
-      '<path d="M38 232 H58" stroke-opacity="0.5"/><path d="M102 232 H82" stroke-opacity="0.5"/>' +
-      A_CLOSE + '</svg>',
-
-    /* Business smart: still a suit — trousers in the same cloth — but patterned, open at the
-       collar, and on a loafer, which is exactly what the rules allow and formal does not. */
-    'business-smart': A_OPEN + A_TROUSERS('var(--art-cloth)') +
-      '<path d="M48 130 V222" stroke-opacity="0.26"/><path d="M58 130 V222" stroke-opacity="0.26"/>' +
-      '<path d="M92 130 V222" stroke-opacity="0.26"/><path d="M82 130 V222" stroke-opacity="0.26"/>' +
-      A_SHOE_LOAFER + A_SLEEVES + A_BODY +
-      '<path d="M50 30 V126" stroke-opacity="0.26"/><path d="M60 26 V126" stroke-opacity="0.26"/>' +
-      '<path d="M90 30 V126" stroke-opacity="0.26"/><path d="M80 26 V126" stroke-opacity="0.26"/>' +
-      '<path d="M33 54 V104" stroke-opacity="0.26"/><path d="M107 54 V104" stroke-opacity="0.26"/>' +
-      A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
-      '<circle cx="70" cy="50" r="2" fill="currentColor" stroke="none"/>' +
-      A_CLOSE + '</svg>',
-
-    /* Smart casual: the odd combination. The trousers are plainly not the jacket's cloth, the
-       jacket carries patch pockets rather than a welt, and the shoe is a clean sneaker. */
-    'smart-casual': A_OPEN + A_TROUSERS('var(--art-shirt)') + A_SHOE_SNEAK + A_SLEEVES + A_BODY + A_SHIRTV + A_NOTCH + A_OPENCOLLAR +
-      '<path d="M66 44 V70"/><path d="M74 44 V70"/>' +
-      '<circle cx="70" cy="50" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="70" cy="63" r="2" fill="currentColor" stroke="none"/>' +
-      '<rect x="45" y="96" width="19" height="21" rx="3"/>' +
-      '<rect x="76" y="96" width="19" height="21" rx="3"/>' +
-      '</svg>',
-
-    /* Day-to-day: no jacket at all, which is the whole tell. A shirt with its placket and
-       buttons on show, tucked into chinos, on a sneaker. */
-    'day-to-day': A_OPEN + A_TROUSERS('var(--art-cloth)') + A_SHOE_SNEAK +
-      '<path d="M48 26 L34 46 L32 100 L46 104 L46 56 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M92 26 L106 46 L108 100 L94 104 L94 56 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M61 20 L48 26 L46 56 L44 132 L96 132 L94 56 L92 26 L79 20 Q70 28 61 20 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M61 20 L56 31 L68 45 L70 28 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M79 20 L84 31 L72 45 L70 28 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M66 34 V132" stroke-opacity="0.5"/><path d="M74 34 V132" stroke-opacity="0.5"/>' +
-      '<circle cx="70" cy="52" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="70" cy="70" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="70" cy="88" r="2" fill="currentColor" stroke="none"/>' +
-      '<circle cx="70" cy="106" r="2" fill="currentColor" stroke="none"/>' +
-      '<rect x="48" y="52" width="16" height="15" rx="2"/>' +
-      '</svg>',
-
-    /* Home: a shawl collar is one unbroken curve with neither a notch nor a peak, the robe runs
-       past the hip where every jacket above it stops, and it is belted rather than buttoned. */
-    /* The robe's cloth is a tint, not an opaque fill, so anything drawn under it shows
-       through. Every other outfit's trousers start at the jacket hem; these have to start
-       below the robe's, or the loungewear reads as a panel printed on the robe. */
-    home: A_OPEN +
-      '<path d="M48 180 L45 224 L64 224 L68 196 L68 180 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M92 180 L95 224 L76 224 L72 196 L72 180 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M41 224 Q34 224 34 232 Q34 240 42 240 L60 240 Q64 240 64 234 L63 224 Z" fill="var(--art-shoe)"/>' +
-      '<path d="M99 224 Q106 224 106 232 Q106 240 98 240 L80 240 Q76 240 76 234 L77 224 Z" fill="var(--art-shoe)"/>' +
-      '<path d="M44 28 L29 48 L27 108 L42 112 L42 58 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M96 28 L111 48 L113 108 L98 112 L98 58 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M61 20 L44 28 L42 58 L38 186 L102 186 L98 58 L96 28 L79 20 Z" fill="var(--art-cloth)"/>' +
-      '<path d="M65 32 L70 39 L75 32 L77 186 L63 186 Z" fill="var(--art-shirt)"/>' +
-      '<path d="M63 21 C51 48 46 96 46 178 L64 178 C64 108 66 54 70 34 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
-      '<path d="M77 21 C89 48 94 96 94 178 L76 178 C76 108 74 54 70 34 Z" fill="var(--forge-accent)" fill-opacity="0.22"/>' +
-      '<rect x="36" y="104" width="68" height="11" rx="5.5" fill="var(--forge-accent)" fill-opacity="0.34"/>' +
-      '<circle cx="70" cy="109.5" r="6" fill="var(--forge-accent)" fill-opacity="0.55"/>' +
-      '</svg>',
-  };
-
   /* ---- supplied photographs -------------------------------------------------------------
-     The drawings are a floor, not a ceiling. When a real image exists for an occasion its
-     path goes in here and the page shows that instead; until then the occasion keeps its
-     drawing, so a card is never missing a picture and never shows a broken one.
+     Dress Code carried drawn garment sketches for a while. They were removed: six line
+     drawings of outfits told the occasions apart only barely, and the page is being
+     restructured. A card with no picture simply has no picture.
 
+     When a real image exists for an occasion its path goes in here and the page shows it.
      A path is only ever added at the same time as the file actually landing in
-     assets/dress/. Adding one ahead of the file would put a broken image on a card. */
+     assets/dress/ — one added ahead of its file is a broken image on a card. */
   var PHOTO = {
     // 'black-tie':       'assets/dress/black-tie.webp',
     // 'business-formal': 'assets/dress/business-formal.webp',
@@ -409,8 +284,6 @@
   };
   function photo(key) { return PHOTO[key] || ''; }
 
-  function art(key) { return ART[key] || ''; }
-
   /* ---- one concept per card ------------------------------------------------------------
      Every line is its own card. A section's heading rides along on each of its cards rather
      than being a card of its own, so "peak lapel or shawl collar" is never read without
@@ -419,12 +292,12 @@
 
      Pacing over density, deliberately: Dress Code is twenty-two cards rather than six. */
   function cards(key) {
-    var src = null, eyebrow = '';
+    var src = null, eyebrow = '', isDress = false;
     for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) {
       src = [{ key: '', name: SUBJECTS[i].name, note: '', lines: SUBJECTS[i].lines }];
       eyebrow = SUBJECTS[i].eyebrow;
     }
-    if (!src && key === 'dress') { src = DRESS; eyebrow = 'BY OCCASION'; }
+    if (!src && key === 'dress') { src = DRESS; eyebrow = 'BY OCCASION'; isDress = true; }
     if (!src && key === 'dining') { src = DINING; eyebrow = 'SECOND NATURE, NOT PERFORMED'; }
     if (!src) return [];
 
@@ -433,9 +306,11 @@
       sec.lines.forEach(function (line, li) {
         out.push({
           eyebrow: eyebrow, title: sec.name, note: sec.note || '', text: line,
-          /* The drawing belongs to the occasion, not to the rule, so every card in a
-             section carries it. */
-          art: ART[sec.key] ? sec.key : '',
+          /* An occasion is a dress-code notion: Black Tie is one, "Before the Meal" is not.
+             Only dress cards carry it, so a picture keyed to an occasion can never surface
+             against a dining section that happens to share a key. The picture belongs to the
+             occasion rather than to the rule, so every card in a section names the same one. */
+          occasion: isDress ? (sec.key || '') : '',
           /* Where you are inside the section as well as inside the deck: four rules under one
              heading should read as four, not as an undifferentiated run of cards. */
           step: li + 1, steps: sec.lines.length,
@@ -485,7 +360,7 @@
   root.GentlemenEtiquette = {
     SUBJECTS: SUBJECTS, DRESS: DRESS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
-    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, art: art, ART: ART,
+    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards,
     photo: photo, PHOTO: PHOTO,
     _seed: seed,
   };
