@@ -1505,7 +1505,9 @@ t('switching pages does not leave a second model behind', async () => {
   await boot({ scene: 'forge', forgeCentre: 'home' });
   await page.waitForTimeout(2000);
   await seeAnatomy();
-  for (const s of ['forge', 'dashboard', 'forge', 'dashboard']) {
+  /* Away and back, twice, ending on the Forge — the check afterwards is that the model
+     mounted once, so the last hop has to be the page that has one. */
+  for (const s of ['dashboard', 'forge', 'dashboard', 'forge']) {
     await page.evaluate((x) => window.__nvx.setState({ scene: x, forgeCentre: 'home' }), s);
     await page.waitForTimeout(900);
   }
