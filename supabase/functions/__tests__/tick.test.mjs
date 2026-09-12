@@ -1,5 +1,12 @@
 /* Drives the REAL reminder-tick logic (transpiled) against a fake database.
-   node tick.test.mjs */
+   node tick.test.mjs
+
+   First, before anything reads the clock: the suite runs at a pinned instant rather than at
+   whatever time of day you happen to start it. The logic under test is full of windows — it
+   will not send outside 06:00-23:00 London, and it files logs and the calendar heads-up in a
+   21:00 local slot — so an unpinned clock made this suite report different things at different
+   hours. See fixed-clock.mjs. */
+import { atLondonTime } from './fixed-clock.mjs';
 import { makeAdmin } from './stub-supabase.mjs';
 import * as email from './stub-email.mjs';
 import * as push from './stub-push.mjs';
@@ -187,10 +194,16 @@ t('the logs line names only the logs actually missing', async()=>{
     sleep_logs:[{id:'s1',user_id:UID,log_date:today}],
     hydration_logs:[{id:'h1',user_id:UID,log_date:today}],
   }));
-  const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
-  const ukMin=(()=>{ const f=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
-    const [h,m]=f.split(':').map(Number); return h*60+m; })();
-  if(ukMin < 21*60){ if(r.logs!==0) throw new Error('logs fired before 21:00 UK'); return; }
+  /* The logs slot is 21:00 UK and is hardcoded to UK time whatever timezone the user is in,
+     so this is the one test that has to be run in the evening. It used to read the real clock
+     and return without asserting anything for the twenty-one hours a day it was shut. */
+  await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+  if(email.sends.length) throw new Error('logs fired outside the 21:00 UK slot');
+  reset();
+  await atLondonTime('21:30', async()=>{
+    const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+    if(!r.logs) throw new Error('the logs reminder did not fire inside its own slot');
+  });
   const body=email.sends[0].text;
   if(/Sleep & energy/.test(body)) throw new Error('named a log that was already filled in');
   if(/Hydration/.test(body)) throw new Error('named a log that was already filled in');
@@ -208,8 +221,10 @@ t('a workout logged today counts, despite being a timestamp not a date', async()
     performance_logs:[{user_id:UID,log_date:today,id:'p1'}],
     workouts:[{id:'w1',user_id:UID,occurred_at:today+'T18:30:00.000Z'}],
   }));
-  const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
-  if(r.logs===0) return; // before 21:00 UK, nothing to assert
+  await atLondonTime('21:30', async()=>{
+    const r=await sweepUser(admin,UID,'Sam',{...prefs, lastSeenVersion:LATEST});
+    if(!r.logs) throw new Error('the logs reminder did not fire inside its own slot');
+  });
   if(/Training/.test(email.sends[0].text))
     throw new Error('a workout logged today was still reported as missing');
 });
