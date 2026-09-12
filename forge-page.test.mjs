@@ -81,13 +81,17 @@ const spans = () => page.evaluate(() => [...document.querySelectorAll('span,div'
 
 /* ---- the page exists and is reachable the way the app says it is ---- */
 
-t('the Forge is its own scene, not a tab inside Fitness', async () => {
+t('the Forge is its own scene, and the page Fitness HQ used to be is gone', async () => {
   await boot();
   const st = await page.evaluate(() => window.__nvx.state.scene);
   eq(st, 'forge', 'scene');
   const body = await text();
   ok(/❖ THE FORGE/.test(body), 'the page header did not render');
-  ok(!/Body Systems/.test(body), 'the Fitness page rendered at the same time — the scenes are not exclusive');
+  /* Fitness HQ was removed outright; "Body Systems" was its heading, and it must not come
+     back from a stale scene flag or a half-reverted removal. */
+  ok(!/Body Systems/.test(body), 'the Fitness page rendered — it was supposed to be gone');
+  eq(await page.evaluate(() => 'isFitness' in window.__nvx.renderVals ? 'present' : 'absent'), 'absent',
+     'the Fitness scene flag is still produced');
 });
 
 
@@ -176,10 +180,12 @@ t('the Forge opens on its home', async () => {
 t('the 3D anatomy is revealed before anything measures it', async () => {
   await boot({ scene: 'forge' });
   /* The anatomy sits behind a tap on the Forge — the model is a download and a WebGL scene,
-     so it stays out of the page until asked for. On Fitness HQ, where this test used to run,
-     the mount was always in the markup. Open it before stubbing the engine, or there is no
-     mount for _syncAnatomy to reach. */
-  await openAnatomy();
+     so it stays out of the page until asked for, and the mount then holds its own load until
+     it is on screen. On Fitness HQ, where this test used to run, it was always in the markup
+     and always measured. Opening it is not enough here: _syncAnatomy returns early on
+     _anatomyDeferred, so the panel has to be scrolled to as well or the engine is never
+     reached at all. */
+  await seeAnatomy();
   /* The real defect: reattach() ran fit() while the mount was still display:none, so
      clientWidth was 0, the canvas locked to its 120px floor, and the model came back as a
      thumbnail against the left edge of a full-width card. Stub the engine and watch the
@@ -218,10 +224,12 @@ t('the 3D anatomy is revealed before anything measures it', async () => {
 t('the drawn figure is put away whenever the model is up', async () => {
   await boot({ scene: 'forge' });
   /* The anatomy sits behind a tap on the Forge — the model is a download and a WebGL scene,
-     so it stays out of the page until asked for. On Fitness HQ, where this test used to run,
-     the mount was always in the markup. Open it before stubbing the engine, or there is no
-     mount for _syncAnatomy to reach. */
-  await openAnatomy();
+     so it stays out of the page until asked for, and the mount then holds its own load until
+     it is on screen. On Fitness HQ, where this test used to run, it was always in the markup
+     and always measured. Opening it is not enough here: _syncAnatomy returns early on
+     _anatomyDeferred, so the panel has to be scrolled to as well or the engine is never
+     reached at all. */
+  await seeAnatomy();
   await page.evaluate(() => {
     window.NervexusAnatomy3D = {
       supported: () => true, hasScene: () => true, isMounted: () => false,
