@@ -8564,7 +8564,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.12-304 · v11.304 gent-trim';
+const NOTIF_BUILD_VERSION = '2026.09.12-305 · v11.305 forge-only';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13478,6 +13478,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.305', date:'Sep 12, 2026', major:true, notes:[
+      'Fitness HQ is gone. The Forge is the training page now, and everything that led to the old one leads there instead \u2014 the rail, the phone bar, the health redirect and the voice assistant\u2019s health and diet command.',
+      'Your training log is untouched and lives on the Forge. Nothing logged was tied to the old page.',
+      'The AI strength coach came with it rather than being deleted with the page \u2014 it sits beside the Strength Chart on the Forge home.',
+      'Bulk Import was broken and is fixed. It could not read the format its own example advertised: \u201cBench press 80kg 4x8\u201d imported as an exercise called \u201cBench press 80kg\u201d, at 4kg, for one set of eight. Weight, sets and reps now all land where they belong.',
+      'The anatomy on the Forge repaints as you train again. Its refresh still watched the old Fitness page long after the model moved, so the muscle glow sat stale.',
+    ]},
     {version:'v11.304', date:'Sep 12, 2026', major:true, notes:[
       'Dress Code is off the Gentlemen\u2019s Centre. It is being restructured, so rather than leave a half-finished subject in place it has gone entirely \u2014 the six occasions, their twenty-two rules, and the ten dress questions that fed the daily test.',
       'The daily test is therefore one question from each of Events, History and Dining Manners rather than four. Days you finished under the old four-question set still count toward your streak, and your accuracy is unchanged.',
