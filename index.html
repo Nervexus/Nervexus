@@ -8642,7 +8642,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.12-305 · v11.305 forge-only';
+const NOTIF_BUILD_VERSION = '2026.09.12-306 · v11.306 brain-rest';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13560,6 +13560,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.306', date:'Sep 12, 2026', major:true, notes:[
+      'The Forge\u2019s Mental centre has something on it: Brain Rest. Five minutes sitting in silence before the work starts \u2014 not a break between things, the thing itself.',
+      'It asks twice before the clock runs: are you ready, then are all devices away. Both are asked every time rather than remembered, and neither starts the timer until it is answered.',
+      'Full screen while it runs, with one way out. No pause \u2014 a five minute sit you can pause is a four minute sit with a gap in it \u2014 and the clock is real time, so a phone that goes to sleep mid-sit does not hand you back four minutes.',
+    ]},
     {version:'v11.305', date:'Sep 12, 2026', major:true, notes:[
       'Fitness HQ is gone. The Forge is the training page now, and everything that led to the old one leads there instead \u2014 the rail, the phone bar, the health redirect and the voice assistant\u2019s health and diet command.',
       'Your training log is untouched and lives on the Forge. Nothing logged was tied to the old page.',
