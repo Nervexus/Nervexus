@@ -53,48 +53,6 @@
   ];
 
   /* ---- dress code, by occasion --------------------------------------------------------- */
-  var DRESS = [
-    { key: 'black-tie', name: 'Black Tie / Formal Evening', note: 'Evening, invitation-led',
-      lines: [
-        'Tuxedo (dinner jacket), black or midnight blue.',
-        'Peak lapel or shawl collar, satin facing.',
-        'Black bow tie, white dress shirt — marcella or pleated front.',
-        'Black patent or highly polished oxford shoes.',
-      ] },
-    { key: 'business-formal', name: 'Business Formal', note: 'Boardroom, high-stakes meetings, banking',
-      lines: [
-        'Two or three-piece suit, solid navy or charcoal.',
-        'Notch or peak lapel, minimal pattern.',
-        'White or light blue shirt, conservative tie.',
-        'Oxford or derby, black or dark brown.',
-      ] },
-    { key: 'business-smart', name: 'Business Smart', note: 'Client meetings, dinners, senior everyday office',
-      lines: [
-        'Suit in navy, charcoal, or a subtle pattern — pinstripe, birdseye.',
-        'Tie optional depending on the setting.',
-        'Loafers acceptable if the room allows it.',
-      ] },
-    { key: 'smart-casual', name: 'Smart Casual', note: 'Networking, upscale casual dinners',
-      lines: [
-        'Odd jacket and trouser combination — blazer with chinos or wool trousers.',
-        'Open collar shirt or knit polo, no tie.',
-        'Suede loafers or clean leather sneakers.',
-      ] },
-    { key: 'day-to-day', name: 'Day-to-Day', note: 'Everyday wear',
-      lines: [
-        'Well-fitted chinos or tailored trousers.',
-        'Oxford shirt, knit polo, or quality crewneck.',
-        'Structured but unlined jacket or overshirt for layering.',
-        'Clean leather shoes or minimalist sneakers — nothing sloppy.',
-      ] },
-    { key: 'home', name: 'Home Wear', note: 'The standard does not fully drop at home',
-      lines: [
-        'Still put-together, never "just rolled out of bed".',
-        'Quality loungewear: merino or cotton knitwear, tailored joggers or drawstring trousers.',
-        'A robe or overshirt for receiving guests informally.',
-        'No graphic tees, no worn-out gym clothes.',
-      ] },
-  ];
 
   /* ---- dining and table manners -------------------------------------------------------- */
   var DINING = [
@@ -141,36 +99,6 @@
      Every answer has a because. A question that only says "wrong" teaches nothing. */
   var QUESTIONS = [
     // ---- DRESS CODE
-    { cat: 'Dress Code', q: 'Black tie. Which lapel is correct on the dinner jacket?',
-      a: ['Peak lapel or shawl collar', 'Notch lapel', 'Either, it makes no difference', 'No lapel at all'], c: 0,
-      why: 'Peak or shawl, both with satin facing. A notch lapel is a business jacket’s lapel and is the commonest tell that a tuxedo was bought as a suit.' },
-    { cat: 'Dress Code', q: 'What colour, besides black, is correct for a dinner jacket?',
-      a: ['Midnight blue', 'Charcoal', 'Dark brown', 'Bottle green'], c: 0,
-      why: 'Midnight blue reads blacker than black under artificial light, which is why it has been correct for evening since the 1930s.' },
-    { cat: 'Dress Code', q: 'Business formal — the boardroom. Which suit?',
-      a: ['Solid navy or charcoal', 'Light grey check', 'Navy with a bold windowpane', 'Any colour, if it fits'], c: 0,
-      why: 'Solid navy or charcoal, minimal pattern. In a high-stakes room the suit should not be the thing anyone remembers.' },
-    { cat: 'Dress Code', q: 'Smart casual. What goes on your top half?',
-      a: ['An odd jacket — a blazer, not a suit jacket', 'The jacket from your navy suit', 'No jacket at all', 'A dinner jacket, dressed down'], c: 0,
-      why: 'An odd jacket is cut to be worn apart from trousers. A suit jacket worn alone shows it immediately: the cloth and the finish do not match anything.' },
-    { cat: 'Dress Code', q: 'Which shoes finish black tie?',
-      a: ['Black patent or highly polished oxfords', 'Dark brown brogues', 'Suede loafers', 'Clean leather sneakers'], c: 0,
-      why: 'Patent or a mirror polish. Brown shoes are never correct with evening dress.' },
-    { cat: 'Dress Code', q: 'Business smart. Are loafers acceptable?',
-      a: ['Yes, if the room allows it', 'Never with a suit', 'Only in brown', 'Only without socks'], c: 0,
-      why: 'Business smart is the register that reads the room. Loafers are fine where the room is; the judgement is the point, not the shoe.' },
-    { cat: 'Dress Code', q: 'Home wear. What is the standard?',
-      a: ['Still put-together — quality knitwear, tailored joggers', 'Whatever is comfortable', 'Old gym clothes are fine at home', 'A suit, always'], c: 0,
-      why: 'The standard does not fully drop at home. No graphic tees, no worn-out gym kit — a robe or overshirt for receiving anyone informally.' },
-    { cat: 'Dress Code', q: 'Which shirt belongs with black tie?',
-      a: ['White, marcella or pleated front', 'Light blue poplin', 'White with a button-down collar', 'Any white shirt'], c: 0,
-      why: 'Marcella (piqué) or a pleated front, in white. A button-down collar is sportswear and never belongs with evening dress.' },
-    { cat: 'Dress Code', q: 'Tailoring: what matters most?',
-      a: ['Fit and fabric', 'The brand on the label', 'The price paid', 'How new it is'], c: 0,
-      why: 'Understanding fit and fabric, not brands. A well-cut inexpensive suit outranks a badly-fitted expensive one in any room that can tell.' },
-    { cat: 'Dress Code', q: 'Day-to-day. Which is wrong?',
-      a: ['Scuffed, sloppy shoes', 'Well-fitted chinos', 'A knit polo', 'An unlined overshirt'], c: 0,
-      why: 'Everything else on the list is day-to-day correct. Shoes are where an otherwise good outfit is given away — nothing sloppy.' },
 
     // ---- DINING MANNERS
     { cat: 'Dining Manners', q: 'You sit down. What happens to the napkin?',
@@ -254,7 +182,7 @@
       why: 'A deal extracted from somebody who resents it is a deal you will renegotiate. Persuasion outlasts pressure.' },
   ];
 
-  var CATEGORIES = ['Events', 'History', 'Dress Code', 'Dining Manners'];
+  var CATEGORIES = ['Events', 'History', 'Dining Manners'];
 
   /* A stable hash of the date. The same day gives the same question on every device and
      through any number of reloads, and consecutive days give unrelated ones — a plain
@@ -266,23 +194,6 @@
     h ^= h >>> 13; h = Math.imul(h, 1274126177); h ^= h >>> 16;
     return h >>> 0;
   }
-  /* ---- supplied photographs -------------------------------------------------------------
-     Dress Code carried drawn garment sketches for a while. They were removed: six line
-     drawings of outfits told the occasions apart only barely, and the page is being
-     restructured. A card with no picture simply has no picture.
-
-     When a real image exists for an occasion its path goes in here and the page shows it.
-     A path is only ever added at the same time as the file actually landing in
-     assets/dress/ — one added ahead of its file is a broken image on a card. */
-  var PHOTO = {
-    // 'black-tie':       'assets/dress/black-tie.webp',
-    // 'business-formal': 'assets/dress/business-formal.webp',
-    // 'business-smart':  'assets/dress/business-smart.webp',
-    // 'smart-casual':    'assets/dress/smart-casual.webp',
-    // 'day-to-day':      'assets/dress/day-to-day.webp',
-    // 'home':            'assets/dress/home.webp',
-  };
-  function photo(key) { return PHOTO[key] || ''; }
 
   /* ---- one concept per card ------------------------------------------------------------
      Every line is its own card. A section's heading rides along on each of its cards rather
@@ -292,12 +203,11 @@
 
      Pacing over density, deliberately: Dress Code is twenty-two cards rather than six. */
   function cards(key) {
-    var src = null, eyebrow = '', isDress = false;
+    var src = null, eyebrow = '';
     for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) {
       src = [{ key: '', name: SUBJECTS[i].name, note: '', lines: SUBJECTS[i].lines }];
       eyebrow = SUBJECTS[i].eyebrow;
     }
-    if (!src && key === 'dress') { src = DRESS; eyebrow = 'BY OCCASION'; isDress = true; }
     if (!src && key === 'dining') { src = DINING; eyebrow = 'SECOND NATURE, NOT PERFORMED'; }
     if (!src) return [];
 
@@ -306,11 +216,6 @@
       sec.lines.forEach(function (line, li) {
         out.push({
           eyebrow: eyebrow, title: sec.name, note: sec.note || '', text: line,
-          /* An occasion is a dress-code notion: Black Tie is one, "Before the Meal" is not.
-             Only dress cards carry it, so a picture keyed to an occasion can never surface
-             against a dining section that happens to share a key. The picture belongs to the
-             occasion rather than to the rule, so every card in a section names the same one. */
-          occasion: isDress ? (sec.key || '') : '',
           /* Where you are inside the section as well as inside the deck: four rules under one
              heading should read as four, not as an undifferentiated run of cards. */
           step: li + 1, steps: sec.lines.length,
@@ -358,11 +263,9 @@
   }
 
   root.GentlemenEtiquette = {
-    SUBJECTS: SUBJECTS, DRESS: DRESS, DINING: DINING,
+    SUBJECTS: SUBJECTS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
-    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards,
-    photo: photo, PHOTO: PHOTO,
-    _seed: seed,
+    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, _seed: seed,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.GentlemenEtiquette;
 })(typeof window !== 'undefined' ? window : this);

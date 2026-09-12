@@ -185,16 +185,6 @@
   .cc-grow{ display:flex; align-items:center; justify-content:space-between; gap:10px;
     padding:12px 26px; border-top:1px solid var(--quiet-line); }
   .cc-grow:first-child{ border-top:0; }
-  /* Dress code can put a picture of the occasion beside the rule. Nothing fills it at the
-     moment — the drawn sketches that used to were removed — so every card takes the
-     solo column until a photograph is supplied. */
-  .cc-gdress{ display:grid; grid-template-columns:158px 1fr; gap:30px; align-items:center; flex:1; min-width:0; }
-  .cc-gdress-solo{ grid-template-columns:1fr; }
-  .cc-gart{ border:1px solid var(--quiet-line); border-radius:16px; background:var(--quiet-bg);
-    padding:12px; color:var(--quiet-ink); }
-  /* A supplied photograph will not come at the ratio the drawings are drawn on, so the box
-     keeps its shape and the image is fitted inside it rather than cropped or stretched. */
-  .cc-gphoto{ display:block; width:100%; aspect-ratio:140/260; object-fit:contain; border-radius:9px; }
   /* BACK, position, NEXT. The dot row is the position on a wide screen; on a phone
      twenty-two dots wrapped onto their own line and shoved NEXT down with them, so there the
      position is a bar instead and the count in the card header carries the exact figure. */
@@ -213,10 +203,6 @@
     .cc-gfoot{ padding:12px 18px; }
     .cc-grow{ padding:12px 18px; }
     .cc-gstat{ padding:14px; }
-    /* Beside the rule, not above it: stacked, a full-length figure would push the rule
-       and the controls off a phone screen. */
-    .cc-gdress{ grid-template-columns:104px 1fr; gap:16px; align-items:center; }
-    .cc-gart{ padding:8px; }
   }
   .theme-ultra{ --u-bg:#EFEBE3; --u-card:rgba(255,255,255,0.82); --u-ink:#3f3f46; --u-muted:#52525b; --u-line:rgba(63,63,70,0.16); --u-accent:#292524; }
   .theme-ultra.theme-noir{ --u-bg:#121212; --u-card:rgba(30,30,30,0.86); --u-ink:#C4BDB0; --u-muted:#968F82; --u-line:rgba(150,143,130,0.28); --u-accent:#C4BDB0; }
@@ -435,15 +421,13 @@
 <script src="learning-speaking.js?v=3"></script>
 <script src="learning-physiology.js?v=4"></script>
 <script src="learning-money.js?v=4"></script>
-<script src="learning-gentleman.js?v=2"></script>
-<script src="gentleman-blackbook.js?v=2"></script>
 <script src="orb-engine.js?v=8"></script>
 <script src="notification-engine.js?v=1"></script>
 <script src="anatomy-3d.js?v=9"></script>
 <script src="exercise-index.js?v=6"></script>
 <script src="finance-import.js?v=2"></script>
 <script src="rota-import.js?v=3"></script>
-<script src="gentlemen-etiquette.js?v=7"></script>
+<script src="gentlemen-etiquette.js?v=8"></script>
 <script src="ai-gateway.js?v=3"></script>
 <script src="voice-assistant-engine.js?v=33"></script>
 <script src="constellation-engine.js?v=3"></script>
@@ -2900,265 +2884,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </sc-if>
               </sc-if>
 
-      <!-- ===== THE BLACK BOOK (private, full-screen) ===== -->
-              <sc-if value="{{ isBlackBookScene }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back to Gentleman's Etiquette</span>
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1px; color:#c9a24a; cursor:pointer; border:1px solid rgba(201,162,74,0.35); border-radius:8px; padding:6px 12px;" style-hover="{ background:'rgba(201,162,74,0.1)' }">✕ Exit</span>
-                </div>
-                <div style="position:relative; width:100%; box-sizing:border-box; margin:16px 0 0; padding:72px 28px 56px; text-align:center; background:radial-gradient(ellipse at 50% -10%, #1a1a1a 0%, #050505 72%); border-radius:20px; overflow:hidden;">
-                  <svg width="34" height="34" viewBox="0 0 36 36" style="position:absolute; top:14px; left:14px; opacity:0.5;"><path d="M3 18 C 3 8, 12 3, 20 3 M20 3 C 16 3, 13 6, 13 10 C 13 14, 17 15, 19 12" stroke="#c9a24a" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="3" cy="18" r="1.2" fill="#c9a24a"/></svg>
-                  <svg width="34" height="34" viewBox="0 0 36 36" style="position:absolute; top:14px; right:14px; opacity:0.5; transform:scaleX(-1);"><path d="M3 18 C 3 8, 12 3, 20 3 M20 3 C 16 3, 13 6, 13 10 C 13 14, 17 15, 19 12" stroke="#c9a24a" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="3" cy="18" r="1.2" fill="#c9a24a"/></svg>
-                  <svg width="34" height="34" viewBox="0 0 36 36" style="position:absolute; bottom:14px; left:14px; opacity:0.5; transform:scaleY(-1);"><path d="M3 18 C 3 8, 12 3, 20 3 M20 3 C 16 3, 13 6, 13 10 C 13 14, 17 15, 19 12" stroke="#c9a24a" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="3" cy="18" r="1.2" fill="#c9a24a"/></svg>
-                  <svg width="34" height="34" viewBox="0 0 36 36" style="position:absolute; bottom:14px; right:14px; opacity:0.5; transform:scale(-1,-1);"><path d="M3 18 C 3 8, 12 3, 20 3 M20 3 C 16 3, 13 6, 13 10 C 13 14, 17 15, 19 12" stroke="#c9a24a" stroke-width="1" fill="none" stroke-linecap="round"/><circle cx="3" cy="18" r="1.2" fill="#c9a24a"/></svg>
-                  <div style="font-family:'Pinyon Script',cursive; font-weight:400; font-size:clamp(40px,7vw,72px); line-height:1.05; color:#eee6d8;">The Black Book</div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:#8a7a5f; margin:22px 0 26px;">GENTLEMAN'S ETIQUETTE · MEMBERS ONLY</div>
-                  <div style="font-family:Georgia,serif; font-style:italic; font-size:14.5px; color:#a99a80; line-height:1.75; max-width:460px; margin:0 auto 30px;">The names and places people already deep in a category tend to know, chosen deliberately over the obvious, billboard-famous ones.</div>
-                  <div style="display:inline-block; padding:13px 34px; border:1px solid rgba(201,162,74,0.45); border-radius:999px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:#c9a24a;">CURATED, NOT FOR SALE</div>
-                </div>
-                <div style="width:100%; box-sizing:border-box; overflow:hidden; padding:13px 0; border-top:1px solid rgba(201,162,74,0.15); border-bottom:1px solid rgba(201,162,74,0.15); white-space:nowrap; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:3px; color:#5f5346; text-align:center; margin-bottom:28px;">THE BLACK BOOK &nbsp;·&nbsp; GENTLEMAN'S ETIQUETTE &nbsp;·&nbsp; MEMBERS ONLY &nbsp;·&nbsp; THE BLACK BOOK &nbsp;·&nbsp; GENTLEMAN'S ETIQUETTE &nbsp;·&nbsp; MEMBERS ONLY</div>
-
-                <div style="display:flex; gap:8px; margin:20px 0; flex-wrap:wrap;">
-                  <span onClick="{{ setBBBrands }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabBrandsBg }}; color:{{ bbTabBrandsC }};">Brands</span>
-                  <span onClick="{{ setBBLocations }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabLocationsBg }}; color:{{ bbTabLocationsC }};">Locations</span>
-                  <span onClick="{{ setBBHotels }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabHotelsBg }}; color:{{ bbTabHotelsC }};">Hotels</span>
-                  <span onClick="{{ setBBSaved }}" style="font-size:12.5px; font-weight:700; padding:9px 16px; border-radius:3px 10px 10px 10px; cursor:pointer; background:{{ bbTabSavedBg }}; color:{{ bbTabSavedC }};">☆ My Black Book</span>
-                </div>
-
-                <sc-if value="{{ isBBHotels }}" hint-placeholder-val="{{ false }}">
-                  <div style="font-family:Georgia,serif; font-style:italic; font-size:12.5px; color:#a4a4ac; line-height:1.6; max-width:560px; margin-bottom:16px;">Every hotel pick from across The Black Book's 26 cities, in one list — 4.5–5★ tier only, landmark names alongside quieter private ones.</div>
-                  <div style="display:flex; align-items:center; gap:9px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); max-width:340px; margin-bottom:14px;">
-                    <span style="color:#C9C9CE; font-size:12px;">⌕</span>
-                    <input value="{{ bbHotelQueryVal }}" onInput="{{ setBBHotelQuery }}" placeholder="Search a city, region or hotel…" style="flex:1; background:transparent; border:none; outline:none; color:#eef0f2; font-size:12.5px;">
-                  </div>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
-                    <sc-for list="{{ bbHotelRegionChips }}" as="c" hint-placeholder-count="7">
-                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
-                    </sc-for>
-                  </div>
-                  <sc-if value="{{ bbHotelNoResults }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:12.5px; color:#6f6f78; padding:20px 0;">No hotels match that search.</div>
-                  </sc-if>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px;">
-                    <sc-for list="{{ bbAllHotelCards }}" as="h" hint-placeholder-count="8">
-                      <div class="cc-vault-tile" style="--vault-accent:#7cb0ff; --vault-line:rgba(124,176,255,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ h.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ h.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ h.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ h.save }}" title="Save to My Black Book" style="cursor:pointer; color:#7cb0ff; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#7cb0ff; margin-top:4px;">{{ h.cityLine }}</div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ h.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-
-                <sc-if value="{{ isBBBrands }}" hint-placeholder-val="{{ true }}">
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
-                    <sc-for list="{{ bbCatChips }}" as="c" hint-placeholder-count="5">
-                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
-                    </sc-for>
-                  </div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
-                    <sc-for list="{{ bbBrandCards }}" as="b" hint-placeholder-count="5">
-                      <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box; overflow-wrap:break-word;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:15px; font-weight:700; color:#eef0f2;">{{ b.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                            <span onClick="{{ b.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ b.noteColor }}; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                            <span onClick="{{ b.save }}" title="Save to My Black Book" style="cursor:pointer; color:#c9a24a; font-size:15px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                          </div>
-                        </div>
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#c9a24a; margin-top:4px;">{{ b.origin }}</div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:10px;">{{ b.blurb }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-
-                <sc-if value="{{ isBBLocations }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex; align-items:center; gap:9px; padding:9px 13px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); max-width:340px; margin-bottom:14px;">
-                    <span style="color:#C9C9CE; font-size:12px;">⌕</span>
-                    <input value="{{ bbLocationQueryVal }}" onInput="{{ setBBLocationQuery }}" placeholder="Search a city or region…" style="flex:1; background:transparent; border:none; outline:none; color:#eef0f2; font-size:12.5px;">
-                  </div>
-                  <sc-if value="{{ bbLocationNoResults }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:12.5px; color:#6f6f78; padding:8px 0 18px;">No cities match that search.</div>
-                  </sc-if>
-                  <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px;">
-                    <sc-for list="{{ bbCityChips }}" as="c" hint-placeholder-count="10">
-                      <span onClick="{{ c.go }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; padding:8px 14px; border-radius:9px; cursor:pointer; background:{{ c.bg }}; color:{{ c.c }};">{{ c.label }}</span>
-                    </sc-for>
-                  </div>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:16px;">{{ bbCityRegion }}</div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#7cb0ff; margin-bottom:8px;">HOTELS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbHotelCards }}" as="h" hint-placeholder-count="3">
-                      <div class="cc-vault-tile" style="--vault-accent:#7cb0ff; --vault-line:rgba(124,176,255,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ h.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ h.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ h.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ h.save }}" title="Save to My Black Book" style="cursor:pointer; color:#7cb0ff; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ h.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#ff8a92; margin-bottom:8px;">RESTAURANTS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbRestaurantCards }}" as="r" hint-placeholder-count="3">
-                      <div class="cc-vault-tile" style="--vault-accent:#ff8a92; --vault-line:rgba(255,138,146,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ r.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ r.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ r.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ r.save }}" title="Save to My Black Book" style="cursor:pointer; color:#ff8a92; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ r.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#C4FF3D; margin-bottom:8px;">EVENTS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbEventCards }}" as="e" hint-placeholder-count="3">
-                      <div class="cc-vault-tile" style="--vault-accent:#C4FF3D; --vault-line:rgba(196,255,61,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ e.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ e.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ e.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ e.save }}" title="Save to My Black Book" style="cursor:pointer; color:#C4FF3D; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ e.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#6de0c9; margin-bottom:8px;">SPAS &amp; WELLNESS</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbSpaCards }}" as="sp" hint-placeholder-count="2">
-                      <div class="cc-vault-tile" style="--vault-accent:#6de0c9; --vault-line:rgba(109,224,201,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ sp.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ sp.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ sp.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ sp.save }}" title="Save to My Black Book" style="cursor:pointer; color:#6de0c9; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ sp.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#ffb86b; margin-bottom:8px;">MOTORING</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbMotoringCards }}" as="mo" hint-placeholder-count="2">
-                      <div class="cc-vault-tile" style="--vault-accent:#ffb86b; --vault-line:rgba(255,184,107,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ mo.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ mo.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ mo.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ mo.save }}" title="Save to My Black Book" style="cursor:pointer; color:#ffb86b; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ mo.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#c9a24a; margin-bottom:8px;">PRIVATE CINEMA</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbCinemaCards }}" as="ci" hint-placeholder-count="2">
-                      <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ ci.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ ci.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ ci.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ ci.save }}" title="Save to My Black Book" style="cursor:pointer; color:#c9a24a; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ ci.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#d8d8e0; margin-bottom:8px;">LUXURY CLOTHING</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin-bottom:20px;">
-                    <sc-for list="{{ bbShoppingCards }}" as="sh" hint-placeholder-count="2">
-                      <div class="cc-vault-tile" style="--vault-accent:#d8d8e0; --vault-line:rgba(216,216,224,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                          <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ sh.name }}</div>
-                          <div style="display:flex; gap:8px; flex:0 0 auto;">
-                          <span onClick="{{ sh.noteOpen }}" title="Private note" style="cursor:pointer; color:{{ sh.noteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                          <span onClick="{{ sh.save }}" title="Save to My Black Book" style="cursor:pointer; color:#d8d8e0; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                        </div>
-                        </div>
-                        <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ sh.note }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#d69bff; margin-bottom:8px;">HOLIDAY IDEA</div>
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px;">
-                    <div class="cc-vault-tile" style="--vault-accent:#d69bff; --vault-line:rgba(214,155,255,0.2); --vault-bg:#161310; padding:16px; box-sizing:border-box;">
-                      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
-                        <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ bbHolidayName }}</div>
-                        <div style="display:flex; gap:8px; flex:0 0 auto;">
-                        <span onClick="{{ bbHolidayNoteOpen }}" title="Private note" style="cursor:pointer; color:{{ bbHolidayNoteColor }}; font-size:13px;" style-hover="{ transform:'scale(1.15)' }">📝</span>
-                        <span onClick="{{ saveBBHoliday }}" title="Save to My Black Book" style="cursor:pointer; color:#d69bff; font-size:14px;" style-hover="{ transform:'scale(1.15)' }">☆</span>
-                      </div>
-                      </div>
-                      <div style="font-size:12px; color:#a4a4ac; line-height:1.55; margin-top:8px;">{{ bbHolidayNote }}</div>
-                    </div>
-                  </div>
-                </sc-if>
-
-                <sc-if value="{{ isBBSaved }}" hint-placeholder-val="{{ false }}">
-                  <sc-if value="{{ hasBBSaved }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex; flex-direction:column; gap:10px;">
-                      <sc-for list="{{ bbSavedList }}" as="s" hint-placeholder-count="3">
-                        <div class="cc-vault-tile" style="--vault-accent:#c9a24a; --vault-line:rgba(201,162,74,0.2); --vault-bg:#161310; padding:14px 16px; box-sizing:border-box; display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                          <div style="min-width:0;">
-                            <div style="font-size:13.5px; color:#eef0f2; overflow-wrap:break-word;">{{ s.body }}</div>
-                            <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#75757d; margin-top:4px;">SAVED {{ s.stamp }}</div>
-                          </div>
-                          <span onClick="{{ s.remove }}" style="cursor:pointer; color:#7c7c84; font-size:12px; flex:0 0 auto;" style-hover="{ color:'#ff6b76' }">✕</span>
-                        </div>
-                      </sc-for>
-                    </div>
-                  </sc-if>
-                  <sc-if value="{{ !hasBBSaved }}" hint-placeholder-val="{{ true }}">
-                    <div style="border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:32px 20px; text-align:center; color:#75757d; font-size:12.5px; max-width:420px;">Nothing saved yet — tap the ☆ on any brand or place to keep it here, synced to your account.</div>
-                  </sc-if>
-                </sc-if>
-
-                <sc-if value="{{ noteEditorOpen }}" hint-placeholder-val="{{ false }}">
-                  <div onClick="{{ closeNoteEditor }}" style="position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; padding:24px;">
-                    <div onClick="{{ stopProp }}" style="max-width:440px; width:100%; border-radius:6px; padding:2px; background:linear-gradient(135deg, rgba(201,162,74,0.5), rgba(201,162,74,0.15)); box-shadow:0 30px 70px rgba(0,0,0,0.6);">
-                      <div style="border-radius:5px; padding:22px 22px 20px; background:#100d0a; border:1px solid rgba(201,162,74,0.2); box-sizing:border-box;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#c9a24a; margin-bottom:4px;">PRIVATE NOTE</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:18px; color:#f1e6d0; margin-bottom:14px;">{{ noteEditorLabel }}</div>
-                        <textarea value="{{ noteEditorDraft }}" onInput="{{ setNoteEditorDraft }}" placeholder="Your private note — never shown to anyone else…" style="width:100%; min-height:100px; padding:11px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; font-family:inherit; box-sizing:border-box; margin-bottom:14px;"></textarea>
-                        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
-                          <span onClick="{{ clearNoteEditor }}" style="font-size:11.5px; color:#8a7a5f; cursor:pointer;" style-hover="{ color:'#c9a24a' }">Clear note</span>
-                          <div style="display:flex; gap:8px;">
-                            <div onClick="{{ closeNoteEditor }}" style="padding:9px 16px; border-radius:6px; cursor:pointer; border:1px solid rgba(255,255,255,0.14); color:#c5c5ca; font-size:12.5px; font-weight:600;">Cancel</div>
-                            <div onClick="{{ saveNoteEditor }}" style="padding:9px 16px; border-radius:6px; cursor:pointer; background:#c9a24a; color:#0a0806; font-size:12.5px; font-weight:700;">Save</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </sc-if>
-              </sc-if>
 
       <!-- ===== MUSIC ===== -->
       <sc-if value="{{ isMusic }}" hint-placeholder-val="{{ false }}">
@@ -7875,625 +7600,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
             </sc-if>
 
-            <!-- ===== GENTLEMAN'S ETIQUETTE ===== -->
-            <sc-if value="{{ isGentSubject }}" hint-placeholder-val="{{ false }}">
-
-              <sc-if value="{{ isGentHub }}" hint-placeholder-val="{{ true }}">
-                <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
-                <div style="background:#F5F1E8; border-radius:2px; padding:14px; margin-bottom:20px; box-shadow:0 20px 50px rgba(58,42,32,0.18);">
-                <div style="border:1px solid rgba(91,26,26,0.35); border-radius:2px; padding:22px 22px 24px; font-family:'Cormorant Garamond',Georgia,serif; color:#3A2A20; text-align:center;">
-                  <img src="favicon.png" alt="" style="display:block; width:36px; height:36px; object-fit:contain; margin:0 auto 10px; opacity:0.9;">
-                  <div style="font-size:10.5px; letter-spacing:3px; color:#8a6a5a;">◆ LEARNING CENTRE</div>
-                  <h1 style="font-style:italic; font-weight:500; font-size:24px; color:#3A2A20; margin:10px 0 8px;">Gentleman’s Etiquette</h1>
-                  <div style="font-size:13px; color:#6b5a4e; line-height:1.5; max-width:480px; margin:0 auto;">Dress, drinks, service and protocol — the vocabulary and conventions that mark real fluency.</div>
-                  <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin:16px auto 0;">
-                    <div style="width:40px; height:1px; background:#5B1A1A;"></div>
-                    <span style="color:#5B1A1A; font-size:11px;">❦</span>
-                    <div style="width:40px; height:1px; background:#5B1A1A;"></div>
-                  </div>
-                </div>
-                </div>
-                </sc-if>
-                <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
-                <div style="margin-bottom:20px;">
-                  <div style="font-size:19px; font-weight:700;">Gentleman’s Etiquette</div>
-                  <div style="font-size:12.5px; color:#8a8a92; margin-top:4px; line-height:1.5;">Dress, drinks, service and protocol — the vocabulary and conventions that mark real fluency.</div>
-                </div>
-                </sc-if>
-
-                <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:16px; font-family:'Cormorant Garamond',Georgia,serif;">
-                    <div onClick="{{ openGentTutor }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
-                      <span style="width:26px; height:26px; color:#5B1A1A; display:flex; margin:0 auto 10px;" data-icon="learning"></span>
-                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">AI Tutor</div>
-                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">Ask the Etiquette Assistant</div>
-                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">Ask a Question</div>
-                    </div>
-                    <div onClick="{{ gentOpenQtSetup }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
-                      <span style="width:26px; height:26px; color:#5B1A1A; display:flex; margin:0 auto 10px;" data-icon="productivity"></span>
-                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">Quick Test</div>
-                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">14 topics · 6 difficulties · 5-50 questions</div>
-                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">Start Test</div>
-                    </div>
-                    <div onClick="{{ gentGoDaily }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
-                      <span style="width:26px; height:26px; color:#5B1A1A; display:flex; margin:0 auto 10px;" data-icon="flame"></span>
-                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">Daily Challenge</div>
-                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">8 mixed questions · resets every 24h</div>
-                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">{{ gentDailyLabel }}</div>
-                    </div>
-                    <div onClick="{{ goGentDashboard }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
-                      <span style="width:26px; height:26px; color:#5B1A1A; display:flex; margin:0 auto 10px;" data-icon="trending"></span>
-                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">Progress Overview</div>
-                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">Track your stats and improvement</div>
-                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12.5px; font-weight:600;">View Progress</div>
-                    </div>
-                    <sc-if value="{{ !isMinorAccount }}" hint-placeholder-val="{{ true }}">
-                    <div onClick="{{ goGentBlackBook }}" style="border-radius:14px; background:#FEFCF8; border:1px solid rgba(201,162,74,0.5); padding:20px; cursor:pointer; text-align:center;" style-hover="{ transform:'translateY(-2px)' }">
-                      <span style="width:26px; height:26px; color:#c9a24a; display:flex; margin:0 auto 10px;" data-icon="business"></span>
-                      <div style="font-size:17px; font-weight:600; color:#3A2A20;">The Black Book</div>
-                      <div style="font-size:12.5px; color:#8a6a5a; margin-top:4px;">Insider brands &amp; a worldwide guide</div>
-                      <div style="margin-top:14px; padding:10px; border-radius:9px; background:#8a6a1a; color:#F5F1E8; font-size:12.5px; font-weight:600;">Open</div>
-                    </div>
-                    </sc-if>
-                  </div>
-
-                  <sc-if value="{{ gentPlacementDone }}" hint-placeholder-val="{{ false }}">
-                    <div onClick="{{ goGentDashboard }}" style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:16px 20px; margin-bottom:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; font-family:'Cormorant Garamond',Georgia,serif;">
-                      <div><div style="font-size:10.5px; letter-spacing:2px; color:#8a6a5a;">CURRENT LEVEL</div><div style="font-size:18px; font-weight:600; color:#3A2A20; margin-top:2px;">Level {{ gentLevelNum }} of 120 · {{ gentGradeStr }}</div></div>
-                      <div style="display:flex; gap:22px; flex-wrap:wrap;">
-                        <div><div style="font-size:10px; letter-spacing:1px; color:#a99485;">STRONGEST</div><div style="font-size:14px; color:#3d6b3d; margin-top:2px;">{{ gentStrongestStr }}</div></div>
-                        <div><div style="font-size:10px; letter-spacing:1px; color:#a99485;">FOCUS ON</div><div style="font-size:14px; color:#8a3030; margin-top:2px;">{{ gentWeakestStr }}</div></div>
-                      </div>
-                    </div>
-                  </sc-if>
-
-                  <div style="border-radius:14px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); padding:16px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; font-family:'Cormorant Garamond',Georgia,serif;">
-                    <div style="flex:1; min-width:220px;">
-                      <div style="font-size:10.5px; letter-spacing:2px; color:#8a6a5a;">TODAY’S REAL-WORLD CHALLENGE<sc-if value="{{ hasChallengeStreak }}" hint-placeholder-val="{{ false }}"> · 🔥 {{ gentChallengeStreak }}d</sc-if></div>
-                      <div style="font-size:14px; margin-top:4px; line-height:1.45; color:#3A2A20;">{{ gentChallengeText }}</div>
-                    </div>
-                    <span onClick="{{ gentMarkChallengeDone }}" style="font-size:12.5px; font-weight:600; color:#5B1A1A; border:1px solid rgba(91,26,26,0.25); border-radius:9px; padding:8px 14px; cursor:pointer; white-space:nowrap;">{{ gentChallengeBtnLabel }}</span>
-                  </div>
-
-                  <sc-if value="{{ hasWeakDrillData }}" hint-placeholder-val="{{ false }}">
-                    <div onClick="{{ startGentWeakDrill }}" style="border-radius:14px; border:1px solid rgba(91,26,26,0.25); background:#FAF7F0; padding:14px 18px; margin-bottom:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; font-family:'Cormorant Garamond',Georgia,serif;" style-hover="{ transform:'translateY(-2px)' }">
-                      <div><div style="font-size:10.5px; letter-spacing:2px; color:#8a3030;">🎯 DRILL MY WEAK TOPICS</div><div style="font-size:13.5px; color:#6b5a4e; margin-top:3px;">Focus practice on {{ gentWeakTopicName }} and your other lowest-accuracy topics</div></div>
-                      <span style="font-size:13px; color:#5B1A1A; font-weight:600;">Start →</span>
-                    </div>
-                  </sc-if>
-
-                  <div style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); border-radius:14px; padding:16px 8px; margin-bottom:16px; display:flex; align-items:center;">
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentQtOverallAccuracy }}%</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentDashQuestions }}</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
-                    <div style="width:1px; height:30px; background:rgba(91,26,26,0.16);"></div>
-                    <div style="flex:1; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:#3A2A20;">{{ gentDashHours }}h</div><div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:10.5px; color:#a99485; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                  </div>
-
-                  <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
-                    <div onClick="{{ lcToolsGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcToolsGap }};">
-                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Learning Tools</div>
-                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcToolsLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcToolsRot }});">&#9662;</span></span>
-                    </div>
-                    <sc-if value="{{ lcToolsOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-                      <div onClick="{{ goGentPlacement }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">16 QUESTIONS · 12 MIN</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">{{ gentPlacementLabel }}</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Finds your level, rank, and a personal learning plan.</div>
-                        <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">Start Test</div>
-                      </div>
-                      <div onClick="{{ startGentLevelTest }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">LEVEL {{ gentLevelNum }} OF 120</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">Level Ladder</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Climb one level at a time — mixed etiquette topics.</div>
-                        <div style="height:5px; border-radius:3px; background:rgba(91,26,26,0.12); overflow:hidden; margin-top:10px;"><div style="height:100%; width:{{ gentLevelProgressPct }}%; background:#5B1A1A;"></div></div>
-                      </div>
-                      <div onClick="{{ goGentFormulas }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">REFERENCE</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">Etiquette Glossary</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Correct terms, conventions and quick reference across every topic.</div>
-                        <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">Open Library</div>
-                      </div>
-                      <div onClick="{{ goGentDashboard }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">XP {{ gentDashXP }}</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">Progress Dashboard</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Accuracy, streak, hours studied &amp; strongest/weakest topic.</div>
-                        <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">View Dashboard</div>
-                      </div>
-                      <div onClick="{{ goGentScenario }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">NEW · JUDGMENT</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">Scenario Simulator</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Real "what would you do" situations, not just trivia.</div>
-                        <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">Open</div>
-                      </div>
-                      <div onClick="{{ goGentOccasion }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">NEW · AI BRIEFING</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">Occasion Prep</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Pick an upcoming event — get a personal etiquette cheat-sheet.</div>
-                        <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">Open</div>
-                      </div>
-                      <div onClick="{{ goGentPlaceSetting }}" style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:16px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#a99485;">NEW · VISUAL</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:16px; font-weight:600; color:#3A2A20; margin-top:5px;">Place Setting Drill</div>
-                        <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; color:#8a6a5a; margin-top:4px; line-height:1.4;">Tap the correct spot on a real formal table setting.</div>
-                        <div style="margin-top:12px; text-align:center; padding:8px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; font-weight:600;">Open</div>
-                      </div>
-                    </div>
-                    </sc-if>
-                  </div>
-
-                  <div style="background:#F8F4EC; border:1px solid rgba(91,26,26,0.1); border-radius:14px; padding:18px; margin-bottom:16px;">
-                    <!-- A drop-down: the name is always on it, the section behind it folds away. -->
-                    <div onClick="{{ lcSkillGo }}" style="display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; margin-bottom:{{ lcSkillGap }};">
-                      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:600; color:#3A2A20;">Practice by Skill</div>
-                      <span style="display:flex; align-items:center; gap:8px; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; color:#5B1A1A;">{{ lcSkillLabel }}<span style="display:inline-block; font-size:11px; transform:rotate({{ lcSkillRot }});">&#9662;</span></span>
-                    </div>
-                    <sc-if value="{{ lcSkillOpen }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
-                      <sc-for list="{{ gentTopicCards }}" as="t" hint-placeholder-count="8">
-                        <div style="border-radius:12px; border:1px solid rgba(91,26,26,0.12); background:#FEFCF8; padding:14px;">
-                          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; font-weight:600; color:#3A2A20;">{{ t.label }}</div>
-                          <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:12px; color:#8a6a5a; margin-top:4px; line-height:1.4; margin-bottom:10px;">{{ t.desc }}</div>
-                          <div style="display:flex; gap:8px;">
-                            <div onClick="{{ t.learn }}" style="flex:1; text-align:center; padding:7px; border-radius:8px; background:#5B1A1A; color:#F5F1E8; font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; font-weight:600; cursor:pointer;">Learn</div>
-                            <div onClick="{{ t.practice }}" style="flex:1; text-align:center; padding:7px; border-radius:8px; border:1px solid rgba(91,26,26,0.25); color:#5B1A1A; font-family:'Cormorant Garamond',Georgia,serif; font-size:12.5px; font-weight:600; cursor:pointer;">Practice</div>
-                          </div>
-                        </div>
-                      </sc-for>
-                    </div>
-                    </sc-if>
-                  </div>
-                </sc-if>
-
-                <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
-                <sc-if value="{{ gentPlacementDone }}" hint-placeholder-val="{{ false }}">
-                  <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
-                    <div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">CURRENT LEVEL</div><div style="font-size:18px; font-weight:700; margin-top:3px;">Level {{ gentLevelNum }} of 120 · {{ gentGradeStr }}</div></div>
-                    <div style="display:flex; gap:22px; flex-wrap:wrap;">
-                      <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">STRONGEST</div><div style="font-size:13px; color:#4ADE80; margin-top:2px;">{{ gentStrongestStr }}</div></div>
-                      <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">FOCUS ON</div><div style="font-size:13px; color:#ff8a92; margin-top:2px;">{{ gentWeakestStr }}</div></div>
-                    </div>
-                    <div onClick="{{ goGentDashboard }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">View dashboard →</div>
-                  </div>
-                </sc-if>
-
-                <div onClick="{{ openGentTutor }}" class="cc-glowbtn" style="border-radius:14px; background:#1b1d21; padding:14px 18px; margin-bottom:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;" style-hover="{ background:'#202226' }">
-                  <div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#d69bff;">AI ASSISTANT</div><div style="font-size:14px; font-weight:700; margin-top:2px;">Ask the Etiquette Assistant</div></div>
-                  <span style="font-size:12px; color:#8a8a92;">Text or voice →</span>
-                </div>
-
-                <div onClick="{{ gentOpenQtSetup }}" class="cc-glowbtn" style="border-radius:16px; background:linear-gradient(160deg,#1a1d16,#0c0d09); border:1px solid rgba(196,255,61,0.3); padding:20px 22px; margin-bottom:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;" style-hover="{ transform:'translateY(-2px)' }">
-                  <div><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C4FF3D;">⚡ QUICK TEST</div><div style="font-size:17px; font-weight:700; margin-top:4px;">14 topics · 6 difficulties · 5-50 questions</div><div style="font-size:12px; color:#8a9b6e; margin-top:3px;">Jump into a short assessment any time — no full lesson needed.</div></div>
-                  <div style="padding:12px 22px; border-radius:11px; background:#5B1A1A; color:#F5F1E8; font-weight:700; font-size:13.5px; white-space:nowrap;">Start →</div>
-                </div>
-
-                <div onClick="{{ gentGoDaily }}" style="border-radius:14px; background:#1b1d21; padding:16px 18px; margin-bottom:22px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;" style-hover="{ background:'#202226' }">
-                  <div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">DAILY CHALLENGE</div><div style="font-size:14px; font-weight:600; margin-top:3px;">8 mixed questions · resets every 24h</div></div>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:700; color:{{ gentDailyColor }};">{{ gentDailyLabel }}</span>
-                </div>
-
-                <div style="border-radius:14px; background:#1b1d21; padding:16px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;">
-                  <div style="flex:1; min-width:220px;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">TODAY’S REAL-WORLD CHALLENGE<sc-if value="{{ hasChallengeStreak }}" hint-placeholder-val="{{ false }}"> · 🔥 {{ gentChallengeStreak }}d</sc-if></div>
-                    <div style="font-size:13.5px; margin-top:4px; line-height:1.45; color:#d6d6da;">{{ gentChallengeText }}</div>
-                  </div>
-                  <span onClick="{{ gentMarkChallengeDone }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; font-weight:700; color:{{ gentChallengeBtnC }}; background:{{ gentChallengeBtnBg }}; border:1px solid {{ gentChallengeBtnBd }}; border-radius:9px; padding:8px 14px; cursor:pointer; white-space:nowrap;">{{ gentChallengeBtnLabel }}</span>
-                </div>
-
-                <sc-if value="{{ hasWeakDrillData }}" hint-placeholder-val="{{ false }}">
-                  <div onClick="{{ startGentWeakDrill }}" style="border-radius:14px; border:1px solid rgba(255,138,146,0.3); background:linear-gradient(160deg,#241014,#0f0a0b); padding:14px 18px; margin-bottom:22px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#ff8a92;">🎯 DRILL MY WEAK TOPICS</div><div style="font-size:13px; color:#c9989c; margin-top:3px;">Focus practice on {{ gentWeakTopicName }} and your other lowest-accuracy topics</div></div>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#eef0f2;">Start →</span>
-                  </div>
-                </sc-if>
-
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:22px;">
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentQtOverallAccuracy }}%</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">ACCURACY</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentDashQuestions }}</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">TOTAL QUESTIONS</div></div>
-                  <div style="border-radius:12px; background:#1b1d21; padding:12px; text-align:center;"><div style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;">{{ gentDashHours }}h</div><div style="font-size:9px; color:#7c7c84; letter-spacing:1px; margin-top:3px;">HOURS STUDIED</div></div>
-                </div>
-
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:22px;">
-                  <div onClick="{{ goGentPlacement }}" style="border-radius:14px; border:1px solid rgba(120,170,255,0.3); background:linear-gradient(160deg,#10182a,#0a0f1a); padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7cb0ff;">16 QUESTIONS · 12 MIN</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">{{ gentPlacementLabel }}</div>
-                    <div style="font-size:11.5px; color:#8a9bb8; margin-top:4px; line-height:1.4;">Finds your level, rank, and a personal learning plan.</div>
-                  </div>
-                  <div onClick="{{ startGentLevelTest }}" style="border-radius:14px; border:1px solid rgba(255,255,255,0.16); background:#1b1d21; padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">LEVEL {{ gentLevelNum }} OF 120</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">Level Ladder</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Climb one level at a time — mixed etiquette topics.</div>
-                    <div style="height:5px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden; margin-top:10px;"><div style="height:100%; width:{{ gentLevelProgressPct }}%; background:#7cb0ff;"></div></div>
-                  </div>
-                  <div onClick="{{ goGentFormulas }}" style="border-radius:14px; border:1px solid rgba(255,255,255,0.16); background:#1b1d21; padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">REFERENCE</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">Etiquette Glossary</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Correct terms, conventions and quick reference across every topic.</div>
-                  </div>
-                  <div onClick="{{ goGentDashboard }}" style="border-radius:14px; border:1px solid rgba(255,255,255,0.16); background:#1b1d21; padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">XP {{ gentDashXP }}</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">Progress Dashboard</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Accuracy, streak, hours studied &amp; strongest/weakest topic.</div>
-                  </div>
-                  <div onClick="{{ goGentScenario }}" style="border-radius:14px; border:1px solid rgba(196,255,61,0.25); background:#1b1d21; padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#C4FF3D;">NEW · JUDGMENT</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">Scenario Simulator</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Real "what would you do" situations, not just trivia.</div>
-                  </div>
-                  <div onClick="{{ goGentOccasion }}" style="border-radius:14px; border:1px solid rgba(214,155,255,0.25); background:#1b1d21; padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#d69bff;">NEW · AI BRIEFING</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">Occasion Prep</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Pick an upcoming event — get a personal etiquette cheat-sheet.</div>
-                  </div>
-                  <div onClick="{{ goGentPlaceSetting }}" style="border-radius:14px; border:1px solid rgba(124,176,255,0.25); background:#1b1d21; padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7cb0ff;">NEW · VISUAL</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">Place Setting Drill</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Tap the correct spot on a real formal table setting.</div>
-                  </div>
-                  <sc-if value="{{ !isMinorAccount }}" hint-placeholder-val="{{ true }}">
-                  <div onClick="{{ goGentBlackBook }}" style="border-radius:14px; border:1px solid rgba(201,162,74,0.35); background:linear-gradient(160deg,#1a1610,#0d0b08); padding:18px; cursor:pointer;" style-hover="{ transform:'translateY(-2px)' }">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#c9a24a;">NEW · REFERENCE</div>
-                    <div style="font-size:16px; font-weight:700; margin-top:4px;">The Black Book</div>
-                    <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4;">Insider brands and a worldwide guide — not the names everyone already knows.</div>
-                  </div>
-                  </sc-if>
-                </div>
-
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">PRACTICE A TOPIC</div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin-bottom:22px;">
-                  <sc-for list="{{ gentTopicCards }}" as="t" hint-placeholder-count="8">
-                    <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px;">
-                      <div style="font-size:14px; font-weight:700; color:#eef0f2;">{{ t.label }}</div>
-                      <div style="font-size:11.5px; color:#8a8a92; margin-top:4px; line-height:1.4; margin-bottom:12px;">{{ t.desc }}</div>
-                      <div style="display:flex; gap:8px;">
-                        <div onClick="{{ t.learn }}" style="flex:1; text-align:center; padding:8px; border-radius:9px; background:#5B1A1A; color:#F5F1E8; font-size:12px; font-weight:600; cursor:pointer;" style-hover="{ background:'#4A1515' }">Learn</div>
-                        <div onClick="{{ t.practice }}" style="flex:1; text-align:center; padding:8px; border-radius:9px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12px; font-weight:700; cursor:pointer;">Practice</div>
-                      </div>
-                    </div>
-                  </sc-for>
-                </div>
-                </sc-if>
-              </sc-if>
-
-              <sc-if value="{{ isGentLearn }}" hint-placeholder-val="{{ false }}">
-                <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                <sc-if value="{{ gentLesson }}" hint-placeholder-val="{{ true }}">
-                  <div style="font-size:22px; font-weight:700; margin:14px 0 10px;">{{ gentLesson.title }}</div>
-                  <span onClick="{{ gentReadLesson }}" style="display:inline-flex; align-items:center; gap:7px; padding:8px 15px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#c8c8ce; font-size:12px; font-weight:600; cursor:pointer; margin-bottom:18px;">{{ gentLessonSpeakLabel }}</span>
-                  <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; max-width:680px; margin-bottom:20px;">{{ gentLesson.intro }}</p>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">ORIGIN &amp; CONTEXT</div>
-                  <div class="cc-glowcard" style="border-radius:14px; background:#1b1d21; padding:16px 18px; margin-bottom:22px; max-width:680px;">
-                    <p style="font-size:13px; color:#b8b8c0; line-height:1.7; margin:0;">{{ gentLesson.origin }}</p>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">DEEP DIVE</div>
-                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
-                    <sc-for list="{{ gentLesson.sections }}" as="sec" hint-placeholder-count="4">
-                      <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:20px; min-height:170px; display:flex; flex-direction:column;">
-                        <div style="font-size:14.5px; font-weight:700; color:#eef0f2; margin-bottom:9px;">{{ sec.heading }}</div>
-                        <p style="font-size:12.5px; color:#b8b8c0; line-height:1.65; margin:0;">{{ sec.body }}</p>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">COMMON MISCONCEPTIONS</div>
-                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
-                    <sc-for list="{{ gentLesson.misconceptions }}" as="mi" hint-placeholder-count="3">
-                      <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:140px; display:flex; flex-direction:column; justify-content:center;">
-                        <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;"><span style="color:#ff6b76; font-size:12px; flex:0 0 auto;">✗</span><span style="font-size:12.5px; color:#c9989c; line-height:1.5;">{{ mi.myth }}</span></div>
-                        <div style="display:flex; gap:8px; align-items:flex-start;"><span style="color:#4ADE80; font-size:12px; flex:0 0 auto;">✓</span><span style="font-size:12.5px; color:#b8b8c0; line-height:1.5;">{{ mi.reality }}</span></div>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">HOW EXPERTS THINK ABOUT THIS</div>
-                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:24px;">
-                    <sc-for list="{{ gentLesson.expertNotes }}" as="en" hint-placeholder-count="3">
-                      <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; min-height:110px; display:flex; gap:10px; align-items:flex-start;">
-                        <span style="color:#7cb0ff; font-size:13px; flex:0 0 auto;">◆</span>
-                        <span style="font-size:12.5px; color:#d5d5da; line-height:1.6;">{{ en }}</span>
-                      </div>
-                    </sc-for>
-                  </div>
-
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKED EXAMPLES</div>
-                  <div class="cc-lesson-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:24px;">
-                    <sc-for list="{{ gentLesson.examples }}" as="ex" hint-placeholder-count="2">
-                      <div class="cc-glowcard" style="border-radius:12px; background:#1b1d21; padding:14px 16px;">
-                        <div style="font-size:13.5px; color:#eef0f2; margin-bottom:6px; line-height:1.4;">{{ ex.q }}</div>
-                        <div style="font-size:11.5px; color:#7c7c84; margin-bottom:4px;">{{ ex.working }}</div>
-                        <div style="font-size:14px; font-weight:700; color:#4ADE80;">{{ ex.answer }}</div>
-                      </div>
-                    </sc-for>
-                  </div>
-                  <div onClick="{{ gentLessonStartPractice }}" class="cc-glowbtn" style="display:inline-block; padding:13px 22px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;" style-hover="{ transform:'translateY(-1px)' }">Start practice →</div>
-                </sc-if>
-              </sc-if>
-
-              <sc-if value="{{ isGentPractice }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92;">{{ gentPracticeScoreStr }}</span>
-                </div>
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">{{ gentQTopic }}</div>
-                <div style="font-size:22px; font-weight:700; margin-bottom:22px; letter-spacing:-.3px; max-width:640px; line-height:1.4;">{{ gentQPrompt }}</div>
-                <sc-if value="{{ gentIsMC }}" hint-placeholder-val="{{ false }}">
-                  <div class="cc-mc-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; max-width:560px; margin-bottom:18px;">
-                    <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
-                      <div onClick="{{ o.pick }}" style="padding:13px 16px; border-radius:11px; border:1px solid rgba(255,255,255,0.14); background:{{ o.bg }}; color:{{ o.c }}; font-size:14px; font-weight:600; cursor:pointer; text-align:center;">{{ o.label }}</div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-                <div style="display:flex; gap:10px; max-width:340px;">
-                  <input value="{{ gentInput }}" onInput="{{ setGentInput }}" onKeyDown="{{ gentSubmitKey }}" placeholder="Your answer" style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:16px; outline:none; box-sizing:border-box;" style-focus="{ borderColor:'rgba(196,255,61,0.55)' }">
-                  <div onClick="{{ gentSubmit }}" class="cc-glowbtn" style="padding:14px 22px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:14px; white-space:nowrap;" style-hover="{ transform:'translateY(-1px)' }">Check</div>
-                </div>
-                <div onClick="{{ gentIDKPractice }}" style="margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#e8b45a; cursor:pointer; display:inline-block;" style-hover="{ color:'#ffcf7d' }">I don’t know →</div>
-                <sc-if value="{{ gentFeedbackShow }}" hint-placeholder-val="{{ false }}">
-                  <div style="margin-top:18px; border-radius:12px; padding:14px 16px; background:rgba(255,255,255,0.04); max-width:560px;">
-                    <div style="font-size:14px; font-weight:700; color:{{ gentFeedbackColor }};">{{ gentFeedbackText }}</div>
-                    <div style="display:flex; gap:14px; align-items:center; margin-top:10px;">
-                      <span onClick="{{ toggleGentMethod }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">{{ gentMethodToggleLabel }}</span>
-                      <div onClick="{{ gentNextPractice }}" class="cc-glowbtn" style="margin-left:auto; padding:9px 18px; border-radius:10px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:12.5px;">Next question →</div>
-                    </div>
-                    <sc-if value="{{ gentShowMethod }}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size:12.5px; color:#a4a4ac; margin-top:10px;">{{ gentMethodText }}</div>
-                    </sc-if>
-                  </div>
-                </sc-if>
-                <div style="margin-top:14px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                  <span onClick="{{ getGentHint }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#d69bff; cursor:pointer;" style-hover="{ color:'#eef0f2' }">✨ Get an AI hint</span>
-                  <sc-if value="{{ gentHintLoading }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8a8a92;">thinking…</span></sc-if>
-                  <sc-if value="{{ gentHintErr }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#ff3b4a;">{{ gentHintErr }}</span></sc-if>
-                </div>
-                <sc-if value="{{ hasGentHint }}" hint-placeholder-val="{{ false }}">
-                  <div style="margin-top:10px; border-radius:11px; background:rgba(214,155,255,0.08); border:1px solid rgba(214,155,255,0.25); padding:12px 14px; max-width:460px; font-size:12.5px; color:#d9c2ec; line-height:1.5;">💡 {{ gentHintText }}</div>
-                </sc-if>
-              </sc-if>
-
-              <sc-if value="{{ isGentTest }}" hint-placeholder-val="{{ false }}">
-                <div class="cc-glowcard" style="border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:#1b1d21; padding:14px 18px; margin-bottom:18px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84;">{{ gentTestLabel }}</div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; color:#eef0f2;">{{ gentTimerLabel }}</div>
-                  </div>
-                </div>
-                <div style="height:5px; border-radius:3px; background:rgba(255,255,255,0.06); overflow:hidden; margin-bottom:22px;"><div style="height:100%; width:{{ gentProgressPct }}; background:#4ADE80; border-radius:3px;"></div></div>
-                <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; margin-bottom:8px;">Question {{ gentQNum }} of {{ gentQTotal }} · {{ gentQTopic }}</div>
-                <div style="font-size:22px; font-weight:700; margin-bottom:22px; letter-spacing:-.3px; max-width:640px; line-height:1.4;">{{ gentQPrompt }}</div>
-                <sc-if value="{{ gentIsMC }}" hint-placeholder-val="{{ false }}">
-                  <div class="cc-mc-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; max-width:560px; margin-bottom:18px;">
-                    <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
-                      <div onClick="{{ o.pick }}" style="padding:13px 16px; border-radius:11px; border:1px solid rgba(255,255,255,0.14); background:{{ o.bg }}; color:{{ o.c }}; font-size:14px; font-weight:600; cursor:pointer; text-align:center;">{{ o.label }}</div>
-                    </sc-for>
-                  </div>
-                </sc-if>
-                <div style="display:flex; gap:10px; max-width:340px;">
-                  <input value="{{ gentInput }}" onInput="{{ setGentInput }}" onKeyDown="{{ gentSubmitTestKey }}" placeholder="Your answer" style="flex:1; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:16px; outline:none; box-sizing:border-box;" style-focus="{ borderColor:'rgba(196,255,61,0.55)' }">
-                  <div onClick="{{ gentSubmitTest }}" class="cc-glowbtn" style="padding:14px 22px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:14px;">Submit</div>
-                </div>
-                <div style="margin-top:14px; display:flex; gap:18px;">
-                  <div onClick="{{ gentSkipTest }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#7c7c84; cursor:pointer; display:inline-block;" style-hover="{ color:'#eef0f2' }">Skip question →</div>
-                  <div onClick="{{ gentIDKTest }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#e8b45a; cursor:pointer; display:inline-block;" style-hover="{ color:'#ffcf7d' }">I don’t know →</div>
-                  <div onClick="{{ gentEndTest }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#ff6b76; cursor:pointer; display:inline-block;" style-hover="{ color:'#ff9aa2' }">✕ End &amp; save</div>
-                </div>
-              </sc-if>
-
-              <sc-if value="{{ isGentResults }}" hint-placeholder-val="{{ false }}">
-                <sc-if value="{{ gentResultIsPlacement }}" hint-placeholder-val="{{ false }}">
-                  <div style="border-radius:14px; border:1px solid rgba(120,170,255,0.3); background:#151a24; padding:22px; text-align:center; margin-bottom:20px;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7cb0ff;">PLACEMENT RESULT</div>
-                    <div style="font-size:44px; font-weight:800; margin-top:10px;">Level {{ gentResultLevel }}</div>
-                    <div style="font-size:15px; font-weight:700; margin-top:6px; color:#eef0f2;">{{ gentResultGrade }}</div>
-                    <div style="font-size:13px; color:#8a8a92; margin-top:6px;">{{ gentResultScore }} correct · {{ gentResultPct }}</div>
-                    <div style="display:flex; justify-content:center; gap:26px; margin-top:16px; flex-wrap:wrap; text-align:center;">
-                      <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">STRONGEST</div><div style="font-size:13px; color:#4ADE80; margin-top:2px;">{{ gentResultStrongest }}</div></div>
-                      <div><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">WEAKEST</div><div style="font-size:13px; color:#ff8a92; margin-top:2px;">{{ gentResultWeakest }}</div></div>
-                    </div>
-                    <sc-if value="{{ gentResultFocusList }}" hint-placeholder-val="{{ false }}">
-                      <div style="margin-top:18px; text-align:left;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#7c7c84; margin-bottom:8px;">YOUR PERSONAL LEARNING PLAN</div>
-                        <sc-for list="{{ gentResultFocusList }}" as="fa" hint-placeholder-count="3">
-                          <div style="display:flex; gap:9px; padding:5px 0; font-size:13px; color:#dcdce0;"><span style="color:#7cb0ff;">▸</span>{{ fa.label }}</div>
-                        </sc-for>
-                      </div>
-                    </sc-if>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ gentResultIsLevel }}" hint-placeholder-val="{{ false }}">
-                  <div style="border-radius:14px; border:1px solid rgba(120,170,255,0.3); background:#151a24; padding:22px; text-align:center; margin-bottom:20px;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7cb0ff;">LEVEL LADDER</div>
-                    <div style="font-size:44px; font-weight:800; margin-top:10px;">LEVEL {{ gentResultLevel }}</div>
-                    <div style="font-size:15px; font-weight:700; margin-top:6px; color:{{ gentResultPassColor }};">{{ gentResultPassStr }}</div>
-                    <div style="font-size:13px; color:#8a8a92; margin-top:4px;">{{ gentResultScore }} correct · {{ gentResultPct }}</div>
-                    <sc-if value="{{ gentResultLeveledUp }}" hint-placeholder-val="{{ false }}">
-                      <div style="margin-top:12px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#7cb0ff;">Level {{ gentResultNextLevel }} unlocked!</div>
-                    </sc-if>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ gentResultBreakdown }}" hint-placeholder-val="{{ false }}">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">BY TOPIC</div>
-                  <sc-for list="{{ gentResultBreakdown }}" as="b" hint-placeholder-count="0">
-                    <div style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:13px;">
-                      <span style="color:#d4d4d8;">{{ b.topic }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; color:#9a9aa2;">{{ b.ok }} / {{ b.total }}</span>
-                    </div>
-                  </sc-for>
-                </sc-if>
-                <div style="display:flex; gap:10px; margin-top:22px;">
-                  <div onClick="{{ goGentHub }}" style="flex:1; text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13.5px;">Back to Gentleman’s Etiquette hub</div>
-                  <sc-if value="{{ gentResultIsLevel }}" hint-placeholder-val="{{ false }}">
-                    <div onClick="{{ continueGentLevel }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">{{ continueGentLevelLabel }}</div>
-                  </sc-if>
-                </div>
-              </sc-if>
-
-              <sc-if value="{{ isGentFormulas }}" hint-placeholder-val="{{ false }}">
-                <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                <div style="font-size:22px; font-weight:700; margin:14px 0 14px;">Etiquette Glossary</div>
-                <input value="{{ gentFormulaSearchVal }}" onInput="{{ setGentFormulaSearch }}" placeholder="Search the glossary (e.g. valet, decanting, RSVP)…" style="width:100%; max-width:400px; padding:12px 16px; border-radius:11px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13.5px; outline:none; box-sizing:border-box; margin-bottom:20px;" style-focus="{ borderColor:'rgba(196,255,61,0.55)' }">
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;">
-                  <sc-for list="{{ gentFormulaList }}" as="f" hint-placeholder-count="8">
-                    <div style="border-radius:14px; background:#1b1d21; padding:16px;">
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.5px; color:#7c7c84; margin-bottom:6px;">{{ f.topic }}</div>
-                      <div style="font-size:14px; font-weight:700; color:#eef0f2; margin-bottom:8px;">{{ f.name }}</div>
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#4ADE80; margin-bottom:10px;">{{ f.formula }}</div>
-                      <div style="font-size:12px; color:#a4a4ac; line-height:1.5; margin-bottom:8px;">{{ f.when }}</div>
-                      <div style="font-size:11.5px; color:#8a8a92; line-height:1.5; margin-bottom:6px;">e.g. {{ f.example }}</div>
-                      <div style="font-size:11px; color:#7cb0ff; line-height:1.5;">💡 {{ f.tip }}</div>
-                    </div>
-                  </sc-for>
-                </div>
-              </sc-if>
-
-              <sc-if value="{{ isGentAgeLock }}" hint-placeholder-val="{{ false }}">
-                <div class="cc-glowcard" style="border-radius:16px; border:1px solid rgba(255,255,255,0.14); background:#1b1d21; padding:26px 24px; max-width:520px;">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">🔒 NOT AVAILABLE ON THIS ACCOUNT</div>
-                  <div style="font-size:18px; font-weight:700; margin-bottom:12px;">The Black Book is 18+ only</div>
-                  <p style="font-size:13.5px; color:#b8b8c0; line-height:1.6; margin-bottom:20px;">This account is set to under 18, so this section (spirits, cigars and other 18+ references) is switched off.</p>
-                  <div onClick="{{ goGentHub }}" class="cc-glowbtn" style="display:inline-block; padding:12px 20px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;" style-hover="{ transform:'translateY(-1px)' }">‹ Back to Gentleman's Etiquette</div>
-                </div>
-              </sc-if>
-
-              <sc-if value="{{ isGentDashboard }}" hint-placeholder-val="{{ false }}">
-                <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
-                <div style="background:#F5F1E8; border-radius:2px; padding:12px; margin:14px 0 18px; box-shadow:0 16px 40px rgba(58,42,32,0.16);">
-                <div style="border:1px solid rgba(91,26,26,0.35); border-radius:2px; padding:16px 20px 18px; font-family:'Cormorant Garamond',Georgia,serif; color:#3A2A20; text-align:center;">
-                  <div style="font-size:10px; letter-spacing:3px; color:#8a6a5a;">◆ PROGRESS</div>
-                  <h1 style="font-style:italic; font-weight:500; font-size:21px; color:#3A2A20; margin:6px 0 0;">Progress Dashboard</h1>
-                </div>
-                </div>
-                </sc-if>
-                <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:22px; font-weight:700; margin:14px 0 18px;">Progress Dashboard</div>
-                </sc-if>
-                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:22px;">
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">LEVEL</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashLevel }} / 120</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">RANK</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashGrade }}</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">XP</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashXP }}</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">DAILY STREAK</div><div style="font-size:24px; font-weight:800; margin-top:4px;">🔥 {{ gentDashStreak }}d</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">QUESTIONS ANSWERED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashQuestions }}</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">ACCURACY</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashAccuracy }}%</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">HOURS STUDIED</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashHours }}h</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">THIS WEEK / MONTH</div><div style="font-size:24px; font-weight:800; margin-top:4px;">{{ gentDashWeekly }} / {{ gentDashMonthly }}</div></div>
-                </div>
-                <div class="cc-dash-stat-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px;">
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">STRONGEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#4ADE80;">{{ gentDashStrongest }}</div></div>
-                  <div style="border-radius:14px; background:#1b1d21; padding:16px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d; margin-bottom:6px;">WEAKEST TOPIC</div><div style="font-size:16px; font-weight:700; color:#ff8a92;">{{ gentDashWeakest }}</div></div>
-                </div>
-              </sc-if>
-
-              <!-- ===== SCENARIO SIMULATOR ===== -->
-              <sc-if value="{{ isGentScenario }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92;">Scenario {{ gentScenNum }} of {{ gentScenTotal }}</span>
-                </div>
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">{{ gentScenTopic }} · WHAT WOULD YOU DO?</div>
-                <div style="font-size:19px; font-weight:700; margin-bottom:22px; letter-spacing:-.3px; max-width:640px; line-height:1.45;">{{ gentScenSetup }}</div>
-                <div style="display:flex; flex-direction:column; gap:10px; max-width:600px;">
-                  <sc-for list="{{ gentScenChoices }}" as="c" hint-placeholder-count="3">
-                    <div onClick="{{ c.pick }}" style="padding:14px 16px; border-radius:12px; border:1px solid {{ c.bd }}; background:{{ c.bg }}; color:#eef0f2; font-size:13.5px; cursor:pointer; line-height:1.4;">{{ c.text }}</div>
-                  </sc-for>
-                </div>
-                <sc-if value="{{ gentScenChosen }}" hint-placeholder-val="{{ false }}">
-                  <div style="margin-top:18px; border-radius:12px; padding:14px 16px; background:rgba(255,255,255,0.04); max-width:600px;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:{{ gentScenOutcomeColor }};">{{ gentScenQualityLabel }}</div>
-                    <div style="font-size:14px; color:#eef0f2; margin-top:8px; line-height:1.5;">{{ gentScenOutcomeText }}</div>
-                    <div onClick="{{ gentNextScenario }}" class="cc-glowbtn" style="margin-top:14px; display:inline-block; padding:9px 18px; border-radius:10px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:12.5px;">{{ gentNextScenarioLabel }}</div>
-                  </div>
-                </sc-if>
-              </sc-if>
-
-              <sc-if value="{{ isGentScenarioResults }}" hint-placeholder-val="{{ false }}">
-                <div style="border-radius:14px; border:1px solid rgba(196,255,61,0.3); background:#151a11; padding:22px; text-align:center; margin-bottom:20px;">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#C4FF3D;">SCENARIO SIMULATOR</div>
-                  <div style="font-size:44px; font-weight:800; margin-top:10px;">{{ gentScenResultPct }}%</div>
-                  <div style="font-size:15px; font-weight:700; margin-top:6px; color:#eef0f2;">{{ gentScenResultBest }} of {{ gentScenResultTotal }} best choices</div>
-                  <div style="font-size:12.5px; color:#8a8a92; margin-top:8px; max-width:420px; margin-left:auto; margin-right:auto; line-height:1.5;">Judgment, not memorisation — every scenario stays available to replay any time.</div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                  <div onClick="{{ goGentHub }}" style="flex:1; text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13.5px;">Back to Gentleman’s Etiquette hub</div>
-                  <div onClick="{{ goGentScenario }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">Play again</div>
-                </div>
-              </sc-if>
-
-              <!-- ===== OCCASION PREP BRIEFING ===== -->
-              <sc-if value="{{ isGentOccasion }}" hint-placeholder-val="{{ false }}">
-                <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                <div style="font-size:22px; font-weight:700; margin:14px 0 8px;">Occasion Prep Briefing</div>
-                <div style="font-size:12.5px; color:#8a8a92; margin-bottom:18px; max-width:600px; line-height:1.5;">Pick an upcoming occasion and get a real, AI-generated cheat-sheet — dress, dining and conversation guidance in one place.</div>
-                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;">
-                  <sc-for list="{{ gentOccasionChips }}" as="o" hint-placeholder-count="8">
-                    <span onClick="{{ o.pick }}" style="font-size:12.5px; font-weight:600; color:{{ o.c }}; border:1px solid {{ o.bd }}; background:{{ o.bg }}; border-radius:10px; padding:9px 15px; cursor:pointer;">{{ o.label }}</span>
-                  </sc-for>
-                </div>
-                <sc-if value="{{ hasGentOccasionSel }}" hint-placeholder-val="{{ false }}">
-                  <div onClick="{{ generateGentOccasionBriefing }}" class="cc-glowbtn" style="display:inline-block; padding:13px 22px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px; margin-bottom:20px;">✨ {{ gentOccasionBtnLabel }} — {{ gentOccasionSelName }}</div>
-                </sc-if>
-                <sc-if value="{{ hasGentOccasionErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff8a5b; margin-bottom:16px;">⚠ {{ gentOccasionErr }}</div></sc-if>
-                <sc-if value="{{ hasGentOccasionResult }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; max-width:900px;">
-                    <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px;">
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#7cb0ff; margin-bottom:8px;">DRESS</div>
-                      <p style="font-size:13px; color:#d5d5da; line-height:1.6; margin:0;">{{ gentOccasionDress }}</p>
-                    </div>
-                    <sc-if value="{{ hasGentOccasionDining }}" hint-placeholder-val="{{ false }}">
-                      <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px;">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#e8b45a; margin-bottom:8px;">DINING &amp; DRINKS</div>
-                        <p style="font-size:13px; color:#d5d5da; line-height:1.6; margin:0;">{{ gentOccasionDining }}</p>
-                      </div>
-                    </sc-if>
-                    <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px;">
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#d69bff; margin-bottom:8px;">CONVERSATION</div>
-                      <p style="font-size:13px; color:#d5d5da; line-height:1.6; margin:0;">{{ gentOccasionConversation }}</p>
-                    </div>
-                    <div class="cc-glowcard" style="border-radius:16px; background:#1b1d21; padding:18px; border:1px solid rgba(255,138,146,0.25);">
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#ff8a92; margin-bottom:8px;">AVOID</div>
-                      <p style="font-size:13px; color:#d5d5da; line-height:1.6; margin:0;">{{ gentOccasionAvoid }}</p>
-                    </div>
-                  </div>
-                </sc-if>
-              </sc-if>
-
-              <!-- ===== PLACE SETTING DRILL ===== -->
-              <sc-if value="{{ isGentPlaceSetting }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                  <span onClick="{{ goGentHub }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#eef0f2' }">‹ Back</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92;">{{ gentPSNum }} of {{ gentPSTotal }}</span>
-                </div>
-                <div style="font-size:18px; font-weight:700; margin-bottom:18px; max-width:600px;">{{ gentPSPrompt }}</div>
-                <div style="position:relative; width:100%; max-width:640px; height:280px; border-radius:18px; background:radial-gradient(circle at 50% 55%,#1c2016,#101208); border:1px solid rgba(255,255,255,0.08); margin-bottom:16px;">
-                  <sc-for list="{{ gentPSItems }}" as="h" hint-placeholder-count="12">
-                    <div onClick="{{ h.onClick }}" style="position:absolute; left:{{ h.left }}; top:{{ h.top }}; transform:translate(-50%,-50%); width:26px; height:26px; border-radius:8px; background:{{ h.bg }}; border:1.5px solid {{ h.bd }}; cursor:pointer;"></div>
-                  </sc-for>
-                </div>
-                <sc-if value="{{ gentPSFeedbackShow }}" hint-placeholder-val="{{ false }}">
-                  <div style="border-radius:12px; padding:14px 16px; background:rgba(255,255,255,0.04); max-width:600px; margin-bottom:14px;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; color:{{ gentPSFeedbackColor }};">{{ gentPSFeedbackTitle }}</div>
-                    <div style="font-size:13px; color:#d5d5da; margin-top:6px; line-height:1.5;">{{ gentPSFeedbackText }}</div>
-                  </div>
-                  <div onClick="{{ gentNextPS }}" class="cc-glowbtn" style="display:inline-block; padding:11px 20px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">{{ gentNextPSLabel }}</div>
-                </sc-if>
-              </sc-if>
-
-              <sc-if value="{{ isGentPlaceSettingResults }}" hint-placeholder-val="{{ false }}">
-                <div style="border-radius:14px; border:1px solid rgba(124,176,255,0.3); background:#10182a; padding:22px; text-align:center; margin-bottom:20px;">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#7cb0ff;">PLACE SETTING DRILL</div>
-                  <div style="font-size:44px; font-weight:800; margin-top:10px;">{{ gentPSResultPct }}%</div>
-                  <div style="font-size:15px; font-weight:700; margin-top:6px; color:#eef0f2;">{{ gentPSResultScore }} of {{ gentPSResultTotal }} correct</div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                  <div onClick="{{ goGentHub }}" style="flex:1; text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:rgba(255,255,255,0.08); color:#eef0f2; font-weight:700; font-size:13.5px;">Back to Gentleman’s Etiquette hub</div>
-                  <div onClick="{{ goGentPlaceSetting }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13.5px;">Play again</div>
-                </div>
-              </sc-if>
-
-            </sc-if>
 
           </div>
         </div>
@@ -8630,13 +7736,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div class="cc-gbody">
                 <!-- On Dress Code the drawing sits beside the rule; everywhere else the text
                      takes the full width and the grid collapses to one column. -->
-                <div class="{{ gentBodyCls }}">
-                  <sc-if value="{{ gentCardHasPhoto }}" hint-placeholder-val="{{ false }}">
-                    <div class="cc-gart">
-                      <img src="{{ gentCardPhoto }}" alt="{{ gentCardPhotoAlt }}" class="cc-gphoto">
-                    </div>
-                  </sc-if>
-                  <div style="min-width:0;">
+                <div style="min-width:0;">
                     <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:var(--head-ink);">{{ gentCardTitle }}</div>
                     <sc-if value="{{ gentCardNote }}" hint-placeholder-val="{{ false }}">
                       <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:var(--quiet-ink); margin-top:8px;">{{ gentCardNote }}</div>
@@ -8644,8 +7744,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     <!-- One concept, set large. The heading above it is what keeps a rule
                          readable on its own: "peak lapel or shawl collar" means nothing
                          without "Black Tie". -->
-                    <div style="font-size:21px; line-height:1.65; color:var(--body-ink); max-width:44ch; margin-top:22px;">{{ gentCardText }}</div>
-                  </div>
+                  <div style="font-size:21px; line-height:1.65; color:var(--body-ink); max-width:44ch; margin-top:22px;">{{ gentCardText }}</div>
                 </div>
               </div>
               <sc-if value="{{ gentCardHasStep }}" hint-placeholder-val="{{ false }}">
@@ -9577,7 +8676,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.12-303 · v11.303 dress-no-art';
+const NOTIF_BUILD_VERSION = '2026.09.12-304 · v11.304 gent-trim';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9725,13 +8824,6 @@ activities: this._mergeShipLog(s.activities),
       moneyMode:'hub', moneyTopic:'budgeting', moneyQ:null, moneyInput:'', moneyFeedback:null, moneyShowMethod:false, moneyScore:0, moneyTotal:0,
       moneyQueue:[], moneyIdx:0, moneyAnswers:[], moneyTimerEnd:0, moneyNow:Date.now(), moneyDuration:0, moneyStartedAt:0, moneyLastResult:null,
       moneyFormulaSearch:'', moneyLevel:0, moneyPlacement:false, moneyHint:'', moneyHintLoading:false, moneyHintErr:'',
-      gentMode:'hub', gentTopic:'dresscode', gentQ:null, gentInput:'', gentFeedback:null, gentShowMethod:false, gentScore:0, gentTotal:0,
-      gentQueue:[], gentIdx:0, gentAnswers:[], gentTimerEnd:0, gentNow:Date.now(), gentDuration:0, gentStartedAt:0, gentLastResult:null,
-      gentFormulaSearch:'', gentLevel:0, gentPlacement:false, gentHint:'', gentHintLoading:false, gentHintErr:'', gentWeakDrill:false,
-      gentScenQueue:[], gentScenIdx:0, gentScenChoice:null, gentScenPicks:[], gentScenStartedAt:0,
-      gentOccasionSel:'', gentOccasionResult:null, gentOccasionLoading:false, gentOccasionErr:'',
-      gentPSQueue:[], gentPSIdx:0, gentPSPicked:'', gentPSScore:0, gentPSStartedAt:0,
-      gentBBTab:'brands', gentBBCat:'watches', gentBBCity:'london', gentBBHotelRegion:'All', gentBBHotelQuery:'', gentBBLocationQuery:'',
       phyTutorMessages:[], phyTutorInput:'', phyTutorLoading:false, phyTutorErr:'', phyTutorVoiceId:'pro_f', phyTutorListening:false,
       tutorOpen:false, tutorSubject:'maths', tutorMessages:{}, tutorInput:'', tutorLoading:false, tutorErr:'', tutorVoiceId:'pro_f', tutorListening:false,
       qtMode:'closed', qtSubject:'english', qtType:'grammar', qtDifficulty:'Intermediate', qtLength:10, qtQueue:[], qtIdx:0, qtQ:null, qtInput:'', qtAnswers:[], qtStartedAt:0, qtIsDaily:false, qtLastResult:null,
@@ -9822,7 +8914,7 @@ activities: this._mergeShipLog(s.activities),
   async backupCodeToCloud(){
     if(this.state.backupBusy) return;
     if(!this._sbOn()){ this.setState({backupErr:'Sign in required to back up.'}); return; }
-    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','exercise-index.js','favicon.png','gentleman-blackbook.js','health-tracker.js','learning-english.js','learning-gentleman.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
+    const files=['index.html','countries-data.js','constellation-engine.js','void-orb-engine.js','ai-gateway.js','exercise-index.js','favicon.png','health-tracker.js','learning-english.js','learning-grammar.js','learning-history.js','learning-maths.js','learning-money.js','learning-physiology.js','learning-science.js','learning-speaking.js','manifest.json','notif-engine.js','notification-engine.js','orb-engine.js','providers-data.js','service-worker.js','supabase-client.js','support.js','voice-assistant-engine.js','voice-engine.js','anatomy-3d.js','anatomy-three.js','anatomy-model.glb','vendor/react.production.min.js','vendor/react-dom.production.min.js','vendor/supabase.min.js'];
     this.setState({backupBusy:true, backupErr:''});
     try{
       for(const f of files){
@@ -10871,7 +9963,7 @@ activities: this._mergeShipLog(s.activities),
   }
   _testTierOrder(){ return ['Easy','Mid','High','Max','Ultra']; }
   _testTierFromCount(n){ if(n>=30) return 'Ultra'; if(n>=16) return 'Max'; if(n>=8) return 'High'; if(n>=3) return 'Mid'; return 'Easy'; }
-  _totalQtTestsDone(){ const subs=['maths','english','science','grammar','history','physiology','speaking','money','gentleman']; return subs.reduce((sum,s)=>sum+(((this._qtState(s).history)||[]).length),0); }
+  _totalQtTestsDone(){ const subs=['maths','english','science','grammar','history','physiology','speaking','money']; return subs.reduce((sum,s)=>sum+(((this._qtState(s).history)||[]).length),0); }
   _effectiveTestTier(){ const S=this.state; const auto=S.prefs.testDifficultyAuto!==false; return auto ? this._testTierFromCount(this._totalQtTestsDone()) : (S.prefs.testDifficulty||'Easy'); }
   _mapGlobalTierToSubjectDifficulty(tier, subjOpts){ const order=this._testTierOrder(); const idx=Math.max(0,order.indexOf(tier)); const ranked=(subjOpts||[]).filter(d=>d!=='Auto'); if(!ranked.length) return (subjOpts&&subjOpts[0])||'Intermediate'; const mappedIdx=Math.round(idx/(order.length-1)*(ranked.length-1)); return ranked[mappedIdx]; }
   setTestDifficulty(tier){ this.mut(s=>({prefs:{...s.prefs, testDifficulty:tier, testDifficultyAuto:false}})); }
@@ -11131,7 +10223,7 @@ activities: this._mergeShipLog(s.activities),
   // ===== QUICK TEST =====
   _qtToday(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
   _qtDefaults(){ return { history:[], topicStats:{}, xpByDate:{}, dailyChallenge:null }; }
-  _qtEngine(subj){ subj=subj||this.state.qtSubject; if(subj==='maths') return window.LearningMaths; if(subj==='science') return window.LearningScience; if(subj==='grammar') return window.LearningGrammar; if(subj==='history') return window.LearningHistory; if(subj==='physiology') return window.LearningPhysiology; if(subj==='speaking') return window.LearningSpeaking; if(subj==='money') return window.LearningMoney; if(subj==='gentleman') return window.LearningGentleman; return this._LE(); }
+  _qtEngine(subj){ subj=subj||this.state.qtSubject; if(subj==='maths') return window.LearningMaths; if(subj==='science') return window.LearningScience; if(subj==='grammar') return window.LearningGrammar; if(subj==='history') return window.LearningHistory; if(subj==='physiology') return window.LearningPhysiology; if(subj==='speaking') return window.LearningSpeaking; if(subj==='money') return window.LearningMoney; return this._LE(); }
   // A subject's Progress Overview was reading only <subject>History, which holds finished
   // full tests. Everything you do in Quick Test and practice lands in a separate
   // quickTest<Subject> store, so a day of real questions showed 0 questions, 0% accuracy
@@ -11142,10 +10234,10 @@ activities: this._mergeShipLog(s.activities),
   // count "activities tagged Learning" and so ignored every question actually answered.
   _learningTotalXP(){
     const L=this.state.learning||{};
-    const SUBJ=['english','maths','science','grammar','history','physiology','speaking','money','gentleman'];
+    const SUBJ=['english','maths','science','grammar','history','physiology','speaking','money'];
     const HIST={english:'englishHistory', maths:'mathsHistory', science:'scienceHistory',
       grammar:'grammarHistory', history:'historyHistory', physiology:'physiologyHistory',
-      speaking:'speakingHistory', money:'moneyHistory', gentleman:'gentHistory'};
+      speaking:'speakingHistory', money:'moneyHistory'};
     let xp=0;
     for(const s of SUBJ){
       const qt=(L[this._qtStorageKey(s)])||{};
@@ -11174,11 +10266,11 @@ activities: this._mergeShipLog(s.activities),
       monthly:dates.filter(d=>d>=now30).length,
     };
   }
-  _qtStorageKey(subj){ subj=subj||this.state.qtSubject; if(subj==='maths') return 'quickTestMaths'; if(subj==='science') return 'quickTestScience'; if(subj==='grammar') return 'quickTestGrammar'; if(subj==='history') return 'quickTestHistory'; if(subj==='physiology') return 'quickTestPhysiology'; if(subj==='speaking') return 'quickTestSpeaking'; if(subj==='money') return 'quickTestMoney'; if(subj==='gentleman') return 'quickTestGentleman'; return 'quickTest'; }
+  _qtStorageKey(subj){ subj=subj||this.state.qtSubject; if(subj==='maths') return 'quickTestMaths'; if(subj==='science') return 'quickTestScience'; if(subj==='grammar') return 'quickTestGrammar'; if(subj==='history') return 'quickTestHistory'; if(subj==='physiology') return 'quickTestPhysiology'; if(subj==='speaking') return 'quickTestSpeaking'; if(subj==='money') return 'quickTestMoney'; return 'quickTest'; }
   _qtState(subj){ const s=this.state; return (s.learning&&s.learning[this._qtStorageKey(subj)])||this._qtDefaults(); }
   _qtDefaultsMerge(s, subj){ return {...this._qtDefaults(), ...((s.learning&&s.learning[this._qtStorageKey(subj)])||{})}; }
-  _qtUserLevel(subj){ subj=subj||this.state.qtSubject; const L=this.state.learning; if(subj==='maths') return (L&&L.mathsLevel)||1; if(subj==='science') return (L&&L.scienceLevel)||1; if(subj==='grammar') return (L&&L.grammarLevel)||1; if(subj==='history') return (L&&L.historyLevel)||1; if(subj==='physiology') return (L&&L.physiologyLevel)||1; if(subj==='speaking') return (L&&L.speakingLevel)||1; if(subj==='money') return (L&&L.moneyLevel)||1; if(subj==='gentleman') return (L&&L.gentLevel)||1; return (L&&L.englishLevel)||1; }
-  qtOpenSetup(subject){ const subj=subject||'english'; const defaultType= (subj==='maths'||subj==='science'||subj==='grammar'||subj==='history'||subj==='physiology'||subj==='speaking'||subj==='money'||subj==='gentleman') ? 'mixed' : 'grammar'; const eng=this._qtEngine(subj); const defaultDiff=(eng&&eng.QT_DIFFICULTIES)?this._mapGlobalTierToSubjectDifficulty(this._effectiveTestTier(), eng.QT_DIFFICULTIES):'Intermediate'; this.setState({qtSubject:subj, qtType:defaultType, qtDifficulty:defaultDiff, qtMode:'setup'}); }
+  _qtUserLevel(subj){ subj=subj||this.state.qtSubject; const L=this.state.learning; if(subj==='maths') return (L&&L.mathsLevel)||1; if(subj==='science') return (L&&L.scienceLevel)||1; if(subj==='grammar') return (L&&L.grammarLevel)||1; if(subj==='history') return (L&&L.historyLevel)||1; if(subj==='physiology') return (L&&L.physiologyLevel)||1; if(subj==='speaking') return (L&&L.speakingLevel)||1; if(subj==='money') return (L&&L.moneyLevel)||1; return (L&&L.englishLevel)||1; }
+  qtOpenSetup(subject){ const subj=subject||'english'; const defaultType= (subj==='maths'||subj==='science'||subj==='grammar'||subj==='history'||subj==='physiology'||subj==='speaking'||subj==='money') ? 'mixed' : 'grammar'; const eng=this._qtEngine(subj); const defaultDiff=(eng&&eng.QT_DIFFICULTIES)?this._mapGlobalTierToSubjectDifficulty(this._effectiveTestTier(), eng.QT_DIFFICULTIES):'Intermediate'; this.setState({qtSubject:subj, qtType:defaultType, qtDifficulty:defaultDiff, qtMode:'setup'}); }
   qtClose(){ this.setState({qtMode:'closed'}); }
   qtEndTest(){ if(!this.state.qtAnswers.length){ this.qtClose(); return; } this.qtFinish(); }
   qtSetType(t){ this.setState({qtType:t}); }
@@ -14499,6 +13591,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.304', date:'Sep 12, 2026', major:true, notes:[
+      'Dress Code is off the Gentlemen\u2019s Centre. It is being restructured, so rather than leave a half-finished subject in place it has gone entirely \u2014 the six occasions, their twenty-two rules, and the ten dress questions that fed the daily test.',
+      'The daily test is therefore one question from each of Events, History and Dining Manners rather than four. Days you finished under the old four-question set still count toward your streak, and your accuracy is unchanged.',
+      'The original Gentleman\u2019s Etiquette subject is out of the Learning Centre, along with The Black Book that sat inside it. The Learning Centre is eight subjects now. The Gentlemen\u2019s Centre on the main rail is the one that stays.',
+      'Nothing else in the Learning Centre moved \u2014 the other eight subjects keep their levels, history and progress exactly as they were.',
+    ]},
     {version:'v11.303', date:'Sep 12, 2026', major:false, notes:[
       'The drawn outfits are off the Dress Code cards. Six line drawings of a jacket told the occasions apart only barely \u2014 and the page is being restructured, so a card now carries its rule and nothing else.',
       'The slot for real photographs stays, so supplied images still drop straight in without a card ever showing a broken one.',
@@ -18413,100 +17511,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   moneyOpenDashboard(){ this._moneyStopTicker(); this.setState({moneyMode:'dashboard'}); }
   setMoneyFormulaSearch(e){ this.setState({moneyFormulaSearch:e.target.value}); }
 
-  _gentSaveHistory(entry){ this.mut(s=>({ learning:{ ...(s.learning||{}), gentHistory:[entry, ...((s.learning&&s.learning.gentHistory)||[])].slice(0,30) } })); this.save(); }
-  _gentStopTicker(){ if(this._gentTimer){ clearInterval(this._gentTimer); this._gentTimer=null; } }
-  _gentStartTicker(){ this._gentStopTicker(); this._gentTimer=setInterval(()=>{
-    if(!(this.state.scene==='learning' && this.state.learningTab==='Gentleman’s Etiquette' && this.state.gentMode==='test')){ this._gentStopTicker(); return; }
-    const now=Date.now(); this.setState({gentNow:now});
-    if(now>=this.state.gentTimerEnd){ this.gentFinishTest(); }
-  }, 250); }
-  gentGoHub(){ const wasBlackBook=this.state.scene==='blackbook'; this._gentStopTicker(); this.setState({gentMode:'hub', gentQ:null, gentFeedback:null, gentInput:'', scene:'learning'}); if(wasBlackBook) this._forceReflowNextFrame(); }
-  gentStartLearn(topicKey){ this.setState({gentMode:'learn', gentTopic:topicKey}); }
-  gentStartPractice(topicKey){ const LG=window.LearningGentleman; if(!LG) return; const lvl=(this.state.learning&&this.state.learning.gentLevel)||1;
-    this.setState({ gentMode:'practice', gentTopic:topicKey, gentQ:LG.generate(topicKey), gentInput:'', gentFeedback:null, gentShowMethod:false, gentScore:0, gentTotal:0, gentHint:'', gentHintErr:'' }); }
-  setGentInput(e){ this.setState({gentInput:e.target.value}); }
-  toggleGentMethod(){ this.setState(s=>({gentShowMethod:!s.gentShowMethod})); }
-  gentIDKPractice(){ const S=this.state; if(!S.gentQ||S.gentFeedback||S.gentMode!=='practice') return;
-    this.setState(s=>({ gentFeedback:{ok:false, idk:true, text:'No worries — the answer is "'+S.gentQ.answer+'".'}, gentTotal:s.gentTotal+1 })); }
-  gentSubmit(){ const LG=window.LearningGentleman; if(!LG) return; const S=this.state; if(!S.gentQ||S.gentFeedback) return;
-    const ok=LG.checkAnswer(S.gentQ, S.gentInput);
-    this.setState(s=>({ gentFeedback:{ok, text: ok?'Correct!':('Not quite — the answer is "'+S.gentQ.answer+'".')}, gentScore:s.gentScore+(ok?1:0), gentTotal:s.gentTotal+1 })); }
-  gentNextPractice(){ const LG=window.LearningGentleman; if(!LG) return; const S=this.state;
-    this.setState({ gentQ:LG.generate(S.gentTopic), gentInput:'', gentFeedback:null, gentShowMethod:false, gentHint:'', gentHintErr:'' }); }
-  async gentGetHint(){ const S=this.state; if(!window.claude || !S.gentQ){ this.setState({gentHintErr: window.claude?'':'AI unavailable in this environment'}); return; }
-    this.setState({gentHintLoading:true, gentHintErr:'', gentHint:''});
-    const sys='You are a refined etiquette and protocol coach. Give exactly ONE short hint (max 2 sentences) that guides the student toward the correct term or convention. NEVER state the final answer.';
-    const prompt='Topic: '+S.gentQ.topic+'. Question: '+S.gentQ.prompt+'. Give a short hint only, no answer.';
-    try{ const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:200}); this.setState({gentHint:(raw||'').trim(), gentHintLoading:false}); }
-    catch(e){ this.setState({gentHintLoading:false, gentHintErr:(e&&e.message)||'Could not get a hint'}); }
-  }
-  gentStartPlacement(){ const LG=window.LearningGentleman; if(!LG) return; this._gentBusy=false; const n=16, dur=12*60000, now=Date.now();
-    this.setState({ gentMode:'test', gentPlacement:true, gentWeakDrill:false, gentLevel:0, gentQueue:LG.generatePlacementSet(n), gentIdx:0, gentQ:null, gentAnswers:[], gentInput:'', gentFeedback:null, gentScore:0, gentTotal:n, gentTimerEnd:now+dur, gentNow:now, gentDuration:dur, gentStartedAt:now },()=>{ this.setState({gentQ:this.state.gentQueue[0]}); }); this._gentStartTicker(); }
-  // Level Ladder tests are genuinely tailored: once you have focus areas from a placement
-  // test or a weak-topics drill, roughly a third of each subsequent Level Ladder test is
-  // drawn specifically from those weak topics — the rest stays normal mixed-level practice,
-  // so it never becomes a narrow drill, just weighted toward what you actually got wrong.
-  gentStartLevelTest(){ const LG=window.LearningGentleman; if(!LG) return; const lvl=Math.max(1,(this.state.learning&&this.state.learning.gentLevel)||1); const n=this._levelTestQuestionCount(lvl,120), dur=8*60000, now=Date.now();
-    const storedFocusAreas=(this.state.learning&&this.state.learning.gentFocusAreas)||[];
-    const dueTopics=this._srsDueTopics('Gentleman');
-    const focusAreas=dueTopics.length?dueTopics:storedFocusAreas;
-    const keyFor=(label)=>Object.keys(LG.TOPIC_LABELS).find(k=>LG.TOPIC_LABELS[k]===label);
-    const focusKeys=focusAreas.map(keyFor).filter(Boolean);
-    let queue;
-    if(focusKeys.length){
-      const focusCount=Math.min(n,Math.round(n*0.35));
-      queue=[];
-      for(let i=0;i<n;i++) queue.push(i<focusCount ? LG.generate(focusKeys[i%focusKeys.length], lvl) : LG.generateForLevel(lvl));
-      for(let i=queue.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=queue[i]; queue[i]=queue[j]; queue[j]=t; }
-    } else queue=LG.generateLevelSet(n,lvl);
-    this.setState({ gentMode:'test', gentPlacement:false, gentWeakDrill:false, gentLevel:lvl, gentQueue:queue, gentIdx:0, gentQ:null, gentAnswers:[], gentInput:'', gentFeedback:null, gentScore:0, gentTotal:n, gentTimerEnd:now+dur, gentNow:now, gentDuration:dur, gentStartedAt:now },()=>{ this.setState({gentQ:this.state.gentQueue[0]}); }); this._gentStartTicker(); }
-  gentSubmitTest(){ if(this._gentBusy) return; const LG=window.LearningGentleman; if(!LG) return; const S=this.state; if(!S.gentQ) return; this._gentBusy=true;
-    const ok=LG.checkAnswer(S.gentQ, S.gentInput);
-    const answers=[...S.gentAnswers, {topic:S.gentQ.topic, ok}]; const ns=ok?S.gentScore+1:S.gentScore; const nextIdx=S.gentIdx+1;
-    if(nextIdx>=S.gentQueue.length){ this.setState({gentAnswers:answers, gentScore:ns},()=>{ this.gentFinishTest(); this._gentBusy=false; }); }
-    else { this.setState({ gentAnswers:answers, gentScore:ns, gentIdx:nextIdx, gentQ:S.gentQueue[nextIdx], gentInput:'' },()=>{ this._gentBusy=false; }); } }
-  gentSkipTest(){ if(this._gentBusy) return; const S=this.state; if(S.gentMode!=='test') return; this._gentBusy=true;
-    const answers=[...S.gentAnswers, {topic:S.gentQ.topic, ok:false}]; const nextIdx=S.gentIdx+1;
-    if(nextIdx>=S.gentQueue.length){ this.setState({gentAnswers:answers},()=>{ this.gentFinishTest(); this._gentBusy=false; }); }
-    else { this.setState({ gentAnswers:answers, gentIdx:nextIdx, gentQ:S.gentQueue[nextIdx], gentInput:'' },()=>{ this._gentBusy=false; }); } }
-  gentIDKTest(){ if(this._gentBusy) return; const S=this.state; if(S.gentMode!=='test') return; this._gentBusy=true;
-    const answers=[...S.gentAnswers, {topic:S.gentQ.topic, ok:false, idk:true}]; const nextIdx=S.gentIdx+1;
-    if(nextIdx>=S.gentQueue.length){ this.setState({gentAnswers:answers},()=>{ this.gentFinishTest(); this._gentBusy=false; }); }
-    else { this.setState({ gentAnswers:answers, gentIdx:nextIdx, gentQ:S.gentQueue[nextIdx], gentInput:'' },()=>{ this._gentBusy=false; }); } }
-  gentEndTest(){ if(!this.state.gentAnswers.length){ this.gentGoHub(); return; } this.gentFinishTest(); }
-  gentFinishTest(){ if(this.state.gentMode==='results') return; this._gentStopTicker(); const LG=window.LearningGentleman; const S=this.state; const pct=S.gentTotal?Math.round(S.gentScore/S.gentTotal*100):0;
-    const byTopic={}; S.gentAnswers.forEach(a=>{ byTopic[a.topic]=byTopic[a.topic]||{ok:0,total:0}; byTopic[a.topic].total++; if(a.ok) byTopic[a.topic].ok++; });
-    const breakdown=Object.keys(byTopic).map(k=>({topic:k, ok:byTopic[k].ok, total:byTopic[k].total}));
-    this._srsUpdateFromBreakdown('Gentleman',breakdown);
-    const timeTaken=Math.round((Date.now()-S.gentStartedAt)/1000);
-    if(S.gentPlacement){
-      const level=LG.levelFromScore(pct); const grade=LG.gradeFromLevel(level); const sw=LG.strongestWeakest(breakdown);
-      const curLevel=((S.learning&&S.learning.gentLevel)||1);
-      this.mut(s=>({ learning:{...(s.learning||{}), gentLevel:Math.max(curLevel,level), gentGrade:grade, gentStrongest:sw.strongest, gentWeakest:sw.weakest, gentFocusAreas:sw.focusAreas, gentPlacementDone:true} }));
-      const entry={ id:'gent'+Date.now(), mode:'Placement Test', date:Date.now(), score:S.gentScore, total:S.gentTotal, pct, level, grade, strongest:sw.strongest, weakest:sw.weakest, focusAreas:sw.focusAreas, timeTaken, breakdown };
-      this._gentSaveHistory(entry); this.setState({gentMode:'results', gentLastResult:entry}); this.logCompletedTest('Etiquette Placement Test', S.gentScore+'/'+S.gentTotal+' ('+pct+'%)', timeTaken/60); return;
-    }
-    const passed=pct>=40; const curMax=((S.learning&&S.learning.gentLevel)||1); let leveledUp=false;
-    if(passed && S.gentLevel>=curMax && curMax<120){ leveledUp=true; this.mut(s=>({ learning:{...(s.learning||{}), gentLevel:Math.min(120,curMax+1), gentGrade:LG.gradeFromLevel(Math.min(120,curMax+1))} })); }
-    const entry={ id:'gent'+Date.now(), mode:'Level '+S.gentLevel, level:S.gentLevel, date:Date.now(), score:S.gentScore, total:S.gentTotal, pct, passed, leveledUp, timeTaken, breakdown };
-    // Keep focus areas current — recomputed from ALL history (not just this one test), so the
-    // "tailored toward what you failed" weighting in gentStartLevelTest stays up to date as you
-    // keep practising, not frozen at the original placement test result.
-    const allHist=[entry, ...((S.learning&&S.learning.gentHistory)||[])];
-    const acc={}; allHist.forEach(h=>(h.breakdown||[]).forEach(b=>{ acc[b.topic]=acc[b.topic]||{topic:b.topic,ok:0,total:0}; acc[b.topic].ok+=b.ok; acc[b.topic].total+=b.total; }));
-    const swAll=LG.strongestWeakest(Object.values(acc));
-    this.mut(s=>({ learning:{...(s.learning||{}), gentStrongest:swAll.strongest||s.learning.gentStrongest, gentWeakest:swAll.weakest||s.learning.gentWeakest, gentFocusAreas:swAll.focusAreas.length?swAll.focusAreas:s.learning.gentFocusAreas} }));
-    this._gentSaveHistory(entry); this.setState({gentMode:'results', gentLastResult:entry});
-    this.logCompletedTest('Etiquette Level '+S.gentLevel+' Test', S.gentScore+'/'+S.gentTotal+' ('+pct+'%)', timeTaken/60);
-  }
-  gentOpenFormulas(){ this._gentStopTicker(); this.setState({gentMode:'formulas', gentFormulaSearch:''}); }
-  gentOpenDashboard(){ this._gentStopTicker(); this.setState({gentMode:'dashboard'}); }
-  setGentFormulaSearch(e){ this.setState({gentFormulaSearch:e.target.value}); }
-  // ===== The Black Book — insider brands + worldwide locations reference =====
-  // The Black Book is its own top-level scene (not nested under scene==='learning'), same
-  // pattern as the Notification Testing Panel — a page this private shouldn't depend on
-  // three simultaneous conditions (scene + tab + mode) all agreeing to render correctly.
-  gentOpenBlackBook(){ if(this.state.prefs.isMinor){ this.setState({gentMode:'agelock'}); return; } this._gentStopTicker(); this.setState({gentMode:'blackbook', scene:'blackbook'}); this._forceReflowNextFrame(); }
   // Dark Psychology and The Black Book are private, sensitive pages — while either is open
   // the sidebar and top bar hide entirely (same collapse Focus Mode uses) so nothing about
   // them is visible around the edges of the screen.
@@ -18536,17 +17540,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     requestAnimationFrame(()=>requestAnimationFrame(toggle));
     setTimeout(toggle, 60);
   }
-  setGentBBTab(t){ this.setState({gentBBTab:t}); }
-  setGentBBCat(k){ this.setState({gentBBCat:k}); }
-  setGentBBCity(k){ this.setState({gentBBCity:k}); }
-  setGentBBHotelRegion(r){ this.setState({gentBBHotelRegion:r}); }
-  setGentBBHotelQuery(e){ this.setState({gentBBHotelQuery:e.target.value}); }
-  setGentBBLocationQuery(e){ this.setState({gentBBLocationQuery:e.target.value}); }
-  // "My Black Book" — saved brands/places, synced through the same private notes vault
-  // (tagged so they list separately) rather than a new table, since that vault already
-  // syncs to Supabase per-account.
-  gentSaveBBItem(category,name,note){ const id=this._uuid(); const title='⚜ Black Book Saved'; const body=category+' — '+name+(note?(' :: '+note):''); this.mut(s=>({notes:[{id,title,body,ts:Date.now()},...s.notes]})); if(this._sbOn()) window.SB.insert('notes',{id,user_id:this.state.authUserId,title,body}); this.showToast('system','Saved to My Black Book',name); }
-  gentRemoveSavedBB(id){ this.mut(s=>({notes:s.notes.filter(n=>n.id!==id)})); if(this._sbOn()) window.SB.remove('notes',id); }
   // ===== Private per-entry notes (Black Book + Dark Psychology) — reuses the same
   // private notes vault as the Safety Journal / Saved items, keyed by a scope+entry
   // string in the title so one note can exist per entry without a new table.
@@ -18577,66 +17570,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(existing){ this.mut(s=>({notes:s.notes.filter(n=>n.id!==existing.id)})); if(this._sbOn()) window.SB.remove('notes', existing.id); }
     this.setState({noteEditor:null});
   }
-  // ===== Scenario Simulator — branching real-world "what would you do" situations =====
-  gentStartScenarios(){ const LG=window.LearningGentleman; if(!LG) return; this._gentStopTicker();
-    this.setState({ gentMode:'scenario', gentScenQueue:LG.generateScenarioSet(8), gentScenIdx:0, gentScenChoice:null, gentScenPicks:[], gentScenStartedAt:Date.now() }); }
-  gentPickScenario(choiceIdx){ const S=this.state; if(S.gentScenChoice!=null) return;
-    const sc=S.gentScenQueue[S.gentScenIdx]; if(!sc) return; const choice=sc.choices[choiceIdx]; if(!choice) return;
-    this.setState(s=>({ gentScenChoice:choiceIdx, gentScenPicks:[...s.gentScenPicks, {id:sc.id, quality:choice.quality}] })); }
-  gentNextScenario(){ const S=this.state; const nextIdx=S.gentScenIdx+1;
-    if(nextIdx>=S.gentScenQueue.length){
-      const best=S.gentScenPicks.filter(p=>p.quality==='best').length, total=S.gentScenPicks.length;
-      const timeTaken=Math.round((Date.now()-S.gentScenStartedAt)/1000);
-      this.logCompletedTest('Etiquette Scenario Simulator', best+'/'+total+' best choices', timeTaken/60);
-      this.setState({ gentMode:'scenarioResults' }); return;
-    }
-    this.setState({ gentScenIdx:nextIdx, gentScenChoice:null }); }
-  // ===== Occasion Prep Briefing — real AI, grounded in a chosen upcoming occasion =====
-  gentOpenOccasion(){ this._gentStopTicker(); this.setState({gentMode:'occasion', gentOccasionSel:'', gentOccasionResult:null, gentOccasionErr:''}); }
-  gentSetOccasion(v){ this.setState({gentOccasionSel:v, gentOccasionResult:null, gentOccasionErr:''}); }
-  async generateGentOccasionBriefing(){
-    const S=this.state; const occ=S.gentOccasionSel; if(!occ) return;
-    if(!window.claude){ this.setState({gentOccasionErr:'AI unavailable in this environment'}); return; }
-    this.setState({gentOccasionLoading:true, gentOccasionErr:''});
-    const sys='You are a world-class etiquette and protocol coach preparing a private briefing for a specific upcoming occasion. Precise, practical, encouraging genuine confidence rather than snobbery. Return ONLY valid minified JSON, no markdown fences.';
-    const shape='{"dress":"2-3 sentence dress code guidance","dining":"2-3 sentence dining or drinks guidance (empty string if not relevant to this occasion)","conversation":"2-3 sentence conversation and social guidance","avoid":"1-2 sentence common mistake to avoid at this occasion"}';
-    const prompt='Prepare a concise, practical etiquette briefing for this upcoming occasion: "'+occ+'". Return JSON exactly matching this shape: '+shape;
-    try{ const raw=await window.claude.complete({system:sys, messages:[{role:'user',content:prompt}], model:'claude-sonnet-4-5', max_tokens:600});
-      const j=this._extractJSON(raw);
-      if(j && (j.dress||j.dining||j.conversation)) this.setState({gentOccasionResult:j, gentOccasionLoading:false});
-      else this.setState({gentOccasionLoading:false, gentOccasionErr:'Could not parse the AI response — try again.'});
-    }catch(e){ this.setState({gentOccasionLoading:false, gentOccasionErr:(e&&e.message)||'Generation failed'}); }
-  }
-  // ===== Place Setting Drill — tap the correct position on an unlabelled diagram =====
-  gentStartPlaceSetting(){ const LG=window.LearningGentleman; if(!LG) return; this._gentStopTicker();
-    this.setState({ gentMode:'placesetting', gentPSQueue:LG.generatePlaceSettingSet(8), gentPSIdx:0, gentPSPicked:'', gentPSScore:0, gentPSStartedAt:Date.now() }); }
-  gentPickPS(itemId){ const S=this.state; if(S.gentPSPicked) return;
-    const cur=S.gentPSQueue[S.gentPSIdx]; if(!cur) return; const ok=itemId===cur.correct;
-    this.setState(s=>({ gentPSPicked:itemId, gentPSScore:s.gentPSScore+(ok?1:0) })); }
-  gentNextPS(){ const S=this.state; const nextIdx=S.gentPSIdx+1;
-    if(nextIdx>=S.gentPSQueue.length){
-      const timeTaken=Math.round((Date.now()-S.gentPSStartedAt)/1000);
-      this.logCompletedTest('Etiquette Place Setting Drill', S.gentPSScore+'/'+S.gentPSQueue.length, timeTaken/60);
-      this.setState({ gentMode:'placesettingResults' }); return;
-    }
-    this.setState({ gentPSIdx:nextIdx, gentPSPicked:'' }); }
-  // ===== Drill My Weak Topics — builds a mixed test weighted toward your lowest-accuracy topics =====
-  _gentTopicStats(){ const hist=(this.state.learning&&this.state.learning.gentHistory)||[]; const acc={};
-    hist.forEach(h=>(h.breakdown||[]).forEach(b=>{ acc[b.topic]=acc[b.topic]||{ok:0,total:0}; acc[b.topic].ok+=b.ok; acc[b.topic].total+=b.total; }));
-    return Object.keys(acc).map(k=>({topic:k, ok:acc[k].ok, total:acc[k].total, pct:acc[k].total?Math.round(acc[k].ok/acc[k].total*100):0})); }
-  gentStartWeakDrill(){ const LG=window.LearningGentleman; if(!LG) return;
-    const stats=this._gentTopicStats().filter(s=>s.total>=2).sort((a,b)=>a.pct-b.pct);
-    if(!stats.length) return;
-    const keyFor=(label)=>Object.keys(LG.TOPIC_LABELS).find(k=>LG.TOPIC_LABELS[k]===label);
-    const keys=stats.slice(0,3).map(s=>keyFor(s.topic)).filter(Boolean);
-    if(!keys.length) return;
-    const lvl=Math.max(1,(this.state.learning&&this.state.learning.gentLevel)||1); const n=12, dur=8*60000, now=Date.now();
-    const queue=[]; for(let i=0;i<n;i++) queue.push(LG.generate(keys[i%keys.length], lvl));
-    this.setState({ gentMode:'test', gentPlacement:false, gentWeakDrill:true, gentLevel:lvl, gentQueue:queue, gentIdx:0, gentQ:null, gentAnswers:[], gentInput:'', gentFeedback:null, gentScore:0, gentTotal:n, gentTimerEnd:now+dur, gentNow:now, gentDuration:dur, gentStartedAt:now },()=>{ this.setState({gentQ:this.state.gentQueue[0]}); }); this._gentStartTicker(); }
-  // ===== Daily Real-World Challenge — one bite-size action per day, date-seeded =====
-  gentMarkChallengeDone(){ const today=this._qtToday();
-    this.mut(s=>({ learning:{...(s.learning||{}), gentChallengeLog:{...((s.learning&&s.learning.gentChallengeLog)||{}), [today]:true} } }));
-    this.showToast('system','Challenge complete','Nice — real-world etiquette practice logged for today.'); }
   _tutorSystemPrompt(subj){ return ({
     maths:'You are a world-class, highly experienced GCSE Mathematics teacher. Explain concepts step by step, give hints before answers, and adapt to the student\u2019s level.',
     english:'You are a world-class, highly experienced GCSE English Language teacher, expert in vocabulary, reading comprehension and writing craft.',
@@ -20109,7 +19042,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       dietDoneToday:_dietBase.filter(d=>d.checked).length, dietTotalToday:_dietBase.length,
       dietDashList:_dietBase.slice(0,8).map(d=>({ name:d.name, cat:d.cat, check:d.checked?'✓':'', bdr:d.checked?'#FFFFFF':'rgba(255,255,255,0.16)', fill:d.checked?'#FFFFFF':'transparent', txt:d.checked?'#8f9a94':'#eef0f2', strike:d.checked?'line-through':'none', toggle:()=>this.toggleDietItem(d.id), toggleLock:()=>this.toggleDietLock(d.id), lockIcon:d.locked?'\ud83d\udd12':'\ud83d\udd13', lockColor:d.locked?'#e8b45a':'#5f5f66' })),
       goHealthDiet:()=>this.setState({scene:'fitness'}),
-      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isForge:scene==='forge', isBiz:scene==='business', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych', isBlackBookScene:scene==='blackbook',
+      isHome:scene==='home', isDash:scene==='dashboard', isBrief:scene==='briefing', isGlobe:scene==='globe', isFitness:scene==='fitness', isForge:scene==='forge', isBiz:scene==='business', isChecklists:false, isNotifTest:scene==='notiftest', isMusic:scene==='music', isCal:scene==='calendar', isLearning:scene==='learning', isVoice:scene==='voice', isDarkPsychScene:scene==='darkpsych',
       noteEditorOpen: !!S.noteEditor, noteEditorLabel: S.noteEditor?S.noteEditor.label:'', noteEditorDraft: S.noteEditor?S.noteEditor.draft:'',
       setNoteEditorDraft:(e)=>this.setEntryNoteDraft(e), saveNoteEditor:()=>this.saveEntryNote(), closeNoteEditor:()=>this.closeEntryNote(), clearNoteEditor:()=>this.clearEntryNote(),
       ...this._safe(()=>{
@@ -20346,7 +19279,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const qtResultCorrect=r?r.score:0, qtResultTotal=r?r.total:0, qtResultIncorrectCount=r?(r.total-r.score):0;
         return {
           isQtClosed:S.qtMode==='closed', isQtSetup:S.qtMode==='setup', isQtRunning:S.qtMode==='running', isQtResults:S.qtMode==='results',
-          openQtSetup:()=>this.qtOpenSetup('english'), closeQt:()=>this.qtClose(), qtBackLabel: S.qtSubject==='maths'?'Back to Maths hub':(S.qtSubject==='science'?'Back to Science hub':(S.qtSubject==='grammar'?'Back to Grammar hub':(S.qtSubject==='history'?'Back to History hub':(S.qtSubject==='physiology'?'Back to Human Psychology hub':(S.qtSubject==='speaking'?'Back to Speaking hub':(S.qtSubject==='money'?'Back to Finance hub':(S.qtSubject==='gentleman'?'Back to Gentleman’s Etiquette hub':'Back to English hub'))))))),
+          openQtSetup:()=>this.qtOpenSetup('english'), closeQt:()=>this.qtClose(), qtBackLabel: S.qtSubject==='maths'?'Back to Maths hub':(S.qtSubject==='science'?'Back to Science hub':(S.qtSubject==='grammar'?'Back to Grammar hub':(S.qtSubject==='history'?'Back to History hub':(S.qtSubject==='physiology'?'Back to Human Psychology hub':(S.qtSubject==='speaking'?'Back to Speaking hub':(S.qtSubject==='money'?'Back to Finance hub':'Back to English hub')))))),
           qtTypeOptions: (QTE?QTE.QT_TYPES:[]).map(t=>({ key:t.key, label:t.label, go:()=>this.qtSetType(t.key), active:S.qtType===t.key, bg:S.qtType===t.key?(S.prefs.theme==='Ultra'?'#5B1A1A':'#ffffff'):'rgba(255,255,255,0.04)', c:S.qtType===t.key?(S.prefs.theme==='Ultra'?'#F5F1E8':'#0a0a0b'):'#c5c5ca' })),
           qtDifficultyOptions: (QTE?QTE.QT_DIFFICULTIES:[]).map(d=>({ label:d, go:()=>this.qtSetDifficulty(d), active:S.qtDifficulty===d, bg:S.qtDifficulty===d?(S.prefs.theme==='Ultra'?'#5B1A1A':'#ffffff'):'rgba(255,255,255,0.04)', c:S.qtDifficulty===d?(S.prefs.theme==='Ultra'?'#F5F1E8':'#0a0a0b'):'#c5c5ca' })),
           qtLengthOptions: (QTE?QTE.QT_LENGTHS:[]).map(n=>({ n, label:n+(n===5?' (Quick)':n===50?' (Challenge)':''), go:()=>this.qtSetLength(n), active:S.qtLength===n, bg:S.qtLength===n?(S.prefs.theme==='Ultra'?'#5B1A1A':'#ffffff'):'rgba(255,255,255,0.04)', c:S.qtLength===n?(S.prefs.theme==='Ultra'?'#F5F1E8':'#0a0a0b'):'#c5c5ca' })),
@@ -20940,8 +19873,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const mDailyState = (mQtState.dailyChallenge&&mQtState.dailyChallenge.date===this._qtToday()) ? mQtState.dailyChallenge : null;
         return {
           isMoneySubject:S.learningTab==='Money',
-          isGentSubject:S.learningTab==='Gentleman’s Etiquette',
-          isMoneyHub:S.moneyMode==='hub' && S.qtMode==='closed', isMoneyLearn:S.moneyMode==='learn', isMoneyPractice:S.moneyMode==='practice', isMoneyTest:S.moneyMode==='test', isMoneyResults:S.moneyMode==='results',
+              isMoneyHub:S.moneyMode==='hub' && S.qtMode==='closed', isMoneyLearn:S.moneyMode==='learn', isMoneyPractice:S.moneyMode==='practice', isMoneyTest:S.moneyMode==='test', isMoneyResults:S.moneyMode==='results',
           isMoneyFormulas:S.moneyMode==='formulas', isMoneyDashboard:S.moneyMode==='dashboard',
           moneyTopicCards:(MN&&MN.TOPICS)?MN.TOPICS.map(t=>({...t, learn:()=>this.moneyStartLearn(t.key), practice:()=>this.moneyStartPractice(t.key)})):[],
           moneyPlacementDone, moneyPlacementLabel: moneyPlacementDone?'Retake Placement Test':'Placement Test',
@@ -20980,180 +19912,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         };
       }, {}),
       ...this._safe(()=>{
-        const LG=window.LearningGentleman;
-        const gentHist=(S.learning&&S.learning.gentHistory)||[];
-        const gentLevel=Math.max(1,(S.learning&&S.learning.gentLevel)||1);
-        const gentGrade=(S.learning&&S.learning.gentGrade)||'';
-        const gentPlacementDone=!!(S.learning&&S.learning.gentPlacementDone);
-        const gentStrongest=(S.learning&&S.learning.gentStrongest)||'';
-        const gentWeakest=(S.learning&&S.learning.gentWeakest)||'';
-        const gentFocusAreas=(S.learning&&S.learning.gentFocusAreas)||[];
-        const gQtState=this._qtState('gentleman'); const gHist=(gQtState.history||[]);
-        const gLT=this._learnTotals('gentleman', gentHist);
-        const gAllTotals={q:gLT.q,c:gLT.c,t:gLT.t};
-        const gDashAccuracy=gLT.accuracy;
-        const gDashHours=gLT.hours;
-        const gWeeklyCount=gLT.weekly, gMonthlyCount=gLT.monthly;
-        const gDashXP=gLT.xp;
-        const gentFormulaQ=(S.gentFormulaSearch||'').toLowerCase();
-        const gentFormulaList=LG?LG.FORMULAS.filter(f=>!gentFormulaQ||f.name.toLowerCase().includes(gentFormulaQ)||f.topic.toLowerCase().includes(gentFormulaQ)):[];
-        const gq=S.gentQ;
-        const gIsMC = gq && gq.type==='mc';
-        const gOptions = (gIsMC ? gq.options : []).map(o=>({ label:o, pick:()=>this.setState({gentInput:o}), sel:S.gentInput===o, bg:S.gentInput===o?'#FFFFFF':'rgba(255,255,255,0.03)', c:S.gentInput===o?'#0c0c0d':'#eef0f2' }));
-        const gentLesson = (()=>{ const l=LG&&LG.LESSONS[S.gentTopic]; return l||null; })();
-        const gRemainingMs=Math.max(0,(S.gentTimerEnd||0)-(S.gentNow||Date.now()));
-        const gRemainingSec=Math.ceil(gRemainingMs/1000);
-        const gTimerLabel=Math.floor(gRemainingSec/60)+':'+String(gRemainingSec%60).padStart(2,'0');
-        const gProgressPct=S.gentDuration?Math.max(0,Math.min(100,100-(gRemainingMs/S.gentDuration*100))):0;
-        const r6=S.gentLastResult;
-        const gQtOverallAccuracyVal = gQtState.history&&gQtState.history.length ? Math.round(gQtState.history.reduce((a,h)=>a+(h.total?h.score/h.total:0),0)/gQtState.history.length*100) : 0;
-        const gQtTodayXPVal = (gQtState.xpByDate&&gQtState.xpByDate[this._qtToday()])||0;
-        const gDailyState = (gQtState.dailyChallenge&&gQtState.dailyChallenge.date===this._qtToday()) ? gQtState.dailyChallenge : null;
-        const BB=window.BLACKBOOK_DATA;
-        const bbCat=BB?(BB.catById(S.gentBBCat)||BB.BRAND_CATEGORIES[0]):null;
-        const bbCity=BB?(BB.cityById(S.gentBBCity)||BB.CITIES[0]):null;
-        const bbNoteMeta=(key,label)=>{ const has=this._hasEntryNote('BB',key); return { noteHas:has, noteColor:has?'#c9a24a':'#5f5850', noteOpen:()=>this.openEntryNote('BB',key,label) }; };
-        return {
-          isGentHub:S.gentMode==='hub' && S.qtMode==='closed', isGentLearn:S.gentMode==='learn', isGentPractice:S.gentMode==='practice', isGentTest:S.gentMode==='test', isGentResults:S.gentMode==='results',
-          isGentFormulas:S.gentMode==='formulas', isGentDashboard:S.gentMode==='dashboard', isGentBlackBook:S.gentMode==='blackbook', isGentAgeLock:S.gentMode==='agelock',
-          goGentBlackBook:()=>this.gentOpenBlackBook(),
-          isBBBrands:(S.gentBBTab||'brands')==='brands', isBBLocations:(S.gentBBTab||'brands')==='locations', isBBHotels:(S.gentBBTab||'brands')==='hotels',
-          setBBBrands:()=>this.setGentBBTab('brands'), setBBLocations:()=>this.setGentBBTab('locations'), setBBHotels:()=>this.setGentBBTab('hotels'),
-          bbTabBrandsBg:(S.gentBBTab||'brands')==='brands'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabBrandsC:(S.gentBBTab||'brands')==='brands'?'#0a0a0b':'#c5c5ca',
-          bbTabLocationsBg:S.gentBBTab==='locations'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabLocationsC:S.gentBBTab==='locations'?'#0a0a0b':'#c5c5ca',
-          bbTabHotelsBg:S.gentBBTab==='hotels'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabHotelsC:S.gentBBTab==='hotels'?'#0a0a0b':'#c5c5ca',
-          bbCatChips:(BB?BB.BRAND_CATEGORIES:[]).map(c=>({ label:c.label, go:()=>this.setGentBBCat(c.key), bg:(S.gentBBCat||'watches')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCat||'watches')===c.key?'#0a0a0b':'#c5c5ca' })),
-          bbBrandCards:(bbCat?bbCat.brands:[]).map(b=>({ ...b, save:()=>this.gentSaveBBItem(bbCat.label,b.name,b.blurb), ...bbNoteMeta('brand:'+(bbCat?bbCat.key:'')+':'+b.name, b.name) })),
-          bbLocationQueryVal:S.gentBBLocationQuery||'', setBBLocationQuery:(e)=>this.setGentBBLocationQuery(e),
-          bbCityChips:(()=>{ const q=(S.gentBBLocationQuery||'').trim().toLowerCase(); return (BB?BB.CITIES:[]).filter(c=>!q||c.label.toLowerCase().includes(q)||c.region.toLowerCase().includes(q)).map(c=>({ label:c.label, go:()=>this.setGentBBCity(c.key), bg:(S.gentBBCity||'london')===c.key?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBCity||'london')===c.key?'#0a0a0b':'#c5c5ca' })); })(),
-          bbLocationNoResults:(()=>{ const q=(S.gentBBLocationQuery||'').trim().toLowerCase(); if(!q) return false; return !(BB?BB.CITIES:[]).some(c=>c.label.toLowerCase().includes(q)||c.region.toLowerCase().includes(q)); })(),
-          bbCityRegion:bbCity?(bbCity.label+' · '+bbCity.region).toUpperCase():'',
-          bbHotelCards:(bbCity&&bbCity.hotels?bbCity.hotels:[]).map(h=>({...h, save:()=>this.gentSaveBBItem('Hotel',h.name,h.note), ...bbNoteMeta('hotel:'+(bbCity?bbCity.key:'')+':'+h.name, h.name) })),
-          bbHotelRegionChips:(()=>{ const regions=[]; (BB?BB.CITIES:[]).forEach(c=>{ if(!regions.includes(c.region)) regions.push(c.region); }); return ['All'].concat(regions).map(r=>({ label:r, go:()=>this.setGentBBHotelRegion(r), bg:(S.gentBBHotelRegion||'All')===r?'#c9a24a':'rgba(255,255,255,0.04)', c:(S.gentBBHotelRegion||'All')===r?'#0a0a0b':'#c5c5ca' })); })(),
-          bbHotelQueryVal:S.gentBBHotelQuery||'', setBBHotelQuery:(e)=>this.setGentBBHotelQuery(e),
-          ...(()=>{ const region=S.gentBBHotelRegion||'All'; const q=(S.gentBBHotelQuery||'').trim().toLowerCase(); const out=[];
-            (BB?BB.CITIES:[]).forEach(c=>{ if(region!=='All'&&c.region!==region) return; const cityHit=q && (c.label.toLowerCase().includes(q)||c.region.toLowerCase().includes(q));
-              (c.hotels||[]).forEach(h=>{ if(q && !cityHit && !h.name.toLowerCase().includes(q)) return; out.push({ ...h, cityLine:(c.label+' · '+c.region).toUpperCase(), save:()=>this.gentSaveBBItem('Hotel',h.name,h.note), ...bbNoteMeta('hotel:'+c.key+':'+h.name, h.name) }); });
-            });
-            out.sort((a,b)=>a.cityLine.localeCompare(b.cityLine));
-            return { bbAllHotelCards:out, bbHotelNoResults:out.length===0 };
-          })(),
-          bbRestaurantCards:(bbCity&&bbCity.restaurants?bbCity.restaurants:[]).map(r=>({...r, save:()=>this.gentSaveBBItem('Restaurant',r.name,r.note), ...bbNoteMeta('restaurant:'+(bbCity?bbCity.key:'')+':'+r.name, r.name) })),
-          bbEventCards:(bbCity&&bbCity.events?bbCity.events:[]).map(e=>({...e, save:()=>this.gentSaveBBItem('Event',e.name,e.note), ...bbNoteMeta('event:'+(bbCity?bbCity.key:'')+':'+e.name, e.name) })),
-          bbSpaCards:(bbCity&&bbCity.spas?bbCity.spas:[]).map(sp=>({...sp, save:()=>this.gentSaveBBItem('Spa',sp.name,sp.note), ...bbNoteMeta('spa:'+(bbCity?bbCity.key:'')+':'+sp.name, sp.name) })),
-          bbMotoringCards:(bbCity&&bbCity.motoring?bbCity.motoring:[]).map(mo=>({...mo, save:()=>this.gentSaveBBItem('Motoring',mo.name,mo.note), ...bbNoteMeta('motoring:'+(bbCity?bbCity.key:'')+':'+mo.name, mo.name) })),
-          bbCinemaCards:(bbCity&&bbCity.cinema?bbCity.cinema:[]).map(ci=>({...ci, save:()=>this.gentSaveBBItem('Private Cinema',ci.name,ci.note), ...bbNoteMeta('cinema:'+(bbCity?bbCity.key:'')+':'+ci.name, ci.name) })),
-          bbShoppingCards:(bbCity&&bbCity.shopping?bbCity.shopping:[]).map(sh=>({...sh, save:()=>this.gentSaveBBItem('Luxury Clothing',sh.name,sh.note), ...bbNoteMeta('shopping:'+(bbCity?bbCity.key:'')+':'+sh.name, sh.name) })),
-          bbHolidayName:bbCity?bbCity.holiday.name:'', bbHolidayNote:bbCity?bbCity.holiday.note:'', saveBBHoliday:()=>bbCity&&this.gentSaveBBItem('Holiday',bbCity.holiday.name,bbCity.holiday.note),
-          bbHolidayNoteHas: bbCity?this._hasEntryNote('BB','holiday:'+bbCity.key):false,
-          bbHolidayNoteColor: bbCity&&this._hasEntryNote('BB','holiday:'+bbCity.key)?'#c9a24a':'#5f5850',
-          bbHolidayNoteOpen: ()=>bbCity&&this.openEntryNote('BB','holiday:'+bbCity.key, bbCity.holiday.name),
-          isBBSaved:S.gentBBTab==='saved',
-          setBBSaved:()=>this.setGentBBTab('saved'),
-          bbTabSavedBg:S.gentBBTab==='saved'?'#c9a24a':'rgba(255,255,255,0.04)', bbTabSavedC:S.gentBBTab==='saved'?'#0a0a0b':'#c5c5ca',
-          bbSavedList:(S.notes||[]).filter(n=>n.title==='⚜ Black Book Saved').map(n=>({ id:n.id, body:n.body, stamp:new Date(n.ts).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}), remove:()=>this.gentRemoveSavedBB(n.id) })),
-          hasBBSaved:(S.notes||[]).some(n=>n.title==='⚜ Black Book Saved'),
-          isGentScenario:S.gentMode==='scenario', isGentScenarioResults:S.gentMode==='scenarioResults',
-          isGentOccasion:S.gentMode==='occasion', isGentPlaceSetting:S.gentMode==='placesetting', isGentPlaceSettingResults:S.gentMode==='placesettingResults',
-          gentTopicCards:(LG&&LG.TOPICS)?LG.TOPICS.map(t=>({...t, learn:()=>this.gentStartLearn(t.key), practice:()=>this.gentStartPractice(t.key)})):[],
-          gentPlacementDone, gentPlacementLabel: gentPlacementDone?'Retake Placement Test':'Placement Test',
-          gentLevelNum:gentLevel, gentLevelProgressPct:Math.round((gentLevel/120)*100), gentGradeStr: gentGrade||'—', gentStrongestStr: gentStrongest||'—', gentWeakestStr: gentWeakest||'—',
-          gentFocusAreasList: gentFocusAreas.map(t=>({label:t})),
-          goGentPlacement:()=>this.gentStartPlacement(), startGentLevelTest:()=>this.gentStartLevelTest(),
-          goGentFormulas:()=>this.gentOpenFormulas(), goGentDashboard:()=>this.gentOpenDashboard(), goGentHub:()=>this.gentGoHub(), openGentTutor:()=>this.openTutor('gentleman'),
-          gentOpenQtSetup:()=>this.qtOpenSetup('gentleman'),
-          gentDailyLabel: gDailyState&&gDailyState.completed?'Completed today ✓':'Start Daily Challenge', gentDailyAvailable: !(gDailyState&&gDailyState.completed), gentDailyColor: !(gDailyState&&gDailyState.completed)?'#C4FF3D':'#7c7c84', gentGoDaily:()=>this.qtStartDaily('gentleman'),
-          gentQtOverallAccuracy: gQtOverallAccuracyVal, gentQtTodayXP: gQtTodayXPVal, gentQtStreak: this._streakFor('Learning'),
-          gentDashQuestions: gAllTotals.q, gentDashAccuracy: gDashAccuracy, gentDashHours: gDashHours, gentDashXP: gDashXP, gentDashStreak: this._streakFor('Learning'), gentDashWeekly: gWeeklyCount, gentDashMonthly: gMonthlyCount,
-          gentDashLevel: gentLevel, gentDashGrade: gentGrade||'Not yet assessed', gentDashStrongest: gentStrongest||'—', gentDashWeakest: gentWeakest||'—',
-          gentFormulaSearchVal:S.gentFormulaSearch||'', setGentFormulaSearch:(e)=>this.setGentFormulaSearch(e), gentFormulaList,
-          gentLesson, gentLessonStartPractice:()=>this.gentStartPractice(S.gentTopic),
-          gentReadLesson:()=>this.readLessonAloud(gentLesson), gentLessonSpeakLabel:S._lessonSpeaking?'⏸ Stop':'🎧 Listen to this lesson',
-          gentQPrompt: gq?gq.prompt:'', gentQTopic: gq?gq.topic:'', gentIsMC:gIsMC, gentOptions:gOptions,
-          gentInput:S.gentInput||'', setGentInput:(e)=>this.setGentInput(e), gentSubmit:()=>this.gentSubmit(), gentSubmitKey:enterKey(()=>this.gentSubmit()),
-          gentFeedbackShow: !!(S.gentFeedback && S.gentMode==='practice'), gentFeedbackOk: !!(S.gentFeedback&&S.gentFeedback.ok), gentFeedbackText: S.gentFeedback?S.gentFeedback.text:'', gentFeedbackColor:(S.gentFeedback&&S.gentFeedback.ok)?'#4ADE80':'#ff5563',
-          gentMethodText: gq?gq.method:'', gentShowMethod:!!S.gentShowMethod, gentMethodToggleLabel:S.gentShowMethod?'Hide explanation':'Show explanation', toggleGentMethod:()=>this.toggleGentMethod(),
-          gentNextPractice:()=>this.gentNextPractice(), gentIDKPractice:()=>this.gentIDKPractice(),
-          gentPracticeScoreStr: S.gentTotal?(S.gentScore+'/'+S.gentTotal+' correct'):'No answers yet',
-          gentHintText:S.gentHint||'', gentHintLoading:!!S.gentHintLoading, gentHintErr:S.gentHintErr||'', getGentHint:()=>this.gentGetHint(), hasGentHint:!!S.gentHint,
-          isGentPlacementActive: S.gentMode==='test' && !!S.gentPlacement,
-          gentTestLabel: S.gentPlacement?'ETIQUETTE PLACEMENT TEST':(S.gentWeakDrill?'ETIQUETTE · WEAK TOPICS DRILL':('ETIQUETTE · LEVEL '+S.gentLevel+' OF 120')),
-          gentTimerLabel:gTimerLabel, gentProgressPct:gProgressPct+'%', gentQNum:(S.gentIdx||0)+1, gentQTotal:(S.gentQueue||[]).length,
-          gentSkipTest:()=>this.gentSkipTest(), gentIDKTest:()=>this.gentIDKTest(), gentEndTest:()=>this.gentEndTest(), gentSubmitTest:()=>this.gentSubmitTest(), gentSubmitTestKey:enterKey(()=>this.gentSubmitTest()),
-          gentResultIsPlacement: !!(r6&&r6.mode==='Placement Test'), gentResultIsLevel: !!(r6&&r6.level && r6.mode!=='Placement Test'),
-          gentResultScore: r6?(r6.score+' / '+r6.total):'', gentResultPct: r6&&r6.pct!=null?(r6.pct+'%'):'',
-          gentResultLevel: r6?r6.level:0, gentResultGrade: r6&&r6.grade?r6.grade:'',
-          gentResultPassed: !!(r6&&r6.passed), gentResultPassColor:(r6&&r6.passed)?'#4ADE80':'#ff5563', gentResultPassStr: r6&&r6.passed?'PASSED':'NOT YET — TRY AGAIN',
-          gentResultLeveledUp: !!(r6&&r6.leveledUp), gentResultNextLevel: r6?Math.min(120,(r6.level||0)+1):0,
-          gentResultStrongest: r6?r6.strongest:'', gentResultWeakest: r6?r6.weakest:'',
-          gentResultFocusList: (r6&&r6.focusAreas||[]).map(t=>({label:t})),
-          gentResultBreakdown: (r6&&r6.breakdown)||[],
-          continueGentLevel:()=>this.gentStartLevelTest(), continueGentLevelLabel: r6&&r6.leveledUp?('Start Level '+gentLevel):(r6?('Retry Level '+r6.level):''),
-        };
-      }, {}),
-      ...this._safe(()=>{
-        const LG=window.LearningGentleman; if(!LG) return {};
-        // ---- Scenario Simulator ----
-        const sc=S.gentScenQueue[S.gentScenIdx]||null;
-        const scChosen=S.gentScenChoice!=null;
-        const scChoiceObj=sc && scChosen ? sc.choices[S.gentScenChoice] : null;
-        const scQualityColor={best:'#4ADE80', good:'#e8b45a', poor:'#ff5563'};
-        const scStats=this._gentTopicStats().filter(s=>s.total>=2).sort((a,b)=>a.pct-b.pct);
-        const scBest=S.gentScenPicks.filter(p=>p.quality==='best').length;
-        // ---- Place Setting Drill ----
-        const psCur=S.gentPSQueue[S.gentPSIdx]||null;
-        const psPicked=S.gentPSPicked;
-        // ---- Daily Real-World Challenge ----
-        const todayStr=this._qtToday();
-        const chLog=(S.learning&&S.learning.gentChallengeLog)||{};
-        const chDoneToday=!!chLog[todayStr];
-        let chStreak=0; for(let i=0;i<365;i++){ const d=new Date(Date.now()-i*86400000); const ds=d.toISOString().slice(0,10); if(chLog[ds]) chStreak++; else break; }
-        const GENT_OCCASIONS=['Black-Tie Gala','Wedding Guest','Business Dinner','Meeting a Partner’s Parents','Job Interview Lunch','Hotel Stay & Concierge','Cigar & Whisky Evening','Hosting a Formal Dinner Party'];
-        return {
-          // Hub additions
-          hasWeakDrillData: scStats.length>0, gentWeakTopicName: scStats[0]?scStats[0].topic:'', startGentWeakDrill:()=>this.gentStartWeakDrill(),
-          gentChallengeText: LG.dailyRealWorldChallenge(todayStr), gentChallengeDoneToday: chDoneToday, gentChallengeStreak: chStreak, hasChallengeStreak: chStreak>0,
-          gentChallengeBtnLabel: chDoneToday?'Done today ✓':'Mark done', gentMarkChallengeDone:()=>this.gentMarkChallengeDone(),
-          gentChallengeBtnC: chDoneToday?'#4ADE80':'#0a0a0b', gentChallengeBtnBg: chDoneToday?'transparent':'#C4FF3D', gentChallengeBtnBd: chDoneToday?'rgba(74,222,128,0.4)':'transparent',
-          goGentScenario:()=>this.gentStartScenarios(), goGentOccasion:()=>this.gentOpenOccasion(), goGentPlaceSetting:()=>this.gentStartPlaceSetting(),
-          // Scenario Simulator
-          gentScenNum:S.gentScenIdx+1, gentScenTotal:S.gentScenQueue.length, gentScenTopic: sc?sc.topic:'', gentScenSetup: sc?sc.setup:'',
-          gentScenChoices: sc?sc.choices.map((c,i)=>({ idx:i, text:c.text, pick:()=>this.gentPickScenario(i),
-            picked: S.gentScenChoice===i, bg: S.gentScenChoice===i?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.03)',
-            bd: S.gentScenChoice===i?scQualityColor[c.quality]:'rgba(255,255,255,0.14)' })):[],
-          gentScenChosen: scChosen, gentScenOutcomeText: scChoiceObj?scChoiceObj.outcome:'',
-          gentScenOutcomeColor: scChoiceObj?scQualityColor[scChoiceObj.quality]:'#eef0f2',
-          gentScenQualityLabel: scChoiceObj?({best:'BEST CHOICE',good:'REASONABLE',poor:'MISSTEP'})[scChoiceObj.quality]:'',
-          gentNextScenario:()=>this.gentNextScenario(), gentNextScenarioLabel: (S.gentScenIdx+1>=S.gentScenQueue.length)?'See results →':'Next scenario →',
-          gentScenResultBest: scBest, gentScenResultTotal: S.gentScenPicks.length,
-          gentScenResultPct: S.gentScenPicks.length?Math.round(scBest/S.gentScenPicks.length*100):0,
-          // Occasion Prep Briefing
-          gentOccasionChips: GENT_OCCASIONS.map(o=>({ label:o, pick:()=>this.gentSetOccasion(o),
-            c: S.gentOccasionSel===o?'#0c0c0d':'#eef0f2', bg: S.gentOccasionSel===o?'#FFFFFF':'#1b1d21', bd: S.gentOccasionSel===o?'#FFFFFF':'rgba(255,255,255,0.14)' })),
-          gentOccasionSelName: S.gentOccasionSel||'', hasGentOccasionSel: !!S.gentOccasionSel,
-          gentOccasionLoading: !!S.gentOccasionLoading, gentOccasionErr: S.gentOccasionErr||'', hasGentOccasionErr: !!S.gentOccasionErr,
-          generateGentOccasionBriefing:()=>this.generateGentOccasionBriefing(),
-          gentOccasionBtnLabel: S.gentOccasionLoading?'Preparing…':(S.gentOccasionResult?'Regenerate briefing':'Generate briefing'),
-          hasGentOccasionResult: !!S.gentOccasionResult,
-          gentOccasionDress: (S.gentOccasionResult&&S.gentOccasionResult.dress)||'', gentOccasionDining: (S.gentOccasionResult&&S.gentOccasionResult.dining)||'',
-          gentOccasionConversation: (S.gentOccasionResult&&S.gentOccasionResult.conversation)||'', gentOccasionAvoid: (S.gentOccasionResult&&S.gentOccasionResult.avoid)||'',
-          hasGentOccasionDining: !!(S.gentOccasionResult&&S.gentOccasionResult.dining),
-          // Place Setting Drill
-          gentPSNum:S.gentPSIdx+1, gentPSTotal:S.gentPSQueue.length, gentPSPrompt: psCur?psCur.q:'',
-          gentPSItems: LG.PLACESETTING_ITEMS.map(it=>{
-            let bg='rgba(255,255,255,0.16)', bd='rgba(255,255,255,0.35)';
-            if(psPicked){ if(it.id===psCur.correct){ bg='rgba(74,222,128,0.85)'; bd='#4ADE80'; } else if(it.id===psPicked){ bg='rgba(255,86,99,0.85)'; bd='#ff5563'; } }
-            return { id:it.id, left:it.left, top:it.top, bg, bd, onClick:()=>this.gentPickPS(it.id) };
-          }),
-          gentPSFeedbackShow: !!psPicked, gentPSFeedbackText: (psPicked&&psCur)?psCur.why:'',
-          gentPSFeedbackColor: (psPicked&&psCur&&psPicked===psCur.correct)?'#4ADE80':'#ff8a92',
-          gentPSFeedbackTitle: (psPicked&&psCur&&psPicked===psCur.correct)?'Correct':'Not quite',
-          gentNextPS:()=>this.gentNextPS(), gentNextPSLabel: (S.gentPSIdx+1>=S.gentPSQueue.length)?'See results →':'Next →',
-          gentPSResultScore: S.gentPSScore, gentPSResultTotal: S.gentPSQueue.length,
-          gentPSResultPct: S.gentPSQueue.length?Math.round(S.gentPSScore/S.gentPSQueue.length*100):0,
-        };
-      }, {}),
-      ...this._safe(()=>{
         const subj=S.tutorSubject||'maths';
         const msgs=((S.tutorMessages&&S.tutorMessages[subj])||[]).map((m,i)=>({ idx:i, isUser:m.role==='user', text:m.text, bubbleBg:m.role==='user'?'#1e1e21':'#141416', align:m.role==='user'?'flex-end':'flex-start', speak:()=>this.tutorSpeak(m.text) }));
         const voiceOptions=((this._pd()&&this._pd().TTS_PROVIDERS&&this._pd().TTS_PROVIDERS[0].voices)||[]).map(p=>({ id:p.id, label:p.name, go:()=>this.tutorSetVoice(p.id), preview:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.previewElevenVoice(p.id); }, bg:(S.tutorVoiceId||'21m00Tcm4TlvDq8ikWAM')===p.id?'#ffffff':'rgba(255,255,255,0.04)', c:(S.tutorVoiceId||'pro_f')===p.id?'#0a0a0b':'#c5c5ca' }));
@@ -21180,7 +19938,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           out[k+'Gap']=on?'14px':'0px';
         });
         return out; })(),
-      learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money','Gentleman’s Etiquette'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
+      learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
       homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, homeWordmark:(S.prefs.ultraStyle||'Ultra X'), powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',
 
@@ -21258,7 +20016,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const sub=S.gentSub||'test';
         const PAGES=[['test','DAILY TEST'],['money','MONEY & POWER'],['history','HISTORY & CULTURE'],
                      ['taste','TASTE'],['conversation','CONVERSATION'],['foundation','FOUNDATION'],
-                     ['dress','DRESS CODE'],['dining','DINING']];
+                     ['dining','DINING']];
         const set=G.dailySet(this._gentToday());
         const picks=this._gentPicks();
         const at=Math.max(0, Math.min(set.length, S.gentTestIdx||0));
@@ -21297,13 +20055,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               /* Only Dress Code has drawings: an occasion is a shape, a dining rule is not.
                  The column count follows the drawing rather than the subpage, so a section
                  that gains art later needs no change here. */
-              /* Only an occasion that has actually been photographed gets a picture column.
-                 The drawn garment sketches that used to fill it were removed — six line
-                 drawings of outfits separated the occasions only barely. */
-              gentCardPhoto:(c.occasion && G.photo) ? G.photo(c.occasion) : '',
-              gentCardHasPhoto:!!(c.occasion && G.photo && G.photo(c.occasion)),
-              gentCardPhotoAlt:c.title ? (c.title + ' \u2014 what the occasion looks like') : '',
-              gentBodyCls:(c.occasion && G.photo && G.photo(c.occasion)) ? 'cc-gdress' : 'cc-gdress cc-gdress-solo',
               gentCardStep:c.steps>1?(c.step+' of '+c.steps+' in this section'):'',
               gentCardHasStep:c.steps>1,
               gentPos:cards.length?((idx+1)+' OF '+cards.length):'',
@@ -21351,7 +20102,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             bg:i===at?'var(--forge-accent)':(picks[i]!=null?'var(--quiet-hover)':'var(--quiet-line)') })),
           gentScore:rightCount+' / '+set.length,
           gentResultLine:rightCount===set.length
-            ? 'All four. That is the standard \u2014 come back tomorrow.'
+            /* Not "all four": the set is one question per category and the number of
+               categories is not fixed, so the copy must not name a count the page can
+               contradict. */
+            ? 'A clean sweep. That is the standard \u2014 come back tomorrow.'
             : (rightCount>=set.length-1
               ? 'One to look at again. The reason is on its card if you step back.'
               : 'Worth stepping back through these before the day starts.'),
@@ -21376,8 +20130,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
            gentDots:[], gentPrev:()=>{}, gentNext:()=>{}, gentPrevCursor:'default',
            gentPrevOpacity:'0.35', gentNextCursor:'default', gentNextOpacity:'0.35', gentNextLabel:'',
            gentCardText:'', gentCardStep:'', gentCardHasStep:false,
-           gentBodyCls:'cc-gdress cc-gdress-solo',
-           gentCardPhoto:'', gentCardHasPhoto:false, gentCardPhotoAlt:'',
            gentProgPct:'0%', gentTestProgPct:'0%',
            gentQShow:true, gentResultShow:false, gentQPos:'',
            gentTestBack:()=>{}, gentTestNext:()=>{}, gentTBackCursor:'default', gentTBackOpacity:'0.35',

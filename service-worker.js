@@ -8,14 +8,14 @@
 // Mirrors NOTIF_BUILD_VERSION in index.html — the page fetches this file to confirm whether
 // an "update available" signal is real before interrupting anyone. The two must move together;
 // the release check asserts they match.
-const BUILD_VERSION = '2026.09.12-303 · v11.303 dress-no-art';
-const CACHE = 'cc-v187';
+const BUILD_VERSION = '2026.09.12-304 · v11.304 gent-trim';
+const CACHE = 'cc-v188';
 const SHELL = [
   './', './AI Command Center.dc.html', './manifest.json', './favicon.png',
   './support.js', './countries-data.js', './notif-engine.js', './notification-engine.js', './voice-engine.js',
   './providers-data.js', './health-tracker.js', './learning-maths.js', './learning-english.js',
   './learning-science.js', './learning-grammar.js', './learning-history.js', './learning-speaking.js',
-  './learning-physiology.js', './learning-money.js', './learning-gentleman.js', './gentleman-blackbook.js', './orb-engine.js', './voice-assistant-engine.js',
+  './learning-physiology.js', './learning-money.js', './orb-engine.js', './voice-assistant-engine.js',
   './anatomy-3d.js', './constellation-engine.js', './void-orb-engine.js', './ai-gateway.js', './exercise-index.js','./finance-import.js', './forge-engine.js', './forge-training.js', './xp-fx.js',
   // Vendored third-party runtime. React especially: it is the difference between the app
   // rendering and a blank page, so it must be in the precached shell, not fetched remotely.

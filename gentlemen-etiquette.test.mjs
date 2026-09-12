@@ -2,7 +2,7 @@
 
    The subject matter, the dress code and the dining manners are the owner's own words and are
    held here as data. The interesting part is the daily test: one question a day, drawn across
-   all four categories, and the same question all day on every device — a test you can reroll
+   every category, and the same question all day on every device — a test you can reroll
    by reloading is not a test. */
 import fs from 'fs';
 const root = {};
@@ -30,15 +30,6 @@ t('the five subject areas are all there, in the owner’s words', async () => {
     ok(all.includes(phrase), 'the line about "' + phrase + '" is missing');
 });
 
-t('the dress code covers every occasion, black tie to home', async () => {
-  eq(G.DRESS.length, 6, 'six occasions were specified');
-  eq(G.DRESS.map(d => d.key).join(','), 'black-tie,business-formal,business-smart,smart-casual,day-to-day,home', 'wrong occasions');
-  for (const d of G.DRESS) ok(d.lines.length >= 3, d.key + ' has only ' + d.lines.length + ' lines');
-  const all = G.DRESS.flatMap(d => d.lines).join(' ');
-  for (const phrase of ['midnight blue', 'Peak lapel or shawl collar', 'solid navy or charcoal',
-                        'Odd jacket', 'nothing sloppy', 'No graphic tees'])
-    ok(all.includes(phrase), 'the dress line about "' + phrase + '" is missing');
-});
 
 t('dining covers the meal from sitting down to the last glass', async () => {
   eq(G.DINING.map(d => d.key).join(','), 'before,cutlery,table,conduct,wine', 'wrong dining sections');
@@ -60,20 +51,18 @@ t('every line is its own card, with its heading carried on it', async () => {
       ok(card.eyebrow, s.key + ' card ' + i + ' lost its eyebrow');
     });
   }
-  /* Pacing over density, deliberately: the six occasions are twenty-two cards. */
-  const dress = G.cards('dress');
-  eq(dress.length, G.DRESS.reduce((a, d) => a + d.lines.length, 0), 'dress should be one card per line');
-  ok(dress.length > 20, 'only ' + dress.length + ' dress cards — that is still a reference, not a read');
-  eq(G.cards('dining').length, G.DINING.reduce((a, d) => a + d.lines.length, 0), 'dining too');
+  /* Pacing over density, deliberately: dining's five sections are eighteen cards. */
+  const dining = G.cards('dining');
+  eq(dining.length, G.DINING.reduce((a, d) => a + d.lines.length, 0), 'dining should be one card per line');
+  ok(dining.length > 15, 'only ' + dining.length + ' dining cards — that is still a reference, not a read');
 
-  const lapel = dress.find(c => /Peak lapel/.test(c.text));
-  ok(lapel, 'the lapel rule is missing');
-  eq(lapel.title, 'Black Tie / Formal Evening', 'it must carry the occasion it belongs to');
-  eq(lapel.note, 'Evening, invitation-led', 'and the note that says when that applies');
+  const napkin = dining.find(c => /Napkin on your lap/.test(c.text));
+  ok(napkin, 'the napkin rule is missing');
+  eq(napkin.title, 'Before the Meal', 'it must carry the section it belongs to');
 });
 
 t('a card knows where it is, in its section and in the deck', async () => {
-  for (const key of ['money', 'dress', 'dining']) {
+  for (const key of ['money', 'dining']) {
     const c = G.cards(key);
     c.forEach((card, i) => {
       eq(card.n, i + 1, key + ': card ' + i + ' is numbered wrongly in the deck');
@@ -81,11 +70,11 @@ t('a card knows where it is, in its section and in the deck', async () => {
       ok(card.step >= 1 && card.step <= card.steps, key + ': card ' + i + ' has a bad step ' + card.step + '/' + card.steps);
     });
   }
-  const dress = G.cards('dress');
-  eq(dress[0].step, 1, 'the first card of the first occasion');
-  eq(dress[0].steps, 4, 'black tie has four rules');
-  eq(dress[4].step, 1, 'the fifth card starts the second occasion');
-  eq(dress[4].title, 'Business Formal', 'and that occasion is business formal');
+  const dining = G.cards('dining');
+  eq(dining[0].step, 1, 'the first card of the first section');
+  eq(dining[0].steps, 3, 'before the meal has three rules');
+  eq(dining[3].step, 1, 'the fourth card starts the second section');
+  eq(dining[3].title, 'Cutlery', 'and that section is cutlery');
 });
 
 t('a card deck for something that is not a page is empty, not broken', async () => {
@@ -95,11 +84,11 @@ t('a card deck for something that is not a page is empty, not broken', async () 
 });
 
 /* ---- the daily set ---------------------------------------------------------------------- */
-t('the day deals four questions, one from each category', async () => {
+t('the day deals one question from each category', async () => {
   for (const d of days(30)) {
     const set = G.dailySet(d);
-    eq(set.length, 4, d + ' dealt ' + set.length + ' questions');
-    eq(new Set(set.map(q => q.cat)).size, 4, d + ' repeated a category');
+    eq(set.length, G.CATEGORIES.length, d + ' dealt ' + set.length + ' questions');
+    eq(new Set(set.map(q => q.cat)).size, G.CATEGORIES.length, d + ' repeated a category');
     for (const q of set) {
       eq(q.options.length, 4, d + ': four options');
       ok(q.correct >= 0 && q.correct < 4, d + ': the answer index is out of range');
@@ -118,7 +107,7 @@ t('the same day deals the same four, every time', async () => {
 t('the order of the categories moves too', async () => {
   /* A test that always opens on Events is a rotation wearing a different hat. */
   const first = new Set(days(40).map(d => G.dailySet(d)[0].cat));
-  eq(first.size, 4, 'only ' + first.size + ' categories ever come first');
+  eq(first.size, G.CATEGORIES.length, 'only ' + first.size + ' categories ever come first');
 });
 
 t('the four are not the same four every day', async () => {
@@ -145,7 +134,7 @@ t('the single-question draw still works, and is the first of the set', async () 
 });
 
 t('every question has four answers, one right, and a reason', async () => {
-  ok(G.QUESTIONS.length >= 30, 'only ' + G.QUESTIONS.length + ' questions');
+  ok(G.QUESTIONS.length >= 20, 'only ' + G.QUESTIONS.length + ' questions');
   for (const q of G.QUESTIONS) {
     eq(q.a.length, 4, 'wrong number of options: ' + q.q);
     ok(G.CATEGORIES.includes(q.cat), 'unknown category ' + q.cat + ' on: ' + q.q);
@@ -155,7 +144,7 @@ t('every question has four answers, one right, and a reason', async () => {
   }
 });
 
-t('all four categories are drawn from', async () => {
+t('every category is drawn from', async () => {
   const seen = {};
   G.QUESTIONS.forEach(q => { seen[q.cat] = (seen[q.cat] || 0) + 1; });
   for (const c of G.CATEGORIES) ok(seen[c] >= 5, c + ' has only ' + (seen[c] || 0) + ' questions');
@@ -191,37 +180,8 @@ t('a missing or odd date does not throw', async () => {
    The drawings are a floor. When real images arrive each one gets a path here and takes over
    for that occasion. These hold the slot honest: no path without a file behind it, and no path
    pointing at an occasion that does not exist. */
-t('no photograph is claimed that is not actually there', async () => {
-  const fs = await import('fs');
-  for (const [key, path] of Object.entries(G.PHOTO)) {
-    ok(G.DRESS.some(d => d.key === key), 'PHOTO names "' + key + '", which is not an occasion');
-    ok(fs.existsSync(new URL('./' + path, import.meta.url)),
-       key + ' points at ' + path + ', which is not in the repo — that is a broken image on a card');
-  }
-});
 
-t('an occasion with no photograph simply has none', async () => {
-  /* The drawn sketches that used to stand in were removed. Nothing is a legitimate answer
-     now, so the only thing to hold is that a key that means nothing resolves to nothing
-     rather than to some other occasion's picture. */
-  eq(G.photo('nonsense'), '', 'an unknown key resolved to a photograph');
-  eq(G.photo(''), '', 'an empty key resolved to a photograph');
-  eq(typeof G.art, 'undefined', 'the drawings are still in the engine');
-  eq(typeof G.ART, 'undefined', 'the drawings are still in the engine');
-});
 
-t('every dress card still names the occasion a picture would belong to', async () => {
-  /* The hook the restructure and any supplied photograph both hang on. */
-  const cards = G.cards('dress');
-  for (const d of G.DRESS) {
-    const mine = cards.filter(c => c.title === d.name);
-    eq(mine.length, d.lines.length, d.name + ' has the wrong number of cards');
-    for (const c of mine) eq(c.occasion, d.key, d.name + ' card names ' + c.occasion);
-  }
-  for (const key of ['dining', 'money', 'history', 'taste', 'conversation', 'foundation']) {
-    for (const c of G.cards(key)) eq(c.occasion, '', key + ' should name no occasion');
-  }
-});
 
 let pass = 0, fail = 0;
 for (const [n, f] of T) {

@@ -28,7 +28,7 @@ const pageErrors = [];
 page.on('pageerror', e => pageErrors.push(e.message));
 
 const SUBJECTS = ['Maths', 'English', 'Science', 'Grammar', 'History', 'Speaking',
-                  'Human Physiology', 'Money', 'Gentleman’s Etiquette'];
+                  'Human Physiology', 'Money'];
 
 async function boot(patch) {
   await page.goto('http://127.0.0.1:' + PORT + '/index.html', { waitUntil: 'load' });

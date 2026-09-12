@@ -45,9 +45,9 @@ const tab = (label) => page.evaluate((want) => {
 }, label);
 
 const TABS = ['DAILY TEST', 'MONEY & POWER', 'HISTORY & CULTURE', 'TASTE',
-              'CONVERSATION', 'FOUNDATION', 'DRESS CODE', 'DINING'];
+              'CONVERSATION', 'FOUNDATION', 'DINING'];
 
-t('the page opens on the test, with all eight subpages offered', async () => {
+t('the page opens on the test, with every subpage offered', async () => {
   await boot();
   const b = await text();
   for (const label of TABS) ok(b.includes(label), 'no tab for ' + label);
@@ -63,7 +63,6 @@ t('every subpage renders its own content', async () => {
     'TASTE': 'genuine palate',
     'CONVERSATION': 'Knowing when to say nothing',
     'FOUNDATION': 'rarely try to',
-    'DRESS CODE': 'midnight blue',
     'DINING': 'No phones at the table',
   };
   for (const label of Object.keys(want)) {
@@ -82,28 +81,28 @@ t('every subpage renders its own content', async () => {
 });
 
 t('a page shows one line at a time, with its heading above it', async () => {
-  await boot({ gentSub: 'dress' });
+  await boot({ gentSub: 'dining' });
   const b = await text();
-  ok(b.includes('Black Tie / Formal Evening'), 'the heading should be on the card');
-  ok(b.includes('Tuxedo (dinner jacket), black or midnight blue.'), 'and the first rule');
-  ok(!b.includes('Peak lapel'), 'the second rule should be on its own card, not this one');
-  ok(b.includes('1 OF 22'), 'twenty-two cards, not six: ' + (b.match(/\d+ OF \d+/) || ''));
-  ok(/1 of 4 in this section/.test(b), 'and where you are inside the occasion');
+  ok(b.includes('Before the Meal'), 'the heading should be on the card');
+  ok(b.includes('Wait for the host to sit'), 'and the first rule');
+  ok(!b.includes('Napkin on your lap'), 'the second rule should be on its own card, not this one');
+  ok(b.includes('1 OF 18'), 'eighteen cards, not five: ' + (b.match(/\d+ OF \d+/) || ''));
+  ok(/1 of 3 in this section/.test(b), 'and where you are inside the section');
 });
 
 t('the heading stays put while the rules advance', async () => {
-  /* The reason a rule can be one card at all: "peak lapel or shawl collar" is meaningless
-     without the occasion above it. */
-  await boot({ gentSub: 'dress' });
-  for (let i = 0; i < 3; i++) {
+  /* The reason a rule can be one card at all: "never start eating until the host begins" is
+     thin without the section above it saying when that applies. */
+  await boot({ gentSub: 'dining' });
+  for (let i = 0; i < 2; i++) {
     await page.evaluate(() => window.__nvx.gentStep(1));
     await page.waitForTimeout(250);
-    ok((await text()).includes('Black Tie / Formal Evening'), 'card ' + (i + 2) + ' lost the occasion');
+    ok((await text()).includes('Before the Meal'), 'card ' + (i + 2) + ' lost the section');
   }
-  ok((await text()).includes('Black patent'), 'the fourth rule should be showing');
+  ok((await text()).includes('Never start eating'), 'the third rule should be showing');
   await page.evaluate(() => window.__nvx.gentStep(1));
   await page.waitForTimeout(300);
-  ok((await text()).includes('Business Formal'), 'the fifth card should start the next occasion');
+  ok((await text()).includes('Cutlery'), 'the fourth card should start the next section');
 });
 
 t('every card in the deck is reached, and it ends', async () => {
@@ -129,7 +128,7 @@ t('the deck stops at both ends rather than wrapping', async () => {
 });
 
 t('switching subpage starts the new one at its first card', async () => {
-  await boot({ gentSub: 'dress' });
+  await boot({ gentSub: 'dining' });
   await page.evaluate(() => { window.__nvx.gentStep(1); window.__nvx.gentStep(1); });
   await page.waitForTimeout(300);
   eq(await page.evaluate(() => window.__nvx.state.gentIdx), 2, 'moved to the third card');
@@ -141,7 +140,7 @@ t('switching subpage starts the new one at its first card', async () => {
 
 t('the arrow keys move through the cards', async () => {
   /* A carousel you have to reach for the mouse to advance is a carousel you stop reading. */
-  await boot({ gentSub: 'dress' });
+  await boot({ gentSub: 'dining' });
   await page.keyboard.press('ArrowRight');
   await page.keyboard.press('ArrowRight');
   await page.waitForTimeout(400);
@@ -154,12 +153,12 @@ t('the arrow keys move through the cards', async () => {
 /* ---- the daily test, as a deck ----------------------------------------------------------- */
 const setOf = () => page.evaluate(() => window.__nvx._gent().dailySet(window.__nvx._fbToday()));
 
-t('the test is four questions, one per card', async () => {
+t('the test is one question per category, one per card', async () => {
   await boot();
   const set = await setOf();
-  eq(set.length, 4, 'four questions');
+  eq(set.length, 3, 'one question per category');
   const b = await text();
-  ok(/QUESTION 1 OF 4/.test(b), 'it should say which question you are on: ' + (b.match(/QUESTION \d OF \d/) || ''));
+  ok(new RegExp('QUESTION 1 OF ' + set.length).test(b), 'it should say which question you are on: ' + (b.match(/QUESTION \d OF \d/) || ''));
   ok(b.includes(set[0].q), 'the first question should be showing');
   ok(!b.includes(set[1].q), 'the second should not be on the same screen');
 });
@@ -188,10 +187,13 @@ t('the whole set can be answered, and ends on a result', async () => {
     await page.waitForTimeout(220);
   }
   const b = await text();
-  ok(b.includes('4 / 4'), 'the result should be a score: ' + (b.match(/\d \/ \d/) || ''));
-  ok(/All four/.test(b), 'and say something about it');
+  ok(b.includes(set.length + ' / ' + set.length), 'the result should be a score: ' + (b.match(/\d \/ \d/) || ''));
+  /* And it must not name a count — the set is one question per category, so copy that says
+     "all four" goes wrong the moment a category is added or removed. */
+  ok(/clean sweep/i.test(b), 'and say something about it');
+  ok(!/\ball (?:three|four|five)\b/i.test(b), 'the result copy names a count it cannot guarantee: ' + b.slice(0, 200));
   const rec = await page.evaluate(() => window.__nvx.state.prefs.gentTest[window.__nvx._fbToday()]);
-  eq(rec.right, 4, 'all four recorded as right');
+  eq(rec.right, set.length, 'every question recorded as right');
   eq(rec.done, true, 'and the day recorded as finished');
 });
 
@@ -273,7 +275,7 @@ t('nothing threw through any of it', async () => {
    The subpage row used to be eight loose chips on a wrapping flex line; on a phone it broke
    into a ragged block whose shape changed with the active tab. These hold the row to one box
    and one line at every width, and hold the cards to one ruled frame. */
-t('the subpage row is one ruled box, not eight loose chips', async () => {
+t('the subpage row is one ruled box, not a handful of loose chips', async () => {
   await boot();
   const box = await page.evaluate(() => {
     const r = document.querySelector('.cc-gtabs'); if (!r) throw new Error('no subpage row');
@@ -285,7 +287,7 @@ t('the subpage row is one ruled box, not eight loose chips', async () => {
              firstUndivided: parseFloat(getComputedStyle(tabs[0]).borderLeftWidth) === 0,
              rows: new Set(tabs.map(e => Math.round(e.getBoundingClientRect().top))).size };
   });
-  eq(box.n, 8, 'the row does not hold all eight subpages');
+  eq(box.n, 7, 'the row does not hold every subpage');
   ok(parseFloat(box.border) > 0, 'the row has no box around it');
   ok(parseFloat(box.radius) > 0, 'the box is not rounded');
   ok(box.divided, 'the tabs are not divided by lines');
@@ -309,7 +311,7 @@ t('the row and its lines are the raiment’s, not a fixed white', async () => {
 });
 
 t('every card is a ruled frame: a header band, a body, and the rule between them', async () => {
-  for (const sub of ['test', 'money', 'dress', 'dining']) {
+  for (const sub of ['test', 'money', 'dining']) {
     await boot({ gentSub: sub });
     const f = await page.evaluate(() => {
       const card = document.querySelector('.cc-gcard');
@@ -349,7 +351,7 @@ t('standing is one ruled panel of four figures, all of them legible', async () =
 /* ---- the phone ---------------------------------------------------------------------------- */
 t('on a phone the subpage row is still one line, and the page does not scroll sideways', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await boot({ gentSub: 'dress' });
+  await boot({ gentSub: 'dining' });
   const m = await page.evaluate(() => {
     const r = document.querySelector('.cc-gtabs');
     const tabs = [...document.querySelectorAll('.cc-gtab')];
@@ -364,9 +366,9 @@ t('on a phone the subpage row is still one line, and the page does not scroll si
   await page.setViewportSize({ width: 1440, height: 1200 });
 });
 
-t('on a phone the deck is paced by a bar, not by twenty-two dots on their own line', async () => {
+t('on a phone the deck is paced by a bar, not by a dot per card on its own line', async () => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await boot({ gentSub: 'dress' });
+  await boot({ gentSub: 'dining' });
   const m = await page.evaluate(() => {
     const nav = document.querySelector('.cc-gnav');
     const kids = [...nav.children].filter(e => getComputedStyle(e).display !== 'none');
@@ -383,9 +385,9 @@ t('on a phone the deck is paced by a bar, not by twenty-two dots on their own li
   ok(m.bar !== 'none', 'there is no progress bar on a phone');
   eq(m.rows, 1, 'BACK, the bar and NEXT sit on ' + m.rows + ' lines');
   ok(m.navH <= m.backH + 2, 'the nav is ' + m.navH + 'px tall against a ' + m.backH + 'px button \u2014 something wrapped');
-  eq(m.fill, '5%', 'the bar does not report the first of twenty-two');
+  eq(m.fill, '6%', 'the bar does not report the first of eighteen');
   /* And it moves. */
-  await page.evaluate(() => window.__nvx.gentGoto(21));
+  await page.evaluate(() => window.__nvx.gentGoto(17));
   await page.waitForTimeout(150);
   eq(await page.evaluate(() => document.querySelector('.cc-gprog > span').style.width), '100%', 'the bar does not fill by the last card');
   await page.setViewportSize({ width: 1440, height: 1200 });
@@ -393,14 +395,14 @@ t('on a phone the deck is paced by a bar, not by twenty-two dots on their own li
 
 t('on a wide screen the dots come back and the bar goes away', async () => {
   await page.setViewportSize({ width: 1440, height: 1200 });
-  await boot({ gentSub: 'dress' });
+  await boot({ gentSub: 'dining' });
   const m = await page.evaluate(() => ({
     dots: getComputedStyle(document.querySelector('.cc-gdots')).display,
     bar: getComputedStyle(document.querySelector('.cc-gprog')).display,
     n: document.querySelectorAll('.cc-gdots > span').length }));
   ok(m.dots !== 'none', 'the dots are hidden on a wide screen');
   eq(m.bar, 'none', 'the phone bar is showing on a wide screen');
-  eq(m.n, 22, 'the dot row does not report all twenty-two cards');
+  eq(m.n, 18, 'the dot row does not report all eighteen cards');
 });
 
 
@@ -408,69 +410,8 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
    Dress Code carried drawn garment sketches for a while and they were removed: six line
    drawings of outfits told the occasions apart only barely. A card has no picture now unless
    one is supplied, and these hold both halves of that. */
-t('no dress card carries a picture until one is supplied', async () => {
-  await boot({ gentSub: 'dress' });
-  const n = await page.evaluate(() => window.__nvx._gent().cards('dress').length);
-  eq(n, 22, 'dress code is not the deck it was');
-  for (const i of [0, 4, 9, 15, 21]) {
-    await page.evaluate(x => window.__nvx.gentGoto(x), i);
-    await page.waitForTimeout(110);
-    const card = await page.evaluate(() => ({
-      box: !!document.querySelector('.cc-gart'),
-      img: !!document.querySelector('.cc-gphoto'),
-      svg: !!document.querySelector('.cc-gart svg'),
-      solo: !!document.querySelector('.cc-gdress-solo'),
-      text: (document.querySelector('.cc-gbody') || {}).innerText || '' }));
-    ok(!card.box, 'card ' + (i + 1) + ' still reserves a picture box');
-    ok(!card.img && !card.svg, 'card ' + (i + 1) + ' still has a picture on it');
-    /* And the rule takes the full width rather than leaving a column standing empty. */
-    ok(card.solo, 'card ' + (i + 1) + ' leaves the picture column standing empty');
-    ok(/\S/.test(card.text), 'card ' + (i + 1) + ' lost its rule along with its picture');
-  }
-});
 
-t('a supplied photograph appears, one occasion at a time', async () => {
-  await boot({ gentSub: 'dress' });
-  /* Stand a real image in for one occasion only; the rest must stay as they are. */
-  await page.evaluate(() => {
-    const px = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    window.GentlemenEtiquette.PHOTO['black-tie'] = px;
-    window.__nvx.setState({ gentIdx: 0 });
-  });
-  await page.waitForTimeout(400);
-  const wired = await page.evaluate(() => ({
-    img: !!document.querySelector('.cc-gphoto'),
-    solo: !!document.querySelector('.cc-gdress-solo'),
-    alt: (document.querySelector('.cc-gphoto') || {}).alt || '' }));
-  ok(wired.img, 'the supplied photograph did not render');
-  ok(!wired.solo, 'the picture rendered but the rule kept the full width underneath it');
-  ok(/Black Tie/.test(wired.alt), 'the photograph has no useful alt text: "' + wired.alt + '"');
-  /* The next occasion along has no photograph and must not borrow this one. */
-  await page.evaluate(() => window.__nvx.gentGoto(4));
-  await page.waitForTimeout(300);
-  const plain = await page.evaluate(() => ({
-    img: !!document.querySelector('.cc-gphoto'), box: !!document.querySelector('.cc-gart') }));
-  ok(!plain.img && !plain.box, 'an occasion with no photograph rendered one anyway');
-});
 
-t('a photograph is fitted to the box rather than cropped or stretched', async () => {
-  await boot({ gentSub: 'dress' });
-  await page.evaluate(() => {
-    /* A deliberately square image: nothing supplied will arrive at the exact ratio the box
-       is built on, and the wrong answer is to stretch it. */
-    window.GentlemenEtiquette.PHOTO['black-tie'] =
-      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    window.__nvx.setState({ gentIdx: 0 });
-  });
-  await page.waitForTimeout(400);
-  const fit = await page.evaluate(() => {
-    const img = document.querySelector('.cc-gphoto'); const cs = getComputedStyle(img);
-    const r = img.getBoundingClientRect();
-    return { objectFit: cs.objectFit, ratio: +(r.width / r.height).toFixed(2) };
-  });
-  eq(fit.objectFit, 'contain', 'a supplied image is cropped or stretched to fit');
-  eq(fit.ratio, +(140 / 260).toFixed(2), 'the art box changed shape to suit the image');
-});
 
 let pass = 0, fail = 0;
 for (const [n, f] of T) {
