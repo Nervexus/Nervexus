@@ -74,6 +74,11 @@ t('the other centres are unchanged', async () => {
 });
 
 t('the rings wear the raiment, like every other chart', async () => {
+  /* Something has to be logged before this can be asked. It used to read the day with an
+     empty record, and what it was actually sampling was the round cap each ring drew at
+     zero — three dots at twelve o'clock that were a defect, not a colour sample. */
+  const feed = () => page.evaluate(() => window.__nvx.setState({ health: { ...window.__nvx.state.health,
+    meals: [{ id: 'r', name: 'Lunch', kcal: 1200, protein: 90, date: window.__nvx._todayStr() }] } }));
   const cap = () => page.evaluate(() => {
     const cv = document.querySelector('canvas[data-chart="healthRings"]');
     const d = cv.getContext('2d').getImageData(Math.round(cv.width / 2), 0, 1, cv.height).data;
@@ -82,6 +87,8 @@ t('the rings wear the raiment, like every other chart', async () => {
     return null;
   });
   await boot('health', 'Ultra X');
+  await feed();
+  await page.waitForTimeout(1400);
   const x = await cap();
   ok(x && x.r > x.g + 40 && x.r > x.b + 40, 'Ultra X should lead with red, got ' + JSON.stringify(x));
   await page.evaluate(() => window.__nvx.setPref('ultraStyle', 'Maison Élysée'));
@@ -265,6 +272,42 @@ t('the two halves stack on a phone', async () => {
   await page.setViewportSize({ width: 1280, height: 1200 });
   await page.waitForTimeout(400);
   eq(cols, 1, 'the split is still ' + cols + ' columns wide on a phone');
+});
+
+t('the panel is built for the frame it is in', async () => {
+  /* It was authored at desktop sizes and those went straight onto a 390px screen: a 168px
+     ring and three 30px serif figures filled the frame between them, and ADD stretched
+     across whatever the two number fields left over. The whole thing steps down together
+     on a phone rather than one piece at a time, so the proportions hold. */
+  const read = () => page.evaluate(() => {
+    const pan = document.querySelector('.rest-panel');
+    const px = (el, prop) => el ? Math.round(parseFloat(getComputedStyle(el)[prop])) : 0;
+    const add = [...pan.querySelectorAll('.rest-chip-on')].find(e => e.textContent.trim() === 'ADD');
+    return { rings: px(pan.querySelector('.rest-rings'), 'width'),
+             figure: px(pan.querySelector('.rest-figure'), 'fontSize'),
+             head: px(pan.querySelector('.rest-h2'), 'fontSize'),
+             addW: add ? Math.round(add.getBoundingClientRect().width) : 0,
+             panelH: Math.round(pan.getBoundingClientRect().height),
+             panelW: Math.round(pan.getBoundingClientRect().width) };
+  });
+
+  await boot('health');
+  const desk = await read();
+  eq(desk.rings, 168, 'the desktop ring changed size');
+  eq(desk.figure, 30, 'the desktop figure changed size');
+  ok(desk.addW < desk.panelW * 0.2, 'ADD is ' + desk.addW + 'px of a ' + desk.panelW + 'px panel — it is stretching again');
+
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.waitForTimeout(700);
+  const phone = await read();
+  await page.setViewportSize({ width: 1280, height: 1200 });
+  await page.waitForTimeout(400);
+  ok(phone.rings <= 100, 'the ring is still ' + phone.rings + 'px on a phone');
+  ok(phone.figure <= 20, 'the figures are still ' + phone.figure + 'px on a phone');
+  ok(phone.head <= 22, 'Log Today is still ' + phone.head + 'px on a phone');
+  /* Roughly half a 900px window. Above that the logging half — the reason the page is not
+     decoration — is below the fold on the device it is most used on. */
+  ok(phone.panelH < 480, 'the panel is ' + phone.panelH + 'px tall on a 390px frame');
 });
 
 t('a meal still goes in through the new surface', async () => {

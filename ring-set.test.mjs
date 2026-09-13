@@ -212,6 +212,24 @@ t('an account that has logged nothing gets empty rings', async () => {
   ok(empty < full / 2.5, 'an empty log still paints ' + empty + ' pixels of ring against ' + full + ' — something is hard-coded');
 });
 
+t('a ring at zero is an empty track, not a dot', async () => {
+  /* The round line cap draws itself even at zero length, so a day with nothing logged came
+     out as three marks floating at twelve o'clock — which reads as a fault on the canvas
+     rather than as "nothing yet". */
+  const oxblood = () => page.evaluate(() => {
+    const cv = document.querySelector('canvas[data-chart="fitRings"]');
+    const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4)
+      if (d[i + 3] > 200 && d[i] > 100 && d[i] < 180 && d[i + 1] < 70 && d[i + 2] < 70) n++;
+    return n;
+  });
+  await boot('Ultra X', []);
+  eq(await oxblood(), 0, 'an empty set still paints ring colour — the cap is drawing at zero');
+  await boot('Ultra X', WORKOUTS);
+  ok(await oxblood() > 200, 'a logged week paints no ring at all, so the guard is eating real values');
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });
