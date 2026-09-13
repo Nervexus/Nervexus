@@ -11804,7 +11804,7 @@ activities: this._mergeShipLog(s.activities),
   // Work time used to be typed into the generic Log Activity box, which took any category.
   // These write the same activity rows (so the work log, the trackers and Time Distribution
   // all still read them) but only ever as Work, with the kind of work kept alongside.
-  WORK_TYPES = ['Deep Work','Meetings','Admin','Client','Planning'];
+  WORK_TYPES = ['Deep Work','Meetings','Admin','Client','Planning','Focus'];
   addWorkHours(){
     const S=this.state;
     const label=(S.whText||'').trim();
@@ -13409,7 +13409,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const m=+w.min||0; if(m>0) ev.push({xp:m, ts:w.ts});
     });
     Object.keys(exDay).forEach(k=>ev.push({xp:25, ts:exDay[k]}));
-    s.activities.forEach(a=>{ if(!a.seeded && !/^Shipped update v/.test(a.text||'')) ev.push({xp:15,ts:a.ts}); });
+    /* A logged activity is worth 15. A finished Brain Rest is worth BRAIN_REST_XP, read off
+       the row rather than a separate log \u2014 the row is the only record there is, and the two
+       columns it is recognised by are real ones that survive a Supabase round trip. */
+    s.activities.forEach(a=>{ if(a.seeded || /^Shipped update v/.test(a.text||'')) return;
+      const isRest=a.cat==='Work' && a.sub==='Focus' && (a.text||'')===this.BRAIN_REST_LABEL();
+      ev.push({xp:isRest?this.BRAIN_REST_XP():15, ts:a.ts}); });
     /* Shipping a build used to be worth 500 XP to the owner. 113 of them had landed, which
        was 72% of the whole score — the Life Performance Index was mostly a count of how
        often the app had been deployed, and it went up while the owner did nothing. */
@@ -15788,6 +15793,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      The clock is an end timestamp, not a counter. A counter loses time whenever the tab is
      backgrounded or the phone sleeps, which would quietly hand back a four-minute sit. */
   BR_SECONDS(){ return 300; }
+  BRAIN_REST_XP(){ return 300; }
   openBrainRest(){ this._brStop(); this.setState({brStage:'ready', brLeft:this.BR_SECONDS()}); }
   brainRestReady(){ this.setState({brStage:'devices'}); }
   brainRestBegin(){
@@ -15796,11 +15802,31 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this._brStop();
     this._brTimer=setInterval(()=>{
       const left=Math.max(0, Math.round((this.state.brEndsAt-Date.now())/1000));
-      if(left<=0){ this._brStop(); this.setState({brLeft:0, brStage:'done'}); return; }
+      if(left<=0){ this._brStop(); this.setState({brLeft:0, brStage:'done'}); this._brLogCompletion(); return; }
       if(left!==this.state.brLeft) this.setState({brLeft:left});
     }, 250);
   }
   _brStop(){ if(this._brTimer){ clearInterval(this._brTimer); this._brTimer=null; } }
+  /* A finished sit is five minutes of work and goes in the work log as one, filed under
+     Focus. Written only when the clock actually ran out \u2014 ending early logs nothing,
+     because it was not five minutes.
+
+     That row is the whole record: there is no separate XP store for it. The Power Level
+     builds its events out of data that already exists, so a second log would be a second
+     thing to sync and a second thing to fall out of step. Its worth is read back off the row
+     (see the event builder), which is also why the text is fixed rather than free-typed \u2014
+     text and sub are real columns on the activities table, and a flag of my own invention
+     would not survive the round trip through Supabase. */
+  BRAIN_REST_LABEL(){ return 'Brain Rest'; }
+  _brLogCompletion(){
+    const id=this._uuid(), ts=Date.now(), mins=Math.round(this.BR_SECONDS()/60);
+    const row={ id, text:this.BRAIN_REST_LABEL(), cat:'Work', sub:'Focus', ts, min:mins };
+    this.mut(s=>({ activities:[...(s.activities||[]), row] }));
+    if(this._sbOn()){ try{ window.SB.upsert('activities',{ id, user_id:this.state.authUserId,
+      text:row.text, cat:'Work', sub:'Focus', min:mins, ts:new Date(ts).toISOString() },'id'); }catch(e){} }
+    this.showToast('system','Brain rest complete','Five minutes logged to Focus \u00b7 +'+this.BRAIN_REST_XP()+' XP');
+    this.save();
+  }
   /* Leaving early ends it. There is no pause: a five minute sit you can pause is a four
      minute sit with a gap in it. */
   closeBrainRest(){ this._brStop(); this.setState({brStage:'', brEndsAt:0, brLeft:this.BR_SECONDS()}); }

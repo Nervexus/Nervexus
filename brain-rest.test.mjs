@@ -200,6 +200,91 @@ t('it takes the whole screen, at both widths', async () => {
   await page.setViewportSize({ width: 1440, height: 1000 });
 });
 
+
+/* ---- what a finished sit leaves behind ------------------------------------------------------
+   One row in the work log, filed under Focus, and 300 XP. There is no separate store for
+   either: the row is the record, and the Power Level reads its worth back off the row. */
+t('Focus is one of the work log’s types', async () => {
+  await boot();
+  const types = await page.evaluate(() => window.__nvx.WORK_TYPES);
+  ok(types.includes('Focus'), 'Focus is not offered in the work log: ' + types.join(', '));
+});
+
+t('a finished sit writes one Focus entry in the work log', async () => {
+  await boot({ activities: [] });
+  await page.evaluate(() => window.__nvx.brainRestBegin());
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx.setState({ brEndsAt: Date.now() + 600 }));
+  await page.waitForTimeout(1600);
+  const rows = await page.evaluate(() => window.__nvx.state.activities || []);
+  eq(rows.length, 1, 'expected one work log entry, got ' + rows.length);
+  eq(rows[0].cat, 'Work', 'not filed as work');
+  eq(rows[0].sub, 'Focus', 'not filed under Focus');
+  eq(rows[0].min, 5, 'the entry is not five minutes');
+  ok(rows[0].text, 'the entry has no text');
+  ok(rows[0].id, 'the entry has no id, so it cannot sync');
+});
+
+t('ending early logs nothing — it was not five minutes', async () => {
+  await boot({ activities: [] });
+  await page.evaluate(() => window.__nvx.brainRestBegin());
+  await page.waitForTimeout(700);
+  await page.evaluate(() => window.__nvx.closeBrainRest());
+  await page.waitForTimeout(600);
+  eq(await page.evaluate(() => (window.__nvx.state.activities || []).length), 0,
+     'ending early still wrote a work log entry');
+});
+
+t('a finished sit is worth exactly 300 XP, through the real count', async () => {
+  await boot({ activities: [] });
+  const before = await page.evaluate(() => window.__nvx.computePower().totalXP);
+  await page.evaluate(() => window.__nvx.brainRestBegin());
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx.setState({ brEndsAt: Date.now() + 600 }));
+  await page.waitForTimeout(1600);
+  const after = await page.evaluate(() => window.__nvx.computePower().totalXP);
+  eq(after - before, 300, 'the sit was worth ' + (after - before) + ' XP');
+  /* Not 315: the row must not also collect the ordinary 15 an activity is worth. */
+  ok(after - before !== 315, 'it collected the activity XP on top of its own');
+});
+
+t('only a real sit is worth it — a typed Focus entry is an ordinary activity', async () => {
+  await boot({ activities: [] });
+  const base = await page.evaluate(() => window.__nvx.computePower().totalXP);
+  /* Same category and sub, different text. */
+  await page.evaluate(() => window.__nvx.setState({ activities: [
+    { id: 'a1', text: 'Reading', cat: 'Work', sub: 'Focus', ts: Date.now(), min: 5 } ] }));
+  await page.waitForTimeout(400);
+  eq(await page.evaluate(() => window.__nvx.computePower().totalXP) - base, 15,
+     'a typed Focus entry is being paid as a brain rest');
+  /* Same text, filed elsewhere. */
+  await page.evaluate((label) => window.__nvx.setState({ activities: [
+    { id: 'a2', text: label, cat: 'Work', sub: 'Deep Work', ts: Date.now(), min: 5 } ] }),
+    await page.evaluate(() => window.__nvx.BRAIN_REST_LABEL()));
+  await page.waitForTimeout(400);
+  eq(await page.evaluate(() => window.__nvx.computePower().totalXP) - base, 15,
+     'the label alone is being paid, without the Focus filing');
+});
+
+t('the entry survives what Supabase can actually store', async () => {
+  /* The row is recognised by cat, sub and text — all real columns. A flag of our own would
+     be dropped on the round trip and the sit would quietly become worth 15. */
+  await boot({ activities: [] });
+  await page.evaluate(() => window.__nvx.brainRestBegin());
+  await page.waitForTimeout(400);
+  await page.evaluate(() => window.__nvx.setState({ brEndsAt: Date.now() + 600 }));
+  await page.waitForTimeout(1600);
+  const row = await page.evaluate(() => (window.__nvx.state.activities || [])[0]);
+  const COLUMNS = ['id', 'text', 'cat', 'sub', 'min', 'ts'];
+  const base = await page.evaluate(() => window.__nvx.computePower().totalXP);
+  /* Put back only what the table has columns for, as a sync would. */
+  await page.evaluate((r) => window.__nvx.setState({ activities: [r] }),
+    Object.fromEntries(COLUMNS.map(k => [k, row[k]])));
+  await page.waitForTimeout(400);
+  eq(await page.evaluate(() => window.__nvx.computePower().totalXP), base,
+     'the sit lost its worth once it had been through the columns the table actually has');
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.join(' | '), '', 'page errors');
 });
