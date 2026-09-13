@@ -8642,7 +8642,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.12-306 · v11.306 brain-rest';
+const NOTIF_BUILD_VERSION = '2026.09.13-307 · v11.307 focus-xp';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13565,6 +13565,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.307', date:'Sep 13, 2026', major:true, notes:[
+      'A finished Brain Rest now counts. It writes itself into the Work Log as five minutes of Focus \u2014 a new type alongside Deep Work, Meetings, Admin, Client and Planning \u2014 and is worth 300 XP.',
+      'Only a sit that ran the full five minutes counts. Ending early logs nothing and pays nothing, because it was not five minutes.',
+    ]},
     {version:'v11.306', date:'Sep 12, 2026', major:true, notes:[
       'The Forge\u2019s Mental centre has something on it: Brain Rest. Five minutes sitting in silence before the work starts \u2014 not a break between things, the thing itself.',
       'It asks twice before the clock runs: are you ready, then are all devices away. Both are asked every time rather than remembered, and neither starts the timer until it is answered.',
