@@ -8660,7 +8660,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-307 · v11.307 focus-xp';
+const NOTIF_BUILD_VERSION = '2026.09.13-308 · v11.308 white-abyss';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13583,6 +13583,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.308', date:'Sep 13, 2026', major:false, notes:[
+      'Brain Rest is its own place now rather than a card over the app \u2014 a pale luminous field with the horizon of something vast just below the frame, one hairline down the middle, and everything said in the lower third.',
+      'The hairline is the clock. Its filled part is the five minutes draining, and it is the only thing on the screen that moves.',
+      'White whichever raiment you are on, and black on Noir. The point of the sit is stepping out of the app, so it is one place rather than four tinted ones.',
+    ]},
     {version:'v11.307', date:'Sep 13, 2026', major:true, notes:[
       'A finished Brain Rest now counts. It writes itself into the Work Log as five minutes of Focus \u2014 a new type alongside Deep Work, Meetings, Admin, Client and Planning \u2014 and is worth 300 XP.',
       'Only a sit that ran the full five minutes counts. Ending early logs nothing and pays nothing, because it was not five minutes.',
