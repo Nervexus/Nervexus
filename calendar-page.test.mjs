@@ -290,109 +290,53 @@ t('an event with no end time shows one time and no empty line', async () => {
   eq((row.match(/\d\d:\d\d/g) || []).length, 1, 'a general event with no duration has exactly one time: ' + JSON.stringify(row));
 });
 
-t('the card block is the three cards from the template', async () => {
-  /* Mark, name, constellation, one line at the foot — and the stagger, which is the whole
-     shape of the reference: three panels caught mid-fall rather than a row of three. */
+t('the panels are glass over a lit ground', async () => {
+  /* The template, applied to the panels the page already has rather than to three cards
+     added beside them. The ground is part of the card: glass with nothing behind it is a
+     grey box, so the field is a gradient in the raiment's own accent. */
   await boot();
   const b = await page.evaluate(() => {
-    const row = document.querySelector('.lcb-row');
-    if (!row) return null;
-    const cards = [...row.querySelectorAll('.lcb-card')];
-    return {
-      n: cards.length,
-      badges: cards.map(c => c.querySelector('.lcb-badge').textContent.trim()),
-      names: cards.map(c => c.querySelector('.lcb-name').textContent.trim()),
-      /* Uppercase is the stylesheet's, not the copy's — textContent stays title case. */
-      caps: cards.every(c => getComputedStyle(c.querySelector('.lcb-name')).textTransform === 'uppercase'),
-      stars: cards.map(c => c.querySelectorAll('.lcb-glyph svg path').length),
-      feet: cards.map(c => c.querySelector('.lcb-foot').textContent.trim()),
-      tops: cards.map(c => Math.round(c.getBoundingClientRect().top)),
-      ground: !!document.querySelector('.lcb .lcb-field'),
-      glass: cards.every(c => /blur/.test(getComputedStyle(c).backdropFilter)),
-    };
+    const stage = document.querySelector('.lcb-stage');
+    if (!stage) return null;
+    const field = stage.querySelector('.lcb-field');
+    const cards = [...stage.querySelectorAll('.lc-card')];
+    return { field: !!field,
+             lit: field ? getComputedStyle(field).backgroundImage : '',
+             onStage: cards.length,
+             glass: cards.every(c => /blur/.test(getComputedStyle(c).backdropFilter)),
+             /* the panels sit ON the field, not beside it */
+             inside: cards.every(c => stage.contains(c)) };
   });
-  ok(b, 'there is no card block on the calendar');
-  eq(b.n, 3, 'the block is not three cards');
-  eq(b.badges.join(' | '), '01 - TD | 02 - WK | 03 - NX', 'the marks are wrong or out of order');
-  eq(b.names.join(' | '), 'Today | This Week | Next Up', 'the card names are wrong');
-  ok(b.caps, 'the card names are not set in the letterspaced caps the template uses');
-  ok(b.stars.every(n => n >= 3), 'a card has no constellation: ' + b.stars.join(','));
-  ok(b.feet.every(f => f.length > 10), 'a card has nothing at its foot');
-  ok(b.ground, 'the cards are glass over nothing');
-  ok(b.glass, 'the cards are not glass');
-  ok(b.tops[0] < b.tops[1] && b.tops[1] < b.tops[2],
-     'the cards are not stepping down: ' + b.tops.join(','));
+  ok(b, 'there is no lit ground on the calendar');
+  ok(b.field, 'the ground is missing');
+  ok(/gradient/.test(b.lit), 'the ground is flat, not lit');
+  eq(b.onStage, 3, 'the three panels are not the ones on the ground');
+  ok(b.glass && b.inside, 'the panels are not glass over it');
 });
 
-t('what the block says is what the calendar underneath it holds', async () => {
-  /* A card that reports a count the grid disagrees with is worse than no card. These read
-     the same events through the same repeat rule the day panel uses. */
-  const d0 = day(0), d2 = day(2);
-  await boot({ calSel: d0, events: [
-    { id: 'a', title: 'Dinner with Sarah', date: d0, time: '23:50', repeat: [], kind: 'general' },
-    { id: 'b', title: 'Shift at the yard', date: d0, time: '00:01', endTime: '17:00', repeat: [], kind: 'work' },
-    { id: 'c', title: 'Dentist', date: d2, time: '11:15', repeat: [], kind: 'general' },
-  ]});
-  const feet = await page.evaluate(() => [...document.querySelectorAll('.lcb-foot')].map(e => e.textContent.trim()));
-  ok(/^2 things on today/.test(feet[0]), 'TODAY miscounts the day: ' + feet[0]);
-  ok(/3 things across the next seven days/.test(feet[1]), 'THIS WEEK miscounts: ' + feet[1]);
-  ok(/1 work\.$/.test(feet[1]), 'THIS WEEK lost the work count: ' + feet[1]);
-  ok(/Dinner with Sarah|Shift at the yard|Dentist/.test(feet[2]), 'NEXT UP names nothing: ' + feet[2]);
-});
-
-t('an empty calendar says so rather than counting nothing', async () => {
-  await boot({ events: [] });
-  const feet = await page.evaluate(() => [...document.querySelectorAll('.lcb-foot')].map(e => e.textContent.trim()));
-  ok(/Nothing on today/.test(feet[0]), 'TODAY on an empty calendar: ' + feet[0]);
-  ok(/Seven days clear/.test(feet[1]), 'THIS WEEK on an empty calendar: ' + feet[1]);
-  ok(/Nothing scheduled ahead/.test(feet[2]), 'NEXT UP on an empty calendar: ' + feet[2]);
-});
-
-t('NEXT UP looks past the month on screen', async () => {
-  /* It used to be reasonable to scan only the month being drawn. Paging back to March should
-     not make the card claim nothing is coming. */
-  const far = (() => { const x = new Date(); x.setDate(x.getDate() + 40); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); })();
-  await boot({ events: [{ id: 'z', title: 'Flight to Rome', date: far, time: '06:40', repeat: [], kind: 'general' }] });
-  const foot = await page.evaluate(() => document.querySelectorAll('.lcb-foot')[2].textContent.trim());
-  ok(/Flight to Rome/.test(foot), 'NEXT UP stopped at the month on screen: ' + foot);
-});
-
-t('the block stacks and drops the stagger on a phone', async () => {
-  await boot();
-  await page.setViewportSize({ width: 390, height: 900 });
-  await page.waitForTimeout(600);
-  const cols = await page.evaluate(() => {
-    const row = document.querySelector('.lcb-row');
-    const c2 = document.querySelector('.lcb-2');
-    return { n: getComputedStyle(row).gridTemplateColumns.trim().split(/\s+/).length,
-             step: Math.round(parseFloat(getComputedStyle(c2).marginTop)) };
-  });
-  await page.setViewportSize({ width: 1440, height: 1200 });
-  await page.waitForTimeout(400);
-  eq(cols.n, 1, 'the block is still ' + cols.n + ' across on a phone');
-  eq(cols.step, 0, 'the stagger survived onto a single column, so card two starts with a gap');
-});
-
-t('the constellation is lit against whatever it is drawn on', async () => {
-  /* An accent-coloured glow behind a dark mark on an ivory ground is a smudge, not light. */
+t('the ground is lit in the raiment, not one hard-coded colour', async () => {
+  const seen = {};
   for (const style of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
     await boot();
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(800);
-    const g = await page.evaluate(() => {
-      const svg = document.querySelector('.lcb-glyph svg');
-      const shell = document.querySelector('.cc-shell');
-      const lum = (c) => { const f = (c.match(/[\d.]+/g) || []).map(Number);
-        return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
-      return { halo: getComputedStyle(shell).getPropertyValue('--lcb-halo').trim(),
-               mark: lum(getComputedStyle(svg).color),
-               card: lum(getComputedStyle(shell).getPropertyValue('--lcb-near').trim().replace(/^#(..)(..)(..)$/,
-                 (m, r, g2, b) => 'rgb(' + parseInt(r, 16) + ',' + parseInt(g2, 16) + ',' + parseInt(b, 16) + ')')) };
-    });
-    ok(g.halo, style + ': the constellation has no halo token');
-    /* A dark mark sits on a light ground and a light mark on a dark one — never both light. */
-    ok((g.mark > 128) !== (g.card > 128), style + ': the constellation is the same weight as its ground');
+    seen[style] = await page.evaluate(() =>
+      getComputedStyle(document.querySelector('.cc-shell')).getPropertyValue('--lcb-accent').trim());
+    ok(seen[style], style + ': the ground has no accent');
   }
+  const vals = Object.values(seen);
+  eq(new Set(vals).size, vals.length, 'two raiments are lighting the ground the same colour: ' + JSON.stringify(seen));
+});
+
+t('the ground tightens on a phone rather than keeping a desktop margin', async () => {
+  await boot();
+  const desk = await page.evaluate(() => Math.round(parseFloat(getComputedStyle(document.querySelector('.lcb-stage')).paddingTop)));
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.waitForTimeout(600);
+  const phone = await page.evaluate(() => Math.round(parseFloat(getComputedStyle(document.querySelector('.lcb-stage')).paddingTop)));
+  await page.setViewportSize({ width: 1440, height: 1200 });
+  await page.waitForTimeout(400);
+  ok(phone < desk, 'the ground keeps its ' + phone + 'px desktop margin on a 390px frame');
 });
 
 t('the three panels wear the card layout', async () => {
@@ -415,9 +359,15 @@ t('the card is readable on every raiment it can be worn with', async () => {
      was wrong. Éverpine's dark-green card is the home scene only — everywhere else, the
      calendar included, it wears the ivory one, so a card painted dark green from the raiment
      name came out with the page's dark ink on a dark ground and the month vanished. */
+  /* Chromium hands back color(srgb r g b / a) for some computed values, where the channels
+     are 0-1 rather than 0-255. Reading those as 0-255 makes a white card look black, which is
+     a test that fails on a page that is fine. */
+  const chans = (c) => {
+    const f = (String(c).match(/[\d.]+/g) || []).map(Number);
+    return /^color\(/.test(String(c).trim()) ? f.slice(0, 3).map(v => v * 255).concat(f.slice(3)) : f;
+  };
   const lum = (c) => {
-    const f = (c.match(/[\d.]+/g) || []).map(Number);
-    const [r, g, b] = f;
+    const [r, g, b] = chans(c);
     const s = [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
     return 0.2126 * s[0] + 0.7152 * s[1] + 0.0722 * s[2];
   };
@@ -430,8 +380,10 @@ t('the card is readable on every raiment it can be worn with', async () => {
       const shell = document.querySelector('.cc-shell');
       /* Composite the card over what is actually behind it, so a translucent ground is
          measured as the colour a person sees rather than as its own alpha. */
+      const ch = (c) => { const f = (String(c).match(/[\d.]+/g) || []).map(Number);
+        return /^color\(/.test(String(c).trim()) ? f.slice(0, 3).map(v => v * 255).concat(f.slice(3)) : f; };
       const mix = (fg, bg) => {
-        const F = (fg.match(/[\d.]+/g) || []).map(Number), B = (bg.match(/[\d.]+/g) || []).map(Number);
+        const F = ch(fg), B = ch(bg);
         const a = F.length > 3 ? F[3] : 1;
         return 'rgb(' + [0, 1, 2].map(i => Math.round(F[i] * a + (B[i] == null ? 255 : B[i]) * (1 - a))).join(',') + ')';
       };
