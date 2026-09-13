@@ -319,10 +319,19 @@
   .cc-shell.raiment-noir, .cc-shell.raiment-base{ --lc-edge:rgba(236,232,224,0.22);
              --lc-raise:rgba(255,255,255,0.075); --lc-on-accent:#0B0B0C; }
 
-  .lc-card{ position:relative; border-radius:16px; padding:20px 18px 18px; box-sizing:border-box;
+  /* The rim is what makes a pane read as glass rather than as a tinted rectangle: light
+     catching the top and left edge from inside, the way it does on every panel in the
+     reference. It is an inset shadow, not a border, so it lies along the corner radius. */
+  .lc-card{ position:relative; border-radius:18px; padding:20px 18px 18px; box-sizing:border-box;
     background:var(--lc-bg); border:1px solid var(--lc-edge, var(--lc-line));
     backdrop-filter:blur(22px) saturate(1.2); -webkit-backdrop-filter:blur(22px) saturate(1.2);
-    box-shadow:0 22px 50px var(--lc-glow); }
+    box-shadow:inset 0 1px 0 var(--lc-rim), inset 1px 0 0 var(--lc-rim),
+               inset 0 -1px 0 var(--lc-rim-low), 0 22px 50px var(--lc-glow); }
+  /* A pane inside a pane. The reference groups things this way rather than ruling them: a
+     softer fill, the same rim, and no border of its own. */
+  .lc-sub{ position:relative; border-radius:14px; padding:13px 14px; box-sizing:border-box;
+    background:var(--lc-sub); border:1px solid transparent;
+    box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 20px var(--lc-glow); }
   /* The mark and the title, centred over the card the way the template has them. */
   .lc-head{ display:flex; flex-direction:column; align-items:center; gap:11px; margin-bottom:18px; }
   .lc-badge{ display:inline-flex; align-items:center; justify-content:center; padding:4px 12px;
@@ -354,19 +363,24 @@
     background:linear-gradient(102deg, transparent 34%, rgba(255,255,255,0.14) 50%, transparent 66%); }
   .cc-shell{ --lcb-accent:#FFFFFF; --lcb-far:#171A1F; --lcb-near:#0E1013;
              --lcb-lit:rgba(255,255,255,0.24); --lcb-dim:rgba(255,255,255,0.16);
-             --lc-bg:rgba(255,255,255,0.06); }
+             --lc-bg:rgba(255,255,255,0.06); --lc-sub:rgba(255,255,255,0.05);
+             --lc-rim:rgba(255,255,255,0.13); --lc-rim-low:rgba(255,255,255,0.03); }
   .cc-shell.raiment-x{        --lcb-accent:#8E3030; --lcb-far:#DCD6D2; --lcb-near:#EFEBE3;
              --lcb-lit:rgba(142,48,48,0.24); --lcb-dim:rgba(142,48,48,0.16);
-             --lc-bg:rgba(255,255,255,0.42); }
+             --lc-bg:rgba(255,255,255,0.42); --lc-sub:rgba(255,255,255,0.40);
+             --lc-rim:rgba(255,255,255,0.80); --lc-rim-low:rgba(255,255,255,0.22); }
   .cc-shell.raiment-noir{     --lcb-accent:#C9A24A; --lcb-far:#111112; --lcb-near:#070708;
              --lcb-lit:rgba(201,162,74,0.24); --lcb-dim:rgba(201,162,74,0.16);
-             --lc-bg:rgba(255,255,255,0.055); }
+             --lc-bg:rgba(255,255,255,0.055); --lc-sub:rgba(255,255,255,0.045);
+             --lc-rim:rgba(255,255,255,0.11); --lc-rim-low:rgba(255,255,255,0.025); }
   .cc-shell.raiment-maison{   --lcb-accent:#4E6E96; --lcb-far:#D8DEE6; --lcb-near:#F2ECE0;
              --lcb-lit:rgba(78,110,150,0.24); --lcb-dim:rgba(78,110,150,0.16);
-             --lc-bg:rgba(255,255,255,0.44); }
+             --lc-bg:rgba(255,255,255,0.44); --lc-sub:rgba(255,255,255,0.42);
+             --lc-rim:rgba(255,255,255,0.82); --lc-rim-low:rgba(255,255,255,0.24); }
   .cc-shell.raiment-everpine{ --lcb-accent:#7E9080; --lcb-far:#DAD9CE; --lcb-near:#EFEBE3;
              --lcb-lit:rgba(126,144,128,0.26); --lcb-dim:rgba(126,144,128,0.18);
-             --lc-bg:rgba(255,255,255,0.42); }
+             --lc-bg:rgba(255,255,255,0.42); --lc-sub:rgba(255,255,255,0.40);
+             --lc-rim:rgba(255,255,255,0.80); --lc-rim-low:rgba(255,255,255,0.22); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
 
   /* The month across the top, then the clock and the day side by side under it. The clock
@@ -378,6 +392,20 @@
   .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:auto; gap:10px;
     align-content:start; min-height:324px; }
   @media (max-width:620px){ .cal-grid{ gap:6px; min-height:0; } }
+  .cal-tags{ margin-top:14px; }
+  .cal-tags-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-tags-label{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.5px;
+    color:var(--lc-muted); }
+  .cal-tags-clear{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.2px;
+    color:var(--lc-accent); cursor:pointer; }
+  .cal-tags-row{ display:flex; gap:9px; flex-wrap:wrap; }
+  .cal-tag{ width:28px; height:28px; border-radius:10px; cursor:pointer;
+    border:2px solid transparent; box-shadow:inset 0 1px 0 rgba(255,255,255,0.28);
+    transition:transform 120ms ease, box-shadow 120ms ease; }
+  .cal-tag:hover{ transform:translateY(-1px); }
+  /* The chosen one is ringed in the card's own ink rather than a hard-coded white, which was
+     invisible on an ivory raiment. */
+  .cal-tag-on{ border-color:var(--lc-accent); box-shadow:0 0 0 2px var(--lc-bg), 0 6px 14px var(--lc-glow); }
   /* ---- THE MONTH GRID -------------------------------------------------------------------
      A day is a number, not a box. Today is the one solid thing on the grid, the selected day
      is raised the way a chosen row is, a highlighted day keeps the colour it was given, and
@@ -411,8 +439,8 @@
      panel below is showing. The chosen row lifts off the card rather than being outlined,
      which is the whole idea of the reference: things are raised, not ruled. */
   .cal-clock{ display:flex; align-items:center; gap:16px; padding:14px 14px;
-    border-radius:14px; background:var(--lc-raise); border:1px solid var(--lc-line);
-    box-shadow:0 8px 22px var(--lc-glow); margin-bottom:14px; }
+    border-radius:14px; background:var(--lc-raise); border:1px solid transparent;
+    box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); margin-bottom:14px; }
   .cal-dial{ width:74px; height:74px; flex:0 0 74px; display:block; }
   .cal-dial-face{ fill:none; stroke:var(--lc-line); stroke-width:1; }
   .cal-dial-marks{ stroke:var(--lc-accent); stroke-width:1.6; opacity:0.32; stroke-linecap:round; }
@@ -3845,7 +3873,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84;">{{ dayEventCount }} EVENTS</span>
                 </span>
               </div>
-              <div class="cc-cal-daylist">
+              <!-- The list is a pane inside the pane, the way the reference groups things. -->
+              <div class="cc-cal-daylist lc-sub">
               <sc-for list="{{ dayEvents }}" as="e" hint-placeholder-count="3">
                 <div style="display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
                   <span onClick="{{ e.cycleColor }}" title="{{ e.colorTitle }}" style="width:9px; height:9px; flex:0 0 9px; border-radius:50%; background:{{ e.color }}; cursor:{{ e.colorCursor }};"></span>
@@ -3870,6 +3899,21 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </sc-for>
               </div>
               <sc-if value="{{ noDayEvents }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 0;">No events yet on this day.</div></sc-if>
+              <!-- Tagging the day. Only offered when the list is one day, because that is the
+                   only time the day being tagged is the day on screen. -->
+              <sc-if value="{{ calIsDay }}" hint-placeholder-val="{{ true }}">
+                <div class="lc-sub cal-tags">
+                  <div class="cal-tags-head">
+                    <span class="cal-tags-label">TAG {{ selShortUpper }}</span>
+                    <sc-if value="{{ hasDayTag }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearHighlight }}" class="cal-tags-clear">CLEAR</span></sc-if>
+                  </div>
+                  <div class="cal-tags-row">
+                    <sc-for list="{{ hlColors }}" as="c" hint-placeholder-count="6">
+                      <span onClick="{{ c.pick }}" title="{{ c.name }}" class="{{ c.cls }}" style="background:{{ c.swatch }};"></span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
               <div style="height:1px; background:rgba(255,255,255,0.08); margin:16px 0 14px;"></div>
               <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:#6f6f78; margin-bottom:10px;">ADD TO {{ selShortUpper }}</div>
               <!-- The rota import first: it is the one that keeps hours and who you are on
@@ -9049,7 +9093,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-319 · v11.319 cal-layout';
+const NOTIF_BUILD_VERSION = '2026.09.13-320 · v11.320 lit-rim';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -18614,8 +18658,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         bg:(today||sel)?'transparent':(hl?this.hexA(hl,0.26):'transparent'),
         numColor:today?'inherit':(hlInk||muted),
         select:()=>this.setState({calSel:ds}) }); }
-    /* The Highlight card is gone — its swatches and its clear both went with it. A day's
-       own colour is still read by the grid, so anything tagged before stays tagged. */
+    /* Tagging a day. It had its own card; it belongs inside the day panel, which is the
+       only place the day being tagged is named. The swatch shows the colour chosen; what
+       is drawn against the surface is _hlInk, pulled far enough toward the middle to be
+       seen on either ground. */
+    const _hlDefs=this.DAY_COLORS(); const _curHl=(S.dayColors||{})[S.calSel];
+    const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], on:_curHl===c[1],
+      cls:'cal-tag'+(_curHl===c[1]?' cal-tag-on':''),
+      pick:()=>{ const day=S.calSel, color=c[1];
+        /* Tapping the colour a day already has takes it off, so the row is the whole of
+           the control and CLEAR is not the only way back to no tag. */
+        this.mut(st=>{ const dc={...(st.dayColors||{})}; if(dc[day]===color) delete dc[day]; else dc[day]=color; return {dayColors:dc}; });
+        if(this._sbOn()){ if(_curHl===c[1]) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{});
+          else window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } } }));
+    const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
+    const hasDayTag=!!_curHl;
     /* THE SCOPE. The list under the day panel is one of three things: the day you have
        selected, the next seven days, or the month ahead — chosen on the NOW card above it.
        Everything below reads the same events through the same repeat rule either way, so a
@@ -21188,7 +21245,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             ring:cur===c[1]?'#FFFFFF':'rgba(255,255,255,0.15)',
             pick:()=>this.setPref('evNewColor', c[1]) })) };
       })(),
-      dows:['MON','TUE','WED','THU','FRI','SAT','SUN'], monthLabel, calCells, prevMonth:()=>this.setState(s=>{ let mm=s.calM-1,yy=s.calY; if(mm<0){mm=11;yy--;} return {calM:mm,calY:yy}; }), nextMonth:()=>this.setState(s=>{ let mm=s.calM+1,yy=s.calY; if(mm>11){mm=0;yy++;} return {calM:mm,calY:yy}; }),
+      dows:['MON','TUE','WED','THU','FRI','SAT','SUN'], monthLabel, calCells, hlColors, clearHighlight, hasDayTag, prevMonth:()=>this.setState(s=>{ let mm=s.calM-1,yy=s.calY; if(mm<0){mm=11;yy--;} return {calM:mm,calY:yy}; }), nextMonth:()=>this.setState(s=>{ let mm=s.calM+1,yy=s.calY; if(mm>11){mm=0;yy++;} return {calM:mm,calY:yy}; }),
       dayEvents, noDayEvents:dayEvents.length===0, dayEventCount:dayEvents.length, selDayLabel, selShort, selShortUpper:selShort.toUpperCase(), evTitle:S.evTitle, evTime:S.evTime,
       setEvTitle:(e)=>this.setState({evTitle:e.target.value}), setEvTime:(e)=>this.setState({evTime:e.target.value}),
       onCalScreenshot:(e)=>{ const f=e.target.files&&e.target.files[0]; if(f) this.importCalendarScreenshot(f); e.target.value=''; },
