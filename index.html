@@ -354,33 +354,41 @@
   .lcb-stage{ position:relative; border-radius:24px; overflow:hidden; padding:22px; box-sizing:border-box; }
   .lcb-field{ position:absolute; inset:0; pointer-events:none;
     background:
-      radial-gradient(ellipse 70% 90% at 14% 6%,  var(--lcb-lit) 0%, transparent 62%),
-      radial-gradient(ellipse 80% 70% at 90% 98%, var(--lcb-dim) 0%, transparent 64%),
-      linear-gradient(160deg, var(--lcb-far) 0%, var(--lcb-near) 100%); }
+      radial-gradient(ellipse 62% 74% at 86% 4%,   var(--lcb-lit) 0%, transparent 58%),
+      radial-gradient(ellipse 72% 66% at 8% 96%,   var(--lcb-dim) 0%, transparent 60%),
+      /* the silvery band through the middle that makes it pearl rather than a gradient */
+      radial-gradient(ellipse 120% 34% at 34% 46%, var(--lcb-sheen) 0%, transparent 70%),
+      linear-gradient(158deg, var(--lcb-far) 0%, var(--lcb-near) 62%, var(--lcb-far) 100%); }
   /* One faint sweep across it, the way light sits on the reference rather than a texture you
      would ever look at directly. */
   .lcb-field::after{ content:''; position:absolute; inset:0;
-    background:linear-gradient(102deg, transparent 34%, rgba(255,255,255,0.14) 50%, transparent 66%); }
-  .cc-shell{ --lcb-accent:#FFFFFF; --lcb-far:#171A1F; --lcb-near:#0E1013;
-             --lcb-lit:rgba(255,255,255,0.24); --lcb-dim:rgba(255,255,255,0.16);
+    background:linear-gradient(102deg, transparent 30%, var(--lcb-sheen) 50%, transparent 70%); }
+  /* THE PEARL. One ground for every raiment: a cool grey field with a warm bloom in the top
+     corner and a cooler one opposite, low saturation throughout — mother of pearl rather than
+     a tint. The raiment used to colour it (oxblood, gold, blue, green) and no longer does;
+     it still colours everything drawn ON it, which is where it reads.
+
+     The one thing that does follow the raiment is how light the pearl is, because it cannot
+     not: Noir's panels are a translucent white over a black page with pale ink in them, and
+     a pale ground under those is pale ink on pale glass. So Noir gets the same pearl in
+     graphite — the same two hues at the same two places, a sixth of the light. The bloom
+     values are deliberately the same numbers on both, so the only difference is alpha. */
+  .cc-shell{ --lcb-far:#24242A; --lcb-near:#0F1013;
+             --lcb-lit:rgba(255,233,208,0.10); --lcb-dim:rgba(206,218,236,0.09);
+             --lcb-sheen:rgba(255,255,255,0.05);
              --lc-bg:rgba(255,255,255,0.06); --lc-sub:rgba(255,255,255,0.05);
              --lc-rim:rgba(255,255,255,0.13); --lc-rim-low:rgba(255,255,255,0.03); }
-  .cc-shell.raiment-x{        --lcb-accent:#8E3030; --lcb-far:#DCD6D2; --lcb-near:#EFEBE3;
-             --lcb-lit:rgba(142,48,48,0.24); --lcb-dim:rgba(142,48,48,0.16);
+  .cc-shell.raiment-x, .cc-shell.raiment-maison, .cc-shell.raiment-everpine{
+             --lcb-far:#C6C4C2; --lcb-near:#F4F2EF;
+             --lcb-lit:rgba(255,233,208,0.62); --lcb-dim:rgba(206,218,236,0.50);
+             --lcb-sheen:rgba(255,255,255,0.34);
              --lc-bg:rgba(255,255,255,0.42); --lc-sub:rgba(255,255,255,0.40);
              --lc-rim:rgba(255,255,255,0.80); --lc-rim-low:rgba(255,255,255,0.22); }
-  .cc-shell.raiment-noir{     --lcb-accent:#C9A24A; --lcb-far:#111112; --lcb-near:#070708;
-             --lcb-lit:rgba(201,162,74,0.24); --lcb-dim:rgba(201,162,74,0.16);
+  .cc-shell.raiment-noir{     --lcb-far:#24242A; --lcb-near:#0B0B0D;
+             --lcb-lit:rgba(255,233,208,0.11); --lcb-dim:rgba(206,218,236,0.08);
+             --lcb-sheen:rgba(255,255,255,0.045);
              --lc-bg:rgba(255,255,255,0.055); --lc-sub:rgba(255,255,255,0.045);
              --lc-rim:rgba(255,255,255,0.11); --lc-rim-low:rgba(255,255,255,0.025); }
-  .cc-shell.raiment-maison{   --lcb-accent:#4E6E96; --lcb-far:#D8DEE6; --lcb-near:#F2ECE0;
-             --lcb-lit:rgba(78,110,150,0.24); --lcb-dim:rgba(78,110,150,0.16);
-             --lc-bg:rgba(255,255,255,0.44); --lc-sub:rgba(255,255,255,0.42);
-             --lc-rim:rgba(255,255,255,0.82); --lc-rim-low:rgba(255,255,255,0.24); }
-  .cc-shell.raiment-everpine{ --lcb-accent:#7E9080; --lcb-far:#DAD9CE; --lcb-near:#EFEBE3;
-             --lcb-lit:rgba(126,144,128,0.26); --lcb-dim:rgba(126,144,128,0.18);
-             --lc-bg:rgba(255,255,255,0.42); --lc-sub:rgba(255,255,255,0.40);
-             --lc-rim:rgba(255,255,255,0.80); --lc-rim-low:rgba(255,255,255,0.22); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
 
   /* The month across the top, then the clock and the day side by side under it. The clock
@@ -9093,7 +9101,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-322 · v11.322 vlogs';
+const NOTIF_BUILD_VERSION = '2026.09.13-323 · v11.323 pearl';
 class Component extends DCLogic {
   constructor(props){
     super(props);

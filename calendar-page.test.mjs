@@ -320,18 +320,34 @@ t('the panels are glass over a lit ground', async () => {
   ok(b.glass && b.inside, 'the panels are not glass over it');
 });
 
-t('the ground is lit in the raiment, not one hard-coded colour', async () => {
+t('the ground is one pearl, not four raiment tints', async () => {
+  /* It used to be lit in each raiment's accent — oxblood, gold, blue, green. It is mother of
+     pearl now: the same warm bloom and cool counter on every raiment, low saturation, and the
+     raiment colours everything drawn ON it instead. */
   const seen = {};
   for (const style of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
     await boot();
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(800);
-    seen[style] = await page.evaluate(() =>
-      getComputedStyle(document.querySelector('.cc-shell')).getPropertyValue('--lcb-accent').trim());
-    ok(seen[style], style + ': the ground has no accent');
+    seen[style] = await page.evaluate(() => {
+      const cs = getComputedStyle(document.querySelector('.cc-shell'));
+      return { lit: cs.getPropertyValue('--lcb-lit').trim(), dim: cs.getPropertyValue('--lcb-dim').trim(),
+               far: cs.getPropertyValue('--lcb-far').trim() };
+    });
+    ok(seen[style].lit && seen[style].dim, style + ': the ground has lost its bloom');
   }
-  const vals = Object.values(seen);
-  eq(new Set(vals).size, vals.length, 'two raiments are lighting the ground the same colour: ' + JSON.stringify(seen));
+  /* Hue is shared. The three light raiments are the same pearl outright. */
+  const light = ['Ultra X', 'Maison Élysée', 'Maison Éverpine'].map(k => JSON.stringify(seen[k]));
+  eq(new Set(light).size, 1, 'the light raiments are not sharing one ground: ' + light.join(' | '));
+  /* Noir is the same pearl in graphite — the one thing that follows the raiment is how light
+     it is, because its panels are pale ink on translucent white and a pale ground under those
+     is pale on pale. */
+  const chan = (c) => (String(c).match(/[\d.]+/g) || []).map(Number);
+  const lit = chan(seen['Ultra X'].lit), noirLit = chan(seen['Noir'].lit);
+  eq(lit.slice(0, 3).join(','), noirLit.slice(0, 3).join(','), 'Noir is a different hue, not the same pearl darker');
+  ok(noirLit[3] < lit[3], 'Noir should be the dimmer of the two, got ' + noirLit[3] + ' against ' + lit[3]);
+  const darker = (h) => parseInt(h.replace('#', '').slice(0, 2), 16);
+  ok(darker(seen['Noir'].far) < darker(seen['Ultra X'].far), 'Noir is not the darker ground');
 });
 
 t('the ground tightens on a phone rather than keeping a desktop margin', async () => {
