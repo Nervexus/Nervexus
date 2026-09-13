@@ -157,14 +157,51 @@
      ruled between tabs, and when the labels do not fit it scrolls sideways rather than
      reflowing — the row keeps the same shape at every width. Every line in here is the
      raiment's own, so the box changes colour with the theme instead of being a fixed white. */
+  /* ===== BRAIN REST: the white abyss =====
+     Not a card and not a raiment surface. The sit is its own place \u2014 white, luminous, almost
+     empty, with a soft horizon low in the frame and one hairline running down the middle. It
+     is white whichever raiment is on, because the whole point is stepping out of the app for
+     five minutes; Noir alone gets the black version, since a white screen is the one thing
+     that raiment exists not to do.
+
+     Two variants only, so there is nothing here to half-apply the way the per-raiment attempt
+     did \u2014 that one left dark ink on a black ground on the ivory raiments. */
+  .cc-shell{ --ab-far:#E2E1DE; --ab-mid:#EFEEEC; --ab-near:#FCFCFB; --ab-limb:rgba(255,255,255,0.92);
+             --ab-line:rgba(58,56,52,0.26); --ab-ink:#2A2A28; --ab-muted:#6E6C67;
+             --ab-fill:#2A2A28; --ab-on-fill:#FCFCFB; }
+  .cc-shell.raiment-noir{ --ab-far:#040405; --ab-mid:#090909; --ab-near:#101012; --ab-limb:rgba(255,255,255,0.20);
+             --ab-line:rgba(236,232,224,0.24); --ab-ink:#ECE8E0; --ab-muted:#928F88;
+             --ab-fill:#ECE8E0; --ab-on-fill:#0B0B0C; }
+  /* The ground: a wide pale field, then the horizon \u2014 a vast sphere's edge just below the
+     frame, lit from behind. Two gradients rather than an image, so it is sharp at any size. */
+  .rest-abyss{ position:absolute; inset:0; pointer-events:none;
+    background:
+      /* The light gathering along the limb. Every stop is soft: a hard one draws a box across
+         the screen rather than the edge of something round. */
+      radial-gradient(ellipse 96% 40% at 50% 74%, var(--ab-limb) 0%, transparent 66%),
+      /* the body of it, filling the bottom of the frame */
+      radial-gradient(ellipse 150% 62% at 50% 140%, var(--ab-near) 0%, var(--ab-near) 46%, transparent 74%),
+      /* and the field it sits in, deepest in the top corners */
+      radial-gradient(ellipse 140% 106% at 50% -6%, var(--ab-mid) 0%, var(--ab-far) 100%); }
+  /* The grain the reference has. Kept very low: it takes the flatness off a gradient without
+     ever being a texture you notice. */
+  .rest-grain{ position:absolute; inset:0; pointer-events:none; opacity:0.09; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"); }
+  .cc-shell.raiment-noir .rest-grain{ mix-blend-mode:screen; opacity:0.10; }
+  /* One hairline down the middle. On the gates it simply hangs there; while you are sitting
+     the filled part of it is the clock, which is the only moving thing on the screen. */
+  /* No cap: the thread takes whatever height is left, which is what puts the words in the
+     lower third on a tall window as well as on a phone. */
+  .rest-thread{ position:relative; width:1px; flex:1 1 auto; min-height:60px;
+    background:linear-gradient(to bottom, transparent 0%, var(--ab-line) 14%, var(--ab-line) 86%, transparent 100%); }
+  .rest-thread > i{ position:absolute; left:-1px; top:0; width:3px; display:block;
+    background:var(--ab-ink); opacity:0.55; transition:height 900ms linear; }
   /* Brain Rest takes the whole screen. The sheen is sized to the window rather than a card,
      and the ring steps down on a phone so the clock, the line under it and the way out all
      fit without scrolling — a sit you have to scroll during is not a sit. */
   .lu-full .lu-sheen{ width:180px; }
   @media (max-width:900px){
     .lu-full{ padding:24px 18px; }
-    .lu-full .lu-frame{ inset:12px; }
-    .lu-bigring{ width:168px; height:168px; margin:18px auto 6px; }
     .lu-full h2{ font-size:30px; margin-top:18px; }
   }
   .cc-gtabs{ display:flex; align-items:stretch; border:1px solid var(--quiet-line); border-radius:14px;
@@ -851,54 +888,35 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
     </sc-if>
 
-  <!-- BRAIN REST. Built on the level-up card deliberately: same frame, same champagne rule,
-       same sheen and the same ring, so the two moments in the app that ask you to stop and
-       look at one thing look like each other. Four stages in one overlay rather than three
-       separate popups — the card stays put and only its middle changes, so answering a gate
-       does not feel like being handed another dialogue. -->
+  <!-- BRAIN REST — the white abyss.
+       A place rather than a dialogue: a pale luminous field with the horizon of something
+       vast just under the frame, one hairline down the middle, and everything said in the
+       lower third. White on every raiment but Noir, which gets the same thing inverted.
+       While you are sitting the filled part of the hairline is the clock, and it is the only
+       thing on the screen that moves. -->
   <sc-if value="{{ brOpen }}" hint-placeholder-val="{{ false }}">
-    <!-- Full screen rather than a card in the middle of one. A five minute sit that leaves the
-         rest of the app visible around the edges is asking you to stop while showing you
-         everything you stopped doing. The level-up's language is kept — the champagne rule,
-         the ring, the sheen, the serif — but the rule is an inset frame here, because a border
-         on the window edge reads as browser chrome rather than as a card. -->
-    <div style="position:fixed; inset:0; z-index:1000; background:#0a0a0d; display:flex; align-items:center; justify-content:center; padding:0;">
-      <!-- Not a cc-glowcard: that class forces a translucent background, which at full screen
-           means the page you just walked away from shows faintly through the whole sit. It
-           also stamps the sovereign corner diamond, which belongs on a card and not on a
-           window edge. The ground here is opaque on purpose. -->
-      <div class="lu-card lu-full" style="width:100%; height:100%; max-width:none; border-radius:0; background:#0a0a0d; border:none; padding:40px 28px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; animation:luPop 520ms cubic-bezier(.2,.9,.3,1) both; position:relative; overflow:hidden;">
-        <div class="lu-frame" style="position:absolute; inset:18px; border:1px solid rgba(231,216,166,0.34); border-radius:10px; pointer-events:none;"></div>
-        <!-- The sheen runs on the gates and on the finish, and stops while you are sitting:
-             five silent minutes should not have something moving on the screen. -->
-        <sc-if value="{{ brSheen }}" hint-placeholder-val="{{ true }}">
-          <div class="lu-sheen" style="position:absolute; top:0; bottom:0; width:70px; background:linear-gradient(100deg, rgba(231,216,166,0) 0%, rgba(231,216,166,0.13) 50%, rgba(231,216,166,0) 100%); animation:luSheen 2600ms ease-in-out 380ms infinite; pointer-events:none;"></div>
-        </sc-if>
+    <div style="position:fixed; inset:0; z-index:1000; overflow:hidden;">
+      <div class="rest-abyss"></div>
+      <div class="rest-grain"></div>
+      <div class="lu-card rest-stage" style="position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
 
-        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:3px; color:#E7D8A6;">{{ brBanner }}</div>
+        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--ab-muted); flex:0 0 auto;">{{ brBanner }}</div>
 
-        <div class="lu-bigring" style="position:relative; width:214px; height:214px; margin:26px auto 8px;">
-          <sc-if value="{{ brHalo }}" hint-placeholder-val="{{ false }}">
-            <div class="lu-halo" style="position:absolute; inset:0; border-radius:50%; border:1px solid rgba(231,216,166,0.5); animation:luHalo 1500ms ease-out 240ms 2;"></div>
-          </sc-if>
-          <div class="lu-ring" style="position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(231,216,166,0.55); box-shadow:inset 0 0 30px rgba(231,216,166,0.14); display:flex; flex-direction:column; align-items:center; justify-content:center; animation:luRing 620ms cubic-bezier(.2,.9,.3,1) both;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:#8f8f99;">{{ brRingLabel }}</div>
-            <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:{{ brRingSize }}; line-height:1; color:#ffffff; margin-top:4px;">{{ brRingValue }}</div>
+        <!-- The thread. Empty on the gates; the clock while you sit. -->
+        <div class="rest-thread"><i style="height:{{ brThreadPct }};"></i></div>
+
+        <div style="flex:0 0 auto; width:100%; max-width:520px; padding-bottom:6px;">
+          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:{{ brTitleSize }}; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--ab-ink);">{{ brTitle }}</div>
+          <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--ab-muted); max-width:42ch; margin:18px auto 0;">{{ brBody }}</div>
+
+          <div style="margin-top:34px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
+            <sc-if value="{{ brHasSecondary }}" hint-placeholder-val="{{ true }}">
+              <span onClick="{{ brSecondary }}" style="flex:{{ brSecondaryFlex }}; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--ab-line); background:transparent; color:var(--ab-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">{{ brSecondaryLabel }}</span>
+            </sc-if>
+            <sc-if value="{{ brHasPrimary }}" hint-placeholder-val="{{ true }}">
+              <span onClick="{{ brPrimary }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--ab-fill); color:var(--ab-on-fill); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">{{ brPrimaryLabel }}</span>
+            </sc-if>
           </div>
-        </div>
-
-        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:38px; font-weight:600; color:#eef0f2; margin:22px 0 2px;">{{ brTitle }}</h2>
-        <div style="font-size:15px; line-height:1.65; color:#9a9aa2; max-width:40ch; margin:12px auto 0;">{{ brBody }}</div>
-
-        <!-- A stage that offers only one action renders only one button. Rendering the other
-             with an empty label left a blank white bar across the card while you were sitting. -->
-        <div style="margin-top:34px; display:flex; gap:12px; align-items:stretch; width:100%; max-width:420px;">
-          <sc-if value="{{ brHasSecondary }}" hint-placeholder-val="{{ true }}">
-            <span onClick="{{ brSecondary }}" style="flex:{{ brSecondaryFlex }}; padding:14px 18px; border-radius:12px; cursor:pointer; border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.03); color:#c3c3ca; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.6px; display:flex; align-items:center; justify-content:center;">{{ brSecondaryLabel }}</span>
-          </sc-if>
-          <sc-if value="{{ brHasPrimary }}" hint-placeholder-val="{{ true }}">
-            <span onClick="{{ brPrimary }}" style="flex:1; min-width:0; padding:14px; border-radius:12px; cursor:pointer; background:#eef0f2; color:#0d0d10; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.4px; display:flex; align-items:center; justify-content:center;">{{ brPrimaryLabel }}</span>
-          </sc-if>
         </div>
       </div>
     </div>
@@ -18782,25 +18800,29 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const st=S.brStage||'';
         const secs=S.brLeft==null?300:S.brLeft;
         const clock=this._brClock(secs);
+        /* The clock is the headline while you sit: it is the only thing worth reading, and the
+           frame is otherwise identical on all four stages. */
         const M={
-          ready:{ banner:'\u25c6 BRAIN REST', ring:'MINUTES', value:'5', size:'86px', halo:false, sheen:true,
-            title:'Are you ready?', body:'Five minutes sitting in silence. Not a break between things \u2014 the thing itself.',
+          ready:{ banner:'BRAIN REST', title:'Are you ready?', size:'44px',
+            body:'Five minutes sitting in silence. Not a break between things \u2014 the thing itself.',
             p:'I\u2019M READY', s:'NOT YET' },
-          devices:{ banner:'\u25c6 BRAIN REST', ring:'MINUTES', value:'5', size:'86px', halo:false, sheen:true,
-            title:'All devices away?', body:'Phone down and out of reach, watch off, nothing on that can interrupt you. Start when that is actually true.',
+          devices:{ banner:'BRAIN REST', title:'All devices away?', size:'44px',
+            body:'Phone down and out of reach, watch off, nothing on that can interrupt you. Start when that is actually true.',
             p:'THEY\u2019RE AWAY', s:'NOT YET' },
-          sitting:{ banner:'\u25c6 SITTING', ring:'REMAINING', value:clock, size:'64px', halo:false, sheen:false,
-            title:'Sit.', body:'Nothing to do and nothing to get right. Let it run.',
+          sitting:{ banner:'SITTING', title:clock, size:'68px',
+            body:'Nothing to do and nothing to get right. Let it run.',
             p:'', s:'END EARLY' },
-          done:{ banner:'\u25c6 DONE', ring:'MINUTES', value:'5', size:'86px', halo:true, sheen:true,
-            title:'Five minutes.', body:'That is the rest taken. Go and start the work.',
+          done:{ banner:'DONE', title:'Five minutes.', size:'44px',
+            body:'That is the rest taken. Go and start the work.',
             p:'CONTINUE', s:'' },
         };
         const m=M[st]||M.ready;
         return {
           brOpen:!!st && !!S.loggedIn,
-          brBanner:m.banner, brRingLabel:m.ring, brRingValue:m.value, brRingSize:m.size,
-          brHalo:m.halo, brSheen:m.sheen, brTitle:m.title, brBody:m.body,
+          brBanner:m.banner, brTitle:m.title, brBody:m.body, brTitleSize:m.size,
+          /* The thread fills as the five minutes go. Empty before and after: a full line on
+             the finish would read as something still running. */
+          brThreadPct:(st==='sitting' && secs<=300) ? Math.round((300-secs)/300*100)+'%' : '0%',
           /* While it is running there is no primary: the only thing on offer is to end it
              early, and that sits where the quiet button always sits. */
           brPrimaryLabel:m.p, brSecondaryLabel:m.s,

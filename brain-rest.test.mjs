@@ -36,12 +36,14 @@ async function boot(patch) {
   await page.waitForTimeout(700);
 }
 const stage = () => page.evaluate(() => window.__nvx.state.brStage);
-const title = () => page.evaluate(() => (document.querySelector('.lu-card h2') || {}).innerText || '');
-const ring = () => page.evaluate(() => {
-  const r = document.querySelector('.lu-ring'); if (!r) return null;
-  const d = r.querySelectorAll('div');
-  return { label: d[0].innerText.trim(), value: d[1].innerText.trim() };
-});
+const title = () => page.evaluate(() => (document.querySelector('.rest-title') || {}).innerText || '');
+/* The clock is the headline while you sit, and the filled part of the thread is the same
+   thing drawn. */
+const clock = () => page.evaluate(() => ({
+  value: (document.querySelector('.rest-title') || {}).innerText || '',
+  mark: (document.querySelector('.rest-mark') || {}).innerText || '',
+  thread: (document.querySelector('.rest-thread > i') || {}).style?.height || '',
+}));
 /* Click the element that carries the handler: matching on text alone also picks up the
    wrapping row, whose textContent is the same once one of the two buttons is hidden. */
 const click = (label) => page.evaluate((l) => {
@@ -102,11 +104,12 @@ t('the clock is the wall clock, so a slept tab cannot shorten the sit', async ()
   await click('BEGIN'); await page.waitForTimeout(250);
   await click('I’M READY'); await page.waitForTimeout(250);
   await click('THEY’RE AWAY'); await page.waitForTimeout(1400);
-  const r1 = await ring();
-  eq(r1.label, 'REMAINING', 'the ring should be counting down');
+  const r1 = await clock();
+  eq(r1.mark, 'SITTING', 'the mark should say what is happening');
   ok(/^4:5\d$/.test(r1.value), 'the clock reads ' + r1.value + ' a second in');
+  ok(/^[0-9]+%$/.test(r1.thread), 'the thread is not reporting progress: ' + r1.thread);
   await page.waitForTimeout(2200);
-  const r2 = await ring();
+  const r2 = await clock();
   ok(r2.value !== r1.value, 'the clock did not move');
   /* The end is a timestamp. Moving it is the only thing that ends the sit early, which is
      what proves a counter is not what is being read. */
@@ -120,10 +123,11 @@ t('while you are sitting there is nothing to do and nothing moving', async () =>
   await click('I’M READY'); await page.waitForTimeout(250);
   await click('THEY’RE AWAY'); await page.waitForTimeout(900);
   /* No sheen: five silent minutes should not have an animation running across the card. */
-  eq(await page.evaluate(() => !!document.querySelector('.lu-sheen')), false, 'the sheen is still running while sitting');
+  /* Nothing decorative moves. The thread fills, and that is the clock. */
+  eq(await page.evaluate(() => !!document.querySelector('.lu-sheen')), false, 'a sheen is running while sitting');
   /* One button, and it is the quiet one. An empty primary used to render as a blank white
      bar across the card. */
-  const buttons = await page.evaluate(() => [...document.querySelectorAll('.lu-card span')]
+  const buttons = await page.evaluate(() => [...document.querySelectorAll('.rest-stage span')]
     .filter(e => e.onclick).map(e => e.textContent.trim()));
   eq(buttons.length, 1, 'expected one action while sitting, got: ' + JSON.stringify(buttons));
   eq(buttons[0], 'END EARLY', 'the only action should be to end it');
@@ -139,7 +143,7 @@ t('it finishes, and finishing puts the timer away', async () => {
   eq(await stage(), 'done', 'it did not finish when the clock ran out');
   ok(/Five minutes/.test(await title()), 'the finish says: ' + (await title()));
   eq(await page.evaluate(() => !!window.__nvx._brTimer), false, 'the timer is still running after it finished');
-  const buttons = await page.evaluate(() => [...document.querySelectorAll('.lu-card span')]
+  const buttons = await page.evaluate(() => [...document.querySelectorAll('.rest-stage span')]
     .filter(e => e.onclick).map(e => e.textContent.trim()));
   eq(buttons.join(','), 'CONTINUE', 'the finish should offer only CONTINUE, got: ' + JSON.stringify(buttons));
   await click('CONTINUE');
@@ -147,28 +151,6 @@ t('it finishes, and finishing puts the timer away', async () => {
   eq(await stage(), '', 'CONTINUE did not close it');
 });
 
-t('it wears the level-up card’s language', async () => {
-  /* Asked for by name: the two moments that stop you and ask you to look at one thing should
-     look like each other. The rule is an inset frame rather than a card border, because at
-     full screen a border on the window edge reads as browser chrome. */
-  await boot();
-  await click('BEGIN');
-  await page.waitForTimeout(500);
-  const look = await page.evaluate(() => {
-    const c = document.querySelector('.lu-card'); if (!c) return null;
-    const f = document.querySelector('.lu-frame');
-    return { card: !!c, ring: !!document.querySelector('.lu-ring'), sheen: !!document.querySelector('.lu-sheen'),
-             anim: getComputedStyle(c).animationName,
-             frame: f ? getComputedStyle(f).borderTopColor : null,
-             serif: /Cormorant/.test(getComputedStyle(document.querySelector('.lu-card h2')).fontFamily) };
-  });
-  ok(look && look.card, 'it is not built on the level-up card');
-  ok(look.ring, 'no ring');
-  ok(look.sheen, 'no sheen on a gate');
-  ok(look.serif, 'the headline is not the serif the level-up card uses');
-  eq(look.anim, 'luPop', 'it does not arrive the way the level-up card does');
-  ok(look.frame && /231, 216, 166/.test(look.frame), 'the champagne rule is missing: ' + look.frame);
-});
 
 t('it takes the whole screen, at both widths', async () => {
   /* A five minute sit that leaves the app visible around the edges is asking you to stop
@@ -283,6 +265,66 @@ t('the entry survives what Supabase can actually store', async () => {
   await page.waitForTimeout(400);
   eq(await page.evaluate(() => window.__nvx.computePower().totalXP), base,
      'the sit lost its worth once it had been through the columns the table actually has');
+});
+
+/* ---- the white abyss --------------------------------------------------------------------
+   The sit is its own place rather than a card over the app: a pale luminous field with the
+   horizon of something vast low in the frame, one hairline down the middle, and everything
+   said in the lower third. White on every raiment but Noir, which gets it inverted. */
+t('it is the white abyss, and the black one only on Noir', async () => {
+  const read = async (raiment) => {
+    await boot();
+    await page.evaluate((r) => window.__nvx.setState({
+      prefs: { ...window.__nvx.state.prefs, theme: 'Ultra', ultraStyle: r }, brStage: 'ready' }), raiment);
+    await page.waitForTimeout(900);
+    return page.evaluate(() => {
+      const stage = document.querySelector('.rest-stage');
+      const lum = (c) => { const [r, g, b] = (c.match(/\d+/g) || []).slice(0, 3).map(Number); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+      const cs = getComputedStyle(document.querySelector('.cc-shell'));
+      return { far: cs.getPropertyValue('--ab-far').trim(), inkLum: lum(getComputedStyle(document.querySelector('.rest-title')).color),
+               groundLum: lum(cs.getPropertyValue('--ab-near').trim().replace('#', '').replace(/^(..)(..)(..)$/, (m, a, b2, c) => 'rgb(' + parseInt(a, 16) + ',' + parseInt(b2, 16) + ',' + parseInt(c, 16) + ')')),
+               abyss: !!document.querySelector('.rest-abyss'), thread: !!document.querySelector('.rest-thread'), stage: !!stage };
+    });
+  };
+  for (const raiment of ['Ultra X', 'Maison Élysée', 'Maison Éverpine']) {
+    const r = await read(raiment);
+    ok(r.abyss && r.thread && r.stage, raiment + ': the scene did not render');
+    ok(r.groundLum > 200, raiment + ' is not the white abyss: ground brightness ' + Math.round(r.groundLum));
+    ok(r.inkLum < 120, raiment + ': the ink is not dark enough to read on white (' + Math.round(r.inkLum) + ')');
+  }
+  const noir = await read('Noir');
+  ok(noir.groundLum < 40, 'Noir is not the black version: ground brightness ' + Math.round(noir.groundLum));
+  ok(noir.inkLum > 180, 'Noir’s ink is not light enough to read on black (' + Math.round(noir.inkLum) + ')');
+});
+
+t('the layout is the mark, the thread, then everything in the lower third', async () => {
+  await boot();
+  await page.evaluate(() => window.__nvx.setState({ brStage: 'ready' }));
+  await page.waitForTimeout(900);
+  const box = await page.evaluate(() => {
+    const r = (sel) => { const e = document.querySelector(sel); return e ? e.getBoundingClientRect() : null; };
+    return { mark: r('.rest-mark'), thread: r('.rest-thread'), title: r('.rest-title'), h: window.innerHeight };
+  });
+  ok(box.mark && box.thread && box.title, 'the scene is missing a part');
+  ok(box.mark.top < box.h * 0.15, 'the mark is not at the top');
+  ok(box.thread.top >= box.mark.bottom, 'the thread does not hang below the mark');
+  ok(box.title.top > box.h * 0.6, 'the headline is not in the lower third (top ' + Math.round(box.title.top) + ' of ' + box.h + ')');
+  ok(box.thread.bottom <= box.title.top + 1, 'the thread runs through the text');
+});
+
+t('the thread is the clock, and is empty before and after', async () => {
+  const fill = () => page.evaluate(() => (document.querySelector('.rest-thread > i') || {}).style?.height || '');
+  await boot();
+  await page.evaluate(() => window.__nvx.setState({ brStage: 'ready' }));
+  await page.waitForTimeout(500);
+  eq(await fill(), '0%', 'the thread is filled before the sit has started');
+  await page.evaluate(() => window.__nvx.setState({ brStage: 'sitting', brLeft: 150, brEndsAt: Date.now() + 150000 }));
+  await page.waitForTimeout(500);
+  eq(await fill(), '50%', 'half way through, the thread reads ' + (await fill()));
+  await page.evaluate(() => window.__nvx.setState({ brStage: 'done' }));
+  await page.waitForTimeout(500);
+  /* Empty on the finish: a full line would read as something still running. */
+  eq(await fill(), '0%', 'the thread is still filled after it finished');
 });
 
 t('nothing threw through any of it', async () => {
