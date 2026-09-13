@@ -280,6 +280,66 @@
     .rest-name{ margin-bottom:6px; }
     .rest-row{ gap:8px; }
   }
+  /* ---- THE LOG CARD -------------------------------------------------------------------
+     The card language from the template: a glass panel, a numbered mark in a pill, and a
+     letterspaced title above whatever the card actually holds. Calendar first, because it is
+     the smallest of the Logs and the layout has to be right before it goes anywhere else.
+
+     It carries its own ground rather than .cc-glowcard, so the panel is glass on every
+     raiment instead of a flat fill — the per-raiment values below are light where the
+     raiment's ground is light, which is what keeps the rewritten ink readable on it. */
+  /* The ground comes from the tokens the page is already wearing rather than from a second
+     per-raiment table. Keying it off raiment-* looked right and was wrong: Éverpine's
+     dark-green card is the home scene only — everywhere else, the calendar included, it is
+     wearing the ivory one, so a card painted dark green from the raiment name came out with
+     the page's dark ink on a dark ground and the month vanished.
+     The accent is --quiet-ink, which is the one value already calibrated per raiment to be
+     read against the ground that raiment actually puts underneath it. */
+  .cc-shell{ --lc-bg:var(--u-card, rgba(255,255,255,0.05));
+             --lc-line:var(--u-line, rgba(255,255,255,0.13));
+             --lc-muted:var(--u-muted, #8f8f99);
+             --lc-accent:var(--quiet-ink, #FFFFFF);
+             --lc-glow:rgba(0,0,0,0.16); }
+
+  .lc-card{ position:relative; border-radius:18px; padding:20px 18px 18px; box-sizing:border-box;
+    background:var(--lc-bg); border:1px solid var(--lc-line);
+    backdrop-filter:blur(18px) saturate(1.15); -webkit-backdrop-filter:blur(18px) saturate(1.15);
+    box-shadow:0 16px 38px var(--lc-glow); }
+  /* The mark and the title, centred over the card the way the template has them. */
+  .lc-head{ display:flex; flex-direction:column; align-items:center; gap:11px; margin-bottom:18px; }
+  .lc-badge{ display:inline-flex; align-items:center; justify-content:center; padding:4px 12px;
+    border-radius:999px; border:1px solid var(--lc-line); color:var(--lc-muted);
+    font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:2.2px; white-space:nowrap; }
+  .lc-title{ font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:3.4px;
+    text-transform:uppercase; color:var(--lc-accent); text-align:center; line-height:1.3; }
+  /* A hairline under the head, in the card's own accent, so the title reads as a heading
+     rather than as the first row of the content. */
+  .lc-head::after{ content:''; display:block; width:46px; height:1px; background:var(--lc-line); }
+  /* The base theme runs a 3D ground behind the page and darkens every card over it. The log
+     card is not a .cc-glowcard, so it has to take that treatment itself or it comes out as a
+     pale wash on a moving background. */
+  .cc-shell.raiment-base.spline-active .lc-card{ background:rgba(18,19,21,0.34); }
+  @media (max-width:620px){
+    .lc-card{ padding:17px 14px 15px; border-radius:16px; }
+    .lc-head{ gap:9px; margin-bottom:14px; }
+    .lc-title{ font-size:10.5px; letter-spacing:2.8px; }
+  }
+  /* The record the gate reads back. Hairlines and the mono/serif pairing the panels already
+     use, so it is the same object as the sit rather than a dialogue wearing its colours. */
+  .lg-record{ margin:22px auto 0; max-width:420px; width:100%; text-align:left;
+    border-top:1px solid var(--ab-line); }
+  .lg-line{ display:flex; align-items:baseline; gap:14px; padding:11px 2px;
+    border-bottom:1px solid var(--ab-line); }
+  .lg-k{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.8px;
+    color:var(--ab-muted); flex:0 0 88px; }
+  .lg-v{ font-family:'Cormorant Garamond',Georgia,serif; font-size:19px; font-weight:300;
+    line-height:1.3; color:var(--ab-ink); flex:1; min-width:0; overflow-wrap:anywhere; }
+  @media (max-width:620px){
+    .lg-record{ margin-top:18px; }
+    .lg-line{ padding:9px 2px; gap:10px; }
+    .lg-k{ flex:0 0 72px; font-size:8px; letter-spacing:1.4px; }
+    .lg-v{ font-size:17px; }
+  }
   /* No cap: the thread takes whatever height is left, which is what puts the words in the
      lower third on a tall window as well as on a phone. */
   .rest-thread{ position:relative; width:1px; flex:1 1 auto; min-height:60px;
@@ -1006,6 +1066,40 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <sc-if value="{{ brHasPrimary }}" hint-placeholder-val="{{ true }}">
               <span onClick="{{ brPrimary }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--ab-fill); color:var(--ab-on-fill); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">{{ brPrimaryLabel }}</span>
             </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- THE LOG GATE. The same field the sit opens into, reading the record back before it is
+       written. z-index sits under Brain Rest's: a sit is the one thing that outranks it. -->
+  <sc-if value="{{ lgOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:999; overflow:hidden;">
+      <div class="rest-abyss"></div>
+      <div class="rest-grain"></div>
+      <div class="lu-card rest-stage" style="position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; overflow-y:auto; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
+
+        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--ab-muted); flex:0 0 auto;">{{ lgMark }}</div>
+
+        <div class="rest-thread"><i style="height:0%;"></i></div>
+
+        <div style="flex:0 0 auto; width:100%; max-width:520px; padding-bottom:6px;">
+          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:38px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--ab-ink);">{{ lgTitle }}</div>
+
+          <!-- the record itself, in the words the log will use -->
+          <div class="lg-record">
+            <sc-for list="{{ lgLines }}" as="ln" hint-placeholder-count="3">
+              <div class="lg-line">
+                <span class="lg-k">{{ ln.k }}</span>
+                <span class="lg-v">{{ ln.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:30px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
+            <span onClick="{{ lgDecline }}" style="flex:0 0 auto; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--ab-line); background:transparent; color:var(--ab-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">DECLINE</span>
+            <span onClick="{{ lgConfirm }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--ab-fill); color:var(--ab-on-fill); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">CONFIRM</span>
           </div>
         </div>
       </div>
@@ -3538,7 +3632,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </div>
         <div class="cc-grid-cal" style="display:grid; grid-template-columns:1fr 340px; gap:18px; align-items:start;">
-          <div class="cc-glowcard cc-cal-hero" style="border-radius:20px; background:#16181c; padding:20px; display:flex; flex-direction:column;">
+          <div class="lc-card cc-cal-hero" style="display:flex; flex-direction:column;">
+            <div class="lc-head">
+              <span class="lc-badge">01 - MO</span>
+              <div class="lc-title">Month</div>
+            </div>
             <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:8px; flex:0 0 auto;">
               <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7"><div style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; letter-spacing:1px;">{{ d }}</div></sc-for>
             </div>
@@ -3554,7 +3652,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
           </div>
           <div style="display:flex; flex-direction:column; gap:16px;">
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">02 - DY</span>
+                <div class="lc-title">The Day</div>
+              </div>
               <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:12px;">
                 <span style="font-size:13px; font-weight:600;">{{ selDayLabel }}</span>
                 <span style="display:flex; align-items:baseline; gap:10px; white-space:nowrap;">
@@ -3653,7 +3755,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <span onClick="{{ addEvent }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:11px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">Add to {{ selShort }}</span>
               </div>
             </div>
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">03 - HL</span>
+                <div class="lc-title">Highlight</div>
+              </div>
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
                 <span style="font-size:13px; font-weight:600;">Highlight {{ selShort }}</span>
                 <span onClick="{{ clearHighlight }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#6f6f78; cursor:pointer;" style-hover="{ color:'#FFFFFF' }">CLEAR</span>
@@ -8776,7 +8882,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-312 · v11.312 abyss-scale';
+const NOTIF_BUILD_VERSION = '2026.09.13-313 · v11.313 log-gate';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -8875,6 +8981,7 @@ activities: this._mergeShipLog(s.activities),
          the sit itself, then done. brEndsAt is the wall clock rather than a countdown, so a
          backgrounded tab or a dropped frame cannot shorten five minutes. */
       brStage:'', brEndsAt:0, brLeft:300,
+      logGate:null,
       levelUp:null, lcOpen:{}, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
@@ -15933,6 +16040,123 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _forge(){ return window.Forge||null; }
   setForgeCentre(k){ this.setState({forgeCentre:k}); }
 
+  /* ---- THE LOG GATE -------------------------------------------------------------------
+     Nothing goes into a log without being read back first. Press the save on a filled form
+     and the same field the sit opens into takes the screen, shows the record as it will be
+     written, and asks. CONFIRM writes it; DECLINE leaves the form exactly as it was, so a
+     wrong number is corrected rather than retyped.
+
+     Only the buttons a person presses go through here. Everything that writes a log without
+     a person at the form — the rota import, a bulk paste, the voice assistant, the Brain
+     Rest completion — calls the writers below directly and is not gated, because there is
+     nobody there to answer. */
+  LOG_GATE_KINDS(){
+    return {
+      event:    ()=>this._addEventFromForm(),
+      meal:     ()=>this.addMeal(),
+      workout:  ()=>this.addWorkout(),
+      activity: ()=>this.addActivity(),
+      income:   ()=>this.addIncome(),
+      expense:  ()=>this.addExpense(),
+      logall:   ()=>this.saveLogAll(),
+    };
+  }
+  /* What the gate shows: the record itself, field by field, in the words the log will use.
+     Returns null when there is nothing to write — an empty form still does nothing at all
+     rather than opening a screen to ask about it. */
+  _logGateCard(kind){
+    const S=this.state, t=(v)=>String(v==null?'':v).trim();
+    const row=(k,v)=>({k, v:t(v)});
+    const some=(rows)=>rows.filter(r=>r.v);
+    if(kind==='event'){
+      const title=t(S.evTitle); if(!title) return null;
+      const work=S.evKind==='work';
+      const days=(S.evRepeatDays||[]).length;
+      return { mark:'CALENDAR', title:'Add this to the day?', lines:some([
+        row('EVENT', title),
+        row('DAY', this._gateDayLabel(S.calSel)),
+        row('TIME', t(S.evTime)||'09:00'),
+        row('TYPE', work?'Work':'General'),
+        row('ENDS', work?t(S.evEndTime):''),
+        row('WITH', work?t(S.evAttendees):''),
+        row('TAKES', !work && t(S.evEstMins) ? t(S.evEstMins)+' min':''),
+        row('REPEATS', days?days+(days===1?' day a week':' days a week'):''),
+      ])};
+    }
+    if(kind==='meal'){
+      const name=t(S.mealName), kcal=+S.mealKcal||0; if(!name||!kcal) return null;
+      return { mark:'HEALTH', title:'Log this meal?', lines:some([
+        row('MEAL', name), row('FUEL', kcal+' kcal'),
+        row('PROTEIN', (+S.mealProtein||0)?(+S.mealProtein)+' g':''),
+      ])};
+    }
+    if(kind==='workout'){
+      const ex=t(S.woEx); const mn=parseInt(S.woMin)||0, wt=parseFloat(S.woWeight)||0;
+      const st=parseInt(S.woSets)||0, rp=parseInt(S.woReps)||0, di=parseFloat(S.woDist)||0;
+      if(!ex||!(mn>0||wt>0||rp>0||di>0)) return null;
+      return { mark:'TRAINING', title:'Log this session?', lines:some([
+        row('EXERCISE', ex),
+        row('SETS', st&&rp ? st+' × '+rp : (rp?rp+' reps':'')),
+        row('LOAD', wt>0 ? wt+' '+(S.woUnit||'kg') : ''),
+        row('DISTANCE', di>0 ? di+' '+(S.woDistUnit||'km') : ''),
+        row('TIME', mn>0 ? mn+' min' : ''),
+      ])};
+    }
+    if(kind==='activity'){
+      const v=t(S.actText); if(!v) return null;
+      const mn=(parseInt(S.actHr,10)||0)*60+(parseInt(S.actMin,10)||0);
+      return { mark:'WORK', title:'Log this?', lines:some([
+        row('DID', v), row('CATEGORY', S.actCat||''), row('TIME', (mn>0?mn:30)+' min'),
+      ])};
+    }
+    if(kind==='income'||kind==='expense'){
+      const inc=kind==='income';
+      const label=t(inc?S.incLabel:S.expLabel), amt=parseFloat(inc?S.incAmt:S.expAmt)||0;
+      if(!label||!(amt>0)) return null;
+      return { mark:'FINANCE', title:inc?'Log this income?':'Log this expense?', lines:some([
+        row(inc?'FROM':'ON', label), row('AMOUNT', this._gateMoney(amt)),
+      ])};
+    }
+    if(kind==='logall'){
+      const d=S.logAll||{};
+      const lines=some([
+        row('TRAINING', t(d.woEx)),
+        row(d.finKind==='income'?'INCOME':'EXPENSE', t(d.finLabel) && parseFloat(d.finAmt)>0 ? t(d.finLabel)+' · '+this._gateMoney(parseFloat(d.finAmt)) : ''),
+        row('SLEEP', ((+d.slpH||0)||(+d.slpM||0)) ? (+d.slpH||0)+'h '+(+d.slpM||0)+'m' : ''),
+        row('WATER', (+d.hydMl||0) ? (+d.hydMl)+' ml' : ''),
+        row('WEIGHT', (+d.bodyWeight||0) ? (+d.bodyWeight)+' kg' : ''),
+        row('BODY FAT', (+d.bodyFat||0) ? (+d.bodyFat)+'%' : ''),
+        row('MUSCLE', (+d.muscle||0) ? (+d.muscle)+' kg' : ''),
+        row('MEAL', t(d.mealName) && (+d.mealKcal||0) ? t(d.mealName)+' · '+(+d.mealKcal)+' kcal' : ''),
+        row('WORK', t(d.actText)),
+      ]);
+      if(!lines.length) return null;
+      return { mark:'DAILY LOG', title:lines.length===1?'Log this?':'Log all '+lines.length+'?', lines };
+    }
+    return null;
+  }
+  _gateDayLabel(iso){
+    if(!iso) return '';
+    const d=new Date(iso+'T12:00:00');
+    if(isNaN(d)) return String(iso);
+    return d.toLocaleDateString(undefined,{weekday:'long', day:'numeric', month:'long'});
+  }
+  _gateMoney(n){ const v=+n||0; return '£'+(v%1?v.toFixed(2):String(v)); }
+  askLog(kind){
+    const card=this._logGateCard(kind);
+    if(!card) return;                       // an empty form is still a no-op, not a question
+    this.setState({ logGate:{ kind, mark:card.mark, title:card.title, lines:card.lines } });
+  }
+  logGateConfirm(){
+    const g=this.state.logGate; if(!g) return;
+    this.setState({logGate:null});
+    const fn=this.LOG_GATE_KINDS()[g.kind];
+    if(fn) fn();
+  }
+  /* Declining closes the screen and touches nothing else. The form still holds every value
+     that was typed into it, which is the whole reason a decline is worth having. */
+  logGateDecline(){ this.setState({logGate:null}); }
+
   /* ---- BRAIN REST ---------------------------------------------------------------------
      Five minutes sitting in silence, before anything else. Two gates before the clock
      starts, because the point is the sitting and not the timer: you say you are ready, then
@@ -18399,7 +18623,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           macros:[{label:'PROTEIN',val:proteinTotal+'g',c:'#ff5563'},{label:'CARBS',val:carbs+'g',c:'#eef0f2'},{label:'FAT',val:fat+'g',c:'#9a9aa2'}],
           mealList:H.meals.map((m,idx)=>({name:m.name, kcal:m.kcal, protein:m.protein, remove:()=>{ this.mut(s=>({health:{...s.health,meals:s.health.meals.filter((_,j)=>j!==idx)}})); if(this._sbOn() && m.id) window.SB.remove('meals',m.id); }})),
           mealName:S.mealName, setMealName:(e)=>this.setState({mealName:e.target.value}), mealKcal:S.mealKcal, setMealKcal:(e)=>this.setState({mealKcal:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,4)}), mealProtein:S.mealProtein, setMealProtein:(e)=>this.setState({mealProtein:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,3)}),
-          addMeal:()=>this.addMeal(),
+          addMeal:()=>this.askLog('meal'),
           waterPlus:()=>this.mut(s=>({health:{...s.health,water:Math.min(20,s.health.water+1)}})), waterMinus:()=>this.mut(s=>({health:{...s.health,water:Math.max(0,s.health.water-1)}})),
           recSignals:[['Muscle soreness',H.soreness],['Stress',H.stress],['Energy',H.energy],['Mood',H.mood]].map(r=>({label:r[0], v:r[1]||'—', w:r[1]?sig(r[1])[0]:'0%', c:r[1]?sig(r[1])[1]:'#6f6f78'})),
           bodyFat:H.bodyFat!=null?H.bodyFat:'—', muscleMass:H.muscleMass!=null?H.muscleMass:'—', bmi:H.bmi!=null?H.bmi:'—', waist:H.waist!=null?H.waist:'—',
@@ -18679,7 +18903,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hrDate:this._fbToday(),
           hydPlus:()=>this.addHydMl(250), hydMinus:()=>this.undoHydGlass(),
           hydMinusInk:hWater>0?'var(--ab-accent)':'var(--ab-muted)',
-          addMealKey:enterKey(()=>this.addMeal()),
+          addMealKey:enterKey(()=>this.askLog('meal')),
           /* Removed by id. The list shown is today's, so an index into it is not an index into
              the stored array and would delete somebody else's dinner. */
           hrMeals:hMeals.map(m=>({ name:m.name, detail:(+m.kcal||0)+' kcal'+((+m.protein)?(' \u00b7 '+m.protein+'g'):''),
@@ -18921,6 +19145,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // and their open-flags used to survive a logout — so a popup left open (or a stray daily
       // check-in timer firing right around logout) could render on top of the logged-out screen.
       // Gate rendering on S.loggedIn directly, on top of clearing both flags in logout() itself.
+      /* THE LOG GATE. Whatever is waiting to be confirmed, read back as the log will write
+         it. Closed is the normal state, so every one of these is a plain default. */
+      lgOpen: !!S.logGate && !!S.loggedIn,
+      lgMark: (S.logGate||{}).mark || '',
+      lgTitle:(S.logGate||{}).title || '',
+      lgLines:((S.logGate||{}).lines || []).map((l,i)=>({ key:'lg'+i, k:l.k, v:l.v })),
+      lgConfirm:()=>this.logGateConfirm(),
+      lgDecline:()=>this.logGateDecline(),
+
       /* BRAIN REST. One card, four stages: the two gates, the sit, the finish. Everything the
          card shows is chosen here so the markup stays one shape rather than four. */
       ...(()=>{
@@ -19023,7 +19256,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       logAllChipInk:this._logKinds().every(k=>k.done)?'#6cffba':'#e8b45a',
       logAllChipEdge:this._logKinds().every(k=>k.done)?'rgba(108,255,186,0.32)':'rgba(232,180,90,0.34)',
       closeLogAll:()=>this.closeLogAll(), stopLogAllClick:(e)=>{ e.stopPropagation(); },
-      openLogAll:()=>this.openLogAll(), saveLogAll:()=>this.saveLogAll(),
+      openLogAll:()=>this.openLogAll(), saveLogAll:()=>this.askLog('logall'),
       logKinds:this._logKinds().map(k=>({ chip:(k.done?'\u2713 ':'')+k.label,
         ink:k.done?'#6cffba':'#8f8f99', edge:k.done?'rgba(108,255,186,0.32)':'rgba(255,255,255,0.14)' })),
       logAllSummary:(()=>{ const left=this._logKinds().filter(k=>!k.done).length;
@@ -20456,7 +20689,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       woUnitC:(S.woUnit||'kg')==='BW'?'#F4F4F5':'#b8b8c0', woUnitBg:(S.woUnit||'kg')==='BW'?'rgba(255,255,255,0.14)':'transparent', woUnitBd:(S.woUnit||'kg')==='BW'?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',
       toggleWoUnit:()=>this.setState(s=>({woUnit:(s.woUnit||'kg')==='BW'?'kg':'BW'})),
       woLogEyebrow:'◆ '+((S.woPart==='Full')?'ALL TRAINING':S.woPart.toUpperCase()+' LOG')+' · '+(S.woRange||'Week').toUpperCase(),
-      addWorkout:()=>this.addWorkout(),
+      addWorkout:()=>this.askLog('workout'),
       addWorkoutKey:enterKey(()=>this.addWorkout()),
       workoutList, coachMsg, moveKcal:(this.todayMin()*8)+' kcal', trainToday:this.todayMin(), trainWeek:this.weekMin(),
       openCoachChat:()=>{ if(!S.fitLoading) this.fitAskAI('Give me a deeper breakdown of my training this week, and what to focus on next.'); },
@@ -20551,7 +20784,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       expCatDraft:S.expCatDraft||'', setExpCatDraft:(e)=>this.setState({expCatDraft:e.target.value}),
       addExpCat:()=>{ this.addExpenseCategory(S.expCatDraft); this.setState({expCat:(S.expCatDraft||'').trim()||S.expCat, expCatDraft:''}); },
       addExpCatKey:(e)=>{ if(e.key==='Enter'){ this.addExpenseCategory(S.expCatDraft); this.setState({expCat:(S.expCatDraft||'').trim()||S.expCat, expCatDraft:''}); } },
-      addIncome:()=>this.addIncome(), addIncKey:enterKey(()=>this.addIncome()), addExpense:()=>this.addExpense(), addExpKey:enterKey(()=>this.addExpense()),
+      addIncome:()=>this.askLog('income'), addIncKey:enterKey(()=>this.askLog('income')), addExpense:()=>this.askLog('expense'), addExpKey:enterKey(()=>this.askLog('expense')),
       ...(()=>{ const y=S.moneyCalY, m=S.moneyCalM;
         const moneyMonthLabel=new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'});
         const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const daysIn=new Date(y,m+1,0).getDate();
@@ -20660,8 +20893,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       actLogEyebrow:'◆ '+((S.actCat==='Full')?'ALL LOGS':S.actCat.toUpperCase()+' LOG')+' · '+(S.actRange||'Week').toUpperCase(),
       actMin:S.actMin, setActMin:(e)=>this.setState({actMin:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,4)}),
       actHr:S.actHr, setActHr:(e)=>this.setState({actHr:(e.target.value||'').replace(/[^0-9]/g,'').slice(0,3)}),
-      addActivity:()=>this.addActivity(),
-      addActKey:enterKey(()=>{ const v=S.actText.trim(); if(v){ const mn=(parseInt(S.actHr,10)||0)*60+(parseInt(S.actMin,10)||0); this.mut(s=>({activities:[...s.activities,{id:this._uuid(),text:v,cat:s.actCat,ts:Date.now(),min:(mn>0?mn:30)}],actText:'',actMin:'',actHr:''})); } }),
+      addActivity:()=>this.askLog('activity'),
+      /* Enter used to inline its own copy of addActivity, so the key and the button wrote
+         the row by two different routes. One route now, and it is the gated one. */
+      addActKey:enterKey(()=>this.askLog('activity')),
       activityList, recTasks, aiTasksBtnLabel, aiTasksSourceLabel, aiTasksErr:S.aiTasksErr||'', generateAiTasks:()=>this.generateAiTasks(),
       catPie:(()=>{ const segs=this.catTime(); const tot=segs.reduce((a,s)=>a+s.min,0)||1; return segs.map(s=>({cat:s.cat,color:s.color,hrs:this.fmtHrs(s.min),pct:Math.round(s.min/tot*100)+'%'})); })(),
       noCatPie:this.catTime().length===0,
@@ -20755,8 +20990,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       /* One save path shared by the button and the Enter key. They used to be two identical
          copies of the same body, which is how the new fields would have ended up saved by
          one and dropped by the other. */
-      addEvent:()=>this._addEventFromForm(),
-      addEventKey:enterKey(()=>this._addEventFromForm()),
+      addEvent:()=>this.askLog('event'),
+      addEventKey:enterKey(()=>this.askLog('event')),
       evKind:S.evKind||'general',
       evIsWork:(S.evKind||'general')==='work', evIsGeneral:(S.evKind||'general')!=='work',
       setEvKindWork:()=>this.setState({evKind:'work'}), setEvKindGeneral:()=>this.setState({evKind:'general'}),

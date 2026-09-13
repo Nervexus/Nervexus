@@ -326,7 +326,18 @@ t('a meal still goes in through the new surface', async () => {
     if (!add) return false; add.click(); return true;
   });
   ok(hit, 'there is no ADD on the panel that does anything');
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(700);
+  /* ADD asks before it writes now, and the gate reads the meal back as it will be logged.
+     Nothing is in the list until that is answered. */
+  const asked = await page.evaluate(() => window.__nvx.state.logGate);
+  ok(asked && asked.kind === 'meal', 'ADD did not open the log gate');
+  ok(!(await text()).includes('620 / 2400 kcal'), 'the meal landed before it was confirmed');
+  const said = await page.evaluate(() => {
+    const el = [...document.querySelectorAll('span')].find(e => e.textContent.trim() === 'CONFIRM' && e.onclick);
+    if (!el) return false; el.click(); return true;
+  });
+  ok(said, 'there is no CONFIRM on the gate');
+  await page.waitForTimeout(900);
   const b = await text();
   ok(b.includes('Porridge and eggs'), 'the meal did not land in the list');
   ok(b.includes('620 / 2400 kcal'), 'the rings row did not take the meal');

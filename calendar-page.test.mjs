@@ -290,6 +290,77 @@ t('an event with no end time shows one time and no empty line', async () => {
   eq((row.match(/\d\d:\d\d/g) || []).length, 1, 'a general event with no duration has exactly one time: ' + JSON.stringify(row));
 });
 
+t('the three panels wear the card layout', async () => {
+  /* One card language across the Logs, from the template: a glass panel, a numbered mark in
+     a pill, and a letterspaced title above whatever the card holds. */
+  await boot();
+  const cards = await page.evaluate(() => [...document.querySelectorAll('.lc-card')].map(c => ({
+    badge: (c.querySelector('.lc-badge') || {}).textContent || '',
+    title: (c.querySelector('.lc-title') || {}).textContent || '',
+    glass: getComputedStyle(c).backdropFilter,
+  })));
+  eq(cards.length, 3, 'the calendar does not carry three cards');
+  eq(cards.map(c => c.badge.trim()).join(' | '), '01 - MO | 02 - DY | 03 - HL', 'the marks are wrong or out of order');
+  eq(cards.map(c => c.title.trim()).join(' | '), 'Month | The Day | Highlight', 'the titles are wrong');
+  ok(cards.every(c => /blur/.test(c.glass)), 'the panels are not glass');
+});
+
+t('the card is readable on every raiment it can be worn with', async () => {
+  /* The bug this is here for: keying the card's ground off the raiment name looked right and
+     was wrong. Éverpine's dark-green card is the home scene only — everywhere else, the
+     calendar included, it wears the ivory one, so a card painted dark green from the raiment
+     name came out with the page's dark ink on a dark ground and the month vanished. */
+  const lum = (c) => {
+    const f = (c.match(/[\d.]+/g) || []).map(Number);
+    const [r, g, b] = f;
+    const s = [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    return 0.2126 * s[0] + 0.7152 * s[1] + 0.0722 * s[2];
+  };
+  for (const style of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
+    await boot();
+    await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
+    await page.waitForTimeout(900);
+    const c = await page.evaluate(() => {
+      const card = document.querySelector('.lc-card');
+      const shell = document.querySelector('.cc-shell');
+      /* Composite the card over what is actually behind it, so a translucent ground is
+         measured as the colour a person sees rather than as its own alpha. */
+      const mix = (fg, bg) => {
+        const F = (fg.match(/[\d.]+/g) || []).map(Number), B = (bg.match(/[\d.]+/g) || []).map(Number);
+        const a = F.length > 3 ? F[3] : 1;
+        return 'rgb(' + [0, 1, 2].map(i => Math.round(F[i] * a + (B[i] == null ? 255 : B[i]) * (1 - a))).join(',') + ')';
+      };
+      const ground = getComputedStyle(shell).backgroundColor;
+      const num = [...card.querySelectorAll('span')].find(e => /^\d+$/.test(e.textContent.trim()));
+      const label = card.querySelector('.lc-title');
+      return { bg: mix(getComputedStyle(card).backgroundColor, ground),
+               ink: num ? getComputedStyle(num).color : '',
+               title: label ? getComputedStyle(label).color : '' };
+    });
+    ok(c.ink, style + ': there are no day numbers on the card to measure');
+    const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+    const dayR = ratio(c.bg, c.ink), titleR = ratio(c.bg, c.title);
+    ok(dayR >= 2, style + ': the day numbers are ' + dayR.toFixed(2) + ':1 against the card — they disappear into it');
+    ok(titleR >= 2, style + ': the card title is ' + titleR.toFixed(2) + ':1 against the card');
+  }
+});
+
+t('the card steps down on a phone', async () => {
+  await boot();
+  const deskPad = await page.evaluate(() => Math.round(parseFloat(getComputedStyle(document.querySelector('.lc-card')).paddingTop)));
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.waitForTimeout(600);
+  const phone = await page.evaluate(() => {
+    const c = document.querySelector('.lc-card');
+    return { pad: Math.round(parseFloat(getComputedStyle(c).paddingTop)),
+             title: Math.round(parseFloat(getComputedStyle(c.querySelector('.lc-title')).fontSize)) };
+  });
+  await page.setViewportSize({ width: 1440, height: 1200 });
+  await page.waitForTimeout(400);
+  ok(phone.pad < deskPad, 'the card padding is the same ' + phone.pad + 'px on a phone as on a desk');
+  ok(phone.title <= 11, 'the card title is still ' + phone.title + 'px on a phone');
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });
