@@ -170,6 +170,96 @@ t('water can be taken back one glass at a time', async () => {
   ok((await text()).includes('0 / 8 glasses'), 'undoing past empty should stop at zero, not go negative');
 });
 
+t('Health wears the same place Mental opens into', async () => {
+  /* Two dark ruled cards sitting on the Forge page, while the centre next door was a pale
+     field you step into. Same app, two different materials. Health is the same field now —
+     the same sheen, the same grain, and the hairline doing the column-dividing rather than
+     a border. */
+  await boot('health', 'Ultra X');
+  const p = await page.evaluate(() => {
+    const pan = document.querySelector('.rest-panel');
+    if (!pan) return null;
+    const head = [...pan.querySelectorAll('div')].find(e => e.textContent.trim() === 'Log Today');
+    return {
+      abyss: !!pan.querySelector('.rest-abyss'),
+      grain: !!pan.querySelector('.rest-grain'),
+      rule: !!pan.querySelector('.rest-rule'),
+      serif: head ? /Cormorant/.test(getComputedStyle(head).fontFamily) : false,
+      /* the card it used to be, and the translucency that came with it */
+      card: pan.classList.contains('cc-glowcard') || !!pan.querySelector('.cc-glowcard'),
+      ink: getComputedStyle(pan).getPropertyValue('--ab-ink').trim(),
+    };
+  });
+  ok(p, 'the Health centre is not the abyss panel');
+  ok(p.abyss, 'no field'); ok(p.grain, 'no grain');
+  ok(p.rule, 'the hairline is not dividing the two halves');
+  ok(p.serif, 'Log Today is not the serif the sit uses');
+  ok(!p.card, 'the ruled card is still there');
+  eq(p.ink, '#2A2A28', 'Ultra X is not reading the pale field');
+});
+
+t('and it goes black for Noir only', async () => {
+  await boot('health', 'Noir');
+  const n = await page.evaluate(() => {
+    const pan = document.querySelector('.rest-panel');
+    return pan ? getComputedStyle(pan).getPropertyValue('--ab-ink').trim() : '';
+  });
+  eq(n, '#ECE8E0', 'Noir is not wearing the black variant');
+});
+
+t('nothing in it is painted the raiment colour', async () => {
+  /* .theme-ultra input::placeholder paints every hint the raiment's muted ink with
+     !important. On Maison Elysee that is its blue, so the three inputs came out with
+     coloured hints on a panel whose entire point is that nothing in it is coloured. */
+  await boot('health', 'Maison Élysée');
+  const c = await page.evaluate(() => {
+    const f = document.querySelector('.rest-panel .rest-field');
+    if (!f) return null;
+    const pan = document.querySelector('.rest-panel');
+    return { hint: getComputedStyle(f, '::placeholder').color,
+             muted: getComputedStyle(pan).getPropertyValue('--ab-muted').trim() };
+  });
+  ok(c, 'no field to read');
+  /* --ab-muted is #6E6C67 on every raiment but Noir */
+  eq(c.hint, 'rgb(110, 108, 103)', 'the hint is wearing the raiment (' + c.hint + ') not the field');
+  eq(c.muted, '#6E6C67', 'the muted token moved');
+});
+
+t('the two halves stack on a phone', async () => {
+  await boot('health');
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.waitForTimeout(600);
+  const cols = await page.evaluate(() => {
+    const sp = document.querySelector('.rest-split');
+    return sp ? getComputedStyle(sp).gridTemplateColumns.trim().split(/\s+/).length : 0;
+  });
+  await page.setViewportSize({ width: 1280, height: 1200 });
+  await page.waitForTimeout(400);
+  eq(cols, 1, 'the split is still ' + cols + ' columns wide on a phone');
+});
+
+t('a meal still goes in through the new surface', async () => {
+  /* The redesign moved every control onto a different element. A panel that looks right and
+     cannot take a meal is worse than the cards were. */
+  await boot('health');
+  /* Typed into the real inputs, not pushed into state: the point of the test is that the
+     fields the redesign replaced are still wired to the handlers. */
+  await page.fill('.rest-panel input[placeholder^="Meal"]', 'Porridge and eggs');
+  await page.fill('.rest-panel input[placeholder="kcal"]', '620');
+  await page.fill('.rest-panel input[placeholder="protein g"]', '38');
+  await page.waitForTimeout(400);
+  const hit = await page.evaluate(() => {
+    const add = [...document.querySelectorAll('.rest-panel .rest-chip')]
+      .find(e => e.textContent.trim() === 'ADD' && e.onclick);
+    if (!add) return false; add.click(); return true;
+  });
+  ok(hit, 'there is no ADD on the panel that does anything');
+  await page.waitForTimeout(800);
+  const b = await text();
+  ok(b.includes('Porridge and eggs'), 'the meal did not land in the list');
+  ok(b.includes('620 / 2400 kcal'), 'the rings row did not take the meal');
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });
