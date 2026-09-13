@@ -9093,7 +9093,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-321 · v11.321 sweep';
+const NOTIF_BUILD_VERSION = '2026.09.13-322 · v11.322 vlogs';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12257,7 +12257,13 @@ activities: this._mergeShipLog(s.activities),
   // Work time used to be typed into the generic Log Activity box, which took any category.
   // These write the same activity rows (so the work log, the trackers and Time Distribution
   // all still read them) but only ever as Work, with the kind of work kept alongside.
-  WORK_TYPES = ['Deep Work','Meetings','Admin','Client','Planning','Focus'];
+  WORK_TYPES = ['Deep Work','Meetings','Admin','Client','Planning','Focus','Vlog'];
+  /* A vlog is work, so it goes in the work log like the rest of it — and it carries a
+     bonus, because recording one is a harder thing to start than an hour of admin.
+     The bonus is the first of a day only: after that a vlog is an ordinary entry. A
+     bonus you can take four times before lunch is not a bonus, it is a tap. */
+  VLOG_SUB(){ return 'Vlog'; }
+  VLOG_XP(){ return 150; }
   addWorkHours(){
     const S=this.state;
     const label=(S.whText||'').trim();
@@ -13934,9 +13940,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* A logged activity is worth 15. A finished Brain Rest is worth BRAIN_REST_XP, read off
        the row rather than a separate log \u2014 the row is the only record there is, and the two
        columns it is recognised by are real ones that survive a Supabase round trip. */
-    s.activities.forEach(a=>{ if(a.seeded || /^Shipped update v/.test(a.text||'')) return;
+    /* Vlogs are worth the bonus once a day. Walked oldest first so it is the day's first
+       vlog that carries it and not whichever row happens to be stored first — the two
+       come to the same score either way, since every event here is summed by timestamp
+       and both rows fall on the same day, so this is about the record being deterministic
+       rather than about the number changing. */
+    const _vlogDays={};
+    [...s.activities].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(a=>{
+      if(a.seeded || /^Shipped update v/.test(a.text||'')) return;
       const isRest=a.cat==='Work' && a.sub==='Focus' && (a.text||'')===this.BRAIN_REST_LABEL();
-      ev.push({xp:isRest?this.BRAIN_REST_XP():15, ts:a.ts}); });
+      if(isRest){ ev.push({xp:this.BRAIN_REST_XP(), ts:a.ts}); return; }
+      if(a.cat==='Work' && a.sub===this.VLOG_SUB()){
+        const day=new Date(a.ts||0).toLocaleDateString('en-CA');
+        const first=!_vlogDays[day]; _vlogDays[day]=true;
+        ev.push({xp:first?this.VLOG_XP():15, ts:a.ts}); return; }
+      ev.push({xp:15, ts:a.ts}); });
     /* Shipping a build used to be worth 500 XP to the owner. 113 of them had landed, which
        was 72% of the whole score — the Life Performance Index was mostly a count of how
        often the app had been deployed, and it went up while the owner did nothing. */

@@ -115,6 +115,76 @@ t('they earn no XP and build no work streak', async () => {
   eq(r.streak, 0, 'the ship log is building a work streak out of deploys');
 });
 
+t('a vlog is a kind of work, and goes in the work log like the rest of it', async () => {
+  await boot({ activities: [] });
+  const types = await page.evaluate(() => window.__nvx.WORK_TYPES);
+  ok(types.includes('Vlog'), 'Vlog is not one of the kinds of work: ' + types.join(', '));
+  /* Written through the form a person actually uses, not pushed into state. */
+  await page.evaluate(() => { window.__nvx.setState({ whText: 'Episode 12', whType: 'Vlog', whHr: '0', whMin: '40' }); });
+  await page.waitForTimeout(300);
+  await page.evaluate(() => window.__nvx.addWorkHours());
+  await page.waitForTimeout(600);
+  const row = await page.evaluate(() => (window.__nvx.state.activities || []).find(a => a.text === 'Episode 12'));
+  ok(row, 'the vlog did not land in the work log');
+  eq(row.cat, 'Work', 'a vlog is filed outside Work');
+  eq(row.sub, 'Vlog', 'the vlog lost its kind');
+  eq(row.min, 40, 'the minutes did not come through');
+  eq(await page.evaluate(() => window.__nvx.state.whText), '', 'the form was not cleared');
+});
+
+t('the first vlog of a day carries the bonus and the rest do not', async () => {
+  /* A bonus you can take four times before lunch is not a bonus, it is a tap. */
+  const xp = () => page.evaluate(() => window.__nvx.computePower().totalXP);
+  const put = (rows) => page.evaluate((r) => window.__nvx.setState({ activities: r }), rows);
+  const now = Date.now(), yest = now - 86400000;
+  await boot({ activities: [] });
+  const base = await xp();
+
+  await put([{ id: 'v1', text: 'Episode 1', cat: 'Work', sub: 'Vlog', ts: now, min: 45 }]);
+  await page.waitForTimeout(400);
+  const one = await xp();
+  eq(one - base, await page.evaluate(() => window.__nvx.VLOG_XP()), 'the first vlog of a day is not worth the bonus');
+
+  await put([{ id: 'v1', text: 'Episode 1', cat: 'Work', sub: 'Vlog', ts: now, min: 45 },
+             { id: 'v2', text: 'Episode 2', cat: 'Work', sub: 'Vlog', ts: now + 1000, min: 30 }]);
+  await page.waitForTimeout(400);
+  eq((await xp()) - one, 15, 'the second vlog of the same day took the bonus too');
+
+  await put([{ id: 'v1', text: 'Episode 1', cat: 'Work', sub: 'Vlog', ts: now, min: 45 },
+             { id: 'v2', text: 'Episode 2', cat: 'Work', sub: 'Vlog', ts: now + 1000, min: 30 },
+             { id: 'v0', text: 'Episode 0', cat: 'Work', sub: 'Vlog', ts: yest, min: 30 }]);
+  await page.waitForTimeout(400);
+  const three = await xp();
+  eq(three - base, (await page.evaluate(() => window.__nvx.VLOG_XP())) * 2 + 15,
+     'yesterday should have its own first vlog, worth its own bonus');
+});
+
+t('a vlog logged on its own day gets its own bonus', async () => {
+  /* The cap is per day, not per account. Three days of one vlog each is three bonuses; one
+     day of three vlogs is one. */
+  const xp = () => page.evaluate(() => window.__nvx.computePower().totalXP);
+  const D = 86400000, now = Date.now();
+  await boot({ activities: [] });
+  const base = await xp();
+  const bonus = await page.evaluate(() => window.__nvx.VLOG_XP());
+  await page.evaluate((t) => window.__nvx.setState({ activities: [
+    { id: 'd0', text: 'Ep A', cat: 'Work', sub: 'Vlog', ts: t, min: 30 },
+    { id: 'd1', text: 'Ep B', cat: 'Work', sub: 'Vlog', ts: t - 86400000, min: 30 },
+    { id: 'd2', text: 'Ep C', cat: 'Work', sub: 'Vlog', ts: t - 2 * 86400000, min: 30 }] }), now);
+  await page.waitForTimeout(400);
+  eq((await xp()) - base, bonus * 3, 'three days of one vlog each should be three bonuses');
+});
+
+t('an ordinary work entry is still an ordinary work entry', async () => {
+  const xp = () => page.evaluate(() => window.__nvx.computePower().totalXP);
+  await boot({ activities: [] });
+  const base = await xp();
+  await page.evaluate((ts) => window.__nvx.setState({ activities: [
+    { id: 'w1', text: 'Invoices', cat: 'Work', sub: 'Admin', ts, min: 40 }] }), Date.now());
+  await page.waitForTimeout(400);
+  eq((await xp()) - base, 15, 'adding Vlog changed what a normal work entry is worth');
+});
+
 t('nothing threw', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 4).join(' | '));
 });
