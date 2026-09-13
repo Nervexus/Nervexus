@@ -3813,7 +3813,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div class="lc-card cc-cal-hero" style="display:flex; flex-direction:column;">
             <div class="lc-head">
               <span class="lc-badge">01 - MO</span>
-              <div class="lc-title">Month</div>
+              <div class="lc-title">{{ monthLabel }}</div>
             </div>
             <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:8px; flex:0 0 auto;">
               <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7"><div style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; letter-spacing:1px;">{{ d }}</div></sc-for>
@@ -9101,7 +9101,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-323 · v11.323 pearl';
+const NOTIF_BUILD_VERSION = '2026.09.13-324 · v11.324 month-label';
 class Component extends DCLogic {
   constructor(props){
     super(props);

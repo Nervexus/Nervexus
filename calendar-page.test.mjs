@@ -372,7 +372,10 @@ t('the three panels wear the card layout', async () => {
   })));
   eq(cards.length, 3, 'the calendar does not carry its three panels');
   eq(cards.map(c => c.badge.trim()).join(' | '), '01 - MO | 02 - NW | 03 - DY', 'the marks are wrong or out of order');
-  eq(cards.map(c => c.title.trim()).join(' | '), 'Month | Now | The Day', 'the titles are wrong');
+  /* The Month card's title used to say the literal word "Month" — the month name was shown
+     only up in the page header, so the card itself never said which one it was. */
+  ok(/^\w+ \d{4}$/.test(cards[0].title.trim()), 'the Month card does not name the actual month: ' + cards[0].title);
+  eq(cards.map(c => c.title.trim()).slice(1).join(' | '), 'Now | The Day', 'the other titles are wrong');
   ok(cards.every(c => /blur/.test(c.glass)), 'the panels are not glass');
 });
 
