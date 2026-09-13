@@ -207,10 +207,10 @@ t('and it goes black for Noir only', async () => {
   eq(n, '#ECE8E0', 'Noir is not wearing the black variant');
 });
 
-t('nothing in it is painted the raiment colour', async () => {
-  /* .theme-ultra input::placeholder paints every hint the raiment's muted ink with
-     !important. On Maison Elysee that is its blue, so the three inputs came out with
-     coloured hints on a panel whose entire point is that nothing in it is coloured. */
+t('the hint text is the field\'s, not the raiment\'s', async () => {
+  /* Lines and pills wear the raiment; body copy and hints do not. .theme-ultra
+     input::placeholder paints every hint the raiment's muted ink with !important, which on
+     Maison Elysee is its blue — a blue hint sitting inside a grey field. */
   await boot('health', 'Maison Élysée');
   const c = await page.evaluate(() => {
     const f = document.querySelector('.rest-panel .rest-field');
@@ -223,6 +223,35 @@ t('nothing in it is painted the raiment colour', async () => {
   /* --ab-muted is #6E6C67 on every raiment but Noir */
   eq(c.hint, 'rgb(110, 108, 103)', 'the hint is wearing the raiment (' + c.hint + ') not the field');
   eq(c.muted, '#6E6C67', 'the muted token moved');
+});
+
+t('every line and pill on it is the raiment\'s own colour', async () => {
+  /* The field stays white — that is the idea of it — but the things drawn ON the field are
+     the raiment, or the panel is the same object in all four and the raiment has been
+     stepped away from. Ultra X oxblood, Maison Élysée blue, Éverpine gold, Noir white. */
+  const want = {
+    'Ultra X':          { accent: '#5B1A1A', line: 'rgba(91,26,26,0.32)',    fill: 'rgb(91, 26, 26)' },
+    'Maison Élysée':    { accent: '#3C5A7D', line: 'rgba(60,90,125,0.34)',   fill: 'rgb(60, 90, 125)' },
+    'Maison Éverpine':  { accent: '#7C6A38', line: 'rgba(124,106,56,0.34)',  fill: 'rgb(124, 106, 56)' },
+    'Noir':             { accent: '#FFFFFF', line: 'rgba(236,232,224,0.24)', fill: 'rgb(236, 232, 224)' },
+  };
+  for (const [style, w] of Object.entries(want)) {
+    await boot('health', style);
+    const got = await page.evaluate(() => {
+      const pan = document.querySelector('.rest-panel');
+      const cs = getComputedStyle(pan);
+      const add = [...pan.querySelectorAll('.rest-chip-on')].find(e => e.textContent.trim() === 'ADD');
+      const field = pan.querySelector('.rest-field');
+      return { accent: cs.getPropertyValue('--ab-accent').trim(),
+               line: cs.getPropertyValue('--ab-line').trim(),
+               pill: add ? getComputedStyle(add).backgroundColor : '',
+               under: field ? getComputedStyle(field).borderBottomColor : '' };
+    });
+    eq(got.accent, w.accent, style + ' has the wrong accent');
+    eq(got.line, w.line, style + ' has the wrong hairline');
+    eq(got.pill, w.fill, style + ' ADD is not the raiment colour');
+    ok(got.under !== 'rgb(0, 0, 0)' && got.under !== '', style + ' field underline is unpainted');
+  }
 });
 
 t('the two halves stack on a phone', async () => {

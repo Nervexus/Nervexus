@@ -168,10 +168,21 @@
      did \u2014 that one left dark ink on a black ground on the ivory raiments. */
   .cc-shell{ --ab-far:#E2E1DE; --ab-mid:#EFEEEC; --ab-near:#FCFCFB; --ab-limb:rgba(255,255,255,0.92);
              --ab-line:rgba(58,56,52,0.26); --ab-ink:#2A2A28; --ab-muted:#6E6C67;
-             --ab-fill:#2A2A28; --ab-on-fill:#FCFCFB; }
+             --ab-accent:#2A2A28; --ab-fill:#2A2A28; --ab-on-fill:#FCFCFB; }
   .cc-shell.raiment-noir{ --ab-far:#040405; --ab-mid:#090909; --ab-near:#101012; --ab-limb:rgba(255,255,255,0.20);
              --ab-line:rgba(236,232,224,0.24); --ab-ink:#ECE8E0; --ab-muted:#928F88;
-             --ab-fill:#ECE8E0; --ab-on-fill:#0B0B0C; }
+             --ab-accent:#FFFFFF; --ab-fill:#ECE8E0; --ab-on-fill:#0B0B0C; }
+  /* The field stays white — that is the whole idea of it — but everything drawn ON the field
+     is the raiment's own colour: every hairline, every filled pill, the clock as it descends.
+     Ultra X is oxblood, Maison Élysée its blue, Éverpine its gold, Noir white, which it
+     already was. Those are the same hexes --quiet-ink uses rather than --forge-accent, because
+     these lines land on an ivory ground and Éverpine's champagne is invisible there. */
+  .cc-shell.raiment-x{ --ab-accent:#5B1A1A; --ab-line:rgba(91,26,26,0.32);
+             --ab-fill:#5B1A1A; --ab-on-fill:#FCFCFB; }
+  .cc-shell.raiment-maison{ --ab-accent:#3C5A7D; --ab-line:rgba(60,90,125,0.34);
+             --ab-fill:#3C5A7D; --ab-on-fill:#F6F0E4; }
+  .cc-shell.raiment-everpine{ --ab-accent:#7C6A38; --ab-line:rgba(124,106,56,0.34);
+             --ab-fill:#7C6A38; --ab-on-fill:#FCFCFB; }
   /* The ground: a wide pale field, then the horizon \u2014 a vast sphere's edge just below the
      frame, lit from behind. Two gradients rather than an image, so it is sharp at any size. */
   .rest-abyss{ position:absolute; inset:0; pointer-events:none;
@@ -210,7 +221,7 @@
      point is that nothing in it is coloured. Doubling the class outranks it without
      touching the rule the rest of the app relies on. */
   .rest-field.rest-field::placeholder{ color:var(--ab-muted) !important; opacity:0.75; }
-  .rest-field:focus{ border-bottom-color:var(--ab-ink); }
+  .rest-field:focus{ border-bottom-color:var(--ab-accent); }
   .rest-chip{ display:inline-flex; align-items:center; justify-content:center; padding:10px 18px;
     border-radius:999px; border:1px solid var(--ab-line); background:transparent; color:var(--ab-muted);
     font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; }
@@ -225,7 +236,7 @@
   .rest-thread{ position:relative; width:1px; flex:1 1 auto; min-height:60px;
     background:linear-gradient(to bottom, transparent 0%, var(--ab-line) 14%, var(--ab-line) 86%, transparent 100%); }
   .rest-thread > i{ position:absolute; left:-1px; top:0; width:3px; display:block;
-    background:var(--ab-ink); opacity:0.55; transition:height 900ms linear; }
+    background:var(--ab-accent); opacity:0.72; transition:height 900ms linear; }
   /* Brain Rest takes the whole screen. The sheen is sized to the window rather than a card,
      and the ring steps down on a phone so the clock, the line under it and the way out all
      fit without scrolling — a sit you have to scroll during is not a sit. */
@@ -8716,7 +8727,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-310 · v11.310 health-abyss';
+const NOTIF_BUILD_VERSION = '2026.09.13-311 · v11.311 abyss-raiment';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -18615,7 +18626,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hrWaterHint:(hWater>=hWaterGoal?'Target met':(hWaterGoal-hWater)+' to go'),
           hrDate:this._fbToday(),
           hydPlus:()=>this.addHydMl(250), hydMinus:()=>this.undoHydGlass(),
-          hydMinusInk:hWater>0?'#eef0f2':'#5c5c64',
+          hydMinusInk:hWater>0?'var(--ab-accent)':'var(--ab-muted)',
           addMealKey:enterKey(()=>this.addMeal()),
           /* Removed by id. The list shown is today's, so an index into it is not an index into
              the stored array and would delete somebody else's dinner. */
@@ -18629,7 +18640,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           trainSections:trainSections, trainPicker:trainPicker
         };
       }, { forgeCentres:[], forgeShowHome:false, forgeShowHealth:false, forgeShowMental:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[],
-           hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'#5c5c64', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true }),
+           hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'var(--ab-muted)', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
