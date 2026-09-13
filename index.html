@@ -124,7 +124,10 @@
      driving the row, and a min-height keeps the month itself steady whether it falls over
      five weeks or six. The panel scrolls inside itself rather than growing. */
   @media (min-width:901px){
-    .cc-cal-hero{ min-height:760px; }
+    /* The card used to be given the height so a five-week month did not sit shorter than a
+       six-week one. The grid carries that now — six rows' worth, always — so the panel can
+       hug its days instead of leaving a third of itself empty under them. */
+    .cc-cal-hero{ min-height:0; }
     .cc-cal-daylist{ max-height:300px; overflow-y:auto; }
   }
   /* The accent a control takes when it is the selected one. Same source as the Forge's, so
@@ -307,9 +310,12 @@
              --lc-edge:rgba(255,255,255,0.52);
              /* The pane a raised thing sits on — brighter than the card, so a chosen row and
                 the clock tile lift off it rather than being outlined on it. */
-             --lc-raise:rgba(255,255,255,0.92); }
+             --lc-raise:rgba(255,255,255,0.92);
+             /* The ink that goes on top of the accent, for the one filled thing on the
+                grid. Noir's accent is nearly white, so its opposite is the black. */
+             --lc-on-accent:#FCFBF9; }
   .cc-shell.raiment-noir, .cc-shell.raiment-base{ --lc-edge:rgba(236,232,224,0.22);
-             --lc-raise:rgba(255,255,255,0.075); }
+             --lc-raise:rgba(255,255,255,0.075); --lc-on-accent:#0B0B0C; }
 
   .lc-card{ position:relative; border-radius:16px; padding:20px 18px 18px; box-sizing:border-box;
     background:var(--lc-bg); border:1px solid var(--lc-edge, var(--lc-line));
@@ -356,6 +362,37 @@
              --lcb-lit:rgba(126,144,128,0.26); --lcb-dim:rgba(126,144,128,0.18); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
 
+  .cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:auto; gap:10px;
+    align-content:start; min-height:324px; }
+  @media (max-width:620px){ .cal-grid{ gap:6px; min-height:0; } }
+  /* ---- THE MONTH GRID -------------------------------------------------------------------
+     A day is a number, not a box. Today is the one solid thing on the grid, the selected day
+     is raised the way a chosen row is, a highlighted day keeps the colour it was given, and
+     everything else is just its number — which is what makes the three that are not ordinary
+     readable at a glance. */
+  .cal-cell{ position:relative; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:5px; padding:2px 0; box-sizing:border-box; cursor:pointer; }
+  /* The mark is a square around the number, not the whole grid row — a row-height fill on a
+     tall card is a slab, and the reference's today is a tile you could put your thumb on. */
+  .cal-cell-pill{ display:flex; align-items:center; justify-content:center;
+    width:38px; height:38px; border-radius:13px; border:1px solid transparent;
+    transition:background 140ms ease, box-shadow 140ms ease; }
+  .cal-cell:hover .cal-cell-pill{ background:var(--lc-raise); }
+  .cal-cell-num{ font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1; }
+  /* Held open whether or not the day has anything on it, so a row of days does not jump
+     about as events are added to one of them. */
+  .cal-cell-dots{ display:flex; gap:3px; height:5px; align-items:center; }
+  .cal-cell-sel .cal-cell-pill{ background:var(--lc-raise) !important;
+    box-shadow:0 6px 16px var(--lc-glow); border-color:var(--lc-edge, var(--lc-line)); }
+  .cal-cell-today .cal-cell-pill{ background:var(--lc-accent) !important;
+    box-shadow:0 8px 18px var(--lc-glow); }
+  .cal-cell-today .cal-cell-num{ color:var(--lc-on-accent) !important; font-weight:600; }
+  .cal-cell-blank{ cursor:default; }
+  .cal-cell-blank:hover .cal-cell-pill{ background:transparent; }
+  @media (max-width:620px){
+    .cal-cell-pill{ width:32px; height:32px; border-radius:11px; }
+    .cal-cell-num{ font-size:11.5px; }
+  }
   /* ---- NOW: the clock, and the scope of the list under it ------------------------------
      A soft tile carrying a real dial, and three rows saying how much of the calendar the
      panel below is showing. The chosen row lifts off the card rather than being outlined,
@@ -3728,11 +3765,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:8px; flex:0 0 auto;">
               <sc-for list="{{ dows }}" as="d" hint-placeholder-count="7"><div style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84; letter-spacing:1px;">{{ d }}</div></sc-for>
             </div>
-            <div style="display:grid; grid-template-columns:repeat(7,1fr); grid-auto-rows:1fr; gap:12px; flex:1;">
+            <div class="cal-grid">
               <sc-for list="{{ calCells }}" as="c" hint-placeholder-count="35">
-                <div onClick="{{ c.select }}" style="width:100%; height:100%; border-radius:10px; border:1px solid {{ c.border }}; background:{{ c.bg }}; box-shadow:{{ c.ring }}; padding:6px; cursor:{{ c.cursor }}; display:flex; flex-direction:column; position:relative;" style-hover="{ borderColor:'rgba(255,255,255,0.3)' }">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:{{ c.numColor }};">{{ c.d }}</span>
-                  <div style="display:flex; gap:3px; margin-top:auto; flex-wrap:wrap;">
+                <div onClick="{{ c.select }}" class="{{ c.cls }}">
+                  <span class="cal-cell-pill" style="background:{{ c.bg }};"><span class="cal-cell-num" style="color:{{ c.numColor }};">{{ c.d }}</span></span>
+                  <div class="cal-cell-dots">
                     <sc-for list="{{ c.dots }}" as="dt" hint-placeholder-count="0"><span style="width:5px; height:5px; border-radius:50%; background:{{ dt.c }};"></span></sc-for>
                   </div>
                 </div>
@@ -9011,7 +9048,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-316 · v11.316 now-scope';
+const NOTIF_BUILD_VERSION = '2026.09.13-317 · v11.317 soft-grid';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -18557,8 +18594,25 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // calendar derived
     const y=S.calY, m=S.calM; const monthLabel=new Date(y,m,1).toLocaleString('en-US',{month:'long',year:'numeric'});
     const first=new Date(y,m,1); const startDow=(first.getDay()+6)%7; const daysIn=new Date(y,m+1,0).getDate(); const _tz=(S.account&&S.account.timezone)||'auto'; let todayStr; try{ todayStr=new Date().toLocaleDateString('en-CA',_tz==='auto'?{}:{timeZone:_tz}); }catch(e){ todayStr=new Date().toLocaleDateString('en-CA'); }
-    const calCells=[]; for(let i=0;i<startDow;i++) calCells.push({d:'',dots:[],bg:'transparent',border:'transparent',numColor:'transparent',cursor:'default',select:()=>{}});
-    for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const isNoir=isU && S.prefs.ultraStyle==='Noir'; const hlInk=hl?this._hlInk(hl):null; const bg=today?(isNoir?'rgba(196,189,176,0.18)':isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.26):(isNoir?'rgba(150,143,130,0.05)':isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isNoir?'#C4BDB0':isU?'#5B1A1A':'#FFFFFF'):(hlInk?this.hexA(hlInk,0.7):(isNoir?'rgba(150,143,130,0.18)':isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?(isNoir?'#C4BDB0':'#ff5563'):(hlInk?hlInk:(isNoir?'#968F82':isU?'#52525b':'#b8b8c0')); const ring=sel?(isNoir?'0 0 0 3px #FFFFFF inset':(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset')):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(e=>({c:this._evColor(e)})), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
+    const calCells=[]; for(let i=0;i<startDow;i++) calCells.push({d:'',dots:[],cls:'cal-cell cal-cell-blank',bg:'transparent',numColor:'transparent',select:()=>{}});
+    /* A day is a number, not a box. Today is the one solid thing on the grid — filled in
+       the raiment — the selected day is raised like a chosen row, a highlighted day keeps
+       the colour it was given, and every other day is just its number. The four states
+       are a class rather than four inline colours, so the grid is one design and not a
+       palette assembled per cell. */
+    for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const evs=S.events.filter(e=>this._eventOccursOn(e,ds));
+      const sel=ds===S.calSel, today=ds===todayStr;
+      const hl=(S.dayColors||{})[ds], hlInk=hl?this._hlInk(hl):null;
+      const isU=S.prefs.theme==='Ultra', isNoir=isU && S.prefs.ultraStyle==='Noir';
+      const muted=isNoir?'#968F82':isU?'#52525b':'#b8b8c0';
+      calCells.push({ d:String(d), dots:evs.slice(0,3).map(e=>({c:this._evColor(e)})),
+        cls:'cal-cell'+(today?' cal-cell-today':(sel?' cal-cell-sel':'')),
+        /* today and the selection are painted by their class; a highlight is the user's
+           own colour and stays inline. */
+        bg:(today||sel)?'transparent':(hl?this.hexA(hl,0.26):'transparent'),
+        numColor:today?'inherit':(hlInk||muted),
+        select:()=>this.setState({calSel:ds}) }); }
     const _hlDefs=this.DAY_COLORS(); const _curHl=(S.dayColors||{})[S.calSel]; const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], ring:_curHl===c[1]?'#ffffff':'rgba(255,255,255,0.15)', glow:_curHl===c[1]?'0 0 10px '+this.hexA(c[1],0.7):'none', pick:()=>{ const day=S.calSel, color=c[1]; this.mut(st=>{ const dc={...(st.dayColors||{})}; dc[day]=color; return {dayColors:dc}; }); if(this._sbOn()) window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } })); const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
     /* THE SCOPE. The list under the day panel is one of three things: the day you have
        selected, the next seven days, or the month ahead — chosen on the NOW card above it.

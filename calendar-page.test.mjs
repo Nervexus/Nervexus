@@ -63,7 +63,13 @@ t('the month is one size, whatever day is selected', async () => {
   await page.waitForTimeout(500);
   const loud = await calHeight();
   eq(loud, quiet, 'the month changed height when a busy day was selected (' + quiet + ' -> ' + loud + ')');
-  ok(quiet > 600, 'the month should keep a real size, got ' + quiet + 'px');
+  /* The card used to carry a 760px minimum so a five-week month did not sit shorter than a
+     six-week one. The grid carries that now — six rows' worth, always — so the panel hugs its
+     days instead of leaving a third of itself empty under them. The invariant is the grid's,
+     and the card is whatever the grid plus its head comes to. */
+  const grid = await page.evaluate(() => Math.round(document.querySelector('.cal-grid').getBoundingClientRect().height));
+  ok(grid >= 320, 'the grid does not hold six rows, got ' + grid + 'px');
+  ok(quiet > 400, 'the month collapsed, got ' + quiet + 'px');
 });
 
 t('a day you are not working is a blank day', async () => {
