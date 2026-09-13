@@ -290,6 +290,111 @@ t('an event with no end time shows one time and no empty line', async () => {
   eq((row.match(/\d\d:\d\d/g) || []).length, 1, 'a general event with no duration has exactly one time: ' + JSON.stringify(row));
 });
 
+t('the card block is the three cards from the template', async () => {
+  /* Mark, name, constellation, one line at the foot — and the stagger, which is the whole
+     shape of the reference: three panels caught mid-fall rather than a row of three. */
+  await boot();
+  const b = await page.evaluate(() => {
+    const row = document.querySelector('.lcb-row');
+    if (!row) return null;
+    const cards = [...row.querySelectorAll('.lcb-card')];
+    return {
+      n: cards.length,
+      badges: cards.map(c => c.querySelector('.lcb-badge').textContent.trim()),
+      names: cards.map(c => c.querySelector('.lcb-name').textContent.trim()),
+      /* Uppercase is the stylesheet's, not the copy's — textContent stays title case. */
+      caps: cards.every(c => getComputedStyle(c.querySelector('.lcb-name')).textTransform === 'uppercase'),
+      stars: cards.map(c => c.querySelectorAll('.lcb-glyph svg path').length),
+      feet: cards.map(c => c.querySelector('.lcb-foot').textContent.trim()),
+      tops: cards.map(c => Math.round(c.getBoundingClientRect().top)),
+      ground: !!document.querySelector('.lcb .lcb-field'),
+      glass: cards.every(c => /blur/.test(getComputedStyle(c).backdropFilter)),
+    };
+  });
+  ok(b, 'there is no card block on the calendar');
+  eq(b.n, 3, 'the block is not three cards');
+  eq(b.badges.join(' | '), '01 - TD | 02 - WK | 03 - NX', 'the marks are wrong or out of order');
+  eq(b.names.join(' | '), 'Today | This Week | Next Up', 'the card names are wrong');
+  ok(b.caps, 'the card names are not set in the letterspaced caps the template uses');
+  ok(b.stars.every(n => n >= 3), 'a card has no constellation: ' + b.stars.join(','));
+  ok(b.feet.every(f => f.length > 10), 'a card has nothing at its foot');
+  ok(b.ground, 'the cards are glass over nothing');
+  ok(b.glass, 'the cards are not glass');
+  ok(b.tops[0] < b.tops[1] && b.tops[1] < b.tops[2],
+     'the cards are not stepping down: ' + b.tops.join(','));
+});
+
+t('what the block says is what the calendar underneath it holds', async () => {
+  /* A card that reports a count the grid disagrees with is worse than no card. These read
+     the same events through the same repeat rule the day panel uses. */
+  const d0 = day(0), d2 = day(2);
+  await boot({ calSel: d0, events: [
+    { id: 'a', title: 'Dinner with Sarah', date: d0, time: '23:50', repeat: [], kind: 'general' },
+    { id: 'b', title: 'Shift at the yard', date: d0, time: '00:01', endTime: '17:00', repeat: [], kind: 'work' },
+    { id: 'c', title: 'Dentist', date: d2, time: '11:15', repeat: [], kind: 'general' },
+  ]});
+  const feet = await page.evaluate(() => [...document.querySelectorAll('.lcb-foot')].map(e => e.textContent.trim()));
+  ok(/^2 things on today/.test(feet[0]), 'TODAY miscounts the day: ' + feet[0]);
+  ok(/3 things across the next seven days/.test(feet[1]), 'THIS WEEK miscounts: ' + feet[1]);
+  ok(/1 work\.$/.test(feet[1]), 'THIS WEEK lost the work count: ' + feet[1]);
+  ok(/Dinner with Sarah|Shift at the yard|Dentist/.test(feet[2]), 'NEXT UP names nothing: ' + feet[2]);
+});
+
+t('an empty calendar says so rather than counting nothing', async () => {
+  await boot({ events: [] });
+  const feet = await page.evaluate(() => [...document.querySelectorAll('.lcb-foot')].map(e => e.textContent.trim()));
+  ok(/Nothing on today/.test(feet[0]), 'TODAY on an empty calendar: ' + feet[0]);
+  ok(/Seven days clear/.test(feet[1]), 'THIS WEEK on an empty calendar: ' + feet[1]);
+  ok(/Nothing scheduled ahead/.test(feet[2]), 'NEXT UP on an empty calendar: ' + feet[2]);
+});
+
+t('NEXT UP looks past the month on screen', async () => {
+  /* It used to be reasonable to scan only the month being drawn. Paging back to March should
+     not make the card claim nothing is coming. */
+  const far = (() => { const x = new Date(); x.setDate(x.getDate() + 40); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); })();
+  await boot({ events: [{ id: 'z', title: 'Flight to Rome', date: far, time: '06:40', repeat: [], kind: 'general' }] });
+  const foot = await page.evaluate(() => document.querySelectorAll('.lcb-foot')[2].textContent.trim());
+  ok(/Flight to Rome/.test(foot), 'NEXT UP stopped at the month on screen: ' + foot);
+});
+
+t('the block stacks and drops the stagger on a phone', async () => {
+  await boot();
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.waitForTimeout(600);
+  const cols = await page.evaluate(() => {
+    const row = document.querySelector('.lcb-row');
+    const c2 = document.querySelector('.lcb-2');
+    return { n: getComputedStyle(row).gridTemplateColumns.trim().split(/\s+/).length,
+             step: Math.round(parseFloat(getComputedStyle(c2).marginTop)) };
+  });
+  await page.setViewportSize({ width: 1440, height: 1200 });
+  await page.waitForTimeout(400);
+  eq(cols.n, 1, 'the block is still ' + cols.n + ' across on a phone');
+  eq(cols.step, 0, 'the stagger survived onto a single column, so card two starts with a gap');
+});
+
+t('the constellation is lit against whatever it is drawn on', async () => {
+  /* An accent-coloured glow behind a dark mark on an ivory ground is a smudge, not light. */
+  for (const style of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
+    await boot();
+    await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
+    await page.waitForTimeout(800);
+    const g = await page.evaluate(() => {
+      const svg = document.querySelector('.lcb-glyph svg');
+      const shell = document.querySelector('.cc-shell');
+      const lum = (c) => { const f = (c.match(/[\d.]+/g) || []).map(Number);
+        return 0.2126 * f[0] + 0.7152 * f[1] + 0.0722 * f[2]; };
+      return { halo: getComputedStyle(shell).getPropertyValue('--lcb-halo').trim(),
+               mark: lum(getComputedStyle(svg).color),
+               card: lum(getComputedStyle(shell).getPropertyValue('--lcb-near').trim().replace(/^#(..)(..)(..)$/,
+                 (m, r, g2, b) => 'rgb(' + parseInt(r, 16) + ',' + parseInt(g2, 16) + ',' + parseInt(b, 16) + ')')) };
+    });
+    ok(g.halo, style + ': the constellation has no halo token');
+    /* A dark mark sits on a light ground and a light mark on a dark one — never both light. */
+    ok((g.mark > 128) !== (g.card > 128), style + ': the constellation is the same weight as its ground');
+  }
+});
+
 t('the three panels wear the card layout', async () => {
   /* One card language across the Logs, from the template: a glass panel, a numbered mark in
      a pill, and a letterspaced title above whatever the card holds. */

@@ -315,6 +315,74 @@
   /* A hairline under the head, in the card's own accent, so the title reads as a heading
      rather than as the first row of the content. */
   .lc-head::after{ content:''; display:block; width:46px; height:1px; background:var(--lc-line); }
+  /* ---- THE CARD BLOCK ------------------------------------------------------------------
+     The template itself: three glass cards stepping down across a lit ground, each with its
+     mark, its name, a constellation, and one line at the foot saying what it is. Calendar is
+     where it is being tried before it goes to the rest of the Logs.
+
+     The ground is part of the design, not decoration — glass with nothing behind it is just
+     a grey box. It is a gradient in the raiment's own accent rather than a photograph, so it
+     costs nothing, ships no third-party image, and changes with the style like everything
+     else does. */
+  .lcb{ position:relative; border-radius:22px; overflow:hidden; margin-bottom:20px;
+    padding:26px 22px 30px; box-sizing:border-box; }
+  .lcb-field{ position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(ellipse 70% 90% at 18% 8%,  color-mix(in srgb, var(--lcb-accent) 26%, transparent) 0%, transparent 62%),
+      radial-gradient(ellipse 80% 70% at 88% 96%, color-mix(in srgb, var(--lcb-accent) 18%, transparent) 0%, transparent 64%),
+      linear-gradient(160deg, var(--lcb-far) 0%, var(--lcb-near) 100%); }
+  /* One faint sweep across it, the way light sits on the reference rather than a texture you
+     would ever look at directly. */
+  .lcb-field::after{ content:''; position:absolute; inset:0;
+    background:linear-gradient(102deg, transparent 34%, rgba(255,255,255,0.16) 50%, transparent 66%); }
+  .cc-shell{ --lcb-accent:#FFFFFF; --lcb-far:#171A1F; --lcb-near:#0E1013;
+             --lcb-card:rgba(255,255,255,0.10); --lcb-edge:rgba(255,255,255,0.22);
+             --lcb-ink:#F3F4F6; --lcb-sub:rgba(243,244,246,0.74); --lcb-halo:rgba(255,255,255,0.50); }
+  .cc-shell.raiment-x{        --lcb-accent:#8E3030; --lcb-far:#DCD6D2; --lcb-near:#EFEBE3;
+             --lcb-card:rgba(255,255,255,0.34); --lcb-edge:rgba(255,255,255,0.55);
+             --lcb-ink:#2A2523; --lcb-sub:rgba(42,37,35,0.72); --lcb-halo:rgba(255,255,255,0.90); }
+  .cc-shell.raiment-noir{     --lcb-accent:#C9A24A; --lcb-far:#111112; --lcb-near:#070708;
+             --lcb-card:rgba(255,255,255,0.07); --lcb-edge:rgba(236,232,224,0.20);
+             --lcb-ink:#ECE8E0; --lcb-sub:rgba(236,232,224,0.70); --lcb-halo:rgba(201,162,74,0.45); }
+  .cc-shell.raiment-maison{   --lcb-accent:#4E6E96; --lcb-far:#D8DEE6; --lcb-near:#F2ECE0;
+             --lcb-card:rgba(255,255,255,0.36); --lcb-edge:rgba(255,255,255,0.58);
+             --lcb-ink:#22374E; --lcb-sub:rgba(34,55,78,0.72); --lcb-halo:rgba(255,255,255,0.90); }
+  .cc-shell.raiment-everpine{ --lcb-accent:#7E9080; --lcb-far:#DAD9CE; --lcb-near:#EFEBE3;
+             --lcb-card:rgba(255,255,255,0.34); --lcb-edge:rgba(255,255,255,0.55);
+             --lcb-ink:#2B3229; --lcb-sub:rgba(43,50,41,0.72); --lcb-halo:rgba(255,255,255,0.90); }
+
+  .lcb-row{ position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:18px;
+    align-items:start; }
+  /* The stagger. Each card sits a step lower than the one before it, which is the whole
+     shape of the reference — three panels caught mid-fall rather than a row of three. */
+  .lcb-2{ margin-top:34px; }
+  .lcb-3{ margin-top:68px; }
+  .lcb-card{ position:relative; display:flex; flex-direction:column; align-items:center;
+    text-align:center; min-height:348px; padding:20px 18px 22px; box-sizing:border-box;
+    border-radius:14px; background:var(--lcb-card); border:1px solid var(--lcb-edge);
+    backdrop-filter:blur(22px) saturate(1.2); -webkit-backdrop-filter:blur(22px) saturate(1.2);
+    box-shadow:0 22px 50px rgba(0,0,0,0.20); }
+  .lcb-badge{ display:inline-flex; align-items:center; justify-content:center; padding:3px 11px;
+    border-radius:999px; border:1px solid var(--lcb-edge); color:var(--lcb-sub);
+    font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:2.2px; white-space:nowrap; }
+  .lcb-name{ margin-top:13px; font-family:'JetBrains Mono',monospace; font-size:11.5px;
+    letter-spacing:3.2px; text-transform:uppercase; color:var(--lcb-ink); line-height:1.35; }
+  /* The constellation sits in the middle of whatever height the card ends up being, so three
+     cards of different content still read as one set. */
+  .lcb-glyph{ flex:1 1 auto; display:flex; align-items:center; justify-content:center;
+    padding:16px 0; min-height:96px; }
+  .lcb-glyph svg{ width:104px; height:104px; display:block;
+    filter:drop-shadow(0 0 14px var(--lcb-halo)); }
+  .lcb-foot{ font-size:12px; line-height:1.6; color:var(--lcb-sub); max-width:30ch; }
+  @media (max-width:900px){
+    .lcb-row{ grid-template-columns:1fr; gap:14px; }
+    .lcb-2, .lcb-3{ margin-top:0; }
+    .lcb-card{ min-height:0; padding:16px 16px 18px; }
+    .lcb-glyph{ min-height:0; padding:12px 0; }
+    .lcb-glyph svg{ width:78px; height:78px; }
+    .lcb{ padding:18px 14px 20px; border-radius:18px; }
+    .lcb-name{ font-size:10.5px; letter-spacing:2.6px; }
+  }
   /* The base theme runs a 3D ground behind the page and darkens every card over it. The log
      card is not a .cc-glowcard, so it has to take that treatment itself or it comes out as a
      pale wash on a moving background. */
@@ -3629,6 +3697,33 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <span onClick="{{ prevMonth }}" style="cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; color:#cfcfd4; font-size:16px;" style-hover="{ background:'rgba(255,255,255,0.05)' }">‹</span>
             <span style="font-size:17px; font-weight:600; min-width:180px; text-align:center;">{{ monthLabel }}</span>
             <span onClick="{{ nextMonth }}" style="cursor:pointer; width:36px; height:36px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; color:#cfcfd4; font-size:16px;" style-hover="{ background:'rgba(255,255,255,0.05)' }">›</span>
+          </div>
+        </div>
+        <!-- THE CARD BLOCK. Three panels stepping down across a lit ground, each with its
+             mark, its name, a constellation and one line saying what it is. On Calendar
+             first: it is the smallest of the Logs, so the layout can be judged here before
+             it goes anywhere else. -->
+        <div class="lcb">
+          <div class="lcb-field"></div>
+          <div class="lcb-row">
+            <div class="lcb-card lcb-1">
+              <span class="lcb-badge">01 - TD</span>
+              <div class="lcb-name">Today</div>
+              <div class="lcb-glyph"><svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" focusable="false"><path d="M30 17 C32.375 33.625 32.375 33.625 49 36 C32.375 38.375 32.375 38.375 30 55 C27.625 38.375 27.625 38.375 11 36 C27.625 33.625 27.625 33.625 30 17 Z"/><path d="M70 17 C72.375 33.625 72.375 33.625 89 36 C72.375 38.375 72.375 38.375 70 55 C67.625 38.375 67.625 38.375 51 36 C67.625 33.625 67.625 33.625 70 17 Z"/><path d="M50 46 C52.75 65.25 52.75 65.25 72 68 C52.75 70.75 52.75 70.75 50 90 C47.25 70.75 47.25 70.75 28 68 C47.25 65.25 47.25 65.25 50 46 Z"/><path d="M50 42 C51 49 51 49 58 50 C51 51 51 51 50 58 C49 51 49 51 42 50 C49 49 49 49 50 42 Z"/></svg></div>
+              <div class="lcb-foot">{{ cbTodayBody }}</div>
+            </div>
+            <div class="lcb-card lcb-2">
+              <span class="lcb-badge">02 - WK</span>
+              <div class="lcb-name">This Week</div>
+              <div class="lcb-glyph"><svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" focusable="false"><path d="M50 9 C52.625 27.375 52.625 27.375 71 30 C52.625 32.625 52.625 32.625 50 51 C47.375 32.625 47.375 32.625 29 30 C47.375 27.375 47.375 27.375 50 9 Z"/><path d="M31 46 C33.125 60.875 33.125 60.875 48 63 C33.125 65.125 33.125 65.125 31 80 C28.875 65.125 28.875 65.125 14 63 C28.875 60.875 28.875 60.875 31 46 Z"/><path d="M69 46 C71.125 60.875 71.125 60.875 86 63 C71.125 65.125 71.125 65.125 69 80 C66.875 65.125 66.875 65.125 52 63 C66.875 60.875 66.875 60.875 69 46 Z"/><path d="M50 49 C51 56 51 56 58 57 C51 58 51 58 50 65 C49 58 49 58 42 57 C49 56 49 56 50 49 Z"/></svg></div>
+              <div class="lcb-foot">{{ cbWeekBody }}</div>
+            </div>
+            <div class="lcb-card lcb-3">
+              <span class="lcb-badge">03 - NX</span>
+              <div class="lcb-name">Next Up</div>
+              <div class="lcb-glyph"><svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true" focusable="false"><path d="M50 4 C52.75 23.25 52.75 23.25 72 26 C52.75 28.75 52.75 28.75 50 48 C47.25 28.75 47.25 28.75 28 26 C47.25 23.25 47.25 23.25 50 4 Z"/><path d="M27 44 C29.25 59.75 29.25 59.75 45 62 C29.25 64.25 29.25 64.25 27 80 C24.75 64.25 24.75 64.25 9 62 C24.75 59.75 24.75 59.75 27 44 Z"/><path d="M73 44 C75.25 59.75 75.25 59.75 91 62 C75.25 64.25 75.25 64.25 73 80 C70.75 64.25 70.75 64.25 55 62 C70.75 59.75 70.75 59.75 73 44 Z"/><path d="M50 43 C51.125 50.875 51.125 50.875 59 52 C51.125 53.125 51.125 53.125 50 61 C48.875 53.125 48.875 53.125 41 52 C48.875 50.875 48.875 50.875 50 43 Z"/><path d="M50 69 C50.875 75.125 50.875 75.125 57 76 C50.875 76.875 50.875 76.875 50 83 C49.125 76.875 49.125 76.875 43 76 C49.125 75.125 49.125 75.125 50 69 Z"/></svg></div>
+              <div class="lcb-foot">{{ cbNextBody }}</div>
+            </div>
           </div>
         </div>
         <div class="cc-grid-cal" style="display:grid; grid-template-columns:1fr 340px; gap:18px; align-items:start;">
@@ -8882,7 +8977,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-313 · v11.313 log-gate';
+const NOTIF_BUILD_VERSION = '2026.09.13-314 · v11.314 card-block';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -20923,6 +21018,43 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       closeNoteRead:()=>this.setState({noteRead:null}),
 
       // calendar
+      /* THE CARD BLOCK's three lines. Real counts off the same events the grid draws, and the
+         same repeat rule the day panel uses, so a card never claims a day the calendar
+         underneath it disagrees with. Each says the one thing its card is for. */
+      ...(()=>{
+        const iso=(d)=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+        const all=S.events||[];
+        const on=(dstr)=>all.filter(e=>this._eventOccursOn(e,dstr)).sort((a,b)=>String(a.time||'').localeCompare(String(b.time||'')));
+        const now=new Date(), todayStr=iso(now), hhmm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+        const plural=(n,one,many)=>n+' '+(n===1?one:many);
+
+        const today=on(todayStr);
+        const laterToday=today.filter(e=>String(e.time||'') >= hhmm);
+        const cbTodayBody = !today.length ? 'Nothing on today. The grid below is where it goes.'
+          : laterToday.length ? plural(today.length,'thing','things')+' on today \u00b7 next is '+laterToday[0].title+' at '+laterToday[0].time+'.'
+          : plural(today.length,'thing','things')+' on today, all of it behind you.';
+
+        /* The seven days from today, not the calendar week, because "this week" on a page you
+           are looking at now means the next seven days and not the four that are already
+           gone. */
+        let weekN=0, weekWork=0, next=null;
+        for(let i=0;i<7;i++){ const d=new Date(now); d.setDate(d.getDate()+i);
+          on(iso(d)).forEach(e=>{ weekN++; if(e.kind==='work') weekWork++; }); }
+        const cbWeekBody = !weekN ? 'Seven days clear ahead.'
+          : plural(weekN,'thing','things')+' across the next seven days'+(weekWork?' \u00b7 '+weekWork+' work.':'.');
+
+        /* The next event that has not started, looked for a year out rather than only in the
+           month on screen — paging back to March should not make the card say nothing is
+           coming. */
+        for(let i=0;i<366 && !next;i++){ const d=new Date(now); d.setDate(d.getDate()+i); const ds=iso(d);
+          const hit=on(ds).find(e=>ds>todayStr || String(e.time||'') >= hhmm);
+          if(hit) next={ev:hit, date:d, ds}; }
+        const cbNextBody = !next ? 'Nothing scheduled ahead.'
+          : next.ds===todayStr ? next.ev.title+' \u2014 today at '+next.ev.time+'.'
+          : next.ev.title+' \u2014 '+next.date.toLocaleDateString(undefined,{weekday:'long'})+' at '+next.ev.time+'.';
+
+        return { cbTodayBody, cbWeekBody, cbNextBody };
+      })(),
       hasDayEvents:dayEvents.length>0,
       clearDay:()=>this.clearDay(),
       clearDayLabel:'CLEAR ALL',
