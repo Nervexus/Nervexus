@@ -190,6 +190,12 @@
   .cc-shell.raiment-noir .rest-grain{ mix-blend-mode:screen; opacity:0.10; }
   /* One hairline down the middle. On the gates it simply hangs there; while you are sitting
      the filled part of it is the clock, which is the only moving thing on the screen. */
+  /* The way in, on the Mental centre: the same field and the same hairline as the sit itself,
+     boxed. Its own min-height rather than the page's, so the thread has room to hang. */
+  .rest-panel{ position:relative; border-radius:20px; overflow:hidden; min-height:520px; display:flex; }
+  .rest-panel-in{ position:relative; flex:1; display:flex; flex-direction:column; align-items:center;
+    padding:30px 26px 34px; box-sizing:border-box; text-align:center; }
+  @media (max-width:900px){ .rest-panel{ min-height:460px; } .rest-panel-in{ padding:26px 18px 30px; } }
   /* No cap: the thread takes whatever height is left, which is what puts the words in the
      lower third on a tall window as well as on a phone. */
   .rest-thread{ position:relative; width:1px; flex:1 1 auto; min-height:60px;
@@ -3223,15 +3229,25 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
         <!-- MENTAL. One thing on it: five minutes sitting in silence before anything else. -->
         <sc-if value="{{ forgeShowMental }}" hint-placeholder-val="{{ false }}">
-          <div class="cc-glowcard" style="border-radius:20px; padding:0; overflow:hidden;">
-            <div style="padding:15px 26px; border-bottom:1px solid var(--quiet-line); background:var(--quiet-bg); display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:var(--forge-accent);">◆ MENTAL</span>
-              <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--quiet-ink);">5 MINUTES</span>
-            </div>
-            <div style="padding:34px 30px 32px;">
-              <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:var(--head-ink);">Brain Rest</div>
-              <div style="font-size:19px; line-height:1.6; color:var(--body-ink); max-width:46ch; margin-top:16px;">Five minutes sitting in silence. No music, no screen, nothing to finish first — it is there to clear the head before the work starts, not to fill the time.</div>
-              <div onClick="{{ openBrainRest }}" style="display:inline-block; margin-top:26px; padding:15px 28px; border-radius:12px; cursor:pointer; color:var(--sel-ink); background:var(--sel-bg); font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.4px;">BEGIN</div>
+          <!-- The way in wears the same place it opens into: the same pale field, the same
+               hairline, the words low. Tapping BEGIN should feel like stepping further into
+               somewhere you are already standing rather than opening a dialogue. -->
+          <div class="rest-panel">
+            <div class="rest-abyss"></div>
+            <div class="rest-grain"></div>
+            <div class="rest-panel-in">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; width:100%; max-width:520px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--ab-muted);">MENTAL</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--ab-muted);">5 MIN</span>
+              </div>
+              <div class="rest-thread"><i style="height:0%;"></i></div>
+              <div style="width:100%; max-width:520px;">
+                <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:44px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--ab-ink);">Brain Rest</div>
+                <div style="font-size:15px; line-height:1.7; color:var(--ab-muted); max-width:42ch; margin:18px auto 0;">Five minutes sitting in silence. No music, no screen, nothing to finish first — it is there to clear the head before the work starts, not to fill the time.</div>
+                <div style="margin-top:32px; display:flex; justify-content:center;">
+                  <span onClick="{{ openBrainRest }}" style="min-width:220px; padding:15px 30px; border-radius:999px; cursor:pointer; background:var(--ab-fill); color:var(--ab-on-fill); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">BEGIN</span>
+                </div>
+              </div>
             </div>
           </div>
         </sc-if>
@@ -8660,7 +8676,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-308 · v11.308 white-abyss';
+const NOTIF_BUILD_VERSION = '2026.09.13-309 · v11.309 abyss-panel';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13583,6 +13599,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.309', date:'Sep 13, 2026', major:false, notes:[
+      'The Mental centre wears the same place it opens into. It was a ruled card with a header band, which made starting a sit feel like opening a dialogue rather than stepping further into somewhere you were already standing.',
+    ]},
     {version:'v11.308', date:'Sep 13, 2026', major:false, notes:[
       'Brain Rest is its own place now rather than a card over the app \u2014 a pale luminous field with the horizon of something vast just below the frame, one hairline down the middle, and everything said in the lower third.',
       'The hairline is the clock. Its filled part is the five minutes draining, and it is the only thing on the screen that moves.',

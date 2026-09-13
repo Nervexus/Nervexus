@@ -327,6 +327,43 @@ t('the thread is the clock, and is empty before and after', async () => {
   eq(await fill(), '0%', 'the thread is still filled after it finished');
 });
 
+
+t('the way in wears the place it opens into', async () => {
+  /* The Mental centre used to be a ruled card with a header band — a different object from
+     the sit it started. It is the same field, the same hairline and the same pill now, so
+     BEGIN reads as stepping further into somewhere you are already standing. */
+  await boot();
+  const panel = await page.evaluate(() => {
+    const pan = document.querySelector('.rest-panel');
+    if (!pan) return null;
+    const inside = (sel) => !!pan.querySelector(sel);
+    const btn = [...pan.querySelectorAll('span')].find(e => e.textContent.trim() === 'BEGIN');
+    return { abyss: inside('.rest-abyss'), grain: inside('.rest-grain'), thread: inside('.rest-thread'),
+             pill: btn ? Math.round(parseFloat(getComputedStyle(btn).borderRadius)) : 0,
+             serif: /Cormorant/.test(getComputedStyle(pan.querySelector('div[style*="Cormorant"]')).fontFamily),
+             /* and no trace of the card it used to be */
+             band: !!pan.querySelector('[style*="border-bottom"]') };
+  });
+  ok(panel, 'the Mental centre is not the abyss panel');
+  ok(panel.abyss, 'no field'); ok(panel.grain, 'no grain'); ok(panel.thread, 'no thread');
+  ok(panel.serif, 'the title is not the serif the sit uses');
+  ok(panel.pill > 100, 'BEGIN is not a pill (radius ' + panel.pill + ')');
+  ok(!panel.band, 'the old ruled header band is still there');
+});
+
+t('nothing on any of it renders an escape instead of a character', async () => {
+  /* A \\u2014 written into markup rather than into a JS string shows up as those six
+     characters on screen, which is exactly what happened to the panel copy. */
+  for (const st of ['', 'ready', 'devices', 'sitting', 'done']) {
+    await boot();
+    await page.evaluate((x) => window.__nvx.setState({ brStage: x, brLeft: 150, brEndsAt: Date.now() + 150000 }), st);
+    await page.waitForTimeout(600);
+    const text = await page.evaluate(() => document.body.innerText);
+    const bad = text.match(/\\u[0-9a-fA-F]{4}/g);
+    eq(bad ? bad.join(',') : '', '', (st || 'the panel') + ' shows a literal escape');
+  }
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.join(' | '), '', 'page errors');
 });
