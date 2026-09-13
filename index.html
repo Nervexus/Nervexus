@@ -9093,7 +9093,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-320 · v11.320 lit-rim';
+const NOTIF_BUILD_VERSION = '2026.09.13-321 · v11.321 sweep';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9948,7 +9948,8 @@ activities: this._mergeShipLog(s.activities),
   }
 
   applyAvatars(){ if(!this.root) return; const acc=this.state.account||{}, dr=this.state.acctDraft||acc; const mk=(n)=>((n||'U').trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('')||'U').toUpperCase(); this.root.querySelectorAll('[data-avatar]').forEach(el=>{ const src=el.dataset.avatar==='settings'?dr:acc; if(src.avatar){ el.style.backgroundImage='url("'+src.avatar+'")'; el.textContent=''; } else { el.style.backgroundImage='none'; el.textContent=mk(src.name); } }); }
-  componentWillUnmount(){ this._brStop(); this.killLoops(); if(this._orbLoops){ this._orbLoops.forEach(c=>c()); this._orbLoops.clear(); }
+  componentWillUnmount(){ this._brStop(); this.killLoops();
+    if(this._calRaf!=null){ cancelAnimationFrame(this._calRaf); this._calRaf=null; } if(this._orbLoops){ this._orbLoops.forEach(c=>c()); this._orbLoops.clear(); }
     if(this._mlMap){ try{ this._mlMap.remove(); }catch(e){} this._mlMap=null; this._mlContainerEl=null; }
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
@@ -13028,22 +13029,56 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
   /* Hands, then the reading beside them. Everything is read off one Date so the dial and the
      words can never disagree, and the whole thing is a no-op when the card is not on screen. */
-  _tickCalClock(d, o){
-    const host=this.root.querySelector('[data-calclock]');
-    if(!host) return;
-    const parts=(()=>{ try{
+  /* The movement. A quartz watch ticks once a second; an automatic sweeps, because its
+     escapement beats eight times in that second — 28,800 vph, the ordinary rate. So the hands
+     are painted on every frame at that beat rather than once a second, which is a sweep to
+     the eye and the right kind of sweep if you look closely. The minute and hour hands creep
+     with it, as they do on a real movement: a minute hand that jumps on the minute is the
+     giveaway that a dial is a picture of a watch rather than a watch.
+
+     The frame loop, not setState — sixty re-renders a second to move a hand would take the
+     focus out of every field on the page. */
+  CAL_BEAT(){ return 8; }              // beats per second: 28,800 vph
+  _calParts(d, o){
+    try{
       const f=new Intl.DateTimeFormat('en-GB',{hour:'numeric',minute:'numeric',second:'numeric',hour12:false,...o}).formatToParts(d);
       const g=(t)=>+((f.find(x=>x.type===t)||{}).value||0);
       return { h:g('hour')%24, m:g('minute'), s:g('second') };
-    }catch(e){ return { h:d.getHours(), m:d.getMinutes(), s:d.getSeconds() }; } })();
-    const turn=(sel,deg)=>{ const g=host.querySelector(sel); if(g) g.setAttribute('transform','rotate('+deg+' 50 50)'); };
-    turn('[data-hand="h"]', (parts.h%12)*30 + parts.m*0.5);
-    turn('[data-hand="m"]', parts.m*6 + parts.s*0.1);
-    turn('[data-hand="s"]', parts.s*6);
+    }catch(e){ return { h:d.getHours(), m:d.getMinutes(), s:d.getSeconds() }; }
+  }
+  _paintCalHands(host, d, o){
+    const p=this._calParts(d, o), B=this.CAL_BEAT();
+    /* Seconds with the beat in them. Everything above is derived from this one number, so the
+       three hands can never be a fraction of a second apart from each other. */
+    const sec=p.s + Math.floor(d.getMilliseconds()/1000*B)/B;
+    const min=p.m + sec/60;
+    const turn=(sel,deg)=>{ const g=host.querySelector(sel); if(g) g.setAttribute('transform','rotate('+deg.toFixed(3)+' 50 50)'); };
+    turn('[data-hand="s"]', sec*6);
+    turn('[data-hand="m"]', min*6);
+    turn('[data-hand="h"]', ((p.h%12) + min/60)*30);
+  }
+  _calClockLoop(){
+    if(this._calRaf!=null) return;
+    const step=()=>{
+      this._calRaf=null;
+      const host=this.root && this.root.querySelector('[data-calclock]');
+      if(!host) return;                  // the card is gone: the loop stops itself
+      this._paintCalHands(host, new Date(), this._calTz||{});
+      this._calRaf=requestAnimationFrame(step);
+    };
+    this._calRaf=requestAnimationFrame(step);
+  }
+  _tickCalClock(d, o){
+    const host=this.root.querySelector('[data-calclock]');
+    if(!host) return;
+    this._calTz=o;
+    this._paintCalHands(host, d, o);
+    this._calClockLoop();
+    const p=this._calParts(d, o);
     const t=host.querySelector('[data-calclock-time]');
-    if(t){ const h12=parts.h%12||12, ap=parts.h<12?'am':'pm';
+    if(t){ const h12=p.h%12||12, ap=p.h<12?'am':'pm';
       /* On the hour it reads "4pm", like the reference. Any other minute has to say which. */
-      t.textContent = parts.m===0 ? (h12+ap) : (h12+':'+String(parts.m).padStart(2,'0')+ap); }
+      t.textContent = p.m===0 ? (h12+ap) : (h12+':'+String(p.m).padStart(2,'0')+ap); }
     const dt=host.querySelector('[data-calclock-date]');
     if(dt){ try{
       const wd=d.toLocaleDateString('en-GB',{weekday:'short',...o});

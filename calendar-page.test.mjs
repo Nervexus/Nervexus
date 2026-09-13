@@ -451,6 +451,35 @@ t('NOW carries a real dial that reads the same time as the words beside it', asy
   ok(Math.abs(c.hour - (h12 * 30 + m * 0.5)) < 2, 'the hour hand and the reading disagree');
 });
 
+t('the movement sweeps rather than ticking', async () => {
+  /* A quartz watch jumps once a second; an automatic sweeps, because its escapement beats
+     eight times in that second. Sampling faster than a second has to show the hands moving,
+     or the dial is a picture of a watch rather than a watch. */
+  await boot();
+  await page.waitForTimeout(900);
+  const read = () => page.evaluate(() => {
+    const deg = (k) => { const t = document.querySelector('[data-hand="' + k + '"]').getAttribute('transform') || '';
+      const m = t.match(/rotate\(([-\d.]+)/); return m ? +m[1] : null; };
+    return { s: deg('s'), m: deg('m'), h: deg('h') };
+  });
+  const shots = [];
+  for (let i = 0; i < 6; i++) { shots.push(await read()); await page.waitForTimeout(140); }
+  const moves = shots.slice(1).filter((v, i) => v.s !== shots[i].s).length;
+  ok(moves >= 3, 'the second hand moved ' + moves + ' times in 6 samples across ~0.8s — it is ticking, not sweeping');
+  /* The minute hand creeps with it. A minute hand that only moves on the minute is the
+     giveaway, and across a second it should have moved a little and not a whole degree. */
+  const mSpread = Math.max(...shots.map(v => v.m)) - Math.min(...shots.map(v => v.m));
+  ok(mSpread > 0, 'the minute hand is parked between minutes');
+  ok(mSpread < 1, 'the minute hand moved ' + mSpread.toFixed(3) + ' degrees in under a second');
+  /* All three are derived from one reading, so they cannot disagree about the time. The hour
+     hand must sit at a whole hour plus half a degree for each minute the minute hand shows. */
+  const last = shots[shots.length - 1];
+  const minsPast = last.m / 6;
+  const off = (last.h - minsPast * 0.5 + 360) % 30;
+  ok(Math.min(off, 30 - off) < 0.2,
+     'the hour hand is ' + last.h.toFixed(2) + ' degrees with the minute hand at ' + minsPast.toFixed(2) + ' minutes past');
+});
+
 t('the dial ticks without re-rendering the page', async () => {
   /* If this ever moves to state, every input on the page loses focus once a second. */
   await boot();
