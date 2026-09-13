@@ -316,7 +316,7 @@ t('the panels are glass over a lit ground', async () => {
   ok(b, 'there is no lit ground on the calendar');
   ok(b.field, 'the ground is missing');
   ok(/gradient/.test(b.lit), 'the ground is flat, not lit');
-  eq(b.onStage, 4, 'the panels are not the ones on the ground');
+  eq(b.onStage, 3, 'the panels are not the ones on the ground');
   ok(b.glass && b.inside, 'the panels are not glass over it');
 });
 
@@ -354,9 +354,9 @@ t('the three panels wear the card layout', async () => {
     title: (c.querySelector('.lc-title') || {}).textContent || '',
     glass: getComputedStyle(c).backdropFilter,
   })));
-  eq(cards.length, 4, 'the calendar does not carry its four panels');
-  eq(cards.map(c => c.badge.trim()).join(' | '), '01 - MO | 02 - NW | 03 - DY | 04 - HL', 'the marks are wrong or out of order');
-  eq(cards.map(c => c.title.trim()).join(' | '), 'Month | Now | The Day | Highlight', 'the titles are wrong');
+  eq(cards.length, 3, 'the calendar does not carry its three panels');
+  eq(cards.map(c => c.badge.trim()).join(' | '), '01 - MO | 02 - NW | 03 - DY', 'the marks are wrong or out of order');
+  eq(cards.map(c => c.title.trim()).join(' | '), 'Month | Now | The Day', 'the titles are wrong');
   ok(cards.every(c => /blur/.test(c.glass)), 'the panels are not glass');
 });
 
@@ -539,6 +539,40 @@ t('picking Today also takes you to today', async () => {
   const st = await page.evaluate(() => ({ scope: window.__nvx.state.calScope, sel: window.__nvx.state.calSel }));
   eq(st.scope, 'day', 'picking Today did not narrow the scope');
   eq(st.sel, day(0), 'picking Today left the selection on another date');
+});
+
+t('the month gets the width, and the clock and the day share what is under it', async () => {
+  /* The month is the block the page is for, so it is not sharing a row with a sidebar any
+     more. The clock is a fixed measure — a dial and three rows and nothing else — and the day
+     takes whatever is left, which is where the list and the whole add form live. */
+  await boot();
+  const box = await page.evaluate(() => {
+    const r = (el) => { const b = el.getBoundingClientRect(); return { x: Math.round(b.x), w: Math.round(b.width), y: Math.round(b.y) }; };
+    const cards = [...document.querySelectorAll('.lc-card')];
+    return { month: r(cards[0]), now: r(cards[1]), day: r(cards[2]) };
+  });
+  ok(box.month.w > box.now.w + box.day.w - 60, 'the month is not the full width of the block');
+  ok(box.now.y > box.month.y + box.month.w / 4, 'the clock is not under the month');
+  eq(box.now.y, box.day.y, 'the clock and the day are not on the same row');
+  ok(box.day.x > box.now.x + box.now.w - 40, 'the day is not beside the clock');
+  ok(box.day.w > box.now.w, 'the day is not the wider of the two');
+});
+
+t('the Highlight card is gone, and what it tagged is not lost', async () => {
+  /* Its swatches and its clear went with it. A day that was already tagged still shows its
+     colour on the grid, because the grid reads dayColors and always did. */
+  const d = day(3);
+  await boot({ dayColors: { [d]: '#9B1C1C' } });
+  const b = await text();
+  ok(!/Today stays red/.test(b), 'the Highlight card is still on the page');
+  ok(!/^\s*Highlight\s*$/m.test(b), 'the Highlight title is still on the page');
+  const painted = await page.evaluate((ds) => {
+    const n = +ds.slice(-2);
+    const cell = [...document.querySelectorAll('.cal-cell')]
+      .find(c => +((c.querySelector('.cal-cell-num') || {}).textContent || 0) === n);
+    return cell ? getComputedStyle(cell.querySelector('.cal-cell-pill')).backgroundColor : '';
+  }, d);
+  ok(/rgba?\(155, 28, 28/.test(painted), 'a day tagged before still has to show its colour, got ' + painted);
 });
 
 t('nothing threw through any of it', async () => {
