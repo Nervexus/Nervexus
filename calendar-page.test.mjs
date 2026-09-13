@@ -310,7 +310,7 @@ t('the panels are glass over a lit ground', async () => {
   ok(b, 'there is no lit ground on the calendar');
   ok(b.field, 'the ground is missing');
   ok(/gradient/.test(b.lit), 'the ground is flat, not lit');
-  eq(b.onStage, 3, 'the three panels are not the ones on the ground');
+  eq(b.onStage, 4, 'the panels are not the ones on the ground');
   ok(b.glass && b.inside, 'the panels are not glass over it');
 });
 
@@ -348,9 +348,9 @@ t('the three panels wear the card layout', async () => {
     title: (c.querySelector('.lc-title') || {}).textContent || '',
     glass: getComputedStyle(c).backdropFilter,
   })));
-  eq(cards.length, 3, 'the calendar does not carry three cards');
-  eq(cards.map(c => c.badge.trim()).join(' | '), '01 - MO | 02 - DY | 03 - HL', 'the marks are wrong or out of order');
-  eq(cards.map(c => c.title.trim()).join(' | '), 'Month | The Day | Highlight', 'the titles are wrong');
+  eq(cards.length, 4, 'the calendar does not carry its four panels');
+  eq(cards.map(c => c.badge.trim()).join(' | '), '01 - MO | 02 - NW | 03 - DY | 04 - HL', 'the marks are wrong or out of order');
+  eq(cards.map(c => c.title.trim()).join(' | '), 'Month | Now | The Day | Highlight', 'the titles are wrong');
   ok(cards.every(c => /blur/.test(c.glass)), 'the panels are not glass');
 });
 
@@ -416,6 +416,123 @@ t('the card steps down on a phone', async () => {
   await page.waitForTimeout(400);
   ok(phone.pad < deskPad, 'the card padding is the same ' + phone.pad + 'px on a phone as on a desk');
   ok(phone.title <= 11, 'the card title is still ' + phone.title + 'px on a phone');
+});
+
+t('NOW carries a real dial that reads the same time as the words beside it', async () => {
+  /* The hands are moved from the app's own one-second tick rather than from state, because a
+     setState every second would re-render the whole page to move a second hand. Everything is
+     read off one Date, so the dial and the reading can never disagree. */
+  await boot();
+  await page.waitForTimeout(1200);
+  const c = await page.evaluate(() => {
+    const h = document.querySelector('[data-calclock]');
+    if (!h) return null;
+    const deg = (k) => { const t = h.querySelector('[data-hand="' + k + '"]').getAttribute('transform') || '';
+      const m = t.match(/rotate\(([-\d.]+)/); return m ? +m[1] : null; };
+    return { time: h.querySelector('[data-calclock-time]').textContent.trim(),
+             date: h.querySelector('[data-calclock-date]').textContent.trim(),
+             hour: deg('h'), min: deg('m'), sec: deg('s') };
+  });
+  ok(c, 'there is no clock on the calendar');
+  ok(/^\d{1,2}(:\d{2})?(am|pm)$/.test(c.time), 'the clock reads "' + c.time + '"');
+  ok(/^\w{3}, \d{1,2}(st|nd|rd|th) \w+$/.test(c.date), 'the date reads "' + c.date + '"');
+  for (const k of ['hour', 'min', 'sec'])
+    ok(c[k] !== null && c[k] >= 0 && c[k] < 360, 'the ' + k + ' hand is at ' + c[k] + ' degrees');
+  /* The hands have to agree with the reading. The minute hand is 6° per minute. */
+  const m = /:(\d{2})/.test(c.time) ? +c.time.match(/:(\d{2})/)[1] : 0;
+  ok(Math.abs(c.min - (m * 6)) < 7, 'the minute hand says ' + c.min + '° and the clock says :' + m);
+  const h12 = +c.time.match(/^(\d{1,2})/)[1] % 12;
+  ok(Math.abs(c.hour - (h12 * 30 + m * 0.5)) < 2, 'the hour hand and the reading disagree');
+});
+
+t('the dial ticks without re-rendering the page', async () => {
+  /* If this ever moves to state, every input on the page loses focus once a second. */
+  await boot();
+  await page.click('input[placeholder="Event title"]');
+  await page.type('input[placeholder="Event title"]', 'Typing through a tick');
+  const before = await page.evaluate(() => document.querySelector('[data-hand="s"]').getAttribute('transform'));
+  await page.waitForTimeout(2200);
+  const after = await page.evaluate(() => document.querySelector('[data-hand="s"]').getAttribute('transform'));
+  ok(before !== after, 'the second hand did not move in two seconds');
+  const held = await page.evaluate(() => ({
+    focused: document.activeElement && document.activeElement.placeholder === 'Event title',
+    value: document.querySelector('input[placeholder="Event title"]').value }));
+  eq(held.value, 'Typing through a tick', 'the tick wiped what was being typed');
+  ok(held.focused, 'the tick stole focus from the field, so it is re-rendering the page');
+});
+
+t('the scope says how much of the calendar the list below is', async () => {
+  const d0 = day(0), d2 = day(2), d9 = day(9);
+  const seed = { calSel: d0, calScope: 'day', events: [
+    { id: 'a', title: 'Dinner with Sarah', date: d0, time: '19:30', repeat: [], kind: 'general' },
+    { id: 'b', title: 'Shift at the yard', date: d0, time: '09:00', endTime: '17:00', repeat: [], kind: 'work' },
+    { id: 'c', title: 'Dentist', date: d2, time: '11:15', repeat: [], kind: 'general' },
+    { id: 'e', title: 'Flight', date: d9, time: '06:40', repeat: [], kind: 'general' },
+  ]};
+  await boot(seed);
+  const rows = await page.evaluate(() => [...document.querySelectorAll('.cal-scope-row')]
+    .map(r => ({ text: r.textContent.replace(/\s+/g, ' ').trim(), on: r.classList.contains('cal-scope-on') })));
+  eq(rows.length, 3, 'the scope is not three rows');
+  /* Today 2, the next seven days 3, the month ahead 4 — and each count is what picking it
+     actually produces, which is the only reason a count is worth showing. */
+  ok(/Today 2/.test(rows[0].text), 'Today miscounts: ' + rows[0].text);
+  ok(/Upcoming 3/.test(rows[1].text), 'Upcoming miscounts: ' + rows[1].text);
+  ok(/All 4/.test(rows[2].text), 'All miscounts: ' + rows[2].text);
+  eq(rows.filter(r => r.on).length, 1, 'more than one scope is showing as chosen');
+  ok(rows[0].on, 'the day scope is not the one chosen to start with');
+
+  const listed = () => page.evaluate(() => window.__nvx.__render ? 0 :
+    [...document.querySelectorAll('span')].filter(e => /^(Dinner with Sarah|Shift at the yard|Dentist|Flight)$/.test(e.textContent.trim())).length);
+  eq(await listed(), 2, 'the day scope is not listing the day');
+
+  await page.evaluate(() => [...document.querySelectorAll('.cal-scope-row')].find(r => /Upcoming/.test(r.textContent)).click());
+  await page.waitForTimeout(800);
+  eq(await listed(), 3, 'picking Upcoming did not widen the list');
+  ok((await text()).includes('The next seven days'), 'the panel did not say what it is showing now');
+
+  await page.evaluate(() => [...document.querySelectorAll('.cal-scope-row')].find(r => /All/.test(r.textContent)).click());
+  await page.waitForTimeout(800);
+  eq(await listed(), 4, 'picking All did not widen the list');
+  ok((await text()).includes('The month ahead'), 'the panel did not say what it is showing now');
+});
+
+t('a wider list says which day each row belongs to', async () => {
+  const d0 = day(0), d3 = day(3);
+  await boot({ calSel: d0, calScope: 'upcoming', events: [
+    { id: 'a', title: 'Dinner with Sarah', date: d0, time: '19:30', repeat: [], kind: 'general' },
+    { id: 'c', title: 'Dentist', date: d3, time: '11:15', repeat: [], kind: 'general' },
+  ]});
+  const b = await text();
+  /* Two rows across two days, so the date is the only thing telling them apart. */
+  const stamps = await page.evaluate(() => [...document.querySelectorAll('span,div')]
+    .filter(e => e.children.length === 0 && /^\w{3}, \w{3} \d{1,2}$/.test(e.textContent.trim())).length);
+  ok(stamps >= 2, 'the rows in a seven-day list carry no date (' + stamps + ')');
+  await boot({ calSel: d0, calScope: 'day', events: [
+    { id: 'a', title: 'Dinner with Sarah', date: d0, time: '19:30', repeat: [], kind: 'general' } ]});
+  const one = await page.evaluate(() => [...document.querySelectorAll('span,div')]
+    .filter(e => e.children.length === 0 && /^\w{3}, \w{3} \d{1,2}$/.test(e.textContent.trim())).length);
+  eq(one, 0, 'a one-day list is stamping every row with the day it obviously is');
+});
+
+t('Clear all is not offered for a list that is not one day', async () => {
+  /* It removes every event on the selected day. Offered above a seven-day list it reads as
+     "clear these", which is not what it does. */
+  const d0 = day(0);
+  const ev = [{ id: 'a', title: 'Dinner with Sarah', date: d0, time: '19:30', repeat: [], kind: 'general' }];
+  await boot({ calSel: d0, calScope: 'day', events: ev });
+  ok(/CLEAR ALL|Clear all/i.test(await text()), 'Clear all is missing on a single day');
+  await boot({ calSel: d0, calScope: 'all', events: ev });
+  ok(!/CLEAR ALL/i.test(await text()), 'Clear all is still offered over a month-wide list');
+});
+
+t('picking Today also takes you to today', async () => {
+  /* A scope called Today that leaves you looking at a day in March is lying about what it did. */
+  await boot({ calSel: day(9), calScope: 'all' });
+  await page.evaluate(() => [...document.querySelectorAll('.cal-scope-row')].find(r => /Today/.test(r.textContent)).click());
+  await page.waitForTimeout(700);
+  const st = await page.evaluate(() => ({ scope: window.__nvx.state.calScope, sel: window.__nvx.state.calSel }));
+  eq(st.scope, 'day', 'picking Today did not narrow the scope');
+  eq(st.sel, day(0), 'picking Today left the selection on another date');
 });
 
 t('nothing threw through any of it', async () => {

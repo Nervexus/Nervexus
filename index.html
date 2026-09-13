@@ -304,8 +304,12 @@
                 than on flat paper. The pane itself stays the card the page already defines:
                 a color-mix here would leave the panel fully transparent anywhere the function
                 is unsupported, since an invalid value unsets the whole custom property. */
-             --lc-edge:rgba(255,255,255,0.52); }
-  .cc-shell.raiment-noir, .cc-shell.raiment-base{ --lc-edge:rgba(236,232,224,0.22); }
+             --lc-edge:rgba(255,255,255,0.52);
+             /* The pane a raised thing sits on — brighter than the card, so a chosen row and
+                the clock tile lift off it rather than being outlined on it. */
+             --lc-raise:rgba(255,255,255,0.92); }
+  .cc-shell.raiment-noir, .cc-shell.raiment-base{ --lc-edge:rgba(236,232,224,0.22);
+             --lc-raise:rgba(255,255,255,0.075); }
 
   .lc-card{ position:relative; border-radius:16px; padding:20px 18px 18px; box-sizing:border-box;
     background:var(--lc-bg); border:1px solid var(--lc-edge, var(--lc-line));
@@ -352,6 +356,48 @@
              --lcb-lit:rgba(126,144,128,0.26); --lcb-dim:rgba(126,144,128,0.18); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
 
+  /* ---- NOW: the clock, and the scope of the list under it ------------------------------
+     A soft tile carrying a real dial, and three rows saying how much of the calendar the
+     panel below is showing. The chosen row lifts off the card rather than being outlined,
+     which is the whole idea of the reference: things are raised, not ruled. */
+  .cal-clock{ display:flex; align-items:center; gap:16px; padding:14px 14px;
+    border-radius:14px; background:var(--lc-raise); border:1px solid var(--lc-line);
+    box-shadow:0 8px 22px var(--lc-glow); margin-bottom:14px; }
+  .cal-dial{ width:74px; height:74px; flex:0 0 74px; display:block; }
+  .cal-dial-face{ fill:none; stroke:var(--lc-line); stroke-width:1; }
+  .cal-dial-marks{ stroke:var(--lc-accent); stroke-width:1.6; opacity:0.32; stroke-linecap:round; }
+  .cal-dial-ticks{ stroke:var(--lc-accent); stroke-width:2.2; opacity:0.6; stroke-linecap:round; }
+  .cal-hand{ stroke:currentColor; fill:none; stroke-linecap:round; }
+  .cal-hand-h{ stroke-width:4; }
+  .cal-hand-m{ stroke-width:2.6; }
+  .cal-hand-s{ stroke-width:1; stroke:var(--lc-accent); opacity:0.75; }
+  .cal-pin{ fill:currentColor; }
+  .cal-clock-read{ min-width:0; }
+  .cal-clock-time{ font-family:'Cormorant Garamond',Georgia,serif; font-size:28px; font-weight:300;
+    line-height:1.1; }
+  .cal-clock-date{ font-size:12px; opacity:0.66; margin-top:3px; }
+  .cal-scope{ display:flex; flex-direction:column; gap:4px; }
+  .cal-scope-row{ display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:12px;
+    cursor:pointer; border:1px solid transparent; background:transparent; }
+  .cal-scope-row:hover{ background:var(--lc-raise); }
+  /* Raised, not ruled. */
+  .cal-scope-on{ background:var(--lc-raise); border-color:var(--lc-edge, var(--lc-line));
+    box-shadow:0 8px 20px var(--lc-glow); }
+  .cal-scope-mark{ font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1.4px;
+    opacity:0.5; flex:0 0 auto; }
+  .cal-scope-label{ flex:1; min-width:0; font-size:13.5px; }
+  .cal-scope-on .cal-scope-label{ font-weight:600; }
+  .cal-scope-n{ font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:2px 8px;
+    border-radius:999px; background:var(--lc-bg); border:1px solid var(--lc-line); opacity:0.8; }
+  .cal-scope-chev{ font-family:'JetBrains Mono',monospace; font-size:13px; width:10px;
+    color:var(--lc-accent); flex:0 0 10px; }
+  @media (max-width:620px){
+    .cal-clock{ gap:13px; padding:12px; }
+    .cal-dial{ width:60px; height:60px; flex:0 0 60px; }
+    .cal-clock-time{ font-size:23px; }
+    .cal-scope-row{ padding:9px 10px; gap:9px; }
+    .cal-scope-label{ font-size:12.5px; }
+  }
   /* The base theme runs a 3D ground behind the page and darkens every card over it. The log
      card is not a .cc-glowcard, so it has to take that treatment itself or it comes out as a
      pale wash on a moving background. */
@@ -3694,15 +3740,54 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
           </div>
           <div style="display:flex; flex-direction:column; gap:16px;">
+            <!-- NOW. The clock and the scope, in that order: what time it is, then how much
+                 of the calendar the list underneath is showing. Picking a scope changes that
+                 list rather than opening another one. -->
             <div class="lc-card">
               <div class="lc-head">
-                <span class="lc-badge">02 - DY</span>
+                <span class="lc-badge">02 - NW</span>
+                <div class="lc-title">Now</div>
+              </div>
+              <div class="cal-clock" data-calclock>
+                <svg class="cal-dial" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+                  <circle cx="50" cy="50" r="45" class="cal-dial-face"/>
+                  <g class="cal-dial-ticks">
+                    <path d="M50 8 V15 M50 85 V92 M8 50 H15 M85 50 H92"/>
+                  </g>
+                  <g class="cal-dial-marks">
+                    <path d="M50 9 V13 M71 14.6 V17.1 M85.4 29 V31.5 M91 50 H87 M85.4 71 V68.5 M71 85.4 V82.9 M50 91 V87 M29 85.4 V82.9 M14.6 71 V68.5 M9 50 H13 M14.6 29 V31.5 M29 14.6 V17.1" transform="rotate(0 50 50)"/>
+                  </g>
+                  <g data-hand="h"><path d="M50 52 V28" class="cal-hand cal-hand-h"/></g>
+                  <g data-hand="m"><path d="M50 54 V18" class="cal-hand cal-hand-m"/></g>
+                  <g data-hand="s"><path d="M50 58 V16" class="cal-hand cal-hand-s"/></g>
+                  <circle cx="50" cy="50" r="3.4" class="cal-pin"/>
+                </svg>
+                <div class="cal-clock-read">
+                  <div class="cal-clock-time" data-calclock-time>&nbsp;</div>
+                  <div class="cal-clock-date" data-calclock-date>&nbsp;</div>
+                </div>
+              </div>
+              <div class="cal-scope">
+                <sc-for list="{{ calScopeRows }}" as="sc" hint-placeholder-count="3">
+                  <div onClick="{{ sc.pick }}" class="{{ sc.cls }}">
+                    <span class="cal-scope-mark">{{ sc.mark }}</span>
+                    <span class="cal-scope-label">{{ sc.label }}</span>
+                    <span class="cal-scope-n">{{ sc.n }}</span>
+                    <span class="cal-scope-chev">{{ sc.chev }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">03 - DY</span>
                 <div class="lc-title">The Day</div>
               </div>
               <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:12px;">
-                <span style="font-size:13px; font-weight:600;">{{ selDayLabel }}</span>
+                <sc-if value="{{ calIsDay }}" hint-placeholder-val="{{ true }}"><span style="font-size:13px; font-weight:600;">{{ selDayLabel }}</span></sc-if>
+                <sc-if value="{{ calNotDay }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px; font-weight:600;">{{ calScopeTitle }}</span></sc-if>
                 <span style="display:flex; align-items:baseline; gap:10px; white-space:nowrap;">
-                  <sc-if value="{{ hasDayEvents }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearDay }}" title="Remove every event on this day" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#ff8a8a; cursor:pointer; border:1px solid rgba(255,138,138,0.3); border-radius:6px; padding:3px 7px;" style-hover="{ background:'rgba(255,138,138,0.12)' }">{{ clearDayLabel }}</span></sc-if>
+                  <sc-if value="{{ hasClearDay }}" hint-placeholder-val="{{ false }}"><span onClick="{{ clearDay }}" title="Remove every event on this day" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#ff8a8a; cursor:pointer; border:1px solid rgba(255,138,138,0.3); border-radius:6px; padding:3px 7px;" style-hover="{ background:'rgba(255,138,138,0.12)' }">{{ clearDayLabel }}</span></sc-if>
                   <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#7c7c84;">{{ dayEventCount }} EVENTS</span>
                 </span>
               </div>
@@ -3722,6 +3807,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       <sc-if value="{{ e.isWork }}" hint-placeholder-val="{{ false }}"><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.8px; color:#e8b45a; border:1px solid rgba(232,180,90,0.34); border-radius:5px; padding:2px 5px; flex:none;">WORK</span></sc-if>
                       <div style="font-size:13px; color:#dbdbe0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ e.title }}</div>
                     </div>
+                    <sc-if value="{{ e.showDay }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--lc-accent); margin-top:2px; letter-spacing:.6px;">{{ e.dayLabel }}</div></sc-if>
                     <sc-if value="{{ e.detail }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84; margin-top:2px;">{{ e.detail }}</div></sc-if>
                     <sc-if value="{{ e.repeatLabel }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#7c7c84; margin-top:2px;">↻ {{ e.repeatLabel }}</div></sc-if>
                   </div>
@@ -3799,7 +3885,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
             <div class="lc-card">
               <div class="lc-head">
-                <span class="lc-badge">03 - HL</span>
+                <span class="lc-badge">04 - HL</span>
                 <div class="lc-title">Highlight</div>
               </div>
               <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
@@ -8925,7 +9011,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.13-315 · v11.315 lit-panels';
+const NOTIF_BUILD_VERSION = '2026.09.13-316 · v11.316 now-scope';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9024,7 +9110,7 @@ activities: this._mergeShipLog(s.activities),
          the sit itself, then done. brEndsAt is the wall clock rather than a countdown, so a
          backgrounded tab or a dropped frame cannot shorten five minutes. */
       brStage:'', brEndsAt:0, brLeft:300,
-      logGate:null,
+      logGate:null, calScope:'day',
       levelUp:null, lcOpen:{}, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
@@ -12853,7 +12939,39 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   hexA(hex,a){ const m=hex.replace('#',''); const r=parseInt(m.substring(0,2),16),g=parseInt(m.substring(2,4),16),b=parseInt(m.substring(4,6),16); return 'rgba('+r+','+g+','+b+','+a+')'; }
   ago(ts){ const d=(Date.now()-ts)/86400000; if(d<0.04) return 'now'; if(d<1) return Math.max(1,Math.floor(d*24))+'h ago'; if(d<2) return 'yesterday'; return Math.floor(d)+'d ago'; }
 
-  startClock(){ const upd=()=>{ if(!this.root) return; const tz=(this.state.account&&this.state.account.timezone)||'auto'; const o=tz==='auto'?{}:{timeZone:tz}; const d=new Date(); const cl=this.root.querySelector('[data-clock]'); if(cl){ try{ cl.textContent=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit',...o}); }catch(e){ cl.textContent=d.toLocaleTimeString('en-GB'); } } const de=this.root.querySelector('[data-date]'); if(de){ try{ const wd=d.toLocaleDateString('en-GB',{weekday:'short',...o}).toUpperCase(); const dm=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',...o}).toUpperCase(); de.textContent=wd+' · '+dm; }catch(e){} } }; upd(); this._clk=setInterval(upd,1000); }
+  startClock(){ const upd=()=>{ if(!this.root) return; const tz=(this.state.account&&this.state.account.timezone)||'auto'; const o=tz==='auto'?{}:{timeZone:tz}; const d=new Date(); const cl=this.root.querySelector('[data-clock]'); if(cl){ try{ cl.textContent=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit',...o}); }catch(e){ cl.textContent=d.toLocaleTimeString('en-GB'); } } const de=this.root.querySelector('[data-date]'); if(de){ try{ const wd=d.toLocaleDateString('en-GB',{weekday:'short',...o}).toUpperCase(); const dm=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',...o}).toUpperCase(); de.textContent=wd+' · '+dm; }catch(e){} }
+      /* The calendar's dial. Driven from here rather than from state: a setState every
+         second would re-render the whole page to move a second hand. */
+      this._tickCalClock(d, o); }; upd(); this._clk=setInterval(upd,1000); }
+
+  /* Hands, then the reading beside them. Everything is read off one Date so the dial and the
+     words can never disagree, and the whole thing is a no-op when the card is not on screen. */
+  _tickCalClock(d, o){
+    const host=this.root.querySelector('[data-calclock]');
+    if(!host) return;
+    const parts=(()=>{ try{
+      const f=new Intl.DateTimeFormat('en-GB',{hour:'numeric',minute:'numeric',second:'numeric',hour12:false,...o}).formatToParts(d);
+      const g=(t)=>+((f.find(x=>x.type===t)||{}).value||0);
+      return { h:g('hour')%24, m:g('minute'), s:g('second') };
+    }catch(e){ return { h:d.getHours(), m:d.getMinutes(), s:d.getSeconds() }; } })();
+    const turn=(sel,deg)=>{ const g=host.querySelector(sel); if(g) g.setAttribute('transform','rotate('+deg+' 50 50)'); };
+    turn('[data-hand="h"]', (parts.h%12)*30 + parts.m*0.5);
+    turn('[data-hand="m"]', parts.m*6 + parts.s*0.1);
+    turn('[data-hand="s"]', parts.s*6);
+    const t=host.querySelector('[data-calclock-time]');
+    if(t){ const h12=parts.h%12||12, ap=parts.h<12?'am':'pm';
+      /* On the hour it reads "4pm", like the reference. Any other minute has to say which. */
+      t.textContent = parts.m===0 ? (h12+ap) : (h12+':'+String(parts.m).padStart(2,'0')+ap); }
+    const dt=host.querySelector('[data-calclock-date]');
+    if(dt){ try{
+      const wd=d.toLocaleDateString('en-GB',{weekday:'short',...o});
+      const dayN=+d.toLocaleDateString('en-GB',{day:'numeric',...o});
+      const mo=d.toLocaleDateString('en-GB',{month:'long',...o});
+      dt.textContent=wd+', '+dayN+this._ordinal(dayN)+' '+mo;
+    }catch(e){} }
+  }
+  _ordinal(n){ const v=n%100; if(v>=11&&v<=13) return 'th';
+    return ({1:'st',2:'nd',3:'rd'})[n%10]||'th'; }
 
   dataSig(){ const s=this.state; const H=s.health||{}; return [s.checklist,s.workouts,s.income,s.expenses,s.savings,s.activities,s.events].map(a=>a.length).join(',')+'|'+s.checklist.filter(c=>c.done).length+'|h'+(H.meals?H.meals.length:0)+','+H.water+','+(H.weights?H.weights.length:0)+','+(H.meals?H.meals.reduce((a,m)=>a+(+m.kcal||0),0):0)+'|m'+(s.missions?s.missions.length:0)+','+(s.missionHistory?s.missionHistory.length:0)+','+(s.missionXP||0)+',mv'+((s.move&&s.move.last)||'')+','+((s.move&&s.move.streak)||0)+','+(s.missions?s.missions.filter(m=>m.lastCompleted===this._todayStr()).length:0)+'|hk'+(H.sleepLog?H.sleepLog.length:0)+','+(H.hydrationLog?H.hydrationLog.length:0)+','+(H.bodyLog?H.bodyLog.length:0)+','+(H.photos?H.photos.length:0)+','+(H.statsPrefs?H.statsPrefs.join(''):'')+','+(H.goals?Object.keys(H.goals).length:0)+'|lm'+((s.learning&&s.learning.mathsHistory)?s.learning.mathsHistory.length:0); }
   sync(){
@@ -18442,7 +18560,36 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const calCells=[]; for(let i=0;i<startDow;i++) calCells.push({d:'',dots:[],bg:'transparent',border:'transparent',numColor:'transparent',cursor:'default',select:()=>{}});
     for(let d=1; d<=daysIn; d++){ const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; const evs=S.events.filter(e=>this._eventOccursOn(e,ds)); const sel=ds===S.calSel; const today=ds===todayStr; const hl=(S.dayColors||{})[ds]; const isU=S.prefs.theme==='Ultra'; const isNoir=isU && S.prefs.ultraStyle==='Noir'; const hlInk=hl?this._hlInk(hl):null; const bg=today?(isNoir?'rgba(196,189,176,0.18)':isU?'rgba(91,26,26,0.14)':'rgba(255,255,255,0.16)'):(hl?this.hexA(hl,0.26):(isNoir?'rgba(150,143,130,0.05)':isU?'rgba(91,26,26,0.03)':'rgba(255,255,255,0.02)')); const border=today?(isNoir?'#C4BDB0':isU?'#5B1A1A':'#FFFFFF'):(hlInk?this.hexA(hlInk,0.7):(isNoir?'rgba(150,143,130,0.18)':isU?'rgba(91,26,26,0.1)':'rgba(255,255,255,0.06)')); const numColor=today?(isNoir?'#C4BDB0':'#ff5563'):(hlInk?hlInk:(isNoir?'#968F82':isU?'#52525b':'#b8b8c0')); const ring=sel?(isNoir?'0 0 0 3px #FFFFFF inset':(isU?'0 0 0 3px #5B1A1A inset':'0 0 0 2px rgba(255,255,255,0.6) inset')):'none'; calCells.push({ d:String(d), dots:evs.slice(0,3).map(e=>({c:this._evColor(e)})), bg, border, numColor, ring, cursor:'pointer', select:()=>this.setState({calSel:ds}) }); }
     const _hlDefs=this.DAY_COLORS(); const _curHl=(S.dayColors||{})[S.calSel]; const hlColors=_hlDefs.map(c=>({ name:c[0], swatch:c[1], ring:_curHl===c[1]?'#ffffff':'rgba(255,255,255,0.15)', glow:_curHl===c[1]?'0 0 10px '+this.hexA(c[1],0.7):'none', pick:()=>{ const day=S.calSel, color=c[1]; this.mut(st=>{ const dc={...(st.dayColors||{})}; dc[day]=color; return {dayColors:dc}; }); if(this._sbOn()) window.SB.upsert('day_colors',{user_id:this.state.authUserId,day,color},'user_id,day'); } })); const clearHighlight=()=>{ const day=S.calSel; this.mut(st=>{ const dc={...(st.dayColors||{})}; delete dc[day]; return {dayColors:dc}; }); if(this._sbOn()) window.sb.from('day_colors').delete().eq('user_id',this.state.authUserId).eq('day',day).then(()=>{}); };
-    const dayEvents=S.events.filter(e=>this._eventOccursOn(e,S.calSel)).sort((a,b)=>a.time.localeCompare(b.time)).map(e=>{ const idx=S.events.indexOf(e); const rl=this._repeatLabel(e.repeat); /* The detail line: a work event reads "09:00-17:00 with Dan", a general task
+    /* THE SCOPE. The list under the day panel is one of three things: the day you have
+       selected, the next seven days, or the month ahead — chosen on the NOW card above it.
+       Everything below reads the same events through the same repeat rule either way, so a
+       wider scope is genuinely more of the same list rather than a second source of truth. */
+    const calScope=S.calScope||'day';
+    const _isoD=(d)=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const _nowD=new Date(), _todayD=_isoD(_nowD);
+    const _spanPairs=(days)=>{ const out=[];
+      for(let i=0;i<days;i++){ const d=new Date(_nowD); d.setDate(d.getDate()+i); const ds=_isoD(d);
+        S.events.forEach(e=>{ if(this._eventOccursOn(e,ds)) out.push([e,ds]); }); }
+      return out; };
+    const _scopePairs = calScope==='day'
+      ? S.events.filter(e=>this._eventOccursOn(e,S.calSel)).map(e=>[e,S.calSel])
+      : _spanPairs(calScope==='upcoming'?7:31);
+    /* The counts beside each row on the NOW card. Worked out once here rather than in the
+       markup, so the number a row shows is the number picking it would produce. */
+    const _scopeCounts={ day:S.events.filter(e=>this._eventOccursOn(e,_todayD)).length,
+                         upcoming:_spanPairs(7).length, all:_spanPairs(31).length };
+    const _scopeDefs=[['day','Today','TD'],['upcoming','Upcoming','UP'],['all','All','AL']];
+    const calScopeRows=_scopeDefs.map(([k,label,mark])=>({ key:k, label, mark,
+      n:String(_scopeCounts[k]), on:calScope===k, chev:calScope===k?'\u203a':'',
+      /* The whole class, not a flag: an expression inside an interpolated class attribute is
+         not evaluated, so a ternary there renders as nothing at all. */
+      cls:'cal-scope-row'+(calScope===k?' cal-scope-on':''),
+      /* Picking Today also moves the selection there — a scope called Today that leaves you
+         looking at a day in March is lying about what it did. */
+      pick:()=>this.setState(calScope===k?{}:(k==='day'?{calScope:k, calSel:_todayD}:{calScope:k})) }));
+    const calIsDay=calScope==='day';
+    const calScopeTitle=calIsDay?'':(calScope==='upcoming'?'The next seven days':'The month ahead');
+    const dayEvents=_scopePairs.sort((a,b)=>(a[1]+(a[0].time||'')).localeCompare(b[1]+(b[0].time||''))).map(pair=>{ const e=pair[0], _ds=pair[1]; const idx=S.events.indexOf(e); const rl=this._repeatLabel(e.repeat); /* The detail line: a work event reads "09:00-17:00 with Dan", a general task
          "09:00 - about 45 min". Empty when neither was filled in, so an event created
          before these fields existed simply shows its time as it always did. */
       const _isWork=(e.kind||'general')==='work';
@@ -18453,6 +18600,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         ? (e.attendees?('with '+e.attendees):'')
         : (e.estMins?('about '+e.estMins+' min'):'');
       return {title:e.title,time:e.time,endTime:e.endTime||'',kindLabel:_isWork?'WORK':'',detail:_det,isWork:_isWork,repeatLabel:rl,
+        /* Which day a row belongs to only needs saying when the list is not one day. */
+        showDay:!calIsDay, dayLabel:calIsDay?'':new Date(_ds+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}),
         /* The dot in front of a row is the colour that day's cell shows for it. A work event
            takes the raiment and cannot be changed; a general one steps through the six on a
            tap, which is the whole of the picker for an event that already exists. */
@@ -20966,6 +21115,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       closeNoteRead:()=>this.setState({noteRead:null}),
 
       // calendar
+      calScopeRows, calIsDay, calScopeTitle, calNotDay:!calIsDay,
+      hasClearDay:calIsDay && dayEvents.length>0,
       hasDayEvents:dayEvents.length>0,
       clearDay:()=>this.clearDay(),
       clearDayLabel:'CLEAR ALL',
