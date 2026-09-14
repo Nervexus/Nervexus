@@ -172,7 +172,7 @@ t('the Forge opens on its home', async () => {
   const body = await text();
   ok(/HOME/.test(body), 'a HOME tab should sit alongside TRAINING, MENTAL and HEALTH');
   /* The Home carries the working half of Fitness HQ now, so it is no longer an empty page. */
-  for (const panel of ['Log Training', 'Muscle Training Split', 'MOVE', 'Strength Chart'])
+  for (const panel of ['LOG TRAINING', 'MUSCLE TRAINING SPLIT', 'MOVE', 'STRENGTH CHART'])
     ok(body.includes(panel), 'the Home is missing ' + panel);
   ok(!/Nothing here yet/.test(body), 'the Home is still showing the empty state');
 });
@@ -283,7 +283,7 @@ t('the unit score header is gone', async () => {
 /* ---- the three cleared centres ---- */
 
 /* The Home's panels belong to the Home. Nothing leaks into the centres beside it. */
-const GHOSTS = ['Muscle Training Split', 'Anatomy', 'Log Training', 'Strength Chart',
+const GHOSTS = ['MUSCLE TRAINING SPLIT', 'ANATOMY', 'LOG TRAINING', 'STRENGTH CHART',
                 'FROM YOUR LOGS', 'PROGRESS', 'WEAKEST LINKS', 'THE TOOLS',
                 'Hand Training', 'RECORD ASSESSMENT'];
 
@@ -341,7 +341,7 @@ t('a section with nothing in it still says so', async () => {
   const body = await text();
   ok(/Nothing here yet/.test(body), 'a section with no pool did not show the empty state');
   ok(!/\bADD\b/.test(body), 'an emptied section is still offering blocks');
-  const cards = await page.evaluate(() => document.querySelectorAll('.cc-scene .cc-glowcard').length);
+  const cards = await page.evaluate(() => document.querySelectorAll('.cc-scene .lc-card').length);
   eq(cards, 2, 'an empty section should be the sidebar and one card, got ' + cards);
   await page.evaluate(() => {
     const s = window.ForgeTraining.section('calves'), was = window.__nvxSavedCalves;
@@ -774,7 +774,7 @@ t('Chest lists its session, in order, with no split it does not have', async () 
   for (const x of D) ok(body.includes(x.name), 'missing from the chest list: ' + x.name);
 
   /* The order is the training priority, so it has to survive to the page. */
-  const shown = await page.evaluate(() => [...document.querySelectorAll('.cc-glowcard')]
+  const shown = await page.evaluate(() => [...document.querySelectorAll('.lc-sub')]
     .map(c => (c.querySelector('div') || {}).textContent)
     .map(t => (t || '').trim()).filter(Boolean));
   const idx = D.map(x => shown.findIndex(t => t.startsWith(x.name)));
@@ -903,7 +903,7 @@ const stepClick = (name, label, sign) => page.evaluate(([n, l, g]) => {
   const title = [...document.querySelectorAll('span')]
     .find(e => e.children.length === 0 && e.textContent.trim() === n);
   if (!title) throw new Error('no block for ' + n);
-  const card = title.closest('.cc-glowcard');
+  const card = title.closest('.lc-sub');
   const row = findRow(card, l);
   if (!row) throw new Error('no ' + l + ' row on ' + n);
   const btn = [...row.querySelectorAll('span')]
@@ -916,7 +916,7 @@ const stepVal = (name, label) => page.evaluate(([n, l]) => {
   const title = [...document.querySelectorAll('span')]
     .find(e => e.children.length === 0 && e.textContent.trim() === n);
   if (!title) throw new Error('no block for ' + n);
-  const row = findRow(title.closest('.cc-glowcard'), l);
+  const row = findRow(title.closest('.lc-sub'), l);
   if (!row) throw new Error('no ' + l + ' row on ' + n);
   const el = row.querySelector('input');
   return el.value === '' ? '—' : el.value;
@@ -928,7 +928,7 @@ const stepType = (name, label, text) => page.evaluate(([n, l, t]) => {
   const title = [...document.querySelectorAll('span')]
     .find(e => e.children.length === 0 && e.textContent.trim() === n);
   if (!title) throw new Error('no block for ' + n);
-  const row = findRow(title.closest('.cc-glowcard'), l);
+  const row = findRow(title.closest('.lc-sub'), l);
   if (!row) throw new Error('no ' + l + ' row on ' + n);
   const el = row.querySelector('input');
   el.value = t;
@@ -1090,7 +1090,7 @@ t('a typed number can be cleared and retyped', async () => {
   const el = (label) => page.evaluate(([n, l]) => {
     const title = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    const row = findRow(title.closest('.cc-glowcard'), l);
+    const row = findRow(title.closest('.lc-sub'), l);
     const i = row.querySelector('input');
     i.value = ''; i.dispatchEvent(new Event('input', { bubbles: true }));
     return null;
@@ -1100,7 +1100,7 @@ t('a typed number can be cleared and retyped', async () => {
   eq(await page.evaluate(([n, l]) => {
     const title = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    return findRow(title.closest('.cc-glowcard'), l).querySelector('input').value;
+    return findRow(title.closest('.lc-sub'), l).querySelector('input').value;
   }, [src.name, 'REPS']), '', 'the field refilled itself while it was being cleared');
 
   await stepType(src.name, 'REPS', '9');
@@ -1146,7 +1146,15 @@ t('typed numbers are held to the same limits as the buttons', async () => {
 
 t('the Forge accent follows the raiment', async () => {
   /* The page was champagne on every raiment. Read back as the browser paints it, per element,
-     because a token that fails to resolve leaves the text black rather than obviously wrong. */
+     because a token that fails to resolve leaves the text black rather than obviously wrong.
+
+     The wordmark ("THE FORGE") is old chrome outside the card system and wears
+     --forge-accent, unchanged by this redesign. The section title and TRAINING PRIORITY are
+     inside the new card block and wear --lc-accent/--quiet-ink instead, the token Calendar
+     and Power Level already established — those two happen to equal --forge-accent for Ultra
+     X, Maison Élysée and Éverpine, but not for Noir (--forge-accent is pure white there,
+     --quiet-ink a pale beige), so the wordmark is checked for being painted at all but not
+     for matching the card's own two elements exactly. */
   await openChest();
   const paint = (style) => page.evaluate((st) => {
     window.__nvx.setPref('theme', st === 'base' ? 'Lime' : 'Ultra');
@@ -1154,7 +1162,7 @@ t('the Forge accent follows the raiment', async () => {
     return new Promise(r => setTimeout(() => {
       const find = (t) => [...document.querySelectorAll('div,span')]
         .find(e => e.children.length === 0 && e.textContent.trim() === t);
-      const wordmark = find('❖ THE FORGE'), tag = find('CHEST'), pri = find('TRAINING PRIORITY');
+      const wordmark = find('❖ THE FORGE'), tag = document.querySelector('.cc-scene .lc-title'), pri = find('TRAINING PRIORITY');
       r({ wordmark: wordmark && getComputedStyle(wordmark).color,
           tag: tag && getComputedStyle(tag).color,
           priority: pri && getComputedStyle(pri).color });
@@ -1167,9 +1175,8 @@ t('the Forge accent follows the raiment', async () => {
     const got = await paint(st);
     for (const k of ['wordmark', 'tag', 'priority'])
       ok(got[k] && /^rgb/.test(got[k]), st + ': the ' + k + ' is not painted (' + got[k] + ')');
-    /* All three carry the same accent, so a swap that missed one shows up here. */
-    eq(new Set([got.wordmark, got.tag, got.priority]).size, 1,
-      st + ': the accent is not the same on every element that wears it');
+    /* The card's own two elements always agree with each other. */
+    eq(got.tag, got.priority, st + ': the card title and TRAINING PRIORITY disagree');
     seen[st] = got.tag;
   }
 
@@ -1177,10 +1184,10 @@ t('the Forge accent follows the raiment', async () => {
   ok(r1 > g1 + 40 && r1 > b1 + 40, 'Ultra X is not red: ' + seen['Ultra X']);
   const [r2, g2, b2] = rgb(seen['Maison Élysée']);
   ok(b2 > r2 + 30, 'Maison is not blue: ' + seen['Maison Élysée']);
-  const [r3, g3, b3] = rgb(seen['Noir']);
-  ok(r3 > 230 && g3 > 230 && b3 > 230, 'Noir is not white: ' + seen['Noir']);
-  const [r4, g4, b4] = rgb(seen['Maison Éverpine']);
-  ok(r4 > 200 && g4 > 190 && b4 < 190, 'Éverpine lost its champagne: ' + seen['Maison Éverpine']);
+  eq(seen['Noir'], 'rgb(196, 189, 176)', 'Noir is not the raiment\'s quiet ink: ' + seen['Noir']);
+  /* --forge-accent's champagne is lighter than --quiet-ink's olive-gold for Éverpine too —
+     the same divergence as Noir, just in the other direction. The card wears quiet-ink. */
+  eq(seen['Maison Éverpine'], 'rgb(124, 106, 56)', 'Éverpine is not the raiment\'s quiet ink: ' + seen['Maison Éverpine']);
 
   await page.evaluate(() => window.__nvx.setPref('theme', 'Lime'));
   await page.waitForTimeout(400);
@@ -1236,7 +1243,7 @@ t('on a phone the section list does not sit under the exercises', async () => {
       /* Only the cards the list actually shares a grid with. Scanning the whole document
          caught the Performance Terminal check-in, which re-opens on its own timer and is
          meant to cover the page — an overlay overlapping things is not a layout fault. */
-      const cards = [...nav.parentElement.querySelectorAll('.cc-glowcard')].filter(c => c !== nav);
+      const cards = [...nav.parentElement.querySelectorAll('.lc-card')].filter(c => c !== nav);
       for (const c of cards) {
         const r = c.getBoundingClientRect();
         if (r.height < 10) continue;
@@ -1276,7 +1283,7 @@ t('the add button stays on the right whatever the block carries', async () => {
     for (const inner of document.querySelectorAll('span')) {
       if (inner.children.length || inner.textContent.trim() !== 'ADD') continue;
       const btn = inner.classList.contains('sc-interp') ? inner.parentElement : inner;
-      const card = btn.closest('.cc-glowcard');
+      const card = btn.closest('.lc-sub');
       const name = (card.querySelector('div') || {}).textContent.trim();
       const b = btn.getBoundingClientRect(), c = card.getBoundingClientRect();
       out.push({ name, rightGap: Math.round(c.right - b.right), leftGap: Math.round(b.left - c.left) });
@@ -1442,11 +1449,12 @@ const anat = () => page.evaluate(() => {
 /* The panel is a tap to open, so every one of these has to open it first — that is the
    point of the change: nothing about the model is in the page until it is asked for. */
 const tapAnatomy = () => page.evaluate(() => {
-  const h = [...document.querySelectorAll('span')]
+  const h = [...document.querySelectorAll('span,div')]
     .find(e => e.children.length === 0 && e.textContent.trim() === 'Anatomy');
   if (!h) return false;
-  const row = (h.classList.contains('sc-interp') ? h.parentElement : h).parentElement;
-  row.click();
+  const clickable = (h.classList.contains('sc-interp') ? h.parentElement : h).closest('[style*="cursor:pointer"]') ||
+    (h.classList.contains('sc-interp') ? h.parentElement : h).parentElement;
+  clickable.click();
   return true;
 });
 const openAnatomy = async () => {
@@ -1573,7 +1581,7 @@ t('the blocks and the button are curved', async () => {
     const inner = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD');
     const b = inner.classList.contains('sc-interp') ? inner.parentElement : inner;
-    const card = b.closest('.cc-glowcard');
+    const card = b.closest('.lc-sub');
     const px = (el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
     return { card: px(card), btn: px(b), input: px(card.querySelector('input')) };
   });
@@ -1630,7 +1638,7 @@ t('timed work is offered in seconds and logged as time', async () => {
   const labels = await page.evaluate((n) => {
     const title = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    return [...title.closest('.cc-glowcard').querySelectorAll('span')]
+    return [...title.closest('.lc-sub').querySelectorAll('span')]
       .filter(e => e.children.length === 0).map(e => e.textContent.trim());
   }, src.name);
   ok(labels.includes('SECS'), 'the stepper is not labelled in seconds');
@@ -1640,7 +1648,7 @@ t('timed work is offered in seconds and logged as time', async () => {
   await page.evaluate((n) => {
     const title = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    [...title.closest('.cc-glowcard').querySelectorAll('span')]
+    [...title.closest('.lc-sub').querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD').click();
   }, src.name);
   await page.waitForTimeout(700);
@@ -1676,7 +1684,7 @@ t('the same exercise on two body parts can both be added', async () => {
     const title = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim().toLowerCase() === name);
     if (!title) throw new Error('no block for ' + name);
-    [...title.closest('.cc-glowcard').querySelectorAll('span')]
+    [...title.closest('.lc-sub').querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD').click();
   }, n);
 
@@ -1747,7 +1755,7 @@ t('metres are offered as metres and logged as a distance', async () => {
   const labels = await page.evaluate((n) => {
     const t = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    return [...t.closest('.cc-glowcard').querySelectorAll('span')]
+    return [...t.closest('.lc-sub').querySelectorAll('span')]
       .filter(e => e.children.length === 0).map(e => e.textContent.trim());
   }, src.name);
   ok(labels.includes('METRES'), 'the stepper is not labelled in metres');
@@ -1756,7 +1764,7 @@ t('metres are offered as metres and logged as a distance', async () => {
   await page.evaluate((n) => {
     const t = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    [...t.closest('.cc-glowcard').querySelectorAll('span')]
+    [...t.closest('.lc-sub').querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === 'ADD').click();
   }, src.name);
   await page.waitForTimeout(700);
@@ -1785,7 +1793,7 @@ t('a single set of something counted in its own unit reads as the count alone', 
   const target = await page.evaluate((n) => {
     const t = [...document.querySelectorAll('span')]
       .find(e => e.children.length === 0 && e.textContent.trim() === n);
-    const card = t.closest('.cc-glowcard');
+    const card = t.closest('.lc-sub');
     return [...card.querySelectorAll('span')]
       .filter(e => e.children.length === 0)
       .map(e => e.textContent.trim()).find(x => /CLIMBS/.test(x));
@@ -1905,7 +1913,7 @@ t('the section list is a sidebar beside the section, not above it', async () => 
   const box = await page.evaluate(() => {
     const row = [...document.querySelectorAll('.cc-scene [data-icon="forge"]')]
       .map(m => m.parentElement).find(el => el && /Shoulders/.test(el.textContent));
-    const h2 = document.querySelector('.cc-scene h2');
+    const h2 = document.querySelector('.cc-scene .lc-title');
     if (!row || !h2) return null;
     const a = row.getBoundingClientRect(), b = h2.getBoundingClientRect();
     return { railRight: a.right, paneLeft: b.left, railTop: a.top, paneTop: b.top };
@@ -1929,13 +1937,13 @@ t('one sidebar row is lit, and it is the section that is open', async () => {
       .map(el => el.textContent.trim()));
   eq(lit.length, 1, 'exactly one row should be lit: ' + lit.join(', '));
   eq(lit[0], 'Calves', 'the wrong row is lit');
-  eq(await page.evaluate(() => document.querySelector('.cc-scene h2').textContent.trim()), 'Calves',
+  eq(await page.evaluate(() => document.querySelector('.cc-scene .lc-title').textContent.trim()), 'Calves',
      'the pane did not follow the sidebar');
 });
 
 t('the four centres still switch', async () => {
   await boot({ forgeCentre: 'home' });
-  for (const [tab, probe] of [['TRAINING', 'Chest'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'Muscle Training Split']]) {
+  for (const [tab, probe] of [['TRAINING', 'CHEST'], ['MENTAL', 'MENTAL'], ['HEALTH', 'HEALTH'], ['HOME', 'MUSCLE TRAINING SPLIT']]) {
     await page.evaluate((t) => {
       const el = [...document.querySelectorAll('span')].find(e =>
         e.children.length === 0 && e.textContent.trim() === t);
@@ -1963,7 +1971,7 @@ t('nothing on the page is rendered twice', async () => {
   eq(blocks, pool, 'the exercise pool rendered ' + blocks + ' blocks for ' + pool + ' exercises');
   /* "Hand Training" legitimately appears twice now — once in the section picker and once as
      the heading — so count the heading element rather than the text. */
-  const headings = await page.evaluate(() => document.querySelectorAll('h2').length);
+  const headings = await page.evaluate(() => document.querySelectorAll('.cc-scene .lc-title').length);
   eq(headings, 1, 'the section heading rendered ' + headings + ' times');
   /* Every section carries a pool now, so the empty state is looked at on one emptied for the
      purpose and put straight back. */
@@ -1987,7 +1995,7 @@ t('nothing on the page is rendered twice', async () => {
   /* One section body, whichever is open — the duplication this catches was a whole block
      copied, so the count is the signal. */
   const bodies = await page.evaluate(() =>
-    [...document.querySelectorAll('h2')].length);
+    [...document.querySelectorAll('.cc-scene .lc-title')].length);
   eq(bodies, 1, 'the section body rendered ' + bodies + ' times');
   const picker = await page.evaluate(() => document.querySelectorAll('.cc-scene [data-icon="forge"]').length);
   const want = await page.evaluate(() => window.ForgeTraining.SECTIONS.length);

@@ -56,7 +56,7 @@ t('HEALTH is no longer an empty page', async () => {
   const b = await text();
   ok(!/Nothing here yet/.test(b), 'the Health centre is still showing the empty state');
   ok(await rings(), 'there is no ring card on the Health centre');
-  for (const label of ['FUEL', 'PROTEIN', 'HYDRATION', 'Log Today'])
+  for (const label of ['FUEL', 'PROTEIN', 'HYDRATION', 'LOG TODAY'])
     ok(b.includes(label), 'the Health centre is missing ' + label);
 });
 
@@ -177,155 +177,83 @@ t('water can be taken back one glass at a time', async () => {
   ok((await text()).includes('0 / 8 glasses'), 'undoing past empty should stop at zero, not go negative');
 });
 
-t('Health wears the same place Mental opens into', async () => {
-  /* Two dark ruled cards sitting on the Forge page, while the centre next door was a pale
-     field you step into. Same app, two different materials. Health is the same field now —
-     the same sheen, the same grain, and the hairline doing the column-dividing rather than
-     a border. */
+t('Health wears the same card block Calendar and Power Level do', async () => {
+  /* Two dark ruled cards sitting on the Forge page, while Calendar and Power Level had already
+     moved to the pearl ground and the lit-rim card block. Health carries the same template
+     now: the .lcb-stage/.lcb-field ground under it, and .lc-card panels with a rim, not the
+     old sit-style abyss/grain field it briefly wore. */
   await boot('health', 'Ultra X');
   const p = await page.evaluate(() => {
-    const pan = document.querySelector('.rest-panel');
-    if (!pan) return null;
-    const head = [...pan.querySelectorAll('div')].find(e => e.textContent.trim() === 'Log Today');
+    const stage = document.querySelector('.lcb-stage');
+    if (!stage) return null;
+    const cards = [...stage.querySelectorAll('.lc-card')];
     return {
-      abyss: !!pan.querySelector('.rest-abyss'),
-      grain: !!pan.querySelector('.rest-grain'),
-      rule: !!pan.querySelector('.rest-rule'),
-      serif: head ? /Cormorant/.test(getComputedStyle(head).fontFamily) : false,
-      /* the card it used to be, and the translucency that came with it */
-      card: pan.classList.contains('cc-glowcard') || !!pan.querySelector('.cc-glowcard'),
-      ink: getComputedStyle(pan).getPropertyValue('--ab-ink').trim(),
+      field: !!stage.querySelector('.lcb-field'),
+      cardCount: cards.length,
+      glass: cards.every(c => /blur/.test(getComputedStyle(c).backdropFilter)),
+      rim: cards.every(c => /inset/.test(getComputedStyle(c).boxShadow)),
     };
   });
-  ok(p, 'the Health centre is not the abyss panel');
-  ok(p.abyss, 'no field'); ok(p.grain, 'no grain');
-  ok(p.rule, 'the hairline is not dividing the two halves');
-  ok(p.serif, 'Log Today is not the serif the sit uses');
-  ok(!p.card, 'the ruled card is still there');
-  eq(p.ink, '#2A2A28', 'Ultra X is not reading the pale field');
-});
-
-t('and it goes black for Noir only', async () => {
-  await boot('health', 'Noir');
-  const n = await page.evaluate(() => {
-    const pan = document.querySelector('.rest-panel');
-    return pan ? getComputedStyle(pan).getPropertyValue('--ab-ink').trim() : '';
-  });
-  eq(n, '#ECE8E0', 'Noir is not wearing the black variant');
-});
-
-t('the hint text is the field\'s, not the raiment\'s', async () => {
-  /* Lines and pills wear the raiment; body copy and hints do not. .theme-ultra
-     input::placeholder paints every hint the raiment's muted ink with !important, which on
-     Maison Elysee is its blue — a blue hint sitting inside a grey field. */
-  await boot('health', 'Maison Élysée');
-  const c = await page.evaluate(() => {
-    const f = document.querySelector('.rest-panel .rest-field');
-    if (!f) return null;
-    const pan = document.querySelector('.rest-panel');
-    return { hint: getComputedStyle(f, '::placeholder').color,
-             muted: getComputedStyle(pan).getPropertyValue('--ab-muted').trim() };
-  });
-  ok(c, 'no field to read');
-  /* --ab-muted is #6E6C67 on every raiment but Noir */
-  eq(c.hint, 'rgb(110, 108, 103)', 'the hint is wearing the raiment (' + c.hint + ') not the field');
-  eq(c.muted, '#6E6C67', 'the muted token moved');
+  ok(p, 'the Health centre is not on the pearl stage');
+  ok(p.field, 'no lit ground under Health');
+  eq(p.cardCount, 3, 'Health should carry its three panels (Today, Log Today, Meals)');
+  ok(p.glass, 'the panels are not glass');
+  ok(p.rim, 'the panels have no lit rim');
 });
 
 t('every line and pill on it is the raiment\'s own colour', async () => {
-  /* The field stays white — that is the idea of it — but the things drawn ON the field are
-     the raiment, or the panel is the same object in all four and the raiment has been
-     stepped away from. Ultra X oxblood, Maison Élysée blue, Éverpine gold, Noir white. */
+  /* The card stays the shared ivory/graphite pearl — that is the idea of it — but the things
+     drawn ON it are the raiment, or the card is the same object in all four and the raiment
+     has been stepped away from. Ultra X oxblood, Maison Élysée blue, Éverpine gold, Noir white
+     — same values calendar-page.test.mjs already established for --lc-accent. */
   const want = {
-    'Ultra X':          { accent: '#5B1A1A', line: 'rgba(91,26,26,0.32)',    fill: 'rgb(91, 26, 26)' },
-    'Maison Élysée':    { accent: '#3C5A7D', line: 'rgba(60,90,125,0.34)',   fill: 'rgb(60, 90, 125)' },
-    'Maison Éverpine':  { accent: '#7C6A38', line: 'rgba(124,106,56,0.34)',  fill: 'rgb(124, 106, 56)' },
-    'Noir':             { accent: '#FFFFFF', line: 'rgba(236,232,224,0.24)', fill: 'rgb(236, 232, 224)' },
+    'Ultra X':          { accent: 'rgb(91, 26, 26)' },
+    'Maison Élysée':    { accent: 'rgb(60, 90, 125)' },
+    'Maison Éverpine':  { accent: 'rgb(124, 106, 56)' },
+    'Noir':             { accent: 'rgb(196, 189, 176)' },
   };
   for (const [style, w] of Object.entries(want)) {
     await boot('health', style);
     const got = await page.evaluate(() => {
-      const pan = document.querySelector('.rest-panel');
-      const cs = getComputedStyle(pan);
-      const add = [...pan.querySelectorAll('.rest-chip-on')].find(e => e.textContent.trim() === 'ADD');
-      const field = pan.querySelector('.rest-field');
-      return { accent: cs.getPropertyValue('--ab-accent').trim(),
-               line: cs.getPropertyValue('--ab-line').trim(),
-               pill: add ? getComputedStyle(add).backgroundColor : '',
-               under: field ? getComputedStyle(field).borderBottomColor : '' };
+      const title = document.querySelector('.lc-title');
+      const add = [...document.querySelectorAll('span')].find(e => e.textContent.trim() === 'ADD');
+      return { title: title ? getComputedStyle(title).color : '',
+               pill: add ? getComputedStyle(add).backgroundColor : '' };
     });
-    eq(got.accent, w.accent, style + ' has the wrong accent');
-    eq(got.line, w.line, style + ' has the wrong hairline');
-    eq(got.pill, w.fill, style + ' ADD is not the raiment colour');
-    ok(got.under !== 'rgb(0, 0, 0)' && got.under !== '', style + ' field underline is unpainted');
+    eq(got.title, w.accent, style + ' the card title is not the raiment ink');
+    eq(got.pill, w.accent, style + ' ADD is not the raiment colour');
   }
 });
 
-t('the two halves stack on a phone', async () => {
+t('the page does not scroll sideways on a phone', async () => {
   await boot('health');
   await page.setViewportSize({ width: 390, height: 900 });
   await page.waitForTimeout(600);
-  const cols = await page.evaluate(() => {
-    const sp = document.querySelector('.rest-split');
-    return sp ? getComputedStyle(sp).gridTemplateColumns.trim().split(/\s+/).length : 0;
+  const over = await page.evaluate(() => {
+    const sc = document.querySelector('.cc-scene') || document.scrollingElement;
+    return sc.scrollWidth - sc.clientWidth;
   });
   await page.setViewportSize({ width: 1280, height: 1200 });
   await page.waitForTimeout(400);
-  eq(cols, 1, 'the split is still ' + cols + ' columns wide on a phone');
-});
-
-t('the panel is built for the frame it is in', async () => {
-  /* It was authored at desktop sizes and those went straight onto a 390px screen: a 168px
-     ring and three 30px serif figures filled the frame between them, and ADD stretched
-     across whatever the two number fields left over. The whole thing steps down together
-     on a phone rather than one piece at a time, so the proportions hold. */
-  const read = () => page.evaluate(() => {
-    const pan = document.querySelector('.rest-panel');
-    const px = (el, prop) => el ? Math.round(parseFloat(getComputedStyle(el)[prop])) : 0;
-    const add = [...pan.querySelectorAll('.rest-chip-on')].find(e => e.textContent.trim() === 'ADD');
-    return { rings: px(pan.querySelector('.rest-rings'), 'width'),
-             figure: px(pan.querySelector('.rest-figure'), 'fontSize'),
-             head: px(pan.querySelector('.rest-h2'), 'fontSize'),
-             addW: add ? Math.round(add.getBoundingClientRect().width) : 0,
-             panelH: Math.round(pan.getBoundingClientRect().height),
-             panelW: Math.round(pan.getBoundingClientRect().width) };
-  });
-
-  await boot('health');
-  const desk = await read();
-  eq(desk.rings, 168, 'the desktop ring changed size');
-  eq(desk.figure, 30, 'the desktop figure changed size');
-  ok(desk.addW < desk.panelW * 0.2, 'ADD is ' + desk.addW + 'px of a ' + desk.panelW + 'px panel — it is stretching again');
-
-  await page.setViewportSize({ width: 390, height: 900 });
-  await page.waitForTimeout(700);
-  const phone = await read();
-  await page.setViewportSize({ width: 1280, height: 1200 });
-  await page.waitForTimeout(400);
-  ok(phone.rings <= 100, 'the ring is still ' + phone.rings + 'px on a phone');
-  ok(phone.figure <= 20, 'the figures are still ' + phone.figure + 'px on a phone');
-  ok(phone.head <= 22, 'Log Today is still ' + phone.head + 'px on a phone');
-  /* Roughly half a 900px window. Above that the logging half — the reason the page is not
-     decoration — is below the fold on the device it is most used on. */
-  ok(phone.panelH < 480, 'the panel is ' + phone.panelH + 'px tall on a 390px frame');
+  ok(over <= 1, 'Health scrolls sideways on a phone by ' + over + 'px');
 });
 
 t('a meal still goes in through the new surface', async () => {
-  /* The redesign moved every control onto a different element. A panel that looks right and
-     cannot take a meal is worse than the cards were. */
+  /* The redesign moved every control onto a different element. A card that looks right and
+     cannot take a meal is worse than the sit panel was. */
   await boot('health');
   /* Typed into the real inputs, not pushed into state: the point of the test is that the
      fields the redesign replaced are still wired to the handlers. */
-  await page.fill('.rest-panel input[placeholder^="Meal"]', 'Porridge and eggs');
-  await page.fill('.rest-panel input[placeholder="kcal"]', '620');
-  await page.fill('.rest-panel input[placeholder="protein g"]', '38');
+  await page.fill('.lcb-stage input[placeholder^="Meal"]', 'Porridge and eggs');
+  await page.fill('.lcb-stage input[placeholder="kcal"]', '620');
+  await page.fill('.lcb-stage input[placeholder="protein g"]', '38');
   await page.waitForTimeout(400);
   const hit = await page.evaluate(() => {
-    const add = [...document.querySelectorAll('.rest-panel .rest-chip')]
+    const add = [...document.querySelectorAll('.lcb-stage span')]
       .find(e => e.textContent.trim() === 'ADD' && e.onclick);
     if (!add) return false; add.click(); return true;
   });
-  ok(hit, 'there is no ADD on the panel that does anything');
+  ok(hit, 'there is no ADD on the card that does anything');
   await page.waitForTimeout(700);
   /* ADD asks before it writes now, and the gate reads the meal back as it will be logged.
      Nothing is in the list until that is answered. */
