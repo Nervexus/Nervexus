@@ -2949,7 +2949,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
               </div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for><input value="{{ incCatDraft }}" onInput="{{ setIncCatDraft }}" onKeyDown="{{ addIncCatKey }}" onBlur="{{ addIncCat }}" placeholder="+ type your own" style="width:172px; flex:none; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
+                <sc-for list="{{ incCatChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.set }}" style="font-size:10px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:7px; padding:3px 8px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}<span onClick="{{ c.remove }}" style="color:#6f6f78; margin-left:5px;" style-hover="{ color:'#ff6b76' }">×</span></span></sc-for><input value="{{ incCatDraft }}" onInput="{{ setIncCatDraft }}" onKeyDown="{{ addIncCatKey }}" onBlur="{{ addIncCat }}" placeholder="+ type your own" style="width:172px; flex:none; padding:3px 8px; border-radius:7px; border:1px dashed rgba(255,255,255,0.22); background:transparent; color:#eef0f2; font-size:10px; outline:none;">
               </div>
               <div style="display:flex; gap:6px; margin-bottom:6px;">
                 <input value="{{ incLabel }}" onInput="{{ setIncLabel }}" onKeyDown="{{ addIncKey }}" placeholder="Source" style="flex:1; min-width:0; padding:8px 10px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;">
@@ -9154,7 +9154,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.14-327 · v11.327 deadcode';
+const NOTIF_BUILD_VERSION = '2026.09.14-328 · v11.328 inc-cat-remove';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -21197,7 +21197,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       bizIncColor:this._bizPalette().inc, bizExpColor:this._bizPalette().exp,
       ...this._finTiles(),
       ...(()=>{ const T=this._finTileTokens(); return { finTileCard:T.card, finTileLine:T.line, finTileLabel:T.label, finTileInk:T.ink, finTileNote:T.note, finTileShadow:T.shadow }; })(),
-      incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent' })),
+      incCatChips: this._incomeCats().map(c=>({ l:c, set:()=>this.setState({incCat:c}), c:S.incCat===c?'#F4F4F5':'#9a9aa2', b:S.incCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.incCat===c?'rgba(255,255,255,0.18)':'transparent', remove:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.removeIncomeCategory(c); } })),
       expCatChips: this._expenseCats().map(c=>({ l:c, set:()=>this.setState({expCat:c}), c:S.expCat===c?'#F4F4F5':'#9a9aa2', b:S.expCat===c?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.expCat===c?'rgba(255,255,255,0.18)':'transparent' })),
       /* Deliberately NOT the newExpenseCat key the Budget Planner's own category box uses —
          both are on this page at once, and sharing one draft made typing in either echo into
