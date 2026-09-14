@@ -378,12 +378,19 @@
              --lcb-sheen:rgba(255,255,255,0.05);
              --lc-bg:rgba(255,255,255,0.06); --lc-sub:rgba(255,255,255,0.05);
              --lc-rim:rgba(255,255,255,0.13); --lc-rim-low:rgba(255,255,255,0.03); }
+  /* The three light raiments share one bloom (lit/dim/sheen, and every glass value below) —
+     that part stays one pearl. Only the base far/near tone now leans a touch toward each
+     raiment's own ink: warm toward Ultra X's oxblood, cool toward Maison's blue, neutral
+     for Éverpine, which wasn't asked for a tint. Small shifts, not a return to four tinted
+     grounds — the glass on top is identical either way. */
   .cc-shell.raiment-x, .cc-shell.raiment-maison, .cc-shell.raiment-everpine{
-             --lcb-far:#C6C4C2; --lcb-near:#F4F2EF;
              --lcb-lit:rgba(255,233,208,0.62); --lcb-dim:rgba(206,218,236,0.50);
              --lcb-sheen:rgba(255,255,255,0.34);
              --lc-bg:rgba(255,255,255,0.42); --lc-sub:rgba(255,255,255,0.40);
              --lc-rim:rgba(255,255,255,0.80); --lc-rim-low:rgba(255,255,255,0.22); }
+  .cc-shell.raiment-x{        --lcb-far:#CDBEBD; --lcb-near:#F7EFED; }
+  .cc-shell.raiment-maison{   --lcb-far:#BFC6D0; --lcb-near:#EFF3F8; }
+  .cc-shell.raiment-everpine{ --lcb-far:#C6C4C2; --lcb-near:#F4F2EF; }
   .cc-shell.raiment-noir{     --lcb-far:#24242A; --lcb-near:#0B0B0D;
              --lcb-lit:rgba(255,233,208,0.11); --lcb-dim:rgba(206,218,236,0.08);
              --lcb-sheen:rgba(255,255,255,0.045);
@@ -9157,7 +9164,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.14-330 · v11.330 tag-row-match';
+const NOTIF_BUILD_VERSION = '2026.09.14-331 · v11.331 ground-lean';
 class Component extends DCLogic {
   constructor(props){
     super(props);

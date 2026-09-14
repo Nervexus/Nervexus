@@ -320,10 +320,13 @@ t('the panels are glass over a lit ground', async () => {
   ok(b.glass && b.inside, 'the panels are not glass over it');
 });
 
-t('the ground is one pearl, not four raiment tints', async () => {
-  /* It used to be lit in each raiment's accent — oxblood, gold, blue, green. It is mother of
-     pearl now: the same warm bloom and cool counter on every raiment, low saturation, and the
-     raiment colours everything drawn ON it instead. */
+t('the ground shares one bloom, with a small lean toward each raiment\'s own hue', async () => {
+  /* It used to be lit in each raiment's accent outright — oxblood, gold, blue, green — then
+     became one pearl shared bit-for-bit across every light raiment, which read as colourless
+     on the two raiments most defined by their colour. Asked for directly afterward: Ultra X
+     wants a slight red lean, Maison a slight baby-blue one, nothing bigger. The warm/cool
+     bloom on top — the part that actually reads as "pearl" — is still exactly one shared
+     thing; only the base tone underneath it leans per raiment now. */
   const seen = {};
   for (const style of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
     await boot();
@@ -336,10 +339,18 @@ t('the ground is one pearl, not four raiment tints', async () => {
     });
     ok(seen[style].lit && seen[style].dim, style + ': the ground has lost its bloom');
   }
-  /* Hue is shared. The three light raiments are the same pearl outright. */
-  const light = ['Ultra X', 'Maison Élysée', 'Maison Éverpine'].map(k => JSON.stringify(seen[k]));
-  eq(new Set(light).size, 1, 'the light raiments are not sharing one ground: ' + light.join(' | '));
-  /* Noir is the same pearl in graphite — the one thing that follows the raiment is how light
+  /* The bloom itself is still shared outright across the three light raiments. */
+  const bloom = ['Ultra X', 'Maison Élysée', 'Maison Éverpine'].map(k => JSON.stringify({ lit: seen[k].lit, dim: seen[k].dim }));
+  eq(new Set(bloom).size, 1, 'the light raiments are not sharing one bloom: ' + bloom.join(' | '));
+  /* Ultra X leans warm (more red than blue), Maison leans cool (more blue than red), and
+     neither matches the other or Éverpine, which was not asked for a tint of its own. */
+  const rgb = (h) => { const m = h.replace('#', ''); return [parseInt(m.slice(0, 2), 16), parseInt(m.slice(4, 6), 16)]; };
+  const x = rgb(seen['Ultra X'].far), m = rgb(seen['Maison Élysée'].far);
+  ok(x[0] > x[1], 'Ultra X ground should lean red, got ' + seen['Ultra X'].far);
+  ok(m[1] > m[0], 'Maison ground should lean blue, got ' + seen['Maison Élysée'].far);
+  ok(seen['Ultra X'].far !== seen['Maison Élysée'].far, 'Ultra X and Maison should not share the exact same ground tint');
+  eq(seen['Maison Éverpine'].far, '#C6C4C2', 'Éverpine\'s ground moved even though only Ultra X and Maison were asked for a tint');
+  /* Noir is the same bloom in graphite — the one thing that follows the raiment is how light
      it is, because its panels are pale ink on translucent white and a pale ground under those
      is pale on pale. */
   const chan = (c) => (String(c).match(/[\d.]+/g) || []).map(Number);
