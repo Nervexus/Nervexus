@@ -196,7 +196,6 @@
     { id:'writing', label:'Writing Assistant', glyph:'✎' },
     { id:'workout', label:'Workout Planning', glyph:'✚' },
     { id:'image', label:'Image Analysis', glyph:'◫' },
-    { id:'coding', label:'Coding', glyph:'⌗' },
     { id:'market', label:'Market Analysis', glyph:'↗' }
   ];
 
@@ -204,7 +203,7 @@
   // Every feature routes to Claude now that it's the only supported provider.
   var DEFAULT_ROUTING = {
     voice:'anthropic', briefings:'anthropic', business:'anthropic', writing:'anthropic',
-    workout:'anthropic', image:'anthropic', coding:'anthropic', market:'anthropic'
+    workout:'anthropic', image:'anthropic', market:'anthropic'
   };
 
   var BRIEFING_CATEGORIES = ['Global Money','Billionaire News','Major Company Movements','Global Economy',

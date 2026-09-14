@@ -9154,7 +9154,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.14-328 · v11.328 inc-cat-remove';
+const NOTIF_BUILD_VERSION = '2026.09.14-329 · v11.329 routing-tidy';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11725,10 +11725,6 @@ activities: this._mergeShipLog(s.activities),
       }
     });
   }
-  // Roles come from PROVIDERS_DATA.AI_FEATURES — the same eight the AI centre's Routing
-  // panel sets. Passing one here is what makes that panel do something.
-  _aiRole(role){ return role||'voice'; }
-
   _parseVoiceDate(text){ const low=(text||'').toLowerCase(); const now=new Date(); const fmt=(d)=>{ try{ return d.toLocaleDateString('en-CA'); }catch(e){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } };
     if(/\btoday\b/.test(low)) return fmt(now);
     if(/\btomorrow\b/.test(low)) return fmt(new Date(now.getTime()+86400000));
