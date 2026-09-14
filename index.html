@@ -406,8 +406,11 @@
     color:var(--lc-muted); }
   .cal-tags-clear{ font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1.2px;
     color:var(--lc-accent); cursor:pointer; }
-  .cal-tags-row{ display:flex; gap:9px; flex-wrap:wrap; }
-  .cal-tag{ width:28px; height:28px; border-radius:10px; cursor:pointer;
+  /* Same row the general-event colour picker already uses (evColorSwatches) — swatches
+     stretch to fill the width rather than sitting as fixed boxes with a gap of empty card
+     after them, and both draw from the same DAY_COLORS() to begin with. */
+  .cal-tags-row{ display:flex; gap:7px; }
+  .cal-tag{ flex:1; height:26px; border-radius:8px; cursor:pointer;
     border:2px solid transparent; box-shadow:inset 0 1px 0 rgba(255,255,255,0.28);
     transition:transform 120ms ease, box-shadow 120ms ease; }
   .cal-tag:hover{ transform:translateY(-1px); }
@@ -9154,7 +9157,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.14-329 · v11.329 routing-tidy';
+const NOTIF_BUILD_VERSION = '2026.09.14-330 · v11.330 tag-row-match';
 class Component extends DCLogic {
   constructor(props){
     super(props);
