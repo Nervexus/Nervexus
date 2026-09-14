@@ -617,32 +617,6 @@ t('the month gets the width, and the clock and the day share what is under it', 
   ok(box.day.w > box.now.w, 'the day is not the wider of the two');
 });
 
-t('tagging a day lives in the day panel now', async () => {
-  /* It had its own card. It belongs inside the panel that names the day being tagged, which
-     is the only place the tag means anything. */
-  const d = day(0);
-  await boot({ calSel: d, dayColors: {} });
-  ok(!/Today stays red/.test(await text()), 'the old Highlight card is still on the page');
-  const cellBg = (ds) => page.evaluate((x) => {
-    const n = +x.slice(-2);
-    const cell = [...document.querySelectorAll('.cal-cell')]
-      .find(c => +((c.querySelector('.cal-cell-num') || {}).textContent || 0) === n);
-    return cell ? getComputedStyle(cell.querySelector('.cal-cell-pill')).backgroundColor : '';
-  }, ds);
-  const swatches = await page.evaluate(() => document.querySelectorAll('.cal-tag').length);
-  eq(swatches, 6, 'the six day colours are not in the day panel');
-  /* Picking one tags the day the panel is showing. */
-  await page.evaluate(() => [...document.querySelectorAll('.cal-tag')][4].click());
-  await page.waitForTimeout(700);
-  eq(await page.evaluate((x) => (window.__nvx.state.dayColors || {})[x], d), '#9B1C1C', 'picking a colour did not tag the day');
-  ok((await text()).includes('CLEAR'), 'a tagged day offers no way to untag it');
-  /* Tapping the same one again takes it off, so the row is the whole control. */
-  await page.evaluate(() => [...document.querySelectorAll('.cal-tag')][4].click());
-  await page.waitForTimeout(700);
-  eq(await page.evaluate((x) => (window.__nvx.state.dayColors || {})[x], d), undefined, 'tapping the chosen colour again did not untag');
-  ok(!(await text()).includes('CLEAR'), 'CLEAR is offered on a day with no tag');
-});
-
 t('a day tagged before still shows its colour', async () => {
   const d = day(3);
   await boot({ dayColors: { [d]: '#9B1C1C' } });
@@ -653,14 +627,6 @@ t('a day tagged before still shows its colour', async () => {
     return cell ? getComputedStyle(cell.querySelector('.cal-cell-pill')).backgroundColor : '';
   }, d);
   ok(/rgba?\(155, 28, 28/.test(painted), 'a tagged day has to show its colour on the grid, got ' + painted);
-});
-
-t('the tag row is not offered over a list that is not one day', async () => {
-  /* It tags the selected day, and above a seven-day list there is no one day to mean. */
-  await boot({ calScope: 'day' });
-  ok(await page.evaluate(() => !!document.querySelector('.cal-tag')), 'the tag row is missing on a single day');
-  await boot({ calScope: 'all' });
-  ok(await page.evaluate(() => !document.querySelector('.cal-tag')), 'the tag row is still offered over a month-wide list');
 });
 
 t('a block is glass with a lit rim, and groups things as panes inside it', async () => {
@@ -678,7 +644,7 @@ t('a block is glass with a lit rim, and groups things as panes inside it', async
   });
   ok(/inset/.test(look.shadow), 'the block has no rim: ' + look.shadow);
   ok(look.radius >= 16, 'the block corner is ' + look.radius + 'px');
-  ok(look.subs >= 2, 'nothing inside a block is grouped as its own pane (' + look.subs + ')');
+  ok(look.subs >= 1, 'nothing inside a block is grouped as its own pane (' + look.subs + ')');
   ok(/inset/.test(look.subShadow), 'a nested pane has no rim of its own');
 });
 
