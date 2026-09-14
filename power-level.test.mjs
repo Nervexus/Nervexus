@@ -551,6 +551,104 @@ t('Power Level is reachable from the mobile More sheet', async () => {
   await page.setViewportSize({ width: 1400, height: 1200 });
 });
 
+/* ---- the card-block redesign: glass over the pearl, six numbered panels ---- */
+
+t('the six panels wear the card layout, in order', async () => {
+  /* The page used to be one .cc-glowcard with a decorative canvas of hills behind it. It is
+     six numbered panels on the shared ground now, the same language Calendar wears. */
+  await boot({ scene: 'power' });
+  const info = await page.evaluate(() => {
+    const stage = document.querySelector('.lcb-stage');
+    const cards = stage ? [...stage.querySelectorAll('.lc-card')] : [];
+    return {
+      stage: !!stage,
+      field: !!(stage && stage.querySelector('.lcb-field')),
+      onStage: cards.every(c => stage.contains(c)),
+      glass: cards.every(c => /blur/.test(getComputedStyle(c).backdropFilter)),
+      cards: cards.map(c => ({
+        badge: (c.querySelector('.lc-badge') || {}).textContent || '',
+        title: (c.querySelector('.lc-title') || {}).textContent || '',
+      })),
+      hills: !!document.querySelector('canvas[data-chart="powerHills"]'),
+    };
+  });
+  ok(info.stage && info.field, 'the pearl ground is missing from Power Level');
+  eq(info.cards.length, 6, 'Power Level should carry six panels, found ' + info.cards.length);
+  ok(info.onStage && info.glass, 'the panels are not glass on the shared ground');
+  eq(info.cards.map(c => c.badge.trim()).join(' | '), '01 - LV | 02 - ST | 03 - AT | 04 - RK | 05 - AI | 06 - AC',
+    'the marks are wrong or out of order');
+  eq(info.cards.map(c => c.title.trim()).join(' | '),
+    'Level | Stats | Attributes | Rank Progression | Specialist | Achievements',
+    'the titles are wrong or out of order');
+  ok(!info.hills, 'the old decorative hills canvas is still in the page');
+});
+
+t('the level ring follows the raiment, not a hard-coded white', async () => {
+  /* startRingOnly used to take a colour argument nobody ever passed one that mattered — it
+     always drew '#FFFFFF'. It now reads RING_PALETTE() itself, the same source the MOVE rings
+     and the health gauges use. */
+  await boot({ scene: 'power' });
+  const capColour = () => page.evaluate(() => {
+    const cv = document.querySelector('canvas[data-chart="powerRing"]');
+    if (!cv) return null;
+    const ctx = cv.getContext('2d');
+    const x = Math.round(cv.width / 2);
+    const d = ctx.getImageData(x, 0, 1, cv.height).data;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200) return { r: d[i], g: d[i + 1], b: d[i + 2] };
+    return null;
+  });
+  await page.evaluate(() => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', 'Ultra X'); });
+  await page.waitForTimeout(1400);
+  const x = await capColour();
+  ok(x, 'nothing was drawn on the Level ring');
+  ok(x.r > x.g + 40 && x.r > x.b + 40, 'Ultra X should lead with red, got rgb(' + [x.r, x.g, x.b] + ')');
+
+  await page.evaluate(() => window.__nvx.setPref('ultraStyle', 'Maison Élysée'));
+  await page.waitForTimeout(1400);
+  const m = await capColour();
+  ok(m, 'nothing was drawn after switching to Maison Élysée');
+  ok(m.b > m.r + 30, 'Maison Élysée should lead with blue, got rgb(' + [m.r, m.g, m.b] + ')');
+
+  await page.evaluate(() => window.__nvx.setPref('ultraStyle', 'Noir'));
+  await page.waitForTimeout(1400);
+  const n = await capColour();
+  ok(n && n.r > 230 && n.g > 230 && n.b > 230, 'Noir should lead with white, got ' + JSON.stringify(n));
+});
+
+t('the stats and ranks take the raiment accent, not the old fixed red', async () => {
+  /* --u-accent (the old rewrite system's token) and --quiet-ink/--lc-accent are not the same
+     colour for Ultra X or Éverpine, so the producers were rewritten to emit var(--lc-accent)
+     directly rather than lean on the string-matching rewrite rules. Reading getComputedStyle
+     back is not enough to prove that on its own: the legacy rules repaint any literal
+     "color:#ff5563" they find via [style*=] regardless of what it is rewritten to, so a
+     regression that reintroduced the old hex would still show a raiment-varying computed
+     colour and this test would pass for the wrong reason. So this checks the raw inline style
+     directly for the old literal hex first, then pins the computed colour of the current-rank
+     row to the exact --quiet-ink hex Calendar's own raiment test already established. */
+  await boot({ scene: 'power' });
+  const dayStreakStyle = () => page.evaluate(() => {
+    const el = [...document.querySelectorAll('div,span')].find(e => e.children.length === 0 && e.textContent.trim() === 'DAY STREAK');
+    const row = el.parentElement;
+    const value = row.children[1] || row.nextElementSibling;
+    return value ? value.getAttribute('style') : null;
+  });
+  const curRankColour = () => page.evaluate(() => {
+    const row = document.querySelector('[data-rank-cur="1"]');
+    if (!row) return null;
+    const num = row.querySelector('span');
+    return num ? getComputedStyle(num).color : null;
+  });
+  for (const [style, want] of [['Ultra X', 'rgb(91, 26, 26)'], ['Maison Élysée', 'rgb(60, 90, 125)']]) {
+    await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
+    await page.waitForTimeout(900);
+    const raw = await dayStreakStyle();
+    ok(raw, 'DAY STREAK is missing on ' + style);
+    ok(!/#ff5563/i.test(raw), style + ': DAY STREAK is carrying the old literal hex again: ' + raw);
+    ok(/var\(--lc-accent\)/.test(raw), style + ': DAY STREAK should bind to --lc-accent, got: ' + raw);
+    eq(await curRankColour(), want, style + ': the current-rank row is not the raiment ink');
+  }
+});
+
 t('nothing threw through any of it', async () => {
   eq(pageErrors.length, 0, 'page errors: ' + pageErrors.slice(0, 5).join(' | '));
 });

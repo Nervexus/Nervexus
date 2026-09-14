@@ -659,7 +659,7 @@
   .theme-ultra .cc-side.cc-side, .theme-ultra .cc-top.cc-top{ background:var(--u-bg) !important; }
   .theme-ultra .cc-home-hero{ background:var(--u-card) !important; }
   .theme-ultra .cc-home-neural{ display:none !important; }
-  .theme-ultra.theme-noir .cc-home-hero, .theme-ultra.theme-noir .cc-power-hero.cc-power-hero{ background:
+  .theme-ultra.theme-noir .cc-home-hero{ background:
       radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 55%),
       repeating-linear-gradient(96deg, rgba(255,255,255,0.022) 0px, rgba(255,255,255,0.022) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 4px),
       repeating-linear-gradient(84deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 7px),
@@ -680,9 +680,9 @@
       repeating-linear-gradient(0deg, rgba(46,69,96,0.05) 0px, rgba(46,69,96,0.05) 1px, rgba(0,0,0,0) 1px, rgba(0,0,0,0) 4px),
       radial-gradient(130% 100% at 50% 0%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 62%),
       linear-gradient(168deg, #9BB3CE 0%, #7C9BBE 100%) !important; box-shadow:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-  /* The calendar hero is a log card now — glass over a lit ground — so it is no longer in
-     this list: the rule painted it a flat fill and turned its blur off, both with !important. */
-  .theme-ultra.theme-maison .cc-power-hero.cc-power-hero{ background:var(--u-card) !important; box-shadow:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+  /* The calendar hero and the Power Level hero are both log cards now — glass over a lit
+     ground — so neither is in this list any more: the rule painted them a flat fill and
+     turned their blur off, both with !important. */
   .theme-ultra.theme-maison [style*="linear-gradient(180deg"]{ background:var(--u-card) !important; }
   .theme-ultra.theme-maison [style*="background:#F5F1E8"], .theme-ultra.theme-maison [style*="background: rgb(245, 241, 232)"], .theme-ultra.theme-maison [style*="background:#FAF7F0"], .theme-ultra.theme-maison [style*="background: rgb(250, 247, 240)"], .theme-ultra.theme-maison [style*="background:#F8F4EC"], .theme-ultra.theme-maison [style*="background: rgb(248, 244, 236)"]{ background:var(--u-card) !important; }
   .theme-ultra.theme-maison [style*="background:#FEFCF8"], .theme-ultra.theme-maison [style*="background: rgb(254, 252, 248)"]{ background:#FFFDF9 !important; }
@@ -2465,71 +2465,122 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ POWER LEVEL</div>
           <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Life Performance Index</h1>
         </div>
-        <div class="cc-glowcard cc-power-hero" style="position:relative; border-radius:24px; background:#101012; padding:36px 32px; display:flex; flex-direction:column; align-items:center; overflow:hidden; margin-bottom:18px;">
-          <canvas data-chart="powerHills" style="position:absolute; inset:0; width:100%; height:100%;"></canvas>
-          <div style="position:relative; width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
-            <canvas data-chart="powerRing" style="position:absolute; inset:0; width:150px; height:150px;"></canvas>
-            <div style="text-align:center; position:relative;"><div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:#9a9aa2;">LEVEL</div><div style="font-size:46px; font-weight:800; line-height:1; color:#fff; text-shadow:0 0 28px rgba(200,200,210,0.55);">{{ powerLevel }}</div></div>
-          </div>
-          <div style="font-size:30px; font-weight:800; margin-top:18px; letter-spacing:-.5px;">{{ rankName }}</div>
-          <div style="font-size:13px; color:#8b8b93; margin-top:4px;">{{ rankDesc }}</div>
-          <div style="width:100%; max-width:520px; margin-top:20px;">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9aa2; margin-bottom:7px;"><span>{{ xpIn }} XP</span><span>{{ xpNext }} XP</span></div>
-            <div style="height:10px; border-radius:6px; background:rgba(255,255,255,0.06); overflow:hidden;"><div style="height:100%; width:{{ powerPct }}; border-radius:6px; background:#FFFFFF;"></div></div>
-            <div style="text-align:center; font-size:11.5px; color:#7c7c84; margin-top:10px;">Next rank: <b style="color:#FFFFFF;">{{ nextRankName }}</b> at Level {{ nextRankLevel }}</div>
-          </div>
-        </div>
-        <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(5,1fr); gap:18px; margin-bottom:18px;">
-          <sc-for list="{{ powerStats }}" as="s" hint-placeholder-count="5">
-            <div class="cc-glowcard" style="border-radius:18px; background:#16181c; padding:18px;">
-              <div style="font-size:11px; letter-spacing:1px; color:#7c7c84;">{{ s.label }}</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; margin-top:8px; color:{{ s.c }};">{{ s.value }}</div>
-            </div>
-          </sc-for>
-        </div>
-        <div class="cc-grid2" style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; margin-bottom:16px;">Attributes</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 22px;" class="cc-grid2">
-              <sc-for list="{{ powerCats }}" as="c" hint-placeholder-count="12">
-                <div>
-                  <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;"><span style="font-size:12.5px; color:#dbdbe0;">{{ c.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#FFFFFF;">LV {{ c.level }}</span></div>
-                  <div style="height:7px; border-radius:5px; background:rgba(255,255,255,0.06); overflow:hidden;"><div style="height:100%; width:{{ c.pct }}; border-radius:5px; background:#FFFFFF;"></div></div>
-                </div>
-              </sc-for>
-            </div>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:14px;">↗ RANK PROGRESSION</div>
-            <!-- Fifty-one ranks rather than nineteen, so the ladder scrolls in its own box and
-                 the panel keeps the height it always had. It opens on your current rank. -->
-            <div id="rankLadder" style="max-height:430px; overflow-y:auto; padding-right:4px;">
-            <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="51">
-              <div data-rank-cur="{{ r.isCur }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); opacity:{{ r.op }};">
-                <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid {{ r.bd }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ r.numC }};">{{ r.min }}</span>
-                <div style="flex:1;"><div style="font-size:13px; color:{{ r.nameC }}; font-weight:600;">{{ r.n }}</div><div style="font-size:10.5px; color:#75757d;">{{ r.d }}</div></div>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ r.tagC }}; border:1px solid {{ r.tagBd }}; border-radius:6px; padding:2px 7px;">{{ r.tag }}</span>
+        <!-- The block design, applied: glass over the pearl ground, each panel with its
+             numbered mark and letterspaced title, and things grouped as panes inside a panel
+             rather than ruled apart — the same language Calendar wears now. The one thing in
+             each panel that is the hero of it (the ring, the focus callout) is raised, the
+             way the clock tile is on Calendar; things that are one of several sit as a plain
+             grouped pane, the way the day’s events do. -->
+        <div class="lcb-stage">
+          <div class="lcb-field"></div>
+          <div style="position:relative; display:flex; flex-direction:column; gap:18px;">
+
+            <!-- LEVEL -->
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">01 - LV</span>
+                <div class="lc-title">Level</div>
               </div>
-            </sc-for>
-            </div>
-          </div>
-        </div>
-        <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1.3fr; gap:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; border:1px solid rgba(255,255,255,0.22); background:#141416; padding:20px;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:12px;">◆ AI PERFORMANCE SPECIALIST</div>
-            <p style="font-size:13px; line-height:1.6; color:#d6d6da;">Continuously analyzing your performance data to find the fastest path forward. Strongest attribute: <b style="color:#fff;">{{ powerStrong }}</b>. Weakest: <b style="color:#FFFFFF;">{{ powerWeak }}</b> — closing this gap is the highest-leverage way to raise your Power Level.</p>
-            <div style="margin-top:12px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);"><div style="font-size:10px; letter-spacing:1.5px; color:#C9C9CE; font-family:'JetBrains Mono',monospace; margin-bottom:6px;">RECOMMENDED FOCUS</div><div style="font-size:12.5px; color:#dbdbe0; line-height:1.5;">{{ powerMission }}</div></div>
-          </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-size:13px; font-weight:600; margin-bottom:14px;">Achievements</div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;" class="cc-grid2">
-              <sc-for list="{{ powerAch }}" as="a" hint-placeholder-count="8">
-                <div style="display:flex; align-items:center; gap:11px; padding:11px; border-radius:12px; border:1px solid {{ a.bd }}; background:rgba(255,255,255,0.02); opacity:{{ a.op }};">
-                  <span style="font-size:15px; color:{{ a.c }};">{{ a.icon }}</span>
-                  <div><div style="font-size:12px; color:#eef0f2; font-weight:600;">{{ a.name }}</div><div style="font-size:10px; color:#75757d;">{{ a.desc }}</div></div>
+              <div style="background:var(--lc-raise); border:1px solid transparent; box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); border-radius:14px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; padding:22px 18px;">
+                <div style="position:relative; width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
+                  <canvas data-chart="powerRing" style="position:absolute; inset:0; width:150px; height:150px;"></canvas>
+                  <div style="text-align:center; position:relative;">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--lc-muted);">LEVEL</div>
+                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:46px; font-weight:300; line-height:1;">{{ powerLevel }}</div>
+                  </div>
                 </div>
-              </sc-for>
+              </div>
+              <div style="text-align:center; margin-top:18px;">
+                <h2 style="font-size:26px; font-weight:800; letter-spacing:-.5px; margin:0;">{{ rankName }}</h2>
+                <div style="font-size:13px; color:var(--lc-muted); margin-top:4px;">{{ rankDesc }}</div>
+              </div>
+              <div style="width:100%; max-width:520px; margin:20px auto 0;">
+                <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-muted); margin-bottom:7px;"><span>{{ xpIn }} XP</span><span>{{ xpNext }} XP</span></div>
+                <div style="height:10px; border-radius:6px; background:var(--lc-line); overflow:hidden;"><div style="height:100%; width:{{ powerPct }}; border-radius:6px; background:var(--lc-accent);"></div></div>
+                <div style="text-align:center; font-size:11.5px; color:var(--lc-muted); margin-top:10px;">Next rank: <b style="color:var(--lc-accent);">{{ nextRankName }}</b> at Level {{ nextRankLevel }}</div>
+              </div>
             </div>
+
+            <!-- STATS -->
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">02 - ST</span>
+                <div class="lc-title">Stats</div>
+              </div>
+              <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(5,1fr); gap:14px;">
+                <sc-for list="{{ powerStats }}" as="s" hint-placeholder-count="5">
+                  <div class="lc-sub">
+                    <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted);">{{ s.label }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; margin-top:8px; color:{{ s.c }};">{{ s.value }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div class="cc-grid2" style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px;">
+              <!-- ATTRIBUTES -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">03 - AT</span>
+                  <div class="lc-title">Attributes</div>
+                </div>
+                <div class="lc-sub cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:14px 22px;">
+                  <sc-for list="{{ powerCats }}" as="c" hint-placeholder-count="12">
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;"><span style="font-size:12.5px;">{{ c.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--lc-accent);">LV {{ c.level }}</span></div>
+                      <div style="height:7px; border-radius:5px; background:var(--lc-line); overflow:hidden;"><div style="height:100%; width:{{ c.pct }}; border-radius:5px; background:var(--lc-accent);"></div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <!-- RANKS -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">04 - RK</span>
+                  <div class="lc-title">Rank Progression</div>
+                </div>
+                <!-- Fifty-one ranks rather than nineteen, so the ladder scrolls in its own box
+                     and the panel keeps the height it always had. It opens on your current
+                     rank. -->
+                <div id="rankLadder" class="lc-sub" style="max-height:430px; overflow-y:auto;">
+                <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="51">
+                  <div data-rank-cur="{{ r.isCur }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--lc-line); opacity:{{ r.op }};">
+                    <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid {{ r.bd }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ r.numC }};">{{ r.min }}</span>
+                    <div style="flex:1;"><div style="font-size:13px; color:{{ r.nameC }}; font-weight:600;">{{ r.n }}</div><div style="font-size:10.5px; color:var(--lc-muted);">{{ r.d }}</div></div>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ r.tagC }}; border:1px solid {{ r.tagBd }}; border-radius:6px; padding:2px 7px;">{{ r.tag }}</span>
+                  </div>
+                </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1.3fr; gap:18px;">
+              <!-- SPECIALIST -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">05 - AI</span>
+                  <div class="lc-title">Specialist</div>
+                </div>
+                <p style="font-size:13px; line-height:1.6;">Continuously analyzing your performance data to find the fastest path forward. Strongest attribute: <b style="color:var(--lc-accent);">{{ powerStrong }}</b>. Weakest: <b style="color:var(--lc-accent);">{{ powerWeak }}</b> — closing this gap is the highest-leverage way to raise your Power Level.</p>
+                <div style="background:var(--lc-raise); border:1px solid transparent; box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); border-radius:14px; box-sizing:border-box; padding:12px 14px; margin-top:12px;"><div style="font-size:10px; letter-spacing:1.5px; color:var(--lc-accent); font-family:'JetBrains Mono',monospace; margin-bottom:6px;">RECOMMENDED FOCUS</div><div style="font-size:12.5px; line-height:1.5;">{{ powerMission }}</div></div>
+              </div>
+              <!-- ACHIEVEMENTS -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">06 - AC</span>
+                  <div class="lc-title">Achievements</div>
+                </div>
+                <div class="lc-sub cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <sc-for list="{{ powerAch }}" as="a" hint-placeholder-count="8">
+                    <div style="display:flex; align-items:center; gap:11px; padding:11px; border-radius:12px; border:1px solid {{ a.bd }}; opacity:{{ a.op }};">
+                      <span style="font-size:15px; color:{{ a.c }};">{{ a.icon }}</span>
+                      <div><div style="font-size:12px; font-weight:600;">{{ a.name }}</div><div style="font-size:10px; color:var(--lc-muted);">{{ a.desc }}</div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -9111,7 +9162,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.14-325 · v11.325 boot-crest';
+const NOTIF_BUILD_VERSION = '2026.09.14-326 · v11.326 power-glass';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13877,7 +13928,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
        against the weekly target now, like the row it sits next to. */
     if(r) this.startRingSet(r,[Math.min(1,(today*8)/this.MOVE_GOAL()), Math.min(1,today/this.DAY_TRAIN_GOAL()), Math.min(1,week/this.WEEK_TRAIN_GOAL())],['#FFFFFF','#eef0f2','#7a7a82'],15,7);
   }
-  init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100, '#FFFFFF'); } const hc=this.root.querySelector('[data-chart="powerHills"]'); if(hc) this.startPowerHills(hc); }
+  /* The wavy powerHills backdrop is gone — it was drawn for the old opaque dark hero card,
+     and the pearl field the whole page now sits on carries that ambience instead; a second,
+     bespoke moving backdrop layered under a glass card fought with it rather than adding to
+     it. The canvas element is gone from the markup too, so this no longer needs to look for
+     it. */
+  init_power(){ const c=this.root.querySelector('[data-chart="powerRing"]'); if(c){ const P=this.computePower(); this.startRingOnly(c, P.pct/100); } }
   startPowerHills(cv){ const {ctx,w,h}=this.prep(cv); const rows=10;
     this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const t=ts*0.00035;
       for(let i=0;i<rows;i++){ const rt=i/(rows-1); const y0=h*0.1+rt*h*0.85; const amp=5+rt*24; const alpha=0.05+rt*0.24;
@@ -13940,7 +13996,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const recent=byDay.slice(15).reduce((a,v)=>a+v,0), prior=byDay.slice(0,15).reduce((a,v)=>a+v,0);
     const deltaPct=prior>0?Math.round((recent-prior)/prior*100):(recent>0?100:0);
     return {series, deltaPct}; }
-  startRingOnly(cv,val,color){ const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9; this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008)); ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke(); ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.lineCap='round'; ctx.shadowColor=color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
+  /* The Level ring used to be handed a flat '#FFFFFF' regardless of raiment — the same
+     hard-coded-white bug the Forge/Health rings had before RING_PALETTE() existed to fix it.
+     This reads the same palette they do, including the pale-ring backing a light raiment's
+     card needs (Éverpine's champagne is invisible without it), instead of repeating the bug
+     for a ring that palette was never wired up to. */
+  startRingOnly(cv,val){
+    const pal=this.RING_PALETTE(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir';
+    const color=pal?pal.cols[0]:'#FFFFFF';
+    const pale=!!(pal&&pal.light&&this._ringPale(color));
+    const {ctx,w,h}=this.prep(cv); const cx=w/2,cy=h/2,r=w/2-9;
+    this.loop((ts)=>{ ctx.clearRect(0,0,w,h); const prog=val*(0.4+0.6*Math.min(1,ts*0.0008));
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,7); ctx.strokeStyle=isNoir?'rgba(150,143,130,0.12)':isU?'rgba(41,37,36,0.1)':'rgba(255,255,255,0.08)'; ctx.lineWidth=6; ctx.stroke();
+      ctx.lineCap='round';
+      if(pale){ ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle='rgba(41,37,36,0.28)'; ctx.lineWidth=8; ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+prog*Math.PI*2); ctx.strokeStyle=color; ctx.lineWidth=6; ctx.shadowColor=pale?'rgba(41,37,36,0.30)':color; ctx.shadowBlur=16; ctx.stroke(); ctx.shadowBlur=0; }); }
   startTrend(cv,vals,color){ const {ctx,w,h}=this.prep(cv); const n=vals.length; this.loop((ts)=>{ const grow=Math.min(1,ts*0.0009); ctx.clearRect(0,0,w,h); ctx.strokeStyle='rgba(255,255,255,0.05)'; for(let g=0;g<4;g++){ const y=(g/3)*(h-8)+4; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); } const pts=vals.map((v,i)=>({x:(i/(n-1))*w, y:h-(v*grow*0.8+0.1)*h})); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); const g=ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,this.hexA(color,0.3)); g.addColorStop(1,this.hexA(color,0)); ctx.fillStyle=g; ctx.fill(); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.shadowColor=this.hexA(color,0.7); ctx.shadowBlur=10; ctx.stroke(); ctx.shadowBlur=0; const last=pts[pts.length-1]; ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(last.x-1,last.y,3,0,7); ctx.fill(); }); }
   computePower(){ const s=this.state, now=Date.now(); const ds=new Date(); ds.setHours(0,0,0,0); const day=ds.getTime(), week=now-7*86400000, month=now-30*86400000;
     const ev=[];
@@ -18912,10 +18982,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       /* The learning streak moved here off the Learning Centre's stats bar. It is the same
          real figure it always was — consecutive days with a logged Learning activity — and
          it belongs beside the other streak rather than on one subject's hub. */
-      powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'#ff5563'},{label:'WEEKLY XP',value:'+'+P.week,c:'#eef0f2'},{label:'TOTAL XP',value:P.totalXP,c:'#eef0f2'},{label:'DAY STREAK',value:P.streak+'d',c:'#ff5563'},{label:'LEARNING STREAK',value:this._streakFor('Learning')+'d',c:'#eef0f2'}],
+      powerStats:[{label:'XP TODAY',value:'+'+P.today,c:'var(--lc-accent)'},{label:'WEEKLY XP',value:'+'+P.week,c:'inherit'},{label:'TOTAL XP',value:P.totalXP,c:'inherit'},{label:'DAY STREAK',value:P.streak+'d',c:'var(--lc-accent)'},{label:'LEARNING STREAK',value:this._streakFor('Learning')+'d',c:'inherit'}],
       powerCats:P.categories.map(c=>({name:c.name,level:c.level,pct:c.pct+'%'})),
-      powerRanks:P.ranks.map(r=>{ const cur=r.n===P.rank.n, locked=P.level<r.min, passed=!cur&&!locked; return {n:r.n,d:r.d,min:r.min,isCur:cur?'1':'0',op:locked?0.45:1,bd:cur?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)',numC:cur?'#ff5563':(passed?'#eef0f2':'#75757d'),nameC:locked?'#9a9aa2':'#eef0f2',tag:cur?'CURRENT':(passed?'UNLOCKED':'LOCKED'),tagC:cur?'#F4F4F5':(passed?'#9a9aa2':'#6f6f78'),tagBd:cur?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)'}; }),
-      powerAch:P.achievements.map(a=>({name:a.name,desc:a.desc,icon:a.u?'✓':'🔒',op:a.u?1:0.42,c:a.u?'#ff5563':'#6f6f78',bd:a.u?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.06)'})),
+      powerRanks:P.ranks.map(r=>{ const cur=r.n===P.rank.n, locked=P.level<r.min, passed=!cur&&!locked; return {n:r.n,d:r.d,min:r.min,isCur:cur?'1':'0',op:locked?0.45:1,bd:cur?'var(--lc-accent)':'var(--lc-line)',numC:cur?'var(--lc-accent)':(passed?'inherit':'var(--lc-muted)'),nameC:locked?'var(--lc-muted)':'inherit',tag:cur?'CURRENT':(passed?'UNLOCKED':'LOCKED'),tagC:cur?'var(--lc-accent)':'var(--lc-muted)',tagBd:cur?'var(--lc-accent)':'var(--lc-line)'}; }),
+      powerAch:P.achievements.map(a=>({name:a.name,desc:a.desc,icon:a.u?'✓':'🔒',op:a.u?1:0.42,c:a.u?'var(--lc-accent)':'var(--lc-muted)',bd:a.u?'var(--lc-accent)':'var(--lc-line)'})),
       powerStrong:P.strongest.name, powerWeak:P.weakest.name, powerMission:P.mission,
       woWeight:S.woWeight, woSets:S.woSets, woReps:S.woReps, setWoWeight:(e)=>this.setState({woWeight:e.target.value}), setWoSets:(e)=>this.setState({woSets:e.target.value}), setWoReps:(e)=>this.setState({woReps:e.target.value}),
       est1RM:best1RM?best1RM+' kg':'—', totalVolume:totVol?(totVol/1000).toFixed(1)+' t':'—', weekVolume:wkVol?(wkVol/1000).toFixed(1)+' t':'—',
