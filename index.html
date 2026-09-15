@@ -8983,38 +8983,42 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
        context of its own. The notification panel below has the same shape for the same reason. -->
   <sc-if value="{{ themeMenuOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closeThemeMenu }}" style="position:fixed; inset:0; z-index:60;"></div>
-    <div class="lc-card" style="position:fixed; top:{{ themeMenuAnchorTop }}px; right:{{ themeMenuAnchorRight }}px; z-index:61; width:280px; padding:14px; border-radius:20px;">
-      <div style="display:flex; align-items:center; gap:3px; padding:4px; border-radius:14px; border:1px solid var(--lc-line); background:var(--lc-sub); margin-bottom:16px;">
+    <!-- Fixed warm frosted glass, the same on every raiment — matching the iOS mode-picker
+         reference exactly rather than following the app's own light/dark ground, since the
+         point of the picture was this specific look, not "however the current theme tints
+         a card." -->
+    <div style="position:fixed; top:{{ themeMenuAnchorTop }}px; right:{{ themeMenuAnchorRight }}px; z-index:61; width:280px; padding:14px; border-radius:20px; box-sizing:border-box; background:rgba(120,102,84,0.55); backdrop-filter:blur(38px) saturate(1.6); -webkit-backdrop-filter:blur(38px) saturate(1.6); border:1px solid rgba(255,255,255,0.18); box-shadow:inset 0 1px 0 rgba(255,255,255,0.25), 0 20px 50px rgba(0,0,0,0.35);">
+      <div style="display:flex; align-items:center; gap:3px; padding:4px; border-radius:14px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); margin-bottom:16px;">
         <sc-for list="{{ themeMenuTabs }}" as="t" hint-placeholder-count="4">
           <span onClick="{{ t.go }}" style="flex:1; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:{{ t.c }}; background:{{ t.bg }};">
             <sc-if value="{{ t.icon }}" hint-placeholder-val="{{ true }}"><span class="icon-inherit" style="width:16px; height:16px; display:flex;" data-icon="{{ t.icon }}"></span></sc-if>
           </span>
         </sc-for>
       </div>
-      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:3px;">MENU</div>
-      <div style="font-size:19px; font-weight:600; color:var(--lc-accent); margin-bottom:12px;">{{ themeMenuLabel }}</div>
-      <div style="height:1px; background:var(--lc-line); margin-bottom:10px;"></div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:rgba(255,255,255,0.55); margin-bottom:3px;">MENU</div>
+      <div style="font-size:19px; font-weight:600; color:#FFFFFF; margin-bottom:12px;">{{ themeMenuLabel }}</div>
+      <div style="height:1px; background:rgba(255,255,255,0.18); margin-bottom:10px;"></div>
 
       <sc-if value="{{ themeMenuIsThemes }}" hint-placeholder-val="{{ true }}">
         <sc-for list="{{ themeMenuThemes }}" as="th" hint-placeholder-count="4">
           <div onClick="{{ th.set }}" style="display:flex; align-items:center; gap:12px; padding:10px 8px; border-radius:12px; cursor:pointer; background:{{ th.bg }};">
-            <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid var(--lc-line); display:flex; align-items:center; justify-content:center; font-size:13px; color:{{ th.ink }};">{{ th.g }}</span>
+            <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center; font-size:13px; color:{{ th.ink }};">{{ th.g }}</span>
             <span style="font-size:13.5px; color:{{ th.ink }}; flex:1;">{{ th.name }}</span>
-            <sc-if value="{{ th.on }}" hint-placeholder-val="{{ false }}"><span style="color:var(--lc-accent); font-size:13px;">✓</span></sc-if>
+            <sc-if value="{{ th.on }}" hint-placeholder-val="{{ false }}"><span style="color:#FFFFFF; font-size:13px;">✓</span></sc-if>
           </div>
         </sc-for>
       </sc-if>
 
       <sc-if value="{{ themeMenuIsWebsite }}" hint-placeholder-val="{{ false }}">
-        <div onClick="{{ visitWebsite }}" style="display:flex; align-items:center; gap:12px; padding:10px 8px; border-radius:12px; cursor:pointer;" style-hover="{ background:'var(--lc-sub)' }">
-          <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid var(--lc-line); display:flex; align-items:center; justify-content:center;"><span class="icon-inherit" style="width:14px; height:14px; display:flex; color:var(--lc-muted);" data-icon="globe"></span></span>
-          <span style="font-size:13.5px; color:var(--lc-accent); flex:1;">Visit the Nervexus website</span>
-          <span style="color:var(--lc-muted); font-size:12px;">↗</span>
+        <div onClick="{{ visitWebsite }}" style="display:flex; align-items:center; gap:12px; padding:10px 8px; border-radius:12px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.1)' }">
+          <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:center;"><span class="icon-inherit" style="width:14px; height:14px; display:flex; color:rgba(255,255,255,0.7);" data-icon="globe"></span></span>
+          <span style="font-size:13.5px; color:#FFFFFF; flex:1;">Visit the Nervexus website</span>
+          <span style="color:rgba(255,255,255,0.5); font-size:12px;">↗</span>
         </div>
       </sc-if>
 
       <sc-if value="{{ themeMenuIsBlank }}" hint-placeholder-val="{{ false }}">
-        <div style="padding:24px 8px; text-align:center; font-size:12px; color:var(--lc-muted);">Nothing here yet.</div>
+        <div style="padding:24px 8px; text-align:center; font-size:12px; color:rgba(255,255,255,0.5);">Nothing here yet.</div>
       </sc-if>
     </div>
   </sc-if>
@@ -9138,7 +9142,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.15-335 · v11.335 theme-menu-2';
+const NOTIF_BUILD_VERSION = '2026.09.15-336 · v11.336 theme-menu-3';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -19445,14 +19449,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             {id:'website', icon:'globe', on:tab==='website', go:()=>this.setThemeMenuTab('website')},
             {id:'blank1', icon:'', on:tab==='blank1', go:()=>this.setThemeMenuTab('blank1')},
             {id:'blank2', icon:'', on:tab==='blank2', go:()=>this.setThemeMenuTab('blank2')},
-          ].map(t=>({...t, c:t.on?'var(--lc-on-accent)':'var(--lc-muted)', bg:t.on?'var(--lc-accent)':'transparent'})),
+          ].map(t=>({...t, c:t.on?'#FFFFFF':'rgba(255,255,255,0.55)', bg:t.on?'rgba(255,255,255,0.22)':'transparent'})),
           themeMenuIsThemes:tab==='themes', themeMenuIsWebsite:tab==='website',
           themeMenuIsBlank:tab==='blank1'||tab==='blank2',
           themeMenuLabel:tab==='themes'?'Themes':tab==='website'?'Website':'Reserved',
           themeMenuThemes:themeDefs.map(d=>{ const on=cur===d.k; return {
             g:d.g, name:d.k, on,
-            ink:on?'var(--lc-accent)':'var(--lc-muted)', bg:on?'var(--lc-sub)':'transparent',
-            set:()=>{ this.setPref('theme','Ultra'); this.setPref('ultraStyle',d.k); this.closeThemeMenu(); } }; }),
+            ink:on?'#FFFFFF':'rgba(255,255,255,0.82)', bg:on?'rgba(255,255,255,0.16)':'transparent',
+            // Stays open on pick, unlike Website below: switching raiments is meant to be
+            // browsed live, one after another, not a single choice that closes the sheet.
+            set:()=>{ this.setPref('theme','Ultra'); this.setPref('ultraStyle',d.k); } }; }),
           visitWebsite:()=>this.visitWebsite(), closeThemeMenu:()=>this.closeThemeMenu(),
           toggleThemeMenu:()=>this.toggleThemeMenu(),
         };
