@@ -1450,11 +1450,16 @@ const anat = () => page.evaluate(() => {
    point of the change: nothing about the model is in the page until it is asked for. */
 const tapAnatomy = () => page.evaluate(() => {
   const h = [...document.querySelectorAll('span,div')]
-    .find(e => e.children.length === 0 && e.textContent.trim() === 'Anatomy');
+    .find(e => e.children.length === 0 && e.textContent.trim() === '◆ ANATOMY');
   if (!h) return false;
-  const clickable = (h.classList.contains('sc-interp') ? h.parentElement : h).closest('[style*="cursor:pointer"]') ||
-    (h.classList.contains('sc-interp') ? h.parentElement : h).parentElement;
-  clickable.click();
+  /* Walk up from the text node to the first ancestor (self included) that actually carries
+     the click handler — checking the .onclick property rather than the style string, because
+     the browser re-serialises an applied inline style with a space after the colon
+     ("cursor: pointer"), which a [style*="cursor:pointer"] attribute selector never matches. */
+  let el = h.classList.contains('sc-interp') ? h.parentElement : h;
+  while (el && !el.onclick) el = el.parentElement;
+  if (!el) return false;
+  el.click();
   return true;
 });
 const openAnatomy = async () => {
