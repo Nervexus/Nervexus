@@ -1121,33 +1121,31 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
     </sc-if>
 
-  <!-- BRAIN REST — the white abyss.
-       A place rather than a dialogue: a pale luminous field with the horizon of something
-       vast just under the frame, one hairline down the middle, and everything said in the
-       lower third. White on every raiment but Noir, which gets the same thing inverted.
-       While you are sitting the filled part of the hairline is the clock, and it is the only
-       thing on the screen that moves. -->
+  <!-- BRAIN REST — the pearl ground, full screen.
+       A place rather than a dialogue: the same lit field every card in the app sits on, filling
+       the whole screen rather than framing a card on it, with one hairline down the middle and
+       everything said in the lower third. While you are sitting the filled part of the hairline
+       is the clock, and it is the only thing on the screen that moves. -->
   <sc-if value="{{ brOpen }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed; inset:0; z-index:1000; overflow:hidden;">
-      <div class="rest-abyss"></div>
-      <div class="rest-grain"></div>
-      <div class="lu-card rest-stage" style="position:relative; width:100%; height:100%; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
+    <div class="lcb-stage" style="position:fixed; inset:0; z-index:1000; border-radius:0;">
+      <div class="lcb-field"></div>
+      <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:0; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
 
-        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--ab-muted); flex:0 0 auto;">{{ brBanner }}</div>
+        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); flex:0 0 auto;">{{ brBanner }}</div>
 
         <!-- The thread. Empty on the gates; the clock while you sit. -->
-        <div class="rest-thread"><i style="height:{{ brThreadPct }};"></i></div>
+        <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:{{ brThreadPct }}; background:var(--lc-accent);"></i></div>
 
         <div style="flex:0 0 auto; width:100%; max-width:520px; padding-bottom:6px;">
-          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:{{ brTitleSize }}; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--ab-ink);">{{ brTitle }}</div>
-          <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--ab-muted); max-width:42ch; margin:18px auto 0;">{{ brBody }}</div>
+          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:{{ brTitleSize }}; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">{{ brTitle }}</div>
+          <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:42ch; margin:18px auto 0;">{{ brBody }}</div>
 
           <div style="margin-top:34px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
             <sc-if value="{{ brHasSecondary }}" hint-placeholder-val="{{ true }}">
-              <span onClick="{{ brSecondary }}" style="flex:{{ brSecondaryFlex }}; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--ab-line); background:transparent; color:var(--ab-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">{{ brSecondaryLabel }}</span>
+              <span onClick="{{ brSecondary }}" style="flex:{{ brSecondaryFlex }}; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">{{ brSecondaryLabel }}</span>
             </sc-if>
             <sc-if value="{{ brHasPrimary }}" hint-placeholder-val="{{ true }}">
-              <span onClick="{{ brPrimary }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--ab-fill); color:var(--ab-on-fill); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">{{ brPrimaryLabel }}</span>
+              <span onClick="{{ brPrimary }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">{{ brPrimaryLabel }}</span>
             </sc-if>
           </div>
         </div>
@@ -3594,23 +3592,21 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </sc-if>
 
         <sc-if value="{{ forgeShowMental }}" hint-placeholder-val="{{ false }}">
-          <!-- The way in wears the same place it opens into: the same pale field, the same
-               hairline, the words low. Tapping BEGIN should feel like stepping further into
-               somewhere you are already standing rather than opening a dialogue. -->
-          <div class="rest-panel">
-            <div class="rest-abyss"></div>
-            <div class="rest-grain"></div>
-            <div class="rest-panel-in">
+          <!-- Same pearl ground as the rest of the Forge now, rather than its own bespoke
+               field — the tab it opens into is part of the same house as Home and Training. -->
+          <div class="lcb-stage" style="min-height:520px; display:flex;">
+            <div class="lcb-field"></div>
+            <div class="lc-card" style="position:relative; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center;">
               <div style="display:flex; align-items:baseline; justify-content:space-between; gap:12px; width:100%; max-width:520px;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--ab-muted);">MENTAL</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--ab-muted);">5 MIN</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted);">MENTAL</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted);">5 MIN</span>
               </div>
-              <div class="rest-thread"><i style="height:0%;"></i></div>
+              <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
               <div style="width:100%; max-width:520px;">
-                <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:44px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--ab-ink);">Brain Rest</div>
-                <div style="font-size:15px; line-height:1.7; color:var(--ab-muted); max-width:42ch; margin:18px auto 0;">Five minutes sitting in silence. No music, no screen, nothing to finish first — it is there to clear the head before the work starts, not to fill the time.</div>
+                <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:44px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Brain Rest</div>
+                <div style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:42ch; margin:18px auto 0;">Five minutes sitting in silence. No music, no screen, nothing to finish first — it is there to clear the head before the work starts, not to fill the time.</div>
                 <div style="margin-top:32px; display:flex; justify-content:center;">
-                  <span onClick="{{ openBrainRest }}" style="min-width:220px; padding:15px 30px; border-radius:999px; cursor:pointer; background:var(--ab-fill); color:var(--ab-on-fill); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">BEGIN</span>
+                  <span onClick="{{ openBrainRest }}" style="min-width:220px; padding:15px 30px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">BEGIN</span>
                 </div>
               </div>
             </div>
@@ -9147,7 +9143,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.16-339 · v11.339 changelog-catchup';
+const NOTIF_BUILD_VERSION = '2026.09.17-340 · v11.340 brain-rest-pearl';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14167,6 +14163,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.340', date:'Sep 17, 2026', major:true, notes:[
+      'Brain Rest sits on the pearl ground now too — both the way in, on the Forge’s Mental tab, and the full-screen sit itself, which used to be its own bespoke field. Still full screen, still one hairline and nothing else moving, just the same ground every other card in the app already sits on.',
+    ]},
     {version:'v11.339', date:'Sep 16, 2026', major:false, notes:[
       'Update Terminal was quietly falling behind — real releases were shipping without an entry here. Every version now gets logged the moment it ships, not backfilled later.',
     ]},

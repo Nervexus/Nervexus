@@ -154,7 +154,9 @@ t('it finishes, and finishing puts the timer away', async () => {
 
 t('it takes the whole screen, at both widths', async () => {
   /* A five minute sit that leaves the app visible around the edges is asking you to stop
-     while showing you everything you stopped doing. */
+     while showing you everything you stopped doing. The pearl ground (lcb-stage) is what
+     actually covers the viewport now; the glass card sitting on it is deliberately inset
+     from that edge by the same margin every card in the app keeps from its own ground. */
   for (const [w, h] of [[1440, 1000], [390, 844]]) {
     await page.setViewportSize({ width: w, height: h });
     await boot();
@@ -163,18 +165,20 @@ t('it takes the whole screen, at both widths', async () => {
        reads the animation rather than the layout. */
     await page.waitForTimeout(900);
     const box = await page.evaluate(() => {
-      const c = document.querySelector('.lu-card').getBoundingClientRect();
+      const c = document.querySelector('.lcb-stage').getBoundingClientRect();
+      /* and nothing of the app behind it is legible through the overlay: sampling the very
+         corner should land on the ground itself, not on anything from the page beneath it. */
+      const corner = document.elementFromPoint(2, 2);
       return { w: Math.round(c.width), h: Math.round(c.height),
                vw: window.innerWidth, vh: window.innerHeight,
-               /* and nothing of the app behind it is legible through the overlay */
-               opaque: getComputedStyle(document.querySelector('.lu-card')).backgroundColor };
+               coveredByStage: !!corner && !!corner.closest('.lcb-stage') };
     });
     eq(box.w, box.vw, 'at ' + w + 'px it is ' + box.w + 'px wide, not full width');
     eq(box.h, box.vh, 'at ' + w + 'px it is ' + box.h + 'px tall, not full height');
-    ok(!/rgba\(.*, 0\.\d+\)/.test(box.opaque), 'the ground is see-through: ' + box.opaque);
+    ok(box.coveredByStage, 'the top corner is not the sit’s own ground: something else shows through');
     /* And it fits: nothing on it should need scrolling, least of all the way out. */
     const fits = await page.evaluate(() => {
-      const btns = [...document.querySelectorAll('.lu-card span')].filter(e => e.onclick);
+      const btns = [...document.querySelectorAll('.rest-stage span')].filter(e => e.onclick);
       return btns.length && btns.every(b => { const r = b.getBoundingClientRect(); return r.bottom <= window.innerHeight + 1 && r.top >= 0; });
     });
     ok(fits, 'at ' + w + 'px a button is off screen');
@@ -267,34 +271,36 @@ t('the entry survives what Supabase can actually store', async () => {
      'the sit lost its worth once it had been through the columns the table actually has');
 });
 
-/* ---- the white abyss --------------------------------------------------------------------
-   The sit is its own place rather than a card over the app: a pale luminous field with the
-   horizon of something vast low in the frame, one hairline down the middle, and everything
-   said in the lower third. White on every raiment but Noir, which gets it inverted. */
-t('it is the white abyss, and the black one only on Noir', async () => {
+/* ---- the pearl ground --------------------------------------------------------------------
+   The sit is its own place rather than a card over the app: the same pearl field every card
+   in the app now sits on, filling the whole screen, one hairline down the middle, and
+   everything said in the lower third. Light on every raiment but Noir, which gets it inverted
+   — the same rule the pearl ground already applies everywhere else it is used. */
+t('it is the pearl ground, and the dark one only on Noir', async () => {
   const read = async (raiment) => {
     await boot();
     await page.evaluate((r) => window.__nvx.setState({
       prefs: { ...window.__nvx.state.prefs, theme: 'Ultra', ultraStyle: r }, brStage: 'ready' }), raiment);
     await page.waitForTimeout(900);
     return page.evaluate(() => {
-      const stage = document.querySelector('.rest-stage');
+      const card = document.querySelector('.lc-card');
       const lum = (c) => { const [r, g, b] = (c.match(/\d+/g) || []).slice(0, 3).map(Number); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
       const cs = getComputedStyle(document.querySelector('.cc-shell'));
-      return { far: cs.getPropertyValue('--ab-far').trim(), inkLum: lum(getComputedStyle(document.querySelector('.rest-title')).color),
-               groundLum: lum(cs.getPropertyValue('--ab-near').trim().replace('#', '').replace(/^(..)(..)(..)$/, (m, a, b2, c) => 'rgb(' + parseInt(a, 16) + ',' + parseInt(b2, 16) + ',' + parseInt(c, 16) + ')')),
-               abyss: !!document.querySelector('.rest-abyss'), thread: !!document.querySelector('.rest-thread'), stage: !!stage };
+      const hexLum = (hex) => lum(hex.trim().replace('#', '').replace(/^(..)(..)(..)$/, (m, a, b2, c) => 'rgb(' + parseInt(a, 16) + ',' + parseInt(b2, 16) + ',' + parseInt(c, 16) + ')'));
+      return { inkLum: lum(getComputedStyle(document.querySelector('.rest-title')).color),
+               groundLum: hexLum(cs.getPropertyValue('--lcb-near')),
+               field: !!document.querySelector('.lcb-field'), thread: !!document.querySelector('.rest-thread'), card: !!card };
     });
   };
   for (const raiment of ['Ultra X', 'Maison Élysée', 'Maison Éverpine']) {
     const r = await read(raiment);
-    ok(r.abyss && r.thread && r.stage, raiment + ': the scene did not render');
-    ok(r.groundLum > 200, raiment + ' is not the white abyss: ground brightness ' + Math.round(r.groundLum));
-    ok(r.inkLum < 120, raiment + ': the ink is not dark enough to read on white (' + Math.round(r.inkLum) + ')');
+    ok(r.field && r.thread && r.card, raiment + ': the scene did not render');
+    ok(r.groundLum > 200, raiment + ' is not the light pearl: ground brightness ' + Math.round(r.groundLum));
+    ok(r.inkLum < 120, raiment + ': the ink is not dark enough to read on it (' + Math.round(r.inkLum) + ')');
   }
   const noir = await read('Noir');
-  ok(noir.groundLum < 40, 'Noir is not the black version: ground brightness ' + Math.round(noir.groundLum));
-  ok(noir.inkLum > 180, 'Noir’s ink is not light enough to read on black (' + Math.round(noir.inkLum) + ')');
+  ok(noir.groundLum < 40, 'Noir is not the dark pearl: ground brightness ' + Math.round(noir.groundLum));
+  ok(noir.inkLum > 180, 'Noir’s ink is not light enough to read on it (' + Math.round(noir.inkLum) + ')');
 });
 
 t('the layout is the mark, the thread, then everything in the lower third', async () => {
@@ -329,23 +335,24 @@ t('the thread is the clock, and is empty before and after', async () => {
 
 
 t('the way in wears the place it opens into', async () => {
-  /* The Mental centre used to be a ruled card with a header band — a different object from
-     the sit it started. It is the same field, the same hairline and the same pill now, so
-     BEGIN reads as stepping further into somewhere you are already standing. */
+  /* The Mental centre used to be a ruled card with a header band, then its own bespoke
+     abyss field different from the sit it started — now it is the same pearl ground every
+     other Forge tab sits on, with the same hairline and the same pill, so BEGIN reads as
+     stepping further into somewhere you are already standing. */
   await boot();
   const panel = await page.evaluate(() => {
-    const pan = document.querySelector('.rest-panel');
+    const pan = document.querySelector('.lcb-stage');
     if (!pan) return null;
     const inside = (sel) => !!pan.querySelector(sel);
     const btn = [...pan.querySelectorAll('span')].find(e => e.textContent.trim() === 'BEGIN');
-    return { abyss: inside('.rest-abyss'), grain: inside('.rest-grain'), thread: inside('.rest-thread'),
+    return { field: inside('.lcb-field'), card: inside('.lc-card'), thread: inside('.rest-thread'),
              pill: btn ? Math.round(parseFloat(getComputedStyle(btn).borderRadius)) : 0,
              serif: /Cormorant/.test(getComputedStyle(pan.querySelector('div[style*="Cormorant"]')).fontFamily),
              /* and no trace of the card it used to be */
              band: !!pan.querySelector('[style*="border-bottom"]') };
   });
-  ok(panel, 'the Mental centre is not the abyss panel');
-  ok(panel.abyss, 'no field'); ok(panel.grain, 'no grain'); ok(panel.thread, 'no thread');
+  ok(panel, 'the Mental centre is not on the pearl ground');
+  ok(panel.field, 'no field'); ok(panel.card, 'no card'); ok(panel.thread, 'no thread');
   ok(panel.serif, 'the title is not the serif the sit uses');
   ok(panel.pill > 100, 'BEGIN is not a pill (radius ' + panel.pill + ')');
   ok(!panel.band, 'the old ruled header band is still there');
