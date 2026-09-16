@@ -8328,25 +8328,27 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
         <div style="margin-bottom:20px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ SETTINGS</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Control Center</h1>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--lc-muted); margin-bottom:7px;">◆ SETTINGS</div>
+          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px; color:var(--lc-accent);">Control Center</h1>
         </div>
-        <div class="cc-grid-cal" style="display:grid; grid-template-columns:230px 1fr; gap:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:14px; height:fit-content; max-height:calc(100vh - 220px); overflow-y:auto;">
+        <div class="lcb-stage">
+        <div class="lcb-field"></div>
+        <div class="cc-grid-cal" style="position:relative; display:grid; grid-template-columns:230px 1fr; gap:18px;">
+          <div class="lc-card" style="padding:14px; height:fit-content; max-height:calc(100vh - 220px); overflow-y:auto;">
             <sc-for list="{{ settingsTabs }}" as="t" hint-placeholder-count="7">
-              <div onClick="{{ t.set }}" style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:11px; cursor:pointer; margin-bottom:2px; background:{{ t.bg }}; border:1px solid {{ t.bd }};" style-hover="{ background:'rgba(255,255,255,0.04)' }">
+              <div onClick="{{ t.set }}" style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-radius:11px; cursor:pointer; margin-bottom:2px; background:{{ t.bg }}; border:1px solid {{ t.bd }};" style-hover="{ background:'var(--lc-sub)' }">
                 <span style="font-size:13px; color:{{ t.c }};">{{ t.name }}</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#6f6f78;">{{ t.soon }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:var(--lc-muted);">{{ t.soon }}</span>
               </div>
             </sc-for>
           </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:24px;">
+          <div class="lc-card" style="padding:24px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-              <span style="font-size:16px; font-weight:700; display:flex; align-items:center; gap:9px;">{{ settingsTab }} <sc-if value="{{ acctLockBadge }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px; color:#C9C9CE;">🔒</span></sc-if></span>
+              <span style="font-size:16px; font-weight:700; display:flex; align-items:center; gap:9px;">{{ settingsTab }} <sc-if value="{{ acctLockBadge }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px; color:var(--lc-muted);">🔒</span></sc-if></span>
               <sc-if value="{{ tabAccount }}" hint-placeholder-val="{{ true }}"><span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ acctChipColor }};">{{ acctChipTxt }}</span></sc-if>
             </div>
             <sc-if value="{{ tabAccount }}" hint-placeholder-val="{{ true }}">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#5c5c62;">{{ appVersion }}</span><span onClick="{{ openWhatsNewBtn }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:4px 9px; cursor:pointer;" style-hover="{ borderColor:'rgba(255,255,255,0.4)', color:'#fff' }">WHAT'S NEW</span>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--lc-muted);">{{ appVersion }}</span><span onClick="{{ openWhatsNewBtn }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:8px; padding:4px 9px; cursor:pointer;" style-hover="{ borderColor:'rgba(255,255,255,0.4)', color:'#fff' }">WHAT'S NEW</span>
               <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ true }}">
                 <span onClick="{{ backupCodeToCloud }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ backupBtnColor }};" style-hover="{ color:'#fff' }">{{ backupBtnLabel }}</span>
               </sc-if>
@@ -8354,11 +8356,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <sc-if value="{{ backupErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#ff5563; margin:-8px 0 12px;">{{ backupErr }}</div></sc-if>
             <sc-if value="{{ acctLocked }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:40px 20px;">
-                <div style="width:70px; height:70px; border-radius:20px; border:1px solid rgba(255,255,255,0.3); background:rgba(255,255,255,0.12),transparent 70%); display:flex; align-items:center; justify-content:center; font-size:30px; margin-bottom:18px;">🔒</div>
+                <div style="width:70px; height:70px; border-radius:20px; border:1px solid var(--lc-line); background:radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%); display:flex; align-items:center; justify-content:center; font-size:30px; margin-bottom:18px;">🔒</div>
                 <div style="font-size:16px; font-weight:600; margin-bottom:4px;">Account Locked</div>
-                <div style="font-size:12.5px; color:#8a8a92; margin-bottom:18px;">Confirm your account password to view and edit these settings.</div>
+                <div style="font-size:12.5px; color:var(--lc-muted); margin-bottom:18px;">Confirm your account password to view and edit these settings.</div>
                 <div style="display:flex; gap:9px; max-width:360px; width:100%;">
-                  <input value="{{ acctPwInput }}" onInput="{{ setAcctPwInput }}" onKeyDown="{{ unlockAcctKey }}" type="password" placeholder="Account password" style="flex:1; padding:12px 14px; border-radius:11px; border:1px solid {{ acctErrBorder }}; background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none; text-align:center; letter-spacing:2px;">
+                  <input value="{{ acctPwInput }}" onInput="{{ setAcctPwInput }}" onKeyDown="{{ unlockAcctKey }}" type="password" placeholder="Account password" style="flex:1; padding:12px 14px; border-radius:11px; border:1px solid {{ acctErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none; text-align:center; letter-spacing:2px;">
                   <span onClick="{{ unlockAcct }}" class="cc-glowbtn" style="padding:12px 22px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13.5px; font-weight:700; cursor:pointer;">{{ unlockAcctLabel }}</span>
                 </div>
                 <sc-if value="{{ acctErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">Incorrect password.</div></sc-if>
@@ -8366,124 +8368,124 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </sc-if>
             <sc-if value="{{ acctUnlocked }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex; align-items:center; gap:18px; margin-bottom:24px;">
-              <div data-avatar="settings" style="width:76px; height:76px; border-radius:20px; background:#151517; border:1px solid rgba(255,255,255,0.35); display:flex; align-items:center; justify-content:center; font-weight:700; color:#FFFFFF; font-size:24px; background-size:cover; background-position:center;"></div>
+              <div data-avatar="settings" style="width:76px; height:76px; border-radius:20px; background:var(--lc-sub); border:1px solid var(--lc-line); display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--lc-accent); font-size:24px; background-size:cover; background-position:center;"></div>
               <div style="display:flex; flex-direction:column; gap:8px;">
-                <label style="font-size:12.5px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:10px; padding:9px 15px; cursor:pointer; text-align:center;" style-hover="{ background:'rgba(255,255,255,0.2)' }">Upload photo<input type="file" accept="image/*" onChange="{{ onAvatar }}" style="display:none;"></label>
-                <span onClick="{{ removeAvatar }}" style="font-size:11.5px; color:#8a8a92; cursor:pointer; text-align:center;" style-hover="{ color:'#FFFFFF' }">Remove</span>
+                <label style="font-size:12.5px; color:var(--lc-accent); border:1px solid var(--lc-line); background:var(--lc-sub); border-radius:10px; padding:9px 15px; cursor:pointer; text-align:center;" style-hover="{ background:'rgba(255,255,255,0.2)' }">Upload photo<input type="file" accept="image/*" onChange="{{ onAvatar }}" style="display:none;"></label>
+                <span onClick="{{ removeAvatar }}" style="font-size:11.5px; color:var(--lc-muted); cursor:pointer; text-align:center;" style-hover="{ color:'#FFFFFF' }">Remove</span>
               </div>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;" class="cc-grid2">
               <div>
-                <div style="font-size:11px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px; font-family:'JetBrains Mono',monospace;">FULL NAME</div>
-                <input value="{{ acctName }}" onInput="{{ setAcctName }}" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none;">
+                <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace;">FULL NAME</div>
+                <input value="{{ acctName }}" onInput="{{ setAcctName }}" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none;">
               </div>
               <div>
-                <div style="font-size:11px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px; font-family:'JetBrains Mono',monospace;">EMAIL</div>
-                <input value="{{ acctEmail }}" onInput="{{ setAcctEmail }}" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none;">
+                <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace;">EMAIL</div>
+                <input value="{{ acctEmail }}" onInput="{{ setAcctEmail }}" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none;">
               </div>
               <div>
-                <div style="font-size:11px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px; font-family:'JetBrains Mono',monospace;">PASSWORD</div>
-                <input value="{{ acctPass }}" onInput="{{ setAcctPass }}" type="password" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none;">
+                <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace;">PASSWORD</div>
+                <input value="{{ acctPass }}" onInput="{{ setAcctPass }}" type="password" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none;">
               </div>
               <div>
-                <div style="font-size:11px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px; font-family:'JetBrains Mono',monospace;">2FA SECONDARY PASSWORD</div>
-                <input value="{{ acctTwoFA }}" onInput="{{ setAcctTwoFA }}" type="text" placeholder="Leave blank to keep 2FA off" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none; box-sizing:border-box;">
-                <div style="font-size:10.5px; color:#6f6f78; margin-top:6px;">Set this to require a second password at login. Leave blank to disable 2FA.</div>
+                <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace;">2FA SECONDARY PASSWORD</div>
+                <input value="{{ acctTwoFA }}" onInput="{{ setAcctTwoFA }}" type="text" placeholder="Leave blank to keep 2FA off" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none; box-sizing:border-box;">
+                <div style="font-size:10.5px; color:var(--lc-muted); margin-top:6px;">Set this to require a second password at login. Leave blank to disable 2FA.</div>
               </div>
               <div>
-                <div style="font-size:11px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px; font-family:'JetBrains Mono',monospace;">LOGIN GREETING</div>
-                <input value="{{ acctGreeting }}" onInput="{{ setAcctGreeting }}" placeholder="e.g. Welcome back, Commander." style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none;">
+                <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace;">LOGIN GREETING</div>
+                <input value="{{ acctGreeting }}" onInput="{{ setAcctGreeting }}" placeholder="e.g. Welcome back, Commander." style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none;">
               </div>
               <div>
-                <div style="font-size:11px; letter-spacing:1px; color:#7c7c84; margin-bottom:7px; font-family:'JetBrains Mono',monospace;">TIME ZONE</div>
-                <select value="{{ tzValue }}" onChange="{{ setTz }}" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none; appearance:none; -webkit-appearance:none;">
-                  <sc-for list="{{ tzOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}" class="cc-glowcard" style="background:#141416; color:#eef0f2;">{{ o.l }}</option></sc-for>
+                <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:7px; font-family:'JetBrains Mono',monospace;">TIME ZONE</div>
+                <select value="{{ tzValue }}" onChange="{{ setTz }}" style="width:100%; padding:12px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none; appearance:none; -webkit-appearance:none;">
+                  <sc-for list="{{ tzOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}" style="background:#141416; color:#eef0f2;">{{ o.l }}</option></sc-for>
                 </select>
-                <div style="font-size:10.5px; color:#6f6f78; margin-top:6px; font-family:'JetBrains Mono',monospace;">Now: {{ tzPreview }}</div>
+                <div style="font-size:10.5px; color:var(--lc-muted); margin-top:6px; font-family:'JetBrains Mono',monospace;">Now: {{ tzPreview }}</div>
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:14px; margin-top:22px; flex-wrap:wrap;">
-              <span onClick="{{ saveAccount }}" style="padding:12px 28px; border-radius:12px; background:{{ saveBtnBg }}; border:1px solid rgba(255,255,255,0.4); color:{{ saveBtnC }}; font-size:13.5px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">{{ saveBtnLabel }}</span>
+              <span onClick="{{ saveAccount }}" style="padding:12px 28px; border-radius:12px; background:{{ saveBtnBg }}; border:1px solid var(--lc-line); color:{{ saveBtnC }}; font-size:13.5px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">{{ saveBtnLabel }}</span>
               <span style="font-size:12px; color:{{ saveHintColor }};">{{ saveHint }}</span>
             </div>
-            <div style="margin-top:14px; font-size:11px; color:#6f6f78; display:flex; align-items:center; gap:8px;"><span style="color:#6cffba;">✓</span> Password is your real Supabase Auth login — changing it here updates it everywhere, on every device.</div>
-            <div style="margin-top:22px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div style="margin-top:14px; font-size:11px; color:var(--lc-muted); display:flex; align-items:center; gap:8px;"><span style="color:#6cffba;">✓</span> Password is your real Supabase Auth login — changing it here updates it everywhere, on every device.</div>
+            <div style="margin-top:22px; padding-top:20px; border-top:1px solid var(--lc-line);">
               <div style="font-size:13px; font-weight:600; margin-bottom:4px;">Test Difficulty</div>
-              <div style="font-size:11.5px; color:#8a8a92; margin-bottom:12px;">Sets the default difficulty for every subject's Quick Test — you can still change it per test. New accounts start on Easy and get auto-ranked up as you complete more Quick Tests, or pick a level yourself below.</div>
+              <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:12px;">Sets the default difficulty for every subject's Quick Test — you can still change it per test. New accounts start on Easy and get auto-ranked up as you complete more Quick Tests, or pick a level yourself below.</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;"><sc-for list="{{ testTierChips }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 16px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                <span style="font-size:11px; color:#6f6f78; font-family:'JetBrains Mono',monospace;">{{ testTierAutoLabel }}</span>
-                <sc-if value="{{ testTierIsManual }}" hint-placeholder-val="{{ false }}"><span onClick="{{ resetTestTierAuto }}" style="font-size:11px; color:#c8c8ce; cursor:pointer; text-decoration:underline;" style-hover="{ color:'#fff' }">Reset to auto-rank</span></sc-if>
+                <span style="font-size:11px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace;">{{ testTierAutoLabel }}</span>
+                <sc-if value="{{ testTierIsManual }}" hint-placeholder-val="{{ false }}"><span onClick="{{ resetTestTierAuto }}" style="font-size:11px; color:var(--lc-muted); cursor:pointer; text-decoration:underline;" style-hover="{ color:'#fff' }">Reset to auto-rank</span></sc-if>
               </div>
             </div>
-            <div style="margin-top:22px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.08);">
-              <div style="font-size:13px; font-weight:600; margin-bottom:4px; display:flex; align-items:center; gap:8px;"><span style="color:#C9C9CE;">🔒</span> Notes Vault Password</div>
-              <div style="font-size:11.5px; color:#8a8a92; margin-bottom:12px;">Resets the password for the Private Notes Vault at the bottom of the Command Center.</div>
+            <div style="margin-top:22px; padding-top:20px; border-top:1px solid var(--lc-line);">
+              <div style="font-size:13px; font-weight:600; margin-bottom:4px; display:flex; align-items:center; gap:8px;"><span style="color:var(--lc-muted);">🔒</span> Notes Vault Password</div>
+              <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:12px;">Resets the password for the Private Notes Vault at the bottom of the Command Center.</div>
               <div style="display:flex; gap:9px; flex-wrap:wrap; align-items:center;">
-                <input value="{{ notesPwDraft }}" onInput="{{ setNotesPwDraft }}" type="text" placeholder="New notes password" style="width:210px; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:14px; outline:none; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">
-                <span onClick="{{ saveNotesPw }}" style="padding:11px 20px; border-radius:11px; background:{{ notesPwBtnBg }}; border:1px solid rgba(255,255,255,0.35); color:#0c0c0d; font-size:13px; font-weight:700; cursor:pointer;">{{ notesPwBtnLabel }}</span>
-                <span style="font-size:11.5px; color:#6f6f78; font-family:'JetBrains Mono',monospace;">Current: {{ notesPwCurrent }}</span>
+                <input value="{{ notesPwDraft }}" onInput="{{ setNotesPwDraft }}" type="text" placeholder="New notes password" style="width:210px; padding:11px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">
+                <span onClick="{{ saveNotesPw }}" style="padding:11px 20px; border-radius:11px; background:{{ notesPwBtnBg }}; border:1px solid var(--lc-line); color:#0c0c0d; font-size:13px; font-weight:700; cursor:pointer;">{{ notesPwBtnLabel }}</span>
+                <span style="font-size:11.5px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace;">Current: {{ notesPwCurrent }}</span>
               </div>
             </div>
             </sc-if>
             </sc-if>
 
             <sc-if value="{{ tabAppear }}" hint-placeholder-val="{{ false }}">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">COMMAND CENTER LAYOUT</div>
-              <sc-for list="{{ dashboardWidgets }}" as="w" hint-placeholder-count="4"><div style="display:flex; align-items:center; justify-content:space-between; padding:11px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><span style="font-size:13px; color:#eef0f2;">{{ w.label }}</span><div onClick="{{ w.toggle }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ w.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ w.pos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:22px 0 12px;">BACKGROUND</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">COMMAND CENTER LAYOUT</div>
+              <sc-for list="{{ dashboardWidgets }}" as="w" hint-placeholder-count="4"><div style="display:flex; align-items:center; justify-content:space-between; padding:11px 2px; border-bottom:1px solid var(--lc-line);"><span style="font-size:13px; color:var(--lc-accent);">{{ w.label }}</span><div onClick="{{ w.toggle }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ w.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ w.pos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:22px 0 12px;">BACKGROUND</div>
               <sc-if value="{{ isBlackholeBg }}" hint-placeholder-val="{{ false }}">
                 <div style="margin-bottom:14px;">
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#7c7c84; margin-bottom:5px;">SPEED</div>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--lc-muted); margin-bottom:5px;">SPEED</div>
                   <input type="range" min="0.05" max="1.5" step="0.05" value="{{ bhSpeed }}" onInput="{{ onBhSpeed }}">
                 </div>
               </sc-if>
-              <span onClick="{{ openMobilePreview }}" class="cc-hide-mobile" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 14px; cursor:pointer; display:inline-block; margin-bottom:18px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">&#128241; PREVIEW ON MOBILE</span>
+              <span onClick="{{ openMobilePreview }}" class="cc-hide-mobile" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.5px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:9px; padding:9px 14px; cursor:pointer; display:inline-block; margin-bottom:18px;" style-hover="{ borderColor:'rgba(255,255,255,0.4)' }">&#128241; PREVIEW ON MOBILE</span>
               <sc-if value="{{ showBgPicker }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"><sc-for list="{{ homeBgChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.5px; padding:8px 14px; border-radius:9px; cursor:pointer; color:{{ c.c }}; border:1px solid {{ c.b }};">{{ c.l }}</span></sc-for></div>
               </sc-if>
-              <sc-if value="{{ bgPickerMobileNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#8a8a92; margin-bottom:14px;">{{ bgPickerMobileNote }}</div></sc-if>
+              <sc-if value="{{ bgPickerMobileNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:var(--lc-muted); margin-bottom:14px;">{{ bgPickerMobileNote }}</div></sc-if>
               <sc-if value="{{ isUltraTheme }}" hint-placeholder-val="{{ false }}">
-              <div style="height:1px; background:rgba(255,255,255,0.08); margin:6px 0 22px;"></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">ULTRA STYLE</div>
+              <div style="height:1px; background:var(--lc-sub); margin:6px 0 22px;"></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">ULTRA STYLE</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ ultraStyleChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
               </sc-if>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">SOVEREIGN</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">SOVEREIGN</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ themeChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">DENSITY</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">DENSITY</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;"><sc-for list="{{ densityChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 4px;">MOTION &amp; EFFECTS</div>
-              <sc-for list="{{ appearToggles }}" as="x" hint-placeholder-count="4"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><div style="min-width:0;"><div style="font-size:13.5px; color:#eef0f2;">{{ x.label }}</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer; transition:background .2s;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,0.4);"></div></div></div></sc-for>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 4px;">MOTION &amp; EFFECTS</div>
+              <sc-for list="{{ appearToggles }}" as="x" hint-placeholder-count="4"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid var(--lc-line);"><div style="min-width:0;"><div style="font-size:13.5px; color:var(--lc-accent);">{{ x.label }}</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer; transition:background .2s;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,0.4);"></div></div></div></sc-for>
             </sc-if>
 
             <sc-if value="{{ tabVoiceSet }}" hint-placeholder-val="{{ false }}">
-              <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px; margin-bottom:20px;">
-                <div style="font-size:11px; color:#8a8a92; line-height:1.5; margin-bottom:12px;">The ElevenLabs connection lives in the <strong style="color:#c8c8ce;">AI Command Center</strong> now, with every other provider. This page is what she sounds like.</div>
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#7c7c84; margin-bottom:8px;">ADD A VOICE BY ID (elevenlabs.io/app/voice-lab)</div>
-                      <div style="display:flex; gap:8px; align-items:center;"><input value="{{ customVoiceIdDraft }}" onInput="{{ onCustomVoiceIdDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Paste ElevenLabs voice ID" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><input value="{{ customVoiceNameDraft }}" onInput="{{ onCustomVoiceNameDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Name" style="width:110px; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none;"><span onClick="{{ addCustomVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600; white-space:nowrap;">ADD</span></div>
+              <div class="lc-sub" style="border-radius:15px; padding:14px; margin-bottom:20px;">
+                <div style="font-size:11px; color:var(--lc-muted); line-height:1.5; margin-bottom:12px;">The ElevenLabs connection lives in the <strong style="color:var(--lc-muted);">AI Command Center</strong> now, with every other provider. This page is what she sounds like.</div>
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:8px;">ADD A VOICE BY ID (elevenlabs.io/app/voice-lab)</div>
+                      <div style="display:flex; gap:8px; align-items:center;"><input value="{{ customVoiceIdDraft }}" onInput="{{ onCustomVoiceIdDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Paste ElevenLabs voice ID" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><input value="{{ customVoiceNameDraft }}" onInput="{{ onCustomVoiceNameDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Name" style="width:110px; padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; outline:none;"><span onClick="{{ addCustomVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--lc-accent); border:1px solid var(--lc-line); background:var(--lc-sub); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600; white-space:nowrap;">ADD</span></div>
               </div>
-              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:13px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.06); margin-bottom:8px;">
-                <div><div style="font-size:11px; color:#7c7c84; font-family:'JetBrains Mono',monospace; letter-spacing:1px;">ACTIVE VOICE MODEL</div><div style="font-size:17px; font-weight:700; margin-top:3px;">{{ voiceModelName }}</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">{{ voiceDeviceName }}</div></div>
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:13px; border:1px solid var(--lc-line); background:var(--lc-sub); margin-bottom:8px;">
+                <div><div style="font-size:11px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; letter-spacing:1px;">ACTIVE VOICE MODEL</div><div style="font-size:17px; font-weight:700; margin-top:3px;">{{ voiceModelName }}</div><div style="font-size:11px; color:var(--lc-muted); margin-top:2px;">{{ voiceDeviceName }}</div></div>
                 <span onClick="{{ testVoice }}" class="cc-glowbtn" style="padding:10px 18px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:12.5px; font-weight:700; cursor:pointer;" style-hover="{ transform:'translateY(-1px)' }">▶ Test voice</span>
               </div>
               <sc-if value="{{ voiceFallbackErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#ff8a5b; margin-bottom:14px; padding:0 2px;">⚠ {{ voiceFallbackErr }}</div></sc-if>
-              <div class="cc-glowcard" style="border-radius:18px; background:#141416; padding:18px 20px 6px; margin-bottom:22px;">
+              <div class="lc-sub" style="border-radius:18px; padding:18px 20px 6px; margin-bottom:22px;">
               <div style="display:flex; align-items:center; justify-content:space-between; margin:2px 0 12px;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">VOICE LIBRARY · ▶ PREVIEW</span>
-                <div style="display:flex; align-items:center; gap:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#c8c8ce;">READ ALOUD</span><div onClick="{{ toggleReadAloud }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ readAloudBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ readAloudPos }}; width:16px; height:16px; border-radius:50%; background:#0a0a0b; transition:left .15s;"></div></div></div>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted);">VOICE LIBRARY · ▶ PREVIEW</span>
+                <div style="display:flex; align-items:center; gap:9px;"><span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:var(--lc-muted);">READ ALOUD</span><div onClick="{{ toggleReadAloud }}" style="width:36px; height:20px; border-radius:10px; cursor:pointer; background:{{ readAloudBg }}; position:relative; transition:background .15s;"><div style="position:absolute; top:2px; left:{{ readAloudPos }}; width:16px; height:16px; border-radius:50%; background:#fff; transition:left .15s;"></div></div></div>
               </div>
-              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"><sc-for list="{{ voices }}" as="v" hint-placeholder-count="8"><div onClick="{{ v.pick }}" style="display:flex; align-items:center; gap:6px; flex:1 1 190px; max-width:260px; padding:7px 9px; border:1px solid {{ v.b }}; border-radius:11px; cursor:pointer; background:{{ v.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }"><span onClick="{{ v.preview }}" title="Preview" style="width:20px; height:20px; flex:0 0 20px; border-radius:50%; border:1px solid rgba(255,255,255,0.45); color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:8px; background:rgba(255,255,255,0.1);" style-hover="{ background:'rgba(255,255,255,0.25)' }">▶</span><span style="flex:1; min-width:0; font-size:11.5px; font-weight:600; color:{{ v.c }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ v.name }}</span><sc-if value="{{ v.custom }}" hint-placeholder-val="{{ false }}"><span onClick="{{ v.remove }}" title="Remove" style="width:18px; height:18px; flex:0 0 18px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:#6f6f78; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span></sc-if></div></sc-for></div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;"><sc-for list="{{ voices }}" as="v" hint-placeholder-count="8"><div onClick="{{ v.pick }}" style="display:flex; align-items:center; gap:6px; flex:1 1 190px; max-width:260px; padding:7px 9px; border:1px solid {{ v.b }}; border-radius:11px; cursor:pointer; background:{{ v.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }"><span onClick="{{ v.preview }}" title="Preview" style="width:20px; height:20px; flex:0 0 20px; border-radius:50%; border:1px solid var(--lc-line); color:var(--lc-accent); display:flex; align-items:center; justify-content:center; font-size:8px; background:var(--lc-sub);" style-hover="{ background:'rgba(255,255,255,0.25)' }">▶</span><span style="flex:1; min-width:0; font-size:11.5px; font-weight:600; color:{{ v.c }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ v.name }}</span><sc-if value="{{ v.custom }}" hint-placeholder-val="{{ false }}"><span onClick="{{ v.remove }}" title="Remove" style="width:18px; height:18px; flex:0 0 18px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; color:var(--lc-muted); line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span></sc-if></div></sc-for></div>
               </div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">SPEAKING RATE</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">SPEAKING RATE</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ voiceRateChips }}" as="c" hint-placeholder-count="4"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">PITCH</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">PITCH</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ voicePitchChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">VOLUME</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">VOLUME</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ volumeChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:9px; padding:8px 15px; cursor:pointer; background:{{ c.bg }};">{{ c.l }}</span></sc-for></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:2px 0 12px;">READING STYLE</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:2px 0 12px;">READING STYLE</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"><sc-for list="{{ readingStyleChips }}" as="c" hint-placeholder-count="5"><span onClick="{{ c.set }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:20px; padding:7px 14px; cursor:pointer; background:{{ c.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ c.l }}</span></sc-for></div>
 
-              <sc-for list="{{ voiceSetToggles }}" as="x" hint-placeholder-count="2"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:13.5px; color:#eef0f2;">{{ x.label }}</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+              <sc-for list="{{ voiceSetToggles }}" as="x" hint-placeholder-count="2"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid var(--lc-line);"><div><div style="font-size:13.5px; color:var(--lc-accent);">{{ x.label }}</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
               <div style="display:flex; gap:8px; margin-top:10px;"><sc-for list="{{ wakeWordChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.set }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:20px; padding:7px 14px; cursor:pointer; background:{{ c.bg }};" style-hover="{ borderColor:'rgba(255,255,255,0.5)' }">{{ c.l }}</span></sc-for></div>
             </sc-if>
 
@@ -8491,238 +8493,238 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <sc-if value="{{ pwaInAppWarnShow }}" hint-placeholder-val="{{ false }}">
                 <div style="padding:12px 14px; margin-bottom:16px; border:1px solid rgba(255,138,91,0.35); border-radius:12px; background:rgba(255,138,91,0.08); font-size:12px; color:#ffb28f; line-height:1.5;">⚠ {{ pwaInAppWarn }}</div>
               </sc-if>
-              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 14px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:rgba(255,255,255,0.03);">
-                <div><div style="font-size:13px; color:#eef0f2; font-weight:600;">Install app</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">Add Nervexus to your home screen for a full-screen, app-like experience.</div>
-                  <sc-if value="{{ pwaManualHelp }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:#8a8a92; margin-top:6px; max-width:340px; line-height:1.5;">{{ pwaManualHelpText }}</div></sc-if>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 14px; margin-bottom:16px; border:1px solid var(--lc-line); border-radius:12px; background:var(--lc-sub);">
+                <div><div style="font-size:13px; color:var(--lc-accent); font-weight:600;">Install app</div><div style="font-size:11px; color:var(--lc-muted); margin-top:2px;">Add Nervexus to your home screen for a full-screen, app-like experience.</div>
+                  <sc-if value="{{ pwaManualHelp }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:var(--lc-muted); margin-top:6px; max-width:340px; line-height:1.5;">{{ pwaManualHelpText }}</div></sc-if>
                 </div>
-                <span onClick="{{ installApp }}" class="cc-glowbtn" style="flex:0 0 auto; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ pwaInstalled ? '#6cffba' : '#cfcfd4' }}; border:1px solid {{ pwaInstalled ? 'rgba(108,255,186,0.35)' : 'rgba(255,255,255,0.14)' }}; border-radius:9px; padding:9px 14px; cursor:pointer; white-space:nowrap;">{{ installBtnLabel }}</span>
+                <span onClick="{{ installApp }}" class="cc-glowbtn" style="flex:0 0 auto; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ pwaInstalled ? '#6cffba' : 'var(--lc-muted)' }}; border:1px solid {{ pwaInstalled ? 'rgba(108,255,186,0.35)' : 'var(--lc-line)' }}; border-radius:9px; padding:9px 14px; cursor:pointer; white-space:nowrap;">{{ installBtnLabel }}</span>
               </div>
-              <div style="padding:13px 14px; margin-bottom:16px; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:rgba(255,255,255,0.03);">
+              <div style="padding:13px 14px; margin-bottom:16px; border:1px solid var(--lc-line); border-radius:12px; background:var(--lc-sub);">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                  <div><div style="font-size:13px; color:#eef0f2; font-weight:600;">Enable notifications</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">Push notifications that arrive even when the app is closed — on this device.</div></div>
-                  <span onClick="{{ requestNotifPermission }}" class="cc-glowbtn" style="flex:0 0 auto; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ notifPermGranted ? '#6cffba' : '#cfcfd4' }}; border:1px solid {{ notifPermGranted ? 'rgba(108,255,186,0.35)' : 'rgba(255,255,255,0.14)' }}; border-radius:9px; padding:9px 14px; cursor:pointer; white-space:nowrap;">{{ notifPermBtnLabel }}</span>
+                  <div><div style="font-size:13px; color:var(--lc-accent); font-weight:600;">Enable notifications</div><div style="font-size:11px; color:var(--lc-muted); margin-top:2px;">Push notifications that arrive even when the app is closed — on this device.</div></div>
+                  <span onClick="{{ requestNotifPermission }}" class="cc-glowbtn" style="flex:0 0 auto; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ notifPermGranted ? '#6cffba' : 'var(--lc-muted)' }}; border:1px solid {{ notifPermGranted ? 'rgba(108,255,186,0.35)' : 'var(--lc-line)' }}; border-radius:9px; padding:9px 14px; cursor:pointer; white-space:nowrap;">{{ notifPermBtnLabel }}</span>
                 </div>
-                <sc-if value="{{ iosStandaloneNeededShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:#8a8a92; margin-top:10px; line-height:1.5;">On iPhone/iPad, push only works after you install the app to your Home Screen (above) and open it from there — this is an Apple restriction, not a setting here.</div></sc-if>
+                <sc-if value="{{ iosStandaloneNeededShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:var(--lc-muted); margin-top:10px; line-height:1.5;">On iPhone/iPad, push only works after you install the app to your Home Screen (above) and open it from there — this is an Apple restriction, not a setting here.</div></sc-if>
                 <sc-if value="{{ pushErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:#ff8a5b; margin-top:10px; line-height:1.5;">{{ pushErr }}</div></sc-if>
               </div>
-              <div style="margin-bottom:16px;"><div style="font-size:16px; font-weight:700; color:#eef0f2;">Notifications</div><div style="font-size:12px; color:#8a8a92; margin-top:3px; line-height:1.5;">Custom AI-generated notifications and calendar reminders, in-app and by email.</div></div>
+              <div style="margin-bottom:16px;"><div style="font-size:16px; font-weight:700; color:var(--lc-accent);">Notifications</div><div style="font-size:12px; color:var(--lc-muted); margin-top:3px; line-height:1.5;">Custom AI-generated notifications and calendar reminders, in-app and by email.</div></div>
 
-              <div style="margin:0 0 12px;"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Custom Notifications</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">Paste a few example notifications and the AI generates 30 more in the same voice — regenerate for more, anytime.</div></div>
-              <textarea value="{{ customNotifSeedVal }}" onInput="{{ setCustomNotifSeed }}" placeholder="Paste a few example notifications, one per line…" style="width:100%; max-width:560px; min-height:80px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; margin-bottom:10px;"></textarea>
+              <div style="margin:0 0 12px;"><div style="font-size:14px; font-weight:700; color:var(--lc-accent);">Custom Notifications</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:3px; line-height:1.5;">Paste a few example notifications and the AI generates 30 more in the same voice — regenerate for more, anytime.</div></div>
+              <textarea value="{{ customNotifSeedVal }}" onInput="{{ setCustomNotifSeed }}" placeholder="Paste a few example notifications, one per line…" style="width:100%; max-width:560px; min-height:80px; padding:12px 14px; border-radius:12px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:13px; outline:none; resize:vertical; margin-bottom:10px;"></textarea>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
-                <span onClick="{{ genCustomNotifs }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:600;">{{ customNotifGenLabel }}</span>
-                <sc-if value="{{ hasCustomNotifs }}" hint-placeholder-val="{{ false }}"><span onClick="{{ genMoreCustomNotifs }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#c9c9d0; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:9px 16px; cursor:pointer;">+ Generate 30 more</span></sc-if>
+                <span onClick="{{ genCustomNotifs }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-accent); border:1px solid var(--lc-line); background:var(--lc-sub); border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:600;">{{ customNotifGenLabel }}</span>
+                <sc-if value="{{ hasCustomNotifs }}" hint-placeholder-val="{{ false }}"><span onClick="{{ genMoreCustomNotifs }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:10px; padding:9px 16px; cursor:pointer;">+ Generate 30 more</span></sc-if>
                 <sc-if value="{{ customNotifGenErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px; color:#ff8a5b;">{{ customNotifGenErr }}</span></sc-if>
               </div>
               <sc-if value="{{ hasCustomNotifs }}" hint-placeholder-val="{{ false }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">{{ customNotifCountLabel }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:8px;">{{ customNotifCountLabel }}</div>
                 <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">
                   <sc-for list="{{ customNotifList }}" as="c" hint-placeholder-count="6">
-                    <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:rgba(255,255,255,0.03);">
-                      <span style="flex:1; min-width:0; font-size:12.5px; color:#c8c8ce; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ c.text }}</span>
-                      <span onClick="{{ c.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#fff' }">×</span>
+                    <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:var(--lc-sub);">
+                      <span style="flex:1; min-width:0; font-size:12.5px; color:var(--lc-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ c.text }}</span>
+                      <span onClick="{{ c.remove }}" style="cursor:pointer; color:var(--lc-muted); font-size:14px;" style-hover="{ color:'#fff' }">×</span>
                     </div>
                   </sc-for>
                 </div>
               </sc-if>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
                 <div onClick="{{ toggleCustomNotifsEnabled }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ customNotifsEnabledBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ customNotifsEnabledPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">Send one of these randomly (push + in-app) every few hours</span>
+                <span style="font-size:12px; color:var(--lc-muted);">Send one of these randomly (push + in-app) every few hours</span>
               </div>
 
-              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Custom Quotes</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">A random quote from your list, shown every 5 minutes while the app is open. Add your own, or let the AI generate more in the same voice.</div></div>
-              <textarea value="{{ quoteDraftVal }}" onInput="{{ setQuoteDraft }}" onKeyDown="{{ addQuoteKey }}" placeholder="Type or paste a quote, press Enter to add…" style="width:100%; max-width:560px; min-height:60px; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; resize:vertical; margin-bottom:10px;"></textarea>
+              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid var(--lc-line);"><div style="font-size:14px; font-weight:700; color:var(--lc-accent);">Custom Quotes</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:3px; line-height:1.5;">A random quote from your list, shown every 5 minutes while the app is open. Add your own, or let the AI generate more in the same voice.</div></div>
+              <textarea value="{{ quoteDraftVal }}" onInput="{{ setQuoteDraft }}" onKeyDown="{{ addQuoteKey }}" placeholder="Type or paste a quote, press Enter to add…" style="width:100%; max-width:560px; min-height:60px; padding:12px 14px; border-radius:12px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:13px; outline:none; resize:vertical; margin-bottom:10px;"></textarea>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
-                <span onClick="{{ addQuote }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:600;">+ Add quote</span>
+                <span onClick="{{ addQuote }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-accent); border:1px solid var(--lc-line); background:var(--lc-sub); border-radius:10px; padding:9px 16px; cursor:pointer; font-weight:600;">+ Add quote</span>
                 <sc-if value="{{ hasQuotes }}" hint-placeholder-val="{{ false }}">
-                  <span onClick="{{ genMoreQuotes }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#c9c9d0; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:9px 16px; cursor:pointer;">{{ quoteGenBtnLabel }}</span>
-                  <span onClick="{{ sendTestQuote }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:6px 11px; cursor:pointer;">Send test</span>
+                  <span onClick="{{ genMoreQuotes }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:10px; padding:9px 16px; cursor:pointer;">{{ quoteGenBtnLabel }}</span>
+                  <span onClick="{{ sendTestQuote }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:8px; padding:6px 11px; cursor:pointer;">Send test</span>
                 </sc-if>
                 <sc-if value="{{ quoteGenErr }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px; color:#ff8a5b;">{{ quoteGenErr }}</span></sc-if>
               </div>
               <sc-if value="{{ hasQuotes }}" hint-placeholder-val="{{ false }}">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">{{ quoteCountLabel }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:8px;">{{ quoteCountLabel }}</div>
                 <div style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:6px; margin-bottom:16px;">
                   <sc-for list="{{ quoteList }}" as="q" hint-placeholder-count="6">
-                    <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:rgba(255,255,255,0.03);">
-                      <span onClick="{{ q.open }}" style="flex:1; min-width:0; font-size:12.5px; color:#c8c8ce; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;" style-hover="{ color:'#fff' }">{{ q.text }}</span>
-                      <span onClick="{{ q.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px;" style-hover="{ color:'#fff' }">×</span>
+                    <div style="display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:10px; background:var(--lc-sub);">
+                      <span onClick="{{ q.open }}" style="flex:1; min-width:0; font-size:12.5px; color:var(--lc-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;" style-hover="{ color:'#fff' }">{{ q.text }}</span>
+                      <span onClick="{{ q.remove }}" style="cursor:pointer; color:var(--lc-muted); font-size:14px;" style-hover="{ color:'#fff' }">×</span>
                     </div>
                   </sc-for>
                 </div>
               </sc-if>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
                 <div onClick="{{ toggleQuotesEnabled }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ quotesEnabledBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ quotesEnabledPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">A random quote from your list every 5 minutes while the app is open</span>
+                <span style="font-size:12px; color:var(--lc-muted);">A random quote from your list every 5 minutes while the app is open</span>
               </div>
 
-              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Reminders</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">Calendar events send an in-app + push notification (and optionally an email) shortly before they start. Your checklist can also nudge you on a schedule while items are still open.</div></div>
+              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid var(--lc-line);"><div style="font-size:14px; font-weight:700; color:var(--lc-accent);">Reminders</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:3px; line-height:1.5;">Calendar events send an in-app + push notification (and optionally an email) shortly before they start. Your checklist can also nudge you on a schedule while items are still open.</div></div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
                 <div onClick="{{ toggleReminderPush }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ reminderPushBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ reminderPushPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">In-app + push reminders</span>
-                <select value="{{ reminderLeadSel }}" onChange="{{ setReminderLeadSel }}" style="padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11.5px; outline:none;">
+                <span style="font-size:12px; color:var(--lc-muted);">In-app + push reminders</span>
+                <select value="{{ reminderLeadSel }}" onChange="{{ setReminderLeadSel }}" style="padding:6px 10px; border-radius:8px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:11.5px; outline:none;">
                   <sc-for list="{{ reminderLeadOptions }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
                   <option value="custom">Custom…</option>
                 </select>
-                <sc-if value="{{ reminderLeadIsCustom }}" hint-placeholder-val="{{ false }}"><input type="number" min="1" value="{{ reminderLeadMins }}" onInput="{{ setReminderLeadMins }}" style="width:64px; padding:6px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11.5px; outline:none;"><span style="font-size:11px; color:#8a8a92;">min before</span></sc-if>
+                <sc-if value="{{ reminderLeadIsCustom }}" hint-placeholder-val="{{ false }}"><input type="number" min="1" value="{{ reminderLeadMins }}" onInput="{{ setReminderLeadMins }}" style="width:64px; padding:6px 9px; border-radius:8px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:11.5px; outline:none;"><span style="font-size:11px; color:var(--lc-muted);">min before</span></sc-if>
               </div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                 <div onClick="{{ toggleChecklistReminder }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ checklistReminderBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ checklistReminderPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">Checklist reminders — open tasks</span>
-                <select value="{{ checklistReminderFreqSel }}" onChange="{{ setChecklistReminderFreqSel }}" style="padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:11.5px; outline:none;">
+                <span style="font-size:12px; color:var(--lc-muted);">Checklist reminders — open tasks</span>
+                <select value="{{ checklistReminderFreqSel }}" onChange="{{ setChecklistReminderFreqSel }}" style="padding:6px 10px; border-radius:8px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:11.5px; outline:none;">
                   <sc-for list="{{ checklistFreqOptions }}" as="o" hint-placeholder-count="12"><option value="{{ o.v }}">{{ o.l }}</option></sc-for>
                 </select>
               </div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                 <div onClick="{{ toggleDailyLogReminder }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ dailyLogReminderBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ dailyLogReminderPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">Daily log reminders — fitness, energy &amp; money, from 7pm if not yet logged</span>
+                <span style="font-size:12px; color:var(--lc-muted);">Daily log reminders — fitness, energy &amp; money, from 7pm if not yet logged</span>
               </div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                 <div onClick="{{ toggleReminderEmail }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ reminderEmailBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ reminderEmailPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">Also email me</span>
-                <span onClick="{{ sendTestReminderEmail }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:6px 11px; cursor:pointer;">{{ testEmailLabel }}</span>
-                <select value="{{ emailProvider }}" onChange="{{ setEmailProvider }}" style="padding:6px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#c8c8ce; font-size:10.5px;"><option value="resend">Resend</option><option value="mailgun">Mailgun</option></select>
+                <span style="font-size:12px; color:var(--lc-muted);">Also email me</span>
+                <span onClick="{{ sendTestReminderEmail }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:8px; padding:6px 11px; cursor:pointer;">{{ testEmailLabel }}</span>
+                <select value="{{ emailProvider }}" onChange="{{ setEmailProvider }}" style="padding:6px 10px; border-radius:8px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-muted); font-size:10.5px;"><option value="resend">Resend</option><option value="mailgun">Mailgun</option></select>
               </div>
               <sc-if value="{{ testEmailErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px; color:#ff8a5b; margin-bottom:8px;">{{ testEmailErr }}</div></sc-if>
               <sc-if value="{{ reminderEmailOn }}" hint-placeholder-val="{{ false }}">
-                <input value="{{ reminderEmailAddr }}" onInput="{{ setReminderEmailAddr }}" placeholder="you@email.com" style="width:100%; max-width:320px; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;">
-                <div style="font-size:10.5px; color:#6f6f78; margin-top:6px; max-width:400px; line-height:1.5;">Requires a RESEND_API_KEY secret set on the Edge Function — ask your admin if emails aren't arriving.</div>
+                <input value="{{ reminderEmailAddr }}" onInput="{{ setReminderEmailAddr }}" placeholder="you@email.com" style="width:100%; max-width:320px; padding:10px 13px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px; outline:none;">
+                <div style="font-size:10.5px; color:var(--lc-muted); margin-top:6px; max-width:400px; line-height:1.5;">Requires a RESEND_API_KEY secret set on the Edge Function — ask your admin if emails aren't arriving.</div>
 
-                <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);">
+                <div style="margin-top:20px; padding-top:16px; border-top:1px solid var(--lc-line);">
                   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-                    <div style="font-size:13px; font-weight:700; color:#eef0f2;">Email template</div>
-                    <sc-if value="{{ emailTemplateCustomized }}" hint-placeholder-val="{{ false }}"><span onClick="{{ resetEmailTemplate }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.14); border-radius:8px; padding:5px 10px; cursor:pointer;">Reset to default</span></sc-if>
+                    <div style="font-size:13px; font-weight:700; color:var(--lc-accent);">Email template</div>
+                    <sc-if value="{{ emailTemplateCustomized }}" hint-placeholder-val="{{ false }}"><span onClick="{{ resetEmailTemplate }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:8px; padding:5px 10px; cursor:pointer;">Reset to default</span></sc-if>
                   </div>
-                  <div style="font-size:11px; color:#8a8a92; margin-bottom:10px; line-height:1.5;">Customize how reminder emails are formatted. Use <code style="color:#c8c8ce;">{{ tplTitleHint }}</code>, <code style="color:#c8c8ce;">{{ tplMessageHint }}</code> and <code style="color:#c8c8ce;">{{ tplCountHint }}</code> as placeholders — they're filled in with the real reminder each time (<code style="color:#c8c8ce;">{{ tplCountHint }}</code> is the item/day count where one applies — e.g. tasks left, or the miss streak number — and comes through blank for reminders that don't have one, like version updates). Leave blank to use the plain default.</div>
-                  <div style="font-size:10px; color:#6f6f78; margin-bottom:4px; letter-spacing:1px;">SUBJECT</div>
-                  <input value="{{ emailTemplateSubjectVal }}" onInput="{{ setEmailTemplateSubject }}" placeholder="{{ tplTitleHint }}" style="width:100%; max-width:420px; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; margin-bottom:12px; box-sizing:border-box;">
-                  <div style="font-size:10px; color:#6f6f78; margin-bottom:4px; letter-spacing:1px;">BODY</div>
-                  <textarea value="{{ emailTemplateBodyVal }}" onInput="{{ setEmailTemplateBody }}" placeholder="{{ tplMessageHint }}" style="width:100%; max-width:420px; min-height:70px; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; resize:vertical; box-sizing:border-box;"></textarea>
+                  <div style="font-size:11px; color:var(--lc-muted); margin-bottom:10px; line-height:1.5;">Customize how reminder emails are formatted. Use <code style="color:var(--lc-muted);">{{ tplTitleHint }}</code>, <code style="color:var(--lc-muted);">{{ tplMessageHint }}</code> and <code style="color:var(--lc-muted);">{{ tplCountHint }}</code> as placeholders — they're filled in with the real reminder each time (<code style="color:var(--lc-muted);">{{ tplCountHint }}</code> is the item/day count where one applies — e.g. tasks left, or the miss streak number — and comes through blank for reminders that don't have one, like version updates). Leave blank to use the plain default.</div>
+                  <div style="font-size:10px; color:var(--lc-muted); margin-bottom:4px; letter-spacing:1px;">SUBJECT</div>
+                  <input value="{{ emailTemplateSubjectVal }}" onInput="{{ setEmailTemplateSubject }}" placeholder="{{ tplTitleHint }}" style="width:100%; max-width:420px; padding:10px 13px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px; outline:none; margin-bottom:12px; box-sizing:border-box;">
+                  <div style="font-size:10px; color:var(--lc-muted); margin-bottom:4px; letter-spacing:1px;">BODY</div>
+                  <textarea value="{{ emailTemplateBodyVal }}" onInput="{{ setEmailTemplateBody }}" placeholder="{{ tplMessageHint }}" style="width:100%; max-width:420px; min-height:70px; padding:10px 13px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px; outline:none; resize:vertical; box-sizing:border-box;"></textarea>
                   <div style="display:flex; align-items:center; gap:10px; margin-top:12px;">
-                    <span onClick="{{ saveEmailTemplate }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:{{ emailTemplateSaved ? '#6cffba' : '#F4F4F5' }}; border:1px solid {{ emailTemplateSaved ? 'rgba(108,255,186,0.35)' : 'rgba(255,255,255,0.4)' }}; background:{{ emailTemplateSaved ? 'transparent' : 'rgba(255,255,255,0.12)' }}; border-radius:10px; padding:9px 16px; cursor:pointer;">{{ emailTemplateSaveLabel }}</span>
+                    <span onClick="{{ saveEmailTemplate }}" style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:{{ emailTemplateSaved ? '#6cffba' : 'var(--lc-accent)' }}; border:1px solid {{ emailTemplateSaved ? 'rgba(108,255,186,0.35)' : 'var(--lc-line)' }}; background:{{ emailTemplateSaved ? 'transparent' : 'var(--lc-sub)' }}; border-radius:10px; padding:9px 16px; cursor:pointer;">{{ emailTemplateSaveLabel }}</span>
                     <sc-if value="{{ emailTemplateDirty }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#e8b45a;">Unsaved changes</span></sc-if>
                   </div>
-                  <div style="margin-top:12px; padding:12px 14px; border-radius:10px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); max-width:420px;">
-                    <div style="font-size:9.5px; letter-spacing:1.5px; color:#6f6f78; margin-bottom:6px;">LIVE PREVIEW</div>
-                    <div style="font-size:12.5px; color:#eef0f2; font-weight:600; margin-bottom:4px;">{{ emailTemplatePreview.subject }}</div>
-                    <div style="font-size:11.5px; color:#b8b8c0; line-height:1.5;">{{ emailTemplatePreview.text }}</div>
+                  <div style="margin-top:12px; padding:12px 14px; border-radius:10px; background:var(--lc-sub); border:1px solid var(--lc-line); max-width:420px;">
+                    <div style="font-size:9.5px; letter-spacing:1.5px; color:var(--lc-muted); margin-bottom:6px;">LIVE PREVIEW</div>
+                    <div style="font-size:12.5px; color:var(--lc-accent); font-weight:600; margin-bottom:4px;">{{ emailTemplatePreview.subject }}</div>
+                    <div style="font-size:11.5px; color:var(--lc-muted); line-height:1.5;">{{ emailTemplatePreview.text }}</div>
                   </div>
                 </div>
               </sc-if>
 
-              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08);"><div style="font-size:14px; font-weight:700; color:#eef0f2;">Reminder Engine</div><div style="font-size:11.5px; color:#8a8a92; margin-top:3px; line-height:1.5;">Governs the Checklist Engine's hourly (or custom) reminders — see Fitness HQ → Training Checklist, or Daily Missions on the Dashboard.</div></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:8px;">FREQUENCY</div>
+              <div style="margin:22px 0 12px; padding-top:16px; border-top:1px solid var(--lc-line);"><div style="font-size:14px; font-weight:700; color:var(--lc-accent);">Reminder Engine</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:3px; line-height:1.5;">Governs the Checklist Engine's hourly (or custom) reminders — see Fitness HQ → Training Checklist, or Daily Missions on the Dashboard.</div></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:8px;">FREQUENCY</div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
                 <sc-for list="{{ notifFreqChips }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; background:{{ c.bg }}; border-radius:9px; padding:8px 13px; cursor:pointer;">{{ c.label }}</span></sc-for>
               </div>
-              <sc-if value="{{ notifFreqIsCustom }}" hint-placeholder-val="{{ false }}"><div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;"><input type="number" min="1" value="{{ notifFrequencyCustomMin }}" onInput="{{ setNotifFrequencyCustomMin }}" style="width:80px; padding:8px 11px; border-radius:9px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none;"><span style="font-size:11.5px; color:#8a8a92;">minutes between reminders</span></div></sc-if>
+              <sc-if value="{{ notifFreqIsCustom }}" hint-placeholder-val="{{ false }}"><div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;"><input type="number" min="1" value="{{ notifFrequencyCustomMin }}" onInput="{{ setNotifFrequencyCustomMin }}" style="width:80px; padding:8px 11px; border-radius:9px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px; outline:none;"><span style="font-size:11.5px; color:var(--lc-muted);">minutes between reminders</span></div></sc-if>
 
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:16px 0 8px;">QUIET HOURS</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:16px 0 8px;">QUIET HOURS</div>
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
                 <div onClick="{{ toggleNotifQuietHours }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ notifQuietBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ notifQuietPos }}; width:17px; height:17px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                <span style="font-size:12px; color:#c8c8ce;">Silence non-critical reminders</span>
+                <span style="font-size:12px; color:var(--lc-muted);">Silence non-critical reminders</span>
                 <sc-if value="{{ notifQuietOn }}" hint-placeholder-val="{{ false }}">
-                  <input type="number" min="0" max="23" value="{{ notifQuietStart }}" onInput="{{ setNotifQuietStart }}" style="width:52px; padding:7px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none; text-align:center;">
-                  <span style="font-size:11px; color:#6f6f78;">to</span>
-                  <input type="number" min="0" max="23" value="{{ notifQuietEnd }}" onInput="{{ setNotifQuietEnd }}" style="width:52px; padding:7px 9px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; outline:none; text-align:center;">
-                  <span style="font-size:10.5px; color:#6f6f78;">(24h, local time)</span>
+                  <input type="number" min="0" max="23" value="{{ notifQuietStart }}" onInput="{{ setNotifQuietStart }}" style="width:52px; padding:7px 9px; border-radius:8px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; outline:none; text-align:center;">
+                  <span style="font-size:11px; color:var(--lc-muted);">to</span>
+                  <input type="number" min="0" max="23" value="{{ notifQuietEnd }}" onInput="{{ setNotifQuietEnd }}" style="width:52px; padding:7px 9px; border-radius:8px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; outline:none; text-align:center;">
+                  <span style="font-size:10.5px; color:var(--lc-muted);">(24h, local time)</span>
                 </sc-if>
               </div>
 
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:16px 0 8px;">WEEKEND BEHAVIOUR</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:16px 0 8px;">WEEKEND BEHAVIOUR</div>
               <div style="display:flex; gap:8px; margin-bottom:14px;">
                 <sc-for list="{{ notifWeekendChips }}" as="c" hint-placeholder-count="2"><span onClick="{{ c.pick }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; background:{{ c.bg }}; border-radius:9px; padding:8px 13px; cursor:pointer;">{{ c.label }}</span></sc-for>
               </div>
 
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:16px 0 8px;">TIME ZONE</div>
-              <input value="{{ notifTimezone }}" onInput="{{ setNotifTimezone }}" placeholder="e.g. America/New_York" style="width:100%; max-width:320px; padding:9px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px; outline:none; margin-bottom:16px; font-family:'JetBrains Mono',monospace;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:16px 0 8px;">TIME ZONE</div>
+              <input value="{{ notifTimezone }}" onInput="{{ setNotifTimezone }}" placeholder="e.g. America/New_York" style="width:100%; max-width:320px; padding:9px 13px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px; outline:none; margin-bottom:16px; font-family:'JetBrains Mono',monospace;">
 
-              <sc-for list="{{ notifBasicToggles }}" as="x" hint-placeholder-count="3"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:13px; color:#eef0f2; font-weight:600;">{{ x.label }}</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+              <sc-for list="{{ notifBasicToggles }}" as="x" hint-placeholder-count="3"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid var(--lc-line);"><div><div style="font-size:13px; color:var(--lc-accent); font-weight:600;">{{ x.label }}</div><div style="font-size:11px; color:var(--lc-muted); margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
 
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:20px 0 8px;">CATEGORIES</div>
-              <div style="font-size:11px; color:#8a8a92; margin-bottom:10px;">Turn any category off entirely — nothing in it will notify you, in-app or out.</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:20px 0 8px;">CATEGORIES</div>
+              <div style="font-size:11px; color:var(--lc-muted); margin-bottom:10px;">Turn any category off entirely — nothing in it will notify you, in-app or out.</div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px 18px;">
-                <sc-for list="{{ notifCategoryToggles }}" as="x" hint-placeholder-count="12"><div style="display:flex; align-items:center; justify-content:space-between; padding:9px 2px; border-bottom:1px solid rgba(255,255,255,0.05);"><span style="font-size:12.5px; color:#dbdbe0;">{{ x.label }}</span><div onClick="{{ x.toggle }}" style="width:34px; height:19px; flex:0 0 34px; border-radius:11px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:15px; height:15px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+                <sc-for list="{{ notifCategoryToggles }}" as="x" hint-placeholder-count="12"><div style="display:flex; align-items:center; justify-content:space-between; padding:9px 2px; border-bottom:1px solid var(--lc-line);"><span style="font-size:12.5px; color:var(--lc-accent);">{{ x.label }}</span><div onClick="{{ x.toggle }}" style="width:34px; height:19px; flex:0 0 34px; border-radius:11px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:15px; height:15px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
               </div>
 
-              <div style="margin-top:22px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08); display:flex; gap:10px; flex-wrap:wrap;">
-                <span onClick="{{ goTesting }}" class="cc-glowbtn" style="font-size:12px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.14); border-radius:10px; padding:10px 16px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.06)' }">🔧 Open Notification Testing Panel</span>
+              <div style="margin-top:22px; padding-top:16px; border-top:1px solid var(--lc-line); display:flex; gap:10px; flex-wrap:wrap;">
+                <span onClick="{{ goTesting }}" class="cc-glowbtn" style="font-size:12px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:10px; padding:10px 16px; cursor:pointer;" style-hover="{ background:'var(--lc-raise)' }">🔧 Open Notification Testing Panel</span>
               </div>
             </sc-if>
 
             <sc-if value="{{ tabMemory }}" hint-placeholder-val="{{ false }}">
-              <div style="font-size:16px; font-weight:700; color:#eef0f2; margin-bottom:6px;">Memory</div>
-              <div style="font-size:12px; color:#8a8a92; margin-bottom:16px; line-height:1.5;">Facts the assistant remembers about you across conversations. Add one, or remove any you don't want it to keep.</div>
+              <div style="font-size:16px; font-weight:700; color:var(--lc-accent); margin-bottom:6px;">Memory</div>
+              <div style="font-size:12px; color:var(--lc-muted); margin-bottom:16px; line-height:1.5;">Facts the assistant remembers about you across conversations. Add one, or remove any you don't want it to keep.</div>
               <div style="display:flex; gap:9px; margin-bottom:16px;">
-                <input value="{{ memDraft }}" onInput="{{ setMemDraft }}" onKeyDown="{{ addMemKey }}" placeholder="e.g. I prefer metric units" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none;">
+                <input value="{{ memDraft }}" onInput="{{ setMemDraft }}" onKeyDown="{{ addMemKey }}" placeholder="e.g. I prefer metric units" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:13px; outline:none;">
                 <span onClick="{{ addMemBtn }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;">Add</span>
               </div>
               <div style="display:flex; flex-direction:column; gap:8px;">
                 <sc-for list="{{ memoryList }}" as="m" hint-placeholder-count="3">
-                  <div style="display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);">
-                    <span style="flex:1; min-width:0; font-size:13px; color:#d6d6da; line-height:1.45;">{{ m.fact }}</span>
-                    <span onClick="{{ m.remove }}" style="cursor:pointer; color:#6f6f78; font-size:14px; flex:0 0 auto;" style-hover="{ color:'#fff' }">×</span>
+                  <div style="display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; background:var(--lc-sub); border:1px solid var(--lc-line);">
+                    <span style="flex:1; min-width:0; font-size:13px; color:var(--lc-muted); line-height:1.45;">{{ m.fact }}</span>
+                    <span onClick="{{ m.remove }}" style="cursor:pointer; color:var(--lc-muted); font-size:14px; flex:0 0 auto;" style-hover="{ color:'#fff' }">×</span>
                   </div>
                 </sc-for>
-                <sc-if value="{{ noMemories }}" hint-placeholder-val="{{ false }}"><div style="padding:24px 0; text-align:center; color:#6f6f78; font-size:12.5px;">No memories yet — add a fact above.</div></sc-if>
+                <sc-if value="{{ noMemories }}" hint-placeholder-val="{{ false }}"><div style="padding:24px 0; text-align:center; color:var(--lc-muted); font-size:12.5px;">No memories yet — add a fact above.</div></sc-if>
               </div>
             </sc-if>
 
             <sc-if value="{{ tabCoach }}" hint-placeholder-val="{{ false }}">
               <div style="margin-bottom:16px;">
-                <div style="font-size:16px; font-weight:700; color:#eef0f2;">Assistant Coaching</div>
-                <div style="font-size:12px; color:#8a8a92; margin-top:3px; line-height:1.5;">Controls what your assistant proactively brings up, unprompted. Tell it to stop mid-conversation ("stop reminding me about spending") and it remembers.</div>
+                <div style="font-size:16px; font-weight:700; color:var(--lc-accent);">Assistant Coaching</div>
+                <div style="font-size:12px; color:var(--lc-muted); margin-top:3px; line-height:1.5;">Controls what your assistant proactively brings up, unprompted. Tell it to stop mid-conversation ("stop reminding me about spending") and it remembers.</div>
               </div>
-              <sc-for list="{{ coachToggles }}" as="x" hint-placeholder-count="7"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:13px; color:#eef0f2; font-weight:600;">{{ x.label }}</div><div style="font-size:11px; color:#8a8a92; margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+              <sc-for list="{{ coachToggles }}" as="x" hint-placeholder-count="7"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid var(--lc-line);"><div><div style="font-size:13px; color:var(--lc-accent); font-weight:600;">{{ x.label }}</div><div style="font-size:11px; color:var(--lc-muted); margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
               <div style="margin-top:20px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">CHECK-IN FREQUENCY</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:10px;">CHECK-IN FREQUENCY</div>
                 <div style="display:flex; gap:8px;"><sc-for list="{{ coachFreqChips }}" as="c" hint-placeholder-count="3"><span onClick="{{ c.set }}" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; background:{{ c.bg }}; border-radius:9px; padding:8px 14px; cursor:pointer;">{{ c.l }}</span></sc-for></div>
               </div>
               <div style="margin-top:20px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">WORKING HOURS <span style="color:#6f6f78;">(optional — only speak up in this window)</span></div>
-                <div style="display:flex; gap:10px; align-items:center;"><input type="time" value="{{ coachWorkStart }}" onInput="{{ setCoachWorkStart }}" style="padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px;"><span style="color:#6f6f78; font-size:12px;">to</span><input type="time" value="{{ coachWorkEnd }}" onInput="{{ setCoachWorkEnd }}" style="padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12.5px;"></div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:10px;">WORKING HOURS <span style="color:var(--lc-muted);">(optional — only speak up in this window)</span></div>
+                <div style="display:flex; gap:10px; align-items:center;"><input type="time" value="{{ coachWorkStart }}" onInput="{{ setCoachWorkStart }}" style="padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px;"><span style="color:var(--lc-muted); font-size:12px;">to</span><input type="time" value="{{ coachWorkEnd }}" onInput="{{ setCoachWorkEnd }}" style="padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12.5px;"></div>
               </div>
-              <div style="margin-top:22px; border-top:1px solid rgba(255,255,255,0.08); padding-top:16px;">
-                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin-bottom:10px;">MUTED TOPICS</div>
-                <sc-if value="{{ noMutedTopics }}" hint-placeholder-val="{{ true }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing muted — the assistant can bring up any enabled topic.</div></sc-if>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;"><sc-for list="{{ mutedTopicChips }}" as="m" hint-placeholder-count="0"><span style="display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:7px 8px 7px 12px;">{{ m.name }}<span onClick="{{ m.unmute }}" style="cursor:pointer; color:#8a8a92;" style-hover="{ color:'#fff' }">&times;</span></span></sc-for></div>
+              <div style="margin-top:22px; border-top:1px solid var(--lc-line); padding-top:16px;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:10px;">MUTED TOPICS</div>
+                <sc-if value="{{ noMutedTopics }}" hint-placeholder-val="{{ true }}"><div style="font-size:11.5px; color:var(--lc-muted);">Nothing muted — the assistant can bring up any enabled topic.</div></sc-if>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;"><sc-for list="{{ mutedTopicChips }}" as="m" hint-placeholder-count="0"><span style="display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:9px; padding:7px 8px 7px 12px;">{{ m.name }}<span onClick="{{ m.unmute }}" style="cursor:pointer; color:var(--lc-muted);" style-hover="{ color:'#fff' }">&times;</span></span></sc-for></div>
               </div>
             </sc-if>
 
             <sc-if value="{{ tabPrivacy }}" hint-placeholder-val="{{ false }}">
-              <sc-for list="{{ privacyToggles }}" as="x" hint-placeholder-count="4"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid rgba(255,255,255,0.06);"><div><div style="font-size:13.5px; color:#eef0f2;">{{ x.label }}</div><div style="font-size:11.5px; color:#8a8a92; margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:20px 0 10px;">ACTIVE SESSIONS</div>
-              <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.06);"><div style="width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:13px;">🖥</div><div style="flex:1;"><div style="font-size:13px; color:#eef0f2;">MacBook Pro · San Francisco</div><div style="font-size:10.5px; color:#8a8a92; font-family:'JetBrains Mono',monospace;">This device · active now</div></div><span style="font-size:9px; color:#6cffba; border:1px solid rgba(108,255,186,0.35); border-radius:20px; padding:2px 8px;">CURRENT</span></div>
-              <div style="display:flex; align-items:center; gap:12px; padding:11px 0;"><div style="width:30px; height:30px; border-radius:9px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:13px;">📱</div><div style="flex:1;"><div style="font-size:13px; color:#eef0f2;">iPhone 16 Pro · San Francisco</div><div style="font-size:10.5px; color:#8a8a92; font-family:'JetBrains Mono',monospace;">Last active 2h ago</div></div><span style="font-size:10px; color:#8a8a92; cursor:pointer;" style-hover="{ color:'#FFFFFF' }">Revoke</span></div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84; margin:20px 0 10px;">MOVE TO ANOTHER DEVICE</div>
-              <div style="font-size:11.5px; color:#8a8a92; margin-bottom:12px; line-height:1.5; max-width:480px;">Your data lives in this browser only. To carry it to your phone, laptop or iPad: export a backup file here, then open the app on the other device and import it there.</div>
+              <sc-for list="{{ privacyToggles }}" as="x" hint-placeholder-count="4"><div style="display:flex; align-items:center; justify-content:space-between; padding:13px 2px; border-bottom:1px solid var(--lc-line);"><div><div style="font-size:13.5px; color:var(--lc-accent);">{{ x.label }}</div><div style="font-size:11.5px; color:var(--lc-muted); margin-top:2px;">{{ x.desc }}</div></div><div onClick="{{ x.toggle }}" style="width:44px; height:24px; flex:0 0 44px; border-radius:14px; background:{{ x.bg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ x.pos }}; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .2s;"></div></div></div></sc-for>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:20px 0 10px;">ACTIVE SESSIONS</div>
+              <div style="display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--lc-line);"><div style="width:30px; height:30px; border-radius:9px; background:var(--lc-sub); display:flex; align-items:center; justify-content:center; font-size:13px;">🖥</div><div style="flex:1;"><div style="font-size:13px; color:var(--lc-accent);">MacBook Pro · San Francisco</div><div style="font-size:10.5px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace;">This device · active now</div></div><span style="font-size:9px; color:#6cffba; border:1px solid rgba(108,255,186,0.35); border-radius:20px; padding:2px 8px;">CURRENT</span></div>
+              <div style="display:flex; align-items:center; gap:12px; padding:11px 0;"><div style="width:30px; height:30px; border-radius:9px; background:var(--lc-sub); display:flex; align-items:center; justify-content:center; font-size:13px;">📱</div><div style="flex:1;"><div style="font-size:13px; color:var(--lc-accent);">iPhone 16 Pro · San Francisco</div><div style="font-size:10.5px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace;">Last active 2h ago</div></div><span style="font-size:10px; color:var(--lc-muted); cursor:pointer;" style-hover="{ color:'#FFFFFF' }">Revoke</span></div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:20px 0 10px;">MOVE TO ANOTHER DEVICE</div>
+              <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:12px; line-height:1.5; max-width:480px;">Your data lives in this browser only. To carry it to your phone, laptop or iPad: export a backup file here, then open the app on the other device and import it there.</div>
               <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-                <span onClick="{{ exportBackup }}" class="cc-glowbtn" style="font-size:12px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:9px 15px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">⤓ Export backup file</span>
-                <label class="cc-glowbtn" style="font-size:12px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:9px 15px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.05)' }">⤒ Import backup file<input type="file" accept="application/json,.json" onChange="{{ importBackup }}" style="display:none;"></label>
-                <span style="font-size:12px; color:#ffb3ba; border:1px solid rgba(255,255,255,0.35); border-radius:10px; padding:9px 15px; cursor:pointer; background:rgba(255,255,255,0.08);" style-hover="{ background:'rgba(255,255,255,0.18)' }">Clear AI memory</span>
+                <span onClick="{{ exportBackup }}" class="cc-glowbtn" style="font-size:12px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:10px; padding:9px 15px; cursor:pointer;" style-hover="{ background:'var(--lc-raise)' }">⤓ Export backup file</span>
+                <label class="cc-glowbtn" style="font-size:12px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:10px; padding:9px 15px; cursor:pointer;" style-hover="{ background:'var(--lc-raise)' }">⤒ Import backup file<input type="file" accept="application/json,.json" onChange="{{ importBackup }}" style="display:none;"></label>
+                <span style="font-size:12px; color:#ffb3ba; border:1px solid rgba(255,138,144,0.35); border-radius:10px; padding:9px 15px; cursor:pointer; background:rgba(255,138,144,0.08);" style-hover="{ background:'var(--lc-raise)' }">Clear AI memory</span>
               </div>
               <sc-if value="{{ backupMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:{{ backupMsgColor }};">{{ backupMsg }}</div></sc-if>
             </sc-if>
 
 
             <sc-if value="{{ tabPerf }}" hint-placeholder-val="{{ false }}">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">◆ MANDATORY</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:6px;">◆ MANDATORY</div>
               <h1 style="font-size:18px; font-weight:700; margin-bottom:6px;">Performance Terminal</h1>
               <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:14px;">
-                <div onClick="{{ openPerfCheckinBtn }}" style="display:inline-block; padding:9px 15px; border-radius:9px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12px; font-weight:600;">Reopen check-in popup</div>
-                <div onClick="{{ sendPerfReminderNow }}" style="display:inline-block; padding:9px 15px; border-radius:9px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12px; font-weight:600;">Send check-in reminder now</div>
+                <div onClick="{{ openPerfCheckinBtn }}" style="display:inline-block; padding:9px 15px; border-radius:9px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:12px; font-weight:600;">Reopen check-in popup</div>
+                <div onClick="{{ sendPerfReminderNow }}" style="display:inline-block; padding:9px 15px; border-radius:9px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:12px; font-weight:600;">Send check-in reminder now</div>
               </div>
-              <p style="font-size:12.5px; color:#8b8b93; margin-bottom:18px; max-width:520px;">Every account, owner included, logs a daily check-in. Miss 7 days in a row and the account is banned — appeal-able. Holidays are exempt, up to your yearly cap.</p>
+              <p style="font-size:12.5px; color:var(--lc-muted); margin-bottom:18px; max-width:520px;">Every account, owner included, logs a daily check-in. Miss 7 days in a row and the account is banned — appeal-able. Holidays are exempt, up to your yearly cap.</p>
 
               <sc-if value="{{ perfBanned }}" hint-placeholder-val="{{ false }}">
                 <div class="cc-glowcard" style="border-radius:16px; background:#1a0d0f; border:1px solid rgba(255,59,74,0.35); padding:18px 20px; margin-bottom:20px;">
                   <div style="font-size:14px; font-weight:700; color:#ff5563; margin-bottom:6px;">⚠ Account banned</div>
                   <div style="font-size:12.5px; color:#d6a0a5; line-height:1.5; margin-bottom:14px;">7 consecutive missed check-ins. Submit an appeal below — the owner reviews it from here.</div>
                   <sc-if value="{{ perfAppealPending }}" hint-placeholder-val="{{ false }}">
-                    <div style="font-size:12px; color:#8b8b93;">Appeal submitted — awaiting review.</div>
+                    <div style="font-size:12px; color:var(--lc-muted);">Appeal submitted — awaiting review.</div>
                   </sc-if>
                   <sc-if value="{{ perfAppealOpen }}" hint-placeholder-val="{{ true }}">
-                    <textarea value="{{ perfAppealDraftVal }}" onInput="{{ setPerfAppealDraft }}" placeholder="Explain what happened…" style="width:100%; min-height:70px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:10px;"></textarea>
+                    <textarea value="{{ perfAppealDraftVal }}" onInput="{{ setPerfAppealDraft }}" placeholder="Explain what happened…" style="width:100%; min-height:70px; padding:11px 13px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; resize:vertical; margin-bottom:10px;"></textarea>
                     <div onClick="{{ submitPerfAppeal }}" style="display:inline-block; padding:11px 18px; border-radius:10px; cursor:pointer; background:#ff5563; color:#fff; font-size:12.5px; font-weight:700;">Submit appeal</div>
                   </sc-if>
                 </div>
@@ -8736,31 +8738,31 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </sc-if>
 
               <sc-if value="{{ perfHasLoggedToday }}" hint-placeholder-val="{{ false }}">
-                <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 20px; margin-bottom:22px; display:flex; align-items:center; gap:10px;"><span style="color:#2fce86;">✓</span><span style="font-size:13px; color:#c8c8ce;">Today’s check-in is logged. See it in the history below — you can resubmit before midnight to update it.</span></div>
+                <div class="lc-sub" style="border-radius:16px; padding:16px 20px; margin-bottom:22px; display:flex; align-items:center; gap:10px;"><span style="color:#2fce86;">✓</span><span style="font-size:13px; color:var(--lc-muted);">Today’s check-in is logged. See it in the history below — you can resubmit before midnight to update it.</span></div>
               </sc-if>
 
-              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:18px 20px; margin-bottom:22px;">
-                <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:14px;">Today’s check-in — {{ perfTodayLabel }}</div>
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What's the one thing today that actually mattered?</div>
-                <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="width:100%; min-height:64px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+              <div class="lc-sub" style="border-radius:16px; padding:18px 20px; margin-bottom:22px;">
+                <div style="font-size:13px; font-weight:700; color:var(--lc-accent); margin-bottom:14px;">Today’s check-in — {{ perfTodayLabel }}</div>
+                <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:6px;">What's the one thing today that actually mattered?</div>
+                <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="width:100%; min-height:64px; padding:11px 13px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Focused hours logged today</div>
-                <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="width:100%; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; margin-bottom:14px; box-sizing:border-box;">
+                <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:6px;">Focused hours logged today</div>
+                <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="width:100%; padding:11px 13px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; margin-bottom:14px; box-sizing:border-box;">
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What did you avoid, delay, or half-ass today?</div>
-                <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest — this is the one that matters…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:6px;">What did you avoid, delay, or half-ass today?</div>
+                <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest — this is the one that matters…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">{{ perfYesterdayLabel }}</div>
-                <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:6px;">{{ perfYesterdayLabel }}</div>
+                <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
                   <div onClick="{{ togglePerfTrained }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ perfTrainedBg }}; position:relative; cursor:pointer;"><div style="width:17px; height:17px; border-radius:50%; background:#fff; position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
-                  <span style="font-size:12.5px; color:#c8c8ce;">Trained / exercised today</span>
+                  <span style="font-size:12.5px; color:var(--lc-muted);">Trained / exercised today</span>
                 </div>
-                <div style="font-size:11.5px; color:#8b8b93; margin:14px 0 6px;">Tomorrow's one priority</div>
-                <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
+                <div style="font-size:11.5px; color:var(--lc-muted); margin:14px 0 6px;">Tomorrow's one priority</div>
+                <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
 
-                <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Discipline today</div>
+                <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:8px;">Discipline today</div>
                 <div style="display:flex; gap:6px; margin-bottom:16px;">
                   <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:26px; color:{{ st.c }};">★</span></sc-for>
                 </div>
@@ -8769,57 +8771,57 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <div onClick="{{ submitPerfLog }}" style="display:inline-block; padding:12px 20px; border-radius:11px; cursor:pointer; background:{{ authBtnBg }}; color:{{ authBtnTextC }}; font-size:12.5px; font-weight:700;">{{ perfSubmitLabel }}</div>
               </div>
 
-              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:18px 20px; margin-bottom:22px;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;"><span style="font-size:13px; font-weight:700; color:#eef0f2;">Holidays</span><span style="font-size:11.5px; color:#8b8b93;">{{ perfHolUsedLabel }}</span></div>
+              <div class="lc-sub" style="border-radius:16px; padding:18px 20px; margin-bottom:22px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;"><span style="font-size:13px; font-weight:700; color:var(--lc-accent);">Holidays</span><span style="font-size:11.5px; color:var(--lc-muted);">{{ perfHolUsedLabel }}</span></div>
                 <div style="display:flex; gap:10px; align-items:flex-end; margin-bottom:10px; flex-wrap:wrap;">
-                  <div><div style="font-size:10.5px; color:#6f6f78; margin-bottom:4px;">Start</div><input type="date" value="{{ perfHolStartVal }}" onInput="{{ setPerfHolStart }}" style="padding:9px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:12.5px;"></div>
-                  <div><div style="font-size:10.5px; color:#6f6f78; margin-bottom:4px;">End</div><input type="date" value="{{ perfHolEndVal }}" onInput="{{ setPerfHolEnd }}" style="padding:9px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:12.5px;"></div>
-                  <div onClick="{{ requestHoliday }}" style="padding:10px 16px; border-radius:9px; cursor:pointer; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.35); color:#F4F4F5; font-size:12px; font-weight:600;">Add holiday</div>
+                  <div><div style="font-size:10.5px; color:var(--lc-muted); margin-bottom:4px;">Start</div><input type="date" value="{{ perfHolStartVal }}" onInput="{{ setPerfHolStart }}" style="padding:9px 11px; border-radius:9px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:12.5px;"></div>
+                  <div><div style="font-size:10.5px; color:var(--lc-muted); margin-bottom:4px;">End</div><input type="date" value="{{ perfHolEndVal }}" onInput="{{ setPerfHolEnd }}" style="padding:9px 11px; border-radius:9px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:12.5px;"></div>
+                  <div onClick="{{ requestHoliday }}" style="padding:10px 16px; border-radius:9px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:12px; font-weight:600;">Add holiday</div>
                 </div>
                 <sc-if value="{{ perfHolErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff3b4a; margin-bottom:8px;">⚠ {{ perfHolErrVal }}</div></sc-if>
                 <sc-for list="{{ perfHolidayList }}" as="h" hint-placeholder-count="0">
-                  <div style="display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-top:1px solid rgba(255,255,255,0.06); font-size:12.5px; color:#c8c8ce;"><span>{{ h.label }} · {{ h.days }}d</span><span onClick="{{ h.cancel }}" style="cursor:pointer; color:#6f6f78;">✕</span></div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-top:1px solid var(--lc-line); font-size:12.5px; color:var(--lc-muted);"><span>{{ h.label }} · {{ h.days }}d</span><span onClick="{{ h.cancel }}" style="cursor:pointer; color:var(--lc-muted);">✕</span></div>
                 </sc-for>
               </div>
 
-              <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:12px;">History</div>
+              <div style="font-size:13px; font-weight:700; color:var(--lc-accent); margin-bottom:12px;">History</div>
               <sc-for list="{{ perfHistoryList }}" as="p" hint-placeholder-count="2">
-                <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 20px; margin-bottom:12px;">
-                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:9px; margin-bottom:8px;"><span style="font-size:13px; font-weight:700; color:#eef0f2;">{{ p.dateLabel }}</span><span style="font-size:13px; color:#ffb020;">{{ p.starsLabel }}</span></div>
+                <div class="lc-sub" style="border-radius:16px; padding:16px 20px; margin-bottom:12px;">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:9px; margin-bottom:8px;"><span style="font-size:13px; font-weight:700; color:var(--lc-accent);">{{ p.dateLabel }}</span><span style="font-size:13px; color:#ffb020;">{{ p.starsLabel }}</span></div>
                   <sc-if value="{{ p.flagged }}" hint-placeholder-val="{{ false }}">
                     <div style="display:flex; align-items:center; gap:7px; padding:7px 11px; border-radius:8px; background:rgba(255,176,32,0.1); border:1px solid rgba(255,176,32,0.35); color:#ffb020; font-size:11px; margin-bottom:8px;">⚠ {{ p.flagReason }} — the owner can see this too.</div>
                   </sc-if>
-                  <div style="font-size:12.5px; color:#b8b8c0; line-height:1.5; margin-bottom:6px;">{{ p.whatDone }}</div>
-                  <div style="font-size:11px; color:#6f6f78; margin-bottom:6px;">⏱ {{ p.duration }}</div>
-                  <div style="font-size:11.5px; color:#8b8b93; margin-bottom:4px;">Avoided: {{ p.benefit }}</div>
-                  <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Follow-through: {{ p.learned }}</div>
-                  <div style="font-size:11px; color:#6f6f78; margin-bottom:4px;">{{ p.trainLabel }}</div>
-                  <div style="font-size:11.5px; color:#8b8b93;">Tomorrow: {{ p.improvement }}</div>
-                  <sc-if value="{{ p.hasOwnerRating }}" hint-placeholder-val="{{ false }}"><div style="margin-top:8px; font-size:11px; color:#9a9aa2;">Owner rating: {{ p.ownerStarsLabel }}</div></sc-if>
+                  <div style="font-size:12.5px; color:var(--lc-muted); line-height:1.5; margin-bottom:6px;">{{ p.whatDone }}</div>
+                  <div style="font-size:11px; color:var(--lc-muted); margin-bottom:6px;">⏱ {{ p.duration }}</div>
+                  <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:4px;">Avoided: {{ p.benefit }}</div>
+                  <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:6px;">Follow-through: {{ p.learned }}</div>
+                  <div style="font-size:11px; color:var(--lc-muted); margin-bottom:4px;">{{ p.trainLabel }}</div>
+                  <div style="font-size:11.5px; color:var(--lc-muted);">Tomorrow: {{ p.improvement }}</div>
+                  <sc-if value="{{ p.hasOwnerRating }}" hint-placeholder-val="{{ false }}"><div style="margin-top:8px; font-size:11px; color:var(--lc-muted);">Owner rating: {{ p.ownerStarsLabel }}</div></sc-if>
                 </div>
               </sc-for>
             <sc-if value="{{ n.hasActions }}" hint-placeholder-val="{{ false }}">
               <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:9px;">
-                <sc-for list="{{ n.actionChips }}" as="a" hint-placeholder-count="3"><span onClick="{{ a.run }}" style="font-size:10px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.3); border-radius:7px; padding:5px 10px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.14)' }">{{ a.label }}</span></sc-for>
+                <sc-for list="{{ n.actionChips }}" as="a" hint-placeholder-count="3"><span onClick="{{ a.run }}" style="font-size:10px; color:var(--lc-accent); border:1px solid var(--lc-line); border-radius:7px; padding:5px 10px; cursor:pointer;" style-hover="{ background:'var(--lc-raise)' }">{{ a.label }}</span></sc-for>
               </div>
             </sc-if>
-              <sc-if value="{{ perfNoHistory }}" hint-placeholder-val="{{ false }}"><div style="padding:20px; text-align:center; color:#6f6f78; font-size:12.5px;">No check-ins logged yet.</div></sc-if>
+              <sc-if value="{{ perfNoHistory }}" hint-placeholder-val="{{ false }}"><div style="padding:20px; text-align:center; color:var(--lc-muted); font-size:12.5px;">No check-ins logged yet.</div></sc-if>
 
               <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:13px; font-weight:700; color:#eef0f2; margin:26px 0 12px;">Team — owner review</div>
-                <sc-if value="{{ perfTeamEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:16px; text-align:center; color:#6f6f78; font-size:12.5px;">{{ perfTeamEmptyLabel }}</div></sc-if>
+                <div style="font-size:13px; font-weight:700; color:var(--lc-accent); margin:26px 0 12px;">Team — owner review</div>
+                <sc-if value="{{ perfTeamEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:16px; text-align:center; color:var(--lc-muted); font-size:12.5px;">{{ perfTeamEmptyLabel }}</div></sc-if>
                 <sc-for list="{{ perfTeamList }}" as="t" hint-placeholder-count="0">
-                  <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 20px; margin-bottom:12px;">
+                  <div class="lc-sub" style="border-radius:16px; padding:16px 20px; margin-bottom:12px;">
                     <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;">
-                      <div><span style="font-size:13px; font-weight:700; color:#eef0f2;">{{ t.name }}</span><span style="font-size:11px; color:#6f6f78; margin-left:8px;">{{ t.email }}</span></div>
+                      <div><span style="font-size:13px; font-weight:700; color:var(--lc-accent);">{{ t.name }}</span><span style="font-size:11px; color:var(--lc-muted); margin-left:8px;">{{ t.email }}</span></div>
                       <span style="font-size:11px; color:{{ t.statusC }}; font-family:'JetBrains Mono',monospace;">{{ t.statusLabel }}</span>
                     </div>
-                    <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">{{ t.lastLabel }} · miss streak {{ t.missStreak }}</div>
+                    <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:8px;">{{ t.lastLabel }} · miss streak {{ t.missStreak }}</div>
                     <sc-if value="{{ t.flaggedToday }}" hint-placeholder-val="{{ false }}">
                       <div style="display:flex; align-items:center; gap:7px; padding:8px 12px; border-radius:9px; background:rgba(255,176,32,0.1); border:1px solid rgba(255,176,32,0.35); color:#ffb020; font-size:11.5px; margin-bottom:8px;">⚠ {{ t.flagReasonToday }}</div>
                     </sc-if>
                     <sc-if value="{{ t.hasLast }}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Override rating: <span style="display:inline-flex; gap:3px; margin-left:6px;"><sc-for list="{{ t.stars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; color:{{ st.c }};">★</span></sc-for></span></div>
+                      <div style="font-size:11.5px; color:var(--lc-muted); margin-bottom:8px;">Override rating: <span style="display:inline-flex; gap:3px; margin-left:6px;"><sc-for list="{{ t.stars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; color:{{ st.c }};">★</span></sc-for></span></div>
                     </sc-if>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
                       <sc-if value="{{ t.appealPending }}" hint-placeholder-val="{{ false }}">
@@ -8827,12 +8829,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div onClick="{{ t.denyAppeal }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:rgba(255,59,74,0.1); border:1px solid rgba(255,59,74,0.3); color:#ff5563; font-size:11.5px; font-weight:600;">Deny appeal</div>
                       </sc-if>
                       <sc-if value="{{ t.notBanned }}" hint-placeholder-val="{{ true }}">
-                        <div onClick="{{ t.ban }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:11.5px;">Ban now</div>
+                        <div onClick="{{ t.ban }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:11.5px;">Ban now</div>
                       </sc-if>
                       <sc-if value="{{ t.banned }}" hint-placeholder-val="{{ false }}">
-                        <div onClick="{{ t.unban }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:11.5px;">Unban</div>
+                        <div onClick="{{ t.unban }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:11.5px;">Unban</div>
                       </sc-if>
-                      <div onClick="{{ t.toggleUltraGrant }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:{{ t.ultraToggleC }}; font-size:11.5px;">{{ t.ultraToggleLabel }}</div>
+                      <div onClick="{{ t.toggleUltraGrant }}" style="padding:8px 14px; border-radius:9px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:{{ t.ultraToggleC }}; font-size:11.5px;">{{ t.ultraToggleLabel }}</div>
                     </div>
                   </div>
                 </sc-for>
@@ -8840,79 +8842,80 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </sc-if>
 
                         <sc-if value="{{ tabWhatsNewPage }}" hint-placeholder-val="{{ false }}">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">CHANGELOG</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:6px;">CHANGELOG</div>
               <h1 style="font-size:18px; font-weight:700; margin-bottom:18px;">Update Terminal</h1>
-              <select value="{{ whatsNewSelVersion }}" onChange="{{ setWhatsNewSelVersion }}" style="padding:10px 13px; border-radius:10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#eef0f2; font-size:13px; outline:none; margin-bottom:16px;">
+              <select value="{{ whatsNewSelVersion }}" onChange="{{ setWhatsNewSelVersion }}" style="padding:10px 13px; border-radius:10px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-size:13px; outline:none; margin-bottom:16px;">
                 <sc-for list="{{ whatsNewList }}" as="c" hint-placeholder-count="3"><option value="{{ c.version }}">{{ c.version }} — {{ c.date }}</option></sc-for>
               </select>
-              <div onClick="{{ openWhatsNewBtn }}" style="display:inline-block; margin-left:12px; padding:10px 16px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12.5px; font-weight:600; vertical-align:top;">Reopen as popup</div>
+              <div onClick="{{ openWhatsNewBtn }}" style="display:inline-block; margin-left:12px; padding:10px 16px; border-radius:10px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:12.5px; font-weight:600; vertical-align:top;">Reopen as popup</div>
               <sc-if value="{{ hasWhatsNewSel }}" hint-placeholder-val="{{ false }}">
-                <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:18px 20px;">
-                  <div style="display:flex; align-items:baseline; gap:9px; margin-bottom:10px;"><span style="font-size:14px; font-weight:700; color:#eef0f2;">{{ whatsNewSel.version }}</span><span style="font-size:11px; color:#6f6f78;">{{ whatsNewSel.date }}</span></div>
+                <div class="lc-sub" style="border-radius:16px; padding:18px 20px;">
+                  <div style="display:flex; align-items:baseline; gap:9px; margin-bottom:10px;"><span style="font-size:14px; font-weight:700; color:var(--lc-accent);">{{ whatsNewSel.version }}</span><span style="font-size:11px; color:var(--lc-muted);">{{ whatsNewSel.date }}</span></div>
                   <sc-for list="{{ whatsNewSel.notes }}" as="n" hint-placeholder-count="2">
-                    <div style="display:flex; gap:8px; font-size:12.5px; color:#b8b8c0; line-height:1.55; margin-bottom:6px;"><span style="color:#6f6f78;">&middot;</span><span>{{ n }}</span></div>
+                    <div style="display:flex; gap:8px; font-size:12.5px; color:var(--lc-muted); line-height:1.55; margin-bottom:6px;"><span style="color:var(--lc-muted);">&middot;</span><span>{{ n }}</span></div>
                   </sc-for>
                 </div>
               </sc-if>
 
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin:28px 0 6px;">CREDITS &amp; LICENCES</div>
-              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 20px;">
-                <div style="font-size:12.5px; color:#a8a8b0; line-height:1.65;">3D anatomy model: &ldquo;man muscle human body&rdquo; by Rena, used under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" style="color:#c8c8ce;">Creative Commons Attribution 4.0</a> licence. The model has been simplified and its shoulder width adjusted for use in Fitness &amp; Recovery.</div>
-                <div style="font-size:12.5px; color:#a8a8b0; line-height:1.65; margin-top:10px;">3D rendering: <a href="https://threejs.org" target="_blank" rel="noopener" style="color:#c8c8ce;">three.js</a>, MIT licence.</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin:28px 0 6px;">CREDITS &amp; LICENCES</div>
+              <div class="lc-sub" style="border-radius:16px; padding:16px 20px;">
+                <div style="font-size:12.5px; color:var(--lc-muted); line-height:1.65;">3D anatomy model: &ldquo;man muscle human body&rdquo; by Rena, used under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener" style="color:var(--lc-muted);">Creative Commons Attribution 4.0</a> licence. The model has been simplified and its shoulder width adjusted for use in Fitness &amp; Recovery.</div>
+                <div style="font-size:12.5px; color:var(--lc-muted); line-height:1.65; margin-top:10px;">3D rendering: <a href="https://threejs.org" target="_blank" rel="noopener" style="color:var(--lc-muted);">three.js</a>, MIT licence.</div>
               </div>
             </sc-if>
 
             <sc-if value="{{ tabTrouble }}" hint-placeholder-val="{{ false }}">
-              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">DIAGNOSTICS</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:6px;">DIAGNOSTICS</div>
               <h1 style="font-size:18px; font-weight:700; margin-bottom:6px;">Troubleshooting</h1>
-              <p style="font-size:12.5px; color:#8b8b93; margin-bottom:18px; max-width:520px;">A live read of what the app can see about your own setup, plus fixes for the issues that come up most.</p>
+              <p style="font-size:12.5px; color:var(--lc-muted); margin-bottom:18px; max-width:520px;">A live read of what the app can see about your own setup, plus fixes for the issues that come up most.</p>
 
-              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 20px; margin-bottom:14px;">
+              <div class="lc-sub" style="border-radius:16px; padding:16px 20px; margin-bottom:14px;">
                 <sc-for list="{{ diagRows }}" as="d" hint-placeholder-count="7">
-                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size:12.5px; color:#8b8b93;">{{ d.k }}</span>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--lc-line);">
+                    <span style="font-size:12.5px; color:var(--lc-muted);">{{ d.k }}</span>
                     <span style="font-size:12.5px; font-weight:600; color:{{ d.c }}; text-align:right;">{{ d.v }}</span>
                   </div>
                 </sc-for>
               </div>
               <div style="display:flex; gap:9px; flex-wrap:wrap; margin-bottom:26px;">
-                <div onClick="{{ startRefresh }}" style="display:inline-block; padding:10px 16px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.16); color:#c8c8ce; font-size:12px; font-weight:600;">↻ {{ tsRefreshLabel }}</div>
+                <div onClick="{{ startRefresh }}" style="display:inline-block; padding:10px 16px; border-radius:10px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:12px; font-weight:600;">↻ {{ tsRefreshLabel }}</div>
               </div>
 
-              <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:12px;">Common issues</div>
+              <div style="font-size:13px; font-weight:700; color:var(--lc-accent); margin-bottom:12px;">Common issues</div>
               <sc-for list="{{ troubleFaq }}" as="f" hint-placeholder-count="8">
-                <div class="cc-glowcard" style="border-radius:14px; background:#16181c; padding:15px 18px; margin-bottom:10px;">
-                  <div style="font-size:13px; font-weight:700; color:#eef0f2; margin-bottom:6px;">{{ f.q }}</div>
-                  <div style="font-size:12.5px; color:#a8a8b0; line-height:1.6;">{{ f.a }}</div>
+                <div class="lc-sub" style="border-radius:14px; padding:15px 18px; margin-bottom:10px;">
+                  <div style="font-size:13px; font-weight:700; color:var(--lc-accent); margin-bottom:6px;">{{ f.q }}</div>
+                  <div style="font-size:12.5px; color:var(--lc-muted); line-height:1.6;">{{ f.a }}</div>
                 </div>
               </sc-for>
             </sc-if>
 
             <sc-if value="{{ tabAdmin }}" hint-placeholder-val="{{ false }}">
               <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;" class="cc-stat4">
-                <sc-for list="{{ adminStats }}" as="s" hint-placeholder-count="4"><div style="border-radius:13px; padding:13px; background:rgba(23,25,29,0.92);"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#75757d;">{{ s.k }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:22px; color:#eef0f2; margin-top:3px;">{{ s.v }}</div></div></sc-for>
+                <sc-for list="{{ adminStats }}" as="s" hint-placeholder-count="4"><div class="lc-sub" style="padding:13px;"><div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:var(--lc-muted);">{{ s.k }}</div><div style="font-family:'JetBrains Mono',monospace; font-size:22px; color:var(--lc-accent); margin-top:3px;">{{ s.v }}</div></div></sc-for>
               </div>
               <!-- Account Requests came off the main rail: it is an owner's admin job, not a
                    place you go. The page itself is unchanged and this is now the way in. -->
               <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin:2px 0 10px; flex-wrap:wrap;">
-                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">USER MANAGEMENT · {{ pendingCount }} PENDING SIGN-UP REQUEST{{ pendingCountPlural }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted);">USER MANAGEMENT · {{ pendingCount }} PENDING SIGN-UP REQUEST{{ pendingCountPlural }}</span>
                 <span onClick="{{ goRequests }}" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.5px; color:var(--sel-ink); background:var(--sel-bg); border-radius:8px; padding:7px 13px; cursor:pointer; white-space:nowrap;">REVIEW ACCOUNT REQUESTS</span>
               </div>
-              <sc-if value="{{ noAdminUsers }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:32px 20px; text-align:center; color:#75757d; font-size:12.5px;">No other accounts yet. Approved sign-ups will appear here for suspension and Ultra-access control.</div></sc-if>
+              <sc-if value="{{ noAdminUsers }}" hint-placeholder-val="{{ false }}"><div style="border:1px dashed var(--lc-line); border-radius:16px; padding:32px 20px; text-align:center; color:var(--lc-muted); font-size:12.5px;">No other accounts yet. Approved sign-ups will appear here for suspension and Ultra-access control.</div></sc-if>
               <sc-for list="{{ adminUsers }}" as="u" hint-placeholder-count="6">
-                <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
-                  <div style="width:34px; height:34px; flex:0 0 34px; border-radius:10px; background:#151517; border:1px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#FFFFFF;">{{ u.initials }}</div>
-                  <div style="flex:1; min-width:0;"><div style="display:flex; align-items:center; gap:8px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">{{ u.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:{{ u.roleC }};">{{ u.role }}</span></div><div style="font-size:11px; color:#8a8a92; font-family:'JetBrains Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ u.email }}</div></div>
+                <div style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--lc-line);">
+                  <div style="width:34px; height:34px; flex:0 0 34px; border-radius:10px; background:var(--lc-sub); border:1px solid var(--lc-line); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--lc-accent);">{{ u.initials }}</div>
+                  <div style="flex:1; min-width:0;"><div style="display:flex; align-items:center; gap:8px;"><span style="font-size:13px; font-weight:600; color:var(--lc-accent);">{{ u.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; color:{{ u.roleC }};">{{ u.role }}</span></div><div style="font-size:11px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ u.email }}</div></div>
                   <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:{{ u.statusCol }};">{{ u.status }}</span>
                   <div style="display:flex; gap:6px;">
-                    <sc-if value="{{ u.isActive }}" hint-placeholder-val="{{ false }}"><span onClick="{{ u.suspend }}" style="font-size:10px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.14); border-radius:7px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#FFFFFF' }">Suspend</span></sc-if>
-                    <sc-if value="{{ u.isSuspended }}" hint-placeholder-val="{{ false }}"><span onClick="{{ u.reactivate }}" style="font-size:10px; color:#cfcfd4; border:1px solid rgba(255,255,255,0.14); border-radius:7px; padding:5px 10px; cursor:pointer;">Reactivate</span></sc-if>
-                    <span onClick="{{ u.toggleUltra }}" style="font-size:10px; color:{{ u.ultraToggleC }}; border:1px solid rgba(255,255,255,0.14); border-radius:7px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#FFFFFF' }">{{ u.ultraToggleLabel }}</span>
+                    <sc-if value="{{ u.isActive }}" hint-placeholder-val="{{ false }}"><span onClick="{{ u.suspend }}" style="font-size:10px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:7px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#FFFFFF' }">Suspend</span></sc-if>
+                    <sc-if value="{{ u.isSuspended }}" hint-placeholder-val="{{ false }}"><span onClick="{{ u.reactivate }}" style="font-size:10px; color:var(--lc-muted); border:1px solid var(--lc-line); border-radius:7px; padding:5px 10px; cursor:pointer;">Reactivate</span></sc-if>
+                    <span onClick="{{ u.toggleUltra }}" style="font-size:10px; color:{{ u.ultraToggleC }}; border:1px solid var(--lc-line); border-radius:7px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#FFFFFF' }">{{ u.ultraToggleLabel }}</span>
                   </div>
                 </div>
               </sc-for>
             </sc-if>
           </div>
+        </div>
         </div>
       </div>
       </sc-if>
@@ -9144,7 +9147,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.15-337 · v11.337 theme-menu-pearl';
+const NOTIF_BUILD_VERSION = '2026.09.16-338 · v11.338 settings-pearl';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10425,8 +10428,8 @@ activities: this._mergeShipLog(s.activities),
     if(this._sbOn()) window.SB.insert('savings',{id,user_id:this.state.authUserId,domain:'business',label:l,amount:a,occurred_at:new Date(t).toISOString()});
   }
   setSavingsGoal(v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeSavingsGoal:n}, savingsGoalDraft:undefined})); }
-  _tog(key,label,desc){ const on=this.state.prefs[key]; return { label, desc, bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setPref(key,!this.state.prefs[key]) }; }
-  _chips(key,opts){ const cur=this.state.prefs[key]; return opts.map(o=>({ l:o, set:()=>this.setPref(key,o), c:cur===o?'#F4F4F5':'#9a9aa2', b:cur===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:cur===o?'rgba(255,255,255,0.18)':'transparent' })); }
+  _tog(key,label,desc){ const on=this.state.prefs[key]; return { label, desc, bg:on?'var(--lc-accent)':'var(--lc-line)', pos:on?'22px':'2px', toggle:()=>this.setPref(key,!this.state.prefs[key]) }; }
+  _chips(key,opts){ const cur=this.state.prefs[key]; return opts.map(o=>({ l:o, set:()=>this.setPref(key,o), c:cur===o?'var(--lc-accent)':'var(--lc-muted)', b:cur===o?'var(--lc-accent)':'var(--lc-line)', bg:cur===o?'var(--lc-sub)':'transparent' })); }
   // The globe button's menu. Four tabs, mode-picker style: Themes (every raiment, by name,
   // with its own glyph) and Website (what the button used to do
   // on its own, before it had anything else to offer). The last two are reserved.
@@ -19067,7 +19070,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       saveHintColor:S.acctPwErr?'#ff5563':((JSON.stringify(S.acctDraft)!==JSON.stringify(S.account)&&!S.acctSaved)?'#ffd66b':'#6f6f78'),
       acctChipTxt:(JSON.stringify(S.acctDraft)!==JSON.stringify(S.account))?'● UNSAVED':'● SAVED',
       acctChipColor:(JSON.stringify(S.acctDraft)!==JSON.stringify(S.account))?'#ffd66b':'#6cffba',
-      testTierChips:(()=>{ const cur=this._effectiveTestTier(); return this._testTierOrder().map(t=>({ l:t, set:()=>this.setTestDifficulty(t), c:cur===t?'#F4F4F5':'#9a9aa2', b:cur===t?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:cur===t?'rgba(255,255,255,0.18)':'transparent' })); })(),
+      testTierChips:(()=>{ const cur=this._effectiveTestTier(); return this._testTierOrder().map(t=>({ l:t, set:()=>this.setTestDifficulty(t), c:cur===t?'var(--lc-accent)':'var(--lc-muted)', b:cur===t?'var(--lc-accent)':'var(--lc-line)', bg:cur===t?'var(--lc-sub)':'transparent' })); })(),
       testTierIsManual:S.prefs.testDifficultyAuto===false,
       testTierAutoLabel:(S.prefs.testDifficultyAuto!==false)?('Auto — based on '+this._totalQtTestsDone()+' Quick Test'+(this._totalQtTestsDone()===1?'':'s')+' completed'):'Manual override active',
       resetTestTierAuto:()=>this.resetTestDifficultyAuto(),
@@ -19109,7 +19112,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           anatomyFrontCount: nF?(' \u25cf'+nF):'', anatomyBackCount: nB?(' \u25cf'+nB):'',
           anatomyActive:active, noAnatomyActive:!active.length };
       })(),
-      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'#F4F4F5':'#9a9aa2', bg:n===S.settingsTab?'rgba(255,255,255,0.14)':'transparent', bd:n===S.settingsTab?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.08)', soon:''})),
+      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'var(--lc-accent)':'var(--lc-muted)', bg:n===S.settingsTab?'var(--lc-sub)':'transparent', bd:n===S.settingsTab?'var(--lc-accent)':'var(--lc-line)', soon:''})),
       // 'AI Providers' is a page of its own now; a state still naming it would render an empty panel.
       settingsTab:S.settingsTab==='AI Providers'?'Account':S.settingsTab,
       ...(()=>{ const c=this._provCfg('elevenlabs'); const PD=this._pd(); const tts=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0])||{voices:[]};
@@ -19121,7 +19124,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           elDraft:(S.provDraft||{}).elevenlabs||'', onElDraft:(e)=>this.setProvDraft('elevenlabs',e), elSave:()=>this.saveProvKey('elevenlabs'), elReplace:()=>this.replaceProvKey('elevenlabs'),
           elTest:()=>this.testProvider('elevenlabs'), elErr:c.err||'',
           elVoiceId:(S.prefs.elevenVoiceId)||'21m00Tcm4TlvDq8ikWAM', setElVoiceId:(e)=>this.setPref('elevenVoiceId', e.target.value),
-          toggleReadAloud:()=>this.toggleReadAloud(), readAloudBg:(S.prefs.readAloudEnabled!==false)?'#FFFFFF':'rgba(255,255,255,0.14)', readAloudPos:(S.prefs.readAloudEnabled!==false)?'18px':'2px',
+          toggleReadAloud:()=>this.toggleReadAloud(), readAloudBg:(S.prefs.readAloudEnabled!==false)?'var(--lc-accent)':'var(--lc-line)', readAloudPos:(S.prefs.readAloudEnabled!==false)?'18px':'2px',
           elVoiceOptions:tts.voices||[],
         }; })(),
       tabMemory:S.settingsTab==='Memory',
@@ -19409,7 +19412,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           perfDraftLearnedVal:S.perfDraftLearned||'', setPerfDraftLearned:(e)=>this.setPerfDraftLearned(e),
           perfDraftImprovementVal:S.perfDraftImprovement||'', setPerfDraftImprovement:(e)=>this.setPerfDraftImprovement(e),
           togglePerfTrained:()=>this.togglePerfTrained(),
-          perfTrainedBg:S.perfDraftTrained?'#FFFFFF':'rgba(255,255,255,0.14)', perfTrainedPos:S.perfDraftTrained?'22px':'2px', perfTrainedBgU:S.perfDraftTrained?perfAcc:(S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.16)':'rgba(91,26,26,0.16)'),
+          perfTrainedBg:S.perfDraftTrained?'var(--lc-accent)':'var(--lc-line)', perfTrainedPos:S.perfDraftTrained?'22px':'2px', perfTrainedBgU:S.perfDraftTrained?perfAcc:(S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.16)':'rgba(91,26,26,0.16)'),
           perfStars:stars, perfSubmitErrShow:!!S.perfSubmitErr, perfSubmitErrVal:S.perfSubmitErr||'', submitPerfLog:()=>this.submitPerfLog(),
           submitPerfCheckinFromModal:()=>this.submitPerfCheckinFromModal(),
           perfSubmitLabel:this._perfHasLoggedToday()?'Update today’s check-in':'Submit check-in',
@@ -19426,8 +19429,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         {key:'motivational',label:'Motivational messages',desc:'Gentle nudges about open tasks & goals'},
         {key:'silent',label:'Silent mode',desc:'Assistant never speaks up first'},
         {key:'vacation',label:'Vacation mode',desc:'Pause all proactive coaching temporarily'},
-      ].map(t=>{ const on=!!(S.prefs.coaching||{})[t.key]; return {label:t.label, desc:t.desc, bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setCoach(t.key,!on)}; }),
-      coachFreqChips:['Low','Normal','High'].map(o=>{ const cur=(S.prefs.coaching||{}).frequency||'Normal'; return {l:o, set:()=>this.setCoach('frequency',o), c:cur===o?'#F4F4F5':'#9a9aa2', b:cur===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:cur===o?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.03)'}; }),
+      ].map(t=>{ const on=!!(S.prefs.coaching||{})[t.key]; return {label:t.label, desc:t.desc, bg:on?'var(--lc-accent)':'var(--lc-line)', pos:on?'22px':'2px', toggle:()=>this.setCoach(t.key,!on)}; }),
+      coachFreqChips:['Low','Normal','High'].map(o=>{ const cur=(S.prefs.coaching||{}).frequency||'Normal'; return {l:o, set:()=>this.setCoach('frequency',o), c:cur===o?'var(--lc-accent)':'var(--lc-muted)', b:cur===o?'var(--lc-accent)':'var(--lc-line)', bg:cur===o?'var(--lc-sub)':'transparent'}; }),
       coachWorkStart:(S.prefs.coaching||{}).workStart||'', coachWorkEnd:(S.prefs.coaching||{}).workEnd||'',
       setCoachWorkStart:(e)=>this.setCoach('workStart',e.target.value), setCoachWorkEnd:(e)=>this.setCoach('workEnd',e.target.value),
       mutedTopicChips:(S.prefs.mutedTopics||[]).map(m=>({name:m, unmute:()=>this.unmuteTopic(m)})),
@@ -19491,7 +19494,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       splineClass:S.prefs.theme==='Ultra'?'':(typeof window!=='undefined' && window.innerWidth<=900)?'spline-active':(S.prefs.homeBg==='Spline')?'spline-active':(S.prefs.homeBg==='Black Hole')?'blackhole-active':'',
       homeHeroBg:(S.prefs.theme==='Ultra')?'transparent':((typeof window!=='undefined' && window.innerWidth<=900) || S.prefs.homeBg==='Spline'||S.prefs.homeBg==='Black Hole')?'transparent':'#000',
       densityChips:this._chips('density',['Compact','Comfortable','Spacious']),
-      quotesEnabledBg:S.prefs.quotesEnabled?'#FFFFFF':'rgba(255,255,255,0.14)', quotesEnabledPos:S.prefs.quotesEnabled?'22px':'2px', toggleQuotesEnabled:()=>this.setPref('quotesEnabled',!S.prefs.quotesEnabled),
+      quotesEnabledBg:S.prefs.quotesEnabled?'var(--lc-accent)':'var(--lc-line)', quotesEnabledPos:S.prefs.quotesEnabled?'22px':'2px', toggleQuotesEnabled:()=>this.setPref('quotesEnabled',!S.prefs.quotesEnabled),
       quoteDraftVal:S.quoteDraft||'', setQuoteDraft:(e)=>this.setQuoteDraft(e), addQuote:()=>this.addQuote(), addQuoteKey:(e)=>this.addQuoteKey(e), sendTestQuote:()=>this.sendTestQuote(),
       hasQuotes:(S.customQuotes||[]).length>0, quoteCount:(S.customQuotes||[]).length,
       quoteCountLabel:(S.customQuotes||[]).length+' saved · '+(S.prefs.quotesEnabled?'on':'off'),
@@ -19519,12 +19522,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // true for the base theme and Noir; Ultra X and Maison Élysée get their own light
       // palette. See _voiceTokens() for the actual per-theme values.
       ...vTok,
-      voiceRateChips:[0.75,1,1.25,1.5].map(o=>({l:o+'×', set:()=>this.setPref('voiceRate',o), c:S.prefs.voiceRate===o?'#F4F4F5':'#9a9aa2', b:S.prefs.voiceRate===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.voiceRate===o?'rgba(255,255,255,0.18)':'transparent'})),
-      voicePitchChips:[0.8,1,1.2].map(o=>({l:o+'×', set:()=>this.setPref('voicePitch',o), c:S.prefs.voicePitch===o?'#F4F4F5':'#9a9aa2', b:S.prefs.voicePitch===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:S.prefs.voicePitch===o?'rgba(255,255,255,0.18)':'transparent'})),
+      voiceRateChips:[0.75,1,1.25,1.5].map(o=>({l:o+'×', set:()=>this.setPref('voiceRate',o), c:S.prefs.voiceRate===o?'var(--lc-accent)':'var(--lc-muted)', b:S.prefs.voiceRate===o?'var(--lc-accent)':'var(--lc-line)', bg:S.prefs.voiceRate===o?'var(--lc-sub)':'transparent'})),
+      voicePitchChips:[0.8,1,1.2].map(o=>({l:o+'×', set:()=>this.setPref('voicePitch',o), c:S.prefs.voicePitch===o?'var(--lc-accent)':'var(--lc-muted)', b:S.prefs.voicePitch===o?'var(--lc-accent)':'var(--lc-line)', bg:S.prefs.voicePitch===o?'var(--lc-sub)':'transparent'})),
       voiceSetToggles:[ this._tog('wake','Wake word','Respond to “Hey '+(S.prefs.wakeWordName||'Hannah')+'”'), this._tog('autoListen','Continuous mode','Keep listening after replies') ],
-      wakeWordChips:['Hannah','Lura'].map(n=>({ l:n, set:()=>this.setPref('wakeWordName',n), c:(S.prefs.wakeWordName||'Hannah')===n?'#F4F4F5':'#9a9aa2', b:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.14)':'transparent' })),
-      readingStyleChips:['Professional','Friendly','Motivational','Executive','Conversational'].map(o=>({l:o, set:()=>this.setReadingStyle(o), c:(S.prefs.readingStyle||'Professional')===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.14)':'transparent'})),
-      volumeChips:[0.5,0.75,1].map(o=>({l:Math.round(o*100)+'%', set:()=>this.setVoiceVolume(o), c:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'#F4F4F5':'#9a9aa2', b:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', bg:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.14)':'transparent'})),
+      wakeWordChips:['Hannah','Lura'].map(n=>({ l:n, set:()=>this.setPref('wakeWordName',n), c:(S.prefs.wakeWordName||'Hannah')===n?'var(--lc-accent)':'var(--lc-muted)', b:(S.prefs.wakeWordName||'Hannah')===n?'var(--lc-accent)':'var(--lc-line)', bg:(S.prefs.wakeWordName||'Hannah')===n?'rgba(255,255,255,0.14)':'transparent' })),
+      readingStyleChips:['Professional','Friendly','Motivational','Executive','Conversational'].map(o=>({l:o, set:()=>this.setReadingStyle(o), c:(S.prefs.readingStyle||'Professional')===o?'var(--lc-accent)':'var(--lc-muted)', b:(S.prefs.readingStyle||'Professional')===o?'var(--lc-accent)':'var(--lc-line)', bg:(S.prefs.readingStyle||'Professional')===o?'rgba(255,255,255,0.14)':'transparent'})),
+      volumeChips:[0.5,0.75,1].map(o=>({l:Math.round(o*100)+'%', set:()=>this.setVoiceVolume(o), c:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'var(--lc-accent)':'var(--lc-muted)', b:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'var(--lc-accent)':'var(--lc-line)', bg:(S.prefs.voiceVolume!=null?S.prefs.voiceVolume:1)===o?'rgba(255,255,255,0.14)':'transparent'})),
       readText:S.readText, setReadText:(e)=>this.setReadText(e), readPasted:()=>this.readPasted(), importReadFile:(e)=>this.importReadFile(e), onDropRead:(e)=>this.onDropRead(e), onDragOverRead:(e)=>{ try{e.preventDefault();}catch(_){} if(!this.state.dragOver) this.setState({dragOver:true}); }, onDragLeaveRead:()=>{ if(this.state.dragOver) this.setState({dragOver:false}); }, importing:S.importing, importErr:S.importErr, dragBg:S.dragOver?(vTok.vDark?'rgba(255,255,255,0.1)':vTok.vInputBg):(vTok.vDark?'rgba(255,255,255,0.02)':vTok.vLine3), dragBd:S.dragOver?vTok.vAccent:vTok.vLine,
       vp:S.vp||{}, playIcon:(S.vp&&S.vp.playing&&!S.vp.paused)?'⏸':'▶', speakBriefing:()=>this.speakBriefing(), pausePlay:()=>this.pausePlay(), stopPlay:()=>this.stopPlay(), restartPlay:()=>this.restartPlay(), skipBack:()=>this.skipPlay(-15), skipFwd:()=>this.skipPlay(15), vpSeg:((S.vp&&S.vp.count)?((S.vp.idx+1)+' / '+S.vp.count):'—'),
       convoHistoryOpen:!!S.convoHistoryOpen,
@@ -19674,7 +19677,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       latestNotes:(this._changelog()[0]||{}).notes||[],
       pushLoading:!!S.pushLoading, pushErr:S.pushErr||'', pushErrShow:!!S.pushErr,
       clearAllNotifs:()=>this.clearAllNotifs(),
-      dashboardWidgets:[['missions','Daily & Diet Checklists'],['training','Training Checklist'],['news','Money / News & Law News']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'#FFFFFF':'rgba(255,255,255,0.14)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
+      dashboardWidgets:[['missions','Daily & Diet Checklists'],['training','Training Checklist'],['news','Money / News & Law News']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'var(--lc-accent)':'var(--lc-line)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
       /* Log everything — one modal covering every daily log. The chips report what is
          already done today, so the panel opens showing what is actually left. */
       logAllOpen:!!S.logAllOpen,
@@ -19760,13 +19763,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       customNotifGenErr:S.customNotifGenErr||'',
       hasCustomNotifs:(S.customNotifs||[]).length>0, customNotifCountLabel:(S.customNotifs||[]).length+' generated',
       customNotifList:(S.customNotifs||[]).map(c=>({text:c.text, remove:()=>this.mut(s=>({customNotifs:(s.customNotifs||[]).filter(x=>x.id!==c.id)}))})),
-      customNotifsEnabledBg:S.prefs.customNotifsEnabled?'#FFFFFF':'rgba(255,255,255,0.14)', customNotifsEnabledPos:S.prefs.customNotifsEnabled?'20px':'2px',
+      customNotifsEnabledBg:S.prefs.customNotifsEnabled?'var(--lc-accent)':'var(--lc-line)', customNotifsEnabledPos:S.prefs.customNotifsEnabled?'20px':'2px',
       toggleCustomNotifsEnabled:()=>this.setPref('customNotifsEnabled',!S.prefs.customNotifsEnabled),
-      reminderPushBg:S.prefs.reminderPushEnabled!==false?'#FFFFFF':'rgba(255,255,255,0.14)', reminderPushPos:S.prefs.reminderPushEnabled!==false?'20px':'2px',
+      reminderPushBg:S.prefs.reminderPushEnabled!==false?'var(--lc-accent)':'var(--lc-line)', reminderPushPos:S.prefs.reminderPushEnabled!==false?'20px':'2px',
       toggleReminderPush:()=>this.setPref('reminderPushEnabled',S.prefs.reminderPushEnabled===false),
-      checklistReminderBg:S.prefs.checklistReminderEnabled!==false?'#FFFFFF':'rgba(255,255,255,0.14)', checklistReminderPos:S.prefs.checklistReminderEnabled!==false?'20px':'2px',
+      checklistReminderBg:S.prefs.checklistReminderEnabled!==false?'var(--lc-accent)':'var(--lc-line)', checklistReminderPos:S.prefs.checklistReminderEnabled!==false?'20px':'2px',
       toggleChecklistReminder:()=>this.setPref('checklistReminderEnabled',S.prefs.checklistReminderEnabled===false),
-      dailyLogReminderBg:S.prefs.dailyLogReminderEnabled!==false?'#FFFFFF':'rgba(255,255,255,0.14)', dailyLogReminderPos:S.prefs.dailyLogReminderEnabled!==false?'20px':'2px',
+      dailyLogReminderBg:S.prefs.dailyLogReminderEnabled!==false?'var(--lc-accent)':'var(--lc-line)', dailyLogReminderPos:S.prefs.dailyLogReminderEnabled!==false?'20px':'2px',
       toggleDailyLogReminder:()=>this.setPref('dailyLogReminderEnabled',S.prefs.dailyLogReminderEnabled===false),
       checklistFreqOptions:[15,30,45,60,90,120,180,240,360,480,720,1440].map(v=>({v, l:v<60?v+' min':(v/60)+' hr'})),
       checklistReminderFreqSel:S.prefs.checklistReminderFreqMins||120,
@@ -19777,7 +19780,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       reminderLeadSel:[5,10,15,30,60,120].includes(S.prefs.reminderLeadMins||15)?(S.prefs.reminderLeadMins||15):'custom',
       setReminderLeadSel:(e)=>{ const v=e.target.value; this.setPref('reminderLeadMins', v==='custom'?60:+v); },
       setReminderLeadMins:(e)=>this.setPref('reminderLeadMins',Math.max(1,+e.target.value||1)),
-      reminderEmailBg:S.prefs.reminderEmailEnabled?'#FFFFFF':'rgba(255,255,255,0.14)', reminderEmailPos:S.prefs.reminderEmailEnabled?'20px':'2px',
+      reminderEmailBg:S.prefs.reminderEmailEnabled?'var(--lc-accent)':'var(--lc-line)', reminderEmailPos:S.prefs.reminderEmailEnabled?'20px':'2px',
       toggleReminderEmail:()=>this.setPref('reminderEmailEnabled',!S.prefs.reminderEmailEnabled), reminderEmailOn:!!S.prefs.reminderEmailEnabled,
       reminderEmailAddr:S.prefs.reminderEmailAddr||(S.account&&S.account.email)||'', setReminderEmailAddr:(e)=>this.setPref('reminderEmailAddr',e.target.value),
       emailTemplateSubjectVal:(S.emailTemplateSubjectDraft!=null?S.emailTemplateSubjectDraft:(S.prefs.emailTemplateSubject||'')), setEmailTemplateSubject:(e)=>this.setEmailTemplateSubjectDraft(e),
@@ -19802,20 +19805,20 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const nc=S.prefs.notifCategories||{};
         return {
           notifFreqChips: FREQ.map(([id,label])=>({ id, label, pick:()=>this.setNotifFrequency(id),
-            c:S.prefs.notifFrequency===id?'#F4F4F5':'#9a9aa2', bg:S.prefs.notifFrequency===id?'rgba(255,255,255,0.18)':'transparent', b:S.prefs.notifFrequency===id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
+            c:S.prefs.notifFrequency===id?'var(--lc-accent)':'var(--lc-muted)', bg:S.prefs.notifFrequency===id?'var(--lc-sub)':'transparent', b:S.prefs.notifFrequency===id?'var(--lc-accent)':'var(--lc-line)' })),
           notifFreqIsCustom: S.prefs.notifFrequency==='custom',
           notifFrequencyCustomMin: S.prefs.notifFrequencyCustomMin||60, setNotifFrequencyCustomMin:e=>this.setNotifFrequencyCustomMin(e),
           notifQuietOn: !!(S.prefs.notifQuietHours&&S.prefs.notifQuietHours.enabled),
-          notifQuietBg: S.prefs.notifQuietHours&&S.prefs.notifQuietHours.enabled?'#FFFFFF':'rgba(255,255,255,0.14)',
+          notifQuietBg: S.prefs.notifQuietHours&&S.prefs.notifQuietHours.enabled?'var(--lc-accent)':'var(--lc-line)',
           notifQuietPos: S.prefs.notifQuietHours&&S.prefs.notifQuietHours.enabled?'20px':'2px',
           toggleNotifQuietHours:()=>this.toggleNotifQuietHours(),
           notifQuietStart: (S.prefs.notifQuietHours&&S.prefs.notifQuietHours.start)||22, setNotifQuietStart:e=>this.setNotifQuietStart(e),
           notifQuietEnd: (S.prefs.notifQuietHours&&S.prefs.notifQuietHours.end)!=null?S.prefs.notifQuietHours.end:7, setNotifQuietEnd:e=>this.setNotifQuietEnd(e),
           notifWeekendChips: [['normal','Normal'],['skip','Skip weekends']].map(([id,label])=>({ id, label, pick:()=>this.setNotifWeekendBehavior(id),
-            c:(S.prefs.notifWeekendBehavior||'normal')===id?'#F4F4F5':'#9a9aa2', bg:(S.prefs.notifWeekendBehavior||'normal')===id?'rgba(255,255,255,0.18)':'transparent', b:(S.prefs.notifWeekendBehavior||'normal')===id?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)' })),
+            c:(S.prefs.notifWeekendBehavior||'normal')===id?'var(--lc-accent)':'var(--lc-muted)', bg:(S.prefs.notifWeekendBehavior||'normal')===id?'var(--lc-sub)':'transparent', b:(S.prefs.notifWeekendBehavior||'normal')===id?'var(--lc-accent)':'var(--lc-line)' })),
           notifTimezone: S.prefs.notifTimezone||'UTC', setNotifTimezone:e=>this.setNotifTimezone(e),
           notifCategoryToggles: catKeys.map(k=>({ key:k, label:(CATS[k]&&CATS[k].label)||(k.charAt(0).toUpperCase()+k.slice(1)),
-            on: nc[k]!==false, bg: nc[k]!==false?'#FFFFFF':'rgba(255,255,255,0.14)', pos: nc[k]!==false?'20px':'2px',
+            on: nc[k]!==false, bg: nc[k]!==false?'var(--lc-accent)':'var(--lc-line)', pos: nc[k]!==false?'20px':'2px',
             toggle:()=>this.toggleNotifCategory(k) })),
           notifBasicToggles: [this._tog('notifSound','Notification sound','Play a chime for in-app notifications'), this._tog('notifVibration','Vibration','Vibrate on supported devices'), this._tog('notifCriticalBypassSilent','Critical bypasses quiet hours','Security and other critical-priority alerts still get through during quiet hours')],
           goTesting:()=>this.setState({scene:'notiftest'}),
