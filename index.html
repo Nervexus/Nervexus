@@ -9147,7 +9147,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.16-338 · v11.338 settings-pearl';
+const NOTIF_BUILD_VERSION = '2026.09.16-339 · v11.339 changelog-catchup';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14167,6 +14167,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.339', date:'Sep 16, 2026', major:false, notes:[
+      'Update Terminal was quietly falling behind — real releases were shipping without an entry here. Every version now gets logged the moment it ships, not backfilled later.',
+    ]},
+    {version:'v11.338', date:'Sep 16, 2026', major:true, notes:[
+      'Settings sits on the pearl ground now, on all eleven tabs — the sidebar, the content panel, every nested card, chip and toggle. It used to stay flat dark regardless of raiment, which read as broken on the light styles like Ultra X and Maison Élysée.',
+    ]},
+    {version:'v11.334', date:'Sep 15, 2026', major:true, notes:[
+      'The globe button in the top bar opens a menu now instead of jumping straight to the website: Themes lists every raiment by name and glyph and switches on a tap without closing the menu, Website is the old link one tap deeper, and two tabs are reserved for later.',
+      'The old four-icon raiment switcher next to it is gone — the new menu replaces it.',
+    ]},
+    {version:'v11.333', date:'Sep 15, 2026', major:false, notes:[
+      'The Forge Home’s Move, Anatomy and Strength Chart are one Progress card now instead of three separate blocks.',
+    ]},
     {version:'v11.309', date:'Sep 13, 2026', major:false, notes:[
       'The Mental centre wears the same place it opens into. It was a ruled card with a header band, which made starting a sit feel like opening a dialogue rather than stepping further into somewhere you were already standing.',
     ]},
