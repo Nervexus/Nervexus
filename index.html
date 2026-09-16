@@ -8356,7 +8356,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <div style="font-size:16px; font-weight:600; margin-bottom:4px;">Account Locked</div>
                 <div style="font-size:12.5px; color:var(--lc-muted); margin-bottom:18px;">Confirm your account password to view and edit these settings.</div>
                 <div style="display:flex; gap:9px; max-width:360px; width:100%;">
-                  <input value="{{ acctPwInput }}" onInput="{{ setAcctPwInput }}" onKeyDown="{{ unlockAcctKey }}" type="password" placeholder="Account password" style="flex:1; padding:12px 14px; border-radius:11px; border:1px solid {{ acctErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none; text-align:center; letter-spacing:2px;">
+                  <input value="{{ acctPwInput }}" onInput="{{ setAcctPwInput }}" onKeyDown="{{ unlockAcctKey }}" type="password" placeholder="Account password" style="flex:1; min-width:0; padding:12px 14px; border-radius:11px; border:1px solid {{ acctErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:14px; outline:none; text-align:center; letter-spacing:2px;">
                   <span onClick="{{ unlockAcct }}" class="cc-glowbtn" style="padding:12px 22px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13.5px; font-weight:700; cursor:pointer;">{{ unlockAcctLabel }}</span>
                 </div>
                 <sc-if value="{{ acctErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">Incorrect password.</div></sc-if>
@@ -8458,7 +8458,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div class="lc-sub" style="border-radius:15px; padding:14px; margin-bottom:20px;">
                 <div style="font-size:11px; color:var(--lc-muted); line-height:1.5; margin-bottom:12px;">The ElevenLabs connection lives in the <strong style="color:var(--lc-muted);">AI Command Center</strong> now, with every other provider. This page is what she sounds like.</div>
                       <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--lc-muted); margin-bottom:8px;">ADD A VOICE BY ID (elevenlabs.io/app/voice-lab)</div>
-                      <div style="display:flex; gap:8px; align-items:center;"><input value="{{ customVoiceIdDraft }}" onInput="{{ onCustomVoiceIdDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Paste ElevenLabs voice ID" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><input value="{{ customVoiceNameDraft }}" onInput="{{ onCustomVoiceNameDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Name" style="width:110px; padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; outline:none;"><span onClick="{{ addCustomVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--lc-accent); border:1px solid var(--lc-line); background:var(--lc-sub); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600; white-space:nowrap;">ADD</span></div>
+                      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ customVoiceIdDraft }}" onInput="{{ onCustomVoiceIdDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Paste ElevenLabs voice ID" style="flex:1 1 160px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><input value="{{ customVoiceNameDraft }}" onInput="{{ onCustomVoiceNameDraft }}" onKeyDown="{{ addCustomVoiceKey }}" placeholder="Name" style="flex:1 1 90px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:12px; outline:none;"><span onClick="{{ addCustomVoice }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--lc-accent); border:1px solid var(--lc-line); background:var(--lc-sub); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600; white-space:nowrap;">ADD</span></div>
               </div>
               <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-radius:13px; border:1px solid var(--lc-line); background:var(--lc-sub); margin-bottom:8px;">
                 <div><div style="font-size:11px; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; letter-spacing:1px;">ACTIVE VOICE MODEL</div><div style="font-size:17px; font-weight:700; margin-top:3px;">{{ voiceModelName }}</div><div style="font-size:11px; color:var(--lc-muted); margin-top:2px;">{{ voiceDeviceName }}</div></div>
@@ -8652,7 +8652,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="font-size:16px; font-weight:700; color:var(--lc-accent); margin-bottom:6px;">Memory</div>
               <div style="font-size:12px; color:var(--lc-muted); margin-bottom:16px; line-height:1.5;">Facts the assistant remembers about you across conversations. Add one, or remove any you don't want it to keep.</div>
               <div style="display:flex; gap:9px; margin-bottom:16px;">
-                <input value="{{ memDraft }}" onInput="{{ setMemDraft }}" onKeyDown="{{ addMemKey }}" placeholder="e.g. I prefer metric units" style="flex:1; padding:11px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:13px; outline:none;">
+                <input value="{{ memDraft }}" onInput="{{ setMemDraft }}" onKeyDown="{{ addMemKey }}" placeholder="e.g. I prefer metric units" style="flex:1; min-width:0; padding:11px 14px; border-radius:11px; border:1px solid var(--lc-line); background:var(--lc-sub); color:var(--lc-accent); font-size:13px; outline:none;">
                 <span onClick="{{ addMemBtn }}" class="cc-glowbtn" style="padding:11px 20px; border-radius:11px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;">Add</span>
               </div>
               <div style="display:flex; flex-direction:column; gap:8px;">
@@ -9143,7 +9143,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.17-340 · v11.340 brain-rest-pearl';
+const NOTIF_BUILD_VERSION = '2026.09.17-341 · v11.341 settings-phone-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14163,6 +14163,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.341', date:'Sep 17, 2026', major:false, notes:[
+      'Two Settings rows were forcing the phone view to scroll sideways — the voice-ID input on the Voice tab and the account-password field on the locked Account screen, both flex rows that would not let their input shrink below its own content width. Fixed on both.',
+    ]},
     {version:'v11.340', date:'Sep 17, 2026', major:true, notes:[
       'Brain Rest sits on the pearl ground now too — both the way in, on the Forge’s Mental tab, and the full-screen sit itself, which used to be its own bespoke field. Still full screen, still one hairline and nothing else moving, just the same ground every other card in the app already sits on.',
     ]},
