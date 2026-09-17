@@ -169,45 +169,30 @@ section{ position:relative; padding:120px 0; }
 }
 
 /* ---- Loura band ----
-   A dark inset between the cream hero and the rest of the page — dark ink needs a dark
-   ground, so this can't just inherit the page's own pearl. It carries the SAME pearl instead,
-   in the app's own Noir register: the same two blooms and the same sheen band, at Noir's
-   fraction of the light, so it reads as the one theme worn darker rather than a different
-   section pasted in. */
-.loura-band{
-  position:relative; overflow:hidden; padding:120px 0;
-  background:
-    radial-gradient(ellipse 95% 85% at 88% 0%,  var(--pearl-dk-lit) 0%, transparent 62%),
-    radial-gradient(ellipse 100% 85% at 4% 100%, var(--pearl-dk-dim) 0%, transparent 64%),
-    radial-gradient(ellipse 160% 45% at 40% 46%, var(--pearl-dk-sheen) 0%, transparent 74%),
-    linear-gradient(158deg, var(--pearl-dk-far) 0%, var(--pearl-dk-near) 50%, var(--pearl-dk-far) 100%);
-}
-.loura-glow{
-  position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
-  width:760px; height:760px; border-radius:50%;
-  background:radial-gradient(circle, rgba(201,165,92,0.13) 0%, transparent 68%);
-  pointer-events:none;
-}
+   No longer its own dark block — a dark inset was exactly the "block to block" problem:
+   one section breaking away from the page's own pearl instead of sitting on it like
+   everything else. No background here at all now, so the page's fixed pearl field (on body)
+   just shows through, and the text below is re-inked for that light ground instead of the
+   near-white set once tuned for a black one. */
+.loura-band{ position:relative; padding:120px 0; }
 .loura-inner{ position:relative; z-index:1; text-align:center; max-width:660px; margin:0 auto; }
 .loura-eyebrow{
   font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px;
-  color:rgba(201,165,92,0.75); margin-bottom:22px;
+  color:var(--maroon); margin-bottom:22px;
 }
 .loura-name{
   font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:300;
   font-size:clamp(52px,8vw,104px); line-height:1; letter-spacing:2px;
-  color:#F1EBE0; margin-bottom:26px;
+  color:var(--ink); margin-bottom:26px;
 }
-.loura-band .crest-divider span{ background:rgba(201,165,92,0.55); }
-.loura-band .crest-divider i{ color:rgba(201,165,92,0.85); }
 .loura-lede{
   font-family:'Cormorant Garamond',Georgia,serif; font-style:italic;
-  font-size:clamp(20px,2.6vw,27px); color:#DCD3C6; margin-bottom:38px;
+  font-size:clamp(20px,2.6vw,27px); color:var(--ink2); margin-bottom:38px;
 }
-.loura-lines p{ font-size:16px; line-height:2; color:rgba(228,220,208,0.62); }
+.loura-lines p{ font-size:16px; line-height:2; color:var(--muted); }
 .loura-foot{
   margin-top:38px; font-family:'JetBrains Mono',monospace;
-  font-size:11px; letter-spacing:3px; color:rgba(201,165,92,0.6);
+  font-size:11px; letter-spacing:3px; color:var(--muted2);
 }
 @media (max-width:760px){
   .loura-band{ padding:88px 0; }
