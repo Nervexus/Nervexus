@@ -10,10 +10,11 @@
   --glass-bg:rgba(255,255,255,0.42); --glass-edge:rgba(255,255,255,0.55);
   --glass-rim:rgba(255,255,255,0.80); --glass-rim-low:rgba(255,255,255,0.22); --glass-shadow:rgba(41,37,36,0.16);
   /* The same pearl, in a graphite register, for the one section on the site (Loura) that is
-     dark on purpose. Brighter than the app's own Noir card ground — that value was tuned for
-     a small UI panel, and at Loura's size (a full-bleed hero band) it read as plain black. */
-  --pearl-dk-far:#2B2A30; --pearl-dk-near:#141318;
-  --pearl-dk-lit:rgba(255,214,158,0.30); --pearl-dk-dim:rgba(150,178,214,0.24); --pearl-dk-sheen:rgba(255,255,255,0.12);
+     dark on purpose. A black pearl actually shows colour — visible amber and blue-green
+     iridescence over a dark ground, not a whisper of tint over near-black. Two rounds of
+     "still black" meant the first two passes under-corrected; this one is deliberately loud. */
+  --pearl-dk-far:#333038; --pearl-dk-near:#17151B;
+  --pearl-dk-lit:rgba(255,196,120,0.58); --pearl-dk-dim:rgba(110,170,190,0.5); --pearl-dk-sheen:rgba(255,255,255,0.22);
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
@@ -176,9 +177,9 @@ section{ position:relative; padding:120px 0; }
 .loura-band{
   position:relative; overflow:hidden; padding:120px 0;
   background:
-    radial-gradient(ellipse 60% 60% at 88% 0%,  var(--pearl-dk-lit) 0%, transparent 60%),
-    radial-gradient(ellipse 65% 60% at 4% 100%, var(--pearl-dk-dim) 0%, transparent 62%),
-    radial-gradient(ellipse 140% 40% at 40% 46%, var(--pearl-dk-sheen) 0%, transparent 72%),
+    radial-gradient(ellipse 95% 85% at 88% 0%,  var(--pearl-dk-lit) 0%, transparent 62%),
+    radial-gradient(ellipse 100% 85% at 4% 100%, var(--pearl-dk-dim) 0%, transparent 64%),
+    radial-gradient(ellipse 160% 45% at 40% 46%, var(--pearl-dk-sheen) 0%, transparent 74%),
     linear-gradient(158deg, var(--pearl-dk-far) 0%, var(--pearl-dk-near) 50%, var(--pearl-dk-far) 100%);
 }
 .loura-glow{
