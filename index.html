@@ -8303,10 +8303,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       </div>
                       <div style="margin-top:11px; display:flex; flex-direction:column; gap:11px;">
                         <sc-if value="{{ elSaved }}" hint-placeholder-val="{{ false }}">
-                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ elMasked }}" readonly style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elTest }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ elReplace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
+                          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ elMasked }}" readonly style="flex:1 1 120px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elTest }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ elReplace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
                         </sc-if>
                         <sc-if value="{{ elNotSaved }}" hint-placeholder-val="{{ true }}">
-                          <div style="display:flex; gap:8px; align-items:center;"><input value="{{ elDraft }}" onInput="{{ onElDraft }}" placeholder="Paste ElevenLabs API key" style="flex:1; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elSave }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
+                          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ elDraft }}" onInput="{{ onElDraft }}" placeholder="Paste ElevenLabs API key" style="flex:1 1 160px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elSave }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
                         </sc-if>
                         <sc-if value="{{ elErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ elErr }}</div></sc-if>
                         <div style="font-size:11px; color:#8a8a92; line-height:1.5;">When connected &amp; enabled, the assistant speaks with your chosen voice below instead of your browser's built-in voice. Falls back automatically if unavailable.</div>
@@ -9143,7 +9143,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.17-341 · v11.341 settings-phone-fix';
+const NOTIF_BUILD_VERSION = '2026.09.17-342 · v11.342 ai-hub-phone-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14163,6 +14163,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.342', date:'Sep 17, 2026', major:false, notes:[
+      'Checked every page on a phone width, not just Settings. The AI Command Center’s connect/retest row had the same flex-row overflow the Voice tab did — fixed there too. Everything else (the horizontally-scrolling subject and Gentlemen tab strips, the voice orb that deliberately bleeds past the frame) turned out to be working as designed.',
+    ]},
     {version:'v11.341', date:'Sep 17, 2026', major:false, notes:[
       'Two Settings rows were forcing the phone view to scroll sideways — the voice-ID input on the Voice tab and the account-password field on the locked Account screen, both flex rows that would not let their input shrink below its own content width. Fixed on both.',
     ]},
