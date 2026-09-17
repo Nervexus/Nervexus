@@ -9,14 +9,31 @@
   --pearl-lit:rgba(255,233,208,0.62); --pearl-dim:rgba(206,218,236,0.50); --pearl-sheen:rgba(255,255,255,0.34);
   --glass-bg:rgba(255,255,255,0.42); --glass-edge:rgba(255,255,255,0.55);
   --glass-rim:rgba(255,255,255,0.80); --glass-rim-low:rgba(255,255,255,0.22); --glass-shadow:rgba(41,37,36,0.16);
+  /* The same pearl, in the app's own Noir register — graphite rather than a new dark tint —
+     for the one section on the site (Loura) that is dark on purpose. */
+  --pearl-dk-far:#24242A; --pearl-dk-near:#0B0B0D;
+  --pearl-dk-lit:rgba(255,233,208,0.11); --pearl-dk-dim:rgba(206,218,236,0.08); --pearl-dk-sheen:rgba(255,255,255,0.045);
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
+/* One pearl field for the whole page rather than a ground re-cut per section: a warm bloom
+   top-right, a cool one bottom-left, and the silvery sheen band between, fixed to the
+   viewport so it reads as one continuous light source under everything you scroll past
+   instead of a box that starts and stops with each card grid. Fixed attachment has known
+   jank on mobile Safari, so it drops to normal scrolling under 760px. */
 body{
-  background:var(--bg); color:var(--ink2);
+  background-color:var(--pearl-near);
+  background-image:
+    radial-gradient(ellipse 60% 60% at 88% 0%,  var(--pearl-lit) 0%, transparent 60%),
+    radial-gradient(ellipse 65% 60% at 4% 100%, var(--pearl-dim) 0%, transparent 62%),
+    radial-gradient(ellipse 140% 40% at 40% 46%, var(--pearl-sheen) 0%, transparent 72%),
+    linear-gradient(158deg, var(--pearl-far) 0%, var(--pearl-near) 50%, var(--pearl-far) 100%);
+  background-attachment:fixed; background-size:100% 100%;
+  color:var(--ink2);
   font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   -webkit-font-smoothing:antialiased; overflow-x:hidden;
 }
+@media (max-width:760px){ body{ background-attachment:scroll; } }
 a{ color:inherit; text-decoration:none; }
 .wrap{ max-width:1120px; margin:0 auto; padding:0 28px; }
 
@@ -150,9 +167,19 @@ section{ position:relative; padding:120px 0; }
 }
 
 /* ---- Loura band ----
-   A dark inset between the cream hero and the rest of the page. Its own colours rather than
-   the page tokens, which are all tuned for dark ink on light paper and invert badly. */
-.loura-band{ position:relative; overflow:hidden; background:#201C1A; padding:120px 0; }
+   A dark inset between the cream hero and the rest of the page — dark ink needs a dark
+   ground, so this can't just inherit the page's own pearl. It carries the SAME pearl instead,
+   in the app's own Noir register: the same two blooms and the same sheen band, at Noir's
+   fraction of the light, so it reads as the one theme worn darker rather than a different
+   section pasted in. */
+.loura-band{
+  position:relative; overflow:hidden; padding:120px 0;
+  background:
+    radial-gradient(ellipse 60% 60% at 88% 0%,  var(--pearl-dk-lit) 0%, transparent 60%),
+    radial-gradient(ellipse 65% 60% at 4% 100%, var(--pearl-dk-dim) 0%, transparent 62%),
+    radial-gradient(ellipse 140% 40% at 40% 46%, var(--pearl-dk-sheen) 0%, transparent 72%),
+    linear-gradient(158deg, var(--pearl-dk-far) 0%, var(--pearl-dk-near) 50%, var(--pearl-dk-far) 100%);
+}
 .loura-glow{
   position:absolute; left:50%; top:42%; transform:translate(-50%,-50%);
   width:760px; height:760px; border-radius:50%;
@@ -185,27 +212,10 @@ section{ position:relative; padding:120px 0; }
   .loura-lines p{ font-size:15px; line-height:1.9; }
 }
 
-/* ---- pearl ground + glass cards ----
-   A lit ground under frosted panels rather than flat cream cards: a warm bloom in one
-   corner, a cool one opposite, a silvery sheen through the middle. No overflow:hidden here —
-   it would clip position:sticky dead the moment a stage wraps stacking cards, so the ground
-   gets its own border-radius instead and trusts background-clip to round it. */
-.pearl-stage{ position:relative; border-radius:28px; padding:20px; }
-.pearl-stage::before{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
-  background:
-    radial-gradient(ellipse 62% 74% at 86% 4%,  var(--pearl-lit) 0%, transparent 58%),
-    radial-gradient(ellipse 72% 66% at 8% 96%,  var(--pearl-dim) 0%, transparent 60%),
-    radial-gradient(ellipse 120% 34% at 34% 46%, var(--pearl-sheen) 0%, transparent 70%),
-    linear-gradient(158deg, var(--pearl-far) 0%, var(--pearl-near) 62%, var(--pearl-far) 100%);
-}
-.pearl-stage::after{
-  content:''; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
-  background:linear-gradient(102deg, transparent 30%, var(--pearl-sheen) 50%, transparent 70%);
-}
-@media (max-width:640px){ .pearl-stage{ padding:12px; border-radius:22px; } }
-
-/* ---- feature stack (sticky scroll-stacking cards) ---- */
+/* ---- feature stack (sticky scroll-stacking cards) ----
+   Glass panels sitting straight on the page's own pearl field now, not on a separate boxed
+   ground re-cut per grid — one continuous field under the whole page instead of a pearl
+   "block" wherever there happens to be a row of cards. */
 .stack-wrap{ position:relative; padding-bottom:24px; }
 .feature{
   position:sticky;
