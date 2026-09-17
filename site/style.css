@@ -9,10 +9,11 @@
   --pearl-lit:rgba(255,233,208,0.62); --pearl-dim:rgba(206,218,236,0.50); --pearl-sheen:rgba(255,255,255,0.34);
   --glass-bg:rgba(255,255,255,0.42); --glass-edge:rgba(255,255,255,0.55);
   --glass-rim:rgba(255,255,255,0.80); --glass-rim-low:rgba(255,255,255,0.22); --glass-shadow:rgba(41,37,36,0.16);
-  /* The same pearl, in the app's own Noir register — graphite rather than a new dark tint —
-     for the one section on the site (Loura) that is dark on purpose. */
-  --pearl-dk-far:#24242A; --pearl-dk-near:#0B0B0D;
-  --pearl-dk-lit:rgba(255,233,208,0.11); --pearl-dk-dim:rgba(206,218,236,0.08); --pearl-dk-sheen:rgba(255,255,255,0.045);
+  /* The same pearl, in a graphite register, for the one section on the site (Loura) that is
+     dark on purpose. Brighter than the app's own Noir card ground — that value was tuned for
+     a small UI panel, and at Loura's size (a full-bleed hero band) it read as plain black. */
+  --pearl-dk-far:#2B2A30; --pearl-dk-near:#141318;
+  --pearl-dk-lit:rgba(255,214,158,0.30); --pearl-dk-dim:rgba(150,178,214,0.24); --pearl-dk-sheen:rgba(255,255,255,0.12);
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
