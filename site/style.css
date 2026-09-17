@@ -2,6 +2,13 @@
   --bg:#EFEBE3; --bg2:#E6E1D5; --card:rgba(255,255,255,0.82); --line:rgba(63,63,70,0.14); --line2:rgba(63,63,70,0.24);
   --ink:#292524; --ink2:#3f3f46; --muted:#52525b; --muted2:#7a7a82;
   --accent:#5B1A1A; --maroon:#5B1A1A; --gold:#C9A55C; --glow1:rgba(91,26,26,0.13); --glow2:rgba(201,165,92,0.16);
+  /* The app's pearl card system, carried over. Nervexus's own light raiment (cream + maroon)
+     already IS the warm-leaning pearl in the app, so these are that raiment's exact values —
+     not a new tint invented for the site. */
+  --pearl-far:#CDBEBD; --pearl-near:#F7EFED;
+  --pearl-lit:rgba(255,233,208,0.62); --pearl-dim:rgba(206,218,236,0.50); --pearl-sheen:rgba(255,255,255,0.34);
+  --glass-bg:rgba(255,255,255,0.42); --glass-edge:rgba(255,255,255,0.55);
+  --glass-rim:rgba(255,255,255,0.80); --glass-rim-low:rgba(255,255,255,0.22); --glass-shadow:rgba(41,37,36,0.16);
 }
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
@@ -178,11 +185,34 @@ section{ position:relative; padding:120px 0; }
   .loura-lines p{ font-size:15px; line-height:1.9; }
 }
 
+/* ---- pearl ground + glass cards ----
+   A lit ground under frosted panels rather than flat cream cards: a warm bloom in one
+   corner, a cool one opposite, a silvery sheen through the middle. No overflow:hidden here —
+   it would clip position:sticky dead the moment a stage wraps stacking cards, so the ground
+   gets its own border-radius instead and trusts background-clip to round it. */
+.pearl-stage{ position:relative; border-radius:28px; padding:20px; }
+.pearl-stage::before{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
+  background:
+    radial-gradient(ellipse 62% 74% at 86% 4%,  var(--pearl-lit) 0%, transparent 58%),
+    radial-gradient(ellipse 72% 66% at 8% 96%,  var(--pearl-dim) 0%, transparent 60%),
+    radial-gradient(ellipse 120% 34% at 34% 46%, var(--pearl-sheen) 0%, transparent 70%),
+    linear-gradient(158deg, var(--pearl-far) 0%, var(--pearl-near) 62%, var(--pearl-far) 100%);
+}
+.pearl-stage::after{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
+  background:linear-gradient(102deg, transparent 30%, var(--pearl-sheen) 50%, transparent 70%);
+}
+@media (max-width:640px){ .pearl-stage{ padding:12px; border-radius:22px; } }
+
 /* ---- feature stack (sticky scroll-stacking cards) ---- */
 .stack-wrap{ position:relative; padding-bottom:24px; }
 .feature{
   position:sticky;
-  background:#FBF7EF; border:1px solid var(--line2); border-radius:32px;
+  background:var(--glass-bg); border:1px solid var(--glass-edge); border-radius:32px;
+  backdrop-filter:blur(22px) saturate(1.2); -webkit-backdrop-filter:blur(22px) saturate(1.2);
+  box-shadow:inset 0 1px 0 var(--glass-rim), inset 1px 0 0 var(--glass-rim),
+             inset 0 -1px 0 var(--glass-rim-low), 0 20px 46px var(--glass-shadow);
   padding:40px 44px; margin-bottom:22px;
   display:flex; align-items:center; gap:28px;
 }
@@ -224,8 +254,12 @@ section{ position:relative; padding:120px 0; }
 }
 @keyframes apiCarouselSpin{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 .api-card{
-  position:relative; overflow:hidden; flex:0 0 190px;
-  background:var(--card); border:1px solid var(--line2); border-radius:22px;
+  position:relative; z-index:1; overflow:hidden; flex:0 0 190px;
+  /* No backdrop-filter here on purpose — ~38 of these animate at once in the marquee, and
+     blurring each one every frame is real cost for a strip this size. The rim/glow still
+     reads as the same glass without it. */
+  background:var(--glass-bg); border:1px solid var(--glass-edge); border-radius:22px;
+  box-shadow:inset 0 1px 0 var(--glass-rim), 0 10px 26px var(--glass-shadow);
   padding:22px 20px 20px; min-height:150px;
   display:flex; flex-direction:column; align-items:flex-start;
 }
@@ -333,7 +367,6 @@ html.js-reveal .reveal.in{ opacity:1; transform:translateY(0); }
     position:static; top:auto !important;
     padding:20px 22px; margin-bottom:12px; gap:16px;
     align-items:flex-start; cursor:pointer;
-    background:#FBF7EF;
   }
   html.js-reveal .feature.reveal{ opacity:1; transform:none; transition:none; }
   .feature-icon{ width:40px; height:40px; flex:0 0 40px; font-size:18px; }

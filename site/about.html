@@ -15,11 +15,17 @@
   .values-5{ grid-template-columns:repeat(5,1fr); }
   @media (max-width:1100px){ .values-5{ grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); } }
   .value-card{
-    position:relative; overflow:hidden;
+    position:relative; z-index:1; overflow:hidden;
     display:flex; flex-direction:column; justify-content:space-between;
     min-height:300px; padding:32px 28px;
-    border-radius:28px; border:1px solid var(--line2);
+    border-radius:28px; border:1px solid var(--glass-edge);
+    /* The per-card tint (--vc1/--vc2) still shows through as a colour identity, painted
+       over a frosted glass base rather than flat white. */
+    background-color:var(--glass-bg);
     background-image:linear-gradient(160deg, var(--vc1) 0%, var(--vc2) 100%);
+    backdrop-filter:blur(22px) saturate(1.2); -webkit-backdrop-filter:blur(22px) saturate(1.2);
+    box-shadow:inset 0 1px 0 var(--glass-rim), inset 1px 0 0 var(--glass-rim),
+               inset 0 -1px 0 var(--glass-rim-low), 0 20px 46px var(--glass-shadow);
   }
   .value-card .num{
     position:relative; z-index:1;
@@ -104,9 +110,12 @@
   /* ---- stacked story cards (fold into each other on scroll) ---- */
   .stack-cards{ max-width:1000px; margin:0 auto; padding:20px 24px 30vh; position:relative; }
   .stack-card{
-    position:sticky;
+    position:sticky; z-index:1;
     display:grid; grid-template-columns:220px 1fr; gap:40px; align-items:center;
-    background:#fff; border:1px solid var(--line2); border-radius:28px;
+    background:var(--glass-bg); border:1px solid var(--glass-edge); border-radius:28px;
+    backdrop-filter:blur(22px) saturate(1.2); -webkit-backdrop-filter:blur(22px) saturate(1.2);
+    box-shadow:inset 0 1px 0 var(--glass-rim), inset 1px 0 0 var(--glass-rim),
+               inset 0 -1px 0 var(--glass-rim-low), 0 20px 46px var(--glass-shadow);
     padding:44px 48px; margin-bottom:28px;
   }
   .stack-card:nth-child(1){ top:96px; }
@@ -182,7 +191,7 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
     <div class="section-sub reveal">Six different apps, none of them talking to each other — so it got built instead.</div>
   </div>
 
-  <div class="stack-cards">
+  <div class="stack-cards pearl-stage">
     <div class="stack-card">
       <div class="stack-card-visual">
         <div class="glow" style="background:radial-gradient(circle,#8B2A2A,transparent 70%);"></div>
@@ -249,7 +258,7 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
     <div class="section-label reveal">◆ WHO IT'S FOR</div>
     <div class="section-title reveal">Built for people who take their life seriously.</div>
     <div class="section-sub reveal">Not everyone needs a system like this. If any of the below sounds like you, it probably does.</div>
-    <div class="values">
+    <div class="values pearl-stage">
       <div class="value-card reveal" style="--vc1:rgba(91,26,26,0.09); --vc2:rgba(91,26,26,0.02);">
         <div class="num">( 01 )</div>
         <div class="glyph">◆</div>
@@ -283,7 +292,7 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
     <div class="section-label reveal">◆ THE PHILOSOPHY</div>
     <div class="section-title reveal">Five principles, no exceptions.</div>
     <div class="section-sub reveal">What Nervexus is actually built around.</div>
-    <div class="values values-5">
+    <div class="values values-5 pearl-stage">
       <div class="value-card reveal" style="--vc1:rgba(91,26,26,0.09); --vc2:rgba(91,26,26,0.02);">
         <div class="num">( 01 )</div>
         <div class="glyph">◆</div>
