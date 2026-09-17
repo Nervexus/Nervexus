@@ -13,21 +13,61 @@ body{
 a{ color:inherit; text-decoration:none; }
 .wrap{ max-width:1120px; margin:0 auto; padding:0 28px; }
 
-/* ---- intro screen (a separate full-viewport block, before the header/hero — you scroll past it) ---- */
+/* ---- intro screen (a separate full-viewport block, before the header/hero — you scroll past it) ----
+   Fogged glass rather than the site's own flat cream — a pale, breathed-on surface with
+   something pressed to the other side of it, the crest sitting where the fog is thinnest.
+   Light ground, dark shape: the same relationship real frosted glass has to what's behind it,
+   not a night scene. */
 .intro-mask{
   position:relative; height:100vh; min-height:520px; overflow:hidden;
-  background:var(--bg);
+  background:radial-gradient(ellipse 130% 95% at 50% 40%, #F2EFE9 0%, #DAD5C9 100%);
   display:flex; align-items:center; justify-content:center;
+}
+/* Two soft patches of haze drifting past each other, the way breath fogs glass unevenly
+   rather than in one even sheet. */
+.intro-mist{
+  position:absolute; inset:-10%; pointer-events:none; opacity:0.8;
+  background:
+    radial-gradient(ellipse 46% 36% at 26% 30%, rgba(255,255,255,0.65) 0%, transparent 70%),
+    radial-gradient(ellipse 52% 40% at 74% 66%, rgba(255,255,255,0.5) 0%, transparent 72%);
+  filter:blur(34px);
+  animation:introMistDrift 16s ease-in-out infinite;
+}
+@keyframes introMistDrift{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  50%{ transform:translate(-2.5%,2%) scale(1.05); }
+}
+/* Pressed to the other side of the glass — dark against the fog rather than lost in it,
+   fingers spread, low and to one side, so the crest still reads as the thing the page
+   opens with rather than competing with it. */
+.intro-hand{
+  position:absolute; left:4%; bottom:2%; width:min(340px, 40vw); height:auto;
+  fill:rgba(30,28,26,0.5); filter:blur(11px);
+  animation:introHandBreathe 7s ease-in-out infinite;
+}
+@media (max-width:640px){
+  /* Narrower and higher so it never sits under the SCROLL prompt. */
+  .intro-hand{ left:-6%; bottom:32%; width:52vw; }
+}
+@keyframes introHandBreathe{
+  0%,100%{ opacity:0.55; filter:blur(11px); }
+  50%{ opacity:0.68; filter:blur(9px); }
+}
+/* The tooth of the glass itself — without it the mist reads as a lighting effect rather
+   than a surface. Cheap: one tiled SVG turbulence filter, no image request. */
+.intro-grain{
+  position:absolute; inset:0; pointer-events:none; opacity:0.045; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .intro-logo-wrap{ position:relative; display:flex; align-items:center; justify-content:center; }
 .intro-logo-glow{
   position:absolute; width:340px; height:340px; border-radius:50%;
-  background:radial-gradient(circle, rgba(201,165,92,0.45) 0%, transparent 70%);
-  filter:blur(4px);
+  background:radial-gradient(circle, rgba(255,255,255,0.85) 0%, transparent 70%);
+  filter:blur(6px);
   animation:introGlowPulse 3.4s ease-in-out infinite;
 }
 @keyframes introGlowPulse{
-  0%,100%{ transform:scale(0.9); opacity:0.55; }
+  0%,100%{ transform:scale(0.9); opacity:0.6; }
   50%{ transform:scale(1.08); opacity:1; }
 }
 .intro-logo{ position:relative; width:180px; height:180px; object-fit:contain; opacity:0.98; }
@@ -44,7 +84,7 @@ a{ color:inherit; text-decoration:none; }
 }
 @keyframes introScrollLine{ 0%{ top:-100%; } 100%{ top:100%; } }
 @media (prefers-reduced-motion:reduce){
-  .intro-logo-glow, .intro-scroll .line::after{ animation:none; opacity:1; transform:none; }
+  .intro-logo-glow, .intro-mist, .intro-hand, .intro-scroll .line::after{ animation:none; opacity:1; transform:none; }
 }
 
 /* ---- nav ---- */
