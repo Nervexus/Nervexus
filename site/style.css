@@ -37,22 +37,6 @@ a{ color:inherit; text-decoration:none; }
   0%,100%{ transform:translate(0,0) scale(1); }
   50%{ transform:translate(-2.5%,2%) scale(1.05); }
 }
-/* Pressed to the other side of the glass — dark against the fog rather than lost in it,
-   fingers spread, low and to one side, so the crest still reads as the thing the page
-   opens with rather than competing with it. */
-.intro-hand{
-  position:absolute; left:4%; bottom:2%; width:min(340px, 40vw); height:auto;
-  fill:rgba(30,28,26,0.5); filter:blur(11px);
-  animation:introHandBreathe 7s ease-in-out infinite;
-}
-@media (max-width:640px){
-  /* Narrower and higher so it never sits under the SCROLL prompt. */
-  .intro-hand{ left:-6%; bottom:32%; width:52vw; }
-}
-@keyframes introHandBreathe{
-  0%,100%{ opacity:0.55; filter:blur(11px); }
-  50%{ opacity:0.68; filter:blur(9px); }
-}
 /* The tooth of the glass itself — without it the mist reads as a lighting effect rather
    than a surface. Cheap: one tiled SVG turbulence filter, no image request. */
 .intro-grain{
@@ -84,7 +68,7 @@ a{ color:inherit; text-decoration:none; }
 }
 @keyframes introScrollLine{ 0%{ top:-100%; } 100%{ top:100%; } }
 @media (prefers-reduced-motion:reduce){
-  .intro-logo-glow, .intro-mist, .intro-hand, .intro-scroll .line::after{ animation:none; opacity:1; transform:none; }
+  .intro-logo-glow, .intro-mist, .intro-scroll .line::after{ animation:none; opacity:1; transform:none; }
 }
 
 /* ---- nav ---- */
