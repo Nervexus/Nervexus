@@ -798,6 +798,21 @@
 <style>
 @keyframes bootPulse{ 0%,100%{ transform:scale(1); opacity:0.85; filter:drop-shadow(0 0 10px rgba(255,255,255,0.15)); } 50%{ transform:scale(1.08); opacity:1; filter:drop-shadow(0 0 22px rgba(255,255,255,0.3)); } }
 @keyframes bootBar{ 0%{ transform:translateX(-100%); } 100%{ transform:translateX(350%); } }
+/* ---- THEME SWITCH VEIL --------------------------------------------------------------------
+   A raiment switch (setPref('theme'/'ultraStyle', ...)) restyles the whole shell at once, and
+   the two ends of the range — Ultra X's light glass and Noir's dark one — are far enough apart
+   that the repaint used to show as a visible stutter. This masks it: the veil paints first
+   (cheap — nothing about the theme has changed yet), the actual switch happens a frame later
+   hidden behind it, and only then does it fade. Built off a reference image: a soft, grained
+   gradient and one small line of text, nothing else moving. */
+.theme-switch-veil{ position:fixed; inset:0; z-index:250; display:flex; align-items:center;
+  justify-content:center; padding:24px; box-sizing:border-box; transition:opacity .5s ease; }
+.theme-switch-grain{ position:absolute; inset:0; pointer-events:none; opacity:0.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.theme-switch-line{ position:relative; font-family:'JetBrains Mono',monospace; font-size:10.5px;
+  letter-spacing:2.6px; text-transform:uppercase; text-align:center; max-width:420px;
+  animation:themeSwitchIn .6s ease both; }
+@keyframes themeSwitchIn{ 0%{ opacity:0; transform:translateY(6px); } 100%{ opacity:1; transform:translateY(0); } }
 /* ===== "Vault" treatment — shared premium look for the two private pages (Dark Psychology,
    The Black Book): curved corners everywhere except one deliberately sharp corner carrying a
    small rotated-square "seal" point, in each page's own accent colour via --vault-accent. */
@@ -1618,6 +1633,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:{{ bootTextC }};">{{ bootStatusLine }}</div>
     </div>
     </sc-if>
+  </div>
+  </sc-if>
+
+  <!-- THEME SWITCH VEIL — see the CSS comment above .theme-switch-veil. Mounted only while an
+       actual switch is in flight (themeSwitching), so it costs nothing the rest of the time. -->
+  <sc-if value="{{ showThemeSwitchVeil }}" hint-placeholder-val="{{ false }}">
+  <div class="theme-switch-veil" style="background:{{ themeSwitchBg }}; opacity:{{ themeSwitchOpacity }}; pointer-events:{{ themeSwitchPtr }};">
+    <div class="theme-switch-grain"></div>
+    <div class="theme-switch-line" style="color:{{ themeSwitchInk }};">{{ themeSwitchLine }}</div>
   </div>
   </sc-if>
 
@@ -9327,7 +9351,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-349 · v11.349 gentlemen-glass-swap';
+const NOTIF_BUILD_VERSION = '2026.09.18-350 · v11.350 theme-switch-veil';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10490,8 +10514,51 @@ activities: this._mergeShipLog(s.activities),
      the newer of the two wins wherever it was picked, and the theme only changes when
      somebody changes it. */
   THEME_KEYS(){ return ['theme','ultraStyle']; }
-  setPref(k,v){ const stamp=this.THEME_KEYS().indexOf(k)>=0;
-    this.mut(s=>({prefs:{...s.prefs, [k]:v, ...(stamp?{_themeAt:Date.now()}:{})}})); }
+  /* Ultra's four styles split light/dark by style, not by the theme flag alone — Noir is
+     itself dark inside "Ultra" (a translucent white panel on a black page), so the veil has
+     to read the destination style, not just whether the destination is Ultra at all. */
+  _isLightRaiment(theme,ultraStyle){ return theme==='Ultra' && ultraStyle!=='Noir'; }
+  _themeSwitchLines(){
+    const name=((this.state.account&&this.state.account.name)||'').trim()||'there';
+    const ver=(NOTIF_BUILD_VERSION.split(' · ')[1]||NOTIF_BUILD_VERSION).split(' ')[0];
+    const app='Nervexus '+ver;
+    return [
+      app+' is loading in for you, '+name+'.',
+      'Getting things ready for you, '+name+' — '+app+' is on its way.',
+      name+', '+app+' is preparing your workspace.',
+      'One moment, '+name+'. '+app+' is loading in.',
+    ];
+  }
+  /* A raiment switch restyles the whole shell at once, and the gap between the lightest and
+     darkest styles (Ultra X to Noir, most visibly) recalculates enough style at once to
+     freeze the main thread for a beat — the same freeze either way, since it's the browser's
+     own style/layout work, not something a re-render order can skip. What changes is what
+     appears the instant that freeze ends: the veil goes on in the very same update as the
+     prefs change (not a frame later — reading state.prefs right after setPref, as
+     _hardReload does, still needs the real new value straight away), so the freeze resolves
+     into the loading line rather than a raw jump-cut to the new theme, then fades once it's
+     had a moment to actually be read. Two back-to-back stamp calls (picking a specific Ultra
+     style sets both theme and ultraStyle) share one veil rather than flashing it twice — the
+     second call just extends the hide timer. */
+  setPref(k,v){
+    const stamp=this.THEME_KEYS().indexOf(k)>=0;
+    if(stamp){
+      const patch={prefs:{...this.state.prefs, [k]:v, _themeAt:Date.now()}};
+      if(!this.state.themeSwitching){
+        const lines=this._themeSwitchLines();
+        patch.themeSwitching=true; patch.themeSwitchHiding=false;
+        patch.themeSwitchLine=lines[Math.floor(Math.random()*lines.length)];
+      }
+      this.mut(()=>patch);
+      clearTimeout(this._themeSwitchHideTimer); clearTimeout(this._themeSwitchGoneTimer);
+      this._themeSwitchHideTimer=setTimeout(()=>{
+        this.setState({themeSwitchHiding:true});
+        this._themeSwitchGoneTimer=setTimeout(()=>this.setState({themeSwitching:false, themeSwitchHiding:false}), 520);
+      }, 650);
+      return;
+    }
+    this.mut(s=>({prefs:{...s.prefs, [k]:v}}));
+  }
   setCoach(k,v){ this.mut(s=>({prefs:{...s.prefs, coaching:{...(s.prefs.coaching||{}), [k]:v}}})); }
   setFinanceBudget(cat,v){ const n=Math.max(0,+v||0); this.mut(s=>({prefs:{...s.prefs, financeBudgets:{...(s.prefs.financeBudgets||{}), [cat]:n}}, financeBudgetDraft:{...(s.financeBudgetDraft||{}), [cat]:undefined}})); }
   /* Income categories used to be a hard-coded list, which is why Log Income still showed all
@@ -14356,6 +14423,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.350', date:'Sep 18, 2026', major:true, notes:[
+      'Switching raiment — Ultra X to Noir most of all, the two ends of the range — used to freeze for a beat while the whole shell restyled, then jump-cut straight to the new look. A loading veil now covers that freeze instead: a soft grained backdrop and one line naming you and the build, in one of four phrasings, gone the moment the new theme has actually settled.',
+    ]},
     {version:'v11.349', date:'Sep 18, 2026', major:false, notes:[
       'The Gentlemen Center’s blocks swapped from dark glass to a pale, frosted one — a fourth reference image, closer to the light stage they sit on. Same layout, same fixed colour regardless of raiment, just white glass now instead of black.',
     ]},
@@ -20178,6 +20248,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // see the comment on the markup for why a faded-but-still-pulsing crest was the thing
       // that bled through as a watermark on the glass cards underneath.
       bootContentShow:!S.bootDone,
+      showThemeSwitchVeil:!!S.themeSwitching,
+      themeSwitchOpacity:S.themeSwitchHiding?0:1, themeSwitchPtr:S.themeSwitchHiding?'none':'auto',
+      themeSwitchBg:this._isLightRaiment(S.prefs.theme,S.prefs.ultraStyle)
+        ?'linear-gradient(160deg, #F7F5F0 0%, #EDEAE2 55%, #E5E1D6 100%)'
+        :'linear-gradient(160deg, #0B0B0D 0%, #050506 60%, #000000 100%)',
+      themeSwitchInk:this._isLightRaiment(S.prefs.theme,S.prefs.ultraStyle)?'#3A2A20':'#C9C9CE',
+      themeSwitchLine:S.themeSwitchLine||'',
       bootBg:S.prefs.theme==='Ultra'?'#F5F1E8':'#050506', bootShowSpline:S.prefs.theme!=='Ultra',
       bootLabelC:S.prefs.theme==='Ultra'?'#3A2A20':'#C9C9CE', bootTextC:S.prefs.theme==='Ultra'?'#8a6a5a':'#6f6f78',
       bootBarTrackC:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.12)':'rgba(255,255,255,0.12)', bootBarFillC:S.prefs.theme==='Ultra'?'linear-gradient(90deg,transparent,#5B1A1A,transparent)':'linear-gradient(90deg,transparent,#fff,transparent)',
