@@ -16,7 +16,7 @@
 <script>
   window.__installPromptEvt = null;
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); window.__installPromptEvt = e; });
-  if ('serviceWorker' in navigator) {
+  if (navigator.serviceWorker) {
     let __swRefreshed = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => { if (__swRefreshed) return; __swRefreshed = true; window.location.reload(); });
     window.addEventListener('load', () => { try { navigator.serviceWorker.register('./service-worker.js').then((reg) => {
@@ -11745,7 +11745,7 @@ activities: this._mergeShipLog(s.activities),
   // Push action buttons fire in the service worker, not the page — it postMessages any
   // open window; a closed app instead gets relaunched with the action in the URL (below).
   _wireNotifActionRelay(){
-    if(!('serviceWorker' in navigator)) return;
+    if(!navigator.serviceWorker) return;
     navigator.serviceWorker.addEventListener('message', (e)=>{
       const d=e.data||{};
       if(d.type!=='notif-action') return;
@@ -12543,7 +12543,7 @@ activities: this._mergeShipLog(s.activities),
   startRefresh(){
     if(this.state.refreshing) return;
     clearInterval(this._refreshTimer);
-    if('serviceWorker' in navigator){ navigator.serviceWorker.getRegistration().then(reg=>{ if(reg) try{ reg.update(); }catch(e){} }).catch(()=>{}); }
+    if(navigator.serviceWorker){ navigator.serviceWorker.getRegistration().then(reg=>{ if(reg) try{ reg.update(); }catch(e){} }).catch(()=>{}); }
     const start=Date.now(), dur=2200;
     this.setState({refreshing:true, refreshPct:0});
     const doPull=this._sbOn() ? Promise.all([this._sbPullCore(), this._sbPullProviderStatus()]).catch(e=>console.warn('[refresh] pull failed', e)) : Promise.resolve();
