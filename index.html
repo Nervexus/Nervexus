@@ -20,6 +20,7 @@
     let __swRefreshed = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => { if (__swRefreshed) return; __swRefreshed = true; window.location.reload(); });
     window.addEventListener('load', () => { try { navigator.serviceWorker.register('./service-worker.js').then((reg) => {
+      if (!reg) return;
       setInterval(() => { try { reg.update(); } catch (e) {} }, 30000);
       document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') try { reg.update(); } catch (e) {} });
       // Most updates self-apply via skipWaiting/clients.claim above, firing controllerchange
