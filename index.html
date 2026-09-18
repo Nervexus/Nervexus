@@ -9312,7 +9312,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-346 · v11.346 quick-log-draft-persist';
+const NOTIF_BUILD_VERSION = '2026.09.18-347 · v11.347 quick-log-typing-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14341,9 +14341,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.347', date:'Sep 18, 2026', major:true, notes:[
+      'The last release’s attempt at Quick Log’s typing lag broke typing outright — letters would not stay in the field. Reverted that change; typing works correctly again. The lag itself is real and still there (every keystroke re-renders the whole app, not just the modal) — fixing that safely needs a bigger change than a quick patch, so it is being done properly rather than risked again.',
+    ]},
     {version:'v11.346', date:'Sep 18, 2026', major:false, notes:[
       'Quick Log no longer forgets a half-typed session. What is typed into its blocks now survives closing the modal, closing the tab, or closing the app outright — reopening Quick Log picks the draft back up instead of starting blank. It only clears once you actually log it.',
-      'Typing into Quick Log was visibly laggy — every keystroke was re-rendering the entire app, not just the modal. Keystrokes now land instantly; the app catches up a beat later, and still flushes immediately (nothing lost) the moment you act on it or close the tab.',
     ]},
     {version:'v11.345', date:'Sep 18, 2026', major:true, notes:[
       'The Training centre gets a search bar that reaches every section at once — type "curl" and get every curl in the app, whichever body part it lives under, with an Add button that works exactly like the one in its own section. And the pools themselves grew a lot: 222 real exercises added across all thirteen sections (234 → 456), from common gym staples to genuinely rare ones — Spoto press, Zottman curl, Copenhagen plank, Girevoy sport lifts. Chest, Arms and Kettlebells had the room to grow the most; Neck and Feet & Ankles ran out of real, distinct exercises well before any of them did.',
@@ -17801,39 +17803,24 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const hasDraft=Array.isArray(draft) && draft.some(b=>(b||'').trim());
     this.setState({quickLogOpen:true, quickLogStep:'confirm', quickLogGreetIdx:Math.floor(Math.random()*3), quickLogBlocks:hasDraft?draft:['']});
   }
-  closeQuickLog(){ this._flushDebounced(); this.setState({quickLogOpen:false}); }
+  closeQuickLog(){ this.setState({quickLogOpen:false}); }
   confirmQuickLog(){ this.setState({quickLogStep:'log'}); }
   /* "Add to Log" writes to a real record rather than a draft — a second confirm, the same
      one-button shape again, before anything is actually saved. Guarded the same way
      submitQuickLog is: nothing typed means nothing to confirm. */
   reviewQuickLog(){
-    this._flushDebounced();
     const n=(this.state.quickLogBlocks||[]).map(b=>(b||'').trim()).filter(Boolean).length;
     if(!n) return;
     this.setState({quickLogStep:'review'});
   }
   backQuickLogToForm(){ this.setState({quickLogStep:'log'}); }
-  /* Every keystroke used to commit straight to state, which re-renders the whole app (every
-     page's derived data, not just this modal) and made typing visibly lag. Debouncing the
-     commit lets the browser paint the character immediately off the input's own DOM value;
-     state (and the save it triggers) catches up a beat later. _flushDebounced() — already
-     wired to pagehide/beforeunload/hidden — still guarantees the last keystroke survives a
-     closed tab, and every action here that reads the blocks flushes first so it never sees
-     a stale one. */
   setQuickLogBlock(i,e){ const v=e&&e.target?e.target.value:e;
-    this._debounce('qlogBlock'+i, ()=>{
-      /* mut()'s own save() runs off React's setState callback, which a pagehide-triggered
-         flush can outrun if the tab closes before that commit fires — so this calls save()
-         itself right after the (synchronous) state mutation, not just through mut(). */
-      this.mut(s=>{ const b=[...(s.quickLogBlocks||[''])]; b[i]=v; return {quickLogBlocks:b}; });
-      this.save();
-    }, 140); }
-  addQuickLogBlock(){ this._flushDebounced(); this.mut(s=>({quickLogBlocks:[...(s.quickLogBlocks||['']), '']})); }
-  removeQuickLogBlock(i){ this._flushDebounced(); this.mut(s=>{
+    this.mut(s=>{ const b=[...(s.quickLogBlocks||[''])]; b[i]=v; return {quickLogBlocks:b}; }); }
+  addQuickLogBlock(){ this.mut(s=>({quickLogBlocks:[...(s.quickLogBlocks||['']), '']})); }
+  removeQuickLogBlock(i){ this.mut(s=>{
     const b=(s.quickLogBlocks||['']).filter((_,idx)=>idx!==i);
     return {quickLogBlocks: b.length?b:['']}; }); }
   submitQuickLog(){
-    this._flushDebounced();
     const blocks=(this.state.quickLogBlocks||[]).map(b=>(b||'').trim()).filter(Boolean);
     if(!blocks.length) return;
     const now=Date.now(); const entries=[];
