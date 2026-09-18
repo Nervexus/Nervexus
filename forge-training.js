@@ -113,7 +113,7 @@
         rng('Landmine single-arm press', 3, 4, 6, 10, {group: 'CABLES, BANDS & THROWS', perSide: true}),
         rng('Resistance band chest press', 3, 4, 12, 20, {group: 'CABLES, BANDS & THROWS', noLoad: true}),
         rng('Resistance band fly', 3, 4, 12, 20, {group: 'CABLES, BANDS & THROWS', noLoad: true}),
-        rng('Cable iron cross hold', 3, 4, 15, 30, {group: 'CABLES, BANDS & THROWS', unit: 'sec', noLoad: true})
+        rng('Cable iron cross', 3, 4, 12, 15, {group: 'CABLES, BANDS & THROWS'})
       ]
     }
   };

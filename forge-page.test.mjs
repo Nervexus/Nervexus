@@ -32,7 +32,10 @@ const browser = await chromium.launch({
   executablePath: '/opt/pw-browsers/chromium',
   args: ['--proxy-server=direct://', '--proxy-bypass-list=*'],   // the agent proxy resets loopback
 });
-const page = await browser.newPage({ viewport: { width: 1280, height: 1400 } });
+/* The service worker's own install can finish mid-run and fire controllerchange, which
+   reloads whatever page happens to be open — a real navigation racing every test's own
+   page.goto. None of this suite exercises the service worker, so it stays off. */
+const page = await browser.newPage({ viewport: { width: 1280, height: 1400 }, serviceWorkers: 'block' });
 const pageErrors = [];
 page.on('pageerror', e => pageErrors.push(e.message));
 
@@ -1738,13 +1741,15 @@ t('Arms renders in its blocks, in order', async () => {
 
 t('a section with no groups gets no stray heading', async () => {
   await openChest();
-  const D = await page.evaluate(() => window.ForgeTraining.section('chest').pool.all);
-  ok(D.every(x => !x.group), 'chest has picked up groups, so this proves nothing');
-  eq(await addBtns(), D.length, 'chest did not render one block each');
+  await page.evaluate(() => window.__nvx.setForgeSection('calves'));
+  await page.waitForTimeout(900);
+  const D = await page.evaluate(() => window.ForgeTraining.section('calves').pool.all);
+  ok(D.every(x => !x.group), 'calves has picked up groups, so this proves nothing');
+  eq(await addBtns(), D.length, 'calves did not render one block each');
   const arms = await page.evaluate(() =>
     [...new Set(window.ForgeTraining.section('arms').pool.all.map(x => x.group))]);
   const body = await text();
-  for (const g of arms) ok(!body.includes(g), 'chest is showing the heading ' + g);
+  for (const g of arms) ok(!body.includes(g), 'calves is showing the heading ' + g);
 });
 
 t('metres are offered as metres and logged as a distance', async () => {
