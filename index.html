@@ -1182,21 +1182,28 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <span class="qlog-badge">◆ MID-SESSION</span>
               <div class="qlog-title">Quick Log</div>
             </div>
-            <div class="qlog-sub">One block per set. Whatever you type — "Bench 80kg 4x8" or just a name — it lands in your training log.</div>
-            <div style="margin-top:26px; display:flex; flex-direction:column; gap:18px;">
-              <sc-for list="{{ quickLogBlocks }}" as="b" hint-placeholder-count="1">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <input value="{{ b.v }}" onInput="{{ b.set }}" placeholder="e.g. Bench press 80kg 4x8" class="qlog-input">
-                  <sc-if value="{{ b.showRemove }}" hint-placeholder-val="{{ false }}">
-                    <span onClick="{{ b.remove }}" style="cursor:pointer; color:rgba(255,255,255,0.55); font-size:18px; line-height:1; flex:0 0 auto;">×</span>
-                  </sc-if>
-                </div>
-              </sc-for>
-            </div>
-            <div onClick="{{ addQuickLogBlock }}" class="qlog-pill-ghost" style="margin-top:22px;">
-              <span style="font-size:15px; line-height:1;">+</span> Add another
-            </div>
-            <div onClick="{{ submitQuickLog }}" class="qlog-pill-dark" style="margin-top:12px;">Add to Log</div>
+            <!-- A confirm gate before the form, the same shape Brain Rest opens into on the
+                 Mental tab: a welcome line and one button, nothing to fill in yet. -->
+            <sc-if value="{{ isQuickLogConfirm }}" hint-placeholder-val="{{ true }}">
+              <div class="qlog-sub" style="margin-top:18px;">{{ quickLogGreeting }}</div>
+              <div onClick="{{ confirmQuickLog }}" class="qlog-pill-dark" style="margin-top:26px;">Begin</div>
+            </sc-if>
+            <sc-if value="{{ isQuickLogForm }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:18px; display:flex; flex-direction:column; gap:18px;">
+                <sc-for list="{{ quickLogBlocks }}" as="b" hint-placeholder-count="1">
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <input value="{{ b.v }}" onInput="{{ b.set }}" placeholder="e.g. Bench press 80kg 4x8" class="qlog-input">
+                    <sc-if value="{{ b.showRemove }}" hint-placeholder-val="{{ false }}">
+                      <span onClick="{{ b.remove }}" style="cursor:pointer; color:rgba(255,255,255,0.55); font-size:18px; line-height:1; flex:0 0 auto;">×</span>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <div onClick="{{ addQuickLogBlock }}" class="qlog-pill-ghost" style="margin-top:22px;">
+                <span style="font-size:15px; line-height:1;">+</span> Add another
+              </div>
+              <div onClick="{{ submitQuickLog }}" class="qlog-pill-dark" style="margin-top:12px;">Add to Log</div>
+            </sc-if>
           </div>
         </div>
       </div>
@@ -9301,7 +9308,7 @@ class Component extends DCLogic {
       workouts: s.workouts || [],
       woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
-      quickLogOpen:false, quickLogBlocks:s.quickLogBlocks||[''],
+      quickLogOpen:false, quickLogStep:'confirm', quickLogGreetIdx:0, quickLogBlocks:s.quickLogBlocks||[''],
       rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
       gentSub:'test', gentIdx:0, gentTestIdx:0,
       // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
@@ -17684,8 +17691,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      doesn't parse into sets/reps/weight still isn't dropped — it's logged as a named entry
      with nothing filled in rather than silently discarded, since a fast note typed at the
      rack is worth keeping even half-formed. */
-  openQuickLog(){ this.setState({quickLogOpen:true, quickLogBlocks:['']}); }
+  /* A confirm gate before the form, the same shape as Brain Rest's way in: a welcome line and
+     one button, nothing to fill in yet. Three lines rather than one so it does not read the
+     same on the tenth visit of the day as it did on the first — picked once per open, not
+     re-rolled while it's sitting open. */
+  _quickLogGreetings(){ const name=((this.state.account&&this.state.account.name)||'').trim()||'there';
+    return [
+      'Welcome, '+name+' — we’re ready for you to log your fitness.',
+      'Good to see you, '+name+'. Let’s get this session logged.',
+      name+', time to log what you’re doing — we’re ready when you are.',
+    ]; }
+  openQuickLog(){ this.setState({quickLogOpen:true, quickLogStep:'confirm', quickLogGreetIdx:Math.floor(Math.random()*3), quickLogBlocks:['']}); }
   closeQuickLog(){ this.setState({quickLogOpen:false}); }
+  confirmQuickLog(){ this.setState({quickLogStep:'log'}); }
   setQuickLogBlock(i,e){ const v=e&&e.target?e.target.value:e;
     this.mut(s=>{ const b=[...(s.quickLogBlocks||[''])]; b[i]=v; return {quickLogBlocks:b}; }); }
   addQuickLogBlock(){ this.mut(s=>({quickLogBlocks:[...(s.quickLogBlocks||['']), '']})); }
@@ -21302,8 +21320,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
       ...this._safe(()=>{
         const blocks=(S.quickLogBlocks&&S.quickLogBlocks.length)?S.quickLogBlocks:[''];
+        const isConfirm=(S.quickLogStep||'confirm')==='confirm';
         return {
           quickLogOpen:!!S.quickLogOpen, openQuickLog:()=>this.openQuickLog(), closeQuickLog:()=>this.closeQuickLog(),
+          isQuickLogConfirm:isConfirm, isQuickLogForm:!isConfirm, confirmQuickLog:()=>this.confirmQuickLog(),
+          quickLogGreeting: this._quickLogGreetings()[S.quickLogGreetIdx||0],
           quickLogBlocks: blocks.map((v,i)=>({
             v, i, set:(e)=>this.setQuickLogBlock(i,e), remove:()=>this.removeQuickLogBlock(i),
             showRemove: blocks.length>1,
