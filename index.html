@@ -331,9 +331,9 @@
      no boxes, a black pill for the one committing action and a white pill for the additive
      one. Deliberately not themed to the raiment — this is a screen glanced at mid-set, not
      a page lived in, and it should look like nothing else in the app.
-     The colour stays its own thing, but the head takes the pearl cards' own shape: a small
-     badge, a title, a hairline under it, centred — the same three lines every lc-card opens
-     with, just in white on glass instead of the raiment's own ink. */
+     The colour stays its own thing, but the head is the Mental tab's own way in now — the
+     same shape Brain Rest opens with: two mono labels at the corners, a thread hanging
+     between them, then a big serif title — just in white on glass instead of on the pearl. */
   .qlog-card{
     position:relative; z-index:1; width:100%; max-width:400px; overflow:hidden;
     border-radius:36px; padding:34px 26px 28px; box-sizing:border-box;
@@ -347,13 +347,13 @@
     background:radial-gradient(circle at 28% 18%, rgba(255,255,255,0.28), transparent 62%); }
   .qlog-close{ position:absolute; top:20px; right:22px; z-index:2; cursor:pointer;
     color:rgba(255,255,255,0.75); font-size:22px; line-height:1; }
-  .qlog-head{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:11px; text-align:center; }
-  .qlog-badge{ display:inline-flex; align-items:center; justify-content:center; padding:4px 12px;
-    border-radius:999px; border:1px solid rgba(255,255,255,0.4); color:rgba(255,255,255,0.85);
-    font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:2.2px; white-space:nowrap; }
-  .qlog-title{ font-family:'Inter',sans-serif; font-weight:700; font-size:24px; line-height:1.15; color:#fff; }
-  .qlog-head::after{ content:''; display:block; width:46px; height:1px; background:rgba(255,255,255,0.4); }
-  .qlog-sub{ margin:14px auto 0; text-align:center; font-size:13px; line-height:1.55; color:rgba(255,255,255,0.78); max-width:290px; }
+  .qlog-corners{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding-right:22px; }
+  .qlog-corner{ font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:rgba(255,255,255,0.7); }
+  .qlog-thread{ position:relative; width:1px; height:30px; margin:12px auto;
+    background:linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.55) 20%, rgba(255,255,255,0.55) 80%, transparent 100%); }
+  .qlog-title{ font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:34px; line-height:1.1;
+    color:#fff; text-align:center; }
+  .qlog-sub{ margin:16px auto 0; text-align:center; font-size:13px; line-height:1.55; color:rgba(255,255,255,0.78); max-width:290px; }
   .qlog-input{
     flex:1; min-width:0; background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.5);
     color:#fff; font-size:14px; padding:6px 2px 9px; outline:none; font-family:'Inter',sans-serif;
@@ -1178,10 +1178,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div class="qlog-sheen"></div>
           <span onClick="{{ closeQuickLog }}" class="qlog-close">×</span>
           <div style="position:relative; z-index:1;">
-            <div class="qlog-head">
-              <span class="qlog-badge">◆ MID-SESSION</span>
-              <div class="qlog-title">Quick Log</div>
+            <div class="qlog-corners">
+              <span class="qlog-corner">QUICK LOG</span>
+              <span class="qlog-corner">{{ quickLogCorner }}</span>
             </div>
+            <div class="qlog-thread"></div>
+            <div class="qlog-title">Quick Log</div>
             <!-- A confirm gate before the form, the same shape Brain Rest opens into on the
                  Mental tab: a welcome line and one button, nothing to fill in yet. -->
             <sc-if value="{{ isQuickLogConfirm }}" hint-placeholder-val="{{ true }}">
@@ -21341,6 +21343,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         return {
           quickLogOpen:!!S.quickLogOpen, openQuickLog:()=>this.openQuickLog(), closeQuickLog:()=>this.closeQuickLog(),
           isQuickLogConfirm:step==='confirm', isQuickLogForm:step==='log', isQuickLogReview:step==='review',
+          quickLogCorner: step==='confirm'?'READY':(step==='review'?'CONFIRM':'LOGGING'),
           confirmQuickLog:()=>this.confirmQuickLog(),
           quickLogGreeting: this._quickLogGreetings()[S.quickLogGreetIdx||0],
           quickLogBlocks: blocks.map((v,i)=>({
