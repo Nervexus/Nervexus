@@ -9312,7 +9312,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-345 · v11.345 training-search-expansion';
+const NOTIF_BUILD_VERSION = '2026.09.18-346 · v11.346 quick-log-draft-persist';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10176,7 +10176,7 @@ activities: this._mergeShipLog(s.activities),
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
     const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
-    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories })); }catch(e){} this._xpWatch(); }
+    localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, quickLogBlocks:s.quickLogBlocks })); }catch(e){} this._xpWatch(); }
   /* XP is not awarded from one place — it is summed out of the logs by computePower, and a
      logged set, a mission, an income entry and the daily login all move it. Rather than
      dressing up a dozen award sites (and missing the next one), the effect watches the total
@@ -14341,6 +14341,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.346', date:'Sep 18, 2026', major:false, notes:[
+      'Quick Log no longer forgets a half-typed session. What is typed into its blocks now survives closing the modal, closing the tab, or closing the app outright — reopening Quick Log picks the draft back up instead of starting blank. It only clears once you actually log it.',
+    ]},
     {version:'v11.345', date:'Sep 18, 2026', major:true, notes:[
       'The Training centre gets a search bar that reaches every section at once — type "curl" and get every curl in the app, whichever body part it lives under, with an Add button that works exactly like the one in its own section. And the pools themselves grew a lot: 222 real exercises added across all thirteen sections (234 → 456), from common gym staples to genuinely rare ones — Spoto press, Zottman curl, Copenhagen plank, Girevoy sport lifts. Chest, Arms and Kettlebells had the room to grow the most; Neck and Feet & Ankles ran out of real, distinct exercises well before any of them did.',
     ]},
@@ -17789,7 +17792,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       'Good to see you, '+name+'. Let’s get this session logged.',
       name+', time to log what you’re doing — we’re ready when you are.',
     ]; }
-  openQuickLog(){ this.setState({quickLogOpen:true, quickLogStep:'confirm', quickLogGreetIdx:Math.floor(Math.random()*3), quickLogBlocks:['']}); }
+  openQuickLog(){
+    /* A closed tab, a killed app or just closing this modal must not cost a half-typed
+       session — quickLogBlocks is persisted, so reopening only starts fresh if there
+       was genuinely nothing saved. */
+    const draft=this.state.quickLogBlocks;
+    const hasDraft=Array.isArray(draft) && draft.some(b=>(b||'').trim());
+    this.setState({quickLogOpen:true, quickLogStep:'confirm', quickLogGreetIdx:Math.floor(Math.random()*3), quickLogBlocks:hasDraft?draft:['']});
+  }
   closeQuickLog(){ this.setState({quickLogOpen:false}); }
   confirmQuickLog(){ this.setState({quickLogStep:'log'}); }
   /* "Add to Log" writes to a real record rather than a draft — a second confirm, the same
