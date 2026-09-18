@@ -9325,7 +9325,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-347 · v11.347 quick-log-typing-fix';
+const NOTIF_BUILD_VERSION = '2026.09.18-348 · v11.348 gentlemen-redesign';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14354,6 +14354,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.348', date:'Sep 18, 2026', major:true, notes:[
+      'The Gentlemen Center is redesigned: a soft, light stage carrying dark glass blocks — the daily test, its result, standing, and every subject page, all cut from the same card. Built off three reference images rather than the app’s usual pearl look, and deliberately fixed rather than raiment-driven, the way Quick Log is — this page reads the same whichever style is active elsewhere.',
+    ]},
     {version:'v11.347', date:'Sep 18, 2026', major:true, notes:[
       'The last release’s attempt at Quick Log’s typing lag broke typing outright — letters would not stay in the field. Reverted that change; typing works correctly again. The lag itself is real and still there (every keystroke re-renders the whole app, not just the modal) — fixing that safely needs a bigger change than a quick patch, so it is being done properly rather than risked again.',
     ]},
