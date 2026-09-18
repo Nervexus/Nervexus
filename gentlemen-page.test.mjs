@@ -272,59 +272,59 @@ t('nothing threw through any of it', async () => {
 });
 
 /* ---- the layout ---------------------------------------------------------------------------
-   The subpage row used to be eight loose chips on a wrapping flex line; on a phone it broke
-   into a ragged block whose shape changed with the active tab. These hold the row to one box
-   and one line at every width, and hold the cards to one ruled frame. */
-t('the subpage row is one ruled box, not a handful of loose chips', async () => {
+   Redesigned onto its own light stage with dark glass blocks (three reference images: a
+   soft neumorphic mood for the page, a dark frosted-glass card for the block) instead of the
+   raiment-driven pearl look every other page carries -- deliberately fixed, the way Quick
+   Log's is. The subpage row is a row of pills now rather than one ruled, divided box; the
+   cards are glass on a gradient rather than a bordered ruled frame. These hold the new shape
+   to its own invariants: one line at every width, one glass block per card, colour that does
+   not move with the raiment. */
+t('the subpage row is seven pills, on one line', async () => {
   await boot();
   const box = await page.evaluate(() => {
-    const r = document.querySelector('.cc-gtabs'); if (!r) throw new Error('no subpage row');
-    const cs = getComputedStyle(r);
-    const tabs = [...r.querySelectorAll('.cc-gtab')];
-    return { n: tabs.length, border: cs.borderTopWidth, radius: cs.borderTopLeftRadius,
-             /* every tab but the first carries the dividing line */
-             divided: tabs.slice(1).every(e => parseFloat(getComputedStyle(e).borderLeftWidth) > 0),
-             firstUndivided: parseFloat(getComputedStyle(tabs[0]).borderLeftWidth) === 0,
+    const r = document.querySelector('.gent-tabs'); if (!r) throw new Error('no subpage row');
+    const tabs = [...r.querySelectorAll('.gent-tab')];
+    return { n: tabs.length,
+             pill: tabs.every(e => parseFloat(getComputedStyle(e).borderRadius) > 8),
              rows: new Set(tabs.map(e => Math.round(e.getBoundingClientRect().top))).size };
   });
   eq(box.n, 7, 'the row does not hold every subpage');
-  ok(parseFloat(box.border) > 0, 'the row has no box around it');
-  ok(parseFloat(box.radius) > 0, 'the box is not rounded');
-  ok(box.divided, 'the tabs are not divided by lines');
-  ok(box.firstUndivided, 'the first tab carries a line it should not');
+  ok(box.pill, 'a tab is not a pill');
   eq(box.rows, 1, 'the row wrapped onto ' + box.rows + ' lines');
 });
 
-t('the row and its lines are the raiment’s, not a fixed white', async () => {
-  for (const [raiment, sub] of [['Ultra X', 'ultraStyle'], ['Maison Élysée', 'ultraStyle']]) {
+t('the stage, the block and the tab row keep their own colour regardless of raiment', async () => {
+  /* Built off three reference images rather than the raiment palette, and fixed the way Quick
+     Log is: a page glanced at for its own content, not one that has to agree with whichever
+     style is active. */
+  const seen = [];
+  for (const raiment of ['Ultra X', 'Maison Élysée']) {
     await boot({ prefs: { ...(await page.evaluate(() => window.__nvx.state.prefs)), theme: 'Ultra', ultraStyle: raiment } });
     const c = await page.evaluate(() => {
-      const r = document.querySelector('.cc-gtabs');
-      const on = [...document.querySelectorAll('.cc-gtab')].find(e => getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)');
-      return { line: getComputedStyle(r).borderTopColor, on: on ? getComputedStyle(on).backgroundColor : null };
+      const on = [...document.querySelectorAll('.gent-tab')].find(e => getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)');
+      return { tab: on ? getComputedStyle(on).backgroundColor : null,
+               block: getComputedStyle(document.querySelector('.gent-block')).backgroundImage };
     });
-    ok(c.on, 'nothing in the row is marked as the page you are on (' + raiment + ')');
-    /* The fixed white the row used to wear. If it comes back the box stops belonging to the
-       theme, which is the whole point of the change. */
-    ok(!/^rgba?\(255, 255, 255/.test(c.line), raiment + ' draws the box in fixed white: ' + c.line);
+    ok(c.tab, 'nothing in the row is marked as the page you are on (' + raiment + ')');
+    seen.push(c);
   }
+  eq(seen[0].tab, seen[1].tab, 'the active tab changed colour with the raiment');
+  eq(seen[0].block, seen[1].block, 'the block changed colour with the raiment');
 });
 
-t('every card is a ruled frame: a header band, a body, and the rule between them', async () => {
+t('every card is its own glass block: a header, then the rest', async () => {
   for (const sub of ['test', 'money', 'dining']) {
     await boot({ gentSub: sub });
     const f = await page.evaluate(() => {
-      const card = document.querySelector('.cc-gcard');
+      const card = document.querySelector('.gent-block');
       if (!card) return null;
-      const head = card.querySelector('.cc-ghead');
-      return { border: parseFloat(getComputedStyle(card).borderTopWidth),
-               head: !!head, rule: head ? parseFloat(getComputedStyle(head).borderBottomWidth) : 0,
-               body: !!card.querySelector('.cc-gbody, .cc-gstats') };
+      const head = card.querySelector('.gent-bhead');
+      return { glass: getComputedStyle(card).boxShadow !== 'none', head: !!head,
+               body: !!card.querySelector('.gent-body, .gent-stats') };
     });
     ok(f, sub + ' has no card at all');
-    ok(f.border > 0, sub + ' card has no box around it');
+    ok(f.glass, sub + ' card has no glass treatment');
     ok(f.head, sub + ' card has no header band');
-    ok(f.rule > 0, sub + ' card header is not ruled off from the body');
     ok(f.body, sub + ' card has no body');
   }
 });
@@ -332,7 +332,7 @@ t('every card is a ruled frame: a header band, a body, and the rule between them
 t('standing is one ruled panel of four figures, all of them legible', async () => {
   await boot();
   const st = await page.evaluate(() => {
-    const cells = [...document.querySelectorAll('.cc-gstat')];
+    const cells = [...document.querySelectorAll('.gent-stat')];
     return cells.map(e => ({ text: e.innerText.replace(/\n/g, ' ').trim(),
       top: parseFloat(getComputedStyle(e).borderTopWidth),
       left: parseFloat(getComputedStyle(e).borderLeftWidth) }));
@@ -353,8 +353,8 @@ t('on a phone the subpage row is still one line, and the page does not scroll si
   await page.setViewportSize({ width: 390, height: 844 });
   await boot({ gentSub: 'dining' });
   const m = await page.evaluate(() => {
-    const r = document.querySelector('.cc-gtabs');
-    const tabs = [...document.querySelectorAll('.cc-gtab')];
+    const r = document.querySelector('.gent-tabs');
+    const tabs = [...document.querySelectorAll('.gent-tab')];
     return { rows: new Set(tabs.map(e => Math.round(e.getBoundingClientRect().top))).size,
              scrolls: r.scrollWidth > r.clientWidth,
              overflowX: getComputedStyle(r).overflowX,
@@ -370,26 +370,26 @@ t('on a phone the deck is paced by a bar, not by a dot per card on its own line'
   await page.setViewportSize({ width: 390, height: 844 });
   await boot({ gentSub: 'dining' });
   const m = await page.evaluate(() => {
-    const nav = document.querySelector('.cc-gnav');
+    const nav = document.querySelector('.gent-nav');
     const kids = [...nav.children].filter(e => getComputedStyle(e).display !== 'none');
-    return { dots: getComputedStyle(document.querySelector('.cc-gdots')).display,
-             bar: getComputedStyle(document.querySelector('.cc-gprog')).display,
+    return { dots: getComputedStyle(document.querySelector('.gent-dots')).display,
+             bar: getComputedStyle(document.querySelector('.gent-prog')).display,
              /* Centres, not tops: the row centres a 4px bar against a 40px button, so their
                 tops differ by design and only their middles should agree. */
              rows: new Set(kids.map(e => { const r = e.getBoundingClientRect(); return Math.round(r.top + r.height / 2); })).size,
              navH: Math.round(nav.getBoundingClientRect().height),
              backH: Math.round(kids[0].getBoundingClientRect().height),
-             fill: document.querySelector('.cc-gprog > span').style.width };
+             fill: document.querySelector('.gent-prog > span').style.width };
   });
   eq(m.dots, 'none', 'the dot row is still shown on a phone');
   ok(m.bar !== 'none', 'there is no progress bar on a phone');
   eq(m.rows, 1, 'BACK, the bar and NEXT sit on ' + m.rows + ' lines');
-  ok(m.navH <= m.backH + 2, 'the nav is ' + m.navH + 'px tall against a ' + m.backH + 'px button \u2014 something wrapped');
+  ok(m.navH <= m.backH + 2, 'the nav is ' + m.navH + 'px tall against a ' + m.backH + 'px button -- something wrapped');
   eq(m.fill, '6%', 'the bar does not report the first of eighteen');
   /* And it moves. */
   await page.evaluate(() => window.__nvx.gentGoto(17));
   await page.waitForTimeout(150);
-  eq(await page.evaluate(() => document.querySelector('.cc-gprog > span').style.width), '100%', 'the bar does not fill by the last card');
+  eq(await page.evaluate(() => document.querySelector('.gent-prog > span').style.width), '100%', 'the bar does not fill by the last card');
   await page.setViewportSize({ width: 1440, height: 1200 });
 });
 
@@ -397,9 +397,9 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
   await page.setViewportSize({ width: 1440, height: 1200 });
   await boot({ gentSub: 'dining' });
   const m = await page.evaluate(() => ({
-    dots: getComputedStyle(document.querySelector('.cc-gdots')).display,
-    bar: getComputedStyle(document.querySelector('.cc-gprog')).display,
-    n: document.querySelectorAll('.cc-gdots > span').length }));
+    dots: getComputedStyle(document.querySelector('.gent-dots')).display,
+    bar: getComputedStyle(document.querySelector('.gent-prog')).display,
+    n: document.querySelectorAll('.gent-dots > span').length }));
   ok(m.dots !== 'none', 'the dots are hidden on a wide screen');
   eq(m.bar, 'none', 'the phone bar is showing on a wide screen');
   eq(m.n, 18, 'the dot row does not report all eighteen cards');
