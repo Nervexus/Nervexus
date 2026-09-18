@@ -281,17 +281,39 @@ const clearAll = () => page.evaluate(() => window.__nvx.setState({
 
 const totalXP = () => page.evaluate(() => window.__nvx.computePower().totalXP);
 
-t('shipping a build is worth nothing', async () => {
-  /* It used to pay the owner 500 a time. 113 builds had landed, which was 72% of the whole
-     score — the index went up while the owner did nothing at all. */
+t('_shipLog files a build as a Vlog, not a plain Work row', async () => {
+  /* It used to pay the owner 500 a time, flat, uncapped, and worth nothing before that —
+     113 builds had landed at the flat rate, which was 72% of the whole score, so it was
+     dropped to zero. Reversed again on the owner's own request: a shipped build is filed as
+     a Vlog now and should read that way at the source, not just happen to earn the right
+     number by coincidence. */
+  await boot();
+  const rows = await page.evaluate(() => window.__nvx._shipLog());
+  ok(rows.length > 0, 'nothing shipped inside the ship-log window, so this test proves nothing');
+  ok(rows.every(r => r.sub === 'Vlog'), 'a shipped build is not filed as a Vlog');
+});
+
+t('a shipped build is paid the vlog rate, not the old flat bonus', async () => {
+  /* Same bonus a spoken vlog gets — the day's first entry worth it, everything else that
+     same day worth the ordinary rate. Still bounded by days, not by builds: ten deploys in
+     one day is still one bonus, not ten. Uses two synthetic rows rather than the real
+     changelog, so the expected number does not have to be recomputed every time a version
+     ships. */
   await boot();
   await clearAll();
-  await page.waitForTimeout(500);
-  eq(await totalXP(), 0, 'an empty log is not worth zero, so something is paying by itself');
-  const versions = await page.evaluate(() => window.__nvx._changelog().length);
-  ok(versions > 50, 'the changelog is too short for this test to mean anything');
-  ok(!(await page.evaluate(() => typeof window.__nvx._ownerShipXP === 'function')),
-    'the ship-XP generator is still there');
+  await page.waitForTimeout(400);
+  const day1 = await page.evaluate(() => { const d = new Date(); d.setHours(9, 0, 0, 0); return d.getTime(); });
+  const day2 = day1 - 86400000;
+  await page.evaluate(({ day1, day2 }) => window.__nvx.setState({
+    activities: [
+      { id: 'a', cat: 'Work', sub: 'Vlog', text: 'v1 — shipped', ts: day1, min: 0, seeded: true, ship: true },
+      { id: 'b', cat: 'Work', sub: 'Vlog', text: 'v2 — shipped later same day', ts: day1 + 1000, min: 0, seeded: true, ship: true },
+      { id: 'c', cat: 'Work', sub: 'Vlog', text: 'v3 — shipped a different day', ts: day2, min: 0, seeded: true, ship: true },
+    ],
+  }), { day1, day2 });
+  await page.waitForTimeout(600);
+  const vlogXP = await page.evaluate(() => window.__nvx.VLOG_XP());
+  eq(await totalXP(), vlogXP * 2 + 15, 'three shipped builds across two days did not pay two bonuses plus one ordinary entry');
 });
 
 t('training pays by the exercise you did, not by the row', async () => {

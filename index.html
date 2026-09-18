@@ -9255,7 +9255,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-343 · v11.343 quick-log';
+const NOTIF_BUILD_VERSION = '2026.09.18-344 · v11.344 quick-log-polish';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14120,13 +14120,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
        rather than about the number changing. */
     const _vlogDays={};
     [...s.activities].sort((a,b)=>(a.ts||0)-(b.ts||0)).forEach(a=>{
-      if(a.seeded || /^Shipped update v/.test(a.text||'')) return;
       const isRest=a.cat==='Work' && a.sub==='Focus' && (a.text||'')===this.BRAIN_REST_LABEL();
       if(isRest){ ev.push({xp:this.BRAIN_REST_XP(), ts:a.ts}); return; }
+      // Checked before the seeded exclusion below: the auto-filed ship-log rows are seeded
+      // AND tagged Vlog, and a Vlog earns its bonus regardless of who or what filed it.
       if(a.cat==='Work' && a.sub===this.VLOG_SUB()){
         const day=new Date(a.ts||0).toLocaleDateString('en-CA');
         const first=!_vlogDays[day]; _vlogDays[day]=true;
         ev.push({xp:first?this.VLOG_XP():15, ts:a.ts}); return; }
+      if(a.seeded || /^Shipped update v/.test(a.text||'')) return;
       ev.push({xp:15, ts:a.ts}); });
     /* Shipping a build used to be worth 500 XP to the owner. 113 of them had landed, which
        was 72% of the whole score — the Life Performance Index was mostly a count of how
@@ -14250,12 +14252,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const first=(n.split(/(?<=[.!?])\s/)[0]||n).trim();
     return first.length>120 ? first.slice(0,117).replace(/\s+\S*$/,'')+'…' : first;
   }
+  /* Filed as a Vlog rather than a plain Work row — a release note is exactly what a vlog is,
+     a record of what got done, and the owner asked for it to carry the same bonus a spoken
+     one would. The first-of-day cap already does the guarding: a second deploy the same day
+     earns the ordinary 15, not another 150, the same as recording two vlogs in one day would. */
   _shipLog(){
     const cut=Date.now() - this.SHIP_LOG_DAYS()*86400000;
     return this._changelog()
       .map(c=>({c, ts:this._parseChangelogDate(c.date)}))
       .filter(x=>x.ts>=cut)
-      .map(({c,ts})=>({ text:c.version+' — '+this._shipHeadline(c), cat:'Work', ts, min:0,
+      .map(({c,ts})=>({ text:c.version+' — '+this._shipHeadline(c), cat:'Work', sub:this.VLOG_SUB(), ts, min:0,
                         seeded:true, ship:true, notes:(c.notes||[]).slice() }));
   }
   _mergeShipLog(existing){
@@ -14278,8 +14284,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
-    {version:'v11.343', date:'Sep 18, 2026', major:true, notes:[
-      'Quick Log, on the Forge’s Log Training card: one block per set, typed standing at the rack, "Add another" for the next one, and it’s in your log the moment you press Add — no review screen, unlike Bulk Import which is built for pasting a whole session after the fact. Its own glass look on purpose, not the pearl every other screen sits on.',
+    {version:'v11.344', date:'Sep 18, 2026', major:true, notes:[
+      'Quick Log now asks before it actually saves: filling in blocks and pressing "Add to Log" goes to a review step first, and nothing is written until Confirm. It opens with a personal welcome line (one of three, so it does not read the same every time) and closes with the Mental tab’s own header shape — corner labels, a thread, a serif title — same glass colour, just the Forge’s own way of opening a screen. Its trigger and Bulk Import’s are centred on the card now too, as filled signature pills instead of plain outlined chips.',
+      'A shipped build is filed as a Vlog in the Work Log now, and paid the same bonus a spoken one gets — the day’s first release worth it, anything else that ships the same day at the ordinary rate. It used to be worth nothing at all, on purpose, to stop the score being a count of how often the app deployed; filing it as a Vlog keeps that same day-by-day cap while finally giving the owner credit for saying what was done.',
     ]},
     {version:'v11.342', date:'Sep 17, 2026', major:false, notes:[
       'Checked every page on a phone width, not just Settings. The AI Command Center’s connect/retest row had the same flex-row overflow the Voice tab did — fixed there too. Everything else (the horizontally-scrolling subject and Gentlemen tab strips, the voice orb that deliberately bleeds past the frame) turned out to be working as designed.',
