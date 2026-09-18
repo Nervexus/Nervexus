@@ -53,18 +53,67 @@
     priority: 'Strength → Explosiveness → Unilateral stability → Muscular endurance',
     pool: {
       all: [
-        rng('Barbell bench press', 3, 5, 3, 8),
-        rng('Dumbbell bench press', 3, 4, 6, 10),
-        rng('Incline dumbbell press', 3, 4, 6, 10),
-        rng('Weighted dips', 3, 4, 5, 10),
-        rng('Push-ups', 3, 4, 10, 30, {noLoad: true}),
-        rng('Explosive / clap push-ups', 3, 5, 3, 6, {noLoad: true}),
-        rng('Medicine-ball chest pass', 3, 5, 3, 6),
-        rng('Cable chest press', 3, 4, 8, 12),
-        rng('Single-arm cable press', 3, 4, 6, 12, {perSide: true}),
-        rng('Single-arm dumbbell floor press', 3, 4, 6, 10, {perSide: true}),
-        rng('Cable fly', 2, 3, 10, 15),
-        rng('Dumbbell squeeze press', 3, 3, 8, 12)
+        rng('Barbell bench press', 3, 5, 3, 8, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Incline barbell bench press', 3, 5, 4, 8, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Decline barbell bench press', 3, 4, 4, 8, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Wide-grip bench press', 3, 4, 4, 8, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Close-grip barbell bench press', 3, 4, 5, 10, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Floor press', 3, 4, 4, 8, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Board press', 3, 4, 3, 6, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Spoto press', 3, 4, 4, 8, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Guillotine press', 3, 3, 6, 10, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Smith machine bench press', 3, 4, 6, 10, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Smith machine incline press', 3, 4, 6, 10, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Machine chest press', 3, 4, 8, 12, {group: 'BARBELL & MACHINE PRESSES'}),
+        rng('Incline machine chest press', 3, 4, 8, 12, {group: 'BARBELL & MACHINE PRESSES'}),
+
+        rng('Dumbbell bench press', 3, 4, 6, 10, {group: 'DUMBBELL PRESSES'}),
+        rng('Incline dumbbell press', 3, 4, 6, 10, {group: 'DUMBBELL PRESSES'}),
+        rng('Decline dumbbell bench press', 3, 4, 6, 10, {group: 'DUMBBELL PRESSES'}),
+        rng('Single-arm dumbbell floor press', 3, 4, 6, 10, {group: 'DUMBBELL PRESSES', perSide: true}),
+        rng('Single-arm dumbbell bench press', 3, 4, 6, 10, {group: 'DUMBBELL PRESSES', perSide: true}),
+        rng('Neutral-grip dumbbell press', 3, 4, 6, 10, {group: 'DUMBBELL PRESSES'}),
+        rng('Alternating dumbbell press', 3, 4, 6, 12, {group: 'DUMBBELL PRESSES'}),
+        rng('Dumbbell hex press', 3, 3, 8, 12, {group: 'DUMBBELL PRESSES'}),
+        rng('Dumbbell squeeze press', 3, 3, 8, 12, {group: 'DUMBBELL PRESSES'}),
+        rng('Svend press', 3, 3, 10, 15, {group: 'DUMBBELL PRESSES'}),
+
+        rng('Cable fly', 2, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Incline cable fly', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Decline cable fly', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Low-to-high cable fly', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('High-to-low cable fly', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Standing cable crossover', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Single-arm cable crossover', 3, 3, 10, 15, {group: 'FLYES & ISOLATION', perSide: true}),
+        rng('Incline dumbbell fly', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Decline dumbbell fly', 3, 3, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Pec deck fly', 3, 4, 10, 15, {group: 'FLYES & ISOLATION'}),
+        rng('Dumbbell pullover', 3, 3, 8, 12, {group: 'FLYES & ISOLATION'}),
+
+        rng('Push-ups', 3, 4, 10, 30, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Explosive / clap push-ups', 3, 5, 3, 6, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Weighted dips', 3, 4, 5, 10, {group: 'BODYWEIGHT & PLYOMETRIC'}),
+        rng('Wide-grip push-up', 3, 4, 10, 20, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Incline push-up', 3, 4, 10, 25, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Decline push-up', 3, 4, 8, 20, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Deficit push-up', 3, 4, 8, 15, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Feet-elevated push-up', 3, 4, 8, 20, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Archer push-up', 3, 3, 4, 10, {group: 'BODYWEIGHT & PLYOMETRIC', perSide: true, noLoad: true}),
+        rng('Ring push-up', 3, 3, 6, 15, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Ring dips', 3, 4, 4, 10, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Plyo push-up', 3, 4, 5, 10, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+        rng('Weighted push-up', 3, 4, 6, 15, {group: 'BODYWEIGHT & PLYOMETRIC'}),
+        rng('Pseudo planche push-up', 3, 3, 4, 10, {group: 'BODYWEIGHT & PLYOMETRIC', noLoad: true}),
+
+        rng('Cable chest press', 3, 4, 8, 12, {group: 'CABLES, BANDS & THROWS'}),
+        rng('Single-arm cable press', 3, 4, 6, 12, {group: 'CABLES, BANDS & THROWS', perSide: true}),
+        rng('Medicine-ball chest pass', 3, 5, 3, 6, {group: 'CABLES, BANDS & THROWS'}),
+        rng('Medicine-ball rebound throw', 3, 5, 3, 6, {group: 'CABLES, BANDS & THROWS'}),
+        rng('Landmine chest press', 3, 4, 6, 10, {group: 'CABLES, BANDS & THROWS'}),
+        rng('Landmine single-arm press', 3, 4, 6, 10, {group: 'CABLES, BANDS & THROWS', perSide: true}),
+        rng('Resistance band chest press', 3, 4, 12, 20, {group: 'CABLES, BANDS & THROWS', noLoad: true}),
+        rng('Resistance band fly', 3, 4, 12, 20, {group: 'CABLES, BANDS & THROWS', noLoad: true}),
+        rng('Cable iron cross hold', 3, 4, 15, 30, {group: 'CABLES, BANDS & THROWS', unit: 'sec', noLoad: true})
       ]
     }
   };
@@ -75,22 +124,62 @@
     priority: 'Shoulder strength → Explosiveness → Rotator cuff stability → Rear delts → Shoulder endurance',
     pool: {
       all: [
-        rng('Barbell overhead press', 3, 5, 3, 8),
-        rng('Dumbbell shoulder press', 3, 4, 6, 10),
-        rng('Single-arm dumbbell overhead press', 3, 4, 6, 10, {perSide: true}),
-        rng('Landmine press', 3, 4, 6, 10, {perSide: true}),
-        rng('Arnold press', 3, 4, 8, 12),
-        rng('Dumbbell lateral raise', 3, 4, 10, 15),
-        rng('Cable lateral raise', 3, 4, 10, 15),
-        rng('Face pulls', 3, 4, 12, 20),
-        rng('Cable external rotation', 2, 3, 12, 20, {perSide: true}),
-        rng('Dumbbell rear delt fly', 3, 4, 10, 15),
-        rng('Reverse pec deck', 3, 4, 10, 15),
-        rng('Plate front raise', 2, 3, 10, 15),
-        rng('Medicine-ball overhead throw', 3, 5, 3, 6),
-        rng('Medicine-ball rotational throw', 3, 5, 3, 6, {perSide: true}),
-        rng('Battle ropes', 3, 5, 20, 30, {unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
-        rng('Dumbbell / barbell shrugs', 3, 4, 8, 15)
+        rng('Barbell overhead press', 3, 5, 3, 8, {group: 'OVERHEAD PRESSES'}),
+        rng('Seated barbell overhead press', 3, 4, 5, 10, {group: 'OVERHEAD PRESSES'}),
+        rng('Push press', 3, 5, 3, 6, {group: 'OVERHEAD PRESSES'}),
+        rng('Behind-the-neck press', 3, 4, 5, 8, {group: 'OVERHEAD PRESSES'}),
+        rng('Z press', 3, 3, 5, 10, {group: 'OVERHEAD PRESSES'}),
+        rng('Dumbbell shoulder press', 3, 4, 6, 10, {group: 'OVERHEAD PRESSES'}),
+        rng('Seated dumbbell shoulder press', 3, 4, 6, 10, {group: 'OVERHEAD PRESSES'}),
+        rng('Single-arm dumbbell overhead press', 3, 4, 6, 10, {group: 'OVERHEAD PRESSES', perSide: true}),
+        rng('Arnold press', 3, 4, 8, 12, {group: 'OVERHEAD PRESSES'}),
+        rng('Landmine press', 3, 4, 6, 10, {group: 'OVERHEAD PRESSES', perSide: true}),
+        rng('Single-arm landmine shoulder press', 3, 4, 6, 10, {group: 'OVERHEAD PRESSES', perSide: true}),
+        rng('Viking press', 3, 4, 5, 10, {group: 'OVERHEAD PRESSES'}),
+        rng('Cuban press', 3, 3, 8, 12, {group: 'OVERHEAD PRESSES'}),
+        rng('Machine shoulder press', 3, 4, 8, 12, {group: 'OVERHEAD PRESSES'}),
+        rng('Smith machine overhead press', 3, 4, 6, 10, {group: 'OVERHEAD PRESSES'}),
+
+        rng('Dumbbell lateral raise', 3, 4, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Cable lateral raise', 3, 4, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Machine lateral raise', 3, 4, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Leaning single-arm lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES', perSide: true}),
+        rng('Seated lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Egyptian lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES', perSide: true}),
+        rng('Plate front raise', 2, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Barbell front raise', 3, 3, 8, 12, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Cable front raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Y-raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('W-raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
+        rng('Lu raise', 3, 3, 8, 12, {group: 'LATERAL & FRONT RAISES'}),
+
+        rng('Face pulls', 3, 4, 12, 20, {group: 'REAR DELTS & ROTATOR CUFF'}),
+        rng('Cable external rotation', 2, 3, 12, 20, {group: 'REAR DELTS & ROTATOR CUFF', perSide: true}),
+        rng('Cable internal rotation', 2, 3, 12, 20, {group: 'REAR DELTS & ROTATOR CUFF', perSide: true}),
+        rng('Dumbbell rear delt fly', 3, 4, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF'}),
+        rng('Bent-over dumbbell lateral raise', 3, 3, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF'}),
+        rng('Reverse pec deck', 3, 4, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF'}),
+        rng('Lying dumbbell external rotation', 2, 3, 12, 20, {group: 'REAR DELTS & ROTATOR CUFF', perSide: true}),
+        rng('Prone Y-raise', 3, 3, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF'}),
+        rng('Prone T-raise', 3, 3, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF'}),
+        rng('Scapular wall slide', 3, 3, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF', noLoad: true}),
+        rng('Cable Y-raise', 3, 3, 10, 15, {group: 'REAR DELTS & ROTATOR CUFF'}),
+
+        rng('Dumbbell / barbell shrugs', 3, 4, 8, 15, {group: 'TRAPS & SHRUGS'}),
+        rng('Trap bar shrug', 3, 4, 8, 15, {group: 'TRAPS & SHRUGS'}),
+        rng('Cable shrug', 3, 4, 10, 15, {group: 'TRAPS & SHRUGS'}),
+        rng('Behind-the-back barbell shrug', 3, 3, 8, 15, {group: 'TRAPS & SHRUGS'}),
+        rng('Snatch-grip shrug', 3, 4, 6, 10, {group: 'TRAPS & SHRUGS'}),
+        rng("Farmer's walk shrug", 3, 4, 20, 40, {group: 'TRAPS & SHRUGS', unit: 'm'}),
+
+        rng('Medicine-ball overhead throw', 3, 5, 3, 6, {group: 'POWER & CONDITIONING'}),
+        rng('Medicine-ball rotational throw', 3, 5, 3, 6, {group: 'POWER & CONDITIONING', perSide: true}),
+        rng('Medicine-ball scoop toss', 3, 5, 3, 6, {group: 'POWER & CONDITIONING'}),
+        rng('Battle ropes', 3, 5, 20, 30, {group: 'POWER & CONDITIONING', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Alternating battle rope waves', 3, 5, 20, 30, {group: 'POWER & CONDITIONING', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Battle rope slams', 3, 5, 20, 30, {group: 'POWER & CONDITIONING', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Sledgehammer overhead slam', 3, 5, 10, 20, {group: 'POWER & CONDITIONING'}),
+        rng('Landmine rotational shoulder press', 3, 4, 6, 10, {group: 'POWER & CONDITIONING', perSide: true})
       ]
     }
   };
@@ -111,6 +200,17 @@
         rng('Cable curl', 3, 3, 10, 15, {group: 'BICEPS'}),
         rng('Preacher curl', 3, 3, 8, 12, {group: 'BICEPS'}),
         rng('Reverse curl', 3, 3, 10, 15, {group: 'BICEPS'}),
+        rng('EZ-bar curl', 3, 4, 6, 10, {group: 'BICEPS'}),
+        rng('Drag curl', 3, 3, 8, 12, {group: 'BICEPS'}),
+        rng('Spider curl', 3, 3, 8, 12, {group: 'BICEPS'}),
+        rng('Concentration curl', 3, 3, 8, 12, {group: 'BICEPS', perSide: true}),
+        rng('Cable rope hammer curl', 3, 3, 10, 15, {group: 'BICEPS'}),
+        rng('21s', 2, 3, 21, 21, {group: 'BICEPS'}),
+        rng('Behind-the-back cable curl', 3, 3, 10, 15, {group: 'BICEPS', perSide: true}),
+        rng("Waiter's curl", 3, 3, 10, 15, {group: 'BICEPS'}),
+        rng('Cross-body hammer curl', 3, 3, 8, 12, {group: 'BICEPS'}),
+        rng('Machine bicep curl', 3, 4, 8, 15, {group: 'BICEPS'}),
+        rng('Resistance band curl', 3, 3, 12, 20, {group: 'BICEPS', noLoad: true}),
 
         rng('Close-grip bench press', 3, 5, 4, 8, {group: 'TRICEPS'}),
         rng('Diamond press-up', 3, 4, 8, 15, {group: 'TRICEPS', noLoad: true}),
@@ -118,6 +218,15 @@
         rng('Overhead cable triceps extension', 3, 3, 10, 15, {group: 'TRICEPS'}),
         rng('Dumbbell skull crushers', 3, 3, 8, 12, {group: 'TRICEPS'}),
         rng('Single-arm cable triceps extension', 3, 3, 10, 15, {group: 'TRICEPS', perSide: true}),
+        rng('JM press', 3, 4, 6, 10, {group: 'TRICEPS'}),
+        rng('Tate press', 3, 3, 8, 12, {group: 'TRICEPS'}),
+        rng('Bench dips', 3, 4, 10, 20, {group: 'TRICEPS', noLoad: true}),
+        rng('Triceps kickback', 3, 3, 10, 15, {group: 'TRICEPS', perSide: true}),
+        rng('V-bar triceps pushdown', 3, 4, 8, 15, {group: 'TRICEPS'}),
+        rng('Reverse-grip triceps pushdown', 3, 3, 10, 15, {group: 'TRICEPS'}),
+        rng('Machine triceps extension', 3, 4, 8, 15, {group: 'TRICEPS'}),
+        rng('Triceps dip machine', 3, 4, 8, 15, {group: 'TRICEPS'}),
+        rng('Lying barbell triceps extension', 3, 3, 8, 12, {group: 'TRICEPS'}),
 
         rng("Farmer's carries", 3, 5, 20, 40, {group: 'FOREARMS & GRIP', unit: 'm'}),
         rng('Heavy dumbbell holds', 3, 5, 20, 45, {group: 'FOREARMS & GRIP', unit: 'sec'}),
@@ -127,6 +236,12 @@
         rng('Plate pinch holds', 3, 5, 20, 45, {group: 'FOREARMS & GRIP', unit: 'sec'}),
         rng('Towel cable curls', 3, 3, 8, 12, {group: 'FOREARMS & GRIP'}),
         rng('Dead hangs', 3, 5, 20, 60, {group: 'FOREARMS & GRIP', unit: 'sec', noLoad: true}),
+        rng('Barbell wrist curl', 3, 3, 12, 20, {group: 'FOREARMS & GRIP'}),
+        rng('Behind-the-back barbell wrist curl', 3, 3, 12, 20, {group: 'FOREARMS & GRIP'}),
+        rng('One-arm dumbbell wrist curl', 3, 3, 12, 20, {group: 'FOREARMS & GRIP', perSide: true}),
+        rng('Fat-grip hold', 3, 5, 20, 45, {group: 'FOREARMS & GRIP', unit: 'sec'}),
+        rng('Grip crusher hold', 3, 4, 10, 20, {group: 'FOREARMS & GRIP', unit: 'sec'}),
+        rng('One-arm barbell hold', 3, 4, 15, 30, {group: 'FOREARMS & GRIP', unit: 'sec', perSide: true}),
 
         rng('Kettlebell finger curl', 3, 4, 8, 15, {group: 'KETTLEBELL WRIST & GRIP'}),
         rng('Kettlebell wrist flip', 3, 4, 8, 15, {group: 'KETTLEBELL WRIST & GRIP'}),
@@ -146,6 +261,8 @@
         rng('Sledgehammer tyre strikes', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
         rng('Sled pulls', 3, 5, 20, 40, {group: 'FIGHTER-SPECIFIC', unit: 'm', setsLabel: 'ROUNDS'}),
         rng('Heavy bag straight-punch intervals', 3, 5, 20, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+        rng('Gi grip pull-up', 3, 4, 3, 8, {group: 'FIGHTER-SPECIFIC', noLoad: true}),
+        rng('Towel farmer\'s carry', 3, 5, 20, 40, {group: 'FIGHTER-SPECIFIC', unit: 'm'}),
         rng('Cable isometric holds', 3, 4, 15, 30, {group: 'FIGHTER-SPECIFIC', unit: 'sec'})
       ]
     }
@@ -164,6 +281,12 @@
       rng('Chin-up', 3, 4, 5, 12, {group: 'VERTICAL PULL', noLoad: true}),
       rng('Lat pulldown', 3, 4, 8, 12, {group: 'VERTICAL PULL'}),
       rng('Straight-arm pulldown', 3, 3, 10, 15, {group: 'VERTICAL PULL'}),
+      rng('Wide-grip pull-up', 3, 4, 4, 10, {group: 'VERTICAL PULL', noLoad: true}),
+      rng('Neutral-grip pull-up', 3, 4, 5, 10, {group: 'VERTICAL PULL', noLoad: true}),
+      rng('Behind-the-neck pulldown', 3, 3, 8, 12, {group: 'VERTICAL PULL'}),
+      rng('Single-arm lat pulldown', 3, 3, 8, 12, {group: 'VERTICAL PULL', perSide: true}),
+      rng('Kneeling lat pulldown', 3, 3, 10, 15, {group: 'VERTICAL PULL'}),
+      rng('Assisted pull-up machine', 3, 4, 6, 12, {group: 'VERTICAL PULL'}),
 
       rng('Barbell bent-over row', 3, 5, 5, 10, {group: 'HORIZONTAL PULL'}),
       rng('Pendlay row', 3, 4, 4, 8, {group: 'HORIZONTAL PULL'}),
@@ -171,22 +294,38 @@
       rng('Chest-supported row', 3, 4, 8, 12, {group: 'HORIZONTAL PULL'}),
       rng('Seated cable row', 3, 4, 8, 12, {group: 'HORIZONTAL PULL'}),
       rng('Inverted row', 3, 4, 8, 15, {group: 'HORIZONTAL PULL', noLoad: true}),
+      rng('T-bar row', 3, 4, 6, 10, {group: 'HORIZONTAL PULL'}),
+      rng('Meadows row', 3, 4, 6, 10, {group: 'HORIZONTAL PULL', perSide: true}),
+      rng('Yates row', 3, 4, 5, 8, {group: 'HORIZONTAL PULL'}),
+      rng('Machine row', 3, 4, 8, 12, {group: 'HORIZONTAL PULL'}),
+      rng('Landmine row', 3, 4, 8, 12, {group: 'HORIZONTAL PULL'}),
+      rng('Wide-grip cable row', 3, 3, 10, 15, {group: 'HORIZONTAL PULL'}),
+      rng('One-arm barbell row', 3, 4, 6, 10, {group: 'HORIZONTAL PULL', perSide: true}),
 
       rng('Conventional deadlift', 3, 5, 3, 6, {group: 'POSTERIOR CHAIN'}),
       rng('Trap-bar deadlift', 3, 4, 4, 8, {group: 'POSTERIOR CHAIN'}),
       rng('Rack pull', 3, 4, 4, 8, {group: 'POSTERIOR CHAIN'}),
       rng('Good morning', 3, 3, 8, 12, {group: 'POSTERIOR CHAIN'}),
+      rng('Deficit deadlift', 3, 4, 3, 6, {group: 'POSTERIOR CHAIN'}),
+      rng('Snatch-grip deadlift', 3, 4, 3, 6, {group: 'POSTERIOR CHAIN'}),
+      rng('Block pull', 3, 4, 3, 6, {group: 'POSTERIOR CHAIN'}),
+      rng('45-degree back extension', 3, 4, 10, 15, {group: 'POSTERIOR CHAIN', noLoad: true}),
+      rng('Reverse hyperextension', 3, 4, 10, 15, {group: 'POSTERIOR CHAIN'}),
 
       rng('Towel pull-up', 3, 4, 3, 8, {group: 'FIGHTER-SPECIFIC', noLoad: true}),
       rng('Bear crawl', 3, 5, 20, 40, {group: 'FIGHTER-SPECIFIC', unit: 'm', noLoad: true}),
       rng('Sandbag over-shoulder throw', 3, 5, 3, 6, {group: 'FIGHTER-SPECIFIC', perSide: true}),
       rng('Renegade row', 3, 4, 6, 10, {group: 'FIGHTER-SPECIFIC', perSide: true}),
+      rng('Muscle-up', 3, 4, 3, 8, {group: 'FIGHTER-SPECIFIC', noLoad: true}),
 
       rng('Band pull-apart', 3, 4, 15, 25, {group: 'BANDS', noLoad: true}),
       rng('Band lat pulldown', 3, 4, 12, 20, {group: 'BANDS', noLoad: true}),
       rng('Band seated row', 3, 4, 12, 20, {group: 'BANDS', noLoad: true}),
       rng('Band single-arm row', 3, 4, 12, 20, {group: 'BANDS', perSide: true, noLoad: true}),
-      rng('Band deadlift', 3, 4, 15, 25, {group: 'BANDS', noLoad: true})
+      rng('Band deadlift', 3, 4, 15, 25, {group: 'BANDS', noLoad: true}),
+      rng('Band face pull', 3, 4, 15, 25, {group: 'BANDS', noLoad: true}),
+      rng('Band pull-through', 3, 4, 15, 25, {group: 'BANDS', noLoad: true}),
+      rng('Banded good morning', 3, 3, 12, 20, {group: 'BANDS', noLoad: true})
     ] }
   };
 
@@ -198,21 +337,38 @@
       rng('Weighted plank', 3, 4, 20, 45, {group: 'ANTI-EXTENSION', unit: 'sec'}),
       rng('Ab wheel rollout', 3, 4, 8, 12, {group: 'ANTI-EXTENSION', noLoad: true}),
       rng('Hollow body hold', 3, 4, 20, 45, {group: 'ANTI-EXTENSION', unit: 'sec', noLoad: true}),
+      rng('Barbell rollout', 3, 4, 6, 10, {group: 'ANTI-EXTENSION'}),
+      rng('Stability ball rollout', 3, 4, 8, 12, {group: 'ANTI-EXTENSION', noLoad: true}),
+      rng('RKC plank', 3, 4, 15, 30, {group: 'ANTI-EXTENSION', unit: 'sec', noLoad: true}),
+      rng('Long-lever plank', 3, 4, 15, 30, {group: 'ANTI-EXTENSION', unit: 'sec', noLoad: true}),
 
       rng('Pallof press', 3, 3, 10, 15, {group: 'ANTI-ROTATION', perSide: true}),
       rng('Suitcase carry', 3, 5, 20, 40, {group: 'ANTI-ROTATION', unit: 'm', perSide: true}),
       rng('Side plank', 3, 3, 20, 45, {group: 'ANTI-ROTATION', unit: 'sec', perSide: true, noLoad: true}),
+      rng('Half-kneeling Pallof press', 3, 3, 10, 15, {group: 'ANTI-ROTATION', perSide: true}),
+      rng('Copenhagen plank', 3, 3, 15, 30, {group: 'ANTI-ROTATION', unit: 'sec', perSide: true, noLoad: true}),
+      rng('Cable anti-rotation hold', 3, 3, 15, 30, {group: 'ANTI-ROTATION', unit: 'sec', perSide: true}),
 
       rng('Russian twist', 3, 3, 15, 25, {group: 'ROTATION & POWER', noLoad: true}),
       rng('Cable woodchop', 3, 4, 10, 15, {group: 'ROTATION & POWER', perSide: true}),
       rng('Medicine-ball slam', 3, 5, 5, 10, {group: 'ROTATION & POWER'}),
       rng('Landmine rotation', 3, 4, 8, 12, {group: 'ROTATION & POWER', perSide: true}),
+      rng('High-to-low cable chop', 3, 3, 10, 15, {group: 'ROTATION & POWER', perSide: true}),
+      rng('Low-to-high cable chop', 3, 3, 10, 15, {group: 'ROTATION & POWER', perSide: true}),
+      rng('Standing medicine-ball rotational slam', 3, 4, 6, 10, {group: 'ROTATION & POWER', perSide: true}),
 
       rng('Hanging leg raise', 3, 4, 8, 15, {group: 'FLEXION & ENDURANCE', noLoad: true}),
       rng('Toes-to-bar', 3, 4, 5, 12, {group: 'FLEXION & ENDURANCE', noLoad: true}),
       rng('V-up', 3, 3, 12, 20, {group: 'FLEXION & ENDURANCE', noLoad: true}),
       rng('Dragon flag', 3, 3, 3, 8, {group: 'FLEXION & ENDURANCE', noLoad: true}),
-      rng('Dead bug', 3, 3, 10, 15, {group: 'FLEXION & ENDURANCE', perSide: true, noLoad: true})
+      rng('Dead bug', 3, 3, 10, 15, {group: 'FLEXION & ENDURANCE', perSide: true, noLoad: true}),
+      rng('Weighted sit-up', 3, 4, 10, 20, {group: 'FLEXION & ENDURANCE'}),
+      rng('Decline sit-up', 3, 4, 10, 20, {group: 'FLEXION & ENDURANCE', noLoad: true}),
+      rng('Cable crunch', 3, 4, 10, 20, {group: 'FLEXION & ENDURANCE'}),
+      rng('Machine crunch', 3, 4, 10, 20, {group: 'FLEXION & ENDURANCE'}),
+      rng('Reverse crunch', 3, 3, 12, 20, {group: 'FLEXION & ENDURANCE', noLoad: true}),
+      rng('Bicycle crunch', 3, 3, 15, 25, {group: 'FLEXION & ENDURANCE', noLoad: true}),
+      rng('L-sit hold', 3, 4, 10, 30, {group: 'FLEXION & ENDURANCE', unit: 'sec', noLoad: true})
     ] }
   };
 
@@ -220,17 +376,37 @@
     key: 'hips', name: 'Hips & Glutes', tag: 'HIPS & GLUTES', part: 'Legs',
     priority: 'Hip strength → Unilateral control → Hip power → Mobility → Endurance',
     pool: { all: [
-      rng('Barbell hip thrust', 3, 4, 6, 12),
-      rng('Sumo deadlift', 3, 5, 3, 8),
-      rng('Cable pull-through', 3, 3, 10, 15),
-      rng('Bulgarian split squat', 3, 4, 6, 12, {perSide: true}),
-      rng('Reverse lunge', 3, 4, 8, 12, {perSide: true}),
-      rng('Walking lunge', 3, 4, 20, 40, {unit: 'm'}),
-      rng('Glute bridge', 3, 3, 10, 20, {noLoad: true}),
-      rng('Lateral band walk', 3, 3, 12, 20, {perSide: true, noLoad: true}),
-      rng('Cossack squat', 3, 3, 6, 12, {perSide: true, noLoad: true}),
-      rng('Hip airplane', 2, 3, 5, 10, {perSide: true, noLoad: true}),
-      rng('90/90 hip switch', 2, 3, 8, 15, {noLoad: true})
+      rng('Barbell hip thrust', 3, 4, 6, 12, {group: 'HIP THRUSTS & BRIDGES'}),
+      rng('Single-leg hip thrust', 3, 3, 8, 12, {group: 'HIP THRUSTS & BRIDGES', perSide: true}),
+      rng('Banded hip thrust', 3, 4, 12, 20, {group: 'HIP THRUSTS & BRIDGES'}),
+      rng('Machine hip thrust', 3, 4, 8, 15, {group: 'HIP THRUSTS & BRIDGES'}),
+      rng('Glute bridge', 3, 3, 10, 20, {group: 'HIP THRUSTS & BRIDGES', noLoad: true}),
+      rng('Single-leg glute bridge', 3, 3, 8, 15, {group: 'HIP THRUSTS & BRIDGES', perSide: true, noLoad: true}),
+      rng('Frog pump', 3, 3, 15, 25, {group: 'HIP THRUSTS & BRIDGES', noLoad: true}),
+
+      rng('Bulgarian split squat', 3, 4, 6, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
+      rng('Reverse lunge', 3, 4, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
+      rng('Walking lunge', 3, 4, 20, 40, {group: 'UNILATERAL & LUNGES', unit: 'm'}),
+      rng('Curtsy lunge', 3, 3, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true, noLoad: true}),
+      rng('Lateral lunge', 3, 3, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
+      rng('Deficit reverse lunge', 3, 3, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
+      rng('Step-back lunge', 3, 4, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
+      rng('Skater squat', 3, 3, 6, 10, {group: 'UNILATERAL & LUNGES', perSide: true, noLoad: true}),
+      rng('Cossack squat', 3, 3, 6, 12, {group: 'UNILATERAL & LUNGES', perSide: true, noLoad: true}),
+
+      rng('Sumo deadlift', 3, 5, 3, 8, {group: 'HINGE & POSTERIOR'}),
+      rng('Cable pull-through', 3, 3, 10, 15, {group: 'HINGE & POSTERIOR'}),
+      rng('B-stance Romanian deadlift', 3, 3, 8, 12, {group: 'HINGE & POSTERIOR', perSide: true}),
+      rng('Cable glute kickback', 3, 3, 10, 15, {group: 'HINGE & POSTERIOR', perSide: true}),
+
+      rng('Lateral band walk', 3, 3, 12, 20, {group: 'MOBILITY & ACTIVATION', perSide: true, noLoad: true}),
+      rng('Hip airplane', 2, 3, 5, 10, {group: 'MOBILITY & ACTIVATION', perSide: true, noLoad: true}),
+      rng('90/90 hip switch', 2, 3, 8, 15, {group: 'MOBILITY & ACTIVATION', noLoad: true}),
+      rng('Clamshell', 3, 3, 12, 20, {group: 'MOBILITY & ACTIVATION', perSide: true, noLoad: true}),
+      rng('Fire hydrant', 3, 3, 10, 15, {group: 'MOBILITY & ACTIVATION', perSide: true, noLoad: true}),
+      rng('Monster walk', 3, 3, 15, 25, {group: 'MOBILITY & ACTIVATION', unit: 'm', noLoad: true}),
+      rng('Standing cable hip abduction', 3, 3, 12, 20, {group: 'MOBILITY & ACTIVATION', perSide: true}),
+      rng('Seated hip abduction machine', 3, 4, 10, 20, {group: 'MOBILITY & ACTIVATION'})
     ] }
   };
 
@@ -238,18 +414,39 @@
     key: 'quads', name: 'Quads', tag: 'QUADS', part: 'Legs',
     priority: 'Squat strength → Unilateral strength → Leg drive → Endurance',
     pool: { all: [
-      rng('Back squat', 3, 5, 3, 8),
-      rng('Front squat', 3, 4, 4, 8),
-      rng('Goblet squat', 3, 4, 8, 15),
-      rng('Hack squat', 3, 4, 8, 12),
-      rng('Leg press', 3, 4, 8, 15),
-      rng('Split squat', 3, 4, 8, 12, {perSide: true}),
-      rng('Step-up', 3, 4, 8, 12, {perSide: true}),
-      rng('Leg extension', 3, 3, 12, 20),
-      rng('Sissy squat', 3, 3, 8, 15, {noLoad: true}),
-      rng('Jump squat', 3, 5, 5, 10, {noLoad: true}),
-      rng('Wall sit', 3, 3, 30, 60, {unit: 'sec', noLoad: true}),
-      rng('Sled push', 3, 5, 20, 40, {unit: 'm', setsLabel: 'ROUNDS'})
+      rng('Back squat', 3, 5, 3, 8, {group: 'SQUATS & PRESSES'}),
+      rng('Front squat', 3, 4, 4, 8, {group: 'SQUATS & PRESSES'}),
+      rng('Zercher squat', 3, 4, 5, 10, {group: 'SQUATS & PRESSES'}),
+      rng('Box squat', 3, 4, 4, 8, {group: 'SQUATS & PRESSES'}),
+      rng('Pause squat', 3, 4, 3, 6, {group: 'SQUATS & PRESSES'}),
+      rng('Safety-bar squat', 3, 4, 5, 8, {group: 'SQUATS & PRESSES'}),
+      rng('Belt squat', 3, 4, 6, 12, {group: 'SQUATS & PRESSES'}),
+      rng('Smith machine squat', 3, 4, 8, 12, {group: 'SQUATS & PRESSES'}),
+      rng('Goblet squat', 3, 4, 8, 15, {group: 'SQUATS & PRESSES'}),
+      rng('Hack squat', 3, 4, 8, 12, {group: 'SQUATS & PRESSES'}),
+      rng('Leg press', 3, 4, 8, 15, {group: 'SQUATS & PRESSES'}),
+      rng('Single-leg leg press', 3, 3, 8, 15, {group: 'SQUATS & PRESSES', perSide: true}),
+
+      rng('Split squat', 3, 4, 8, 12, {group: 'UNILATERAL', perSide: true}),
+      rng('Front-foot-elevated split squat', 3, 3, 8, 12, {group: 'UNILATERAL', perSide: true}),
+      rng('Step-up', 3, 4, 8, 12, {group: 'UNILATERAL', perSide: true}),
+      rng('Box step-up', 3, 4, 8, 12, {group: 'UNILATERAL', perSide: true}),
+      rng('Lateral step-up', 3, 3, 8, 12, {group: 'UNILATERAL', perSide: true}),
+      rng('Deficit step-up', 3, 3, 6, 10, {group: 'UNILATERAL', perSide: true}),
+      rng('Pistol squat', 3, 3, 3, 8, {group: 'UNILATERAL', perSide: true, noLoad: true}),
+      rng('Assisted pistol squat', 3, 3, 5, 10, {group: 'UNILATERAL', perSide: true, noLoad: true}),
+
+      rng('Leg extension', 3, 3, 12, 20, {group: 'ISOLATION & PLYOMETRIC'}),
+      rng('Sissy squat', 3, 3, 8, 15, {group: 'ISOLATION & PLYOMETRIC', noLoad: true}),
+      rng('Machine sissy squat', 3, 3, 8, 15, {group: 'ISOLATION & PLYOMETRIC'}),
+      rng('Spanish squat', 3, 4, 20, 40, {group: 'ISOLATION & PLYOMETRIC', unit: 'sec'}),
+      rng('Wall sit', 3, 3, 30, 60, {group: 'ISOLATION & PLYOMETRIC', unit: 'sec', noLoad: true}),
+      rng('Jump squat', 3, 5, 5, 10, {group: 'ISOLATION & PLYOMETRIC', noLoad: true}),
+      rng('Box jump', 3, 5, 5, 10, {group: 'ISOLATION & PLYOMETRIC', noLoad: true}),
+      rng('Broad jump', 3, 5, 3, 6, {group: 'ISOLATION & PLYOMETRIC', noLoad: true}),
+      rng('Depth jump', 3, 4, 4, 8, {group: 'ISOLATION & PLYOMETRIC', noLoad: true}),
+      rng('Tuck jump', 3, 4, 5, 10, {group: 'ISOLATION & PLYOMETRIC', noLoad: true}),
+      rng('Sled push', 3, 5, 20, 40, {group: 'ISOLATION & PLYOMETRIC', unit: 'm', setsLabel: 'ROUNDS'})
     ] }
   };
 
@@ -257,15 +454,23 @@
     key: 'hamstrings', name: 'Hamstrings', tag: 'HAMSTRINGS', part: 'Legs',
     priority: 'Hinge strength → Knee flexion → Unilateral control → Eccentric strength',
     pool: { all: [
-      rng('Romanian deadlift', 3, 4, 6, 10),
-      rng('Stiff-leg deadlift', 3, 4, 6, 10),
-      rng('Single-leg Romanian deadlift', 3, 3, 8, 12, {perSide: true}),
-      rng('Nordic hamstring curl', 3, 4, 4, 8, {noLoad: true}),
-      rng('Glute-ham raise', 3, 4, 5, 10, {noLoad: true}),
-      rng('Lying leg curl', 3, 4, 8, 15),
-      rng('Seated leg curl', 3, 4, 8, 15),
-      rng('Slider leg curl', 3, 3, 8, 15, {noLoad: true}),
-      rng('Back extension', 3, 3, 10, 15, {noLoad: true})
+      rng('Romanian deadlift', 3, 4, 6, 10, {group: 'HINGE PATTERNS'}),
+      rng('Dumbbell Romanian deadlift', 3, 4, 6, 10, {group: 'HINGE PATTERNS'}),
+      rng('Stiff-leg deadlift', 3, 4, 6, 10, {group: 'HINGE PATTERNS'}),
+      rng('Deficit Romanian deadlift', 3, 4, 6, 10, {group: 'HINGE PATTERNS'}),
+      rng('Single-leg Romanian deadlift', 3, 3, 8, 12, {group: 'HINGE PATTERNS', perSide: true}),
+      rng('Kettlebell Romanian deadlift', 3, 4, 8, 12, {group: 'HINGE PATTERNS'}),
+      rng('Banded Romanian deadlift', 3, 3, 10, 15, {group: 'HINGE PATTERNS', noLoad: true}),
+
+      rng('Nordic hamstring curl', 3, 4, 4, 8, {group: 'CURLS & ISOLATION', noLoad: true}),
+      rng('Glute-ham raise', 3, 4, 5, 10, {group: 'CURLS & ISOLATION', noLoad: true}),
+      rng('Lying leg curl', 3, 4, 8, 15, {group: 'CURLS & ISOLATION'}),
+      rng('Seated leg curl', 3, 4, 8, 15, {group: 'CURLS & ISOLATION'}),
+      rng('Standing leg curl', 3, 3, 10, 15, {group: 'CURLS & ISOLATION', perSide: true}),
+      rng('Cable leg curl', 3, 3, 10, 15, {group: 'CURLS & ISOLATION', perSide: true}),
+      rng('Stability ball leg curl', 3, 3, 10, 15, {group: 'CURLS & ISOLATION', noLoad: true}),
+      rng('Slider leg curl', 3, 3, 8, 15, {group: 'CURLS & ISOLATION', noLoad: true}),
+      rng('Back extension', 3, 3, 10, 15, {group: 'CURLS & ISOLATION', noLoad: true})
     ] }
   };
 
@@ -282,7 +487,14 @@
       rng('Pogo hop', 3, 5, 20, 40, {noLoad: true}),
       rng('Ankle bounce', 3, 4, 20, 40, {noLoad: true}),
       rng('Skipping', 3, 5, 30, 60, {unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
-      rng('Loaded toe walk', 3, 4, 20, 30, {unit: 'm'})
+      rng('Loaded toe walk', 3, 4, 20, 30, {unit: 'm'}),
+      rng('Smith machine calf raise', 3, 4, 10, 20),
+      rng('Barbell calf raise', 3, 4, 10, 20),
+      rng('Machine standing calf raise', 3, 4, 10, 20),
+      rng('Single-leg dumbbell calf raise', 3, 3, 10, 15, {perSide: true}),
+      rng('Seated dumbbell calf raise', 3, 4, 10, 20),
+      rng('Calf raise isometric hold', 3, 4, 20, 40, {unit: 'sec'}),
+      rng('Double-unders', 3, 5, 20, 40, {unit: 'sec', setsLabel: 'ROUNDS', noLoad: true})
     ] }
   };
 
@@ -299,7 +511,14 @@
       rng('Heel walk', 3, 3, 15, 25, {unit: 'm', noLoad: true}),
       rng('Toe walk', 3, 3, 15, 25, {unit: 'm', noLoad: true}),
       rng('Single-leg balance', 3, 3, 30, 60, {unit: 'sec', perSide: true, noLoad: true}),
-      rng('Barefoot skipping', 3, 5, 20, 40, {unit: 'sec', setsLabel: 'ROUNDS', noLoad: true})
+      rng('Barefoot skipping', 3, 5, 20, 40, {unit: 'sec', setsLabel: 'ROUNDS', noLoad: true}),
+      rng('Ankle alphabet', 2, 3, 1, 1, {perSide: true, noLoad: true}),
+      rng('Resisted ankle eversion', 3, 3, 12, 20, {perSide: true, noLoad: true}),
+      rng('Resisted ankle inversion', 3, 3, 12, 20, {perSide: true, noLoad: true}),
+      rng('Marble pickup', 2, 3, 10, 20, {perSide: true, noLoad: true}),
+      rng('Toe yoga', 2, 3, 10, 15, {perSide: true, noLoad: true}),
+      rng('Single-leg balance on foam pad', 3, 3, 30, 60, {unit: 'sec', perSide: true, noLoad: true}),
+      rng('Bosu ball single-leg stand', 3, 3, 30, 60, {unit: 'sec', perSide: true, noLoad: true})
     ] }
   };
 
@@ -316,7 +535,12 @@
       rng('Banded neck extension', 3, 3, 12, 20, {noLoad: true}),
       rng('Banded neck flexion', 3, 3, 12, 20, {noLoad: true}),
       rng('Partner manual neck resistance', 3, 3, 8, 15, {perSide: true, noLoad: true}),
-      rng('Shrug hold', 3, 4, 20, 40, {unit: 'sec'})
+      rng('Shrug hold', 3, 4, 20, 40, {unit: 'sec'}),
+      rng('Weighted neck flexion', 3, 4, 10, 20),
+      rng('Weighted neck extension', 3, 4, 10, 20),
+      rng('Four-way neck machine', 3, 4, 10, 15),
+      rng('Manual lateral neck resistance', 3, 3, 8, 15, {perSide: true, noLoad: true}),
+      rng('Banded neck rotation', 3, 3, 10, 15, {perSide: true, noLoad: true})
     ] }
   };
 
@@ -334,7 +558,14 @@
       rng('Finger extension band', 3, 3, 15, 25, {noLoad: true}),
       rng('Rice bucket digs', 3, 3, 30, 60, {unit: 'sec', noLoad: true}),
       rng('Ball squeeze', 3, 3, 20, 40, {noLoad: true}),
-      rng('Towel wring', 3, 3, 20, 40, {unit: 'sec', noLoad: true})
+      rng('Towel wring', 3, 3, 20, 40, {unit: 'sec', noLoad: true}),
+      rng('Captains of Crush hold', 3, 5, 10, 20, {unit: 'sec'}),
+      rng('Rolling thunder lift', 3, 5, 10, 20, {unit: 'sec'}),
+      rng('Vertical bar hold', 3, 4, 15, 30, {unit: 'sec'}),
+      rng('Dumbbell finger curl', 3, 3, 10, 15),
+      rng('Sledgehammer lever hold', 3, 4, 15, 30, {unit: 'sec', perSide: true}),
+      rng('Plate wrist rotation', 3, 3, 8, 15, {perSide: true}),
+      rng('Grip trainer negative', 3, 4, 10, 20, {unit: 'sec'})
     ] }
   };
 
@@ -356,6 +587,10 @@
       rng('Kettlebell sumo high pull', 3, 4, 8, 15, {group: 'TOTAL BODY'}),
       rng('Kettlebell thruster', 3, 5, 5, 12, {group: 'TOTAL BODY'}),
       rng('Kettlebell side plank row', 3, 3, 6, 12, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell high pull', 3, 4, 8, 15, {group: 'TOTAL BODY'}),
+      rng('Kettlebell close-grip swing', 3, 5, 10, 20, {group: 'TOTAL BODY'}),
+      rng('Kettlebell hand-to-hand swing', 3, 5, 10, 20, {group: 'TOTAL BODY'}),
+      rng('Kettlebell single-arm clean and press', 3, 4, 5, 8, {group: 'TOTAL BODY', perSide: true}),
 
       rng('Kettlebell shoulder press', 3, 4, 5, 10, {group: 'UPPER BODY', perSide: true}),
       rng('Kettlebell deficit push-up', 3, 4, 8, 15, {group: 'UPPER BODY', noLoad: true}),
@@ -388,6 +623,7 @@
       rng('Kettlebell lunge pass', 3, 4, 8, 12, {group: 'LOWER BODY', perSide: true}),
       rng('Kettlebell squat', 3, 4, 8, 15, {group: 'LOWER BODY'}),
       rng('Kettlebell squat flip', 3, 4, 6, 12, {group: 'LOWER BODY'}),
+      rng('Kettlebell goblet squat', 3, 4, 8, 15, {group: 'LOWER BODY'}),
       rng('Kettlebell overhead squat', 3, 3, 5, 10, {group: 'LOWER BODY', perSide: true}),
 
       /* Girevoy sport — the Soviet kettlebell discipline: competitions from the late 1940s,

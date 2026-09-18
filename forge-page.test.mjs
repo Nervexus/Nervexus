@@ -342,7 +342,7 @@ t('a section with nothing in it still says so', async () => {
   ok(/Nothing here yet/.test(body), 'a section with no pool did not show the empty state');
   ok(!/\bADD\b/.test(body), 'an emptied section is still offering blocks');
   const cards = await page.evaluate(() => document.querySelectorAll('.cc-scene .lc-card').length);
-  eq(cards, 2, 'an empty section should be the sidebar and one card, got ' + cards);
+  eq(cards, 3, 'an empty section should be the search bar, the sidebar and one card, got ' + cards);
   await page.evaluate(() => {
     const s = window.ForgeTraining.section('calves'), was = window.__nvxSavedCalves;
     s.pool = was.pool; s.priority = was.priority;

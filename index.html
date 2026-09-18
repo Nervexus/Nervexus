@@ -3739,6 +3739,61 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
         <div class="lcb-stage">
           <div class="lcb-field"></div>
+          <!-- Search reaches every section at once, so an exercise can be found without
+               knowing which body part it is filed under. Typing anything hides the normal
+               sidebar+section view and shows a flat list of every match instead. -->
+          <div class="lc-card" style="position:relative; margin-bottom:14px; padding:14px 16px;">
+            <div style="position:relative; display:flex; align-items:center; gap:10px;">
+              <span class="icon-inherit" style="width:15px; height:15px; flex:0 0 15px; display:flex; color:var(--lc-muted);" data-icon="requests"></span>
+              <input value="{{ trainSearch }}" onInput="{{ setTrainSearch }}" placeholder="Search every exercise…" style="flex:1; min-width:0; background:transparent; border:none; color:inherit; font-size:14px; outline:none;">
+              <sc-if value="{{ hasTrainSearch }}" hint-placeholder-val="{{ false }}">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:var(--lc-muted); white-space:nowrap;">{{ trainSearchCountLabel }}</span>
+                <span onClick="{{ clearTrainSearch }}" style="cursor:pointer; color:var(--lc-muted); font-size:16px; line-height:1;">×</span>
+              </sc-if>
+            </div>
+          </div>
+
+          <sc-if value="{{ hasTrainSearch }}" hint-placeholder-val="{{ false }}">
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">02 - SC</span>
+                <div class="lc-title">Search results</div>
+              </div>
+              <sc-if value="{{ noTrainSearchResults }}" hint-placeholder-val="{{ false }}">
+                <div class="lc-sub" style="padding:44px 24px; text-align:center;">
+                  <div style="font-size:12.5px; color:var(--lc-muted);">Nothing matches that.</div>
+                </div>
+              </sc-if>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(318px,1fr)); gap:8px;">
+                <sc-for list="{{ trainSearchResults }}" as="x" hint-placeholder-count="6">
+                  <div class="lc-sub" style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px;">
+                      <div style="min-width:0;">
+                        <div style="font-size:13.5px; line-height:1.3;">{{ x.name }}</div>
+                        <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:var(--lc-accent); margin-top:3px;">{{ x.section }}</div>
+                      </div>
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:{{ x.targetInk }}; white-space:nowrap;">{{ x.target }}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:nowrap;">
+                      <div style="display:flex; align-items:center; gap:14px 12px; flex-wrap:wrap; flex:1 1 auto; min-width:0;">
+                        <sc-for list="{{ x.steps }}" as="st" hint-placeholder-count="2">
+                          <span style="display:flex; align-items:center; gap:4px;">
+                            <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1.1px; color:var(--lc-muted); margin-right:2px;">{{ st.label }}</span>
+                            <span onClick="{{ st.dec }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:9px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">−</span>
+                            <input value="{{ st.val }}" onInput="{{ st.type }}" placeholder="{{ st.ph }}" type="number" inputmode="decimal" style="font-family:'JetBrains Mono',monospace; font-size:11px; width:46px; padding:5px 4px; text-align:center; border-radius:9px; border:1px solid {{ st.bd }}; background:transparent; color:{{ st.valInk }}; outline:none; box-sizing:border-box;">
+                            <span onClick="{{ st.inc }}" style="font-family:'JetBrains Mono',monospace; font-size:14px; line-height:24px; width:26px; height:26px; text-align:center; border-radius:9px; cursor:{{ st.cursor }}; color:{{ st.ink }}; border:1px solid {{ st.bd }};">+</span>
+                          </span>
+                        </sc-for>
+                      </div>
+                      <span onClick="{{ x.add }}" style="flex:0 0 auto; text-align:center; font-family:'Cormorant Garamond',Georgia,serif; font-size:13px; letter-spacing:1px; padding:7px 18px; border-radius:999px; cursor:{{ x.cursor }}; color:{{ x.ink }}; background:{{ x.bg }}; border:1px solid {{ x.bd }};">{{ x.label }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ noTrainSearch }}" hint-placeholder-val="{{ true }}">
           <div class="cc-grid2" style="position:relative; display:grid; grid-template-columns:224px 1fr; gap:16px; align-items:start;">
 
             <div class="lc-card forge-secnav" style="position:sticky; top:14px; padding:8px;">
@@ -3897,6 +3952,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
 
           </div>
+          </sc-if>
         </div>
         </sc-if>
 
@@ -9255,7 +9311,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-344 · v11.344 quick-log-polish';
+const NOTIF_BUILD_VERSION = '2026.09.18-345 · v11.345 training-search-expansion';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9356,7 +9412,7 @@ activities: this._mergeShipLog(s.activities),
          backgrounded tab or a dropped frame cannot shorten five minutes. */
       brStage:'', brEndsAt:0, brLeft:300,
       logGate:null, calScope:'day',
-      levelUp:null, lcOpen:{}, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{},
+      levelUp:null, lcOpen:{}, forgeCentre:'home', forgeSection:'', forgePool:'gym', poolDraft:{}, poolText:{}, forgeFB:s.forgeFB||{period:'',mode:'day',on:'',evId:'',items:[],done:{},w:{}}, fbDraft:{part:'Chest'}, forgeOpen:null, forgeDraft:{}, trainSearch:'',
       forgeScores:s.forgeScores||{}, forgeHistory:s.forgeHistory||[],
       calY:new Date().getFullYear(), calM:new Date().getMonth(), calSel:(()=>{ try{ return new Date().toLocaleDateString('en-CA'); }catch(e){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); } })(), dayColors:s.dayColors||{}, evTitle:'', evTime:'', evKind:'general', evEndTime:'', evAttendees:'', evEstMins:'',
       selCountry:'United States', wiLayer:'Political', wiTime:'Today', wiQuery:'',
@@ -14284,6 +14340,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.345', date:'Sep 18, 2026', major:true, notes:[
+      'The Training centre gets a search bar that reaches every section at once — type "curl" and get every curl in the app, whichever body part it lives under, with an Add button that works exactly like the one in its own section. And the pools themselves grew a lot: 222 real exercises added across all thirteen sections (234 → 456), from common gym staples to genuinely rare ones — Spoto press, Zottman curl, Copenhagen plank, Girevoy sport lifts. Chest, Arms and Kettlebells had the room to grow the most; Neck and Feet & Ankles ran out of real, distinct exercises well before any of them did.',
+    ]},
     {version:'v11.344', date:'Sep 18, 2026', major:true, notes:[
       'Quick Log now asks before it actually saves: filling in blocks and pressing "Add to Log" goes to a review step first, and nothing is written until Confirm. It opens with a personal welcome line (one of three, so it does not read the same every time) and closes with the Mental tab’s own header shape — corner labels, a thread, a serif title — same glass colour, just the Forge’s own way of opening a screen. Its trigger and Bulk Import’s are centred on the card now too, as filled signature pills instead of plain outlined chips.',
       'A shipped build is filed as a Vlog in the Work Log now, and paid the same bonus a spoken one gets — the day’s first release worth it, anything else that ships the same day at the ordinary rate. It used to be worth nothing at all, on purpose, to stop the score being a count of how often the app deployed; filing it as a Vlog keeps that same day-by-day cap while finally giving the owner credit for saying what was done.',
@@ -19364,6 +19423,64 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const UNIT_STEP={sec:'SECS', m:'METRES', climb:'CLIMBS'};
         const UNIT_PH={sec:'sec', m:'m', climb:'climbs'};
         const UNIT_TARGET={sec:' SEC', m:' M', climb:' CLIMBS'};
+        /* Shared by the per-section pool view and global search below, so an exercise found
+           by typing its name behaves exactly like one found by clicking through to its
+           section — same steppers, same frozen-once-ticked state, same Add. */
+        const mapPoolItem=(sec, x)=>{
+          const asPart=(this.FB_PARTS().indexOf(sec.part)>=0?sec.part:'Full');
+          const item=(fb.items||[]).find(i=>this._fbSame(i, {name:x.name, part:asPart}));
+          const inSession=!!item, ticked=!!(item && fbDone[item.id]);
+          const v=this.poolVals(sec.key, x, item);
+          const stepIt=(field,dir)=>()=>{ if(!ticked) this.stepPool(sec.key, x, item, field, dir); };
+          const raw=[];
+          if(!x.noLoad) raw.push(['weight','WEIGHT','kg', v.weight>0?String(v.weight):'']);
+          raw.push(['reps', UNIT_STEP[x.unit]||'REPS', UNIT_PH[x.unit]||'reps', String(v.reps)]);
+          const steps=raw.map(st=>{
+            const tk=this._poolTextKey(sec.key, x, st[0]);
+            const typed=pt[tk];
+            return { label:st[1], ph:st[2], val:typed!=null?typed:st[3],
+              valInk:ticked?'#7c7c84':'#eef0f2',
+              ink:ticked?'#4a4a52':'#c9c9d2',
+              bd:ticked?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.16)',
+              cursor:ticked?'default':'pointer',
+              type:(e)=>{ if(!ticked) this.typePoolVal(sec.key, x, item, st[0], e); },
+              dec:stepIt(st[0],-1), inc:stepIt(st[0],1) };
+          });
+          const setsTxt=(x.setsMax && x.setsMax>x.sets) ? (x.sets+'–'+x.setsMax) : String(x.sets||1);
+          const repsTxt=(x.repsMax && x.repsMax>x.reps) ? (x.reps+'–'+x.repsMax) : String(x.reps||0);
+          const unitTxt=UNIT_TARGET[x.unit]||'';
+          const side=x.perSide?' · PER SIDE':'';
+          const onlyOne=x.unit && (x.sets||1)===1 && (x.setsMax||1)===1;
+          const target=onlyOne ? (repsTxt+unitTxt)
+            : (setsTxt+' '+(x.setsLabel||'SETS')+' × '+repsTxt+unitTxt);
+          return { name:x.name, section:sec.name, steps,
+            target:ticked?'LOGGED':(target+side),
+            targetInk:ticked?'var(--forge-accent)':'#8f8f99',
+            label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
+            ink:inSession?'var(--forge-add-on)':'var(--forge-add-ink)',
+            bg:inSession?'transparent':'var(--forge-add-bg)',
+            bd:inSession?'var(--forge-add-on)':'var(--forge-add-bg)',
+            group:x.group||'',
+            add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part,
+              {weight:this._poolClamp('weight', v.weight), reps:this._poolClamp('reps', v.reps)}); } };
+        };
+        /* Search reaches every section's pool at once, not just whichever tab is open — the
+           point of it is finding something without already knowing where it lives. One row
+           per exercise name even where a section carries it in both a gym and a home pool. */
+        const trainSearchQ=(S.trainSearch||'').trim().toLowerCase();
+        const trainSearchResults=!trainSearchQ ? [] : secs.filter(sc0=>sc0.pool).flatMap(sc0=>{
+          const seen={}; const out=[];
+          Object.keys(sc0.pool).forEach(pk=>(sc0.pool[pk]||[]).forEach(x=>{
+            if(seen[x.name]) return;
+            if(x.name.toLowerCase().indexOf(trainSearchQ)<0) return;
+            seen[x.name]=true; out.push(mapPoolItem(sc0, x));
+          }));
+          return out;
+        }).sort((a,b)=>a.name.localeCompare(b.name));
+        const hasTrainSearch=trainSearchQ.length>0;
+        const noTrainSearch=!hasTrainSearch;
+        const noTrainSearchResults=hasTrainSearch && trainSearchResults.length===0;
+        const trainSearchCount=trainSearchResults.length;
         const trainSections=secs.filter(x=>x.key===secKey).map(sec=>{
           const poolKeys=Object.keys(sec.pool||{});
           const pool=(poolKeys.indexOf(pool0)>=0)?pool0:(poolKeys[0]||'gym');
@@ -19383,50 +19500,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               bd:pool===q?'#eef0f2':'rgba(255,255,255,0.12)' })),
             poolHint:'Adds to your Full Body session',
             hasPriority:!!sec.priority, priority:sec.priority||'',
-            poolGroups:this._poolGroups(((sec.pool||{})[pool]||[]).map(x=>{
-              const asPart=(this.FB_PARTS().indexOf(sec.part)>=0?sec.part:'Full');
-              const item=(fb.items||[]).find(i=>this._fbSame(i, {name:x.name, part:asPart}));
-              const inSession=!!item, ticked=!!(item && fbDone[item.id]);
-              const v=this.poolVals(sec.key, x, item);
-              /* Frozen once ticked: the set is in the training log with these numbers, and
-                 editing them here would leave the two disagreeing. */
-              const stepIt=(field,dir)=>()=>{ if(!ticked) this.stepPool(sec.key, x, item, field, dir); };
-              /* A press-up or a band pull has nothing to load, so it gets reps alone rather
-                 than a weight stepper that would sit unset for ever. */
-              const raw=[];
-              if(!x.noLoad) raw.push(['weight','WEIGHT','kg', v.weight>0?String(v.weight):'']);
-              raw.push(['reps', UNIT_STEP[x.unit]||'REPS', UNIT_PH[x.unit]||'reps', String(v.reps)]);
-              const steps=raw.map(st=>{
-                const tk=this._poolTextKey(sec.key, x, st[0]);
-                const typed=pt[tk];
-                return { label:st[1], ph:st[2], val:typed!=null?typed:st[3],
-                  valInk:ticked?'#7c7c84':'#eef0f2',
-                  ink:ticked?'#4a4a52':'#c9c9d2',
-                  bd:ticked?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.16)',
-                  cursor:ticked?'default':'pointer',
-                  type:(e)=>{ if(!ticked) this.typePoolVal(sec.key, x, item, st[0], e); },
-                  dec:stepIt(st[0],-1), inc:stepIt(st[0],1) };
-              });
-              const setsTxt=(x.setsMax && x.setsMax>x.sets) ? (x.sets+'\u2013'+x.setsMax) : String(x.sets||1);
-              const repsTxt=(x.repsMax && x.repsMax>x.reps) ? (x.reps+'\u2013'+x.repsMax) : String(x.reps||0);
-              const unitTxt=UNIT_TARGET[x.unit]||'';
-              const side=x.perSide?' \u00b7 PER SIDE':'';
-              /* A single set of something counted in its own unit reads as the count alone —
-                 "3–5 CLIMBS", not "1 SETS × 3–5 CLIMBS". */
-              const onlyOne=x.unit && (x.sets||1)===1 && (x.setsMax||1)===1;
-              const target=onlyOne ? (repsTxt+unitTxt)
-                : (setsTxt+' '+(x.setsLabel||'SETS')+' \u00d7 '+repsTxt+unitTxt);
-              return { name:x.name, steps,
-                target:ticked?'LOGGED':(target+side),
-                targetInk:ticked?'var(--forge-accent)':'#8f8f99',
-                label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
-                ink:inSession?'var(--forge-add-on)':'var(--forge-add-ink)',
-                bg:inSession?'transparent':'var(--forge-add-bg)',
-                bd:inSession?'var(--forge-add-on)':'var(--forge-add-bg)',
-                group:x.group||'',
-                add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part,
-                  {weight:this._poolClamp('weight', v.weight), reps:this._poolClamp('reps', v.reps)}); } };
-            })),
+            poolGroups:this._poolGroups(((sec.pool||{})[pool]||[]).map(x=>mapPoolItem(sec, x))),
             hasList:sec.key==='full-body' || !!list.length, noItems:!list.length,
             doneLabel:n+'/'+list.length+' LOGGED',
             modes:[['day','DAILY'],['date','SCHEDULED']].map(m=>({
@@ -19516,10 +19590,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           forgeShowMental:centre==='mental',
           forgeShowEmpty:centre!=='home' && centre!=='health' && centre!=='mental' && !(centre==='training' && trainSections.length),
           forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
-          trainSections:trainSections, trainPicker:trainPicker
+          trainSections:trainSections, trainPicker:trainPicker,
+          trainSearch:S.trainSearch||'', setTrainSearch:(e)=>this.setState({trainSearch:e.target.value}),
+          clearTrainSearch:()=>this.setState({trainSearch:''}),
+          hasTrainSearch:hasTrainSearch, noTrainSearch:noTrainSearch,
+          noTrainSearchResults:noTrainSearchResults, trainSearchResults:trainSearchResults,
+          trainSearchCount:trainSearchCount,
+          trainSearchCountLabel:trainSearchCount+' match'+(trainSearchCount===1?'':'es')
         };
       }, { forgeCentres:[], forgeShowHome:false, forgeShowHealth:false, forgeShowMental:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[],
-           hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'var(--ab-muted)', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true }),
+           hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'var(--ab-muted)', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true,
+           trainSearch:'', setTrainSearch:()=>{}, clearTrainSearch:()=>{}, hasTrainSearch:false, noTrainSearch:true,
+           noTrainSearchResults:false, trainSearchResults:[], trainSearchCount:0, trainSearchCountLabel:'' }),
       ...this._safe(()=>{
         const anthCfg=this._provCfg('anthropic'); const aiConnected=!!(anthCfg.saved && anthCfg.on!==false);
         const aiStatusLabel=!anthCfg.saved?'NOT CONNECTED':anthCfg.on===false?'DISABLED':(anthCfg.status==='error'?'ERROR':'CONNECTED');
