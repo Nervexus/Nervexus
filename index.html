@@ -325,6 +325,42 @@
              --lc-rim:rgba(255,255,255,0.11); --lc-rim-low:rgba(255,255,255,0.025); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
 
+  /* ---- QUICK LOG — its own frosted-glass look ---------------------------------------
+     Built off a reference image directly rather than the pearl system: a blurred, colour-
+     shifting gradient panel (cool grey into warm amber), white text, underlined fields with
+     no boxes, a black pill for the one committing action and a white pill for the additive
+     one. Deliberately not themed to the raiment — this is a screen glanced at mid-set, not
+     a page lived in, and it should look like nothing else in the app. */
+  .qlog-card{
+    position:relative; z-index:1; width:100%; max-width:400px; overflow:hidden;
+    border-radius:36px; padding:34px 26px 28px; box-sizing:border-box;
+    background:
+      radial-gradient(120% 90% at 12% 0%, rgba(255,255,255,0.32) 0%, transparent 55%),
+      radial-gradient(140% 100% at 92% 100%, rgba(255,190,120,0.55) 0%, transparent 58%),
+      linear-gradient(165deg, #6d7278 0%, #97968f 45%, #cdc4b3 100%);
+    box-shadow:0 30px 80px rgba(0,0,0,0.45);
+  }
+  .qlog-sheen{ position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at 28% 18%, rgba(255,255,255,0.28), transparent 62%); }
+  .qlog-title{ font-family:'Inter',sans-serif; font-weight:700; font-size:26px; line-height:1.15; color:#fff; }
+  .qlog-sub{ margin-top:14px; font-size:13px; line-height:1.55; color:rgba(255,255,255,0.78); max-width:290px; }
+  .qlog-input{
+    flex:1; min-width:0; background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.5);
+    color:#fff; font-size:14px; padding:6px 2px 9px; outline:none; font-family:'Inter',sans-serif;
+  }
+  .qlog-input::placeholder{ color:rgba(255,255,255,0.55); }
+  .qlog-pill-ghost{
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    background:#fff; color:#101012; font-weight:700; font-size:14px;
+    border-radius:999px; padding:14px; cursor:pointer;
+  }
+  .qlog-pill-dark{
+    display:flex; align-items:center; justify-content:center;
+    background:#101012; color:#fff; font-weight:700; font-size:14px;
+    border-radius:999px; padding:15px; cursor:pointer;
+  }
+  @media (max-width:480px){ .qlog-card{ max-width:100%; padding:28px 20px 24px; } }
+
   /* The month across the top, then the clock and the day side by side under it. The clock
      is a fixed measure — it holds a dial and three rows and nothing else — so the day takes
      whatever is left, which is where the list and the whole add form live. */
@@ -1117,6 +1153,40 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <span onClick="{{ confirmWoImport }}" class="cc-glowbtn" style="flex:1; text-align:center; padding:12px; border-radius:11px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-weight:700; font-size:13px;">Add All ({{ woImportRowCount }})</span>
             </div>
           </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- QUICK LOG — one block per set, typed standing at the rack, no review step: the
+         moment "Add to Log" is pressed it's in. Its own frosted-glass look on purpose, styled
+         off a reference the owner sent rather than the app's usual pearl card — a distinct
+         look for a screen you glance at between sets and want to feel unmistakably different
+         from everything else, not another card among cards. -->
+    <sc-if value="{{ quickLogOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ closeQuickLog }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; padding:24px;">
+        <div onClick="{{ stopProp }}" class="qlog-card">
+          <div class="qlog-sheen"></div>
+          <div style="position:relative; z-index:1;">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+              <div class="qlog-title">Quick<br>Log</div>
+              <span onClick="{{ closeQuickLog }}" style="cursor:pointer; color:rgba(255,255,255,0.75); font-size:22px; line-height:1; padding:2px;">×</span>
+            </div>
+            <div class="qlog-sub">One block per set. Whatever you type — "Bench 80kg 4x8" or just a name — it lands in your training log.</div>
+            <div style="margin-top:26px; display:flex; flex-direction:column; gap:18px;">
+              <sc-for list="{{ quickLogBlocks }}" as="b" hint-placeholder-count="1">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <input value="{{ b.v }}" onInput="{{ b.set }}" placeholder="e.g. Bench press 80kg 4x8" class="qlog-input">
+                  <sc-if value="{{ b.showRemove }}" hint-placeholder-val="{{ false }}">
+                    <span onClick="{{ b.remove }}" style="cursor:pointer; color:rgba(255,255,255,0.55); font-size:18px; line-height:1; flex:0 0 auto;">×</span>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div onClick="{{ addQuickLogBlock }}" class="qlog-pill-ghost" style="margin-top:22px;">
+              <span style="font-size:15px; line-height:1;">+</span> Add another
+            </div>
+            <div onClick="{{ submitQuickLog }}" class="qlog-pill-dark" style="margin-top:12px;">Add to Log</div>
+          </div>
         </div>
       </div>
     </sc-if>
@@ -3359,7 +3429,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <span class="lc-badge">01 - LG</span>
                 <div class="lc-title">Log Training</div>
               </div>
-              <span onClick="{{ openWoImport }}" style="width:fit-content; margin:0 0 10px auto; display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:var(--lc-muted); cursor:pointer; border:1px solid var(--lc-line); border-radius:8px; padding:5px 10px;"><span class="icon-inherit" style="width:11px; height:11px; flex:0 0 11px; display:flex;" data-icon="upload"></span>Bulk Import</span>
+              <div style="display:flex; gap:8px; width:fit-content; margin:0 0 10px auto;">
+                <span onClick="{{ openQuickLog }}" title="One block per set, added as you finish it — for logging mid-workout" style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:var(--lc-muted); cursor:pointer; border:1px solid var(--lc-line); border-radius:8px; padding:5px 10px;"><span class="icon-inherit" style="width:11px; height:11px; flex:0 0 11px; display:flex;" data-icon="bolt"></span>Quick Log</span>
+                <span onClick="{{ openWoImport }}" style="display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:var(--lc-muted); cursor:pointer; border:1px solid var(--lc-line); border-radius:8px; padding:5px 10px;"><span class="icon-inherit" style="width:11px; height:11px; flex:0 0 11px; display:flex;" data-icon="upload"></span>Bulk Import</span>
+              </div>
               <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:8px;">
                 <sc-for list="{{ woParts }}" as="p" hint-placeholder-count="8"><span onClick="{{ p.pick }}" style="font-size:11.5px; color:{{ p.c }}; border:1px solid {{ p.b }}; border-radius:8px; padding:6px 12px; cursor:pointer; background:{{ p.bg }};">{{ p.name }}</span></sc-for>
               </div>
@@ -9143,7 +9216,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.17-342 · v11.342 ai-hub-phone-fix';
+const NOTIF_BUILD_VERSION = '2026.09.18-343 · v11.343 quick-log';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9217,6 +9290,7 @@ class Component extends DCLogic {
       workouts: s.workouts || [],
       woPart:'Chest', woRange:'Week', woEx:'', woMin:'', woWeight:'', woUnit:'kg', woBodyWeight:'', woSets:'', woReps:'', bodySex:s.bodySex||'male', fitChat:[], fitInput:'', bizChat:[], bizInput:'',
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
+      quickLogOpen:false, quickLogBlocks:s.quickLogBlocks||[''],
       rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
       gentSub:'test', gentIdx:0, gentTestIdx:0,
       // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
@@ -13832,6 +13906,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          painted by the platform in its own colours — a blue iOS glyph sitting on an ivory
          card — and cannot take the colour of the control it is inside. This can. */
       upload:'<path d="M9 11.6V2.8"/><path d="M5.6 6.2 9 2.8l3.4 3.4"/><path d="M2.8 11.2v3.1a0.9 0.9 0 0 0 0.9 0.9h10.6a0.9 0.9 0 0 0 0.9-0.9v-3.1"/>',
+      // A struck bolt, drawn rather than the ⚡ emoji, for the same reason as upload above.
+      bolt:'<path d="M9.8 1.6 3.4 10.2h4l-1.2 6.2 6.4-8.6h-4z" fill="currentColor" stroke="none"/>',
       /* The Gentlemen Center's mark, drawn in the same language as the Forge's rather than as
          a picture of a hat: a bow tie as two struck triangles about a solid knot, sitting on
          the house rule with its paired end-dots. The first version was a literal top hat —
@@ -14163,6 +14239,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.343', date:'Sep 18, 2026', major:true, notes:[
+      'Quick Log, on the Forge’s Log Training card: one block per set, typed standing at the rack, "Add another" for the next one, and it’s in your log the moment you press Add — no review screen, unlike Bulk Import which is built for pasting a whole session after the fact. Its own glass look on purpose, not the pearl every other screen sits on.',
+    ]},
     {version:'v11.342', date:'Sep 17, 2026', major:false, notes:[
       'Checked every page on a phone width, not just Settings. The AI Command Center’s connect/retest row had the same flex-row overflow the Voice tab did — fixed there too. Everything else (the horizontally-scrolling subject and Gentlemen tab strips, the voice orb that deliberately bleeds past the frame) turned out to be working as designed.',
     ]},
@@ -17585,6 +17664,41 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // Syncs the entered weight into the real Health body-weight tracker — one real number,
     // not a second copy that only lives inside this import.
     if(usedBw) this.addWeight(bw);
+  }
+  /* ---- Quick Log — one block per set, typed standing at the rack -----------------------
+     Bulk Import wants a whole session pasted at once, reviewed before anything is added —
+     right after a workout, not mid-set. This is the other end of it: no review step, one
+     line at a time, added the moment you're done. Reuses the same local parser Bulk Import
+     runs first, so "Bench press 80kg 4x8" in either place lands the same way. A block that
+     doesn't parse into sets/reps/weight still isn't dropped — it's logged as a named entry
+     with nothing filled in rather than silently discarded, since a fast note typed at the
+     rack is worth keeping even half-formed. */
+  openQuickLog(){ this.setState({quickLogOpen:true, quickLogBlocks:['']}); }
+  closeQuickLog(){ this.setState({quickLogOpen:false}); }
+  setQuickLogBlock(i,e){ const v=e&&e.target?e.target.value:e;
+    this.mut(s=>{ const b=[...(s.quickLogBlocks||[''])]; b[i]=v; return {quickLogBlocks:b}; }); }
+  addQuickLogBlock(){ this.mut(s=>({quickLogBlocks:[...(s.quickLogBlocks||['']), '']})); }
+  removeQuickLogBlock(i){ this.mut(s=>{
+    const b=(s.quickLogBlocks||['']).filter((_,idx)=>idx!==i);
+    return {quickLogBlocks: b.length?b:['']}; }); }
+  submitQuickLog(){
+    const blocks=(this.state.quickLogBlocks||[]).map(b=>(b||'').trim()).filter(Boolean);
+    if(!blocks.length) return;
+    const now=Date.now(); const entries=[];
+    blocks.forEach(text=>{
+      const rows=this._localParseWorkoutText(text);
+      if(rows.length){
+        rows.forEach(r=>entries.push({ id:this._uuid(), part:r.part, exercise:r.exercise, min:r.minutes||0,
+          weight:r.weight||0, unit:r.unit||'kg', sets:r.sets||0, reps:r.reps||0, ts:now-entries.length }));
+      } else {
+        entries.push({ id:this._uuid(), part:this._guessBodyPart(text), exercise:text.slice(0,60), min:0,
+          weight:0, unit:'kg', sets:0, reps:0, ts:now-entries.length });
+      }
+    });
+    this.mut(s=>({workouts:[...s.workouts, ...entries]}));
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:null,distance_unit:null,occurred_at:new Date(e.ts).toISOString()}));
+    this.showToast('fitness','Logged to your training log', entries.length+' entr'+(entries.length===1?'y':'ies')+' added.');
+    this.setState({quickLogOpen:false, quickLogBlocks:['']});
   }
   monthly(year){ const y=year!=null?year:new Date().getFullYear(); const inc=Array(12).fill(0), exp=Array(12).fill(0);
     this.state.income.forEach(i=>{ const d=new Date(i.ts); if(d.getFullYear()===y) inc[d.getMonth()]+=(+i.amt||0); });
@@ -21172,6 +21286,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           importDayLabel: dayOff===0?'Logging for Today':(dayOff===1?'Logging for Yesterday':'Logging for '+this._niceDate(this._locDate(-dayOff))),
           woImportBodyWeight:S.woImportBodyWeight||(()=>{ const bl=S.health&&S.health.bodyLog; const last=bl&&bl.length?bl[bl.length-1]:null; return last&&last.weightKg!=null?String(Math.round(last.weightKg)):''; })(),
           setWoImportBodyWeight:(e)=>this.setState({woImportBodyWeight:e.target.value}),
+        };
+      }, {}),
+
+      ...this._safe(()=>{
+        const blocks=(S.quickLogBlocks&&S.quickLogBlocks.length)?S.quickLogBlocks:[''];
+        return {
+          quickLogOpen:!!S.quickLogOpen, openQuickLog:()=>this.openQuickLog(), closeQuickLog:()=>this.closeQuickLog(),
+          quickLogBlocks: blocks.map((v,i)=>({
+            v, i, set:(e)=>this.setQuickLogBlock(i,e), remove:()=>this.removeQuickLogBlock(i),
+            showRemove: blocks.length>1,
+          })),
+          addQuickLogBlock:()=>this.addQuickLogBlock(), submitQuickLog:()=>this.submitQuickLog(),
         };
       }, {}),
 
