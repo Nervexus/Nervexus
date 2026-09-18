@@ -1202,7 +1202,14 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div onClick="{{ addQuickLogBlock }}" class="qlog-pill-ghost" style="margin-top:22px;">
                 <span style="font-size:15px; line-height:1;">+</span> Add another
               </div>
-              <div onClick="{{ submitQuickLog }}" class="qlog-pill-dark" style="margin-top:12px;">Add to Log</div>
+              <div onClick="{{ reviewQuickLog }}" class="qlog-pill-dark" style="margin-top:12px;">Add to Log</div>
+            </sc-if>
+            <!-- A second confirm, the same one-button shape as the first — this one writes to
+                 the real log, so it gets asked for rather than assumed. -->
+            <sc-if value="{{ isQuickLogReview }}" hint-placeholder-val="{{ false }}">
+              <div class="qlog-sub" style="margin-top:18px;">{{ quickLogReviewMsg }}</div>
+              <div onClick="{{ submitQuickLog }}" class="qlog-pill-dark" style="margin-top:26px;">Confirm</div>
+              <div onClick="{{ backQuickLogToForm }}" class="qlog-pill-ghost" style="margin-top:10px; background:transparent; border:1px solid rgba(255,255,255,0.5); color:#fff;">Back</div>
             </sc-if>
           </div>
         </div>
@@ -17704,6 +17711,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   openQuickLog(){ this.setState({quickLogOpen:true, quickLogStep:'confirm', quickLogGreetIdx:Math.floor(Math.random()*3), quickLogBlocks:['']}); }
   closeQuickLog(){ this.setState({quickLogOpen:false}); }
   confirmQuickLog(){ this.setState({quickLogStep:'log'}); }
+  /* "Add to Log" writes to a real record rather than a draft — a second confirm, the same
+     one-button shape again, before anything is actually saved. Guarded the same way
+     submitQuickLog is: nothing typed means nothing to confirm. */
+  reviewQuickLog(){
+    const n=(this.state.quickLogBlocks||[]).map(b=>(b||'').trim()).filter(Boolean).length;
+    if(!n) return;
+    this.setState({quickLogStep:'review'});
+  }
+  backQuickLogToForm(){ this.setState({quickLogStep:'log'}); }
   setQuickLogBlock(i,e){ const v=e&&e.target?e.target.value:e;
     this.mut(s=>{ const b=[...(s.quickLogBlocks||[''])]; b[i]=v; return {quickLogBlocks:b}; }); }
   addQuickLogBlock(){ this.mut(s=>({quickLogBlocks:[...(s.quickLogBlocks||['']), '']})); }
@@ -21320,16 +21336,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
       ...this._safe(()=>{
         const blocks=(S.quickLogBlocks&&S.quickLogBlocks.length)?S.quickLogBlocks:[''];
-        const isConfirm=(S.quickLogStep||'confirm')==='confirm';
+        const step=S.quickLogStep||'confirm';
+        const filledCount=blocks.map(b=>(b||'').trim()).filter(Boolean).length;
         return {
           quickLogOpen:!!S.quickLogOpen, openQuickLog:()=>this.openQuickLog(), closeQuickLog:()=>this.closeQuickLog(),
-          isQuickLogConfirm:isConfirm, isQuickLogForm:!isConfirm, confirmQuickLog:()=>this.confirmQuickLog(),
+          isQuickLogConfirm:step==='confirm', isQuickLogForm:step==='log', isQuickLogReview:step==='review',
+          confirmQuickLog:()=>this.confirmQuickLog(),
           quickLogGreeting: this._quickLogGreetings()[S.quickLogGreetIdx||0],
           quickLogBlocks: blocks.map((v,i)=>({
             v, i, set:(e)=>this.setQuickLogBlock(i,e), remove:()=>this.removeQuickLogBlock(i),
             showRemove: blocks.length>1,
           })),
-          addQuickLogBlock:()=>this.addQuickLogBlock(), submitQuickLog:()=>this.submitQuickLog(),
+          addQuickLogBlock:()=>this.addQuickLogBlock(),
+          reviewQuickLog:()=>this.reviewQuickLog(), backQuickLogToForm:()=>this.backQuickLogToForm(),
+          submitQuickLog:()=>this.submitQuickLog(),
+          quickLogReviewMsg: 'Add '+filledCount+' entr'+(filledCount===1?'y':'ies')+' to your training log?',
         };
       }, {}),
 
