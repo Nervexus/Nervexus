@@ -272,11 +272,13 @@ t('the entry survives what Supabase can actually store', async () => {
 });
 
 /* ---- the pearl ground --------------------------------------------------------------------
-   The sit is its own place rather than a card over the app: the same pearl field every card
-   in the app now sits on, filling the whole screen, one hairline down the middle, and
-   everything said in the lower third. Light on every raiment but Noir, which gets it inverted
-   — the same rule the pearl ground already applies everywhere else it is used. */
-t('it is the pearl ground, and the dark one only on Noir', async () => {
+   The sit is its own place rather than a card over the app: the same ground every card in the
+   app now sits on, filling the whole screen, one hairline down the middle, and everything
+   said in the lower third. The ground itself is Ultra X's original — a flat warm cream — and
+   that no longer varies with the raiment, Noir included: block design was reverted to one
+   fixed look everywhere, on purpose, so what used to invert for Noir now stays exactly the
+   same as the other three. */
+t('it is the pearl ground, Ultra X\'s original, the same on every raiment now including Noir', async () => {
   const read = async (raiment) => {
     await boot();
     await page.evaluate((r) => window.__nvx.setState({
@@ -292,15 +294,12 @@ t('it is the pearl ground, and the dark one only on Noir', async () => {
                field: !!document.querySelector('.lcb-field'), thread: !!document.querySelector('.rest-thread'), card: !!card };
     });
   };
-  for (const raiment of ['Ultra X', 'Maison Élysée', 'Maison Éverpine']) {
+  for (const raiment of ['Ultra X', 'Maison Élysée', 'Maison Éverpine', 'Noir']) {
     const r = await read(raiment);
     ok(r.field && r.thread && r.card, raiment + ': the scene did not render');
     ok(r.groundLum > 200, raiment + ' is not the light pearl: ground brightness ' + Math.round(r.groundLum));
     ok(r.inkLum < 120, raiment + ': the ink is not dark enough to read on it (' + Math.round(r.inkLum) + ')');
   }
-  const noir = await read('Noir');
-  ok(noir.groundLum < 40, 'Noir is not the dark pearl: ground brightness ' + Math.round(noir.groundLum));
-  ok(noir.inkLum > 180, 'Noir’s ink is not light enough to read on it (' + Math.round(noir.inkLum) + ')');
 });
 
 t('the layout is the mark, the thread, then everything in the lower third', async () => {

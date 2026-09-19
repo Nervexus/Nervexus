@@ -637,7 +637,7 @@ t('the level ring follows the raiment, not a hard-coded white', async () => {
   ok(n && n.r > 230 && n.g > 230 && n.b > 230, 'Noir should lead with white, got ' + JSON.stringify(n));
 });
 
-t('the stats and ranks take the raiment accent, not the old fixed red', async () => {
+t('the stats and ranks bind to --lc-accent, not the old fixed red', async () => {
   /* --u-accent (the old rewrite system's token) and --quiet-ink/--lc-accent are not the same
      colour for Ultra X or Éverpine, so the producers were rewritten to emit var(--lc-accent)
      directly rather than lean on the string-matching rewrite rules. Reading getComputedStyle
@@ -660,14 +660,18 @@ t('the stats and ranks take the raiment accent, not the old fixed red', async ()
     const num = row.querySelector('span');
     return num ? getComputedStyle(num).color : null;
   });
-  for (const [style, want] of [['Ultra X', 'rgb(91, 26, 26)'], ['Maison Élysée', 'rgb(60, 90, 125)']]) {
+  /* --lc-accent itself was later fixed to Ultra X's original ink for every raiment (block
+     design reverted, on purpose), so the per-raiment colours this used to expect are now one
+     colour everywhere — the binding to --lc-accent is still what's being proven here, just
+     pinned to its current, single value rather than one per raiment. */
+  for (const style of ['Ultra X', 'Maison Élysée']) {
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(900);
     const raw = await dayStreakStyle();
     ok(raw, 'DAY STREAK is missing on ' + style);
     ok(!/#ff5563/i.test(raw), style + ': DAY STREAK is carrying the old literal hex again: ' + raw);
     ok(/var\(--lc-accent\)/.test(raw), style + ': DAY STREAK should bind to --lc-accent, got: ' + raw);
-    eq(await curRankColour(), want, style + ': the current-rank row is not the raiment ink');
+    eq(await curRankColour(), 'rgb(41, 37, 36)', style + ': the current-rank row is not the fixed block-design ink');
   }
 });
 

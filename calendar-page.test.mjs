@@ -216,16 +216,19 @@ const dropZone = (label) => page.evaluate((want) => {
   };
 }, label);
 
-t('the import controls take the raiment, not a hard-coded dark-theme grey', async () => {
+t('the import controls are legible, the same fixed ink on every raiment', async () => {
   /* They were a white dashed border and #c3c3ca text — written for a dark background and
-     very nearly invisible on an ivory card. */
+     very nearly invisible on an ivory card. Block design was later reverted to Ultra X's
+     original and made the same for every raiment (Noir included), so the raiment-tracking
+     ink this test used to check for is gone on purpose — what still matters is that it is
+     never the old dark-theme grey again. */
   await boot();
-  for (const [style, want] of [['Ultra X', 'rgb(91, 26, 26)'], ['Maison Élysée', 'rgb(60, 90, 125)'], ['Noir', 'rgb(196, 189, 176)']]) {
+  for (const style of ['Ultra X', 'Maison Élysée', 'Noir']) {
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(900);
     const z = await dropZone('Import work rota');
     ok(z, 'the rota import is missing on ' + style);
-    eq(z.ink, want, style + ': the label is not the raiment ink');
+    eq(z.ink, 'rgb(41, 37, 36)', style + ': the label is not the fixed block-design ink');
     eq(z.style, 'dashed', style + ': it should still read as a drop zone');
     ok(z.border !== 'rgba(255, 255, 255, 0.2)', style + ': the border is still the dark-theme white');
   }
@@ -320,45 +323,27 @@ t('the panels are glass over a lit ground', async () => {
   ok(b.glass && b.inside, 'the panels are not glass over it');
 });
 
-t('the ground shares one bloom, with a small lean toward each raiment\'s own hue', async () => {
-  /* It used to be lit in each raiment's accent outright — oxblood, gold, blue, green — then
-     became one pearl shared bit-for-bit across every light raiment, which read as colourless
-     on the two raiments most defined by their colour. Asked for directly afterward: Ultra X
-     wants a slight red lean, Maison a slight baby-blue one, nothing bigger. The warm/cool
-     bloom on top — the part that actually reads as "pearl" — is still exactly one shared
-     thing; only the base tone underneath it leans per raiment now. */
+t('the ground is the same flat cream on every raiment, Noir included', async () => {
+  /* Block design was reverted to Ultra X's original: a flat warm cream ground, no bloom, the
+     same for every raiment rather than the shared pearl bloom with a per-raiment lean this
+     test used to check for. Noir used to get the same bloom inverted to graphite; now it gets
+     the identical flat cream everything else does — that inversion is gone on purpose. */
   const seen = {};
-  for (const style of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
+  for (const style of ['Ultra X', 'Noir', 'Maison \u00c9lys\u00e9e', 'Maison \u00c9verpine']) {
     await boot();
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(800);
     seen[style] = await page.evaluate(() => {
       const cs = getComputedStyle(document.querySelector('.cc-shell'));
       return { lit: cs.getPropertyValue('--lcb-lit').trim(), dim: cs.getPropertyValue('--lcb-dim').trim(),
-               far: cs.getPropertyValue('--lcb-far').trim() };
+               far: cs.getPropertyValue('--lcb-far').trim(), near: cs.getPropertyValue('--lcb-near').trim() };
     });
-    ok(seen[style].lit && seen[style].dim, style + ': the ground has lost its bloom');
   }
-  /* The bloom itself is still shared outright across the three light raiments. */
-  const bloom = ['Ultra X', 'Maison Élysée', 'Maison Éverpine'].map(k => JSON.stringify({ lit: seen[k].lit, dim: seen[k].dim }));
-  eq(new Set(bloom).size, 1, 'the light raiments are not sharing one bloom: ' + bloom.join(' | '));
-  /* Ultra X leans warm (more red than blue), Maison leans cool (more blue than red), and
-     neither matches the other or Éverpine, which was not asked for a tint of its own. */
-  const rgb = (h) => { const m = h.replace('#', ''); return [parseInt(m.slice(0, 2), 16), parseInt(m.slice(4, 6), 16)]; };
-  const x = rgb(seen['Ultra X'].far), m = rgb(seen['Maison Élysée'].far);
-  ok(x[0] > x[1], 'Ultra X ground should lean red, got ' + seen['Ultra X'].far);
-  ok(m[1] > m[0], 'Maison ground should lean blue, got ' + seen['Maison Élysée'].far);
-  ok(seen['Ultra X'].far !== seen['Maison Élysée'].far, 'Ultra X and Maison should not share the exact same ground tint');
-  eq(seen['Maison Éverpine'].far, '#C6C4C2', 'Éverpine\'s ground moved even though only Ultra X and Maison were asked for a tint');
-  /* Noir is the same bloom in graphite — the one thing that follows the raiment is how light
-     it is, because its panels are pale ink on translucent white and a pale ground under those
-     is pale on pale. */
-  const chan = (c) => (String(c).match(/[\d.]+/g) || []).map(Number);
-  const lit = chan(seen['Ultra X'].lit), noirLit = chan(seen['Noir'].lit);
-  eq(lit.slice(0, 3).join(','), noirLit.slice(0, 3).join(','), 'Noir is a different hue, not the same pearl darker');
-  ok(noirLit[3] < lit[3], 'Noir should be the dimmer of the two, got ' + noirLit[3] + ' against ' + lit[3]);
-  const darker = (h) => parseInt(h.replace('#', '').slice(0, 2), 16);
-  ok(darker(seen['Noir'].far) < darker(seen['Ultra X'].far), 'Noir is not the darker ground');
+  for (const style of Object.keys(seen)) {
+    eq(seen[style].far, '#EFEBE3', style + ': the ground is not Ultra X\'s original cream');
+    eq(seen[style].near, '#EFEBE3', style + ': far and near should be the same flat tone, not a gradient');
+    ok(/rgba\(0,\s*0,\s*0,\s*0\)/.test(seen[style].lit), style + ': the old bloom is still lit: ' + seen[style].lit);
+  }
 });
 
 t('the ground tightens on a phone rather than keeping a desktop margin', async () => {
