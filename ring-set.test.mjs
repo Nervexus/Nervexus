@@ -139,7 +139,10 @@ t('a near-white ring is backed so it can be seen on an ivory card', async () => 
   ok(pale.cream, 'champagne is light enough to need backing where a card is ivory');
 });
 
-t('the light raiments are the ivory ones', async () => {
+t('every raiment wearing the ring set is on the ivory card now, Noir included', async () => {
+  /* The block-design revert made every raiment's card the same ivory one, Noir included, so
+     its white ring needs the same pale backing Ultra X and Maison Élysée already get — it is
+     no longer sitting on the dark card this palette was originally written for. */
   const light = await page.evaluate(() => {
     const out = {};
     for (const st of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine']) {
@@ -151,7 +154,7 @@ t('the light raiments are the ivory ones', async () => {
   });
   eq(light['Ultra X'], true, 'Ultra X is an ivory card');
   eq(light['Maison Élysée'], true, 'Maison Élysée is an ivory card');
-  eq(light['Noir'], false, 'Noir is dark; a white ring needs no help');
+  eq(light['Noir'], true, 'Noir wears the same ivory card the others do now');
   /* Éverpine's dark-green card only exists on the home scene, and no ring set lives there —
      on every page that has one, Éverpine is wearing the ivory card like Ultra X. */
   eq(light['Maison Éverpine'], true, 'Éverpine wears the ivory card wherever a ring set actually is');

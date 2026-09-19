@@ -1147,16 +1147,17 @@ t('typed numbers are held to the same limits as the buttons', async () => {
   eq(parseFloat(st.w[st.items[0].id]), 500, 'an out-of-range weight reached the session');
 });
 
-t('the Forge wordmark keeps its raiment accent, the card its fixed block-design ink', async () => {
+t('the Forge wordmark and the card both keep their raiment accent', async () => {
   /* Read back as the browser paints it, per element, because a token that fails to resolve
      leaves the text black rather than obviously wrong.
 
-     The wordmark ("THE FORGE") is old chrome outside the card system and still wears
-     --forge-accent, which still varies per raiment. The section title and TRAINING PRIORITY
-     are inside the pearl card block and wear --lc-accent/--quiet-ink instead — block design
-     was later reverted to Ultra X's original and made the same fixed ink for every raiment,
-     so the wordmark is checked for being painted at all but not for matching the card's own
-     two elements, which now always land on that one fixed colour. */
+     The wordmark ("THE FORGE") is old chrome outside the card system and wears
+     --forge-accent. The section title and TRAINING PRIORITY are inside the pearl card block
+     and wear --lc-accent/--quiet-ink instead — the block-design revert briefly fixed that to
+     one ink for every raiment, and a later pass brought each raiment's own colour back
+     (Ultra X's oxblood, Maison Élysée's blue, Éverpine's olive-gold, Noir's dark gold in
+     place of its old pale taupe), so the wordmark is checked for being painted at all but not
+     for matching the card's own two elements, which are their own token and can differ. */
   await openChest();
   const paint = (style) => page.evaluate((st) => {
     window.__nvx.setPref('theme', st === 'base' ? 'Lime' : 'Ultra');
@@ -1181,10 +1182,16 @@ t('the Forge wordmark keeps its raiment accent, the card its fixed block-design 
     seen[st] = got.tag;
   }
 
-  /* Block design was later reverted to Ultra X's original and made the same for every
-     raiment, so the card's own two elements now land on the same fixed ink everywhere. */
-  for (const st of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine', 'base'])
-    eq(seen[st], 'rgb(41, 37, 36)', st + ': the card is not the fixed block-design ink: ' + seen[st]);
+  /* The card's own two elements follow --lc-accent, which is the raiment's own colour again
+     for the four Ultra substyles; base (Lime) was left on the flat block-design ink since
+     nothing asked for Lime to have its own accent here. */
+  const want = {
+    'Ultra X': 'rgb(91, 26, 26)', 'Noir': 'rgb(138, 106, 42)',
+    'Maison Élysée': 'rgb(60, 90, 125)', 'Maison Éverpine': 'rgb(124, 106, 56)',
+    'base': 'rgb(41, 37, 36)',
+  };
+  for (const st of Object.keys(want))
+    eq(seen[st], want[st], st + ': the card is not the raiment\'s own accent: ' + seen[st]);
 
   await page.evaluate(() => window.__nvx.setPref('theme', 'Lime'));
   await page.waitForTimeout(400);

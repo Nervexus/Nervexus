@@ -660,18 +660,19 @@ t('the stats and ranks bind to --lc-accent, not the old fixed red', async () => 
     const num = row.querySelector('span');
     return num ? getComputedStyle(num).color : null;
   });
-  /* --lc-accent itself was later fixed to Ultra X's original ink for every raiment (block
-     design reverted, on purpose), so the per-raiment colours this used to expect are now one
-     colour everywhere — the binding to --lc-accent is still what's being proven here, just
-     pinned to its current, single value rather than one per raiment. */
-  for (const style of ['Ultra X', 'Maison Élysée']) {
+  /* --lc-accent was fixed to one ink for every raiment by the block-design revert and then
+     given the raiment's own colour back by a later pass (Ultra X's oxblood, Maison Élysée's
+     blue) — the binding to --lc-accent is still what's being proven here, just pinned to
+     each raiment's current value again rather than one flat colour. */
+  const want = { 'Ultra X': 'rgb(91, 26, 26)', 'Maison Élysée': 'rgb(60, 90, 125)' };
+  for (const style of Object.keys(want)) {
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(900);
     const raw = await dayStreakStyle();
     ok(raw, 'DAY STREAK is missing on ' + style);
     ok(!/#ff5563/i.test(raw), style + ': DAY STREAK is carrying the old literal hex again: ' + raw);
     ok(/var\(--lc-accent\)/.test(raw), style + ': DAY STREAK should bind to --lc-accent, got: ' + raw);
-    eq(await curRankColour(), 'rgb(41, 37, 36)', style + ': the current-rank row is not the fixed block-design ink');
+    eq(await curRankColour(), want[style], style + ': the current-rank row is not the raiment\'s own accent');
   }
 });
 

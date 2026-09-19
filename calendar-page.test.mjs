@@ -216,19 +216,20 @@ const dropZone = (label) => page.evaluate((want) => {
   };
 }, label);
 
-t('the import controls are legible, the same fixed ink on every raiment', async () => {
+t('the import controls are legible, and follow the raiment again', async () => {
   /* They were a white dashed border and #c3c3ca text — written for a dark background and
-     very nearly invisible on an ivory card. Block design was later reverted to Ultra X's
-     original and made the same for every raiment (Noir included), so the raiment-tracking
-     ink this test used to check for is gone on purpose — what still matters is that it is
-     never the old dark-theme grey again. */
+     very nearly invisible on an ivory card. The block-design revert briefly fixed this ink
+     to one flat colour for every raiment; a later pass brought the raiment's own accent back
+     (the same --lc-accent restore Forge and Power Level got), so this is back to tracking
+     each raiment's colour — just no longer the old dark-theme grey that started this. */
   await boot();
-  for (const style of ['Ultra X', 'Maison Élysée', 'Noir']) {
+  const want = { 'Ultra X': 'rgb(91, 26, 26)', 'Maison Élysée': 'rgb(60, 90, 125)', 'Noir': 'rgb(138, 106, 42)' };
+  for (const style of Object.keys(want)) {
     await page.evaluate((st) => { window.__nvx.setPref('theme', 'Ultra'); window.__nvx.setPref('ultraStyle', st); }, style);
     await page.waitForTimeout(900);
     const z = await dropZone('Import work rota');
     ok(z, 'the rota import is missing on ' + style);
-    eq(z.ink, 'rgb(41, 37, 36)', style + ': the label is not the fixed block-design ink');
+    eq(z.ink, want[style], style + ': the label is not the raiment\'s own accent');
     eq(z.style, 'dashed', style + ': it should still read as a drop zone');
     ok(z.border !== 'rgba(255, 255, 255, 0.2)', style + ': the border is still the dark-theme white');
   }

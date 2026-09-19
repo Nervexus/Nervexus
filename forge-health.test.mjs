@@ -201,14 +201,17 @@ t('Health wears the same card block Calendar and Power Level do', async () => {
   ok(p.rim, 'the panels have no lit rim');
 });
 
-t('every line and pill on it is the same fixed block-design colour, on every raiment', async () => {
-  /* The card stays the shared ivory/graphite pearl — that is the idea of it — and the things
-     drawn ON it used to be the raiment (Ultra X oxblood, Maison Élysée blue, Éverpine gold,
-     Noir white). Block design was later reverted to Ultra X's original and made the same for
-     every raiment, --lc-accent included, so those four different inks are now one fixed ink
-     everywhere — the point calendar-page.test.mjs already established for --lc-accent. */
-  const accent = 'rgb(41, 37, 36)';
-  for (const style of ['Ultra X', 'Maison Élysée', 'Maison Éverpine', 'Noir']) {
+t('every line and pill on it follows the raiment again', async () => {
+  /* The card stays the shared ivory pearl — that is the idea of it — but the things drawn ON
+     it (the title, the ADD pill) were briefly pinned to one fixed ink by the block-design
+     revert, then given the raiment's own accent back (Ultra X oxblood, Maison Élysée blue,
+     Éverpine olive-gold, Noir a dark gold in place of its old pale taupe, which read as
+     nearly nothing once its card went from graphite to the same ivory every raiment shares). */
+  const want = {
+    'Ultra X': 'rgb(91, 26, 26)', 'Maison Élysée': 'rgb(60, 90, 125)',
+    'Maison Éverpine': 'rgb(124, 106, 56)', 'Noir': 'rgb(138, 106, 42)',
+  };
+  for (const style of Object.keys(want)) {
     await boot('health', style);
     const got = await page.evaluate(() => {
       const title = document.querySelector('.lc-title');
@@ -216,8 +219,8 @@ t('every line and pill on it is the same fixed block-design colour, on every rai
       return { title: title ? getComputedStyle(title).color : '',
                pill: add ? getComputedStyle(add).backgroundColor : '' };
     });
-    eq(got.title, accent, style + ' the card title is not the fixed block-design ink');
-    eq(got.pill, accent, style + ' ADD is not the fixed block-design colour');
+    eq(got.title, want[style], style + ' the card title is not the raiment\'s own accent');
+    eq(got.pill, want[style], style + ' ADD is not the raiment\'s own accent');
   }
 });
 
