@@ -312,18 +312,21 @@ t('the stage, the block and the tab row keep their own colour regardless of raim
   eq(seen[0].block, seen[1].block, 'the block changed colour with the raiment');
 });
 
-t('every card is its own glass block: a header, then the rest', async () => {
+t('every card is its own bordered block: a header, then the rest', async () => {
+  /* The card was glass (a box-shadow) under the earlier redesigns. It now matches Learning
+     Center's own Ultra X card exactly — flat cream, a thin hairline border, no shadow at
+     all — so a border is what proves the block, not a shadow. */
   for (const sub of ['test', 'money', 'dining']) {
     await boot({ gentSub: sub });
     const f = await page.evaluate(() => {
       const card = document.querySelector('.gent-block');
       if (!card) return null;
       const head = card.querySelector('.gent-bhead');
-      return { glass: getComputedStyle(card).boxShadow !== 'none', head: !!head,
+      return { bordered: getComputedStyle(card).borderStyle !== 'none', head: !!head,
                body: !!card.querySelector('.gent-body, .gent-stats') };
     });
     ok(f, sub + ' has no card at all');
-    ok(f.glass, sub + ' card has no glass treatment');
+    ok(f.bordered, sub + ' card has no border');
     ok(f.head, sub + ' card has no header band');
     ok(f.body, sub + ' card has no body');
   }

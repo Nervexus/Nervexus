@@ -339,6 +339,20 @@
              --lc-bg:rgba(255,255,255,0.82); --lc-sub:rgba(255,255,255,0.5);
              --lc-rim:rgba(0,0,0,0); --lc-rim-low:rgba(0,0,0,0); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
+  /* Noir does not want the cream stage or the white block on the Forge specifically — a light
+     pane reads as a mismatch against the rest of the raiment's own dark chrome there in a way
+     it does not on Calendar, Power Level, Settings or Gentlemen. Scoped to the Forge scene by
+     its own data-screen-label rather than changed on .lcb-stage/.lc-card themselves, so those
+     other pages keep the shared white card exactly as before. */
+  .cc-shell.raiment-noir [data-screen-label="Forge"] .lcb-field{ background:none; }
+  .cc-shell.raiment-noir [data-screen-label="Forge"] .lc-card{
+    background:transparent; border-color:rgba(255,255,255,0.14); box-shadow:none; }
+  /* The card's own ink, muted tone and hairlines were the light-card set (dark grey on
+     white); transparent now reveals the raiment's actual dark chrome behind it, so these
+     need Noir's own light-on-dark values instead, matching --u-ink/--u-muted elsewhere. */
+  .cc-shell.raiment-noir [data-screen-label="Forge"] .lcb-stage{
+    color:#C4BDB0; --lc-muted:#968F82; --lc-line:rgba(196,189,176,0.22);
+    --lc-bg:rgba(255,255,255,0.06); --lc-sub:rgba(255,255,255,0.06); --lc-raise:rgba(255,255,255,0.06); }
 
   /* ---- QUICK LOG — its own frosted-glass look ---------------------------------------
      Built off a reference image directly rather than the pearl system: a blurred, colour-
@@ -386,17 +400,17 @@
   }
   @media (max-width:480px){ .qlog-card{ max-width:100%; padding:28px 20px 24px; } }
 
-  /* ---- GENTLEMEN CENTRE — Ultra X's original block design, placements untouched -----------
-     The layout below (a lit stage, glass blocks, a labelled header, card-at-a-time navigation
-     with a dot row) is unchanged from the reference-image pass that built it. What it's made
-     of has since been reverted to match every other block-design page in the app (the Forge,
-     Calendar, Power Level, Settings): Ultra X's original card, fixed for every raiment rather
-     than raiment-driven, the way Quick Log's colour is fixed too — a flat warm cream stage
-     (#EFEBE3), a near-opaque white glass block, dark ink, no bloom and no glass-edge highlight.
-     The accent — the filled nav pill, the progress fill, the eyebrow labels, the block's own
-     hairline and every divider — wears Ultra X's own oxblood rather than a neutral ink, so
-     the page actually reads as Ultra X's traditional theme instead of a colourless copy of
-     it; this, like the card material above it, is fixed and does not vary by raiment.
+  /* ---- GENTLEMEN CENTRE — Learning Center's Ultra X design, placements untouched ----------
+     The layout below (a lit stage, blocks, a labelled header, card-at-a-time navigation with
+     a dot row) is unchanged from the reference-image pass that built it. What it's made of
+     now matches the one other page in the app that was always Ultra X's own — Learning
+     Center: a flat warm cream stage (#EFEBE3), a flat cream card (not glass, no blur) with a
+     thin oxblood hairline, Cormorant Garamond serif for its content, dark ink, and moderate
+     (not full-pill) corners on every button. The accent — the filled button, the progress
+     fill, the eyebrow labels, the block's own hairline and every divider — wears Ultra X's
+     own oxblood rather than a neutral ink; muted secondary text takes Learning's own muted
+     brown rather than a grey. All of it is fixed and does not vary by raiment, the way
+     Quick Log's colour is fixed too.
 
      It is written here as #5B1B1A/rgba(91,27,26,…), one unit off true oxblood (#5B1A1A /
      91,26,26) and invisibly so — deliberately, not a typo. Learning Center and Home style
@@ -412,45 +426,46 @@
   .gent-tabs{ position:relative; display:flex; align-items:stretch; gap:6px; overflow-x:auto;
     padding-bottom:3px; margin-bottom:18px; -webkit-overflow-scrolling:touch; }
   .gent-tabs::-webkit-scrollbar{ display:none; }
+  /* Learning's own subject list is a plain rounded-rect with a background highlight when
+     active — no pill, no mono, no letter-spacing. Kept horizontal here (the reference-image
+     layout), just carrying that same plain look instead of a pill row. */
   .gent-tab{ flex:0 0 auto; white-space:nowrap; text-align:center; padding:10px 16px; cursor:pointer;
-    border-radius:999px; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.4px; }
-  /* Ultra X's original card: a flat bordered glass pane rather than the dark contrast or the
-     bloomed frosted glass earlier passes used. Fixed ink, since it never changes with the
-     raiment. */
-  .gent-block{ position:relative; border-radius:18px; padding:24px 26px; box-sizing:border-box;
-    background:rgba(255,255,255,0.82); border:1px solid rgba(91,27,26,0.16);
-    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    box-shadow:0 22px 50px rgba(58,42,32,0.10);
-    color:#3f3f46; display:flex; flex-direction:column; }
-  @media (max-width:900px){ .gent-block{ padding:18px 18px 20px; border-radius:16px; } }
+    border-radius:11px; font-size:13px; font-weight:600; }
+  /* Learning Center's own card: flat cream, a thin oxblood hairline, no blur and barely any
+     shadow — a bordered pane rather than a glass one. */
+  .gent-block{ position:relative; border-radius:14px; padding:24px 26px; box-sizing:border-box;
+    background:#FAF7F0; border:1px solid rgba(91,27,26,0.14);
+    font-family:'Cormorant Garamond',Georgia,serif;
+    color:#3A2A20; display:flex; flex-direction:column; }
+  @media (max-width:900px){ .gent-block{ padding:18px 18px 20px; border-radius:12px; } }
   .gent-bhead{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
     margin-bottom:20px; }
-  .gent-sub{ border-radius:14px; padding:14px 16px; box-sizing:border-box;
-    background:rgba(255,255,255,0.5); border:1px solid transparent; }
+  .gent-sub{ border-radius:12px; padding:14px 16px; box-sizing:border-box;
+    background:#F8F4EC; border:1px solid rgba(91,27,26,0.1); }
   /* gent-nav (BACK/NEXT, the dots, the progress bar) sits below the block, straight on the
      light stage — same dark-on-light ink as the block now wears, so nothing here has to
-     invert. NEXT is a filled dark pill, the one strong mark on the row; BACK stays a quiet
-     outline the way it does everywhere else in the app. */
+     invert. NEXT is a filled oxblood rect, the one strong mark on the row, at Learning's own
+     moderate radius rather than a full pill; BACK stays a quiet outline. */
   .gent-pill-light{ display:inline-flex; align-items:center; justify-content:center; gap:7px;
-    padding:11px 20px; border-radius:999px; cursor:pointer; white-space:nowrap;
-    background:#5B1B1A; color:#F5F1E8; font-family:'JetBrains Mono',monospace; font-size:10.5px;
-    letter-spacing:1.2px; font-weight:700; }
+    padding:11px 20px; border-radius:9px; cursor:pointer; white-space:nowrap;
+    background:#5B1B1A; color:#F5F1E8; font-family:'Cormorant Garamond',Georgia,serif; font-size:13.5px;
+    font-weight:600; }
   .gent-pill-ghost{ display:inline-flex; align-items:center; justify-content:center; gap:7px;
-    padding:11px 20px; border-radius:999px; cursor:pointer; white-space:nowrap;
-    background:transparent; color:#52525b; border:1px solid rgba(91,27,26,0.16);
-    font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.2px; }
+    padding:11px 20px; border-radius:9px; cursor:pointer; white-space:nowrap;
+    background:transparent; color:#8a6a5a; border:1px solid rgba(91,27,26,0.14);
+    font-family:'Cormorant Garamond',Georgia,serif; font-size:13.5px; font-weight:600; }
   .gent-nav{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:16px; }
   .gent-dots{ display:flex; gap:7px; align-items:center; flex-wrap:wrap; justify-content:center; }
   .gent-prog{ display:none; flex:1; height:4px; border-radius:3px; background:rgba(91,27,26,0.14); overflow:hidden; }
   .gent-prog > span{ display:block; height:100%; background:#5B1B1A; }
   @media (max-width:900px){ .gent-dots{ display:none; } .gent-prog{ display:block; } }
   .gent-stats{ display:grid; grid-template-columns:1fr 1fr; }
-  .gent-stat{ padding:16px 4px; border-top:1px solid rgba(91,27,26,0.16); }
+  .gent-stat{ padding:16px 4px; border-top:1px solid rgba(91,27,26,0.14); }
   .gent-stat:nth-child(-n+2){ border-top:0; }
   .gent-stat:nth-child(odd){ border-left:0; }
-  .gent-stat:not(:nth-child(odd)){ border-left:1px solid rgba(91,27,26,0.16); }
+  .gent-stat:not(:nth-child(odd)){ border-left:1px solid rgba(91,27,26,0.14); }
   .gent-row{ display:flex; align-items:center; justify-content:space-between; gap:10px;
-    padding:12px 0; border-top:1px solid rgba(91,27,26,0.16); }
+    padding:12px 0; border-top:1px solid rgba(91,27,26,0.14); }
   .gent-row:first-child{ border-top:0; }
 
   /* The month across the top, then the clock and the day side by side under it. The clock
@@ -765,7 +780,7 @@
   .blackhole-active .cc-top{ background:rgba(14,15,17,0.2) !important; backdrop-filter:blur(12px) brightness(1.2); -webkit-backdrop-filter:blur(12px) brightness(1.2); }
 
   @media (max-width:900px){ .cc-mobnav{ margin-bottom:env(safe-area-inset-bottom); } }
-  @media (max-width:1300px){ .cc-grid-globe{ grid-template-columns:1fr !important; } }  @media (max-width:900px){ .cc-shell{ grid-template-columns:1fr !important; } .cc-side{ display:none !important; } .cc-mobnav{ display:flex !important; } .cc-mobsheet-backdrop{ display:block !important; } .cc-grid2,.cc-grid-fin,.cc-grid-globe,.cc-grid-fit,.cc-grid-biz,.cc-grid-cal,.cc-money-cal-grid{ grid-template-columns:1fr !important; } .cc-stat4,.cc-stat5{ grid-template-columns:1fr 1fr !important; } .cc-scene{ padding:16px 14px 90px !important; } .cc-top{ padding:12px 14px !important; } .cc-search{ max-width:none !important; } .cc-nw{ display:none !important; } .cc-kbd{ display:none !important; } .cc-asstxt{ display:none !important; } .cc-asst{ padding:9px !important; } .cc-voiceorb{ bottom:82px !important; right:16px !important; width:54px !important; height:54px !important; } .cc-voiceorb canvas{ width:54px !important; height:54px !important; } .cc-toaststack{ left:12px !important; right:12px !important; max-width:none !important; top:68px !important; } }
+  @media (max-width:1300px){ .cc-grid-globe{ grid-template-columns:1fr !important; } }  @media (max-width:900px){ .cc-shell{ grid-template-columns:1fr !important; } .cc-side{ display:none !important; } .cc-mobnav{ display:flex !important; } .cc-mobsheet-backdrop{ display:block !important; } .cc-grid2,.cc-grid-fin,.cc-grid-globe,.cc-grid-fit,.cc-grid-biz,.cc-grid-cal,.cc-money-cal-grid{ grid-template-columns:minmax(0,1fr) !important; } .cc-stat4,.cc-stat5{ grid-template-columns:1fr 1fr !important; } .cc-scene{ padding:16px 14px 90px !important; } .cc-top{ padding:12px 14px !important; } .cc-search{ max-width:none !important; } .cc-nw{ display:none !important; } .cc-kbd{ display:none !important; } .cc-asstxt{ display:none !important; } .cc-asst{ padding:9px !important; } .cc-voiceorb{ bottom:82px !important; right:16px !important; width:54px !important; height:54px !important; } .cc-voiceorb canvas{ width:54px !important; height:54px !important; } .cc-toaststack{ left:12px !important; right:12px !important; max-width:none !important; top:68px !important; } }
   @media (max-width:560px){ .cc-stat4{ grid-template-columns:1fr !important; gap:12px !important; } .cc-stat5{ grid-template-columns:1fr !important; gap:12px !important; } .cc-grid-fin,.cc-grid-biz{ gap:12px !important; } }
 </style>
 <script src="vendor/supabase.min.js"></script>
@@ -3496,7 +3511,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
 
       <!-- ===== THE FORGE ===== -->
       <sc-if value="{{ isForge }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
+      <div data-screen-label="Forge" style="animation:rise .5s ease both;">
 
         <!-- The unit score, the tier and its strapline all measured standards that no longer
              exist, so they are gone with them. The crest and the wordmark stay: they name the
@@ -8288,11 +8303,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <sc-if value="{{ gentQShow }}" hint-placeholder-val="{{ true }}">
                   <div class="gent-block" style="min-height:360px;">
                     <div class="gent-bhead">
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:#5B1B1A;">{{ gentCat }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#52525b;">{{ gentQPos }}</span>
+                      <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentCat }}</span>
+                      <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentQPos }}</span>
                     </div>
                     <div class="gent-body" style="flex:1; display:flex; flex-direction:column; min-width:0;">
-                    <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.3; color:#3f3f46; margin-bottom:26px;">{{ gentQ }}</div>
+                    <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.3; color:#3A2A20; margin-bottom:26px;">{{ gentQ }}</div>
                     <div style="display:flex; flex-direction:column; gap:11px;">
                       <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
                         <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:15px; padding:18px 20px; border-radius:14px; border:1px solid {{ o.bd }}; background:{{ o.bg }}; color:{{ o.ink }}; font-size:16px; line-height:1.45; cursor:{{ o.cursor }};">
@@ -8304,9 +8319,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </div>
                     </div>
                     <sc-if value="{{ gentAnswered }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding-top:18px; margin-top:18px; border-top:1px solid rgba(91,27,26,0.16);">
+                      <div style="padding-top:18px; margin-top:18px; border-top:1px solid rgba(91,27,26,0.14);">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:{{ gentVerdictInk }}; margin-bottom:11px;">{{ gentVerdict }}</div>
-                        <div style="font-size:16.5px; line-height:1.65; color:#52525b;">{{ gentWhy }}</div>
+                        <div style="font-size:16.5px; line-height:1.65; color:#6b5a4e;">{{ gentWhy }}</div>
                       </div>
                     </sc-if>
                   </div>
@@ -8314,19 +8329,19 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <sc-if value="{{ gentResultShow }}" hint-placeholder-val="{{ false }}">
                   <div class="gent-block" style="min-height:360px;">
                     <div class="gent-bhead">
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:#5B1B1A;">TODAY&#39;S TEST</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#52525b;">{{ gentDateLabel }}</span>
+                      <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">TODAY&#39;S TEST</span>
+                      <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentDateLabel }}</span>
                     </div>
                     <div class="gent-body" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-                      <div style="font-family:'JetBrains Mono',monospace; font-size:52px; font-weight:700; color:#3f3f46; line-height:1;">{{ gentScore }}</div>
-                      <div style="font-size:18px; line-height:1.55; color:#52525b; margin-top:18px; max-width:52ch;">{{ gentResultLine }}</div>
+                      <div style="font-family:'JetBrains Mono',monospace; font-size:52px; font-weight:700; color:#3A2A20; line-height:1;">{{ gentScore }}</div>
+                      <div style="font-size:18px; line-height:1.55; color:#6b5a4e; margin-top:18px; max-width:52ch;">{{ gentResultLine }}</div>
                     </div>
-                    <div style="padding-top:6px; margin-top:18px; border-top:1px solid rgba(91,27,26,0.16);">
+                    <div style="padding-top:6px; margin-top:18px; border-top:1px solid rgba(91,27,26,0.14);">
                       <sc-for list="{{ gentReview }}" as="r" hint-placeholder-count="4">
                         <div class="gent-row">
                           <span style="font-size:14px; color:{{ r.ink }}; width:16px; flex:0 0 16px;">{{ r.mark }}</span>
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#52525b; width:120px; flex:0 0 120px;">{{ r.cat }}</span>
-                          <span style="flex:1; min-width:0; font-size:13.5px; color:#52525b; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.q }}</span>
+                          <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a; width:120px; flex:0 0 120px;">{{ r.cat }}</span>
+                          <span style="flex:1; min-width:0; font-size:13.5px; color:#6b5a4e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.q }}</span>
                         </div>
                       </sc-for>
                     </div>
@@ -8346,12 +8361,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="display:flex; flex-direction:column; gap:16px;">
                 <div class="gent-block">
                   <div class="gent-bhead" style="margin-bottom:8px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#52525b;">STANDING</span>
+                    <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">STANDING</span>
                   </div>
                   <div class="gent-stats">
                     <sc-for list="{{ gentStats }}" as="s" hint-placeholder-count="4">
                       <div class="gent-stat">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:#52525b;">{{ s.k }}</div>
+                        <div style="font-size:9.5px; letter-spacing:1px; color:#a99485;">{{ s.k }}</div>
                         <div style="font-family:'JetBrains Mono',monospace; font-size:21px; color:{{ s.c }}; margin-top:5px;">{{ s.v }}</div>
                       </div>
                     </sc-for>
@@ -8359,12 +8374,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
                 <div class="gent-block">
                   <div class="gent-bhead" style="margin-bottom:4px;">
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px; color:#52525b;">DRAWN FROM</span>
+                    <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">DRAWN FROM</span>
                   </div>
                   <sc-for list="{{ gentCatRows }}" as="c" hint-placeholder-count="4">
                     <div class="gent-row">
                       <span style="font-size:13px; color:{{ c.ink }};">{{ c.name }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#52525b;">{{ c.n }}</span>
+                      <span style="font-size:11px; color:#a99485;">{{ c.n }}</span>
                     </div>
                   </sc-for>
                 </div>
@@ -8379,25 +8394,25 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="max-width:820px;">
               <div class="gent-block" style="min-height:340px;">
                 <div class="gent-bhead">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2.5px; color:#5B1B1A;">{{ gentCardEyebrow }}</span>
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#52525b;">{{ gentPos }}</span>
+                  <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentCardEyebrow }}</span>
+                  <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentPos }}</span>
                 </div>
                 <div class="gent-body" style="flex:1; display:flex; flex-direction:column; min-width:0;">
                   <!-- On Dress Code the drawing sits beside the rule; everywhere else the text
                        takes the full width and the grid collapses to one column. -->
                   <div style="min-width:0;">
-                      <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:#3f3f46;">{{ gentCardTitle }}</div>
+                      <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:#3A2A20;">{{ gentCardTitle }}</div>
                       <sc-if value="{{ gentCardNote }}" hint-placeholder-val="{{ false }}">
-                        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1px; color:#52525b; margin-top:8px;">{{ gentCardNote }}</div>
+                        <div style="font-size:11px; letter-spacing:1px; color:#8a6a5a; margin-top:8px;">{{ gentCardNote }}</div>
                       </sc-if>
                       <!-- One concept, set large. The heading above it is what keeps a rule
                            readable on its own: "peak lapel or shawl collar" means nothing
                            without "Black Tie". -->
-                    <div style="font-size:21px; line-height:1.65; color:#52525b; max-width:44ch; margin-top:22px;">{{ gentCardText }}</div>
+                    <div style="font-size:21px; line-height:1.65; color:#6b5a4e; max-width:44ch; margin-top:22px;">{{ gentCardText }}</div>
                   </div>
                 </div>
                 <sc-if value="{{ gentCardHasStep }}" hint-placeholder-val="{{ false }}">
-                  <div style="padding-top:14px; margin-top:14px; border-top:1px solid rgba(91,27,26,0.16); font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1px; color:#52525b;">{{ gentCardStep }}</div>
+                  <div style="padding-top:14px; margin-top:14px; border-top:1px solid rgba(91,27,26,0.14); font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentCardStep }}</div>
                 </sc-if>
               </div>
               <div class="gent-nav">
@@ -9379,7 +9394,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.19-352 · v11.352 raiment-accent-restore';
+const NOTIF_BUILD_VERSION = '2026.09.19-353 · v11.353 mobile-settings-gentlemen-noir-forge';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14465,6 +14480,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.353', date:'Sep 19, 2026', major:true, notes:[
+      'Settings on mobile no longer runs off the right edge of the screen — a grid track that was letting content dictate its own minimum width now shrinks properly on a phone.',
+      'Gentlemen’s Etiquette is rebuilt on Learning Center’s own Ultra X design rather than a look-alike: flat cream cards with a thin oxblood hairline instead of glass, Cormorant Garamond serif throughout, and moderate rounded buttons instead of a full pill.',
+      'The Forge drops its white card for Noir specifically — a light block read as a mismatch against Noir’s own dark chrome everywhere else the raiment shows up. Calendar, Power Level, Settings and Gentlemen keep the shared white card exactly as before; this is Forge-only.',
+    ]},
     {version:'v11.352', date:'Sep 19, 2026', major:true, notes:[
       'The Forge, Gentlemen’s Etiquette, Calendar, Power Level, and Settings had their colour back. The card material stays last week’s flat cream and white, but the accent on top — main buttons, the day you’re on, progress fills, key labels — is the raiment’s own again: Ultra X’s oxblood, Maison Élysée’s blue, Éverpine’s olive-gold, and Noir a dark gold in place of its old pale taupe, which read as nearly nothing once its card went light too. Gentlemen’s Etiquette specifically goes back to wearing Ultra X’s oxblood on its buttons and dividers regardless of raiment, matching how it always used to look.',
     ]},
@@ -21391,7 +21411,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
         return {
           gentTabs:PAGES.map(p=>({ label:p[1], go:()=>this.setGentSub(p[0]),
-            ink:sub===p[0]?'#F5F1E8':'#52525b',
+            ink:sub===p[0]?'#F5F1E8':'#8a6a5a',
             bg:sub===p[0]?'#5B1B1A':'transparent' })),
           gentShowTest:sub==='test',
           gentShowPages:sub!=='test' && !!cards.length,
@@ -21434,7 +21454,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             return { text:t, letter:'ABCD'[i]||'', pick:answered?(()=>{}):(()=>this.answerGentTest(i)),
               cursor:answered?'default':'pointer',
               mark:isRight?'\u2713':(isPick?'\u2715':''),
-              ink:isRight?'#1F8A55':(isPick?'#C1502E':'#3f3f46'),
+              ink:isRight?'#1F8A55':(isPick?'#C1502E':'#3A2A20'),
               bd:isRight?'rgba(31,138,85,0.45)':(isPick?'rgba(193,80,46,0.45)':'rgba(91,27,26,0.16)'),
               bg:isRight?'rgba(31,138,85,0.12)':(isPick?'rgba(193,80,46,0.12)':'rgba(255,255,255,0.35)') };
           }),
@@ -21459,19 +21479,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               : 'Worth stepping back through these before the day starts.'),
           gentReview:set.map((x,i)=>({ cat:x.cat.toUpperCase(), q:x.q,
             mark:picks[i]==null?'\u2013':(picks[i]===x.correct?'\u2713':'\u2715'),
-            ink:picks[i]==null?'#52525b':(picks[i]===x.correct?'#1F8A55':'#C1502E') })),
+            ink:picks[i]==null?'#8a6a5a':(picks[i]===x.correct?'#1F8A55':'#C1502E') })),
           /* All four figures carry the page's reading ink. Two of them were a step quieter
              than the other two, which read as two live figures and two dead ones rather than
              as one panel; only TODAY takes a colour, and only because it is a verdict. */
           gentStats:[
-            {k:'STREAK', v:this._gentStreak()+'d', c:'#3f3f46'},
+            {k:'STREAK', v:this._gentStreak()+'d', c:'#3A2A20'},
             {k:'TODAY', v:answeredCount>=set.length?(rightCount+'/'+set.length):(answeredCount?(answeredCount+'/'+set.length):'OPEN'),
              c:answeredCount>=set.length?(rightCount===set.length?'#1F8A55':'#C1502E'):'#5B1B1A'},
-            {k:'DAYS DONE', v:String(doneDays), c:'#3f3f46'},
-            {k:'CORRECT', v:asked?(Math.round(got/asked*100)+'%'):'\u2014', c:'#3f3f46'},
+            {k:'DAYS DONE', v:String(doneDays), c:'#3A2A20'},
+            {k:'CORRECT', v:asked?(Math.round(got/asked*100)+'%'):'\u2014', c:'#3A2A20'},
           ],
           gentCatRows:G.CATEGORIES.map(c=>({ name:c, n:(counts[c]||0)+' questions',
-            ink:(q&&q.cat===c)?'#5B1B1A':'#52525b' })),
+            ink:(q&&q.cat===c)?'#5B1B1A':'#8a6a5a' })),
         };
       }, { gentTabs:[], gentShowTest:false, gentShowPages:false,
            gentCardEyebrow:'', gentCardTitle:'', gentCardNote:'', gentCardLines:[], gentPos:'',
