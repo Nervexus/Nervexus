@@ -608,6 +608,16 @@
   .theme-ultra.theme-noir [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
   .theme-ultra.theme-noir [style*="Cormorant Garamond"]{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
   .theme-ultra.theme-noir h1, .theme-ultra.theme-noir h2, .theme-ultra.theme-noir h3{ font-family:'Gambarino','Cormorant Garamond',Georgia,serif !important; }
+  /* Brain Rest's own display line ("Brain Rest", "Are you ready?", "All devices away?") reads
+     as a plain, generic serif under Noir — 'Gambarino' isn't an installed font anywhere, so
+     the rule above quietly falls back to the same Cormorant Garamond every other raiment
+     wears. Noir gets the ornate script the home wordmark already uses instead, so the one
+     full-screen moment in the app that's meant to feel unhurried actually looks it. */
+  /* .theme-ultra.theme-noir repeated: the catch-all font rule above (line ~606) reaches this
+     element too, via a :not() chain that happens to out-specificity a plain two-class
+     selector here — repeating the class is the standard way to out-rank that without
+     touching the catch-all rule itself. */
+  .theme-ultra.theme-noir.theme-ultra.theme-noir .rest-title{ font-family:'Pinyon Script',cursive !important; font-weight:400 !important; }
   .theme-ultra.theme-noir svg [stroke="#5B1A1A"]{ stroke:#968F82 !important; }
   .theme-ultra.theme-noir svg [fill="#5B1A1A"]{ fill:#968F82 !important; }
   .theme-ultra.theme-noir [style*="background:#FEFCF8"], .theme-ultra.theme-noir [style*="background: rgb(254, 252, 248)"]{ background:#272626 !important; }
@@ -3795,7 +3805,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </div>
               <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
               <div style="width:100%; max-width:520px;">
-                <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:44px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Brain Rest</div>
+                <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:44px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Brain Rest</div>
                 <div style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:42ch; margin:18px auto 0;">Five minutes sitting in silence. No music, no screen, nothing to finish first — it is there to clear the head before the work starts, not to fill the time.</div>
                 <div style="margin-top:32px; display:flex; justify-content:center;">
                   <span onClick="{{ openBrainRest }}" style="min-width:220px; padding:15px 30px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">BEGIN</span>
@@ -9394,7 +9404,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.19-353 · v11.353 mobile-settings-gentlemen-noir-forge';
+const NOTIF_BUILD_VERSION = '2026.09.19-354 · v11.354 brain-rest-noir-script';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14480,6 +14490,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.354', date:'Sep 19, 2026', major:false, notes:[
+      'Brain Rest’s own line — "Brain Rest", "Are you ready?", "All devices away?" — was quietly falling back to a plain serif under Noir. It now wears the same ornate script as the home wordmark, so the one full-screen moment meant to feel unhurried actually looks it.',
+    ]},
     {version:'v11.353', date:'Sep 19, 2026', major:true, notes:[
       'Settings on mobile no longer runs off the right edge of the screen — a grid track that was letting content dictate its own minimum width now shrinks properly on a phone.',
       'Gentlemen’s Etiquette is rebuilt on Learning Center’s own Ultra X design rather than a look-alike: flat cream cards with a thin oxblood hairline instead of glass, Cormorant Garamond serif throughout, and moderate rounded buttons instead of a full pill.',
