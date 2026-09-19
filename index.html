@@ -9316,7 +9316,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     <div data-orb-mount="float" style="width:66px; height:66px; border-radius:50%; overflow:hidden; filter:drop-shadow(0 0 18px {{ floatOrbGlow }});"></div>
   </div>
   </sc-if>
-  </sc-if>
 
   <!-- ================= REFRESH OVERLAY ================= -->
   <sc-if value="{{ refreshing }}" hint-placeholder-val="{{ false }}">
@@ -9352,7 +9351,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.18-350 · v11.350 theme-switch-veil';
+const NOTIF_BUILD_VERSION = '2026.09.19-351 · v11.351 veil-redesign-and-blockdesign-revert';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14435,6 +14434,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.351', date:'Sep 19, 2026', major:true, notes:[
+      'The theme-switch veil now has a proper look — house crest, wordmark, and a slow ten-second progress sweep — instead of just a line of text on a plain backdrop, and the hold itself is smoother: the sweep runs on the compositor so it can’t stutter against the rotating message underneath.',
+      'The Forge, Gentlemen’s Etiquette, Calendar, Power Level, and Settings all went back to Ultra X’s original block design — the flat cream ground and near-opaque white card — the same on every raiment now, Noir included. Nothing about where anything sits changed, only what the cards are made of.',
+    ]},
     {version:'v11.350', date:'Sep 18, 2026', major:true, notes:[
       'Switching raiment — Ultra X to Noir most of all, the two ends of the range — used to freeze for a beat while the whole shell restyled, then jump-cut straight to the new look. A loading veil now covers that freeze instead: a soft grained backdrop and one line naming you and the build, in one of four phrasings, gone the moment the new theme has actually settled.',
     ]},

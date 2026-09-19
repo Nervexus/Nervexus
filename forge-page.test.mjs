@@ -1147,17 +1147,16 @@ t('typed numbers are held to the same limits as the buttons', async () => {
   eq(parseFloat(st.w[st.items[0].id]), 500, 'an out-of-range weight reached the session');
 });
 
-t('the Forge accent follows the raiment', async () => {
-  /* The page was champagne on every raiment. Read back as the browser paints it, per element,
-     because a token that fails to resolve leaves the text black rather than obviously wrong.
+t('the Forge wordmark keeps its raiment accent, the card its fixed block-design ink', async () => {
+  /* Read back as the browser paints it, per element, because a token that fails to resolve
+     leaves the text black rather than obviously wrong.
 
-     The wordmark ("THE FORGE") is old chrome outside the card system and wears
-     --forge-accent, unchanged by this redesign. The section title and TRAINING PRIORITY are
-     inside the new card block and wear --lc-accent/--quiet-ink instead, the token Calendar
-     and Power Level already established — those two happen to equal --forge-accent for Ultra
-     X, Maison Élysée and Éverpine, but not for Noir (--forge-accent is pure white there,
-     --quiet-ink a pale beige), so the wordmark is checked for being painted at all but not
-     for matching the card's own two elements exactly. */
+     The wordmark ("THE FORGE") is old chrome outside the card system and still wears
+     --forge-accent, which still varies per raiment. The section title and TRAINING PRIORITY
+     are inside the pearl card block and wear --lc-accent/--quiet-ink instead — block design
+     was later reverted to Ultra X's original and made the same fixed ink for every raiment,
+     so the wordmark is checked for being painted at all but not for matching the card's own
+     two elements, which now always land on that one fixed colour. */
   await openChest();
   const paint = (style) => page.evaluate((st) => {
     window.__nvx.setPref('theme', st === 'base' ? 'Lime' : 'Ultra');
@@ -1172,7 +1171,6 @@ t('the Forge accent follows the raiment', async () => {
     }, 550));
   }, style);
 
-  const rgb = (s) => (s.match(/\d+/g) || []).map(Number);
   const seen = {};
   for (const st of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine', 'base']) {
     const got = await paint(st);
@@ -1183,14 +1181,10 @@ t('the Forge accent follows the raiment', async () => {
     seen[st] = got.tag;
   }
 
-  const [r1, g1, b1] = rgb(seen['Ultra X']);
-  ok(r1 > g1 + 40 && r1 > b1 + 40, 'Ultra X is not red: ' + seen['Ultra X']);
-  const [r2, g2, b2] = rgb(seen['Maison Élysée']);
-  ok(b2 > r2 + 30, 'Maison is not blue: ' + seen['Maison Élysée']);
-  eq(seen['Noir'], 'rgb(196, 189, 176)', 'Noir is not the raiment\'s quiet ink: ' + seen['Noir']);
-  /* --forge-accent's champagne is lighter than --quiet-ink's olive-gold for Éverpine too —
-     the same divergence as Noir, just in the other direction. The card wears quiet-ink. */
-  eq(seen['Maison Éverpine'], 'rgb(124, 106, 56)', 'Éverpine is not the raiment\'s quiet ink: ' + seen['Maison Éverpine']);
+  /* Block design was later reverted to Ultra X's original and made the same for every
+     raiment, so the card's own two elements now land on the same fixed ink everywhere. */
+  for (const st of ['Ultra X', 'Noir', 'Maison Élysée', 'Maison Éverpine', 'base'])
+    eq(seen[st], 'rgb(41, 37, 36)', st + ': the card is not the fixed block-design ink: ' + seen[st]);
 
   await page.evaluate(() => window.__nvx.setPref('theme', 'Lime'));
   await page.waitForTimeout(400);
