@@ -22,14 +22,16 @@ t('the five subject areas are all there, in the owner’s words', async () => {
   eq(G.SUBJECTS.map(s => s.key).join(','), 'money,history,taste,conversation,foundation', 'wrong subjects');
   for (const s of G.SUBJECTS) {
     ok(s.name && s.eyebrow, s.key + ' is missing a name or eyebrow');
-    // Each reads as one card of four facts now, not a deck of three-or-more you page through.
-    eq(s.lines.length, 4, s.key + ' should read as four facts, not ' + s.lines.length);
+    // Four facts a page, two pages — a NEXT for the reader who wants to keep going.
+    eq(s.lines.length, 8, s.key + ' should offer eight facts across two pages, not ' + s.lines.length);
   }
   const all = G.SUBJECTS.flatMap(s => s.lines).join(' ');
   for (const phrase of ['not just headlines', 'rise and fall of empires', 'genuine palate',
                         'Knowing when to say nothing', 'rarely try to',
                         'rented, not owned', 'structural, and which are just noise',
-                        'as telling as what you choose', 'without ever letting on', 'the only one that is real'])
+                        'as telling as what you choose', 'without ever letting on', 'the only one that is real',
+                        'balance sheet', 'newly disappointed', 'handshake’s distance',
+                        'invitation, not a failure', 'teach people to keep doing to you'])
     ok(all.includes(phrase), 'the line about "' + phrase + '" is missing');
 });
 

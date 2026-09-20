@@ -26,6 +26,10 @@
         'Basic finance: how deals, equity and leverage work.',
         'Geopolitics — who controls what, and why it matters to money.',
         'Real wealth is quiet — the loudest signals of money are usually the ones rented, not owned.',
+        'A balance sheet tells you what is owned and what is owed — read it before you read the story built on top of it.',
+        'Debt is a tool before it becomes a trap. The difference is who is paying, and by when.',
+        'Sanctions and tariffs are financial weapons — used to move behaviour, not just prices.',
+        'The favour that costs the giver the most is worth the most, regardless of what it is worth to you.',
       ] },
     { key: 'history', name: 'History & Culture', eyebrow: 'ENOUGH TO DISCUSS, NOT JUST RECOGNISE',
       lines: [
@@ -33,6 +37,10 @@
         'Art, architecture and literature — enough to discuss, not just recognise.',
         'Classical rhetoric and philosophy — Cicero, Machiavelli, Sun Tzu: the operating manuals of power.',
         'Reading the present through the past — knowing which of today’s crises are structural, and which are just noise.',
+        'The Renaissance was a return to classical form, not an invention of new ideals.',
+        'A revolution is rarely started by the poorest — it is usually led by the newly disappointed.',
+        'Architecture is frozen power: a building’s scale tells you what its builder wanted you to feel.',
+        'The victors write the first draft of history. The second draft is written by whoever outlasts them.',
       ] },
     { key: 'taste', name: 'Taste & Discernment', eyebrow: 'PALATE, NOT TRIVIA',
       lines: [
@@ -40,6 +48,10 @@
         'Tailoring and dress — understanding fit and fabric, not just brands.',
         'Fine dining etiquette that is second nature, not performed.',
         'Restraint in taste — knowing what to leave out is as telling as what you choose.',
+        'A good watch is chosen for what it says when no one is being shown it.',
+        'Cologne should be noticed at a handshake’s distance, never across a room.',
+        'The best-dressed man in the room is rarely the most decorated — fewer, better pieces beat more.',
+        'Taste is consistency across contexts — the same standard at breakfast as at a state dinner.',
       ] },
     { key: 'conversation', name: 'Conversation', eyebrow: 'THE ROOM BEFORE THE WORDS',
       lines: [
@@ -47,6 +59,10 @@
         'Knowing when to say nothing.',
         'Reading a room before you speak in it.',
         'Remembering what people tell you — and using it, without ever letting on that you kept it.',
+        'A compliment lands harder when it is specific — anyone can say “well done.”',
+        'Silence after a question is an invitation, not a failure. Let it sit before filling it.',
+        'People forgive being disagreed with far more easily than being talked over.',
+        'The best way to be interesting is to be interested — genuinely, not as a tactic.',
       ] },
     { key: 'foundation', name: 'Foundation', eyebrow: 'WHAT THE REST STANDS ON',
       lines: [
@@ -54,6 +70,10 @@
         'Negotiation and persuasion.',
         'Restraint. The men who dominate a room rarely try to.',
         'Discipline — the standard you hold when no one is checking is the only one that is real.',
+        'A promise made casually is a debt you did not mean to take on — weigh it before you say it.',
+        'Consistency is what turns a reputation from an opinion into a fact.',
+        'The apology that matters is the one that changes behaviour, not just the one that is said.',
+        'What you tolerate, you teach people to keep doing to you.',
       ] },
   ];
 

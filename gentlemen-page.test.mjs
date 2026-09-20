@@ -422,8 +422,8 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
    one is supplied, and these hold both halves of that. */
 
 
-/* ---- the five subject areas read as one card of facts, not a deck ------------------------- */
-t('a subject area shows all four facts on one card, not one at a time', async () => {
+/* ---- the five subject areas read as pages of facts, not a deck of single lines ------------- */
+t('a subject area shows four facts per page, with a NEXT for more', async () => {
   for (const [sub, phrase] of [['money', 'not just headlines'], ['history', 'rise and fall of empires'],
                                 ['taste', 'genuine palate'], ['conversation', 'Knowing when to say nothing'],
                                 ['foundation', 'rarely try to']]) {
@@ -431,10 +431,10 @@ t('a subject area shows all four facts on one card, not one at a time', async ()
     const b = await text();
     ok(b.includes(phrase), sub + ' lost its first fact');
     const n = await page.evaluate(() => window.__nvx._gent().subjectFacts(window.__nvx.state.gentSub).facts.length);
-    eq(n, 4, sub + ' should offer four facts, not ' + n);
+    eq(n, 8, sub + ' should offer eight facts across two pages, not ' + n);
     const shown = await page.evaluate(() => document.querySelectorAll('.gent-body > div').length);
-    eq(shown, n, sub + ' should show all ' + n + ' facts on the card at once, found ' + shown);
-    ok(!/‹ BACK|NEXT ›/.test(b), sub + ' still offers BACK/NEXT — nothing left to page through');
+    eq(shown, 4, sub + ' should show four facts a page, found ' + shown);
+    ok(/NEXT ›/.test(b), sub + ' offers no way to see the rest of its facts');
   }
 });
 
@@ -445,14 +445,40 @@ t('each fact carries a fleuron, not a plain dot', async () => {
   for (const m of marks) eq(m, '❦', 'a fact’s mark is not the fleuron: "' + m + '"');
 });
 
-t('Dining alone still pages one rule at a time, and the arrow keys still only move it', async () => {
+t('the fact text reads black, not the muted brown used for lesser copy', async () => {
+  await boot({ gentSub: 'money' });
+  const c = await page.evaluate(() => getComputedStyle(document.querySelectorAll('.gent-body > div > span:last-child')[0]).color);
+  eq(c, 'rgb(58, 42, 32)', 'the fact text is not the page’s own black (#3A2A20)');
+});
+
+t('NEXT moves to the second page of facts, and BACK returns; DONE ends it', async () => {
+  await boot({ gentSub: 'money' });
+  const first = await text();
+  ok(first.includes('not just headlines'), 'page one should open on the first fact');
+  ok(!first.includes('did not mean to take on') && !first.includes('balance sheet'), 'page one is showing page two’s facts already');
+  await clickText('span', 'NEXT ›');
+  await page.waitForTimeout(250);
+  const second = await text();
+  ok(second.includes('balance sheet'), 'NEXT did not reach money’s second page of facts');
+  ok(second.includes('DONE'), 'the last page should offer DONE rather than another NEXT');
+  await clickText('span', '‹ BACK');
+  await page.waitForTimeout(250);
+  ok((await text()).includes('not just headlines'), 'BACK did not return to the first page');
+});
+
+t('Dining still pages one rule at a time; a subject area pages four facts at a time; both answer the arrow keys', async () => {
   await boot({ gentSub: 'dining' });
-  ok((await text()).includes('1 OF 18'), 'Dining should still be a paged deck');
-  await tab('MONEY & POWER');
-  await page.waitForTimeout(300);
+  ok((await text()).includes('1 OF 18'), 'Dining should still be a paged deck of single rules');
   await page.keyboard.press('ArrowRight');
   await page.waitForTimeout(250);
-  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 0, 'the arrow key moved a subject area that no longer pages');
+  ok((await text()).includes('2 OF 18'), 'the arrow key should move Dining by one rule');
+
+  await tab('MONEY & POWER');
+  await page.waitForTimeout(300);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 0, 'switching subpage should start on the first page');
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(250);
+  ok((await text()).includes('balance sheet'), 'the arrow key should move a subject area on to its next page of facts');
 });
 
 

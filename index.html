@@ -8503,11 +8503,26 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <sc-for list="{{ gentFacts }}" as="f" hint-placeholder-count="4">
                     <div style="display:flex; align-items:flex-start; gap:16px;">
                       <span style="flex:0 0 auto; font-size:16px; line-height:1.7; color:#5B1A1A;">❦</span>
-                      <span style="font-size:19px; line-height:1.65; color:#6b5a4e; max-width:58ch;">{{ f.text }}</span>
+                      <span style="font-size:19px; line-height:1.65; color:#3A2A20; max-width:58ch;">{{ f.text }}</span>
                     </div>
                   </sc-for>
                 </div>
               </div>
+              <!-- More than four facts, in case the reader wants to keep going: BACK/NEXT the
+                   same shape as everywhere else on this page, a page of facts at a time rather
+                   than a line at a time. -->
+              <sc-if value="{{ gentFactsHasNav }}" hint-placeholder-val="{{ false }}">
+                <div class="gent-nav">
+                  <span onClick="{{ gentFactsPrev }}" class="gent-pill-ghost" style="cursor:{{ gentFactsPrevCursor }}; opacity:{{ gentFactsPrevOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
+                  <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentFactsProgPct }}; background:#5B1A1A;"></span></div>
+                  <div class="gent-dots">
+                    <sc-for list="{{ gentFactsDots }}" as="d" hint-placeholder-count="2">
+                      <span onClick="{{ d.go }}" style="width:{{ d.w }}; height:8px; border-radius:5px; cursor:pointer; background:{{ d.bg }};"></span>
+                    </sc-for>
+                  </div>
+                  <span onClick="{{ gentFactsNext }}" class="gent-pill-light" style="cursor:{{ gentFactsNextCursor }}; opacity:{{ gentFactsNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentFactsNextLabel }}</span>
+                </div>
+              </sc-if>
             </div>
           </sc-if>
 
@@ -9518,7 +9533,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.20-357 · v11.357 gentlemen-subject-facts';
+const NOTIF_BUILD_VERSION = '2026.09.20-358 · v11.358 gentlemen-facts-ink-and-next';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14608,6 +14623,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.358', date:'Sep 20, 2026', major:false, notes:[
+      'The four facts on each subject area’s card read in the page’s own black now rather than the softer brown used for lesser copy. Each subject also doubles to eight facts, four to a page, with a NEXT for the reader who wants to keep going and a BACK to return.',
+    ]},
     {version:'v11.357', date:'Sep 20, 2026', major:true, notes:[
       'Each of Gentlemen’s Etiquette’s five subject areas now reads as one card of four facts, not three cards you click through one at a time — a genuine fourth fact written for each, and every one marked with the crest’s own fleuron rather than a plain dot, for a quicker read. Dining is unchanged: eighteen rules across five sections still page one at a time.',
     ]},
@@ -17775,7 +17793,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // Moving to another subpage starts it at its first card, never mid-way through.
   setGentSub(k){ this.setState({gentSub:k, gentIdx:0}); }
   _gentCards(){ const G=this._gent(); return G ? G.cards(this.state.gentSub||'test') : []; }
-  gentGoto(i){ const n=this._gentCards().length; if(!n) return;
+  // gentIdx is shared by two different pagers that never show at once: on Dining it counts
+  // individual rule-cards; on a subject area it counts pages of four facts.
+  _gentPageCount(){
+    const G=this._gent(); if(!G) return 0;
+    const sub=this.state.gentSub||'test';
+    if(sub==='dining') return this._gentCards().length;
+    const f=G.subjectFacts(sub);
+    return f ? Math.max(1, Math.ceil(f.facts.length/4)) : 0;
+  }
+  gentGoto(i){ const n=this._gentPageCount(); if(!n) return;
     this.setState({gentIdx:Math.max(0, Math.min(n-1, i))}); }
   gentStep(d){ this.gentGoto((this.state.gentIdx||0)+d); }
   /* Left and right move through the cards. Wired once, and only ever acts on the Gentlemen's
@@ -17787,9 +17814,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     document.addEventListener('keydown',(e)=>{
       if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
       if(e.metaKey||e.ctrlKey||e.altKey) return;
-      // Dining alone still pages one rule at a time; the five subject areas read as one card
-      // of facts now, with nothing left to step through.
-      if(this.state.scene!=='gentlemen' || (this.state.gentSub||'test')!=='dining') return;
+      if(this.state.scene!=='gentlemen' || (this.state.gentSub||'test')==='test') return;
       const t=document.activeElement;
       if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
       if(t && t.isContentEditable) return;
@@ -21630,9 +21655,24 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           gentShowFacts:SUBJECT_KEYS.includes(sub),
           ...(()=>{
             const f=G.subjectFacts(sub)||{eyebrow:'', title:'', facts:[]};
+            // Four at a time, so a card never grows past a single read. gentIdx is reused as
+            // the page number here — dining is the only other consumer of it, and the two are
+            // never showing at once.
+            const PER_PAGE=4;
+            const pageCount=Math.max(1, Math.ceil(f.facts.length/PER_PAGE));
+            const page=Math.max(0, Math.min(pageCount-1, S.gentIdx||0));
             return {
               gentFactsEyebrow:f.eyebrow,
-              gentFacts:f.facts.map((text,i)=>({ text, n:i })),
+              gentFacts:f.facts.slice(page*PER_PAGE, page*PER_PAGE+PER_PAGE).map((text,i)=>({ text, n:i })),
+              gentFactsHasNav:pageCount>1,
+              gentFactsPrev:()=>this.gentStep(-1), gentFactsNext:()=>this.gentStep(1),
+              gentFactsPrevCursor:page>0?'pointer':'default', gentFactsPrevOpacity:page>0?'1':'0.35',
+              gentFactsNextCursor:page<pageCount-1?'pointer':'default', gentFactsNextOpacity:page<pageCount-1?'1':'0.35',
+              gentFactsNextLabel:page<pageCount-1?'NEXT ›':'DONE',
+              gentFactsProgPct:Math.round((page+1)/pageCount*100)+'%',
+              gentFactsDots:Array.from({length:pageCount}, (_,i)=>({
+                go:()=>this.gentGoto(i), w:i===page?'26px':'8px',
+                bg:i===page?'#5B1A1A':'rgba(91,26,26,0.16)' })),
             };
           })(),
           ...(()=>{
@@ -21769,7 +21809,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           })(),
         };
       }, { gentTabs:[], gentShowTest:false, gentShowPages:false,
-           gentShowFacts:false, gentFactsEyebrow:'', gentFacts:[],
+           gentShowFacts:false, gentFactsEyebrow:'', gentFacts:[], gentFactsHasNav:false,
+           gentFactsPrev:()=>{}, gentFactsNext:()=>{}, gentFactsPrevCursor:'default', gentFactsPrevOpacity:'0.35',
+           gentFactsNextCursor:'default', gentFactsNextOpacity:'0.35', gentFactsNextLabel:'', gentFactsProgPct:'0%', gentFactsDots:[],
            gentCrestHasTest:false, openGentSubjectTest:()=>{},
            gentQuizOpen:false, gentQuizPickOpen:false, gentQuizPlayOpen:false, gentQuizResultOpen:false,
            gentQuizBanner:'', gentQuizTopBanner:'', gentQuizPickTitle:'', gentQuizPickBody:'', gentQuizDiffs:[], gentQuizClose:()=>{},
