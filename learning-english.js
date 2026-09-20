@@ -145,34 +145,34 @@
     apostrophes: {
       title: 'Apostrophes',
       intro: 'Apostrophes show possession (belonging) or mark missing letters in a contraction. Getting them right is one of the most common GCSE marking points.',
-      origin: 'The apostrophe entered English from French printers in the 16th century, originally just to mark omitted letters (much like today\u2019s contractions). Its use for possession developed later and more haphazardly — it\u2019s widely believed to have evolved as a shorthand for an older possessive construction using "his" (e.g. "the king his crown" contracting toward "the king\u2019s crown"), which is part of why English possessive apostrophe rules can feel like a historical accident rather than a clean, designed system.',
+      origin: 'The apostrophe entered English from French printers in the 16th century, originally just to mark omitted letters (much like today\u2019s contractions). Its use for possession developed later and more haphazardly. It\u2019s widely believed to have evolved as a shorthand for an older possessive construction using "his" (e.g. "the king his crown" contracting toward "the king\u2019s crown"), which is part of why English possessive apostrophe rules can feel like a historical accident rather than a clean, designed system.',
       sections: [
-        { heading: 'One Symbol, Two Unrelated Jobs', body: 'The apostrophe does two historically separate jobs that happen to share a symbol: marking a contraction (don\u2019t = do not) and marking possession (the dog\u2019s bone). Keeping these mentally separate helps avoid the single most common apostrophe error — using one to make a plain word plural, which isn\u2019t either of the apostrophe\u2019s two legitimate functions at all.' },
-        { heading: 'Why Plural Possessives Look Different', body: 'For a plural noun that already ends in s (dogs, students), adding a full \u2019s would create an awkward double-s sound, so English convention instead adds just the apostrophe after the existing s (dogs\u2019, students\u2019) — this is why "the students\u2019 results" (many students) looks different from "the student\u2019s results" (one student), despite both being grammatically valid possessives.' },
-        { heading: 'The Reliable Contraction Test', body: 'For its/it\u2019s, your/you\u2019re and similar pairs, a fast, mechanical test resolves almost every case: mentally expand the apostrophe version to its two full words (it is, you are) — if the sentence still makes sense, the apostrophe version is correct; if not, use the possessive, no-apostrophe form.' }
+        { heading: 'One Symbol, Two Unrelated Jobs', body: 'The apostrophe does two historically separate jobs that happen to share a symbol: marking a contraction (don\u2019t = do not) and marking possession (the dog\u2019s bone). Keeping these mentally separate helps avoid the single most common apostrophe error, using one to make a plain word plural, which isn\u2019t either of the apostrophe\u2019s two legitimate functions at all.' },
+        { heading: 'Why Plural Possessives Look Different', body: 'For a plural noun that already ends in s (dogs, students), adding a full \u2019s would create an awkward double-s sound, so English convention instead adds just the apostrophe after the existing s (dogs\u2019, students\u2019). This is why "the students\u2019 results" (many students) looks different from "the student\u2019s results" (one student), despite both being grammatically valid possessives.' },
+        { heading: 'The Reliable Contraction Test', body: 'For its/it\u2019s, your/you\u2019re and similar pairs, a fast, mechanical test resolves almost every case: mentally expand the apostrophe version to its two full words (it is, you are), if the sentence still makes sense, the apostrophe version is correct; if not, use the possessive, no-apostrophe form.' }
       ],
       misconceptions: [
-        { myth: 'Adding an apostrophe is how you make a word plural.', reality: 'Apostrophes never form plurals — "bananas for sale," never "banana\u2019s for sale."' },
-        { myth: 'Its and it\u2019s can be used interchangeably.', reality: '"It\u2019s" only ever means "it is" or "it has"; "its" is the possessive — they are never interchangeable.' }
+        { myth: 'Adding an apostrophe is how you make a word plural.', reality: 'Apostrophes never form plurals: "bananas for sale," never "banana\u2019s for sale."' },
+        { myth: 'Its and it\u2019s can be used interchangeably.', reality: '"It\u2019s" only ever means "it is" or "it has"; "its" is the possessive. They are never interchangeable.' }
       ],
       expertNotes: [
         'Editors specifically flag apostrophe-for-plural errors as one of the most visible, credibility-damaging mistakes in professional writing.',
         'The it\u2019s/its distinction is tested more than almost any other single punctuation point at GCSE, precisely because the exception (its has NO apostrophe despite being possessive) breaks the usual pattern.'
       ],
       examples: [
-        { q: 'The teacher___ book (belongs to one teacher)', working: 'Singular possession — add \u2019s', answer: "teacher's" },
-        { q: 'The students___ results (belongs to many students)', working: 'Plural already ending in s — add just an apostrophe', answer: "students'" },
-        { q: 'Its / It\u2019s raining today', working: '"It is" raining — needs the apostrophe', answer: "It's" }
+        { q: 'The teacher___ book (belongs to one teacher)', working: 'Singular possession, add \u2019s', answer: "teacher's" },
+        { q: 'The students___ results (belongs to many students)', working: 'Plural already ending in s, add just an apostrophe', answer: "students'" },
+        { q: 'Its / It\u2019s raining today', working: '"It is" raining, needs the apostrophe', answer: "It's" }
       ]
     },
     tenses: {
       title: 'Verb Tenses',
       intro: 'Tenses show when an action happens: past, present, or future. Mixing tenses within a paragraph is a common mistake that costs marks.',
-      origin: 'English tenses combine TIME with ASPECT (simple/continuous/perfect) as two separate, combinable dimensions — an inheritance from English\u2019s Germanic roots layered with grammar-teaching conventions borrowed from Latin centuries later, which is why English ends up with far more tense forms than languages with a simpler time-only system.',
+      origin: 'English tenses combine TIME with ASPECT (simple/continuous/perfect) as two separate, combinable dimensions, an inheritance from English\u2019s Germanic roots layered with grammar-teaching conventions borrowed from Latin centuries later, which is why English ends up with far more tense forms than languages with a simpler time-only system.',
       sections: [
         { heading: 'Time × Aspect, Not 12 Separate Forms', body: 'Rather than memorising 12 unconnected tenses, it helps to see each as TIME (past/present/future) combined with ASPECT (simple = a fact; continuous = ongoing, using -ing; perfect = linking to another point in time, using have/has/had). Once this grid clicks, perfect and continuous forms behave predictably across all three time periods.' },
-        { heading: 'Why the Perfect Aspect Exists', body: 'Present perfect ("she has lived here for years") specifically links a past action to NOW — still true today — while past simple ("she lived here") describes a fully finished, disconnected past. This distinction, not just "which sounds more natural," is what determines the correct choice in most exam questions.' },
-        { heading: 'Consistency Signals Control', body: 'Prose is conventionally written entirely in past OR present tense; switching without a clear reason (a flashback, a direct quotation) is a frequently penalised sign of inexperienced writing — examiners specifically look for unmotivated tense shifts as a control issue, not just a technical slip.' }
+        { heading: 'Why the Perfect Aspect Exists', body: 'Present perfect ("she has lived here for years") specifically links a past action to NOW, still true today, while past simple ("she lived here") describes a fully finished, disconnected past. This distinction, not just "which sounds more natural," is what determines the correct choice in most exam questions.' },
+        { heading: 'Consistency Signals Control', body: 'Prose is conventionally written entirely in past OR present tense; switching without a clear reason (a flashback, a direct quotation) is a frequently penalised sign of inexperienced writing, examiners specifically look for unmotivated tense shifts as a control issue, not just a technical slip.' }
       ],
       misconceptions: [
         { myth: 'English only really has three tenses: past, present, future.', reality: 'English combines 3 times with up to 4 aspects, producing the 12 commonly-taught tense forms.' },
@@ -183,9 +183,9 @@
         'Copyeditors treat unmotivated tense-shifting in narrative prose as a top-tier line-edit issue.'
       ],
       examples: [
-        { q: 'Yesterday, she (walk) to the shop.', working: 'Finished action in the past — past simple', answer: 'walked' },
-        { q: 'Tomorrow, we (visit) the museum.', working: 'Action not yet happened — future simple', answer: 'will visit' },
-        { q: 'He (study) English for three years now.', working: 'Started in the past, continues now — present perfect', answer: 'has studied' }
+        { q: 'Yesterday, she (walk) to the shop.', working: 'Finished action in the past, past simple', answer: 'walked' },
+        { q: 'Tomorrow, we (visit) the museum.', working: 'Action not yet happened, future simple', answer: 'will visit' },
+        { q: 'He (study) English for three years now.', working: 'Started in the past, continues now, present perfect', answer: 'has studied' }
       ]
     },
     activepassive: {
@@ -193,34 +193,34 @@
       intro: 'In the active voice, the subject does the action. In the passive voice, the subject receives the action. Both are correct, but each creates a different effect.',
       origin: 'English relies on the active/passive distinction unusually heavily as a deliberate stylistic choice, partly because English lost much of the verb-ending system some other languages use to mark "who did what to whom," leaving word order and voice construction to carry more of that meaning-making work instead.',
       sections: [
-        { heading: 'Why Passive Voice Exists', body: 'Passive voice lets a writer make the RECEIVER of an action the grammatical subject — useful when the doer is unknown ("the window was broken"), unimportant ("the bridge was built in 1889"), or deliberately de-emphasised. This is a genuine tool, not a flaw, which is why scientific writing relies on it heavily (the process matters more than who performed it).' },
-        { heading: 'Passive Voice as Evasion', body: 'The same feature that makes passive voice useful also makes it a documented tool for evasion — "mistakes were made" deliberately avoids naming who is responsible, unlike the direct accountability of "I made mistakes." Spotting passive voice in a statement is a genuine critical-reading skill, often the first step in asking who a sentence is avoiding naming.' },
-        { heading: 'The Reliable Spotting Test', body: 'Look for a form of "to be" (is/was/were/been/being) followed by a past participle — this test works even when the doer is omitted entirely (as in "mistakes were made"), which is a common exam trap since passive sentences don\u2019t require a "by [someone]" to be genuinely passive.' }
+        { heading: 'Why Passive Voice Exists', body: 'Passive voice lets a writer make the RECEIVER of an action the grammatical subject. Useful when the doer is unknown ("the window was broken"), unimportant ("the bridge was built in 1889"), or deliberately de-emphasised. This is a genuine tool, not a flaw, which is why scientific writing relies on it heavily (the process matters more than who performed it).' },
+        { heading: 'Passive Voice as Evasion', body: 'The same feature that makes passive voice useful also makes it a documented tool for evasion: "mistakes were made" deliberately avoids naming who is responsible, unlike the direct accountability of "I made mistakes." Spotting passive voice in a statement is a genuine critical-reading skill, often the first step in asking who a sentence is avoiding naming.' },
+        { heading: 'The Reliable Spotting Test', body: 'Look for a form of "to be" (is/was/were/been/being) followed by a past participle. This test works even when the doer is omitted entirely (as in "mistakes were made"), which is a common exam trap since passive sentences don\u2019t require a "by [someone]" to be genuinely passive.' }
       ],
       misconceptions: [
-        { myth: 'Passive voice is always grammatically weaker or wrong.', reality: 'It\u2019s a legitimate stylistic choice for de-emphasising the doer, not an error — active voice is just the usual default.' },
-        { myth: 'You can only spot passive voice if "by [someone]" is included.', reality: 'Passive sentences often omit the doer entirely — the "to be + past participle" structure is the real test.' }
+        { myth: 'Passive voice is always grammatically weaker or wrong.', reality: 'It\u2019s a legitimate stylistic choice for de-emphasising the doer, not an error. Active voice is just the usual default.' },
+        { myth: 'You can only spot passive voice if "by [someone]" is included.', reality: 'Passive sentences often omit the doer entirely, the "to be + past participle" structure is the real test.' }
       ],
       expertNotes: [
         'Media literacy educators teach spotting passive voice in official statements as a tool for identifying deflected accountability.',
         'Style guides for scientific writing often prefer passive voice specifically to keep focus on the process, not the researcher.'
       ],
       examples: [
-        { q: '"The cake was eaten by Tom." — rewrite in active voice', working: 'Make Tom the subject doing the action', answer: 'Tom ate the cake.' },
-        { q: '"The company launched the product." — rewrite in passive voice', working: 'Make "the product" the subject', answer: 'The product was launched by the company.' }
+        { q: '"The cake was eaten by Tom.", rewrite in active voice', working: 'Make Tom the subject doing the action', answer: 'Tom ate the cake.' },
+        { q: '"The company launched the product.", rewrite in passive voice', working: 'Make "the product" the subject', answer: 'The product was launched by the company.' }
       ]
     },
     punctuation: {
       title: 'Commas & Punctuation',
       intro: 'Commas separate ideas and make sentences easier to read. Misusing them is one of the most frequent GCSE writing errors.',
-      origin: 'Punctuation originally guided the VOICE (pause length for reading aloud) rather than encoding grammatical logic — punctuation was only standardised after the printing press (1440s) made consistent, reproducible marks commercially necessary across many printed copies of the same text.',
+      origin: 'Punctuation originally guided the VOICE (pause length for reading aloud) rather than encoding grammatical logic. Punctuation was only standardised after the printing press (1440s) made consistent, reproducible marks commercially necessary across many printed copies of the same text.',
       sections: [
-        { heading: 'Why the Comma Splice Is Specifically Wrong', body: 'A comma splice ("I was hungry, I ate an apple") fails because a comma alone is too weak a connector for two independent clauses (complete sentences) — English requires a full stop, semicolon, or comma+conjunction instead. This is a precise, testable rule, not a style preference, which is why it\u2019s consistently and heavily penalised.' },
+        { heading: 'Why the Comma Splice Is Specifically Wrong', body: 'A comma splice ("I was hungry, I ate an apple") fails because a comma alone is too weak a connector for two independent clauses (complete sentences). English requires a full stop, semicolon, or comma+conjunction instead. This is a precise, testable rule, not a style preference, which is why it\u2019s consistently and heavily penalised.' },
         { heading: 'Reading Aloud Still Works as an Intuitive Check', body: 'Because punctuation\u2019s original job was marking pause length for spoken delivery, reading a sentence aloud and noticing natural pause points remains a genuinely useful intuitive check for comma placement, even though modern rules are framed grammatically.' },
-        { heading: 'Semicolons and Colons Do Different Jobs', body: 'A semicolon joins two independent, closely-related clauses without a conjunction — both sides must stand alone as full sentences. A colon introduces something that explains, lists, or expands on what came before, and what follows doesn\u2019t need to be a complete sentence — mixing these two up is a frequently tested higher-grade distinction.' }
+        { heading: 'Semicolons and Colons Do Different Jobs', body: 'A semicolon joins two independent, closely-related clauses without a conjunction. Both sides must stand alone as full sentences. A colon introduces something that explains, lists, or expands on what came before, and what follows doesn\u2019t need to be a complete sentence. Mixing these two up is a frequently tested higher-grade distinction.' }
       ],
       misconceptions: [
-        { myth: 'Commas and semicolons are basically interchangeable for joining sentences.', reality: 'A comma alone cannot join two complete sentences (a comma splice) — only a semicolon, full stop, or comma+conjunction can.' },
+        { myth: 'Commas and semicolons are basically interchangeable for joining sentences.', reality: 'A comma alone cannot join two complete sentences (a comma splice), only a semicolon, full stop, or comma+conjunction can.' },
         { myth: 'A colon must be followed by a complete list or full sentence.', reality: 'What follows a colon just needs to explain or expand on what came before.' }
       ],
       expertNotes: [
@@ -228,21 +228,21 @@
         'The comma splice is one of the most consistently penalised errors across GCSE, A-Level and university writing assessment.'
       ],
       examples: [
-        { q: '"I was hungry I ate an apple." — fix the comma splice', working: 'Join with a conjunction or split into two sentences', answer: 'I was hungry, so I ate an apple.' },
+        { q: '"I was hungry I ate an apple.", fix the comma splice', working: 'Join with a conjunction or split into two sentences', answer: 'I was hungry, so I ate an apple.' },
         { q: 'Add the missing comma: "After the long journey we finally arrived."', working: 'Comma after the introductory phrase', answer: 'After the long journey, we finally arrived.' }
       ]
     },
     sentencetypes: {
       title: 'Sentence Structure',
-      intro: 'Varying your sentence types (simple, compound, complex) creates rhythm and shows control of language — a key GCSE writing skill.',
+      intro: 'Varying your sentence types (simple, compound, complex) creates rhythm and shows control of language, a key GCSE writing skill.',
       origin: 'Classifying sentences by CLAUSE relationships (rather than length or vocabulary) reflects 19th-20th century formal syntax scholarship, which let examiners assess sentence variety and control as a specific, teachable skill separate from spelling or word choice.',
       sections: [
-        { heading: 'Clauses, Not Length, Define Sentence Type', body: 'Sentence type is about how many clauses a sentence has and how they relate, not about LENGTH — a long, richly-described simple sentence is still grammatically simple (one clause), while a short complex sentence ("Although tired, she smiled") has two clauses despite its brevity.' },
-        { heading: 'Why Subordinate Clauses Feel Incomplete', body: 'A subordinate clause has a subject and verb but expresses an incomplete thought dependent on a main clause — "Although it was raining" sounds like it\u2019s waiting for something, because grammatically it is, which is exactly why punctuating it alone as a full sentence reads as a fragment.' },
-        { heading: 'Sentence Variety Is Rewarded Deliberately', body: 'Examiners specifically reward mixing sentence lengths and structures on purpose (short sentences to build tension, then one long complex sentence to release it) over defaulting to one structure throughout — this variety is treated as direct evidence of a writer controlling the reader\u2019s pace.' }
+        { heading: 'Clauses, Not Length, Define Sentence Type', body: 'Sentence type is about how many clauses a sentence has and how they relate, not about LENGTH. A long, richly-described simple sentence is still grammatically simple (one clause), while a short complex sentence ("Although tired, she smiled") has two clauses despite its brevity.' },
+        { heading: 'Why Subordinate Clauses Feel Incomplete', body: 'A subordinate clause has a subject and verb but expresses an incomplete thought dependent on a main clause: "Although it was raining" sounds like it\u2019s waiting for something, because grammatically it is, which is exactly why punctuating it alone as a full sentence reads as a fragment.' },
+        { heading: 'Sentence Variety Is Rewarded Deliberately', body: 'Examiners specifically reward mixing sentence lengths and structures on purpose (short sentences to build tension, then one long complex sentence to release it) over defaulting to one structure throughout. This variety is treated as direct evidence of a writer controlling the reader\u2019s pace.' }
       ],
       misconceptions: [
-        { myth: 'A "simple sentence" means a short sentence.', reality: 'Simple sentence means ONE clause, regardless of length — it can still be long with plenty of description.' },
+        { myth: 'A "simple sentence" means a short sentence.', reality: 'Simple sentence means ONE clause, regardless of length. It can still be long with plenty of description.' },
         { myth: 'More complex sentences always means better writing.', reality: 'Examiners reward VARIETY (mixing simple, compound and complex), not defaulting to complexity throughout.' }
       ],
       expertNotes: [
@@ -256,12 +256,12 @@
     },
     subjectverb: {
       title: 'Subject-Verb Agreement',
-      intro: 'The verb must match the subject in number — singular subjects take singular verbs, plural subjects take plural verbs.',
-      origin: 'Subject-verb agreement is a residue of a much richer verb-conjugation system in Old English (and still visible in many other languages) that marked person and number far more extensively — Modern English kept only a small trace of this (mainly the -s ending on third-person singular verbs), which is exactly why the rule can feel like an arbitrary, easily-forgotten add-on rather than a deeply integrated feature.',
+      intro: 'The verb must match the subject in number, singular subjects take singular verbs, plural subjects take plural verbs.',
+      origin: 'Subject-verb agreement is a residue of a much richer verb-conjugation system in Old English (and still visible in many other languages) that marked person and number far more extensively, Modern English kept only a small trace of this (mainly the -s ending on third-person singular verbs), which is exactly why the rule can feel like an arbitrary, easily-forgotten add-on rather than a deeply integrated feature.',
       sections: [
-        { heading: 'The Real Subject Can Hide Behind a Phrase', body: 'A prepositional phrase between subject and verb ("The list OF ITEMS is long") often tricks writers into matching the verb to the nearest noun (items) rather than the true subject (list) — the fix is mentally deleting the phrase between commas or prepositions to expose the real subject before choosing the verb.' },
-        { heading: 'Collective Nouns Follow a British/American Split', body: 'Collective nouns like "team" or "family" take a singular verb in standard British English ("the team IS winning"), treating the group as one unit, while American English more often uses a singular verb too but sometimes allows plural when emphasising the individuals within the group — worth knowing which convention a specific exam board or style guide expects.' },
-        { heading: '"Neither," "Either" and Similar Words Are Singular by Convention', body: '"Neither of the answers WAS correct" uses a singular verb because "neither" (and "either," "each," "everyone") is grammatically treated as singular, even though it refers to multiple items — a specific, testable exception that trips up many otherwise-careful writers.' }
+        { heading: 'The Real Subject Can Hide Behind a Phrase', body: 'A prepositional phrase between subject and verb ("The list OF ITEMS is long") often tricks writers into matching the verb to the nearest noun (items) rather than the true subject (list). The fix is mentally deleting the phrase between commas or prepositions to expose the real subject before choosing the verb.' },
+        { heading: 'Collective Nouns Follow a British/American Split', body: 'Collective nouns like "team" or "family" take a singular verb in standard British English ("the team IS winning"), treating the group as one unit, while American English more often uses a singular verb too but sometimes allows plural when emphasising the individuals within the group, worth knowing which convention a specific exam board or style guide expects.' },
+        { heading: '"Neither," "Either" and Similar Words Are Singular by Convention', body: '"Neither of the answers WAS correct" uses a singular verb because "neither" (and "either," "each," "everyone") is grammatically treated as singular, even though it refers to multiple items, a specific, testable exception that trips up many otherwise-careful writers.' }
       ],
       misconceptions: [
         { myth: 'The verb should always match the noun closest to it.', reality: 'The verb must match the TRUE subject, even if another noun (inside a phrase) sits closer to the verb.' },
@@ -519,7 +519,7 @@
   function qNoun(tier) {
     var noun = pick(NOUN_BANK);
     var opts = mkOptions(noun, shuffle(VERB_DISTRACT.concat(ADJ_DISTRACT, ADV_DISTRACT)).slice(0, 3));
-    return { type: 'mc', topic: 'Nouns', prompt: 'Which of these words is a noun?', options: opts, answer: noun, method: '"' + noun + '" is a noun — it names a person, place, thing or idea.' };
+    return { type: 'mc', topic: 'Nouns', prompt: 'Which of these words is a noun?', options: opts, answer: noun, method: '"' + noun + '" is a noun. It names a person, place, thing or idea.' };
   }
 
   var PRONOUN_BANK = [
@@ -527,7 +527,7 @@
     { d: 1, s: 'Give the book to ___.', answer: 'him', options: ['him', 'he', 'his', 'himself'], note: 'After a preposition ("to"), use the object pronoun "him".' },
     { d: 2, s: '___ is the person who called earlier.', answer: 'She', options: ['She', 'Her', 'Herself', 'Hers'], note: 'The subject of the sentence needs the subject pronoun "She".' },
     { d: 2, s: 'This is ___ house, not theirs.', answer: 'our', options: ['our', 'ours', 'us', 'we'], note: '"Our" is the possessive determiner used directly before a noun.' },
-    { d: 3, s: '___ book is this — yours or mine?', answer: 'Whose', options: ['Whose', "Who's", 'Who', 'Which'], note: '"Whose" asks about possession; "who\'s" means "who is".' },
+    { d: 3, s: '___ book is this, yours or mine?', answer: 'Whose', options: ['Whose', "Who's", 'Who', 'Which'], note: '"Whose" asks about possession; "who\'s" means "who is".' },
     { d: 3, s: 'The award went to the student ___ worked hardest.', answer: 'who', options: ['who', 'whom', 'which', 'whose'], note: '"Who" is correct because it is the subject of "worked".' },
     { d: 4, s: 'To ___ should I address this letter?', answer: 'whom', options: ['whom', 'who', 'whose', 'which'], note: '"Whom" is correct after a preposition ("To").' },
     { d: 4, s: 'Each of the players brought ___ own kit.', answer: 'their', options: ['their', 'his', 'they', 'them'], note: 'Modern usage accepts singular "their" after "each of".' }
@@ -634,7 +634,7 @@
     { d: 4, a: 'Had she known the risks, she would not have invested.', o: ['If she would have known the risks, she would not have invested.', 'Had she known the risks, she would not of invested.', 'She would not have invested, had she know the risks.'] },
     { d: 4, a: 'The data suggest that the theory is correct.', o: ['The data suggests that the theory is correct.', 'The datas suggest that the theory is correct.', 'The data suggest that the theory are correct.'] }
   ];
-  function qWritingCorrection(tier) { var b = pickByTier(WRITING_BANK, tier); return { type: 'mc', topic: 'Writing', prompt: 'Which sentence is written correctly?', options: mkOptions(b.a, b.o), answer: b.a, method: 'The other options contain grammar, spelling or agreement errors — this is the fully correct version.' }; }
+  function qWritingCorrection(tier) { var b = pickByTier(WRITING_BANK, tier); return { type: 'mc', topic: 'Writing', prompt: 'Which sentence is written correctly?', options: mkOptions(b.a, b.o), answer: b.a, method: 'The other options contain grammar, spelling or agreement errors. This is the fully correct version.' }; }
 
   var QT_GENERATORS = {
     grammar: function (tier) { return generateGrammarQuestion(); },

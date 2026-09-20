@@ -39,14 +39,14 @@
       // Real, currently-live Anthropic model IDs (not the old placeholder-style "4.5" names
       // with dots, which aren't valid API model slugs and would 404 if ever actually sent).
       usage:true, models:['claude-opus-5','claude-sonnet-5','claude-haiku-4-5-20251001'], defaultModel:'claude-sonnet-5',
-      freeTier:false, freeTierNote:'No free tier — billed per token from your first request. A new key gets a small one-time trial credit, then it’s pay-as-you-go.' },
+      freeTier:false, freeTierNote:'No free tier, billed per token from your first request. A new key gets a small one-time trial credit, then it’s pay-as-you-go.' },
     { id:'google', name:'Google Gemini', mark:'GE', color:'#4285f4', endpoint:'https://generativelanguage.googleapis.com/v1',
       // Google now issues two live key formats — the older "AIza..." keys and newer ones
       // starting "AQ." (seen from AI Studio in Aug 2026) — so this only sanity-checks length
       // and character set instead of pinning to one prefix. The real check happens
       // server-side against Google's own API when you hit Connect.
       auth:'apikey', keyRe:'^[A-Za-z0-9_.\\-]{20,}$', keyHint:'AIza… or AQ….', docs:'ai.google.dev',
-      usage:true, live:true, freeTier:true, freeTierNote:'Free within Google’s generous daily rate limits — no card required to start. Also the only provider here with live web search built in.',
+      usage:true, live:true, freeTier:true, freeTierNote:'Free within Google’s generous daily rate limits. No card required to start. Also the only provider here with live web search built in.',
       // Google retired the 2.5 line for new API keys in Aug 2026 ("no longer available to new
       // users") — moved to the current Gemini 3 stable, no-billing-required Flash tier. Pro is
       // deliberately left out: gemini-3.1-pro is preview-only and requires a paid Blaze plan,
@@ -55,7 +55,7 @@
     { id:'openai', name:'OpenAI (ChatGPT)', mark:'AI', color:'#10a37f', endpoint:'https://api.openai.com/v1',
       // Covers both classic "sk-..." keys and newer project-scoped "sk-proj-..." keys.
       auth:'apikey', keyRe:'^sk-[A-Za-z0-9_\\-]{20,}$', keyHint:'sk-… or sk-proj-…', docs:'platform.openai.com/docs',
-      usage:true, freeTier:false, freeTierNote:'No free tier — billed per token from your first request. Best used as a Backup provider (Routing below) so it only spends anything if your Default provider fails.',
+      usage:true, freeTier:false, freeTierNote:'No free tier, billed per token from your first request. Best used as a Backup provider (Routing below) so it only spends anything if your Default provider fails.',
       models:['gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna'], defaultModel:'gpt-5.6-luna' }
   ];
 
@@ -163,14 +163,14 @@
     { id:'elevenlabs', name:'ElevenLabs', mark:'EL', color:'#111114', endpoint:'https://api.elevenlabs.io/v1',
       auth:'apikey', keyHint:'32+ chars', docs:'elevenlabs.io/docs', tier:'freemium', tierNote:'Free tier: 10k chars/mo',
       voices:[
-        { id:'21m00Tcm4TlvDq8ikWAM', name:'Rachel — calm, professional (f)' },
-        { id:'AZnzlk1XvdvUeBnXmlld', name:'Domi — confident, strong (f)' },
-        { id:'EXAVITQu4vr4xnSDxMaL', name:'Bella — warm, friendly (f)' },
-        { id:'ErXwobaYiN019PkySvjV', name:'Antoni — well-rounded (m)' },
-        { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh — deep, casual (m)' },
-        { id:'VR6AewLTigWG4xSOukaG', name:'Arnold — crisp, authoritative (m)' },
-        { id:'pNInz6obpgDQGcFmaJgB', name:'Adam — deep, narration (m)' },
-        { id:'yoZ06aMxZJJ28mfd3POQ', name:'Sam — raspy, energetic (m)' }
+        { id:'21m00Tcm4TlvDq8ikWAM', name:'Rachel, calm, professional (f)' },
+        { id:'AZnzlk1XvdvUeBnXmlld', name:'Domi, confident, strong (f)' },
+        { id:'EXAVITQu4vr4xnSDxMaL', name:'Bella, warm, friendly (f)' },
+        { id:'ErXwobaYiN019PkySvjV', name:'Antoni, well-rounded (m)' },
+        { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh, deep, casual (m)' },
+        { id:'VR6AewLTigWG4xSOukaG', name:'Arnold, crisp, authoritative (m)' },
+        { id:'pNInz6obpgDQGcFmaJgB', name:'Adam, deep, narration (m)' },
+        { id:'yoZ06aMxZJJ28mfd3POQ', name:'Sam, raspy, energetic (m)' }
       ] }
   ];
 

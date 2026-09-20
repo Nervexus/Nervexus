@@ -43,7 +43,7 @@
         { id: 'eye-track',   name: 'Smooth pursuit, no head movement', unit: 'seconds', tiers: [30, 60, 90, 120] }
       ],
       work: [
-        { name: 'Nasal breathing, all day', dose: 'Every waking hour', cue: 'Mouth shut. If you cannot, you are going too hard — slow down until you can.' },
+        { name: 'Nasal breathing, all day', dose: 'Every waking hour', cue: 'Mouth shut. If you cannot, you are going too hard. Slow down until you can.' },
         { name: 'CO2 tolerance holds',      dose: '5 rounds, daily',   cue: 'Exhale first. Hold to discomfort, never to panic.' },
         { name: 'Hard chewing',             dose: 'Daily',             cue: 'Tough cuts of meat, raw carrot, mastic gum. Both sides evenly or you build a crooked jaw.',
           risk: 'Stop at any jaw clicking or pain. TMJ damage is slow to heal and ends the whole programme.' },
@@ -89,7 +89,7 @@
     },
     {
       key: 'chest', name: 'Chest',
-      why: 'Pressing strength is real strength — but only when the shoulder can survive it. '
+      why: 'Pressing strength is real strength, but only when the shoulder can survive it. '
          + 'Pressed hard and pulled twice as hard.',
       standards: [
         { id: 'bench',      name: 'Bench press',      unit: '% bodyweight', tiers: [75, 100, 140, 175] },
@@ -116,7 +116,7 @@
       ],
       work: [
         { name: 'Hollow body holds',  dose: '5 x max, daily', cue: 'Lower back flat to the floor. If it lifts, shorten the levers.' },
-        { name: 'Ab wheel / rollout', dose: '4 x 8-12',       cue: 'Anti-extension. Do not let the lower back arch — that is the whole exercise.' },
+        { name: 'Ab wheel / rollout', dose: '4 x 8-12',       cue: 'Anti-extension. Do not let the lower back arch. That is the whole exercise.' },
         { name: 'Pallof press',       dose: '3 x 12 each',    cue: 'Anti-rotation. Resist the pull, do not produce it.' },
         { name: 'Loaded carries',     dose: '4 x 60m, weekly',cue: 'Farmer, suitcase, front rack. Built the whole trunk and the grip at once.' },
         { name: 'Hanging leg raises', dose: '4 x 10-15',      cue: 'No swing. Curl the pelvis at the top or it is only hip flexors.' }
@@ -161,7 +161,7 @@
     {
       key: 'lower-legs', name: 'Lower Legs', neglected: true,
       why: 'Calves take bodyweight thousands of times a day and almost everyone trains them '
-         + 'as an afterthought. The tibialis at the front — the muscle nobody trains at all — '
+         + 'as an afterthought. The tibialis at the front, the muscle nobody trains at all — '
          + 'is what stops shin splints and knee pain.',
       standards: [
         { id: 'calf-raise', name: 'Single-leg calf raise', unit: 'reps',    tiers: [15, 25, 40, 60] },
@@ -170,7 +170,7 @@
       ],
       work: [
         { name: 'Standing calf raise', dose: '4 x 15, 3x/week', cue: 'Full stretch at the bottom, 2s hold at the top. Gastroc needs a straight knee.' },
-        { name: 'Seated calf raise',   dose: '4 x 20',          cue: 'Bent knee hits the soleus — the endurance half, and the half that gets skipped.' },
+        { name: 'Seated calf raise',   dose: '4 x 20',          cue: 'Bent knee hits the soleus, the endurance half, and the half that gets skipped.' },
         { name: 'Tibialis raises',     dose: '3 x 25, 3x/week', cue: 'Heels against a wall, toes lifting. Burns like nothing else.' },
         { name: 'Jump rope',           dose: '10 min',          cue: 'Elastic strength through the whole lower leg.' }
       ]
@@ -187,7 +187,7 @@
       ],
       work: [
         { name: 'Short foot exercise', dose: '3 x 10 each, daily', cue: 'Draw the ball of the foot toward the heel without curling the toes. Builds the arch.' },
-        { name: 'Toe splay and lifts', dose: 'Daily',              cue: 'Big toe up alone, then the other four alone. Hard at first — that is the point.' },
+        { name: 'Toe splay and lifts', dose: 'Daily',              cue: 'Big toe up alone, then the other four alone. Hard at first. That is the point.' },
         { name: 'Barefoot walking',    dose: 'Daily',              cue: 'On grass, gravel, sand. Varied ground is the training stimulus.',
           risk: 'Build up slowly. Going from cushioned shoes to barefoot mileage overnight causes stress fractures.' },
         { name: 'Toe spacers',         dose: 'Evenings',           cue: 'Undo the shape the shoes made.' }
@@ -227,7 +227,7 @@
         { id: 'boredom',      name: 'Sitting with nothing', unit: 'minutes', tiers: [5, 15, 30, 60] }
       ],
       drills: [
-        { name: 'Single-task blocks', dose: 'Daily', how: 'One task, timer running, phone in another room. Not silenced — another room.' },
+        { name: 'Single-task blocks', dose: 'Daily', how: 'One task, timer running, phone in another room. Not silenced, another room.' },
         { name: 'Boredom tolerance',  dose: 'Daily', how: 'Sit with no input. No music, no phone, no book. This is withdrawal, and it passes.' },
         { name: 'Attention residue check', dose: 'Between tasks', how: 'Two minutes of nothing between tasks instead of a scroll. Stops the last task bleeding into the next.' },
         { name: 'Kill the pull', dose: 'Once', how: 'Notifications off. Feeds off the home screen. You cannot out-discipline a system designed by thousands of engineers to beat you.' }
@@ -243,7 +243,7 @@
         { id: 'loci',        name: 'Memory palace, items placed', unit: 'items', tiers: [10, 25, 50, 100] }
       ],
       drills: [
-        { name: 'Spaced repetition', dose: 'Daily', how: 'Review at increasing intervals. The app already does this for weak topics — use it.' },
+        { name: 'Spaced repetition', dose: 'Daily', how: 'Review at increasing intervals. The app already does this for weak topics. Use it.' },
         { name: 'Memory palace',     dose: '3x/week', how: 'A route you know. Place vivid, absurd images at fixed points. Absurd is what makes it stick.' },
         { name: 'Active recall',     dose: 'Every study session', how: 'Close the book and write what you remember. Re-reading feels like learning and is not.' },
         { name: 'Name discipline',   dose: 'Every introduction', how: 'Repeat it aloud, link it to an image, use it once before the conversation ends.' }
@@ -292,7 +292,7 @@
       ],
       drills: [
         { name: 'Cold exposure',      dose: 'Daily', how: 'Cold shower, finish on cold. Voluntary discomfort with a defined end.',
-          risk: 'Not for anyone with a heart condition. Never in open water alone — cold shock kills strong swimmers.' },
+          risk: 'Not for anyone with a heart condition. Never in open water alone, cold shock kills strong swimmers.' },
         { name: 'Hardest thing first', dose: 'Daily', how: 'Before email, before phone. The day is won or lost in the first hour.' },
         { name: 'Keep small promises', dose: 'Daily', how: 'Discipline is trust in yourself, and trust is built from small kept promises.' },
         { name: 'Deliberate hard thing', dose: 'Weekly', how: 'One thing you would rather not do. Chosen, not stumbled into.' }
@@ -329,7 +329,7 @@
     { name: 'Sleep 7-9 hours', evidence: 'strong', effect: 'Large',
       detail: 'One week at five hours drops testosterone by 10-15% in healthy young men. Nothing else on this list is undone as fast, and nothing else is as free.' },
     { name: 'Get body fat to 10-15%', evidence: 'strong', effect: 'Large',
-      detail: 'Fat tissue converts testosterone to oestrogen via aromatase. Excess fat is not neutral — it is actively working against you.' },
+      detail: 'Fat tissue converts testosterone to oestrogen via aromatase. Excess fat is not neutral. It is actively working against you.' },
     { name: 'Heavy compound lifting', evidence: 'strong', effect: 'Moderate',
       detail: 'Squats, deadlifts, presses. Acute post-training rises are small and short-lived; the real mechanism is body composition and insulin sensitivity over months.' },
     { name: 'Do not run a calorie deficit forever', evidence: 'strong', effect: 'Large',
@@ -337,7 +337,7 @@
     { name: 'Cut alcohol', evidence: 'strong', effect: 'Moderate',
       detail: 'Directly toxic to Leydig cells. Heavy drinking measurably lowers testosterone; occasional drinking much less so. This is the easiest large win most people refuse.' },
     { name: 'Fix vitamin D', evidence: 'moderate', effect: 'Moderate',
-      detail: 'Correcting a deficiency helps. Supplementing when already replete does nothing. Test before dosing — this is the one worth an actual blood test.' },
+      detail: 'Correcting a deficiency helps. Supplementing when already replete does nothing. Test before dosing. This is the one worth an actual blood test.' },
     { name: 'Enough zinc and magnesium', evidence: 'moderate', effect: 'Moderate',
       detail: 'Deficiency lowers testosterone; correcting it restores. Excess does not push it higher. Food first: oysters, red meat, pumpkin seeds.' },
     { name: 'Manage chronic stress', evidence: 'moderate', effect: 'Moderate',
@@ -353,7 +353,7 @@
   var LIFESTYLE = [
     { name: 'Sleep discipline',  detail: 'Same times daily. Dark, cold, no screens for the last hour. The whole programme is built on this.' },
     { name: 'Daily sunlight',    detail: 'Within an hour of waking, outdoors, no sunglasses. Sets the clock that sets everything else.' },
-    { name: 'Walk 10,000 steps', detail: 'Not training — the baseline underneath training. Non-negotiable on rest days.' },
+    { name: 'Walk 10,000 steps', detail: 'Not training, the baseline underneath training. Non-negotiable on rest days.' },
     { name: 'Cold exposure',     detail: 'Daily. Recovery and discipline in the same two minutes.' },
     { name: 'No phone in bed',   detail: 'The single highest-return rule on this page.' },
     { name: 'Sauna or heat',     detail: 'Where available. Good evidence for cardiovascular health and recovery.' },
@@ -364,15 +364,15 @@
      Cost is what makes a nutrition plan survive contact with a real week. */
   var FOODS = [
     { name: 'Eggs',            per: '£0.30/egg',   gives: 'Complete protein, choline, cholesterol for hormone synthesis', note: 'Whole. The yolk is the nutritious part.' },
-    { name: 'Beef liver',      per: '£0.60/100g',  gives: 'The most nutrient-dense food there is — vitamin A, B12, copper, iron', note: 'Once a week is plenty. Cheap because nobody wants it.' },
+    { name: 'Beef liver',      per: '£0.60/100g',  gives: 'The most nutrient-dense food there is, vitamin A, B12, copper, iron', note: 'Once a week is plenty. Cheap because nobody wants it.' },
     { name: 'Sardines (tinned)', per: '£0.90/tin', gives: 'Omega-3, calcium from the bones, vitamin D, protein', note: 'Cheapest real omega-3 available.' },
     { name: 'Whole milk',      per: '£1.30/litre', gives: 'Protein, calcium, fat-soluble vitamins', note: 'Skimmed removes the fat-soluble vitamins.' },
     { name: 'Oats',            per: '£0.15/serving', gives: 'Slow carbohydrate, fibre, magnesium', note: 'Bulk bags. Cheapest quality carbohydrate there is.' },
     { name: 'Potatoes',        per: '£0.20/500g',  gives: 'Carbohydrate, potassium, vitamin C', note: 'Whole and cooked simply, not processed into chips.' },
-    { name: 'Frozen vegetables', per: '£1.00/kg',  gives: 'Micronutrients, fibre', note: 'Frozen at harvest — often higher in nutrients than fresh that has travelled.' },
+    { name: 'Frozen vegetables', per: '£1.00/kg',  gives: 'Micronutrients, fibre', note: 'Frozen at harvest, often higher in nutrients than fresh that has travelled.' },
     { name: 'Beef mince (higher fat)', per: '£1.50/250g', gives: 'Protein, zinc, iron, creatine, B12', note: 'Cheaper than lean and better for hormones.' },
     { name: 'Pumpkin seeds',   per: '£0.40/30g',   gives: 'Zinc, magnesium', note: 'The two minerals most often short in men who train.' },
-    { name: 'Brazil nuts',     per: '£0.25/2 nuts',gives: 'Selenium', note: 'Two a day. More is genuinely harmful — selenium is toxic in excess.' },
+    { name: 'Brazil nuts',     per: '£0.25/2 nuts',gives: 'Selenium', note: 'Two a day. More is genuinely harmful. Selenium is toxic in excess.' },
     { name: 'Olive oil',       per: '£0.25/tbsp',  gives: 'Monounsaturated fat, polyphenols', note: 'Extra virgin, not for high heat.' },
     { name: 'Greek yoghurt',   per: '£0.60/150g',  gives: 'Protein, calcium, live cultures', note: 'Plain. Flavoured is a dessert.' }
   ];

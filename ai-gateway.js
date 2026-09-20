@@ -119,13 +119,13 @@
   }
 
   function noVisionError() {
-    return { error: 'Reading a picture needs Claude, ChatGPT or Gemini connected in the AI centre — none of them is, so there is nothing here that can look at an image.',
+    return { error: 'Reading a picture needs Claude, ChatGPT or Gemini connected in the AI centre. None of them is, so there is nothing here that can look at an image.',
              code: 'no-vision-provider' };
   }
 
   function noneError(live) {
     return live
-      ? { error: 'That needs a provider that can search the web. Connect Google Gemini in the AI centre — it is the only one here with live search — then ask again.',
+      ? { error: 'That needs a provider that can search the web. Connect Google Gemini in the AI centre. It is the only one here with live search, then ask again.',
           code: 'no-live-provider' }
       : { error: 'No AI provider is connected yet. Add one in the AI centre and this will start working.',
           code: 'no-provider' };

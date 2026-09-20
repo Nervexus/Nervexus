@@ -438,6 +438,6 @@
     isSpinning: function () { return !!S.spin; },
     setAspect: function (r) { S.aspect = r || 1.5; fit(); },
     debugZones: debugZones,
-    CREDIT: 'Model: “man muscle human body” by Rena — CC Attribution',
+    CREDIT: 'Model: “man muscle human body” by Rena: CC Attribution',
   };
 })();

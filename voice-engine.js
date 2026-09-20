@@ -44,7 +44,7 @@
   var PROFILES = [
     { id: 'pro_m',  name: 'Professional Male', desc: 'Clear · neutral · anchor', gender: 'm', lang: 'en-US', rate: 0.98, pitch: 0.92, style: 'Professional',
       prefer: ['Microsoft (Guy|Davis|Andrew)', 'Google US English', 'Aaron', 'Tom', 'Alex', 'Fred'],
-      sample: 'Good morning. Your briefing is ready — let us get straight to what matters.' },
+      sample: 'Good morning. Your briefing is ready. Let us get straight to what matters.' },
     { id: 'exec_f', name: 'Executive Female', desc: 'Poised · authoritative', gender: 'f', lang: 'en-US', rate: 0.96, pitch: 0.94, style: 'Executive',
       prefer: ['Karen', 'Victoria', 'Microsoft Aria', 'Serena', 'Samantha'],
       sample: 'Here is where we stand, and here is the decision I recommend you make.' },

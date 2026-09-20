@@ -511,7 +511,7 @@
       run:function (m, host) {
         var open = host.tools.openTasks();
         return open.length ? 'You have ' + plural(open.length, 'task') + ' left: ' + list(open) + '.'
-                           : 'Nothing left — your task list is clear.';
+                           : 'Nothing left. Your task list is clear.';
       } },
 
     { id:'doneToday', label:'What you finished today', say:'"What have I done today?"',
@@ -547,7 +547,7 @@
         host.tools.addMemory(fact);
         // Colon, not "remember that" — the latter only reads correctly for facts phrased as
         // a clause, and comes out as "I'll remember that my thoughts" for anything else.
-        return 'Noted — I’ll remember: ' + fact + '.';
+        return 'Noted: I’ll remember: ' + fact + '.';
       } },
 
     { id:'schedule', acts:true, label:'Schedule an event', say:'"Schedule a dentist appointment on Friday at 3pm"',
@@ -895,7 +895,7 @@
         return logWorkout(w, host);
       } },
 
-    { id:'addNote', acts:true, label:'Save a note', say:'"Make a note called ideas — buy the domain"',
+    { id:'addNote', acts:true, label:'Save a note', say:'"Make a note called ideas, buy the domain"',
       re:/^(?:make|add|save|write)\s+(?:a\s+)?note(?:\s+(?:called|titled|named))?\s+(.+?)(?:\s*[—–:-]\s*(.+))?[.?!]*$/i,
       run:function (m, host) { var t = stripDest(m[1]); if (!t) return null; host.tools.addNote(cap(t), (m[2] || '').trim()); return 'I’ve saved that note for you.'; } },
 
@@ -910,14 +910,14 @@
     { id:'whoAreYou', label:'Ask who she is', say:'"What is your name?"',
       re:/^(?:what(?:(?:’|')s| is)\s+your\s+name|who\s+are\s+you|what\s+(?:are\s+you\s+)?called)[.?!]*$/i,
       run:function (m, host) {
-        return 'I’m Loura, ' + host.firstName() + ' — your assistant in here.';
+        return 'I’m Loura, ' + host.firstName() + ', your assistant in here.';
       } },
 
     { id:'capabilities', label:'Ask what she can do', say:'"What can you do?"',
       re:/^(?:what\s+can\s+you\s+do|help|what\s+are\s+you\s+able\s+to\s+do|what\s+are\s+your\s+(?:commands|abilities))[.?!]*$/i,
       run:function (m, host) {
         var n = LOCAL.length;
-        return 'I can handle about ' + n + ' things on my own — logging training, food, sleep, money and notes, '
+        return 'I can handle about ' + n + ' things on my own, logging training, food, sleep, money and notes, '
              + 'adding tasks and missions, scheduling, and telling you what you’ve done. '
              + (host.hasAI() ? 'Anything else I’ll think through with your connected AI provider.'
                              : 'Open questions need an AI provider connected in the AI centre.');
@@ -987,7 +987,7 @@
 
      Queries are single-beat on purpose: "let me check" in front of an answer we already
      have is theatre. */
-  var ACKS = ['Okay, doing that now.', 'Sure — one moment.', 'On it.', 'Right, let me get that.'];
+  var ACKS = ['Okay, doing that now.', 'Sure. One moment.', 'On it.', 'Right, let me get that.'];
 
   /* After a confirmed action Loura asks whether there is anything else, by name. That turns
      the next utterance into an answer to a question, not a fresh command — so a bare "no"
@@ -1100,7 +1100,7 @@
     if (QUESTIONY.test(text)) {
       return host.hasAI()
         ? 'I couldn’t get an answer to that one just now.'
-        : 'That one needs an AI provider — there isn’t one connected yet. Everything I do on my own still works.';
+        : 'That one needs an AI provider. There isn’t one connected yet. Everything I do on my own still works.';
     }
     return 'Sorry, I didn’t catch that. Say it again?';
   }

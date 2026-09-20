@@ -64,10 +64,10 @@
       bodies: [
         'Motivation is weather, {name}. Discipline is climate. Move regardless.',
         'The version of you that wins is built on the days you did not feel like it.',
-        'You do not rise to your goals — you fall to your standards. Raise them.',
+        'You do not rise to your goals. You fall to your standards. Raise them.',
         'Comfort is a slow tax on your potential. Refuse to pay it today.',
         'Decide once, execute daily. That is the entire game, {name}.',
-        'No one is coming to save the session. That is the job — and it is yours.'
+        'No one is coming to save the session. That is the job, and it is yours.'
       ],
       contexts: ['Daily discipline · elite protocol', 'Mindset directive', 'Because standards compound']
     },
@@ -79,7 +79,7 @@
         'Recovery reads {recovery}%, {name} — your system is primed. Load the bar.',
         'No session logged yet today. One hour, zero negotiation. Go.',
         'Prime readiness window detected. Train now while the tank is full.',
-        '{lastPart} was your last focus — balance it and hit the opposite chain today.',
+        '{lastPart} was your last focus, balance it and hit the opposite chain today.',
         'The gap between intention and result is one warm-up set. Start it.'
       ],
       contexts: ['Recovery {recovery}% · optimal load', 'Training window open', 'Because readiness is high']
@@ -90,9 +90,9 @@
       titles: ['Recover like a pro.', 'Protect the gains.', 'Down-shift, {name}.', 'Recovery is training.'],
       bodies: [
         'Session banked. Now win recovery: protein, water, and {sleepAvg}h of sleep tonight.',
-        'Soreness is {soreness}. Ten minutes of mobility and hydrate — grow from the work.',
+        'Soreness is {soreness}. Ten minutes of mobility and hydrate, grow from the work.',
         'Muscle is built at rest, {name}. Guard tonight\u2019s sleep window like it matters. It does.',
-        'Readiness sits at {recovery}%. Respect the signal — a smart deload protects momentum.'
+        'Readiness sits at {recovery}%. Respect the signal. A smart deload protects momentum.'
       ],
       contexts: ['Post-session · recovery', 'Because you trained today', 'Recovery {recovery}%']
     },
@@ -101,7 +101,7 @@
       label: 'STREAK', color: PALETTE.hotL, glyph: '✦', family: 'coaching', weight: function (c) { return c.gymStreak >= 5 ? 3 : 2; }, when: function (c) { return c.gymStreak >= 2 || c.moveStreak >= 3; },
       titles: ['{gymStreak}-day streak is alive.', 'Do not break the chain.', 'Momentum is yours.', 'The streak is on the line.'],
       bodies: [
-        '{gymDaysPhrase} straight, {name}. The chain is heavy now — do not be the one who drops it.',
+        '{gymDaysPhrase} straight, {name}. The chain is heavy now. Do not be the one who drops it.',
         'Gym streak stands at {gymStreak}. Your record is {gymLongest}. Go take it.',
         'Consistency is your edge — {moveDaysPhrase} of movement. Extend it before midnight.',
         'Every unbroken day makes tomorrow easier to win. Keep the {gymDaysPhrase} intact.'
@@ -113,9 +113,9 @@
       label: 'PROGRESS', color: PALETTE.gold, glyph: '↗', family: 'coaching', weight: function () { return 2; },
       titles: ['Trending up, {name}.', 'The data agrees.', 'Progress, logged.', 'Level up.'],
       bodies: [
-        'Bodyweight is {weightNow}kg — trend {weightDelta}. The plan is working. Stay the course.',
+        'Bodyweight is {weightNow}kg, trend {weightDelta}. The plan is working. Stay the course.',
         'You banked {xpToday} XP today, {name}. Small deposits compound into rank.',
-        '{workoutsWeekPhrase} this week. That is not luck — that is a system.',
+        '{workoutsWeekPhrase} this week. That is not luck. That is a system.',
         'Quiet progress is still progress. The scoreboard rewards the patient.'
       ],
       contexts: ['Weekly progress', 'XP +{xpToday} today', 'Because the trend is your friend']
@@ -125,7 +125,7 @@
       label: 'PERSONAL BEST', color: PALETTE.gold, glyph: '★', family: 'coaching', weight: function () { return 2; }, when: function (c) { return c.best1RM > 0; },
       titles: ['New personal best.', 'Record broken, {name}.', 'Ceiling raised.', 'That is a PR.'],
       bodies: [
-        'Estimated 1RM is now {best1RM}kg — a new high. Strength is a skill, and you are compounding it.',
+        'Estimated 1RM is now {best1RM}kg. A new high. Strength is a skill, and you are compounding it.',
         'You just redefined your baseline, {name}. Yesterday\u2019s ceiling is today\u2019s floor.',
         'A {best1RM}kg estimate puts you in rare air. Rest, refuel, and come back hungrier.'
       ],
@@ -136,7 +136,7 @@
       label: 'HYDRATION', color: PALETTE.cool, glyph: '◉', family: 'coaching', weight: function (c) { return c.waterLeft >= 3 ? 3 : 2; }, when: function (c) { return c.waterLeft > 0; },
       titles: ['Hydrate, {name}.', 'Water check.', 'Top up.', 'Fuel the machine.'],
       bodies: [
-        'You are at {waterPhrase} of {waterGoal}. {waterLeft} to go — performance drops before thirst does.',
+        'You are at {waterPhrase} of {waterGoal}. {waterLeft} to go, performance drops before thirst does.',
         'Hydration is free performance, {name}. Reach {waterGoal} glasses before the day closes.',
         'Two percent dehydration costs you focus and power. Close the {waterLeft}-glass gap now.'
       ],
@@ -147,7 +147,7 @@
       label: 'SLEEP', color: PALETTE.cool, glyph: '☾', family: 'coaching', weight: function () { return 2; },
       titles: ['Guard your sleep.', 'Wind down, {name}.', 'Sleep is a weapon.', 'Recovery starts tonight.'],
       bodies: [
-        'You have averaged {sleepAvg}h this week. Aim for 8 tonight — muscle and focus are built there.',
+        'You have averaged {sleepAvg}h this week. Aim for 8 tonight. Muscle and focus are built there.',
         'Screens down soon, {name}. Elite recovery is engineered, not hoped for.',
         'The best pre-workout is a full night\u2019s sleep. Protect the window tonight.'
       ],
@@ -158,7 +158,7 @@
       label: 'NUTRITION', color: PALETTE.white, glyph: '◆', family: 'coaching', weight: function () { return 2; },
       titles: ['Fuel with intent.', 'Protein check.', 'Eat for the goal, {name}.', 'Nutrition is the other 80%.'],
       bodies: [
-        'Target {proteinGoal}g of protein today — muscle cannot be built from willpower alone.',
+        'Target {proteinGoal}g of protein today, muscle cannot be built from willpower alone.',
         'Every meal is a vote, {name}. Cast it for the athlete you are becoming.',
         'Whole foods, enough protein, honest portions. Unsexy, undefeated.'
       ],
@@ -182,7 +182,7 @@
       bodies: [
         'Pick one target for the next 90 minutes, {name}. Phone away, doors closed, execute.',
         'Attention is your rarest asset. Spend it on the one thing that moves the needle.',
-        'Depth beats noise. Close ten tabs and open one — the one that matters.'
+        'Depth beats noise. Close ten tabs and open one. The one that matters.'
       ],
       contexts: ['Focus tip', 'Because scattered effort is wasted effort']
     },
@@ -191,7 +191,7 @@
       label: 'COMEBACK', color: PALETTE.hot, glyph: '↺', family: 'coaching', weight: function () { return 4; }, when: function (c) { return c.missedYesterday; },
       titles: ['Reset, {name}.', 'One day does not define you.', 'Back on the horse.', 'The comeback starts now.'],
       bodies: [
-        'You missed yesterday. Champions do not miss twice — today is the rep that counts.',
+        'You missed yesterday. Champions do not miss twice. Today is the rep that counts.',
         'Streaks break; character does not, {name}. Log one honest session and restart the clock.',
         'Do not negotiate with the miss. Show up small, show up now, and rebuild the momentum.'
       ],
@@ -202,7 +202,7 @@
       label: 'HEALTH', color: PALETTE.hotL, glyph: '✚', family: 'coaching', weight: function () { return 1; },
       titles: ['Health check, {name}.', 'Marginal gains.', 'Small habit, big return.'],
       bodies: [
-        'Recovery {recovery}% and resting well. Add a 10-minute walk today — base wins compound.',
+        'Recovery {recovery}% and resting well. Add a 10-minute walk today, base wins compound.',
         'Posture, breath, sunlight, {name}. The unglamorous habits build the durable body.',
         'Stand up, roll the shoulders, take five deep breaths. Reset the nervous system.'
       ],
@@ -215,7 +215,7 @@
       prep: function (c) { var e = pick(c.eventsToday); return { event: e.title, eventTime: e.time }; },
       titles: ['On your schedule.', 'Up next, {name}.', 'Incoming.', 'Block secured.'],
       bodies: [
-        '{event} at {eventTime}. Show up sharp — preparation is a form of respect.',
+        '{event} at {eventTime}. Show up sharp. Preparation is a form of respect.',
         '{eventTime}: {event}. Ten minutes early is on time, {name}.',
         'Do not just attend {event} — arrive decided. Know your one outcome for it.'
       ],
@@ -227,7 +227,7 @@
       prep: function (c) { return { task: pick(c.taskNames) }; },
       titles: ['Open loops, {name}.', 'Close it out.', 'Unfinished business.', 'One rep from done.'],
       bodies: [
-        '{tasksLeftPhrase} still open today. Momentum loves a clean board — clear one now.',
+        '{tasksLeftPhrase} still open today. Momentum loves a clean board, clear one now.',
         '\u201C{task}\u201D is still on your list, {name}. Two minutes of action beats an hour of intention.',
         'You have {tasksLeftPhrase} between you and a closed day. Attack the smallest one first.'
       ],
@@ -288,7 +288,7 @@
       prep: function () { return { figure: '$' + rf(0.8, 9.4, 1) + 'B', sector: pick(SECTORS), dir: pick(['inflows', 'inflows', 'outflows']), th: ordinal(ri(2, 6)) }; },
       titles: ['Capital flow.', 'Money in motion.', 'Liquidity alert.', 'Flows desk.'],
       bodies: [
-        '{figure} rotated into {sector} this session — net {dir} for a {th} straight day.',
+        '{figure} rotated into {sector} this session, net {dir} for a {th} straight day.',
         'Institutional money is moving toward {sector}, {name}. Follow the flow, not the noise.',
         'Smart money leaves tracks: {figure} in {sector} {dir}. Read the footprints.'
       ],

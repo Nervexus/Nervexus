@@ -195,8 +195,8 @@
 
       var date = dt.date || defaultDate;
       var note = '';
-      if (dt.date && dt.date < earliest) { date = earliest; note = 'older than 30 days — moved to ' + earliest; }
-      if (date > todayKey) { date = todayKey; note = 'future date — moved to today'; }
+      if (dt.date && dt.date < earliest) { date = earliest; note = 'older than 30 days, moved to ' + earliest; }
+      if (date > todayKey) { date = todayKey; note = 'future date, moved to today'; }
 
       rows.push({
         type: isIncome ? 'income' : 'expense',

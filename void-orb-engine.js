@@ -255,7 +255,7 @@
       } catch (err) {
         // Past the browser's live-context cap this throws rather than returning null.
         if (window.console) console.warn('[VoidOrb] could not create a WebGL context: '
-          + ((err && err.message) || err) + ' — too many 3D canvases are live.');
+          + ((err && err.message) || err) + ', too many 3D canvases are live.');
         S.lost = true;
         return false;
       }
@@ -273,7 +273,7 @@
       S.renderer.domElement.addEventListener('webglcontextlost', function (e) {
         e.preventDefault();
         S.lost = true;
-        if (window.console) console.warn('[VoidOrb] WebGL context lost — the orb will be rebuilt. '
+        if (window.console) console.warn('[VoidOrb] WebGL context lost. The orb will be rebuilt. '
           + 'If this repeats, too many 3D canvases are being created.');
       }, false);
 

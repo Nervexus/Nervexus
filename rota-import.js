@@ -400,18 +400,18 @@
 
     if (!lines.length) return empty('Nothing to read.');
     if (!tokens(me).filter(function (t) { return t.length >= 3; }).length)
-      return empty('Put your name in first — the rota has everyone on it, and that is how it knows which shifts are yours.');
+      return empty('Put your name in first. The rota has everyone on it, and that is how it knows which shifts are yours.');
 
     /* Dates-down is tried first. A dated row with nothing in it reads as a heading to the
        names-down parser, so letting that one go first would take the sheet apart wrongly. */
     var shape = 'grid-down';
     var got = parseGridDown(lines, todayKey);
     if (got && got.needHeader)
-      return empty('That looks like a rota with the dates down the side and a column each for the people — but the row with everyone\u2019s names is not in what you pasted, so there is nothing to say which column is yours. Copy it again including that row.');
+      return empty('That looks like a rota with the dates down the side and a column each for the people, but the row with everyone\u2019s names is not in what you pasted, so there is nothing to say which column is yours. Copy it again including that row.');
     if (!got) { shape = 'grid'; got = parseGrid(lines, todayKey); }
     if (!got) { shape = 'blocks'; got = parseBlocks(lines, todayKey); }
     if (!got) { shape = 'lines'; got = parseLines(lines, todayKey); }
-    if (!got) return empty('Could not find any shifts in that. A rota needs a date and a time range — "Mon 14  09:00-17:00" — and a name against each one.');
+    if (!got) return empty('Could not find any shifts in that. A rota needs a date and a time range: "Mon 14  09:00-17:00", and a name against each one.');
     var all = got.shifts, blanks = got.blanks || [];
 
     // Anything wildly outside the window is a misread date, not a shift booked in 2031.
@@ -461,7 +461,7 @@
       offDays: offDays, untimed: untimed,
       total: all.length, outOfRange: outOfRange,
       warn: out.length ? '' : ((offDays.length || untimed.length)
-        ? 'No shifts with hours against that name — every day it names is ' + (untimed.length ? 'without a time' : 'a day off') + '.'
+        ? 'No shifts with hours against that name. Every day it names is ' + (untimed.length ? 'without a time' : 'a day off') + '.'
         : people.length
         ? 'Found ' + all.length + ' shift' + (all.length === 1 ? '' : 's') + ' but none against that name. The rota has: ' + people.slice(0, 8).join(', ') + (people.length > 8 ? '…' : '') + '.'
         : 'Could not find any shifts in that.')
