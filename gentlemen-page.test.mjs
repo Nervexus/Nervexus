@@ -422,6 +422,132 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
    one is supplied, and these hold both halves of that. */
 
 
+/* ---- test yourself ---------------------------------------------------------------------
+   A second, separate test from the daily one above: pick a subject, choose a difficulty,
+   answer a short set, see a score. Brain Rest's own full-screen gate is reused for the shape
+   (the .lc-card.rest-stage element Brain Rest itself opens into), so these read it back the
+   same way brain-rest.test.mjs does rather than through any Gentlemen-specific class. */
+const gentQuizStage = () => page.evaluate(() => window.__nvx.state.gentQuizStage);
+const clickText = (sel, text) => page.evaluate(({ sel, text }) => {
+  const el = [...document.querySelectorAll(sel)].find(e => e.textContent.trim() === text);
+  if (!el) throw new Error('nothing matching "' + text + '" in ' + sel);
+  el.click();
+}, { sel, text });
+
+t('Test Yourself only appears on the five subject pages, never the daily test or Dining', async () => {
+  for (const [sub, want] of [['test', false], ['money', true], ['history', true], ['taste', true],
+                              ['conversation', true], ['foundation', true], ['dining', false]]) {
+    await boot({ gentSub: sub });
+    const has = await page.evaluate(() =>
+      !![...document.querySelectorAll('div')].find(e => e.children.length === 0 && e.textContent.trim() === 'TEST YOURSELF ›'));
+    eq(has, want, sub + (want ? ' is missing its Test Yourself button' : ' should not offer a test'));
+  }
+});
+
+t('pressing it opens a full-screen pick of all four levels, and Not Now closes it', async () => {
+  await boot({ gentSub: 'money' });
+  await clickText('div', 'TEST YOURSELF ›');
+  await page.waitForTimeout(200);
+  eq(await gentQuizStage(), 'pick', 'the gate did not open on the level pick');
+  const labels = await page.evaluate(() => [...document.querySelectorAll('.rest-stage span')].map(e => e.textContent.trim()));
+  for (const want of ['EASY', 'MEDIUM', 'HARD', 'EXTRA HARD']) ok(labels.includes(want), 'no ' + want + ' option offered');
+  await clickText('div', 'NOT NOW');
+  await page.waitForTimeout(150);
+  eq(await gentQuizStage(), '', 'Not Now did not close the gate');
+});
+
+t('picking a level starts a quiz sized to that subject and level’s own bank', async () => {
+  await boot({ gentSub: 'history' });
+  await clickText('div', 'TEST YOURSELF ›');
+  await clickText('span', 'HARD');
+  await page.waitForTimeout(200);
+  const s = await page.evaluate(() => ({
+    stage: window.__nvx.state.gentQuizStage, n: window.__nvx.state.gentQuizQueue.length,
+    pos: document.querySelector('.rest-stage').innerText }));
+  eq(s.stage, 'quiz', 'picking Hard did not start the quiz');
+  ok(s.n > 0, 'History’s Hard level came back with no questions');
+  ok(s.pos.includes('QUESTION 1 OF ' + s.n), 'the card does not read as question 1 of ' + s.n);
+  ok(s.pos.includes('HISTORY & CULTURE') && s.pos.includes('HARD'), 'the banner does not name the subject and level');
+});
+
+t('forward is locked until the question in front of you is answered, same as the daily test', async () => {
+  await boot({ gentSub: 'taste' });
+  await clickText('div', 'TEST YOURSELF ›');
+  await clickText('span', 'EASY');
+  await page.waitForTimeout(200);
+  const before = await page.evaluate(() => window.__nvx.state.gentQuizIdx);
+  await clickText('span', 'NEXT ›');
+  await page.waitForTimeout(150);
+  eq(await page.evaluate(() => window.__nvx.state.gentQuizIdx), before, 'NEXT advanced before an answer was given');
+  await page.evaluate(() => {
+    const stage = document.querySelector('.lc-card.rest-stage');
+    const opt = [...stage.querySelectorAll('div')].find(d => d.style.cursor === 'pointer' && d.querySelector('span'));
+    opt.click();
+  });
+  await page.waitForTimeout(150);
+  await clickText('span', 'NEXT ›');
+  await page.waitForTimeout(150);
+  eq(await page.evaluate(() => window.__nvx.state.gentQuizIdx), before + 1, 'NEXT did not advance once answered');
+});
+
+t('an answer is marked right or wrong against the shuffled options, with its reason shown', async () => {
+  await boot({ gentSub: 'conversation' });
+  await clickText('div', 'TEST YOURSELF ›');
+  await clickText('span', 'MEDIUM');
+  await page.waitForTimeout(200);
+  await page.evaluate(() => {
+    const stage = document.querySelector('.lc-card.rest-stage');
+    const opts = [...stage.querySelectorAll('div')].filter(d => d.style.cursor === 'pointer' && d.querySelector('span'));
+    opts[0].click();
+  });
+  await page.waitForTimeout(150);
+  const r = await page.evaluate(() => ({
+    verdict: window.__nvx.state.gentQuizAnswers[0] === window.__nvx.state.gentQuizQueue[0].correct ? 'CORRECT' : 'NOT QUITE',
+    text: document.querySelector('.rest-stage').innerText }));
+  ok(r.text.includes(r.verdict), 'the verdict shown does not match the actual pick');
+  const why = await page.evaluate(() => window.__nvx.state.gentQuizQueue[0].why);
+  ok(r.text.includes(why), 'the reason for the answer is not shown once answered');
+});
+
+t('finishing the set shows a result out of the right total, and Another Level returns to the picker', async () => {
+  await boot({ gentSub: 'foundation' });
+  await clickText('div', 'TEST YOURSELF ›');
+  await clickText('span', 'EXTRA HARD');
+  await page.waitForTimeout(200);
+  const n = await page.evaluate(() => window.__nvx.state.gentQuizQueue.length);
+  for (let i = 0; i < n; i++) {
+    await page.evaluate(() => {
+      const stage = document.querySelector('.lc-card.rest-stage');
+      const opt = [...stage.querySelectorAll('div')].find(d => d.style.cursor === 'pointer' && d.querySelector('span'));
+      opt.click();
+    });
+    await page.waitForTimeout(120);
+    await clickText('span', i === n - 1 ? 'FINISH' : 'NEXT ›');
+    await page.waitForTimeout(120);
+  }
+  eq(await gentQuizStage(), 'result', 'finishing the last question did not reach a result');
+  const score = await page.evaluate(() => document.querySelector('.rest-stage').innerText);
+  ok(score.includes('/ ' + n), 'the result does not read as a score out of ' + n);
+  await clickText('span', 'ANOTHER LEVEL');
+  await page.waitForTimeout(150);
+  eq(await gentQuizStage(), 'pick', 'Another Level did not return to the level pick');
+  await clickText('div', 'NOT NOW');
+});
+
+t('every subject test bank runs at all four levels without throwing', async () => {
+  for (const sub of ['money', 'history', 'taste', 'conversation', 'foundation']) {
+    for (const tier of ['EASY', 'MEDIUM', 'HARD', 'EXTRA HARD']) {
+      await boot({ gentSub: sub });
+      await clickText('div', 'TEST YOURSELF ›');
+      await clickText('span', tier);
+      await page.waitForTimeout(150);
+      const n = await page.evaluate(() => window.__nvx.state.gentQuizQueue.length);
+      ok(n > 0, sub + ' ' + tier + ' has no questions');
+    }
+  }
+  eq(pageErrors.length, 0, 'threw: ' + pageErrors.join(' | '));
+});
+
 
 let pass = 0, fail = 0;
 for (const [n, f] of T) {

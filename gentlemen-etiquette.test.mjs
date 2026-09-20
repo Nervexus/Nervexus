@@ -182,6 +182,35 @@ t('a missing or odd date does not throw', async () => {
    pointing at an occasion that does not exist. */
 
 
+/* ---- the subject test (Test yourself) ----------------------------------------------------- */
+t('every subject has all four levels, and every question in them is well-formed', async () => {
+  const TIERS = G.SUBJECT_TEST_TIERS;
+  eq(TIERS.join(','), 'Easy,Medium,Hard,Extra Hard', 'the tiers are not the four the owner asked for');
+  for (const s of G.SUBJECTS) {
+    for (const tier of TIERS) {
+      const qs = G.subjectTest(s.key, tier);
+      ok(qs.length >= 2, s.key + ' ' + tier + ' has too few questions (' + qs.length + ')');
+      for (const q of qs) {
+        eq(q.a.length, 4, s.key + ' ' + tier + ': "' + q.q + '" does not have four options');
+        ok(q.a.includes(q.a[q.c]) && q.c >= 0 && q.c < 4, s.key + ' ' + tier + ': "' + q.q + '" has no valid correct index');
+        ok(q.why && q.why.length > 10, s.key + ' ' + tier + ': "' + q.q + '" has no real reason given');
+        eq(new Set(q.a).size, 4, s.key + ' ' + tier + ': "' + q.q + '" repeats an option');
+      }
+    }
+  }
+});
+
+t('an unknown subject or level comes back empty, not broken', async () => {
+  eq(G.subjectTest('not-a-subject', 'Easy').length, 0, 'an unknown subject should deal nothing');
+  eq(G.subjectTest('money', 'Impossible').length, 0, 'an unknown level should deal nothing');
+});
+
+t('subjectTest hands back a copy, not the bank itself', async () => {
+  const before = G.subjectTest('money', 'Easy').length;
+  G.subjectTest('money', 'Easy').push({ q: 'inserted', a: ['a', 'b', 'c', 'd'], c: 0, why: 'x' });
+  eq(G.subjectTest('money', 'Easy').length, before, 'mutating the returned array changed the bank itself');
+});
+
 
 let pass = 0, fail = 0;
 for (const [n, f] of T) {

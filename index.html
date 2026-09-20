@@ -1337,6 +1337,76 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     </div>
   </sc-if>
 
+  <!-- GENTLEMEN'S TEST — Test yourself, per subject. Brain Rest's own full-screen shape reused
+       for a different flow: the same pearl field and hairline thread, the ladder of four
+       difficulties standing in for Brain Rest's two gates, then the deck itself, then a score.
+       Not a daily record — closing it forgets it, the same as walking away from Brain Rest's
+       gate before starting ever counted as nothing. -->
+  <sc-if value="{{ gentQuizOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="lcb-stage" style="position:fixed; inset:0; z-index:1000; border-radius:0;">
+      <div class="lcb-field"></div>
+      <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:0; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both; overflow-y:auto;">
+
+        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); flex:0 0 auto;">{{ gentQuizTopBanner }}</div>
+        <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
+
+        <!-- PICK A LEVEL -->
+        <sc-if value="{{ gentQuizPickOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:0 0 auto; width:100%; max-width:420px; padding-bottom:6px;">
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:38px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">{{ gentQuizPickTitle }}</div>
+            <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:38ch; margin:18px auto 0;">{{ gentQuizPickBody }}</div>
+            <div style="margin-top:30px; display:flex; flex-direction:column; gap:10px;">
+              <sc-for list="{{ gentQuizDiffs }}" as="d" hint-placeholder-count="4">
+                <span onClick="{{ d.go }}" style="padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-accent); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:2.4px;">{{ d.label }}</span>
+              </sc-for>
+            </div>
+            <div onClick="{{ gentQuizClose }}" style="margin-top:22px; cursor:pointer; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;">NOT NOW</div>
+          </div>
+        </sc-if>
+
+        <!-- THE QUESTION -->
+        <sc-if value="{{ gentQuizPlayOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1 1 auto; width:100%; max-width:560px; display:flex; flex-direction:column; justify-content:center; padding-bottom:6px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:14px;">{{ gentQuizPos }}</div>
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:26px; font-weight:300; line-height:1.35; margin-bottom:26px;">{{ gentQuizQ }}</div>
+            <div style="display:flex; flex-direction:column; gap:11px; text-align:left;">
+              <sc-for list="{{ gentQuizOptions }}" as="o" hint-placeholder-count="4">
+                <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:15px; padding:16px 18px; border-radius:14px; border:1px solid {{ o.bd }}; background:{{ o.bg }}; font-size:15px; line-height:1.4; cursor:{{ o.cursor }};">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; width:16px; flex:0 0 16px; opacity:.7;">{{ o.letter }}</span>
+                  <span style="flex:1; min-width:0;">{{ o.text }}</span>
+                  <span style="font-size:14px;">{{ o.mark }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <sc-if value="{{ gentQuizAnswered }}" hint-placeholder-val="{{ false }}">
+              <div style="padding-top:16px; margin-top:16px; border-top:1px solid var(--lc-line); text-align:left;">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:var(--lc-accent); margin-bottom:9px;">{{ gentQuizVerdict }}</div>
+                <div style="font-size:14.5px; line-height:1.6; color:var(--lc-muted);">{{ gentQuizWhy }}</div>
+              </div>
+            </sc-if>
+            <div style="margin-top:26px; display:flex; align-items:center; justify-content:space-between; gap:14px;">
+              <span onClick="{{ gentQuizBack }}" style="cursor:{{ gentQuizBackCursor }}; opacity:{{ gentQuizBackOpacity }}; padding:13px 18px; border-radius:999px; border:1px solid var(--lc-line); color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;">‹ BACK</span>
+              <span onClick="{{ gentQuizNext }}" style="cursor:{{ gentQuizNextCursor }}; opacity:{{ gentQuizNextOpacity }}; padding:13px 22px; border-radius:999px; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.4px;">{{ gentQuizNextLabel }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- RESULT -->
+        <sc-if value="{{ gentQuizResultOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:0 0 auto; width:100%; max-width:420px; padding-bottom:6px;">
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:52px; font-weight:300; line-height:1.08; color:var(--lc-accent);">{{ gentQuizScoreLine }}</div>
+            <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:38ch; margin:18px auto 0;">{{ gentQuizResultLine }}</div>
+            <div style="margin-top:30px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
+              <span onClick="{{ gentQuizTryAnother }}" style="flex:1; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px;">ANOTHER LEVEL</span>
+              <span onClick="{{ gentQuizClose }}" style="flex:1; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px;">DONE</span>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </sc-if>
+
   <!-- THE LOG GATE. The same field the sit opens into, reading the record back before it is
        written. z-index sits under Brain Rest's: a sit is the one thing that outranks it. -->
   <sc-if value="{{ lgOpen }}" hint-placeholder-val="{{ false }}">
@@ -8317,6 +8387,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <span style="color:#5B1A1A; font-size:11px;">❦</span>
                 <div style="width:40px; height:1px; background:#5B1A1A;"></div>
               </div>
+              <!-- Test yourself: only on the five subject areas, never on the daily test
+                   (already a test) or Dining (no question bank written for it). -->
+              <sc-if value="{{ gentCrestHasTest }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ openGentSubjectTest }}" style="display:inline-flex; align-items:center; gap:8px; margin-top:18px; padding:11px 22px; border-radius:999px; cursor:pointer; border:1px solid rgba(91,26,26,0.35); color:#5B1A1A; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.2px;">TEST YOURSELF ›</div>
+              </sc-if>
             </div>
           </div>
 
@@ -9421,7 +9496,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.20-355 · v11.355 gentlemen-centre-redesign';
+const NOTIF_BUILD_VERSION = '2026.09.20-356 · v11.356 gentlemen-test-yourself';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9498,6 +9573,10 @@ class Component extends DCLogic {
       quickLogOpen:false, quickLogStep:'confirm', quickLogGreetIdx:0, quickLogBlocks:s.quickLogBlocks||[''],
       rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
       gentSub:'test', gentIdx:0, gentTestIdx:0,
+      // The subject test (Test yourself → Easy/Medium/Hard/Extra Hard), Brain Rest's own
+      // full-screen shape reused for a different flow. Not persisted: closing it forgets it,
+      // the same as walking away from Brain Rest's gate before starting.
+      gentQuizStage:'', gentQuizSubject:'', gentQuizDifficulty:'', gentQuizQueue:[], gentQuizIdx:0, gentQuizAnswers:[],
       // No seeded income. Was $182,000 of invented revenue that the Money Assistant read as real.
       income: s.income || [],
       // No seeded expenses. Was $92,300 of invented costs, analysed as though they were yours.
@@ -14507,6 +14586,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.356', date:'Sep 20, 2026', major:true, notes:[
+      'Test Yourself, on each of Gentlemen’s Etiquette’s five subject pages — Money & Power, History & Culture, Taste, Conversation and Foundation. Press it, choose Easy through Extra Hard, and answer a short set written for that subject at that level; a genuine question bank, not a shortened version of the daily one. Brain Rest’s own full-screen field and hairline are reused for the shape, the same idea carrying two different flows now.',
+    ]},
     {version:'v11.355', date:'Sep 20, 2026', major:true, notes:[
       'Gentlemen’s Etiquette is rebuilt to Learning Center’s own Maths-hub layout: a crest card up top — the house mark, a title and a line of description, the same treatment Brain Rest’s own title wears — then the daily test, standing and every subject page below it as bordered cards, not glass.',
       'Its colours now genuinely follow the raiment the way Learning Center’s own pages do, rather than staying fixed oxblood everywhere: cream and oxblood on Ultra X, dark and warm grey on Noir, cream and blue on Maison Élysée — reusing Learning Center’s exact colours rather than a look-alike set, so it retints through the same mechanism Learning Center itself does.',
@@ -17745,6 +17827,49 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     this.setState({gentTestIdx:at+1});
   }
   gentTestBack(){ this.setState({gentTestIdx:Math.max(0,(this.state.gentTestIdx||0)-1)}); }
+  /* ---- the subject test (Test yourself) --------------------------------------------------
+     A separate thing from the daily test above: pick a subject's own test, choose a
+     difficulty, answer a short set, see a score — as many times as you like, nothing saved
+     between attempts. Brain Rest's own full-screen gate is reused for the shape (one field,
+     one hairline, one thing said at a time); the ladder of four difficulties stands in for
+     Brain Rest's two gates, then the deck itself stands in for the sit. */
+  openGentQuiz(subject){
+    this.setState({gentQuizStage:'pick', gentQuizSubject:subject, gentQuizDifficulty:'',
+      gentQuizQueue:[], gentQuizIdx:0, gentQuizAnswers:[]});
+  }
+  pickGentQuizDifficulty(tier){
+    const G=this._gent(); if(!G) return;
+    const raw=G.subjectTest(this.state.gentQuizSubject, tier);
+    if(!raw.length) return;
+    // Shuffled per attempt — this is a repeatable self-test, not a dated one-shot, so there is
+    // no reason to fix the option order the way the daily test's seeded draw has to.
+    const queue=raw.map(q=>{
+      const order=q.a.map((_,i)=>i);
+      for(let k=order.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); const t=order[k]; order[k]=order[j]; order[j]=t; }
+      return { q:q.q, why:q.why, a:order.map(o=>q.a[o]), correct:order.indexOf(q.c) };
+    });
+    this.setState({gentQuizDifficulty:tier, gentQuizQueue:queue, gentQuizIdx:0,
+      gentQuizAnswers:new Array(queue.length).fill(null), gentQuizStage:'quiz'});
+  }
+  answerGentQuiz(i){
+    this.mut(s=>{
+      if(s.gentQuizAnswers[s.gentQuizIdx]!=null) return {};   // one answer per question here too
+      const answers=s.gentQuizAnswers.slice(); answers[s.gentQuizIdx]=i;
+      return {gentQuizAnswers:answers};
+    });
+  }
+  backGentQuiz(){ this.setState(s=>({gentQuizIdx:Math.max(0,(s.gentQuizIdx||0)-1)})); }
+  nextGentQuiz(){
+    this.setState(s=>{
+      if(s.gentQuizAnswers[s.gentQuizIdx]==null) return {};
+      if(s.gentQuizIdx>=s.gentQuizQueue.length-1) return {gentQuizStage:'result'};
+      return {gentQuizIdx:s.gentQuizIdx+1};
+    });
+  }
+  closeGentQuiz(){
+    this.setState({gentQuizStage:'', gentQuizSubject:'', gentQuizDifficulty:'',
+      gentQuizQueue:[], gentQuizIdx:0, gentQuizAnswers:[]});
+  }
   /* ---- work rota import ----------------------------------------------------------------
      A rota lists everybody. rota-import.js does the reading; this holds the review step and
      the write, and the name is what decides which rows are the user's. It defaults to the
@@ -21420,6 +21545,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const PAGES=[['test','DAILY TEST'],['money','MONEY & POWER'],['history','HISTORY & CULTURE'],
                      ['taste','TASTE'],['conversation','CONVERSATION'],['foundation','FOUNDATION'],
                      ['dining','DINING']];
+        // The five subject areas only — not the daily test (already a test) and not Dining
+        // (never given its own question bank; the owner's brief was Test yourself per subject).
+        const SUBJECT_KEYS=['money','history','taste','conversation','foundation'];
         /* The crest card names whichever subpage is open, the way Learning Center's own
            crest names whichever subject is open — a title-case line and a one-sentence
            description, not the all-caps tab label. */
@@ -21465,6 +21593,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             ink:sub===p[0]?'#0a0a0b':'#c5c5ca',
             bg:sub===p[0]?'#F4F4F5':'transparent' })),
           gentCrestTitle:crest[0], gentCrestDesc:crest[1],
+          gentCrestHasTest:SUBJECT_KEYS.includes(sub),
+          openGentSubjectTest:()=>this.openGentQuiz(sub),
           gentShowTest:sub==='test',
           gentShowPages:sub!=='test' && !!cards.length,
           ...(()=>{
@@ -21544,8 +21674,70 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           ],
           gentCatRows:G.CATEGORIES.map(c=>({ name:c, n:(counts[c]||0)+' questions',
             ink:(q&&q.cat===c)?'#5B1A1A':'#8a6a5a' })),
+          /* THE SUBJECT TEST. Brain Rest's own field, thread and centred stack, reused for a
+             different flow: a ladder of four difficulties standing in for Brain Rest's two
+             gates, then the deck itself, then a score. Uses the pearl system's own --lc-*
+             tokens rather than Learning Center's literal hex, the same way Brain Rest does —
+             it already adapts per raiment through inheritance, with nothing extra to retint. */
+          ...(()=>{
+            const qzStage=S.gentQuizStage||'';
+            const qzSubj=S.gentQuizSubject||'';
+            const qzMeta=CREST[qzSubj]||['',''];
+            const qzTiers=(G.SUBJECT_TEST_TIERS||['Easy','Medium','Hard','Extra Hard']);
+            const qzQueue=S.gentQuizQueue||[];
+            const qzIdx=Math.max(0, Math.min(qzQueue.length-1, S.gentQuizIdx||0));
+            const qzAnswers=S.gentQuizAnswers||[];
+            const qzCur=qzQueue[qzIdx]||null;
+            const qzPick=qzAnswers[qzIdx];
+            const qzAnswered=qzPick!=null;
+            const qzIsLast=qzIdx>=qzQueue.length-1;
+            const qzScore=qzAnswers.reduce((n,p,i)=>n+((qzQueue[i]&&p===qzQueue[i].correct)?1:0),0);
+            return {
+              gentQuizOpen:!!qzStage && !!S.loggedIn,
+              gentQuizPickOpen:qzStage==='pick', gentQuizPlayOpen:qzStage==='quiz', gentQuizResultOpen:qzStage==='result',
+              gentQuizBanner:(qzMeta[0]||'').toUpperCase(),
+              gentQuizTopBanner:qzStage==='quiz' ? ((qzMeta[0]||'').toUpperCase()+' · '+(S.gentQuizDifficulty||'').toUpperCase()) : (qzMeta[0]||'').toUpperCase(),
+              gentQuizPickTitle:'Test yourself',
+              gentQuizPickBody:'Four levels — pick where you want to start.',
+              gentQuizDiffs:qzTiers.map(t=>({ label:t.toUpperCase(), go:()=>this.pickGentQuizDifficulty(t) })),
+              gentQuizClose:()=>this.closeGentQuiz(),
+              gentQuizPos:qzQueue.length?('QUESTION '+(qzIdx+1)+' OF '+qzQueue.length):'',
+              gentQuizQ:qzCur?qzCur.q:'',
+              gentQuizOptions:(qzCur?qzCur.a:[]).map((t,i)=>{
+                const isRight=qzAnswered && i===qzCur.correct;
+                const isPick=qzAnswered && qzPick===i;
+                return { text:t, letter:'ABCD'[i]||'',
+                  pick:qzAnswered?(()=>{}):(()=>this.answerGentQuiz(i)),
+                  cursor:qzAnswered?'default':'pointer',
+                  mark:isRight?'✓':(isPick?'✕':''),
+                  bd:isRight?'rgba(31,138,85,0.45)':(isPick?'rgba(193,80,46,0.45)':'var(--lc-line)'),
+                  bg:isRight?'rgba(31,138,85,0.12)':(isPick?'rgba(193,80,46,0.12)':'transparent') };
+              }),
+              gentQuizAnswered:qzAnswered,
+              gentQuizVerdict:qzAnswered?(qzPick===qzCur.correct?'CORRECT':'NOT QUITE'):'',
+              gentQuizWhy:(qzAnswered && qzCur)?qzCur.why:'',
+              gentQuizBack:()=>this.backGentQuiz(),
+              gentQuizBackCursor:qzIdx>0?'pointer':'not-allowed', gentQuizBackOpacity:qzIdx>0?1:0.35,
+              gentQuizNext:()=>this.nextGentQuiz(),
+              gentQuizNextLabel:qzIsLast?'FINISH':'NEXT ›',
+              gentQuizNextCursor:qzAnswered?'pointer':'not-allowed', gentQuizNextOpacity:qzAnswered?1:0.35,
+              gentQuizScoreLine:qzQueue.length?(qzScore+' / '+qzQueue.length):'',
+              gentQuizResultLine:!qzQueue.length?'':
+                (qzScore===qzQueue.length ? 'A clean sweep at this level. Try the next one up.'
+                : qzScore===0 ? 'Worth stepping back through those — the reasons are on each card.'
+                : 'Solid. Step back through the ones you missed, then try again or move up a level.'),
+              gentQuizTryAnother:()=>this.setState({gentQuizStage:'pick'}),
+            };
+          })(),
         };
       }, { gentTabs:[], gentShowTest:false, gentShowPages:false,
+           gentCrestHasTest:false, openGentSubjectTest:()=>{},
+           gentQuizOpen:false, gentQuizPickOpen:false, gentQuizPlayOpen:false, gentQuizResultOpen:false,
+           gentQuizBanner:'', gentQuizTopBanner:'', gentQuizPickTitle:'', gentQuizPickBody:'', gentQuizDiffs:[], gentQuizClose:()=>{},
+           gentQuizPlayBanner:'', gentQuizPos:'', gentQuizQ:'', gentQuizOptions:[], gentQuizAnswered:false,
+           gentQuizVerdict:'', gentQuizWhy:'', gentQuizBack:()=>{}, gentQuizBackCursor:'not-allowed', gentQuizBackOpacity:0.35,
+           gentQuizNext:()=>{}, gentQuizNextLabel:'', gentQuizNextCursor:'not-allowed', gentQuizNextOpacity:0.35,
+           gentQuizScoreLine:'', gentQuizResultLine:'', gentQuizTryAnother:()=>{},
            gentCardEyebrow:'', gentCardTitle:'', gentCardNote:'', gentCardLines:[], gentPos:'',
            gentDots:[], gentPrev:()=>{}, gentNext:()=>{}, gentPrevCursor:'default',
            gentPrevOpacity:'0.35', gentNextCursor:'default', gentNextOpacity:'0.35', gentNextLabel:'',
