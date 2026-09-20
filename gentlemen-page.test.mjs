@@ -293,23 +293,30 @@ t('the subpage row is seven pills, on one line', async () => {
   eq(box.rows, 1, 'the row wrapped onto ' + box.rows + ' lines');
 });
 
-t('the stage, the block and the tab row keep their own colour regardless of raiment', async () => {
-  /* Built off three reference images rather than the raiment palette, and fixed the way Quick
-     Log is: a page glanced at for its own content, not one that has to agree with whichever
-     style is active. */
+t('the tab row keeps its own colour, the block follows the raiment like Learning Center', async () => {
+  /* Rebuilt on Learning Center's own literal Ultra X hex rather than a look-alike palette,
+     so the app's existing .theme-ultra.theme-noir/-maison retint sheet reaches the block the
+     same way it reaches Learning Center's — dark on Noir, light cream on Ultra X and Maison.
+     The tab row is Learning's own plain list colour (#F4F4F5 active / transparent, #0a0a0b
+     ink / #c5c5ca), which isn't part of that retint sheet on Learning either, so it alone
+     stays constant across raiments. */
   const seen = [];
-  for (const raiment of ['Ultra X', 'Maison Élysée']) {
+  for (const raiment of ['Ultra X', 'Noir', 'Maison Élysée']) {
     await boot({ prefs: { ...(await page.evaluate(() => window.__nvx.state.prefs)), theme: 'Ultra', ultraStyle: raiment } });
     const c = await page.evaluate(() => {
       const on = [...document.querySelectorAll('.gent-tab')].find(e => getComputedStyle(e).backgroundColor !== 'rgba(0, 0, 0, 0)');
       return { tab: on ? getComputedStyle(on).backgroundColor : null,
-               block: getComputedStyle(document.querySelector('.gent-block')).backgroundImage };
+               block: getComputedStyle(document.querySelector('.gent-block')).backgroundColor };
     });
     ok(c.tab, 'nothing in the row is marked as the page you are on (' + raiment + ')');
     seen.push(c);
   }
-  eq(seen[0].tab, seen[1].tab, 'the active tab changed colour with the raiment');
-  eq(seen[0].block, seen[1].block, 'the block changed colour with the raiment');
+  eq(seen[0].tab, seen[1].tab, 'the active tab changed colour between Ultra X and Noir');
+  eq(seen[1].tab, seen[2].tab, 'the active tab changed colour between Noir and Maison Élysée');
+  eq(seen[0].block, 'rgb(250, 247, 240)', 'Ultra X’s block is not Learning Center’s own cream');
+  eq(seen[1].block, 'rgb(24, 24, 24)', 'Noir’s block did not go dark like Learning Center’s does');
+  ok(seen[0].block !== seen[1].block, 'the block did not change colour between Ultra X and Noir');
+  ok(seen[1].block !== seen[2].block, 'the block did not change colour between Noir and Maison Élysée');
 });
 
 t('every card is its own bordered block: a header, then the rest', async () => {
