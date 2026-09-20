@@ -8489,7 +8489,29 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
           </sc-if>
 
-          <!-- Every other subpage is read a card at a time rather than scrolled: one idea,
+          <!-- The five subject areas: one card, every fact on it at once — read in one pass
+               for quick recall rather than clicked through one at a time. The fleuron in front
+               of each line is the crest's own mark, not a plain bullet, so a fact never reads
+               as easy to skip past. -->
+          <sc-if value="{{ gentShowFacts }}" hint-placeholder-val="{{ false }}">
+            <div style="max-width:820px;">
+              <div class="gent-block" style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                <div class="gent-bhead">
+                  <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentFactsEyebrow }}</span>
+                </div>
+                <div class="gent-body" style="flex:1; display:flex; flex-direction:column; gap:24px; min-width:0;">
+                  <sc-for list="{{ gentFacts }}" as="f" hint-placeholder-count="4">
+                    <div style="display:flex; align-items:flex-start; gap:16px;">
+                      <span style="flex:0 0 auto; font-size:16px; line-height:1.7; color:#5B1A1A;">❦</span>
+                      <span style="font-size:19px; line-height:1.65; color:#6b5a4e; max-width:58ch;">{{ f.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Dining alone still reads a card at a time rather than as one list: one idea,
                large, then the next. The cards come from the engine, because where the content
                is cut is a judgement about the material and not a layout detail. -->
           <sc-if value="{{ gentShowPages }}" hint-placeholder-val="{{ false }}">
@@ -9496,7 +9518,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.20-356 · v11.356 gentlemen-test-yourself';
+const NOTIF_BUILD_VERSION = '2026.09.20-357 · v11.357 gentlemen-subject-facts';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14586,6 +14608,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.357', date:'Sep 20, 2026', major:true, notes:[
+      'Each of Gentlemen’s Etiquette’s five subject areas now reads as one card of four facts, not three cards you click through one at a time — a genuine fourth fact written for each, and every one marked with the crest’s own fleuron rather than a plain dot, for a quicker read. Dining is unchanged: eighteen rules across five sections still page one at a time.',
+    ]},
     {version:'v11.356', date:'Sep 20, 2026', major:true, notes:[
       'Test Yourself, on each of Gentlemen’s Etiquette’s five subject pages — Money & Power, History & Culture, Taste, Conversation and Foundation. Press it, choose Easy through Extra Hard, and answer a short set written for that subject at that level; a genuine question bank, not a shortened version of the daily one. Brain Rest’s own full-screen field and hairline are reused for the shape, the same idea carrying two different flows now.',
     ]},
@@ -17762,7 +17787,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     document.addEventListener('keydown',(e)=>{
       if(e.key!=='ArrowLeft' && e.key!=='ArrowRight') return;
       if(e.metaKey||e.ctrlKey||e.altKey) return;
-      if(this.state.scene!=='gentlemen' || (this.state.gentSub||'test')==='test') return;
+      // Dining alone still pages one rule at a time; the five subject areas read as one card
+      // of facts now, with nothing left to step through.
+      if(this.state.scene!=='gentlemen' || (this.state.gentSub||'test')!=='dining') return;
       const t=document.activeElement;
       if(t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
       if(t && t.isContentEditable) return;
@@ -21596,7 +21623,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           gentCrestHasTest:SUBJECT_KEYS.includes(sub),
           openGentSubjectTest:()=>this.openGentQuiz(sub),
           gentShowTest:sub==='test',
-          gentShowPages:sub!=='test' && !!cards.length,
+          // Dining alone still paginates one rule per card — eighteen rules across five
+          // sections reads better paced than a wall. The five subject areas below read as one
+          // consolidated card of facts instead, so they're deliberately excluded here now.
+          gentShowPages:sub==='dining' && !!cards.length,
+          gentShowFacts:SUBJECT_KEYS.includes(sub),
+          ...(()=>{
+            const f=G.subjectFacts(sub)||{eyebrow:'', title:'', facts:[]};
+            return {
+              gentFactsEyebrow:f.eyebrow,
+              gentFacts:f.facts.map((text,i)=>({ text, n:i })),
+            };
+          })(),
           ...(()=>{
             const c=cards[idx]||{eyebrow:'', title:'', note:'', text:'', step:0, steps:0};
             return {
@@ -21731,6 +21769,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           })(),
         };
       }, { gentTabs:[], gentShowTest:false, gentShowPages:false,
+           gentShowFacts:false, gentFactsEyebrow:'', gentFacts:[],
            gentCrestHasTest:false, openGentSubjectTest:()=>{},
            gentQuizOpen:false, gentQuizPickOpen:false, gentQuizPlayOpen:false, gentQuizResultOpen:false,
            gentQuizBanner:'', gentQuizTopBanner:'', gentQuizPickTitle:'', gentQuizPickBody:'', gentQuizDiffs:[], gentQuizClose:()=>{},

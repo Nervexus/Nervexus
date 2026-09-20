@@ -22,11 +22,14 @@ t('the five subject areas are all there, in the owner’s words', async () => {
   eq(G.SUBJECTS.map(s => s.key).join(','), 'money,history,taste,conversation,foundation', 'wrong subjects');
   for (const s of G.SUBJECTS) {
     ok(s.name && s.eyebrow, s.key + ' is missing a name or eyebrow');
-    ok(s.lines.length >= 3, s.key + ' has only ' + s.lines.length + ' lines');
+    // Each reads as one card of four facts now, not a deck of three-or-more you page through.
+    eq(s.lines.length, 4, s.key + ' should read as four facts, not ' + s.lines.length);
   }
   const all = G.SUBJECTS.flatMap(s => s.lines).join(' ');
   for (const phrase of ['not just headlines', 'rise and fall of empires', 'genuine palate',
-                        'Knowing when to say nothing', 'rarely try to'])
+                        'Knowing when to say nothing', 'rarely try to',
+                        'rented, not owned', 'structural, and which are just noise',
+                        'as telling as what you choose', 'without ever letting on', 'the only one that is real'])
     ok(all.includes(phrase), 'the line about "' + phrase + '" is missing');
 });
 
@@ -37,6 +40,18 @@ t('dining covers the meal from sitting down to the last glass', async () => {
   for (const phrase of ['Napkin on your lap', 'outside in', 'four o’clock', 'broken by hand',
                         'travel together', 'No phones at the table', 'by the stem'])
     ok(all.includes(phrase), 'the dining line about "' + phrase + '" is missing');
+});
+
+t('subjectFacts hands back a subject as one card of facts, not a deck', async () => {
+  for (const s of G.SUBJECTS) {
+    const f = G.subjectFacts(s.key);
+    ok(f, s.key + ' returned nothing');
+    eq(f.title, s.name, s.key + '’s facts card lost its heading');
+    eq(f.eyebrow, s.eyebrow, s.key + '’s facts card lost its eyebrow');
+    eq(f.facts.join('|'), s.lines.join('|'), s.key + '’s facts do not match its lines');
+  }
+  eq(G.subjectFacts('dining'), null, 'Dining should not offer a facts card — it still pages');
+  eq(G.subjectFacts('not-a-subject'), null, 'an unknown subject should come back empty, not broken');
 });
 
 t('every line is its own card, with its heading carried on it', async () => {

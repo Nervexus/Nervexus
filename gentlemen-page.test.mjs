@@ -422,6 +422,40 @@ t('on a wide screen the dots come back and the bar goes away', async () => {
    one is supplied, and these hold both halves of that. */
 
 
+/* ---- the five subject areas read as one card of facts, not a deck ------------------------- */
+t('a subject area shows all four facts on one card, not one at a time', async () => {
+  for (const [sub, phrase] of [['money', 'not just headlines'], ['history', 'rise and fall of empires'],
+                                ['taste', 'genuine palate'], ['conversation', 'Knowing when to say nothing'],
+                                ['foundation', 'rarely try to']]) {
+    await boot({ gentSub: sub });
+    const b = await text();
+    ok(b.includes(phrase), sub + ' lost its first fact');
+    const n = await page.evaluate(() => window.__nvx._gent().subjectFacts(window.__nvx.state.gentSub).facts.length);
+    eq(n, 4, sub + ' should offer four facts, not ' + n);
+    const shown = await page.evaluate(() => document.querySelectorAll('.gent-body > div').length);
+    eq(shown, n, sub + ' should show all ' + n + ' facts on the card at once, found ' + shown);
+    ok(!/‹ BACK|NEXT ›/.test(b), sub + ' still offers BACK/NEXT — nothing left to page through');
+  }
+});
+
+t('each fact carries a fleuron, not a plain dot', async () => {
+  await boot({ gentSub: 'money' });
+  const marks = await page.evaluate(() => [...document.querySelectorAll('.gent-body > div > span:first-child')].map(e => e.textContent.trim()));
+  eq(marks.length, 4, 'expected four marks, one per fact');
+  for (const m of marks) eq(m, '❦', 'a fact’s mark is not the fleuron: "' + m + '"');
+});
+
+t('Dining alone still pages one rule at a time, and the arrow keys still only move it', async () => {
+  await boot({ gentSub: 'dining' });
+  ok((await text()).includes('1 OF 18'), 'Dining should still be a paged deck');
+  await tab('MONEY & POWER');
+  await page.waitForTimeout(300);
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(250);
+  eq(await page.evaluate(() => window.__nvx.state.gentIdx), 0, 'the arrow key moved a subject area that no longer pages');
+});
+
+
 /* ---- test yourself ---------------------------------------------------------------------
    A second, separate test from the daily one above: pick a subject, choose a difficulty,
    answer a short set, see a score. Brain Rest's own full-screen gate is reused for the shape

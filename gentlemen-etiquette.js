@@ -25,30 +25,35 @@
         'Macroeconomics and how markets actually move — not just headlines.',
         'Basic finance: how deals, equity and leverage work.',
         'Geopolitics — who controls what, and why it matters to money.',
+        'Real wealth is quiet — the loudest signals of money are usually the ones rented, not owned.',
       ] },
     { key: 'history', name: 'History & Culture', eyebrow: 'ENOUGH TO DISCUSS, NOT JUST RECOGNISE',
       lines: [
         'Deep knowledge of history, especially the rise and fall of empires and institutions.',
         'Art, architecture and literature — enough to discuss, not just recognise.',
         'Classical rhetoric and philosophy — Cicero, Machiavelli, Sun Tzu: the operating manuals of power.',
+        'Reading the present through the past — knowing which of today’s crises are structural, and which are just noise.',
       ] },
     { key: 'taste', name: 'Taste & Discernment', eyebrow: 'PALATE, NOT TRIVIA',
       lines: [
         'Wine, spirits and cigars — not trivia, but genuine palate and etiquette.',
         'Tailoring and dress — understanding fit and fabric, not just brands.',
         'Fine dining etiquette that is second nature, not performed.',
+        'Restraint in taste — knowing what to leave out is as telling as what you choose.',
       ] },
     { key: 'conversation', name: 'Conversation', eyebrow: 'THE ROOM BEFORE THE WORDS',
       lines: [
         'The ability to ask sharp questions and actually listen.',
         'Knowing when to say nothing.',
         'Reading a room before you speak in it.',
+        'Remembering what people tell you — and using it, without ever letting on that you kept it.',
       ] },
     { key: 'foundation', name: 'Foundation', eyebrow: 'WHAT THE REST STANDS ON',
       lines: [
         'Command of language — writing and speaking with precision.',
         'Negotiation and persuasion.',
         'Restraint. The men who dominate a room rarely try to.',
+        'Discipline — the standard you hold when no one is checking is the only one that is real.',
       ] },
   ];
 
@@ -470,6 +475,17 @@
     return out;
   }
 
+  /* ---- a subject in full, one card ------------------------------------------------------
+     The five subject areas read as a short list you take in at once — four facts, not four
+     cards to click through one at a time. Dining stays the deck cards() already builds: it
+     is eighteen rules across five sections, not four short ones, and reads better paced. */
+  function subjectFacts(key) {
+    for (var i = 0; i < SUBJECTS.length; i++) if (SUBJECTS[i].key === key) {
+      return { eyebrow: SUBJECTS[i].eyebrow, title: SUBJECTS[i].name, facts: SUBJECTS[i].lines.slice() };
+    }
+    return null;
+  }
+
   /* ---- the daily test ------------------------------------------------------------------
      Four questions, one from each category, one per card. The set is drawn for the day and
      is the same all day on every device, and the order of the categories moves too — a test
@@ -511,6 +527,7 @@
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
     dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, _seed: seed,
     SUBJECT_TESTS: SUBJECT_TESTS, SUBJECT_TEST_TIERS: SUBJECT_TEST_TIERS, subjectTest: subjectTest,
+    subjectFacts: subjectFacts,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.GentlemenEtiquette;
 })(typeof window !== 'undefined' ? window : this);
