@@ -2306,9 +2306,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="position:absolute; top:14px; right:16px; pointer-events:none; display:flex; flex-direction:column; align-items:flex-end; gap:1px; z-index:6;">
               <sc-for list="{{ xpFx }}" as="fx" hint-placeholder-count="0"><div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#FFFFFF; text-shadow:0 0 12px rgba(255,255,255,0.75); animation:xpFloat 1.3s ease forwards;">{{ fx.text }}</div></sc-for>
             </div>
+            <div style="text-align:center; margin-bottom:14px;">
+              <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Daily Missions</div>
+              <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
+                <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+                <div style="width:5px; height:5px; flex:0 0 auto; background:var(--u-accent, rgba(255,255,255,0.55)); transform:rotate(45deg);"></div>
+                <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+              </div>
+            </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
               <div style="display:flex; align-items:baseline; gap:9px;">
-                <span style="font-size:13px; font-weight:600;">Daily Missions</span>
                 <!-- The evening reminder email tells you to tap this, so it has to exist
                      somewhere you will already be looking. -->
                 <span onClick="{{ openLogAll }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.6px; color:{{ logAllChipInk }}; border:1px solid {{ logAllChipEdge }}; border-radius:7px; padding:4px 8px; cursor:pointer;">{{ logAllChip }}</span>
@@ -2428,9 +2435,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <sc-if value="{{ showTrainingRow }}" hint-placeholder-val="{{ true }}">
           <div class="cc-dash-training-row">
             <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
+              <div style="text-align:center; margin-bottom:14px;">
+                <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Training Checklist</div>
+                <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
+                  <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+                  <div style="width:5px; height:5px; flex:0 0 auto; background:var(--u-accent, rgba(255,255,255,0.55)); transform:rotate(45deg);"></div>
+                  <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+                </div>
+              </div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
                 <div style="display:flex; align-items:baseline; gap:9px;">
-                  <span style="font-size:13px; font-weight:600;">Training Checklist</span>
                   <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ fitChecklistDoneToday }} / {{ fitChecklistTotalToday }}</span>
                 </div>
                 <sc-if value="{{ hasActiveFitChecklist }}" hint-placeholder-val="{{ false }}">
@@ -2473,9 +2487,16 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
           </div>
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
+            <div style="text-align:center; margin-bottom:14px;">
+              <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Diet Checklist</div>
+              <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
+                <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+                <div style="width:5px; height:5px; flex:0 0 auto; background:var(--u-accent, rgba(255,255,255,0.55)); transform:rotate(45deg);"></div>
+                <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+              </div>
+            </div>
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
               <div style="display:flex; align-items:baseline; gap:9px;">
-                <span style="font-size:13px; font-weight:600;">Diet Checklist</span>
                 <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ dietDoneToday }} / {{ dietTotalToday }}</span>
               </div>
               <span onClick="{{ goHealthDiet }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#F4F4F5', borderColor:'rgba(255,255,255,0.4)' }">FULL LIST →</span>
@@ -2495,8 +2516,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </sc-if>
         <div class="cc-grid2" style="display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:18px;">
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE; margin-bottom:6px;">{{ actLogEyebrow }}</div>
-            <div style="font-size:13px; font-weight:600; margin-bottom:12px;">Log Activity</div>
+            <div style="text-align:center; margin-bottom:14px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">{{ actLogEyebrow }}</div>
+              <div style="font-size:14px; font-weight:600; margin-top:4px;">Log Activity</div>
+              <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
+                <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+                <div style="width:5px; height:5px; flex:0 0 auto; background:var(--u-accent, rgba(255,255,255,0.55)); transform:rotate(45deg);"></div>
+                <div style="width:44px; height:1px; background:var(--u-line, rgba(255,255,255,0.16));"></div>
+              </div>
+            </div>
             <div style="display:flex; flex-wrap:wrap; gap:7px; margin-bottom:7px;">
               <sc-for list="{{ actCats }}" as="c" hint-placeholder-count="6"><span onClick="{{ c.pick }}" style="font-size:11.5px; color:{{ c.c }}; border:1px solid {{ c.b }}; border-radius:8px; padding:5px 11px; cursor:pointer; background:{{ c.bg }};">{{ c.name }}</span></sc-for>
             </div>
@@ -9535,7 +9563,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-362 · v11.362 training-checklist-under-missions';
+const NOTIF_BUILD_VERSION = '2026.09.21-363 · v11.363 dashboard-widget-centered-design';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14625,6 +14653,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.363', date:'Sep 21, 2026', major:false, notes:[
+      'Daily Missions, Training Checklist, Diet Checklist and Log Activity now open with a centered title and a line, diamond, line divider, matching the design of the Ultra X home screen. The border and accent colors adapt to whichever theme or Ultra raiment is active, the same way the home screen itself does.',
+    ]},
     {version:'v11.362', date:'Sep 21, 2026', major:false, notes:[
       'The Training Checklist now sits directly under Daily Missions itself, in the same column, rather than under the row the two share with the Diet Checklist. On a phone that means Daily Missions, then Training, then Diet, then Log Activity.',
     ]},
