@@ -627,6 +627,11 @@
   .theme-ultra.theme-noir, .theme-ultra.theme-noir .cc-scene, .theme-ultra.theme-noir .cc-top, .theme-ultra.theme-noir .cc-side{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E") !important; background-blend-mode:overlay !important; background-color:var(--u-bg) !important; }
   .theme-ultra h1, .theme-ultra h2, .theme-ultra h3{ font-family:'Cormorant Garamond',serif !important; font-weight:300 !important; font-style:italic !important; color:var(--u-accent) !important; letter-spacing:.5px !important; }
   .theme-ultra .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:blur(14px) !important; -webkit-backdrop-filter:blur(14px) !important; }
+  /* The four redesigned Dashboard widgets (Daily Missions, Training Checklist, Diet Checklist,
+     Log Activity) want a border as bold as the home screen's own frame, not the faint --u-line
+     used on every other glowcard. Extra .cc-widget-framed repeats outrank the generic rule above
+     on specificity alone, so this doesn't care which one loads last. */
+  .theme-ultra .cc-widget-framed.cc-widget-framed.cc-widget-framed.cc-widget-framed{ border:1.5px solid var(--u-accent) !important; }
   .theme-ultra [style*="background: rgb(22, 24, 28)"], .theme-ultra [style*="background:#16181c"], .theme-ultra [style*="background: rgb(23, 25, 29)"], .theme-ultra [style*="background:#17191d"], .theme-ultra [style*="background: rgb(20, 20, 22)"], .theme-ultra [style*="background:#141416"], .theme-ultra [style*="background: rgb(16, 16, 18)"], .theme-ultra [style*="background:#101012"], .theme-ultra [style*="background: rgb(27, 29, 33)"], .theme-ultra [style*="background:#1b1d21"], .theme-ultra [style*="background: rgb(21, 21, 23)"], .theme-ultra [style*="background:#151517"], .theme-ultra [style*="background: rgb(10, 10, 11)"], .theme-ultra [style*="background:#0a0a0b"], .theme-ultra [style*="background: rgb(12, 13, 9)"], .theme-ultra [style*="background:#0c0d09"], .theme-ultra [style*="background: rgb(32, 34, 38)"], .theme-ultra [style*="background:#202226"], .theme-ultra [style*="background: rgb(30, 30, 33)"], .theme-ultra [style*="background:#1e1e21"], .theme-ultra [style*="background: rgb(30, 29, 22)"], .theme-ultra [style*="background:#1e1d16"]{ background:var(--u-card) !important; color:var(--u-ink) !important; border-color:var(--u-line) !important; backdrop-filter:blur(10px) !important; }
   .theme-ultra [style*="color: rgb(238, 240, 242)"], .theme-ultra [style*="color:#eef0f2"], .theme-ultra [style*="color: rgb(255, 255, 255)"], .theme-ultra [style*="color:#fff"]{ color:var(--u-ink) !important; }
   .theme-ultra [style*="color: rgb(214, 214, 218)"], .theme-ultra [style*="color:#d6d6da"], .theme-ultra [style*="color: rgb(219, 219, 224)"], .theme-ultra [style*="color:#dbdbe0"], .theme-ultra [style*="color: rgb(200, 200, 206)"], .theme-ultra [style*="color:#c8c8ce"], .theme-ultra [style*="color: rgb(207, 207, 212)"], .theme-ultra [style*="color:#cfcfd4"]{ color:var(--u-ink) !important; }
@@ -2302,7 +2307,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ showMissionsRow }}" hint-placeholder-val="{{ true }}">
         <div class="cc-dash-missions-row cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
           <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
-          <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+          <div class="cc-glowcard cc-widget-framed" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
             <div style="position:absolute; top:14px; right:16px; pointer-events:none; display:flex; flex-direction:column; align-items:flex-end; gap:1px; z-index:6;">
               <sc-for list="{{ xpFx }}" as="fx" hint-placeholder-count="0"><div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#FFFFFF; text-shadow:0 0 12px rgba(255,255,255,0.75); animation:xpFloat 1.3s ease forwards;">{{ fx.text }}</div></sc-for>
             </div>
@@ -2434,7 +2439,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
           <sc-if value="{{ showTrainingRow }}" hint-placeholder-val="{{ true }}">
           <div class="cc-dash-training-row">
-            <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+            <div class="cc-glowcard cc-widget-framed" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
               <div style="text-align:center; margin-bottom:14px;">
                 <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Training Checklist</div>
                 <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
@@ -2486,7 +2491,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
           </sc-if>
           </div>
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+          <div class="cc-glowcard cc-widget-framed" style="border-radius:20px; background:#16181c; padding:20px; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
             <div style="text-align:center; margin-bottom:14px;">
               <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Diet Checklist</div>
               <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
@@ -2515,7 +2520,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
         </sc-if>
         <div class="cc-grid2" style="display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+          <div class="cc-glowcard cc-widget-framed" style="border-radius:20px; background:#16181c; padding:20px; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
             <div style="text-align:center; margin-bottom:14px;">
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">{{ actLogEyebrow }}</div>
               <div style="font-size:14px; font-weight:600; margin-top:4px;">Log Activity</div>
@@ -9563,7 +9568,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-365 · v11.365 dashboard-widget-major-update-popup';
+const NOTIF_BUILD_VERSION = '2026.09.21-366 · v11.366 dashboard-widget-border-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14653,6 +14658,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.366', date:'Sep 21, 2026', major:true, notes:[
+      'The border added around Daily Missions, Training Checklist, Diet Checklist and Log Activity in v11.364 was too faint to see under the Ultra X raiment, since it was sharing a near-invisible line color with every other card in the app. Gave these four their own bold border, in the raiment’s accent color, so it actually reads as a frame like the home screen’s.',
+    ]},
     {version:'v11.365', date:'Sep 21, 2026', major:false, notes:[
       'The dashboard redesign in v11.364 shipped without its "What’s New" popup, since it was flagged as a minor entry rather than a major one. Flagged it major, so an update like this shows the popup on your next login instead of sitting quietly in the full changelog.',
     ]},
