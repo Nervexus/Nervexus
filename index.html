@@ -2301,6 +2301,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
         <sc-if value="{{ showMissionsRow }}" hint-placeholder-val="{{ true }}">
         <div class="cc-dash-missions-row cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
+          <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
           <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
             <div style="position:absolute; top:14px; right:16px; pointer-events:none; display:flex; flex-direction:column; align-items:flex-end; gap:1px; z-index:6;">
               <sc-for list="{{ xpFx }}" as="fx" hint-placeholder-count="0"><div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#FFFFFF; text-shadow:0 0 12px rgba(255,255,255,0.75); animation:xpFloat 1.3s ease forwards;">{{ fx.text }}</div></sc-for>
@@ -2424,6 +2425,53 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
             </sc-if>
           </div>
+          <sc-if value="{{ showTrainingRow }}" hint-placeholder-val="{{ true }}">
+          <div class="cc-dash-training-row">
+            <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
+                <div style="display:flex; align-items:baseline; gap:9px;">
+                  <span style="font-size:13px; font-weight:600;">Training Checklist</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ fitChecklistDoneToday }} / {{ fitChecklistTotalToday }}</span>
+                </div>
+                <sc-if value="{{ hasActiveFitChecklist }}" hint-placeholder-val="{{ false }}">
+                  <span onClick="{{ markActiveFitComplete }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#F4F4F5', borderColor:'rgba(255,255,255,0.4)' }">MARK ALL DONE</span>
+                </sc-if>
+              </div>
+              <sc-if value="{{ hasFitChecklists }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:13px;">
+                  <sc-for list="{{ fitChecklistCards }}" as="c" hint-placeholder-count="2">
+                    <span onClick="{{ c.select }}" style="display:inline-flex; align-items:center; gap:7px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.selC }}; border:1px solid {{ c.selBd }}; background:{{ c.selBg }}; border-radius:8px; padding:5px 10px; cursor:pointer;">{{ c.title }}<span onClick="{{ c.remove }}" style="color:#6f6f78;" style-hover="{ color:'#ff6b76' }">×</span></span>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasActiveFitChecklist }}" hint-placeholder-val="{{ false }}">
+                <div style="max-height:280px; overflow-y:auto; margin:0 -4px; padding:0 4px;">
+                  <sc-for list="{{ activeFitChecklistItems }}" as="i" hint-placeholder-count="4">
+                    <div style="padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                      <div style="display:flex; align-items:center; gap:11px;">
+                        <span onClick="{{ i.toggle }}" style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px solid {{ i.boxBd }}; background:{{ i.boxBg }}; display:flex; align-items:center; justify-content:center; font-size:12px; color:#0c0c0d; cursor:pointer;">{{ i.box }}</span>
+                        <span style="flex:1; min-width:0; font-size:13.5px; color:{{ i.txt }}; text-decoration:{{ i.strike }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ i.label }}</span>
+                        <span onClick="{{ i.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+                <sc-if value="{{ noFitChecklistItems }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 2px;">No items yet, add one below.</div></sc-if>
+                <div style="display:flex; align-items:center; gap:9px; padding:12px 0 0;">
+                  <span style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; color:#7c7c84;">＋</span>
+                  <input value="{{ newFitChecklistItemDraft }}" onInput="{{ setFitChecklistItemDraft }}" onKeyDown="{{ addActiveFitChecklistItemKey }}" placeholder="Add an item and press Enter…" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
+                  <span onClick="{{ cycleActiveFitRepeat }}" title="Toggle repeat" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ activeFitRepeatC }}; border:1px solid {{ activeFitRepeatBd }}; background:{{ activeFitRepeatBg }}; border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;">{{ activeFitRepeatLabel }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noFitChecklists }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 2px 12px;">No fitness checklists yet, create one below.</div></sc-if>
+              <div style="display:flex; align-items:center; gap:9px; margin-top:14px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
+                <span style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; color:#7c7c84;">＋</span>
+                <input value="{{ newFitChecklistTitle }}" onInput="{{ setNewFitChecklistTitle }}" onKeyDown="{{ addFitChecklistKey }}" placeholder="New checklist name and press Enter… e.g. Leg Day" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
+              </div>
+            </div>
+          </div>
+          </sc-if>
+          </div>
           <div class="cc-glowcard" style="border-radius:20px; background:#16181c; padding:20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
               <div style="display:flex; align-items:baseline; gap:9px;">
@@ -2441,52 +2489,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <span onClick="{{ d.toggleLock }}" title="Lock in place" style="cursor:pointer; font-size:12px; color:{{ d.lockColor }};">{{ d.lockIcon }}</span>
                 </div>
               </sc-for>
-            </div>
-          </div>
-        </div>
-        </sc-if>
-        <sc-if value="{{ showTrainingRow }}" hint-placeholder-val="{{ true }}">
-        <div class="cc-dash-training-row" style="margin-bottom:18px;">
-          <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:13px; gap:10px;">
-              <div style="display:flex; align-items:baseline; gap:9px;">
-                <span style="font-size:13px; font-weight:600;">Training Checklist</span>
-                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#FFFFFF;">{{ fitChecklistDoneToday }} / {{ fitChecklistTotalToday }}</span>
-              </div>
-              <sc-if value="{{ hasActiveFitChecklist }}" hint-placeholder-val="{{ false }}">
-                <span onClick="{{ markActiveFitComplete }}" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:#9a9aa2; border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px; cursor:pointer;" style-hover="{ color:'#F4F4F5', borderColor:'rgba(255,255,255,0.4)' }">MARK ALL DONE</span>
-              </sc-if>
-            </div>
-            <sc-if value="{{ hasFitChecklists }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:13px;">
-                <sc-for list="{{ fitChecklistCards }}" as="c" hint-placeholder-count="2">
-                  <span onClick="{{ c.select }}" style="display:inline-flex; align-items:center; gap:7px; font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ c.selC }}; border:1px solid {{ c.selBd }}; background:{{ c.selBg }}; border-radius:8px; padding:5px 10px; cursor:pointer;">{{ c.title }}<span onClick="{{ c.remove }}" style="color:#6f6f78;" style-hover="{ color:'#ff6b76' }">×</span></span>
-                </sc-for>
-              </div>
-            </sc-if>
-            <sc-if value="{{ hasActiveFitChecklist }}" hint-placeholder-val="{{ false }}">
-              <div style="max-height:280px; overflow-y:auto; margin:0 -4px; padding:0 4px;">
-                <sc-for list="{{ activeFitChecklistItems }}" as="i" hint-placeholder-count="4">
-                  <div style="padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; align-items:center; gap:11px;">
-                      <span onClick="{{ i.toggle }}" style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px solid {{ i.boxBd }}; background:{{ i.boxBg }}; display:flex; align-items:center; justify-content:center; font-size:12px; color:#0c0c0d; cursor:pointer;">{{ i.box }}</span>
-                      <span style="flex:1; min-width:0; font-size:13.5px; color:{{ i.txt }}; text-decoration:{{ i.strike }}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ i.label }}</span>
-                      <span onClick="{{ i.remove }}" style="cursor:pointer; color:#6f6f78; font-size:15px; line-height:1;" style-hover="{ color:'#FFFFFF' }">×</span>
-                    </div>
-                  </div>
-                </sc-for>
-              </div>
-              <sc-if value="{{ noFitChecklistItems }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 2px;">No items yet, add one below.</div></sc-if>
-              <div style="display:flex; align-items:center; gap:9px; padding:12px 0 0;">
-                <span style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; color:#7c7c84;">＋</span>
-                <input value="{{ newFitChecklistItemDraft }}" onInput="{{ setFitChecklistItemDraft }}" onKeyDown="{{ addActiveFitChecklistItemKey }}" placeholder="Add an item and press Enter…" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
-                <span onClick="{{ cycleActiveFitRepeat }}" title="Toggle repeat" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ activeFitRepeatC }}; border:1px solid {{ activeFitRepeatBd }}; background:{{ activeFitRepeatBg }}; border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;">{{ activeFitRepeatLabel }}</span>
-              </div>
-            </sc-if>
-            <sc-if value="{{ noFitChecklists }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 2px 12px;">No fitness checklists yet, create one below.</div></sc-if>
-            <div style="display:flex; align-items:center; gap:9px; margin-top:14px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
-              <span style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; color:#7c7c84;">＋</span>
-              <input value="{{ newFitChecklistTitle }}" onInput="{{ setNewFitChecklistTitle }}" onKeyDown="{{ addFitChecklistKey }}" placeholder="New checklist name and press Enter… e.g. Leg Day" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
             </div>
           </div>
         </div>
@@ -9533,7 +9535,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-361 · v11.361 gravedigger-landmine-family';
+const NOTIF_BUILD_VERSION = '2026.09.21-362 · v11.362 training-checklist-under-missions';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14623,6 +14625,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.362', date:'Sep 21, 2026', major:false, notes:[
+      'The Training Checklist now sits directly under Daily Missions itself, in the same column, rather than under the row the two share with the Diet Checklist. On a phone that means Daily Missions, then Training, then Diet, then Log Activity.',
+    ]},
     {version:'v11.361', date:'Sep 21, 2026', major:false, notes:[
       'Gravedigger was missing from the exercise list entirely, and Landmine training only covered the press, row and rotation. Added Gravedigger plus Landmine Squat, Landmine Lunge, Landmine Deadlift and Landmine Lateral Raise, both for voice logging and in the Forge’s own training lists.',
     ]},
