@@ -9533,7 +9533,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-360 · v11.360 dashboard-training-row-order';
+const NOTIF_BUILD_VERSION = '2026.09.21-361 · v11.361 gravedigger-landmine-family';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14623,6 +14623,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.361', date:'Sep 21, 2026', major:false, notes:[
+      'Gravedigger was missing from the exercise list entirely, and Landmine training only covered the press, row and rotation. Added Gravedigger plus Landmine Squat, Landmine Lunge, Landmine Deadlift and Landmine Lateral Raise, both for voice logging and in the Forge’s own training lists.',
+    ]},
     {version:'v11.360', date:'Sep 21, 2026', major:false, notes:[
       'The Training Checklist now sits directly under Daily Missions and the Diet Checklist on the Dashboard, ahead of Log Activity, instead of below it.',
     ]},
