@@ -1063,9 +1063,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
        more time, or a strike right now), then the standard log and a second, cross-domain
        roundup, both in the one sitting rather than two separate popups. -->
   <sc-if value="{{ perfCheckinOpen }}" hint-placeholder-val="{{ false }}">
-    <div class="lcb-stage" style="position:fixed; inset:0; z-index:1000; border-radius:0;">
+    <div style="position:fixed; inset:0; z-index:999; background:rgba(0,0,0,0.55);"></div>
+    <div class="lcb-stage" style="position:fixed; inset:20px; z-index:1000; border-radius:24px; box-shadow:0 30px 70px rgba(0,0,0,0.4);">
       <div class="lcb-field"></div>
-      <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:0; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; overflow-y:auto; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
+      <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:24px; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; overflow-y:auto; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
 
         <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); flex:0 0 auto;">PERFORMANCE TERMINAL</div>
         <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
@@ -9578,7 +9579,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-370 · v11.370 performance-terminal-full-screen';
+const NOTIF_BUILD_VERSION = '2026.09.21-371 · v11.371 performance-terminal-rounded-card';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14721,6 +14722,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.371', date:'Sep 21, 2026', major:true, notes:[
+      'The new Performance Terminal was reusing Brain Rest’s literal edge-to-edge, square-cornered shape, which read as a stark, oddly-margined rectangle rather than fitting in with the rest of the app. It now sits with a proper margin and rounded corners, the same frame every other full screen already uses, on a dimmed backdrop instead of bare edges.',
+    ]},
     {version:'v11.370', date:'Sep 21, 2026', major:true, notes:[
       'The nightly Performance Terminal check-in is no longer a popup. It now takes over the full screen, Brain Rest’s own field and hairline, and opens by asking if you’re ready. Say not yet and it asks if you’re still working: say yes and it holds off an hour, say no and tonight counts as missed, a strike lands immediately rather than waiting on the overnight sweep. Say yes straight away and it runs the standard log exactly as before, then a second, cross-domain roundup, financial notes, anything else worth logging, in the same sitting rather than a separate popup. That second log is a first pass. Its exact fields are easy to adjust.',
     ]},
