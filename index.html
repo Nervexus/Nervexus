@@ -9563,7 +9563,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-364 · v11.364 dashboard-widget-bordered-cards';
+const NOTIF_BUILD_VERSION = '2026.09.21-365 · v11.365 dashboard-widget-major-update-popup';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14653,7 +14653,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
-    {version:'v11.364', date:'Sep 21, 2026', major:false, notes:[
+    {version:'v11.365', date:'Sep 21, 2026', major:false, notes:[
+      'The dashboard redesign in v11.364 shipped without its "What’s New" popup, since it was flagged as a minor entry rather than a major one. Flagged it major, so an update like this shows the popup on your next login instead of sitting quietly in the full changelog.',
+    ]},
+    {version:'v11.364', date:'Sep 21, 2026', major:true, notes:[
       'Daily Missions, Training Checklist, Diet Checklist and Log Activity now carry a border around the whole block, the same way the Ultra X home screen frames itself. The border color adapts to whichever theme or Ultra raiment is active.',
     ]},
     {version:'v11.363', date:'Sep 21, 2026', major:false, notes:[
