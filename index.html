@@ -9579,7 +9579,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-371 · v11.371 performance-terminal-rounded-card';
+const NOTIF_BUILD_VERSION = '2026.09.21-372 · v11.372 dead-lift-gravedigger-aliases';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14722,6 +14722,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.372', date:'Sep 21, 2026', major:false, notes:[
+      '"Dead Lift" and "Grave Diggers", written with the natural spacing rather than the exercise list’s own one-word "deadlift" and "gravedigger", now resolve to the same entries, in voice logging and Bulk Import alike. Neither matched before: the list only bridges plurals and a short set of joined equipment words, not a genuine spacing difference, so both were filing as an unclassified Mixed entry instead of Back and Shoulders.',
+    ]},
     {version:'v11.371', date:'Sep 21, 2026', major:true, notes:[
       'The new Performance Terminal was reusing Brain Rest’s literal edge-to-edge, square-cornered shape, which read as a stark, oddly-margined rectangle rather than fitting in with the rest of the app. It now sits with a proper margin and rounded corners, the same frame every other full screen already uses, on a dimmed backdrop instead of bare edges.',
     ]},

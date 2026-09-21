@@ -469,7 +469,12 @@
     /* Named after somebody, or with the equipment sitting in the middle of the name — either
        way the words are not consecutive, so the longest-match rule cannot reach the entry. */
     'arnold style press':'arnold press', 'arnold style kettlebell press':'arnold press',
-    'meadows style row':'meadows row', 'renegade rows':'renegade row'
+    'meadows style row':'meadows row', 'renegade rows':'renegade row',
+    /* Written as two words far more often than the list's own one-word entry — a genuine
+       spacing difference, which nothing else here bridges (loose() only strips a trailing s
+       off each word, it doesn't merge or split words apart). */
+    'dead lift':'deadlift', 'dead lifts':'deadlift',
+    'grave digger':'gravedigger', 'grave diggers':'gravedigger'
   };
 
   /* 'Full', not 'Mixed': Mixed was never rendered anywhere — the Fitness page's buckets are
