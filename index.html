@@ -2307,7 +2307,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ showMissionsRow }}" hint-placeholder-val="{{ true }}">
         <div class="cc-dash-missions-row cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
           <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
-          <div class="cc-glowcard cc-widget-framed" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+          <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
+            <div class="cc-widget-framed" style="position:absolute; inset:10px; border-radius:14px; pointer-events:none; z-index:1; border:1px solid var(--u-line, rgba(255,255,255,0.14));"></div>
             <div style="position:absolute; top:14px; right:16px; pointer-events:none; display:flex; flex-direction:column; align-items:flex-end; gap:1px; z-index:6;">
               <sc-for list="{{ xpFx }}" as="fx" hint-placeholder-count="0"><div style="font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:#FFFFFF; text-shadow:0 0 12px rgba(255,255,255,0.75); animation:xpFloat 1.3s ease forwards;">{{ fx.text }}</div></sc-for>
             </div>
@@ -2439,7 +2440,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
           <sc-if value="{{ showTrainingRow }}" hint-placeholder-val="{{ true }}">
           <div class="cc-dash-training-row">
-            <div class="cc-glowcard cc-widget-framed" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+            <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
+              <div class="cc-widget-framed" style="position:absolute; inset:10px; border-radius:14px; pointer-events:none; z-index:1; border:1px solid var(--u-line, rgba(255,255,255,0.14));"></div>
               <div style="text-align:center; margin-bottom:14px;">
                 <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Training Checklist</div>
                 <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
@@ -2491,7 +2493,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
           </sc-if>
           </div>
-          <div class="cc-glowcard cc-widget-framed" style="border-radius:20px; background:#16181c; padding:20px; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+          <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
+            <div class="cc-widget-framed" style="position:absolute; inset:10px; border-radius:14px; pointer-events:none; z-index:1; border:1px solid var(--u-line, rgba(255,255,255,0.14));"></div>
             <div style="text-align:center; margin-bottom:14px;">
               <div style="font-size:14px; font-weight:600; letter-spacing:.2px;">Diet Checklist</div>
               <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:8px 0 0;">
@@ -2520,7 +2523,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
         </sc-if>
         <div class="cc-grid2" style="display:grid; grid-template-columns:1fr; gap:18px; margin-bottom:18px;">
-          <div class="cc-glowcard cc-widget-framed" style="border-radius:20px; background:#16181c; padding:20px; border:1px solid var(--u-line, rgba(255,255,255,0.14));">
+          <div class="cc-glowcard" style="position:relative; border-radius:20px; background:#16181c; padding:20px; overflow:hidden;">
+            <div class="cc-widget-framed" style="position:absolute; inset:10px; border-radius:14px; pointer-events:none; z-index:1; border:1px solid var(--u-line, rgba(255,255,255,0.14));"></div>
             <div style="text-align:center; margin-bottom:14px;">
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">{{ actLogEyebrow }}</div>
               <div style="font-size:14px; font-weight:600; margin-top:4px;">Log Activity</div>
@@ -9568,7 +9572,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-366 · v11.366 dashboard-widget-border-fix';
+const NOTIF_BUILD_VERSION = '2026.09.21-367 · v11.367 dashboard-widget-inset-frame';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14658,6 +14662,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.367', date:'Sep 21, 2026', major:true, notes:[
+      'The border around Daily Missions, Training Checklist, Diet Checklist and Log Activity sat right on the card’s own edge. The home screen frames its own block with the border set in from the edge instead, so these four now match that: a gap of cream (or whichever raiment’s card color) between the outer card and the border line.',
+    ]},
     {version:'v11.366', date:'Sep 21, 2026', major:true, notes:[
       'The border added around Daily Missions, Training Checklist, Diet Checklist and Log Activity in v11.364 was too faint to see under the Ultra X raiment, since it was sharing a near-invisible line color with every other card in the app. Gave these four their own bold border, in the raiment’s accent color, so it actually reads as a frame like the home screen’s.',
     ]},
