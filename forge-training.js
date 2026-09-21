@@ -146,6 +146,7 @@
         rng('Leaning single-arm lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES', perSide: true}),
         rng('Seated lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
         rng('Egyptian lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES', perSide: true}),
+        rng('Landmine lateral raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES', perSide: true}),
         rng('Plate front raise', 2, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
         rng('Barbell front raise', 3, 3, 8, 12, {group: 'LATERAL & FRONT RAISES'}),
         rng('Cable front raise', 3, 3, 10, 15, {group: 'LATERAL & FRONT RAISES'}),
@@ -391,6 +392,7 @@
       rng('Lateral lunge', 3, 3, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
       rng('Deficit reverse lunge', 3, 3, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
       rng('Step-back lunge', 3, 4, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
+      rng('Landmine lunge', 3, 4, 8, 12, {group: 'UNILATERAL & LUNGES', perSide: true}),
       rng('Skater squat', 3, 3, 6, 10, {group: 'UNILATERAL & LUNGES', perSide: true, noLoad: true}),
       rng('Cossack squat', 3, 3, 6, 12, {group: 'UNILATERAL & LUNGES', perSide: true, noLoad: true}),
 
@@ -423,6 +425,7 @@
       rng('Belt squat', 3, 4, 6, 12, {group: 'SQUATS & PRESSES'}),
       rng('Smith machine squat', 3, 4, 8, 12, {group: 'SQUATS & PRESSES'}),
       rng('Goblet squat', 3, 4, 8, 15, {group: 'SQUATS & PRESSES'}),
+      rng('Landmine squat', 3, 4, 8, 15, {group: 'SQUATS & PRESSES'}),
       rng('Hack squat', 3, 4, 8, 12, {group: 'SQUATS & PRESSES'}),
       rng('Leg press', 3, 4, 8, 15, {group: 'SQUATS & PRESSES'}),
       rng('Single-leg leg press', 3, 3, 8, 15, {group: 'SQUATS & PRESSES', perSide: true}),
@@ -461,6 +464,7 @@
       rng('Single-leg Romanian deadlift', 3, 3, 8, 12, {group: 'HINGE PATTERNS', perSide: true}),
       rng('Kettlebell Romanian deadlift', 3, 4, 8, 12, {group: 'HINGE PATTERNS'}),
       rng('Banded Romanian deadlift', 3, 3, 10, 15, {group: 'HINGE PATTERNS', noLoad: true}),
+      rng('Landmine deadlift', 3, 4, 8, 12, {group: 'HINGE PATTERNS'}),
 
       rng('Nordic hamstring curl', 3, 4, 4, 8, {group: 'CURLS & ISOLATION', noLoad: true}),
       rng('Glute-ham raise', 3, 4, 5, 10, {group: 'CURLS & ISOLATION', noLoad: true}),
@@ -591,6 +595,7 @@
       rng('Kettlebell close-grip swing', 3, 5, 10, 20, {group: 'TOTAL BODY'}),
       rng('Kettlebell hand-to-hand swing', 3, 5, 10, 20, {group: 'TOTAL BODY'}),
       rng('Kettlebell single-arm clean and press', 3, 4, 5, 8, {group: 'TOTAL BODY', perSide: true}),
+      rng('Kettlebell gravedigger', 3, 4, 5, 8, {group: 'TOTAL BODY', perSide: true}),
 
       rng('Kettlebell shoulder press', 3, 4, 5, 10, {group: 'UPPER BODY', perSide: true}),
       rng('Kettlebell deficit push-up', 3, 4, 8, 15, {group: 'UPPER BODY', noLoad: true}),
