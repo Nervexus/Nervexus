@@ -1483,8 +1483,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
   <sc-if value="{{ whatsNewOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed; inset:0; z-index:999; background:{{ wnBackdrop }}; display:flex; align-items:center; justify-content:center; padding:24px;">
       <sc-if value="{{ wnIsUltra }}" hint-placeholder-val="{{ false }}">
-        <div style="width:100%; max-width:560px; max-height:86vh; overflow-y:auto; border-radius:2px; background:{{ wnModalBg }}; padding:16px; box-shadow:0 50px 100px rgba(58,42,32,0.28);">
-        <div style="border:1px solid rgba(91,26,26,0.35); border-radius:2px; padding:40px 40px 44px; font-family:'Cormorant Garamond',Georgia,serif;">
+        <div style="width:100%; max-width:560px; max-height:86vh; overflow-y:auto; border-radius:24px; background:{{ wnModalBg }}; padding:16px; box-shadow:0 50px 100px rgba(58,42,32,0.28);">
+        <div style="border:1px solid rgba(91,26,26,0.35); border-radius:14px; padding:40px 40px 44px; font-family:'Cormorant Garamond',Georgia,serif;">
           <img src="favicon.png" alt="" style="display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 20px; opacity:0.9;">
           <div style="text-align:center; font-size:16px; letter-spacing:4px; color:#8a6a5a;">NERVEXUS ULTRA</div>
           <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:18px auto 22px;">
@@ -1502,12 +1502,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <span style="color:rgba(91,26,26,0.5); font-size:11px;">&#10086;</span>
             <div style="width:56px; height:1px; background:rgba(91,26,26,0.3);"></div>
           </div>
-          <div onClick="{{ closeWhatsNew }}" style="text-align:center; padding:16px; cursor:pointer; background:#5B1A1A; color:#F5F1E8; font-size:11px; letter-spacing:3px; font-weight:500;" style-hover="{ background:'#4A1515' }">ACKNOWLEDGED</div>
+          <div onClick="{{ closeWhatsNew }}" style="text-align:center; padding:16px; cursor:pointer; background:#5B1A1A; color:#F5F1E8; font-size:11px; letter-spacing:3px; font-weight:500; border-radius:999px;" style-hover="{ background:'#4A1515' }">ACKNOWLEDGED</div>
+          <sc-if value="{{ wnHasDestination }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ goToWhatsNewTarget }}" style="margin-top:10px; text-align:center; padding:15px; cursor:pointer; background:transparent; border:1px solid rgba(91,26,26,0.35); color:#5B1A1A; font-size:11px; letter-spacing:3px; font-weight:500; border-radius:999px;" style-hover="{ background:'rgba(91,26,26,0.06)' }">TAKE ME TO IT</div>
+          </sc-if>
         </div>
         </div>
       </sc-if>
       <sc-if value="{{ wnIsNotUltra }}" hint-placeholder-val="{{ true }}">
-      <div class="cc-glowcard" style="width:100%; max-width:440px; max-height:80vh; overflow-y:auto; border-radius:20px; background:{{ wnModalBg }}; padding:28px; box-shadow:0 30px 70px rgba(0,0,0,0.55);">
+      <div class="cc-glowcard" style="width:100%; max-width:440px; max-height:80vh; overflow-y:auto; border-radius:24px; background:{{ wnModalBg }}; padding:28px; box-shadow:0 30px 70px rgba(0,0,0,0.55);">
         <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">WHAT'S NEW</div>
         <h1 style="font-size:20px; font-weight:700; margin-bottom:4px;">{{ latestVersion }}</h1>
         <div style="font-size:11px; color:#6f6f78; margin-bottom:18px;">{{ latestDate }}</div>
@@ -1519,6 +1522,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <span style="font-size:12px; color:#c8c8ce; line-height:1.4;">I've read and acknowledge these changes</span>
         </div>
         <div onClick="{{ closeWhatsNew }}" style="margin-top:12px; text-align:center; padding:13px; border-radius:13px; cursor:{{ whatsNewBtnCursor }}; background:{{ whatsNewBtnBg }}; opacity:{{ whatsNewBtnOpacity }}; color:#0a0a0b; font-size:13.5px; font-weight:700;" style-hover="{ transform:'translateY(-1px)' }">GOT IT</div>
+        <sc-if value="{{ wnHasDestination }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ goToWhatsNewTarget }}" style="margin-top:10px; text-align:center; padding:12px; border-radius:13px; cursor:pointer; background:transparent; border:1px solid rgba(255,255,255,0.14); color:#c8c8ce; font-size:12.5px; font-weight:600;" style-hover="{ borderColor:'rgba(255,255,255,0.4)', color:'#F4F4F5' }">Take me to it</div>
+        </sc-if>
       </div>
       </sc-if>
     </div>
@@ -9568,7 +9574,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-368 · v11.368 dashboard-widget-border-back-to-edge';
+const NOTIF_BUILD_VERSION = '2026.09.21-369 · v11.369 whatsnew-curved-take-me-to-it';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14658,7 +14664,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
-    {version:'v11.368', date:'Sep 21, 2026', major:false, notes:[
+    {version:'v11.369', date:'Sep 21, 2026', major:false, notes:[
+      'The What’s New popup now has rounded corners matching the home screen’s own card, instead of the sharp-edged frame it used before. Design updates with somewhere to send you also get a "Take me to it" button under Acknowledged, so you can jump straight to what changed instead of hunting for it yourself. System and backend entries never show this button.',
+    ]},
+    {version:'v11.368', date:'Sep 21, 2026', major:false, kind:'design', goTo:'dashboard', notes:[
       'Put the border on Daily Missions, Training Checklist, Diet Checklist and Log Activity back on the card’s own edge, undoing the inset frame from v11.367.',
     ]},
     {version:'v11.367', date:'Sep 21, 2026', major:true, notes:[
@@ -20406,6 +20415,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       latestVersion:(this._changelog()[0]||{}).version||'',
       latestDate:(this._changelog()[0]||{}).date||'',
       latestNotes:(this._changelog()[0]||{}).notes||[],
+      // "Take me to it" only makes sense for a visible design/layout change with somewhere
+      // to actually send you, never for a data, backend or bugfix entry (kind defaults to
+      // 'system' when unset, so old entries never grow this button retroactively).
+      wnHasDestination:(this._changelog()[0]||{}).kind==='design' && !!(this._changelog()[0]||{}).goTo,
+      goToWhatsNewTarget:()=>{ const c=this._changelog()[0]; const dest=c&&c.goTo; this.dismissWhatsNew(); if(dest) this.setState({scene:dest}); },
       pushLoading:!!S.pushLoading, pushErr:S.pushErr||'', pushErrShow:!!S.pushErr,
       clearAllNotifs:()=>this.clearAllNotifs(),
       dashboardWidgets:[['missions','Daily & Diet Checklists'],['training','Training Checklist'],['news','Money / News & Law News']].map(w=>{ const on=(S.dashboardLayout||{})[w[0]]!==false; return {label:w[1], bg:on?'var(--lc-accent)':'var(--lc-line)', pos:on?'22px':'2px', toggle:()=>this.setDashboardWidget(w[0],!on)}; }),
