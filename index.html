@@ -1058,97 +1058,101 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     </div>
   </sc-if>
 
+  <!-- PERFORMANCE TERMINAL — Brain Rest's own full-screen shape reused for the daily check-in:
+       the same pearl field and hairline, a ready gate, a decline gate (still working / need
+       more time, or a strike right now), then the standard log and a second, cross-domain
+       roundup, both in the one sitting rather than two separate popups. -->
   <sc-if value="{{ perfCheckinOpen }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed; inset:0; z-index:999; background:{{ wnBackdrop }}; display:flex; align-items:center; justify-content:center; padding:24px;">
-      <sc-if value="{{ wnIsUltra }}" hint-placeholder-val="{{ false }}">
-        <div style="position:relative; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; overflow-x:hidden; border-radius:2px; background:{{ wnModalBg }}; padding:16px; box-shadow:0 50px 100px rgba(58,42,32,0.28);">
-        <svg width="44" height="44" viewBox="0 0 72 72" style="position:absolute; top:8px; left:8px; opacity:0.6; pointer-events:none; z-index:0;"><path d="M6 46 C 6 24, 10 12, 14 8 M14 8 L 58 8" stroke="{{ perfUAccent }}" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M6 46 C 6 34, 10 26, 17 24 C 12 27, 10 32, 11 38" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M14 8 C 24 8, 31 11, 35 16 C 31 12, 24 11, 19 13" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><circle cx="6" cy="46" r="1.5" fill="{{ perfUAccent }}"/><circle cx="58" cy="8" r="1.5" fill="{{ perfUAccent }}"/></svg>
-        <svg width="44" height="44" viewBox="0 0 72 72" style="position:absolute; top:8px; right:8px; opacity:0.6; pointer-events:none; z-index:0; transform:scaleX(-1);"><path d="M6 46 C 6 24, 10 12, 14 8 M14 8 L 58 8" stroke="{{ perfUAccent }}" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M6 46 C 6 34, 10 26, 17 24 C 12 27, 10 32, 11 38" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M14 8 C 24 8, 31 11, 35 16 C 31 12, 24 11, 19 13" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><circle cx="6" cy="46" r="1.5" fill="{{ perfUAccent }}"/><circle cx="58" cy="8" r="1.5" fill="{{ perfUAccent }}"/></svg>
-        <svg width="44" height="44" viewBox="0 0 72 72" style="position:absolute; bottom:8px; left:8px; opacity:0.6; pointer-events:none; z-index:0; transform:scaleY(-1);"><path d="M6 46 C 6 24, 10 12, 14 8 M14 8 L 58 8" stroke="{{ perfUAccent }}" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M6 46 C 6 34, 10 26, 17 24 C 12 27, 10 32, 11 38" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M14 8 C 24 8, 31 11, 35 16 C 31 12, 24 11, 19 13" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><circle cx="6" cy="46" r="1.5" fill="{{ perfUAccent }}"/><circle cx="58" cy="8" r="1.5" fill="{{ perfUAccent }}"/></svg>
-        <svg width="44" height="44" viewBox="0 0 72 72" style="position:absolute; bottom:8px; right:8px; opacity:0.6; pointer-events:none; z-index:0; transform:scale(-1,-1);"><path d="M6 46 C 6 24, 10 12, 14 8 M14 8 L 58 8" stroke="{{ perfUAccent }}" stroke-width="1" fill="none" stroke-linecap="round"/><path d="M6 46 C 6 34, 10 26, 17 24 C 12 27, 10 32, 11 38" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><path d="M14 8 C 24 8, 31 11, 35 16 C 31 12, 24 11, 19 13" stroke="{{ perfUAccent }}" stroke-width="0.8" fill="none" stroke-linecap="round"/><circle cx="6" cy="46" r="1.5" fill="{{ perfUAccent }}"/><circle cx="58" cy="8" r="1.5" fill="{{ perfUAccent }}"/></svg>
-        <div style="position:relative; z-index:1; border:1px solid {{ perfUAccent35 }}; border-radius:2px; padding:40px 40px 44px; font-family:'Cormorant Garamond',Georgia,serif; background:{{ wnModalBg }};">
+    <div class="lcb-stage" style="position:fixed; inset:0; z-index:1000; border-radius:0;">
+      <div class="lcb-field"></div>
+      <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:0; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; overflow-y:auto; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
 
-          <img src="favicon.png" alt="" style="display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 20px; opacity:0.9;">
-          <div style="text-align:center; font-size:16px; letter-spacing:4px; color:{{ perfUMuted }};">MANDATORY</div>
-          <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:18px auto 22px;">
-            <div style="width:56px; height:1px; background:{{ perfUAccent }};"></div>
-            <span style="color:{{ perfUAccent }}; font-size:13px;">❦</span>
-            <div style="width:56px; height:1px; background:{{ perfUAccent }};"></div>
+        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); flex:0 0 auto;">PERFORMANCE TERMINAL</div>
+        <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
+
+        <!-- READY? -->
+        <sc-if value="{{ ptStageReady }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:0 0 auto; width:100%; max-width:480px; padding-bottom:6px;">
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:38px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Ready for tonight's check-in?</div>
+            <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:42ch; margin:18px auto 0;">{{ perfTodayLabel }}. Every day gets logged, no exceptions.</div>
+            <div style="margin-top:34px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
+              <span onClick="{{ perfGateNotReady }}" style="flex:1; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">NOT YET</span>
+              <span onClick="{{ perfGateYesReady }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">YES, BEGIN</span>
+            </div>
           </div>
-          <h1 style="font-style:italic; font-weight:500; font-size:30px; color:{{ perfUInk }}; text-align:center; margin:0 0 6px;">Performance Terminal</h1>
-          <div style="font-size:13px; color:{{ perfUMuted }}; text-align:center; letter-spacing:0.5px; margin-bottom:24px;">{{ perfTodayLabel }}</div>
+        </sc-if>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What's the one thing today that actually mattered?</div>
-          <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
-
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">Focused hours logged today</div>
-          <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; text-align:center; box-sizing:border-box;">
-
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">What did you avoid, delay, or half-ass today?</div>
-          <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest. This is the one that matters…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
-
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">{{ perfYesterdayLabel }}</div>
-          <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
-
-          <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:18px;">
-            <span style="font-size:15px; color:{{ perfUAccent }}; font-style:italic;">Trained today</span>
-            <div onClick="{{ togglePerfTrained }}" style="width:40px; height:22px; border-radius:12px; background:{{ perfTrainedBgU }}; position:relative; cursor:pointer;"><div style="width:18px; height:18px; border-radius:50%; background:#FBF8F1; position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
+        <!-- STILL WORKING? -->
+        <sc-if value="{{ ptStageDecline }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:0 0 auto; width:100%; max-width:480px; padding-bottom:6px;">
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:38px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Still working?</div>
+            <div class="rest-body" style="font-size:15px; line-height:1.7; color:var(--lc-muted); max-width:42ch; margin:18px auto 0;">If you need more time, we'll check back in an hour. If not, tonight counts as missed, and a strike is added straight away.</div>
+            <div style="margin-top:34px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
+              <span onClick="{{ perfGateNotWorking }}" style="flex:1; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">NO, I'M DONE</span>
+              <span onClick="{{ perfGateStillWorking }}" style="flex:1 1 auto; max-width:280px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">YES, GIVE ME AN HOUR</span>
+            </div>
           </div>
+        </sc-if>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:7px; font-style:italic; font-weight:500;">Tomorrow's one priority</div>
-          <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="display:block; width:88%; margin-left:auto; margin-right:auto; padding:5px 18px; border-radius:3px; background:{{ perfUAccent03 }}; border:1px solid {{ perfUAccent14 }}; color:{{ perfUInk }}; font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; line-height:1.3; text-align:center; resize:vertical; box-sizing:border-box;"></textarea>
+        <!-- STANDARD LOG — the original questions, the original design, a new full-screen shell -->
+        <sc-if value="{{ ptStageForm }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1 1 auto; width:100%; max-width:520px; padding-bottom:6px; text-align:left;">
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:30px; font-weight:300; line-height:1.1; letter-spacing:-0.5px; color:var(--lc-accent); text-align:center; margin-bottom:6px;">Tonight's Performance Log</div>
+            <div style="font-size:13px; color:var(--lc-muted); text-align:center; letter-spacing:0.5px; margin-bottom:26px;">{{ perfTodayLabel }}</div>
 
-          <div style="text-align:center; font-size:16px; color:{{ perfUAccent }}; margin-bottom:10px; font-style:italic;">Discipline today</div>
-          <div style="display:flex; gap:8px; justify-content:center; margin-bottom:20px;">
-            <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:24px; color:{{ st.cU }};">★</span></sc-for>
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic;">What's the one thing today that actually mattered?</div>
+            <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="width:100%; min-height:56px; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; resize:vertical; margin-bottom:16px; box-sizing:border-box;"></textarea>
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic;">Focused hours logged today</div>
+            <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="width:100%; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; margin-bottom:16px; box-sizing:border-box;">
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic;">What did you avoid, delay, or half-ass today?</div>
+            <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest. This is the one that matters…" style="width:100%; min-height:48px; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; resize:vertical; margin-bottom:16px; box-sizing:border-box;"></textarea>
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic;">{{ perfYesterdayLabel }}</div>
+            <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="width:100%; min-height:48px; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; resize:vertical; margin-bottom:16px; box-sizing:border-box;"></textarea>
+
+            <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:18px;">
+              <span style="font-size:15px; color:var(--lc-accent); font-style:italic;">Trained today</span>
+              <div onClick="{{ togglePerfTrained }}" style="width:40px; height:22px; border-radius:12px; background:{{ perfTrainedBg }}; position:relative; cursor:pointer;"><div style="width:18px; height:18px; border-radius:50%; background:var(--lc-on-accent); position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
+            </div>
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic;">Tomorrow's one priority</div>
+            <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="width:100%; min-height:48px; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; resize:vertical; margin-bottom:16px; box-sizing:border-box;"></textarea>
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:10px; font-style:italic; text-align:center;">Discipline today</div>
+            <div style="display:flex; gap:8px; justify-content:center; margin-bottom:8px;">
+              <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:26px; color:{{ st.c }};">★</span></sc-for>
+            </div>
+
+            <sc-if value="{{ perfSubmitErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff5563; text-align:center; margin:14px 0 0;">⚠ {{ perfSubmitErrVal }}</div></sc-if>
+            <div onClick="{{ perfFormContinue }}" style="margin-top:26px; text-align:center; padding:16px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; font-weight:500;">CONTINUE</div>
           </div>
+        </sc-if>
 
-          <sc-if value="{{ perfSubmitErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#B3261E; text-align:center; margin-bottom:10px;">⚠ {{ perfSubmitErrVal }}</div></sc-if>
-          <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto 18px;">
-            <div style="width:56px; height:1px; background:{{ perfUAccent30 }};"></div>
-            <span style="color:{{ perfUAccent50 }}; font-size:11px;">❦</span>
-            <div style="width:56px; height:1px; background:{{ perfUAccent30 }};"></div>
+        <!-- FULL LOG — financial, workouts, etc, in the same sitting. A first draft; happy to
+             adjust exactly what this asks for. -->
+        <sc-if value="{{ ptStageFullLog }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1 1 auto; width:100%; max-width:480px; padding-bottom:6px;">
+            <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:30px; font-weight:300; line-height:1.1; letter-spacing:-0.5px; color:var(--lc-accent); margin-bottom:6px;">One more thing</div>
+            <div class="rest-body" style="font-size:14px; line-height:1.6; color:var(--lc-muted); margin-bottom:24px;">A quick daily roundup, financial and otherwise, before we're done.</div>
+
+            <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:20px;">
+              <span style="font-size:15px; color:var(--lc-accent); font-style:italic;">Stayed on budget today</span>
+              <div onClick="{{ togglePerfOnBudget }}" style="width:40px; height:22px; border-radius:12px; background:{{ perfOnBudgetBg }}; position:relative; cursor:pointer;"><div style="width:18px; height:18px; border-radius:50%; background:var(--lc-on-accent); position:absolute; top:2px; left:{{ perfOnBudgetPos }}; transition:left .18s;"></div></div>
+            </div>
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic; text-align:left;">Anything to note financially today?</div>
+            <textarea value="{{ perfDraftSpendNoteVal }}" onInput="{{ setPerfSpendNote }}" placeholder="A big purchase, a bill, optional…" style="width:100%; min-height:44px; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; resize:vertical; margin-bottom:16px; box-sizing:border-box;"></textarea>
+
+            <div style="font-size:14px; color:var(--lc-accent); margin-bottom:7px; font-style:italic; text-align:left;">Anything else worth logging, training, life admin, etc?</div>
+            <textarea value="{{ perfDraftFullNotesVal }}" onInput="{{ setPerfFullNotes }}" placeholder="Optional…" style="width:100%; min-height:44px; padding:12px 15px; border-radius:11px; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-accent); font-family:'Cormorant Garamond',Georgia,serif; font-size:15px; resize:vertical; margin-bottom:16px; box-sizing:border-box;"></textarea>
+
+            <div onClick="{{ perfFullLogSubmit }}" style="margin-top:10px; text-align:center; padding:16px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; font-weight:500;">DONE FOR TONIGHT</div>
           </div>
-          <div onClick="{{ submitPerfCheckinFromModal }}" style="text-align:center; padding:16px; cursor:pointer; background:{{ perfUAccent }}; color:{{ perfUBtnText }}; font-size:11px; letter-spacing:3px; font-weight:500;" style-hover="{ background:'{{ perfUAccentHover }}' }">SUBMIT CHECK-IN</div>
-        </div>
-        </div>
-      </sc-if>
-      <sc-if value="{{ wnIsNotUltra }}" hint-placeholder-val="{{ true }}">
-      <div class="cc-glowcard" style="width:100%; max-width:460px; max-height:86vh; overflow-y:auto; border-radius:20px; background:{{ wnModalBg }}; padding:28px; box-shadow:0 30px 70px rgba(0,0,0,0.35); position:relative;">
-        <img src="favicon.png" alt="" style="position:absolute; top:22px; right:24px; width:30px; height:30px; object-fit:contain; opacity:0.8;">
-        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#8a8a92; margin-bottom:6px;">◆ MANDATORY</div>
-        <h1 style="font-size:20px; font-weight:700; margin-bottom:4px;">Performance Terminal</h1>
-        <div style="font-size:11px; color:#6f6f78; margin-bottom:16px;">{{ perfTodayLabel }} · today’s check-in is required</div>
+        </sc-if>
 
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What's the one thing today that actually mattered?</div>
-        <textarea value="{{ perfDraftWhatVal }}" onInput="{{ setPerfDraftWhat }}" placeholder="Your biggest win today…" style="width:100%; min-height:56px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
-
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Focused hours logged today</div>
-        <input value="{{ perfDraftDurationVal }}" onInput="{{ setPerfDraftDuration }}" placeholder="e.g. 4.5" style="width:100%; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; margin-bottom:12px; box-sizing:border-box;">
-
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">What did you avoid, delay, or half-ass today?</div>
-        <textarea value="{{ perfDraftBenefitVal }}" onInput="{{ setPerfDraftBenefit }}" placeholder="Be honest. This is the one that matters…" style="width:100%; min-height:44px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
-
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">{{ perfYesterdayLabel }}</div>
-        <textarea value="{{ perfDraftLearnedVal }}" onInput="{{ setPerfDraftLearned }}" placeholder="Your honest answer…" style="width:100%; min-height:44px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
-
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
-          <div onClick="{{ togglePerfTrained }}" style="width:38px; height:21px; flex:0 0 38px; border-radius:12px; background:{{ perfTrainedBg }}; position:relative; cursor:pointer;"><div style="width:17px; height:17px; border-radius:50%; background:#fff; position:absolute; top:2px; left:{{ perfTrainedPos }}; transition:left .18s;"></div></div>
-          <span style="font-size:12.5px; color:#c8c8ce;">Trained / exercised today</span>
-        </div>
-
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:6px;">Tomorrow's one priority</div>
-        <textarea value="{{ perfDraftImprovementVal }}" onInput="{{ setPerfDraftImprovement }}" placeholder="The single most important thing to get done…" style="width:100%; min-height:48px; padding:11px 13px; border-radius:11px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:12px;"></textarea>
-
-        <div style="font-size:11.5px; color:#8b8b93; margin-bottom:8px;">Discipline today</div>
-        <div style="display:flex; gap:6px; margin-bottom:14px;">
-          <sc-for list="{{ perfStars }}" as="st" hint-placeholder-count="5"><span onClick="{{ st.set }}" style="cursor:pointer; font-size:24px; color:{{ st.c }};">★</span></sc-for>
-        </div>
-
-        <sc-if value="{{ perfSubmitErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff3b4a; margin-bottom:10px;">⚠ {{ perfSubmitErrVal }}</div></sc-if>
-        <div onClick="{{ submitPerfCheckinFromModal }}" style="margin-top:2px; text-align:center; padding:13px; border-radius:13px; cursor:pointer; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); color:#0a0a0b; font-size:13.5px; font-weight:700;" style-hover="{ transform:'translateY(-1px)' }">SUBMIT CHECK-IN</div>
       </div>
-      </sc-if>
     </div>
   </sc-if>
 
@@ -9574,7 +9578,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-369 · v11.369 whatsnew-curved-take-me-to-it';
+const NOTIF_BUILD_VERSION = '2026.09.21-370 · v11.370 performance-terminal-full-screen';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9624,6 +9628,11 @@ class Component extends DCLogic {
       loginStreak: s.loginStreak||0, lastLoginDate: s.lastLoginDate||'', loginXPLog: s.loginXPLog||[],
       perfLogs: s.perfLogs||[], perfHolidays: s.perfHolidays||[], perfStatus: s.perfStatus||{missStreak:0,banned:false,bannedAt:null,warnedAt:null,appealStatus:'none',appealText:'',appealAt:null},
       perfDraftWhat:'', perfDraftDuration:'', perfDraftBenefit:'', perfDraftLearned:'', perfDraftTrained:true, perfDraftImprovement:'', perfDraftRating:0, perfSubmitErr:'',
+      // The full-screen check-in's own state machine: 'ready' (are you ready?), 'decline'
+      // (still working / need more time?), 'form' (the standard log above), 'fulllog' (the
+      // second, cross-domain roundup below). Always reset to 'ready' whenever the terminal opens.
+      perfGateStage:'ready',
+      perfFullLogs: s.perfFullLogs||[], perfDraftOnBudget:true, perfDraftSpendNote:'', perfDraftFullNotes:'',
       perfHolStart:'', perfHolEnd:'', perfHolErr:'', perfAppealDraft:'',
       perfTeamProfiles:[], perfTeamStatusRaw:[], perfTeamLogsRaw:[],
       missionNotes:{}, missionInput:'', missionRecurring:false, missionView:'active', xpFx:[],
@@ -10440,7 +10449,7 @@ activities: this._mergeShipLog(s.activities),
     if(this._mlWait){ clearInterval(this._mlWait); this._mlWait=null; } clearInterval(this._clk); clearInterval(this._notifTimer); clearInterval(this._dayTimer); clearInterval(this._notifWait); clearInterval(this._refreshTimer); clearInterval(this._quoteTimer); }
 
   save(){ try{ const s=this.state; const em=((s.currentEmail||(s.account&&s.account.email)||'')+'').trim().toLowerCase();
-    const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
+    const slice={ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, account:s.account, bodySex:s.bodySex, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, prefs:s.prefs, customQuotes:s.customQuotes, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, perfLogs:s.perfLogs, perfFullLogs:s.perfFullLogs, perfHolidays:s.perfHolidays, perfStatus:s.perfStatus, usageLog:s.usageLog };
     const accounts={...(s.accounts||{})}; if(em) accounts[em]=slice;
     localStorage.setItem('cc_v2', JSON.stringify({ forgeScores:s.forgeScores, forgeHistory:s.forgeHistory, forgeFB:s.forgeFB, loggedIn:s.loggedIn, voice:s.voice, bodySex:s.bodySex, account:s.account, checklist:s.checklist, workouts:s.workouts, income:s.income, expenses:s.expenses, savings:s.savings, activities:s.activities, events:s.events, dayColors:s.dayColors, notes:s.notes, notesPw:s.notesPw, prefs:s.prefs, users:s.users, health:s.health, missions:s.missions, missionHistory:s.missionHistory, missionXP:s.missionXP, move:s.move, lastRollover:s.lastRollover, requests:s.requests, currentEmail:s.currentEmail, accounts, learning:s.learning, wiRoutes:s.wiRoutes, wiSavedPins:s.wiSavedPins, loginStreak:s.loginStreak, lastLoginDate:s.lastLoginDate, loginXPLog:s.loginXPLog, musicLibrary:s.musicLibrary, musicQueue:s.musicQueue, musicVolume:s.musicVolume, vtx:(s.vtx||[]).slice(-60), memories:s.memories, quickLogBlocks:s.quickLogBlocks })); }catch(e){} this._xpWatch(); }
   /* XP is not awarded from one place — it is summed out of the logs by computePower, and a
@@ -13261,24 +13270,72 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // same rule via email; this is the actual in-app modal. Fixed to UK time regardless of
   // device timezone, same as the server, since this is a uniform policy not a convenience.
   _ukHour(){ try{ return parseInt(new Date().toLocaleString('en-GB',{hour:'numeric',hour12:false,timeZone:'Europe/London'}),10)%24; }catch(e){ return new Date().getHours(); } }
+  // Same fixed-UK-time policy as _ukHour, but the date string, in the reminder-tick edge
+  // function's own format (en-CA => YYYY-MM-DD) so a client-side strike can write a
+  // last_eval_date the server's own sweep will recognise as already handled.
+  _ukDateStr(offsetDays){ try{ const d=new Date(Date.now()+(offsetDays||0)*86400000); return d.toLocaleDateString('en-CA',{timeZone:'Europe/London'}); }catch(e){ return this._locDate(offsetDays); } }
   _checkPerfCheckinPopup(){
     if(this.state.perfCheckinOpen) return;
     if(this.state.whatsNewOpen) return;
     if(this.state.perfStatus && this.state.perfStatus.banned) return;
+    if(this.state.prefs.perfSnoozedUntil && Date.now()<this.state.prefs.perfSnoozedUntil) return;
     if(this._ukHour()<22) return;
     const today=this._todayStr();
     if(this._perfOnHoliday(today)) return;
     if(this._perfHasLoggedToday()) return;
     if(this._perfPopupShownFor===today) return;
     this._perfPopupShownFor=today;
-    this.setState({perfCheckinOpen:true});
+    this.setState({perfCheckinOpen:true, perfGateStage:'ready'});
   }
   // One-time, on-demand early heads-up — sends a notification AND opens the actual check-in
   // form immediately, so tapping the button is a real end-to-end test of the reminder AND the
   // form/submit flow together, not just proof the notification channel works.
   sendPerfReminderNow(){
     if(window.NotificationManager) window.NotificationManager.notify({ type:'system', title:'Performance Terminal', body:'Don\u2019t forget today\u2019s check-in, due by 10pm.', dedupeKey:'perf-early:'+Date.now() }, this._notifHost());
-    this.setState({perfCheckinOpen:true});
+    this.setState({perfCheckinOpen:true, perfGateStage:'ready'});
+  }
+  // The full-screen terminal's own gate: are you ready? If not, are you still working, or
+  // is tonight simply not happening. Mirrors Brain Rest's own two-gate shape.
+  perfGateYesReady(){ this.setState({perfGateStage:'form'}); }
+  perfGateNotReady(){ this.setState({perfGateStage:'decline'}); }
+  // "Still working, give me an hour" \u2014 a real snooze, not just closing the terminal: the
+  // per-day shown-for guard is cleared so the 60s reminders timer can reopen it once the
+  // hour is up, same as any other still-outstanding check-in tonight.
+  perfGateStillWorking(){
+    this.setPref('perfSnoozedUntil', Date.now()+3600000);
+    this._perfPopupShownFor=null;
+    this.setState({perfCheckinOpen:false});
+    this.showToast('system','Check-in held for an hour','We\u2019ll check back with you in an hour.');
+  }
+  // "No, I'm done for tonight" \u2014 counts exactly like a genuinely missed night: a strike now,
+  // rather than waiting on the server's next-day sweep. last_eval_date is pre-set to
+  // tomorrow's UK date so that sweep recognises tonight as already handled and doesn't
+  // double the strike when it runs.
+  perfGateNotWorking(){
+    const cur=(this.state.perfStatus&&this.state.perfStatus.missStreak)||0;
+    const newStreak=cur+1; const banned=newStreak>=7;
+    const patch={missStreak:newStreak, banned, bannedAt:banned?Date.now():null, warnedAt:banned?null:Date.now()};
+    this.mut(st=>({perfStatus:{...(st.perfStatus||{}), ...patch}}));
+    if(this._sbOn()) window.SB.upsert('performance_status', {
+      user_id:this.state.authUserId, miss_streak:newStreak, banned,
+      banned_at:banned?new Date().toISOString():null, warned_at:banned?null:new Date().toISOString(),
+      last_eval_date:this._ukDateStr(1),
+    }, 'user_id').catch(()=>{});
+    this.setState({perfCheckinOpen:false});
+    this.showToast('system', banned?'Account locked':'Strike added', banned?'7 strikes reached, the account is locked pending appeal.':('Strike '+newStreak+' of 7 added for skipping tonight\u2019s check-in.'));
+  }
+  setPerfSpendNote(e){ this.setState({perfDraftSpendNote:this._capitalizeWords(e.target.value)}); }
+  setPerfFullNotes(e){ this.setState({perfDraftFullNotes:this._capitalizeWords(e.target.value)}); }
+  togglePerfOnBudget(){ this.setState(s=>({perfDraftOnBudget:!s.perfDraftOnBudget})); }
+  // The standard log's own "Continue" \u2014 submits it exactly like the old single-stage popup
+  // did, then moves into the second, cross-domain roundup rather than closing.
+  perfFormContinue(){ if(this.submitPerfLog()) this.setState({perfGateStage:'fulllog'}); }
+  perfFullLogSubmit(){
+    const s=this.state; const today=this._todayStr();
+    const entry={ id:this._uuid(), date:today, onBudget:!!s.perfDraftOnBudget, spendNote:(s.perfDraftSpendNote||'').trim(), notes:(s.perfDraftFullNotes||'').trim(), ts:Date.now() };
+    this.mut(st=>({ perfFullLogs:[entry, ...(st.perfFullLogs||[]).filter(l=>l.date!==today)], perfDraftOnBudget:true, perfDraftSpendNote:'', perfDraftFullNotes:'' }));
+    this.setState({perfCheckinOpen:false});
+    this.showToast('system','Full log saved','Tonight\u2019s roundup is saved alongside the check-in.');
   }
   setPerfDraftWhat(e){ this.setState({perfDraftWhat:this._capitalizeWords(e.target.value)}); }
   setPerfDraftDuration(e){ this.setState({perfDraftDuration:e.target.value}); }
@@ -14664,6 +14721,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.370', date:'Sep 21, 2026', major:true, notes:[
+      'The nightly Performance Terminal check-in is no longer a popup. It now takes over the full screen, Brain Rest’s own field and hairline, and opens by asking if you’re ready. Say not yet and it asks if you’re still working: say yes and it holds off an hour, say no and tonight counts as missed, a strike lands immediately rather than waiting on the overnight sweep. Say yes straight away and it runs the standard log exactly as before, then a second, cross-domain roundup, financial notes, anything else worth logging, in the same sitting rather than a separate popup. That second log is a first pass. Its exact fields are easy to adjust.',
+    ]},
     {version:'v11.369', date:'Sep 21, 2026', major:false, notes:[
       'The What’s New popup now has rounded corners matching the home screen’s own card, instead of the sharp-edged frame it used before. Design updates with somewhere to send you also get a "Take me to it" button under Acknowledged, so you can jump straight to what changed instead of hunting for it yourself. System and backend entries never show this button.',
     ]},
@@ -20159,6 +20219,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           perfHolUsedLabel:used+' / '+cap+' days used this year', perfHolStartVal:S.perfHolStart||'', setPerfHolStart:(e)=>this.setPerfHolStart(e), perfHolEndVal:S.perfHolEnd||'', setPerfHolEnd:(e)=>this.setPerfHolEnd(e), requestHoliday:()=>this.requestHoliday(), perfHolErrShow:!!S.perfHolErr, perfHolErrVal:S.perfHolErr||'', perfHolidayList,
           perfHistoryList:hist, perfNoHistory:hist.length===0,
           perfTeamList, perfTeamEmpty:perfTeamList.length===0, perfTeamEmptyLabel:this._sbOn()?'No other accounts yet.':'Connect Supabase to review team check-ins.',
+          // The full-screen terminal's own stages, plus the second, cross-domain roundup's
+          // own fields — kept in this same block since they read the same S.perf* state.
+          ptStageReady:(S.perfGateStage||'ready')==='ready', ptStageDecline:S.perfGateStage==='decline',
+          ptStageForm:S.perfGateStage==='form', ptStageFullLog:S.perfGateStage==='fulllog',
+          perfGateYesReady:()=>this.perfGateYesReady(), perfGateNotReady:()=>this.perfGateNotReady(),
+          perfGateStillWorking:()=>this.perfGateStillWorking(), perfGateNotWorking:()=>this.perfGateNotWorking(),
+          perfFormContinue:()=>this.perfFormContinue(), perfFullLogSubmit:()=>this.perfFullLogSubmit(),
+          togglePerfOnBudget:()=>this.togglePerfOnBudget(),
+          perfOnBudgetBg:S.perfDraftOnBudget?'var(--lc-accent)':'var(--lc-line)', perfOnBudgetPos:S.perfDraftOnBudget?'22px':'2px',
+          perfDraftSpendNoteVal:S.perfDraftSpendNote||'', setPerfSpendNote:(e)=>this.setPerfSpendNote(e),
+          perfDraftFullNotesVal:S.perfDraftFullNotes||'', setPerfFullNotes:(e)=>this.setPerfFullNotes(e),
         };
       }, {}),
       coachToggles:[
@@ -20383,7 +20454,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       staleBuildLine:'Running '+(NOTIF_BUILD_VERSION.split(' · ')[1]||NOTIF_BUILD_VERSION),
       staleAdvice:'Refreshing clears the cached copy and pulls the current build. Nothing you have logged is lost.',
       refreshStaleBuild:()=>this.refreshStaleBuild(), dismissStaleBuild:()=>this.dismissStaleBuild(),
-      openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true}),
+      openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true, perfGateStage:'ready'}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
       wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
