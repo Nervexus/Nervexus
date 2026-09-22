@@ -9585,7 +9585,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.22-374 · v11.374 levelup-full-screen';
+const NOTIF_BUILD_VERSION = '2026.09.22-375 · v11.375 attribute-level-curve';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14617,7 +14617,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const rankForLevel=(lvl)=>{ let r=ranks[0]; for(const x of ranks) if(lvl>=x.min) r=x; return r; };
     const nextForLevel=(lvl)=>{ for(const x of ranks) if(x.min>lvl) return x; return null; };
     const rank=rankForLevel(level), next=nextForLevel(level);
-    const cat=(name,xp)=>{ let L=1; while(T(L+1)<=xp) L++; return {name,xp:Math.round(xp),level:L,pct:Math.min(100,Math.round((xp-T(L))/(T(L+1)-T(L))*100))}; };
+    // Attribute categories get their own, far gentler curve — T() above demands ~370 XP/day
+    // summed across every source on the whole account combined, so reusing it here for each
+    // ONE category (fed by a single narrow slice — just lifting volume, just cardio minutes,
+    // just savings) meant a real, solid gym session (~150 points) still fell short of T(2)'s
+    // 327 just to reach Level 2, and Physical Strength/Endurance/Intelligence/Finance/Focus/
+    // Health all sat stuck near Level 1 no matter how much real, narrow-domain effort went
+    // in, while Consistency and Mental Resilience — which sum many small signals across every
+    // log at once — raced ahead and made the other bars look broken by comparison. TA_STEP/
+    // TA_BASE are scaled down so one real session actually moves its own bar.
+    const TA_STEP=3, TA_BASE=40; const TA=(L)=>TA_STEP*(L-1)*L/2 + TA_BASE*(L-1);
+    const cat=(name,xp)=>{ let L=1; while(TA(L+1)<=xp) L++; return {name,xp:Math.round(xp),level:L,pct:Math.min(100,Math.round((xp-TA(L))/(TA(L+1)-TA(L))*100))}; };
     const totInc=s.income.reduce((a,i)=>a+(+i.amt||0),0), totExp=s.expenses.reduce((a,e)=>a+(+e.amt||0),0);
     // Consistency/Health/Recovery/Mental Resilience used to be flat 6600 regardless of
     // anything logged — permanently tied for "weakest attribute" with a "go improve it"
@@ -14732,6 +14742,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.375', date:'Sep 22, 2026', major:true, kind:'design', goTo:'power', notes:[
+      'Power Level’s ten attributes (Physical Strength, Endurance, Discipline and the rest) were all measured against the same level curve as the overall account, which demands about 370 XP a day summed across everything you do combined. Fine for the account level, but each attribute only ever draws from its own narrow slice, so a real, solid gym session earned Physical Strength roughly 150 points against the 327 needed just to reach Level 2. It sat looking permanently empty no matter how much real training went in, while Consistency and Mental Resilience, which sum many small signals across every log at once, raced ahead and made the rest look broken by comparison. Attributes now use their own, much gentler curve, so a real session actually moves its own bar.',
+    ]},
     {version:'v11.374', date:'Sep 22, 2026', major:true, kind:'design', goTo:'dashboard', notes:[
       'Level Up now uses Brain Rest’s own full-screen field rather than a small popup card, minus its two-gate opening, straight to the result with a single Acknowledged button.',
     ]},

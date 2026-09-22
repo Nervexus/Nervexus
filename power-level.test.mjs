@@ -508,8 +508,8 @@ t('crossing a level opens the card, and it names the level and rank', async () =
 
   await page.evaluate(() => {
     const b = [...document.querySelectorAll('span,div')]
-      .find(e => e.children.length === 0 && e.textContent.trim() === 'CONTINUE');
-    if (!b) throw new Error('no CONTINUE button');
+      .find(e => e.children.length === 0 && e.textContent.trim() === 'ACKNOWLEDGED');
+    if (!b) throw new Error('no ACKNOWLEDGED button');
     b.click();
   });
   await page.waitForTimeout(500);
