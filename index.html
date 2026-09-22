@@ -9585,7 +9585,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.22-378 · v11.378 workout-sync-fix';
+const NOTIF_BUILD_VERSION = '2026.09.22-379 · v11.379 via-import-restored';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13006,13 +13006,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         // the insert below already writes them — every workout pulled back from Supabase
         // silently lost its real unit (falling back to 'kg') and its logged distance, so a
         // distance-only cardio entry (or anything logged in lb) looked wrong after a resync
-        // even though it was recorded correctly. via_import is deliberately left off: that
-        // column does not exist in the live database yet (needs the
-        // 20260922_workout_via_import.sql migration applied first) and requesting a column
-        // that does not exist fails the WHOLE query, which is exactly what silently broke
-        // every workout sync, not just Bulk Import, the moment that column was referenced
-        // here — re-add it once the migration is confirmed applied.
-        window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,unit,sets,reps,distance,distance_unit,occurred_at'}),
+        // even though it was recorded correctly. via_import is back now that
+        // 20260922_workout_via_import.sql is confirmed applied to the live database.
+        window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,unit,sets,reps,distance,distance_unit,occurred_at,via_import'}),
         window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,name,kcal,protein,logged_date'}),
         window.SB.list('sleep_logs',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,hours,bed_time,wake_time,quality,energy,notes'}),
         window.SB.list('hydration_logs',{match:{user_id:uid},order:{column:'logged_at',ascending:true},columns:'id,log_date,amount,logged_at'}),
@@ -13041,7 +13037,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(expenses && expenses.data) patch.expenses=expenses.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(savings && savings.data) patch.savings=savings.data.map(r=>({id:r.id,label:r.label,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
-      if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,unit:r.unit||'kg',sets:r.sets||0,reps:r.reps||0,dist:+r.distance||0,distUnit:r.distance_unit||'km',ts:new Date(r.occurred_at).getTime()}));
+      if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,unit:r.unit||'kg',sets:r.sets||0,reps:r.reps||0,dist:+r.distance||0,distUnit:r.distance_unit||'km',ts:new Date(r.occurred_at).getTime(),viaImport:!!r.via_import}));
       if(notifs && notifs.data){ const fromDb=notifs.data.map(r=>({id:r.id,cat:r.category||'system',title:r.title,body:r.body,read:!!r.read,ts:new Date(r.created_at).getTime()})); const localIds=new Set(this.state.notifs.map(x=>x.id)); patch.notifs=[...this.state.notifs, ...fromDb.filter(x=>!localIds.has(x.id))].sort((a,b)=>b.ts-a.ts).slice(0,40); }
       if(goalsRes && goalsRes.data && goalsRes.data.length){ const g={}; goalsRes.data.forEach(r=>{ if(r.target!=null) g[r.label]=+r.target; }); patch._pendingGoals=g; }
       if(worldIntel && worldIntel.data && worldIntel.data[0]){ const w=worldIntel.data[0]; if(w.selected_country) patch.selCountry=w.selected_country; if(w.layer) patch.wiLayer=w.layer; if(w.time_range) patch.wiTime=w.time_range; if(w.last_query) patch.wiQuery=w.last_query; }
@@ -14779,6 +14775,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.379', date:'Sep 22, 2026', major:false, notes:[
+      'The via_import migration pulled out of the sync in v11.378 is confirmed applied to the live database, verified directly against the schema. Bulk Import’s extra 10 XP per row now survives a resync again, alongside the workout-sync fix that shipped either way.',
+    ]},
     {version:'v11.378', date:'Sep 22, 2026', major:true, notes:[
       'Fixed a real regression: v11.373 added via_import to the workouts sync, but the database column it needs was never applied. Supabase rejects a query that names a column the table does not have, so every workout pull from the cloud has been silently failing outright since, and Bulk Import’s own save to the cloud failed the same way, logged locally for the rest of that session and then gone. via_import is reverted out of the sync until that migration is confirmed applied. While in there: the pull was also missing unit, distance and distance_unit, so a workout reloaded from Supabase always fell back to kg and always lost any logged distance, even though both were being saved correctly. Fixed too.',
     ]},
@@ -18358,12 +18357,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       return { id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight, unit, sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000, viaImport:true };
     });
     this.mut(s=>({workouts:[...s.workouts, ...entries]}));
-    // via_import is deliberately left out of this insert — that column does not exist in
-    // the live database yet, and Supabase/PostgREST rejects the WHOLE insert when the
-    // payload names a column the table doesn't have, so every Bulk Import row silently
-    // failed to save to Supabase at all the moment this was added, not just lose its XP
-    // flag. Add it back once 20260922_workout_via_import.sql is confirmed applied.
-    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString()}).catch(()=>{}));
+    // via_import is back now that 20260922_workout_via_import.sql is confirmed applied to
+    // the live database — Supabase/PostgREST rejects the WHOLE insert when the payload
+    // names a column the table doesn't have, which is why this was pulled out earlier.
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString(),via_import:true}).catch(()=>{}));
     this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log, +'+(entries.length*10)+' XP.');
     this.setState({woImportOpen:false, woImportRows:[], woImportText:'', woImportDayOffset:0});
     // Syncs the entered weight into the real Health body-weight tracker — one real number,
