@@ -9579,7 +9579,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.21-372 · v11.372 dead-lift-gravedigger-aliases';
+const NOTIF_BUILD_VERSION = '2026.09.22-373 · v11.373 bulk-import-xp';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -12996,7 +12996,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         window.SB.list('income',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,recurring,amount,occurred_at'}),
         window.SB.list('expenses',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,category,recurring,amount,occurred_at'}),
         window.SB.list('savings',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,label,amount,occurred_at'}),
-        window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,sets,reps,occurred_at'}),
+        window.SB.list('workouts',{match:{user_id:uid},order:{column:'occurred_at',ascending:false},columns:'id,body_part,exercise,minutes,weight,sets,reps,occurred_at,via_import'}),
         window.SB.list('meals',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,name,kcal,protein,logged_date'}),
         window.SB.list('sleep_logs',{match:{user_id:uid},order:{column:'log_date',ascending:true},columns:'id,log_date,hours,bed_time,wake_time,quality,energy,notes'}),
         window.SB.list('hydration_logs',{match:{user_id:uid},order:{column:'logged_at',ascending:true},columns:'id,log_date,amount,logged_at'}),
@@ -13025,7 +13025,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(income && income.data) patch.income=income.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(expenses && expenses.data) patch.expenses=expenses.data.map(r=>({id:r.id,label:r.label,cat:r.category||'Other',recurring:!!r.recurring,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
       if(savings && savings.data) patch.savings=savings.data.map(r=>({id:r.id,label:r.label,amt:+r.amount||0,ts:new Date(r.occurred_at).getTime()}));
-      if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,unit:r.unit||'kg',sets:r.sets||0,reps:r.reps||0,ts:new Date(r.occurred_at).getTime()}));
+      if(workouts && workouts.data) patch.workouts=workouts.data.map(r=>({id:r.id,part:r.body_part,exercise:r.exercise,min:r.minutes||0,weight:+r.weight||0,unit:r.unit||'kg',sets:r.sets||0,reps:r.reps||0,ts:new Date(r.occurred_at).getTime(),viaImport:!!r.via_import}));
       if(notifs && notifs.data){ const fromDb=notifs.data.map(r=>({id:r.id,cat:r.category||'system',title:r.title,body:r.body,read:!!r.read,ts:new Date(r.created_at).getTime()})); const localIds=new Set(this.state.notifs.map(x=>x.id)); patch.notifs=[...this.state.notifs, ...fromDb.filter(x=>!localIds.has(x.id))].sort((a,b)=>b.ts-a.ts).slice(0,40); }
       if(goalsRes && goalsRes.data && goalsRes.data.length){ const g={}; goalsRes.data.forEach(r=>{ if(r.target!=null) g[r.label]=+r.target; }); patch._pendingGoals=g; }
       if(worldIntel && worldIntel.data && worldIntel.data[0]){ const w=worldIntel.data[0]; if(w.selected_country) patch.selCountry=w.selected_country; if(w.layer) patch.wiLayer=w.layer; if(w.time_range) patch.wiTime=w.time_range; if(w.last_query) patch.wiQuery=w.last_query; }
@@ -14546,6 +14546,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const key=this._locDateFromTs(w.ts)+'|'+String(w.exercise||w.part||'').trim().toLowerCase();
       if(exDay[key]==null || w.ts<exDay[key]) exDay[key]=w.ts;
       const m=+w.min||0; if(m>0) ev.push({xp:m, ts:w.ts});
+      // Bulk Import is a deliberate exception to the per-row rule above it: typing out a
+      // whole session's real numbers by hand is worth rewarding per set, not just once for
+      // the exercise-day, the way a live logged set otherwise would be.
+      if(w.viaImport) ev.push({xp:10, ts:w.ts});
     });
     Object.keys(exDay).forEach(k=>ev.push({xp:25, ts:exDay[k]}));
     /* A logged activity is worth 15. A finished Brain Rest is worth BRAIN_REST_XP, read off
@@ -14722,6 +14726,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.373', date:'Sep 22, 2026', major:false, notes:[
+      'Bulk Import now pays 10 XP per row, on top of the usual per-exercise-per-day credit every workout already earns. Typing out a full session’s real numbers by hand is worth rewarding per set rather than once for the day. Needs a Supabase migration (via_import on workouts) to keep that XP in place across a resync; ask if that hasn’t been applied yet.',
+    ]},
     {version:'v11.372', date:'Sep 21, 2026', major:false, notes:[
       '"Dead Lift" and "Grave Diggers", written with the natural spacing rather than the exercise list’s own one-word "deadlift" and "gravedigger", now resolve to the same entries, in voice logging and Bulk Import alike. Neither matched before: the list only bridges plurals and a short set of joined equipment words, not a genuine spacing difference, so both were filing as an unclassified Mixed entry instead of Back and Shoulders.',
     ]},
@@ -18280,11 +18287,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const entries=rows.map((r,i)=>{
       const unit=r.unit||'kg'; let weight=+r.weight||0;
       if(unit==='BW' && weight<=0 && bw>0){ weight=bw; usedBw=true; }
-      return { id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight, unit, sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000 };
+      return { id:this._uuid(), part:r.part, exercise:r.exercise.trim(), min:+r.minutes||0, weight, unit, sets:+r.sets||0, reps:+r.reps||0, ts:now-i*1000, viaImport:true };
     });
     this.mut(s=>({workouts:[...s.workouts, ...entries]}));
-    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString()}));
-    this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log.');
+    if(this._sbOn()) entries.forEach(e=>window.SB.insert('workouts',{id:e.id,user_id:this.state.authUserId,body_part:e.part,exercise:e.exercise,minutes:e.min,weight:e.weight,unit:e.unit,sets:e.sets,reps:e.reps,distance:e.dist||null,distance_unit:e.dist?(e.distUnit||'km'):null,occurred_at:new Date(e.ts).toISOString(),via_import:true}));
+    this.showToast('system','Workout imported', entries.length+' exercise'+(entries.length===1?'':'s')+' added to your log, +'+(entries.length*10)+' XP.');
     this.setState({woImportOpen:false, woImportRows:[], woImportText:'', woImportDayOffset:0});
     // Syncs the entered weight into the real Health body-weight tracker — one real number,
     // not a second copy that only lives inside this import.
