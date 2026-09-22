@@ -9585,7 +9585,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.22-376 · v11.376 attribute-data-sources';
+const NOTIF_BUILD_VERSION = '2026.09.22-377 · v11.377 strength-forge-standards';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14665,6 +14665,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const kmOf=(w)=>{ const d=+w.dist||0; if(!d) return 0; const u=w.distUnit||'km'; return u==='mi'?d*1.60934:(u==='m'?d/1000:d); };
     const cardioKm=cardio.reduce((t,w)=>t+kmOf(w),0);
     const learnXP=this._learningTotalXP();
+    // The Forge's own Standards assessment (bench/squat/deadlift %bodyweight, pull-ups,
+    // grip, and the rest) is real, deliberately-entered strength data — arguably the most
+    // direct signal of all for this attribute — that never fed Physical Strength at all.
+    const FE=this._forge();
+    const forgeUnit=(FE && FE.unitScore) ? FE.unitScore(s.forgeScores||{}) : {score:0, assessed:0};
     const savedTotal=(s.savings||[]).reduce((t,x)=>t+(+x.amt||0),0);
     // "All logs" for Consistency and Mental Resilience: how many separate places you are
     // actually keeping up, rather than one busy log carrying the score on its own.
@@ -14673,7 +14678,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const activeStreams=streams.filter(n=>n>0).length;
     const allLogXP=streams.reduce((t,n)=>t+n,0);
     const categories=[
-      cat('Physical Strength', liftMin*4 + volume/50),
+      cat('Physical Strength', liftMin*4 + volume/50 + forgeUnit.score*3 + forgeUnit.assessed*5),
       cat('Endurance',         cardioMin*7 + cardioKm*40 + liftMin*1.5),
       cat('Discipline',        MISS.length*12 + dietTicks*8 + perf*25 + workMin*0.4),
       cat('Productivity',      MISS.length*8 + dietTicks*3 + perf*15 + workMin*0.8),
@@ -14693,13 +14698,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // Advice now points at the log that actually feeds each attribute, and no longer
     // mentions Business or Recovery, which no longer exist.
     const MISSION_HINT={
-      'Physical Strength':'Log a strength session with weight, sets and reps.',
-      'Endurance':'Log a cardio session in the training log.',
+      'Physical Strength':'Log a strength session with weight, sets and reps, or record a standard on the Forge.',
+      'Endurance':'Log a cardio session, by minutes or by distance, in the training log.',
       'Discipline':'Finish a Daily Mission, tick your Diet Checklist, or fill in a performance log.',
       'Productivity':'Log some work hours, or clear a mission.',
-      'Intelligence':'Do a Quick Test or a lesson in the Learning Centre.',
-      'Finance':'Add to savings on the Finance Terminal.',
-      'Focus':'Log work hours on Productivity.',
+      'Intelligence':'Do a Quick Test or a lesson in the Learning Centre, or log time under Learning.',
+      'Finance':'Log income, an expense, or add to savings on the Finance Terminal.',
+      'Focus':'Log work hours, or fill in tonight’s Performance Terminal check-in.',
       'Consistency':'Keep more than one log going. This one rewards breadth, not volume.',
       'Health':'Log a session and tick off your Diet Checklist.',
       'Mental Resilience':'Keep several logs ticking over across the week.',
@@ -14764,6 +14769,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.377', date:'Sep 22, 2026', major:true, kind:'design', goTo:'power', notes:[
+      'Physical Strength now also reads the Forge’s own Standards assessment, bench, squat and deadlift as a percentage of bodyweight, pull-ups, grip and the rest, real strength data that was never read by Power Level at all. Both the tier you’ve met on each standard and how many you’ve actually recorded now count toward the attribute.',
+    ]},
     {version:'v11.376', date:'Sep 22, 2026', major:true, kind:'design', goTo:'power', notes:[
       'Six of Power Level’s attributes were reading only one narrow log each, so real activity logged everywhere else in the app fed nothing into them. Endurance and Health only read a workout’s minutes, so a distance-only entry like a 5k run, fully supported everywhere else, earned nothing. Physical Strength and Health’s lifting volume zeroed out every bodyweight set, push-ups and pull-ups included, since it multiplied the weight field directly instead of using the bodyweight approximation already used elsewhere. Intelligence ignored real study time logged against the Activity Log’s own Learning category. Finance read only the standalone Savings log, not income or expenses, tracked everywhere else in the app. Focus ignored the focused hours reported every night in the Performance Terminal check-in. All six now read the real, broader data behind them.',
     ]},
