@@ -1451,36 +1451,42 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     </div>
   </sc-if>
 
+  <!-- LEVEL UP — Brain Rest's own full-screen field reused, minus its two-gate opening: this
+       goes straight to the full page, one hairline, the result, and a single acknowledge
+       button. No confirm-before-you-start step, since there's nothing to start. -->
   <sc-if value="{{ levelUpOpen }}" hint-placeholder-val="{{ false }}">
-    <div style="position:fixed; inset:0; z-index:1000; background:rgba(6,6,9,0.72); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:24px;">
-      <div class="cc-glowcard lu-card" style="width:100%; max-width:420px; border-radius:24px; background:#101014; border:1px solid rgba(231,216,166,0.34); padding:34px 28px 26px; text-align:center; box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 0 60px rgba(231,216,166,0.09); animation:luPop 520ms cubic-bezier(.2,.9,.3,1) both; position:relative; overflow:hidden;">
-        <div class="lu-sheen" style="position:absolute; top:0; bottom:0; width:70px; background:linear-gradient(100deg, rgba(231,216,166,0) 0%, rgba(231,216,166,0.13) 50%, rgba(231,216,166,0) 100%); animation:luSheen 2600ms ease-in-out 380ms infinite; pointer-events:none;"></div>
+    <div style="position:fixed; inset:0; z-index:999; background:rgba(0,0,0,0.55);"></div>
+    <div class="lcb-stage" style="position:fixed; inset:20px; z-index:1000; border-radius:24px; box-shadow:0 30px 70px rgba(0,0,0,0.4);">
+      <div class="lcb-field"></div>
+      <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:24px; display:flex; flex-direction:column; align-items:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; overflow-y:auto; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both;">
 
-        <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:3px; color:#E7D8A6;">{{ luBanner }}</div>
+        <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); flex:0 0 auto;">{{ luBanner }}</div>
+        <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
 
-        <div style="position:relative; width:138px; height:138px; margin:20px auto 4px;">
-          <div class="lu-halo" style="position:absolute; inset:0; border-radius:50%; border:1px solid rgba(231,216,166,0.5); animation:luHalo 1500ms ease-out 240ms 2;"></div>
-          <div class="lu-ring" style="position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(231,216,166,0.55); box-shadow:inset 0 0 30px rgba(231,216,166,0.14); display:flex; flex-direction:column; align-items:center; justify-content:center; animation:luRing 620ms cubic-bezier(.2,.9,.3,1) both;">
-            <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2.6px; color:#8f8f99;">LEVEL</div>
-            <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:52px; line-height:1; color:#ffffff; margin-top:2px;">{{ luLevel }}</div>
+        <div style="flex:0 0 auto; width:100%; max-width:420px; padding-bottom:6px;">
+          <div style="position:relative; width:138px; height:138px; margin:0 auto 4px;">
+            <div style="position:absolute; inset:0; border-radius:50%; border:1.5px solid var(--lc-accent); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2.6px; color:var(--lc-muted);">LEVEL</div>
+              <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:52px; line-height:1; color:var(--lc-accent); margin-top:2px;">{{ luLevel }}</div>
+            </div>
           </div>
+
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.4px; color:var(--lc-muted); margin-top:14px;">{{ luFromTo }}</div>
+
+          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:30px; font-weight:300; line-height:1.1; color:var(--lc-accent); margin:16px 0 2px;">{{ luRank }}</div>
+          <div class="rest-body" style="font-size:14px; line-height:1.5; color:var(--lc-muted);">{{ luRankDesc }}</div>
+
+          <sc-if value="{{ luRankUp }}" hint-placeholder-val="{{ false }}">
+            <div style="display:inline-block; margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--lc-on-accent); background:var(--lc-accent); border-radius:999px; padding:6px 14px;">NEW RANK</div>
+          </sc-if>
+
+          <div style="margin-top:26px; padding-top:16px; border-top:1px solid var(--lc-line); display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.2px; color:var(--lc-muted);">{{ luTotal }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.2px; color:var(--lc-muted);">{{ luNext }}</span>
+          </div>
+
+          <div onClick="{{ closeLevelUp }}" style="margin-top:26px; padding:16px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; font-weight:500;">ACKNOWLEDGED</div>
         </div>
-
-        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.4px; color:#75757d; margin-top:10px;">{{ luFromTo }}</div>
-
-        <h2 style="font-family:'Cormorant Garamond',Georgia,serif; font-size:27px; font-weight:600; color:#eef0f2; margin:16px 0 2px;">{{ luRank }}</h2>
-        <div style="font-size:11.5px; color:#75757d;">{{ luRankDesc }}</div>
-
-        <sc-if value="{{ luRankUp }}" hint-placeholder-val="{{ false }}">
-          <div style="display:inline-block; margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#0d0d10; background:#E7D8A6; border-radius:999px; padding:6px 14px;">NEW RANK</div>
-        </sc-if>
-
-        <div style="margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:space-between; gap:12px;">
-          <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.2px; color:#6f6f78;">{{ luTotal }}</span>
-          <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.2px; color:#6f6f78;">{{ luNext }}</span>
-        </div>
-
-        <div onClick="{{ closeLevelUp }}" style="margin-top:18px; padding:14px; border-radius:12px; cursor:pointer; background:#eef0f2; color:#0d0d10; font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.4px;">CONTINUE</div>
       </div>
     </div>
   </sc-if>
@@ -9579,7 +9585,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.22-373 · v11.373 bulk-import-xp';
+const NOTIF_BUILD_VERSION = '2026.09.22-374 · v11.374 levelup-full-screen';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14726,6 +14732,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.374', date:'Sep 22, 2026', major:true, kind:'design', goTo:'dashboard', notes:[
+      'Level Up now uses Brain Rest’s own full-screen field rather than a small popup card, minus its two-gate opening, straight to the result with a single Acknowledged button.',
+    ]},
     {version:'v11.373', date:'Sep 22, 2026', major:false, notes:[
       'Bulk Import now pays 10 XP per row, on top of the usual per-exercise-per-day credit every workout already earns. Typing out a full session’s real numbers by hand is worth rewarding per set rather than once for the day. Needs a Supabase migration (via_import on workouts) to keep that XP in place across a resync; ask if that hasn’t been applied yet.',
     ]},
