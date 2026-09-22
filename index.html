@@ -9585,7 +9585,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.22-375 · v11.375 attribute-level-curve';
+const NOTIF_BUILD_VERSION = '2026.09.22-376 · v11.376 attribute-data-sources';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14639,13 +14639,31 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // floor is gone; these are now earned from the logs named against each one.
     const W=s.workouts||[], ACT=s.activities||[], MISS=(s.missionHistory||[]);
     const workMin=ACT.filter(a=>a.cat==='Work').reduce((t,a)=>t+(+a.min||0),0);
+    // Logging real study time against the Activity Log's own "Learning" category, or real
+    // effort against "Business", used to feed nothing into Intelligence or Finance — only
+    // the dedicated Learning Center quiz history and the standalone Savings log did.
+    const learnActMin=ACT.filter(a=>a.cat==='Learning').reduce((t,a)=>t+(+a.min||0),0);
+    const businessMin=ACT.filter(a=>a.cat==='Business').reduce((t,a)=>t+(+a.min||0),0);
+    // A day's focused-hours answer from the Performance Terminal check-in used to feed
+    // nothing into Focus either, only time logged against the Activity Log's own "Work"
+    // category did — despite it being a real number of hours the user reports every night.
+    const perfFocusHours=(s.perfLogs||[]).reduce((t,p)=>t+(parseFloat(p.duration)||0),0);
     const dietTicks=((s.health&&s.health.diet)||[]).filter(d=>d.checked).length;
     const perf=(s.perfLogs||[]).length;
     const lift=W.filter(w=>w.part!=='Cardio');
     const cardio=W.filter(w=>w.part==='Cardio');
     const liftMin=lift.reduce((t,w)=>t+(+w.min||0),0);
-    const volume=lift.reduce((t,w)=>t+((+w.weight||0)*(+w.sets||0)*(+w.reps||0)),0);
+    // _workoutVol already exists to approximate a bodyweight set (no external weight) as
+    // sets*reps*8 — used everywhere else a set's load is charted, but this multiplied the
+    // raw weight field directly, so every bodyweight set (push-ups, pull-ups, planks) added
+    // zero volume regardless of how many were actually done.
+    const volume=lift.reduce((t,w)=>t+this._workoutVol(w),0);
     const cardioMin=cardio.reduce((t,w)=>t+(+w.min||0),0);
+    // A distance-only cardio entry (a "5k run" with no minutes attached — the app has
+    // explicitly supported logging exactly this since the distance field shipped) used to
+    // earn nothing here at all, since Endurance and Health only ever read w.min.
+    const kmOf=(w)=>{ const d=+w.dist||0; if(!d) return 0; const u=w.distUnit||'km'; return u==='mi'?d*1.60934:(u==='m'?d/1000:d); };
+    const cardioKm=cardio.reduce((t,w)=>t+kmOf(w),0);
     const learnXP=this._learningTotalXP();
     const savedTotal=(s.savings||[]).reduce((t,x)=>t+(+x.amt||0),0);
     // "All logs" for Consistency and Mental Resilience: how many separate places you are
@@ -14656,14 +14674,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const allLogXP=streams.reduce((t,n)=>t+n,0);
     const categories=[
       cat('Physical Strength', liftMin*4 + volume/50),
-      cat('Endurance',         cardioMin*7 + liftMin*1.5),
+      cat('Endurance',         cardioMin*7 + cardioKm*40 + liftMin*1.5),
       cat('Discipline',        MISS.length*12 + dietTicks*8 + perf*25 + workMin*0.4),
       cat('Productivity',      MISS.length*8 + dietTicks*3 + perf*15 + workMin*0.8),
-      cat('Intelligence',      learnXP*1.5),
-      cat('Finance',           (s.savings||[]).length*40 + savedTotal/100),
-      cat('Focus',             workMin*1.2),
+      cat('Intelligence',      learnXP*1.5 + learnActMin*2),
+      // Savings alone used to carry this whole attribute. Income and expenses are tracked
+      // everywhere else in the app (and already summed into totInc/totExp below for the
+      // achievements) but never fed Finance itself — logging either side of the ledger, or
+      // real Business hours, is exactly the kind of activity this attribute is meant to show.
+      cat('Finance',           (s.savings||[]).length*40 + savedTotal/100 + (s.income||[]).length*15 + (s.expenses||[]).length*8 + totInc/150 + businessMin),
+      cat('Focus',             workMin*1.2 + perfFocusHours*70),
       cat('Consistency',       (s.loginStreak||0)*40 + activeStreams*60 + allLogXP*2),
-      cat('Health',            liftMin*2 + cardioMin*2 + dietTicks*10 + (H.meals||[]).length*8),
+      cat('Health',            liftMin*2 + cardioMin*2 + cardioKm*20 + dietTicks*10 + (H.meals||[]).length*8 + (H.sleepLog||[]).length*6 + (H.hydrationLog||[]).length*3),
       cat('Mental Resilience', allLogXP*1.5 + (s.loginStreak||0)*25 + activeStreams*40),
     ];
     const sorted=[...categories].sort((a,b)=>b.xp-a.xp); const strong=sorted[0], weak=sorted[sorted.length-1];
@@ -14742,6 +14764,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.376', date:'Sep 22, 2026', major:true, kind:'design', goTo:'power', notes:[
+      'Six of Power Level’s attributes were reading only one narrow log each, so real activity logged everywhere else in the app fed nothing into them. Endurance and Health only read a workout’s minutes, so a distance-only entry like a 5k run, fully supported everywhere else, earned nothing. Physical Strength and Health’s lifting volume zeroed out every bodyweight set, push-ups and pull-ups included, since it multiplied the weight field directly instead of using the bodyweight approximation already used elsewhere. Intelligence ignored real study time logged against the Activity Log’s own Learning category. Finance read only the standalone Savings log, not income or expenses, tracked everywhere else in the app. Focus ignored the focused hours reported every night in the Performance Terminal check-in. All six now read the real, broader data behind them.',
+    ]},
     {version:'v11.375', date:'Sep 22, 2026', major:true, kind:'design', goTo:'power', notes:[
       'Power Level’s ten attributes (Physical Strength, Endurance, Discipline and the rest) were all measured against the same level curve as the overall account, which demands about 370 XP a day summed across everything you do combined. Fine for the account level, but each attribute only ever draws from its own narrow slice, so a real, solid gym session earned Physical Strength roughly 150 points against the 327 needed just to reach Level 2. It sat looking permanently empty no matter how much real training went in, while Consistency and Mental Resilience, which sum many small signals across every log at once, raced ahead and made the rest look broken by comparison. Attributes now use their own, much gentler curve, so a real session actually moves its own bar.',
     ]},
