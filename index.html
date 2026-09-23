@@ -9666,7 +9666,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-392 · v11.392 forge-repeat-add';
+const NOTIF_BUILD_VERSION = '2026.09.23-393 · v11.393 training-checklist-default-tab';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14893,6 +14893,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.393', date:'Sep 23, 2026', major:false, notes:[
+      'Training Checklist showed a dead 0/0 with nothing selected until you actually tapped the Full Body session chip, even though it was the only list there — fixed by making it the default tab instead of falling through to nothing when no custom checklist exists yet.',
+    ]},
     {version:'v11.392', date:'Sep 23, 2026', major:false, notes:[
       'The Forge’s exercise pool refused to add the same exercise a second time ("Already in your session") — fine for an accidental double-click, wrong for a warm-up set and a working set both legitimately called Squat. Every ADD makes its own row now.',
     ]},
@@ -21095,8 +21098,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         // checklists, rather than folded into them: ticking it here still calls
         // toggleForgeFBItem, so it still logs (or un-logs) the actual workout set.
         const FB_ID='__fbsession';
-        const isFbActive=S.activeFitChecklistId===FB_ID;
-        const activeFitCL=isFbActive?null:(fitCL.find(c=>c.id===S.activeFitChecklistId)||fitCL[0]||null);
+        // Full Body session is the default tab now, not just an option: with nothing
+        // explicitly picked yet (a fresh activeFitChecklistId), it used to fall through to
+        // fitCL[0] — null when there were no custom checklists yet, leaving nothing selected
+        // at all (a dead 0/0 header while the Full Body chip sat there unselected showing
+        // its own real count).
+        const activeId=S.activeFitChecklistId||FB_ID;
+        const isFbActive=activeId===FB_ID;
+        const activeFitCL=isFbActive?null:(fitCL.find(c=>c.id===activeId)||fitCL[0]||null);
         const fb=this._fb(), fbItems=fb.items||[], fbDone=fb.done||{};
         const fbDoneCount=fbItems.filter(i=>fbDone[i.id]).length;
         const repeatOrder=['none','daily','weekly','monthly'];
