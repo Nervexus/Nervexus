@@ -1365,7 +1365,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
              rather than only the reference's black. Mounted/torn down via the same
              orbLoop+data-orb-mount plumbing the voice orb already uses, so it starts when the
              gate opens and stops the instant its canvas leaves the DOM. -->
-        <canvas data-orb-mount="sgflow" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></canvas>
+        <canvas data-orb-mount="sgflow" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; max-width:640px; height:100%; max-height:760px; pointer-events:none;"></canvas>
 
         <div style="position:relative; flex:0 0 auto; width:100%; max-width:340px;">
           <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); margin-bottom:20px;">SETTINGS</div>
@@ -9622,7 +9622,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-385 · v11.385 settings-gate-spacing-lines';
+const NOTIF_BUILD_VERSION = '2026.09.23-386 · v11.386 settings-gate-mobile-density';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13834,8 +13834,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // so a white line here would just be invisible rather than reading as "Noir's colour".
     const lineCol='rgba(0,0,0,0.4)';
     const accentCol=(cs.getPropertyValue('--lc-accent')||'#292524').trim();
-    const N=Math.max(18,Math.min(40,Math.round(w/22)));
-    const paths=[]; for(let i=0;i<N;i++) paths.push({ isLeft:i%2===0, startY:(i/N)*h*1.4-h*0.2, t:Math.random(), speed:0.0015+Math.random()*0.002 });
+    // Scaled by height as well as width now — on a tall phone the capped canvas above still
+    // leaves more vertical room than the reference's original viewport-wide density accounted
+    // for, so a width-only count read as a handful of lines with big gaps between them rather
+    // than a bundle. The 1.08/-0.04 spread (was 1.4/-0.2) keeps almost every line's start point
+    // on-screen instead of a chunk of them originating above/below the visible frame.
+    const N=Math.max(26,Math.min(56,Math.round((w+h)/16)));
+    const paths=[]; for(let i=0;i<N;i++) paths.push({ isLeft:i%2===0, startY:(i/N)*h*1.08-h*0.04, t:Math.random(), speed:0.0015+Math.random()*0.002 });
     const bez=(t,p0,p1,p2,p3)=>{ const u=1-t; return { x:u*u*u*p0.x+3*u*u*t*p1.x+3*u*t*t*p2.x+t*t*t*p3.x, y:u*u*u*p0.y+3*u*u*t*p1.y+3*u*t*t*p2.y+t*t*t*p3.y }; };
     this.orbLoop(el,()=>{
       ctx.clearRect(0,0,w,h);
@@ -14876,6 +14881,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.386', date:'Sep 23, 2026', major:false, notes:[
+      'The Settings gate’s flow lines were sparse and spread thin on a tall phone screen — counted by width alone, they had far more vertical room to cover on a real device than in a desktop preview. The field is capped to a sane size now and the line count scales with it, so it reads as a bundle on any screen instead of a handful of stray dots.',
+    ]},
     {version:'v11.385', date:'Sep 23, 2026', major:false, notes:[
       'The Settings gate’s flow lines are pure black now under every raiment — white washed out against Noir’s own light card. The title moved up and the password field and its two buttons moved down, so the whole thing breathes instead of sitting bunched in the middle.',
     ]},
