@@ -2566,19 +2566,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <sc-if value="{{ noFitChecklistItems }}" hint-placeholder-val="{{ false }}">
                   <div style="font-size:12px; color:#75757d; padding:8px 2px;">{{ noFitChecklistItemsHint }}</div>
                 </sc-if>
-                <sc-if value="{{ isFbActiveCard }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex; align-items:center; justify-content:space-between; gap:9px; padding:12px 0 0;">
-                    <span style="font-size:11.5px; color:#75757d;">Add exercises from the Forge → Full Body</span>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ activeFitRepeatC }}; border:1px solid {{ activeFitRepeatBd }}; border-radius:8px; padding:6px 11px; white-space:nowrap;">{{ activeFitRepeatLabel }}</span>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ !isFbActiveCard }}" hint-placeholder-val="{{ true }}">
-                  <div style="display:flex; align-items:center; gap:9px; padding:12px 0 0;">
-                    <span style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; color:#7c7c84;">＋</span>
-                    <input value="{{ newFitChecklistItemDraft }}" onInput="{{ setFitChecklistItemDraft }}" onKeyDown="{{ addActiveFitChecklistItemKey }}" placeholder="Add an item and press Enter…" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
-                    <span onClick="{{ cycleActiveFitRepeat }}" title="Toggle repeat" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ activeFitRepeatC }}; border:1px solid {{ activeFitRepeatBd }}; background:{{ activeFitRepeatBg }}; border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;">{{ activeFitRepeatLabel }}</span>
-                  </div>
-                </sc-if>
+                <div style="display:flex; align-items:center; gap:9px; padding:12px 0 0;">
+                  <span style="width:20px; height:20px; flex:0 0 20px; border-radius:7px; border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:12px; color:#7c7c84;">＋</span>
+                  <input value="{{ newFitChecklistItemDraft }}" onInput="{{ setFitChecklistItemDraft }}" onKeyDown="{{ addActiveFitChecklistItemKey }}" placeholder="Add an item and press Enter…" style="flex:1; min-width:0; background:transparent; border:none; outline:none; color:#eef0f2; font-size:13.5px;">
+                  <span onClick="{{ cycleActiveFitRepeat }}" title="Toggle repeat" style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:.5px; color:{{ activeFitRepeatC }}; border:1px solid {{ activeFitRepeatBd }}; background:{{ activeFitRepeatBg }}; border-radius:8px; padding:6px 11px; cursor:pointer; white-space:nowrap;">{{ activeFitRepeatLabel }}</span>
+                </div>
               </sc-if>
               <sc-if value="{{ noFitChecklists }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#75757d; padding:8px 2px 12px;">No fitness checklists yet, create one below.</div></sc-if>
               <div style="display:flex; align-items:center; gap:9px; margin-top:14px; border-top:1px solid rgba(255,255,255,0.06); padding-top:12px;">
@@ -9666,7 +9658,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-395 · v11.395 fbsession-no-mystery-sets';
+const NOTIF_BUILD_VERSION = '2026.09.23-396 · v11.396 training-checklist-fbsession-removed';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14893,6 +14885,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.396', date:'Sep 23, 2026', major:false, notes:[
+      'Training Checklist goes back to showing only your own checklists — the Full Body session card is gone from it. The Forge’s own Full Body page is untouched; ticking an item off there still logs the set exactly as it always has.',
+    ]},
     {version:'v11.395', date:'Sep 23, 2026', major:false, notes:[
       'The "3 ×" in "Landmine rotation · 3 × 20 · 25kg" was the exercise’s own prescribed set count, not anything typed in — the pool’s ADD only ever exposes weight and reps, so it read as a number that came from nowhere. Dropped from the add toast, Training Checklist and Fill Mode: it’s "Landmine rotation · 20 reps · 25kg" now, exactly what was entered.',
     ]},
@@ -21112,90 +21107,49 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // checklists here never disturbs the global Checklists screen's selection.
       ...this._safe(()=>{
         const fitCL=(S.userChecklists||[]).filter(c=>!c.archived && c.category==='fitness');
-        // The Forge's own "Full Body session" (sets/reps/weight, tied to workout logging) used
-        // to be invisible from here entirely — a completely separate list from the plain
-        // label+done ones this widget otherwise shows, so anything added from the Forge never
-        // turned up on the dashboard. It's a selectable card now too, alongside the real
-        // checklists, rather than folded into them: ticking it here still calls
-        // toggleForgeFBItem, so it still logs (or un-logs) the actual workout set.
-        const FB_ID='__fbsession';
-        // Full Body session is the default tab now, not just an option: with nothing
-        // explicitly picked yet (a fresh activeFitChecklistId), it used to fall through to
-        // fitCL[0] — null when there were no custom checklists yet, leaving nothing selected
-        // at all (a dead 0/0 header while the Full Body chip sat there unselected showing
-        // its own real count).
-        const activeId=S.activeFitChecklistId||FB_ID;
-        const isFbActive=activeId===FB_ID;
-        const activeFitCL=isFbActive?null:(fitCL.find(c=>c.id===activeId)||fitCL[0]||null);
-        const fb=this._fb(), fbItems=fb.items||[], fbDone=fb.done||{}, fbW=fb.w||{};
-        const fbDoneCount=fbItems.filter(i=>fbDone[i.id]).length;
-        // fbEnteredLabel folds in the weight (kept in the session's separate weight map, not
-        // on the item — the Forge's own session list edits it in a live input rather than
-        // baking it into a label) and, unlike fbTarget, leaves out sets: the pool's ADD only
-        // ever exposes weight and reps, so a "3 ×" sourced from the exercise's own
-        // prescription read as a number the user never touched and had no idea where it
-        // came from.
-        const fbLabel=(i)=>this.fbEnteredLabel(i, fbW[i.id]||null);
+        const activeFitCL=fitCL.find(c=>c.id===S.activeFitChecklistId)||fitCL[0]||null;
         const repeatOrder=['none','daily','weekly','monthly'];
         return {
-          fitChecklistDoneToday: isFbActive ? fbDoneCount : (activeFitCL ? activeFitCL.items.filter(i=>i.done).length : 0),
-          fitChecklistTotalToday: isFbActive ? fbItems.length : (activeFitCL ? activeFitCL.items.length : 0),
-          fitChecklistCards: [
-            { id:FB_ID, title:'Full Body session ('+fbDoneCount+'/'+fbItems.length+')',
-              select:()=>this.setActiveFitChecklist(FB_ID),
-              remove:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.showToast('fitness','Built into the Forge','Manage its exercises from the Forge → Full Body, not from here.'); },
-              selC:isFbActive?'#F4F4F5':'#9a9aa2', selBd:isFbActive?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', selBg:isFbActive?'rgba(255,255,255,0.16)':'transparent' },
-            ...fitCL.map(c=>{
-              const total=c.items.length, done=c.items.filter(i=>i.done).length;
-              const active=!isFbActive && activeFitCL && c.id===activeFitCL.id;
-              return { id:c.id, title:c.title+' ('+done+'/'+total+')',
-                select:()=>this.setActiveFitChecklist(c.id), remove:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.removeChecklist(c.id); },
-                selC:active?'#F4F4F5':'#9a9aa2', selBd:active?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', selBg:active?'rgba(255,255,255,0.16)':'transparent' };
-            }),
-          ],
-          noFitChecklists: false,
-          hasFitChecklists: true,
-          hasActiveFitChecklist: isFbActive || !!activeFitCL,
-          canMarkAllFitDone: !isFbActive && !!activeFitCL,
-          isFbActiveCard: isFbActive,
-          activeFitChecklistItems: isFbActive ? fbItems.map(i=>({
-            id:i.id, label:fbLabel(i),
-            toggle:()=>this.toggleForgeFBItem(i), remove:()=>this.removeForgeFBItem(i.id),
-            box:fbDone[i.id]?'✓':'', boxBg:fbDone[i.id]?'#FFFFFF':'transparent', boxBd:fbDone[i.id]?'#FFFFFF':'rgba(255,255,255,0.3)',
-            txt:fbDone[i.id]?'#7c7c84':'#d6d6da', strike:fbDone[i.id]?'line-through':'none'
-          })) : (activeFitCL ? activeFitCL.items.map(i=>({
+          fitChecklistDoneToday: activeFitCL ? activeFitCL.items.filter(i=>i.done).length : 0,
+          fitChecklistTotalToday: activeFitCL ? activeFitCL.items.length : 0,
+          fitChecklistCards: fitCL.map(c=>{
+            const total=c.items.length, done=c.items.filter(i=>i.done).length;
+            const active=activeFitCL && c.id===activeFitCL.id;
+            return { id:c.id, title:c.title+' ('+done+'/'+total+')',
+              select:()=>this.setActiveFitChecklist(c.id), remove:(e)=>{ e&&e.stopPropagation&&e.stopPropagation(); this.removeChecklist(c.id); },
+              selC:active?'#F4F4F5':'#9a9aa2', selBd:active?'rgba(255,255,255,0.5)':'rgba(255,255,255,0.12)', selBg:active?'rgba(255,255,255,0.16)':'transparent' };
+          }),
+          noFitChecklists: !fitCL.length,
+          hasFitChecklists: fitCL.length>0,
+          hasActiveFitChecklist: !!activeFitCL,
+          canMarkAllFitDone: !!activeFitCL,
+          activeFitChecklistItems: activeFitCL ? activeFitCL.items.map(i=>({
             id:i.id, label:i.label, toggle:()=>this.toggleChecklistItem(activeFitCL.id,i.id), remove:()=>this.removeChecklistItem(activeFitCL.id,i.id),
             box:i.done?'✓':'', boxBg:i.done?'#FFFFFF':'transparent', boxBd:i.done?'#FFFFFF':'rgba(255,255,255,0.3)',
             txt:i.done?'#7c7c84':'#d6d6da', strike:i.done?'line-through':'none'
-          })) : []),
-          noFitChecklistItems: isFbActive ? fbItems.length===0 : (!!activeFitCL && activeFitCL.items.length===0),
-          noFitChecklistItemsHint: isFbActive ? 'No exercises in your Full Body session yet.' : 'No items yet, add one below.',
-          markActiveFitComplete: (!isFbActive && activeFitCL)?(()=>this.markChecklistComplete(activeFitCL.id)):(()=>{}),
+          })) : [],
+          noFitChecklistItems: !!activeFitCL && activeFitCL.items.length===0,
+          noFitChecklistItemsHint: 'No items yet, add one below.',
+          markActiveFitComplete: activeFitCL?(()=>this.markChecklistComplete(activeFitCL.id)):(()=>{}),
           newFitChecklistItemDraft:S.newFitChecklistItemDraft||'', setFitChecklistItemDraft:e=>this.setFitChecklistItemDraft(e),
-          addActiveFitChecklistItem: (!isFbActive && activeFitCL)?(()=>this.addFitChecklistItem(activeFitCL.id)):(()=>{}),
-          addActiveFitChecklistItemKey: (!isFbActive && activeFitCL)?(e=>this.addFitChecklistItemKey(e,activeFitCL.id)):(()=>{}),
+          addActiveFitChecklistItem: activeFitCL?(()=>this.addFitChecklistItem(activeFitCL.id)):(()=>{}),
+          addActiveFitChecklistItemKey: activeFitCL?(e=>this.addFitChecklistItemKey(e,activeFitCL.id)):(()=>{}),
           newFitChecklistTitle:S.newFitChecklistTitle||'', setNewFitChecklistTitle:e=>this.setNewFitChecklistTitle(e),
           addFitChecklistKey:e=>this.addFitChecklistKey(e), addFitnessChecklist:()=>this.addFitnessChecklist(),
-          activeFitRepeatLabel: isFbActive ? 'RESETS DAILY' : (activeFitCL ? ('REPEAT: '+((activeFitCL.repeat&&activeFitCL.repeat!=='none')?activeFitCL.repeat.toUpperCase():'OFF')) : ''),
-          activeFitRepeatC: isFbActive ? '#7c7c84' : ((activeFitCL && activeFitCL.repeat && activeFitCL.repeat!=='none') ? '#F4F4F5' : '#7c7c84'),
-          activeFitRepeatBd: isFbActive ? 'rgba(255,255,255,0.14)' : ((activeFitCL && activeFitCL.repeat && activeFitCL.repeat!=='none') ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.14)'),
+          activeFitRepeatLabel: activeFitCL ? ('REPEAT: '+((activeFitCL.repeat&&activeFitCL.repeat!=='none')?activeFitCL.repeat.toUpperCase():'OFF')) : '',
+          activeFitRepeatC: (activeFitCL && activeFitCL.repeat && activeFitCL.repeat!=='none') ? '#F4F4F5' : '#7c7c84',
+          activeFitRepeatBd: (activeFitCL && activeFitCL.repeat && activeFitCL.repeat!=='none') ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.14)',
           activeFitRepeatBg: 'transparent',
-          cycleActiveFitRepeat: (!isFbActive && activeFitCL)?(()=>{ const next=repeatOrder[(repeatOrder.indexOf(activeFitCL.repeat||'none')+1)%repeatOrder.length]; this.setChecklistRepeat(activeFitCL.id,next); }):(()=>{}),
-          openFillModeFromWidget: isFbActive ? (()=>this.openFillMode({type:'fbsession'})) : (activeFitCL?(()=>this.openFillMode({type:'checklist', id:activeFitCL.id})):(()=>{})),
+          cycleActiveFitRepeat: activeFitCL?(()=>{ const next=repeatOrder[(repeatOrder.indexOf(activeFitCL.repeat||'none')+1)%repeatOrder.length]; this.setChecklistRepeat(activeFitCL.id,next); }):(()=>{}),
+          openFillModeFromWidget: activeFitCL?(()=>this.openFillMode({type:'checklist', id:activeFitCL.id})):(()=>{}),
         };
       }),
-      // FILL MODE — a quick check-off screen, launched from either the Training Checklist
-      // widget or (once wired there too) the Forge's own Full Body page, so fillModeSource
-      // decides which underlying list is being read/ticked rather than the screen itself.
+      // FILL MODE — a quick check-off screen for a checklist you already built, launched
+      // from the Training Checklist widget's FILL MODE button.
       ...this._safe(()=>{
         const src=S.fillModeSource||null;
         let items=[], title='';
-        if(src && src.type==='fbsession'){
-          const fb=this._fb();
-          const fbDone=fb.done||{}, fbW=fb.w||{};
-          items=(fb.items||[]).map(i=>({ id:i.id, label:this.fbEnteredLabel(i, fbW[i.id]||null), done:!!fbDone[i.id], toggle:()=>this.toggleForgeFBItem(i) }));
-          title='Full Body session';
-        } else if(src && src.type==='checklist'){
+        if(src && src.type==='checklist'){
           const cl=(S.userChecklists||[]).find(c=>c.id===src.id);
           if(cl){ items=cl.items.map(i=>({ id:i.id, label:i.label, done:i.done, toggle:()=>this.toggleChecklistItem(cl.id,i.id) })); title=cl.title; }
         }
