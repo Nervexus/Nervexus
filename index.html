@@ -1372,10 +1372,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:34px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Enter your password</div>
           <div class="rest-body" style="font-size:14px; line-height:1.6; color:var(--lc-muted); max-width:32ch; margin:14px auto 0;">Settings stays out of view until you confirm it's you.</div>
 
-          <input value="{{ settingsGatePass }}" onInput="{{ setSettingsGatePass }}" onKeyDown="{{ unlockSettingsGateKey }}" type="password" autoFocus placeholder="Password" style="margin-top:28px; width:100%; box-sizing:border-box; padding:14px 16px; border-radius:11px; border:1px solid {{ settingsGateErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:15px; outline:none; text-align:center; letter-spacing:2px;">
+          <input value="{{ settingsGatePass }}" onInput="{{ setSettingsGatePass }}" onKeyDown="{{ unlockSettingsGateKey }}" type="password" autoFocus placeholder="Password" style="margin-top:52px; width:100%; box-sizing:border-box; padding:14px 16px; border-radius:11px; border:1px solid {{ settingsGateErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:15px; outline:none; text-align:center; letter-spacing:2px;">
           <sc-if value="{{ settingsGateErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">Incorrect password.</div></sc-if>
 
-          <div style="margin-top:24px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
+          <div style="margin-top:38px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
             <span onClick="{{ closeSettingsGate }}" style="flex:1; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">CANCEL</span>
             <span onClick="{{ unlockSettingsGate }}" style="flex:1 1 auto; max-width:180px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">{{ unlockSettingsGateLabel }}</span>
           </div>
@@ -9622,7 +9622,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-384 · v11.384 settings-gate-flow-canvas';
+const NOTIF_BUILD_VERSION = '2026.09.23-385 · v11.385 settings-gate-spacing-lines';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13828,7 +13828,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const {ctx,w,h}=this.prep(el,2);
     const cx=w/2, cy=h/2;
     const cs=getComputedStyle(el);
-    const lineCol=(cs.getPropertyValue('--lc-line')||'rgba(120,120,120,0.3)').trim();
+    // Pure black lines under every raiment, Noir included — Noir's own Settings card is the
+    // same light cream card every other raiment sits on (a deliberate, existing app-wide
+    // choice: the card's material never varies with raiment, only its accent colour does),
+    // so a white line here would just be invisible rather than reading as "Noir's colour".
+    const lineCol='rgba(0,0,0,0.4)';
     const accentCol=(cs.getPropertyValue('--lc-accent')||'#292524').trim();
     const N=Math.max(18,Math.min(40,Math.round(w/22)));
     const paths=[]; for(let i=0;i<N;i++) paths.push({ isLeft:i%2===0, startY:(i/N)*h*1.4-h*0.2, t:Math.random(), speed:0.0015+Math.random()*0.002 });
@@ -14872,6 +14876,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.385', date:'Sep 23, 2026', major:false, notes:[
+      'The Settings gate’s flow lines are pure black now under every raiment — white washed out against Noir’s own light card. The title moved up and the password field and its two buttons moved down, so the whole thing breathes instead of sitting bunched in the middle.',
+    ]},
     {version:'v11.384', date:'Sep 23, 2026', major:false, notes:[
       'The Settings password gate’s backdrop is a live piece now rather than static rings: paired lines flow in from both edges toward a single point behind the field, coloured from the same raiment tokens as everything else so it still looks right under every style.',
     ]},
