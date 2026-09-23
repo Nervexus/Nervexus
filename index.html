@@ -9320,6 +9320,18 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <div onClick="{{ startRefresh }}" style="display:inline-block; padding:10px 16px; border-radius:10px; cursor:pointer; background:var(--lc-sub); border:1px solid var(--lc-line); color:var(--lc-muted); font-size:12px; font-weight:600;">↻ {{ tsRefreshLabel }}</div>
               </div>
 
+              <!-- Temporary: the raw Power Level attribute numbers, to check a specific value
+                   against reality instead of reading it off the bar. Remove once confirmed. -->
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--lc-muted); margin-bottom:6px;">POWER LEVEL (TEMP DEBUG)</div>
+              <div class="lc-sub" style="border-radius:16px; padding:16px 20px; margin-bottom:26px;">
+                <sc-for list="{{ powerDiagRows }}" as="d" hint-placeholder-count="10">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--lc-line);">
+                    <span style="font-size:12.5px; color:var(--lc-muted);">{{ d.k }}</span>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:600; color:{{ d.c }}; text-align:right;">{{ d.v }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
               <div style="font-size:13px; font-weight:700; color:var(--lc-accent); margin-bottom:12px;">Common issues</div>
               <sc-for list="{{ troubleFaq }}" as="f" hint-placeholder-count="8">
                 <div class="lc-sub" style="border-radius:14px; padding:15px 18px; margin-bottom:10px;">
@@ -9585,7 +9597,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-380 · v11.380 bulk-import-date-bw-fix';
+const NOTIF_BUILD_VERSION = '2026.09.23-381 · v11.381 power-level-temp-debug';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14775,6 +14787,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.381', date:'Sep 23, 2026', major:false, notes:[
+      'Settings → Troubleshooting temporarily shows the raw number behind each Power Level attribute (level, xp, percent to next), to check a specific one against the real computePower() output rather than reading it off the bar. Temporary, coming out again shortly.',
+    ]},
     {version:'v11.380', date:'Sep 23, 2026', major:true, kind:'design', goTo:'dashboard', notes:[
       'Bulk Import misread two real shapes. A header carrying a plain date, "Landline rotation 22/09", split on the slash into two exercises, the real one and a bogus second one called "09", doubling every set logged under it. And "10xBW", written with no space, matched nothing at all, so a whole exercise could go in with real reps and vanish from the import silently, without even an error. Both fixed, verified by running the exact text through the real parser rather than reasoning about the regex.',
     ]},
@@ -20249,7 +20264,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           { q:'A feature I was told about seems to be missing', a:'Tap the refresh icon top-right to force-pull the latest build, then compare the app version above against the newest entry in Settings → Update Terminal, if they don’t match you’re still on a cached older version.' },
           { q:'I forgot my password, or I’m locked out of 2FA', a:'Password reset is available from the login screen via email. 2FA has no recovery path by design, if you’re locked out, use "Owner recovery" on the 2FA prompt, or ask the owner to review it from their side.' },
         ];
-        return { diagRows, troubleFaq, tsRefreshLabel:'Force refresh now' };
+        // Temporary, while checking a specific Power Level number against the real
+        // computePower() output rather than reading it off the bar by eye. Remove once
+        // confirmed — window.__nvx (the usual way to check this from the console) is
+        // deliberately localhost-only, so there was no way to see the raw xp behind a
+        // category from the live site itself.
+        let powerDiagRows=[];
+        try{ powerDiagRows=this.computePower().categories.map(c=>({ k:c.name, v:'Lv '+c.level+' · '+c.xp+' xp · '+c.pct+'%', c:'#eef0f2' })); }catch(e){}
+        return { diagRows, powerDiagRows, troubleFaq, tsRefreshLabel:'Force refresh now' };
       }),
       ...this._safe(()=>{
         const P=S.perfStatus||{}; const missStreak=P.missStreak||0; const banned=!!P.banned; const appealStatus=P.appealStatus||'none';
