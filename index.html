@@ -9666,7 +9666,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-391 · v11.391 training-checklist-fullbody-fillmode';
+const NOTIF_BUILD_VERSION = '2026.09.23-392 · v11.392 forge-repeat-add';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14893,6 +14893,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.392', date:'Sep 23, 2026', major:false, notes:[
+      'The Forge’s exercise pool refused to add the same exercise a second time ("Already in your session") — fine for an accidental double-click, wrong for a warm-up set and a working set both legitimately called Squat. Every ADD makes its own row now.',
+    ]},
     {version:'v11.391', date:'Sep 23, 2026', major:true, kind:'design', goTo:'dashboard', notes:[
       'An exercise added from the Forge’s Full Body page was going into a completely separate list from the dashboard’s Training Checklist, so it never showed up there — two differently-built lists that happened to look alike. Full Body session is a selectable card on Training Checklist now too; ticking it there still logs the real workout set.',
       'Fill Mode: a quick check-off screen for a list you’ve already built, Quick Log’s own frosted-glass look reused for standing there ticking through it fast rather than typing a set. Open it from Training Checklist’s FILL MODE button, on either a plain checklist or the Full Body session. It stays open across closing and reopening the app — leaving it up mid-session picks up exactly where you left it.',
@@ -17599,14 +17602,18 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
      Nothing is logged here — it joins the list, and ticking it there is what writes the set. */
   /* Matched on the body part as well as the name: a landmine press is on both the Chest and
      the Shoulders list, and on name alone the second one would refuse to add and say nothing
-     useful about why. */
+     useful about why. Still used by the pool card's own weight/reps steppers and its
+     ticked/LOGGED state below — just no longer used to refuse a second add. */
   _fbSame(a, b){ return a.name.toLowerCase()===b.name.toLowerCase() && (a.part||'')===(b.part||''); }
   addPoolToSession(ex, part, over){
     const f=this._fb();
     const asPart=(this.FB_PARTS().indexOf(part)>=0?part:'Full');
-    if((f.items||[]).some(i=>this._fbSame(i, {name:ex.name, part:asPart}))){
-      this.showToast('fitness','Already in your session', ex.name); return;
-    }
+    // Used to refuse a second add of the same name+part outright ("Already in your
+    // session"), which was right for an accidental double-click but wrong for a real
+    // session — a warm-up set of Squats and a working set of Squats are both legitimately
+    // "Squat, Legs" and both belong in the log as their own row. Every ADD creates its own
+    // entry now; the session list below is where each one is ticked, weighed and removed
+    // individually.
     const o=over||{};
     const reps=o.reps!=null?o.reps:(ex.reps||0);
     const weight=o.weight!=null?o.weight:0;
@@ -20208,7 +20215,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const mapPoolItem=(sec, x)=>{
           const asPart=(this.FB_PARTS().indexOf(sec.part)>=0?sec.part:'Full');
           const item=(fb.items||[]).find(i=>this._fbSame(i, {name:x.name, part:asPart}));
-          const inSession=!!item, ticked=!!(item && fbDone[item.id]);
+          const ticked=!!(item && fbDone[item.id]);
           const v=this.poolVals(sec.key, x, item);
           const stepIt=(field,dir)=>()=>{ if(!ticked) this.stepPool(sec.key, x, item, field, dir); };
           const raw=[];
@@ -20235,13 +20242,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           return { name:x.name, section:sec.name, steps,
             target:ticked?'LOGGED':(target+side),
             targetInk:ticked?'var(--forge-accent)':'#8f8f99',
-            label:inSession?'ADDED':'ADD', cursor:inSession?'default':'pointer',
-            ink:inSession?'var(--forge-add-on)':'var(--forge-add-ink)',
-            bg:inSession?'transparent':'var(--forge-add-bg)',
-            bd:inSession?'var(--forge-add-on)':'var(--forge-add-bg)',
+            // Always ADD, always clickable — a second (or third) add of the same exercise is
+            // a real thing (a warm-up set, then the working set), not a mistake to block.
+            // item/ticked above still drive the steppers and the LOGGED label for whichever
+            // matching entry was added first; they no longer gate the button itself.
+            label:'ADD', cursor:'pointer',
+            ink:'var(--forge-add-ink)', bg:'var(--forge-add-bg)', bd:'var(--forge-add-bg)',
             group:x.group||'',
-            add:()=>{ if(!inSession) this.addPoolToSession(x, sec.part,
-              {weight:this._poolClamp('weight', v.weight), reps:this._poolClamp('reps', v.reps)}); } };
+            add:()=>this.addPoolToSession(x, sec.part,
+              {weight:this._poolClamp('weight', v.weight), reps:this._poolClamp('reps', v.reps)}) };
         };
         /* Search reaches every section's pool at once, not just whichever tab is open — the
            point of it is finding something without already knowing where it lives. One row
