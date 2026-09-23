@@ -339,22 +339,6 @@
              --lc-bg:rgba(255,255,255,0.82); --lc-sub:rgba(255,255,255,0.5);
              --lc-rim:rgba(0,0,0,0); --lc-rim-low:rgba(0,0,0,0); }
   @media (max-width:900px){ .lcb-stage{ padding:14px; border-radius:18px; } }
-  /* SETTINGS GATE — a concentric-rings motif behind the password field, built from the same
-     --lc-line/--lc-accent tokens the card itself reads (already correct on every raiment, per
-     the note above: these are shared by Home, Health, Training, Mental, Calendar, Power Level
-     and Settings), so it never needs its own per-theme colours. Purely decorative, absolutely
-     positioned behind the content, and centred independent of it. */
-  .sg-rings{ position:absolute; top:50%; left:50%; width:min(86vw,640px); height:min(86vw,640px);
-    transform:translate(-50%,-50%); pointer-events:none; }
-  .sg-ring{ position:absolute; inset:0; border-radius:50%; border:1px solid var(--lc-line); }
-  .sg-ring.r1{ inset:0; animation:sgSpin 90s linear infinite; }
-  .sg-ring.r2{ inset:9%; animation:sgSpin 70s linear infinite reverse; }
-  .sg-ring.r3{ inset:19%; animation:sgSpin 50s linear infinite; }
-  .sg-ring.r4{ inset:30%; border-color:var(--lc-accent); opacity:0.35; }
-  .sg-core{ position:absolute; inset:38%; border-radius:50%; filter:blur(18px);
-    background:radial-gradient(circle, var(--lc-accent) 0%, transparent 72%); opacity:0.16; }
-  @keyframes sgSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce){ .sg-ring{ animation:none !important; } }
   /* Noir does not want the cream stage or the white block on the Forge specifically — a light
      pane reads as a mismatch against the rest of the raiment's own dark chrome there in a way
      it does not on Calendar, Power Level, Settings or Gentlemen. Scoped to the Forge scene by
@@ -1373,7 +1357,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <div class="lcb-field"></div>
       <div class="lc-card rest-stage" style="position:relative; width:100%; height:100%; border-radius:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:46px 26px 40px; box-sizing:border-box; text-align:center; animation:luPop 620ms cubic-bezier(.2,.9,.3,1) both; overflow:hidden;">
 
-        <div class="sg-rings"><div class="sg-ring r1"></div><div class="sg-ring r2"></div><div class="sg-ring r3"></div><div class="sg-ring r4"></div><div class="sg-core"></div></div>
+        <!-- Paired bezier lines flowing in from both edges to a single vanishing point at
+             centre, each carrying one travelling mark — the Gateway Flow reference component's
+             canvas piece, ported to vanilla canvas (it was never actually React under the
+             hood; the wrapper just iframed a plain HTML+canvas document) and colour-sourced
+             from the card's own --lc-line/--lc-accent so it reads correctly on every raiment
+             rather than only the reference's black. Mounted/torn down via the same
+             orbLoop+data-orb-mount plumbing the voice orb already uses, so it starts when the
+             gate opens and stops the instant its canvas leaves the DOM. -->
+        <canvas data-orb-mount="sgflow" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none;"></canvas>
 
         <div style="position:relative; flex:0 0 auto; width:100%; max-width:340px;">
           <div class="rest-mark" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:5px; color:var(--lc-muted); margin-bottom:20px;">SETTINGS</div>
@@ -9630,7 +9622,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-383 · v11.383 settings-password-gate';
+const NOTIF_BUILD_VERSION = '2026.09.23-384 · v11.384 settings-gate-flow-canvas';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13787,6 +13779,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(kind==='mini') this._mountMiniOrb(el);
       else if(kind==='float') this._mountFloatOrb(el);
       else if(kind==='voice') this._mountVoiceOrb(el);
+      else if(kind==='sgflow') this._mountSettingsFlow(el);
     });
     this._syncVoiceOrbBounds();
     this._wireLessonCarousels();
@@ -13820,6 +13813,39 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const proj=pts.map(p=>{ let x=p.x*cosA-p.z*sinA; let z=p.x*sinA+p.z*cosA; let y=p.y*Math.cos(tilt)-z*Math.sin(tilt); z=p.y*Math.sin(tilt)+z*Math.cos(tilt); return {x,y,z}; });
       proj.sort((a,b)=>a.z-b.z);
       for(const p of proj){ const sc=(p.z+1.6)/2.6; const sx=cx+p.x*R*amp; const sy=cy+p.y*R*amp; const rad=(big?1.9:1.1)*sc; const a=0.22+sc*0.78; const col=mono?(p.z>0?'230,230,236':'110,110,118'):(p.z>0?'74,222,128':'210,210,218'); ctx.fillStyle='rgba('+col+','+a+')'; ctx.beginPath(); ctx.arc(sx,sy,rad,0,7); ctx.fill(); }
+    });
+  }
+
+  // ===== SETTINGS GATE FLOW — paired bezier lines converging on centre, each carrying one
+  // travelling mark. Colours are read off the canvas's own computed --lc-line/--lc-accent
+  // rather than hardcoded, so the same drawing looks right under every raiment without a
+  // per-theme branch. Guarded on element identity like the other data-orb-mount canvases —
+  // sc-if fully unmounts this canvas when the gate closes, and _pruneOrbLoops (called every
+  // sync()) cancels the RAF the moment that happens.
+  _mountSettingsFlow(el){
+    if(!el || this._sgFlowEl===el) return;
+    this._sgFlowEl=el;
+    const {ctx,w,h}=this.prep(el,2);
+    const cx=w/2, cy=h/2;
+    const cs=getComputedStyle(el);
+    const lineCol=(cs.getPropertyValue('--lc-line')||'rgba(120,120,120,0.3)').trim();
+    const accentCol=(cs.getPropertyValue('--lc-accent')||'#292524').trim();
+    const N=Math.max(18,Math.min(40,Math.round(w/22)));
+    const paths=[]; for(let i=0;i<N;i++) paths.push({ isLeft:i%2===0, startY:(i/N)*h*1.4-h*0.2, t:Math.random(), speed:0.0015+Math.random()*0.002 });
+    const bez=(t,p0,p1,p2,p3)=>{ const u=1-t; return { x:u*u*u*p0.x+3*u*u*t*p1.x+3*u*t*t*p2.x+t*t*t*p3.x, y:u*u*u*p0.y+3*u*u*t*p1.y+3*u*t*t*p2.y+t*t*t*p3.y }; };
+    this.orbLoop(el,()=>{
+      ctx.clearRect(0,0,w,h);
+      paths.forEach(path=>{
+        const p0={x:path.isLeft?0:w, y:path.startY};
+        const p1={x:path.isLeft?cx*0.5:w-cx*0.5, y:path.startY};
+        const p2={x:path.isLeft?cx*0.8:w-cx*0.8, y:cy};
+        const p3={x:cx, y:cy};
+        ctx.beginPath(); ctx.moveTo(p0.x,p0.y); ctx.bezierCurveTo(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y);
+        ctx.strokeStyle=lineCol; ctx.lineWidth=1; ctx.setLineDash([1,4]); ctx.stroke(); ctx.setLineDash([]);
+        path.t+=path.speed; if(path.t>1){ path.t=0; path.startY+=(Math.random()-0.5)*10; }
+        const pos=bez(path.t,p0,p1,p2,p3);
+        ctx.globalAlpha=0.8; ctx.fillStyle=accentCol; ctx.fillRect(pos.x-1.4,pos.y-1.4,2.8,2.8); ctx.globalAlpha=1;
+      });
     });
   }
 
@@ -14846,6 +14872,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.384', date:'Sep 23, 2026', major:false, notes:[
+      'The Settings password gate’s backdrop is a live piece now rather than static rings: paired lines flow in from both edges toward a single point behind the field, coloured from the same raiment tokens as everything else so it still looks right under every style.',
+    ]},
     {version:'v11.383', date:'Sep 23, 2026', major:true, kind:'design', goTo:'settings', notes:[
       'Settings now asks for your account password first, on a full-screen gate covering the whole app the way Brain Rest does, rather than opening straight in. Just the password, nothing else needed — unlocked once per session.',
     ]},
