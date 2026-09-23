@@ -9666,7 +9666,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-394 · v11.394 fbsession-weight-label';
+const NOTIF_BUILD_VERSION = '2026.09.23-395 · v11.395 fbsession-no-mystery-sets';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14893,6 +14893,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.395', date:'Sep 23, 2026', major:false, notes:[
+      'The "3 ×" in "Landmine rotation · 3 × 20 · 25kg" was the exercise’s own prescribed set count, not anything typed in — the pool’s ADD only ever exposes weight and reps, so it read as a number that came from nowhere. Dropped from the add toast, Training Checklist and Fill Mode: it’s "Landmine rotation · 20 reps · 25kg" now, exactly what was entered.',
+    ]},
     {version:'v11.394', date:'Sep 23, 2026', major:false, notes:[
       'Weight entered on a Forge exercise before ADD went missing everywhere except the confirmation toast — it lives in the session’s own weight map, not on the item, and neither Training Checklist nor Fill Mode knew to look there. Both now show it: "Landmine rotation · 3 × 10 · 25kg".',
     ]},
@@ -17590,6 +17593,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(it.dist>0) bits.push(it.dist+(it.distUnit||'m'));
     return bits.join(' · ')||'—';
   }
+  // The pool's own ADD only ever exposes weight and reps as adjustable fields — sets comes
+  // from the exercise's own prescription (e.g. "3-4 SETS" shown before adding), never
+  // something typed in here. fbTarget's "3 × 20" reads as a number the user made up, since
+  // they never touched a sets field to get it. Used wherever what's shown is meant to read
+  // as exactly what was entered — the add toast, Training Checklist, Fill Mode — rather than
+  // the exercise's full prescription.
+  fbEnteredLabel(it, weightOverride){
+    const bits=[];
+    if(it.reps>0) bits.push(it.reps+' reps');
+    if(it.minutes>0) bits.push(it.minutes+' min');
+    if(it.dist>0) bits.push(it.dist+(it.distUnit||'m'));
+    const w=weightOverride!=null?weightOverride:'';
+    if(w) bits.push(w+'kg');
+    return it.name+(bits.length?' · '+bits.join(' · '):'');
+  }
   setFbDraft(k,e){ const v=e&&e.target?e.target.value:e; this.setState(st=>({fbDraft:{...(st.fbDraft||{}), [k]:v}})); }
   addForgeFBItem(){
     const d=this.state.fbDraft||{};
@@ -17635,7 +17653,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     // The weight rides in the session's weight map, which is where ticking reads it from.
     const w={...(f.w||{})}; if(weight>0 && !timed) w[it.id]=String(weight);
     this.setState({forgeFB:{...f, items:[...(f.items||[]), it], w}});
-    this.showToast('fitness','Added to Full Body', ex.name+' · '+this.fbTarget(it)+(weight>0?' · '+weight+'kg':''));
+    this.showToast('fitness','Added to Full Body', this.fbEnteredLabel(it, weight>0&&!timed?weight:null));
   }
   setForgePool(k){ this._resetPoolText(); this.setState({forgePool:k}); }
   /* Blocks of a session — biceps, triceps, grip — kept in the order the list gives them.
@@ -21111,12 +21129,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const activeFitCL=isFbActive?null:(fitCL.find(c=>c.id===activeId)||fitCL[0]||null);
         const fb=this._fb(), fbItems=fb.items||[], fbDone=fb.done||{}, fbW=fb.w||{};
         const fbDoneCount=fbItems.filter(i=>fbDone[i.id]).length;
-        // fbTarget alone drops the weight — it's kept in the session's separate weight map
-        // (fbW/f.w), not on the item, since the Forge's own session list edits it in a live
-        // input rather than baking it into the label. These two simpler card-style views have
-        // no such input, so the weight has to be folded into the one line they do show or it
-        // silently disappears the moment an exercise leaves the Forge's own page.
-        const fbLabel=(i)=>i.name+(this.fbTarget(i)!=='—'?' · '+this.fbTarget(i):'')+(fbW[i.id]?' · '+fbW[i.id]+'kg':'');
+        // fbEnteredLabel folds in the weight (kept in the session's separate weight map, not
+        // on the item — the Forge's own session list edits it in a live input rather than
+        // baking it into a label) and, unlike fbTarget, leaves out sets: the pool's ADD only
+        // ever exposes weight and reps, so a "3 ×" sourced from the exercise's own
+        // prescription read as a number the user never touched and had no idea where it
+        // came from.
+        const fbLabel=(i)=>this.fbEnteredLabel(i, fbW[i.id]||null);
         const repeatOrder=['none','daily','weekly','monthly'];
         return {
           fitChecklistDoneToday: isFbActive ? fbDoneCount : (activeFitCL ? activeFitCL.items.filter(i=>i.done).length : 0),
@@ -21174,7 +21193,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         if(src && src.type==='fbsession'){
           const fb=this._fb();
           const fbDone=fb.done||{}, fbW=fb.w||{};
-          items=(fb.items||[]).map(i=>({ id:i.id, label:i.name+(this.fbTarget(i)!=='—'?' · '+this.fbTarget(i):'')+(fbW[i.id]?' · '+fbW[i.id]+'kg':''), done:!!fbDone[i.id], toggle:()=>this.toggleForgeFBItem(i) }));
+          items=(fb.items||[]).map(i=>({ id:i.id, label:this.fbEnteredLabel(i, fbW[i.id]||null), done:!!fbDone[i.id], toggle:()=>this.toggleForgeFBItem(i) }));
           title='Full Body session';
         } else if(src && src.type==='checklist'){
           const cl=(S.userChecklists||[]).find(c=>c.id===src.id);
