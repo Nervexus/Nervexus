@@ -9585,7 +9585,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.22-379 · v11.379 via-import-restored';
+const NOTIF_BUILD_VERSION = '2026.09.23-380 · v11.380 bulk-import-date-bw-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14775,6 +14775,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.380', date:'Sep 23, 2026', major:true, kind:'design', goTo:'dashboard', notes:[
+      'Bulk Import misread two real shapes. A header carrying a plain date, "Landline rotation 22/09", split on the slash into two exercises, the real one and a bogus second one called "09", doubling every set logged under it. And "10xBW", written with no space, matched nothing at all, so a whole exercise could go in with real reps and vanish from the import silently, without even an error. Both fixed, verified by running the exact text through the real parser rather than reasoning about the regex.',
+    ]},
     {version:'v11.379', date:'Sep 22, 2026', major:false, notes:[
       'The via_import migration pulled out of the sync in v11.378 is confirmed applied to the live database, verified directly against the schema. Bulk Import’s extra 10 XP per row now survives a resync again, alongside the workout-sync fix that shipped either way.',
     ]},
@@ -17004,7 +17007,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // than Legs. Null for anything not on the list; nothing renders it yet.
   _muscleOf(exercise){ return window.EXERCISE_INDEX ? window.EXERCISE_INDEX.muscleOf(exercise) : null; }
   _splitExerciseNames(name){
-    return (name||'').split(/\s*&\s*|\s*\+\s*|\s*\/\s*|\s+and\s+|\s+x\s+/i).map(s=>s.trim()).filter(Boolean).slice(0,4);
+    // The "/" split is for a genuinely combined name ("Bench Press/Overhead Press"), but a
+    // header carrying a plain date suffix ("Landline rotation 22/09") has a slash too, with
+    // digits flanking it rather than words — that used to split into "Landline rotation 22"
+    // and a second, bogus exercise called "09", each getting every set logged under it twice.
+    // Excluded only when digits sit on both sides, so a real name split is untouched.
+    return (name||'').split(/\s*&\s*|\s*\+\s*|(?<!\d)\s*\/\s*(?!\d)|\s+and\s+|\s+x\s+/i).map(s=>s.trim()).filter(Boolean).slice(0,4);
   }
   // Bodyweight sets (no external weight) still count as training load — approximate them as
   // reps×sets so they show up in volume charts instead of vanishing at 0.
@@ -18248,6 +18256,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const bwRe=/^(.+?)\s+[x×]\s*(\d+(?:\.\d+)?)\s*(?:reps?|rep)?\s*$/i;
     // A bare data line under an existing header, e.g. "10x30kg" (reps x weight kg).
     const setLineRe=/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)\s*(kg|kgs|lb|lbs|pounds)?\s*$/i;
+    // The same bare data line, but bodyweight — "10xBW" — matched nothing at all before:
+    // setLineRe needs a number where BW sits, bwRe needs a space before the x that isn't
+    // there. A whole exercise (reps entered, header and all) vanished silently rather than
+    // failing loudly, since nothing ever follows to trigger a row for the header either.
+    const bwSetLineRe=/^(\d+(?:\.\d+)?)\s*[x×]\s*(?:bw|bodyweight)\s*$/i;
     /* A held set, written the way a hold is written: "30sec", or "30sec x 6kg" when there is
        a bell in your hand. Neither was read at all — the first was taken for an exercise name
        and the second for nothing, so a whole session of kettlebell holds came back as a list
@@ -18277,6 +18290,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       }
       if((m=stripped.match(setLineRe))){
         if(curNames.length) pushRow(curNames, +m[2]||0, normUnit(m[3]), 1, +m[1]||0, 0);
+        return;
+      }
+      if((m=stripped.match(bwSetLineRe))){
+        if(curNames.length) pushRow(curNames, 0, 'BW', 1, +m[1]||0, 0);
         return;
       }
       if((m=stripped.match(holdLineRe))){
