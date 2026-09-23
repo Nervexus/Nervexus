@@ -9666,7 +9666,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-393 · v11.393 training-checklist-default-tab';
+const NOTIF_BUILD_VERSION = '2026.09.23-394 · v11.394 fbsession-weight-label';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14893,6 +14893,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.394', date:'Sep 23, 2026', major:false, notes:[
+      'Weight entered on a Forge exercise before ADD went missing everywhere except the confirmation toast — it lives in the session’s own weight map, not on the item, and neither Training Checklist nor Fill Mode knew to look there. Both now show it: "Landmine rotation · 3 × 10 · 25kg".',
+    ]},
     {version:'v11.393', date:'Sep 23, 2026', major:false, notes:[
       'Training Checklist showed a dead 0/0 with nothing selected until you actually tapped the Full Body session chip, even though it was the only list there — fixed by making it the default tab instead of falling through to nothing when no custom checklist exists yet.',
     ]},
@@ -21106,8 +21109,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const activeId=S.activeFitChecklistId||FB_ID;
         const isFbActive=activeId===FB_ID;
         const activeFitCL=isFbActive?null:(fitCL.find(c=>c.id===activeId)||fitCL[0]||null);
-        const fb=this._fb(), fbItems=fb.items||[], fbDone=fb.done||{};
+        const fb=this._fb(), fbItems=fb.items||[], fbDone=fb.done||{}, fbW=fb.w||{};
         const fbDoneCount=fbItems.filter(i=>fbDone[i.id]).length;
+        // fbTarget alone drops the weight — it's kept in the session's separate weight map
+        // (fbW/f.w), not on the item, since the Forge's own session list edits it in a live
+        // input rather than baking it into the label. These two simpler card-style views have
+        // no such input, so the weight has to be folded into the one line they do show or it
+        // silently disappears the moment an exercise leaves the Forge's own page.
+        const fbLabel=(i)=>i.name+(this.fbTarget(i)!=='—'?' · '+this.fbTarget(i):'')+(fbW[i.id]?' · '+fbW[i.id]+'kg':'');
         const repeatOrder=['none','daily','weekly','monthly'];
         return {
           fitChecklistDoneToday: isFbActive ? fbDoneCount : (activeFitCL ? activeFitCL.items.filter(i=>i.done).length : 0),
@@ -21131,7 +21140,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           canMarkAllFitDone: !isFbActive && !!activeFitCL,
           isFbActiveCard: isFbActive,
           activeFitChecklistItems: isFbActive ? fbItems.map(i=>({
-            id:i.id, label:i.name+(this.fbTarget(i)!=='—'?' · '+this.fbTarget(i):''),
+            id:i.id, label:fbLabel(i),
             toggle:()=>this.toggleForgeFBItem(i), remove:()=>this.removeForgeFBItem(i.id),
             box:fbDone[i.id]?'✓':'', boxBg:fbDone[i.id]?'#FFFFFF':'transparent', boxBd:fbDone[i.id]?'#FFFFFF':'rgba(255,255,255,0.3)',
             txt:fbDone[i.id]?'#7c7c84':'#d6d6da', strike:fbDone[i.id]?'line-through':'none'
@@ -21164,8 +21173,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         let items=[], title='';
         if(src && src.type==='fbsession'){
           const fb=this._fb();
-          const fbDone=fb.done||{};
-          items=(fb.items||[]).map(i=>({ id:i.id, label:i.name+(this.fbTarget(i)!=='—'?' · '+this.fbTarget(i):''), done:!!fbDone[i.id], toggle:()=>this.toggleForgeFBItem(i) }));
+          const fbDone=fb.done||{}, fbW=fb.w||{};
+          items=(fb.items||[]).map(i=>({ id:i.id, label:i.name+(this.fbTarget(i)!=='—'?' · '+this.fbTarget(i):'')+(fbW[i.id]?' · '+fbW[i.id]+'kg':''), done:!!fbDone[i.id], toggle:()=>this.toggleForgeFBItem(i) }));
           title='Full Body session';
         } else if(src && src.type==='checklist'){
           const cl=(S.userChecklists||[]).find(c=>c.id===src.id);
