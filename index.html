@@ -47,7 +47,7 @@
 <helmet>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Pinyon+Script&amp;family=Herr+Von+Muellerhoff&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Pinyon+Script&amp;family=Beau+Rivage&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=gambarino@400&amp;display=swap">
 <style>
   *{ box-sizing:border-box; margin:0; padding:0; }
@@ -154,7 +154,7 @@
   .cc-shell.raiment-x{ --forge-accent:#5B1A1A; }
   .cc-shell.raiment-noir{ --forge-accent:#FFFFFF; --forge-add-bg:#625B50; --forge-add-ink:#F2EFE9; }
   .cc-shell.raiment-maison{ --forge-accent:#3C5A7D; --forge-add-bg:#4E6E96; --forge-add-ink:#F6F0E4; }
-  .cc-shell.raiment-vanguard{ --forge-accent:#420A07; --forge-add-bg:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --forge-add-ink:#EDEBE7; }
+  .cc-shell.raiment-vanguard{ --forge-accent:#420A07; --forge-add-bg:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --forge-add-ink:#FFFFFF; }
   /* ===== THE GENTLEMEN'S CENTRE — one ruled chrome for every subpage =====
      The subpage row was eight loose chips on a wrapping flex line: on a phone it broke into a
      ragged two-three-three block whose shape changed with the active tab. It is one box now,
@@ -264,7 +264,7 @@
      the general silver — the same call every other raiment makes by giving --lc-accent its
      own colour instead of a neutral. --lc-on-accent is white so button labels stay readable
      on it. */
-  .cc-shell.raiment-vanguard{ --lc-accent:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --lc-bg:#EDEBE7; --lc-sub:#E0DDD6; --lc-line:rgba(199,199,199,0.22); --lc-edge:rgba(199,199,199,0.22); --lc-muted:#6E6E7A; --lc-glow:rgba(0,0,0,0.35); --lc-raise:rgba(255,255,255,0.05); --lc-on-accent:#EDEBE7;
+  .cc-shell.raiment-vanguard{ --lc-accent:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --lc-bg:#EDEBE7; --lc-sub:#E0DDD6; --lc-line:rgba(199,199,199,0.22); --lc-edge:rgba(199,199,199,0.22); --lc-muted:#6E6E7A; --lc-glow:rgba(0,0,0,0.35); --lc-raise:rgba(255,255,255,0.05); --lc-on-accent:#FFFFFF;
              --lcb-far:#EDEBE7; --lcb-near:#F6F5F3; --lcb-lit:rgba(0,0,0,0); --lcb-dim:rgba(0,0,0,0); --lcb-sheen:rgba(0,0,0,0); }
   .cc-shell.raiment-vanguard .lc-card, .cc-shell.raiment-vanguard .lcb-stage{ color:#434451; }
   .cc-shell.raiment-vanguard .lc-sig-btn:hover{ background:linear-gradient(135deg,#5C1512 0%,#B82C22 100%) !important; }
@@ -775,7 +775,7 @@
      by themeClass, so the rest of the app stays Ultra X until the look is approved. */
   .theme-ultra.theme-vanguard{ --u-bg:#FFFFFF; --u-card:rgba(237,235,231,0.94); --u-ink:#434451; --u-muted:#6E6E7A; --u-line:rgba(67,68,81,0.16); --u-accent:#420A07; --v-deep:#282931; --v-mid:#EDEBE7; --v-pewter:#420A07;
              --v-main:#FFFFFF; --v-main-mid:#FFFFFF; --v-sub:#420A07; --v-sub-mid:#9E1811; --v-chart:#AD9462; --v-chart-dark:#7A6845; --v-chart-light:#C9B98F;
-             --v-btn:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --v-btn-hover:linear-gradient(135deg,#5C1512 0%,#B82C22 100%); --v-btn-text:#EDEBE7; }
+             --v-btn:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --v-btn-hover:linear-gradient(135deg,#5C1512 0%,#B82C22 100%); --v-btn-text:#FFFFFF; }
   /* The reference is embossed kraft paper, not a flat gradient — the same fractalNoise
      technique Noir already uses for its own grain, pushed harder (Noir's own 0.55 read as
      barely-there once the encoder bug above was actually fixed) so the fibre is visible
@@ -903,7 +903,7 @@
      cream text (i.e. a button's own label) needs dark text specifically; higher specificity
      than the plain cream-text rule wins it back without touching cream text used standalone
      elsewhere on the dark page. */
-  .theme-ultra.theme-vanguard [style*="background:#5B1A1A"][style*="color:#F5F1E8"], .theme-ultra.theme-vanguard [style*="background: rgb(91, 26, 26)"][style*="color: rgb(245, 241, 232)"]{ color:#EDEBE7 !important; }
+  .theme-ultra.theme-vanguard [style*="background:#5B1A1A"][style*="color:#F5F1E8"], .theme-ultra.theme-vanguard [style*="background: rgb(91, 26, 26)"][style*="color: rgb(245, 241, 232)"]{ color:#FFFFFF !important; }
   .theme-ultra.theme-vanguard svg [stroke="#5B1A1A"]{ stroke:var(--u-accent) !important; }
   .theme-ultra.theme-vanguard svg [fill="#5B1A1A"]{ fill:var(--u-accent) !important; }
   .theme-ultra.theme-vanguard [style*="background: rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="background:rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="background: rgba(91, 26, 26"]{ background:rgba(199,199,199,0.15) !important; }
@@ -913,7 +913,7 @@
   .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard *:not(h1):not(h2):not(h3):not([style*="JetBrains Mono"]):not([style*="Pinyon"]):not(canvas){ font-family:'Cormorant Garamond',Georgia,serif !important; }
   .theme-ultra.theme-vanguard [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
   .theme-ultra.theme-vanguard [style*="Pinyon"]{ font-family:'Pinyon Script',cursive !important; }
-  .theme-ultra.theme-vanguard h1, .theme-ultra.theme-vanguard h2, .theme-ultra.theme-vanguard h3{ font-family:'Herr Von Muellerhoff','Cormorant Garamond',cursive !important; font-weight:500 !important; font-style:normal !important; letter-spacing:0 !important; }
+  .theme-ultra.theme-vanguard h1, .theme-ultra.theme-vanguard h2, .theme-ultra.theme-vanguard h3{ font-family:'Beau Rivage','Cormorant Garamond',cursive !important; font-weight:500 !important; font-style:normal !important; letter-spacing:0 !important; }
   /* Only headings with no colour of their own (plain page titles, sitting straight on the
      walnut background) fall back to --u-accent. A heading that already computes its own inline
      colour — a card/popup title using perfUInk or similar, meant to sit on the cream card
@@ -2458,7 +2458,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </svg>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#6E6E7A; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span class="cc-home-powerbtn" onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid #9E1811; background:linear-gradient(135deg,#420A07 0%,#9E1811 100%); color:#EDEBE7; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'linear-gradient(135deg,#5C1512 0%,#B82C22 100%)', borderColor:'#B82C22' }">{{ powerOnLabel }}</span>
+            <span class="cc-home-powerbtn" onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid #9E1811; background:linear-gradient(135deg,#420A07 0%,#9E1811 100%); color:#FFFFFF; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'linear-gradient(135deg,#5C1512 0%,#B82C22 100%)', borderColor:'#B82C22' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
             <div class="cc-home-logo" style="border-color:rgba(246,240,228,0.8);"><img src="favicon.png" alt="Nervexus"></div>
@@ -9821,7 +9821,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-419 · v11.419 vanguard-white-bg-final';
+const NOTIF_BUILD_VERSION = '2026.09.24-420 · v11.420 vanguard-font-btntext-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13414,7 +13414,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       vBubbleYou:dark?(isVanguard?'rgba(199,199,199,0.08)':'rgba(255,255,255,0.05)'):(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
       vTrack:dark?(isVanguard?'rgba(199,199,199,0.12)':'rgba(255,255,255,0.08)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
       vBtnBg:dark?(isVanguard?btnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)'):accent,
-      vBtnText:dark?(isVanguard?'#EDEBE7':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
+      vBtnText:dark?(isVanguard?'#FFFFFF':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
       vBtnShadow:dark?(isVanguard?'0 2px 6px rgba(0,0,0,0.35)':'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)'):'none',
     };
   }
@@ -15056,6 +15056,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.420', date:'Sep 24, 2026', major:false, kind:'fix', notes:[
+      'Vanguard heading font switched to Beau Rivage, a free flowing script closer to the requested "Parfumerie" look (a paid foundry font that can\'t be licensed via CDN). Every red/Bordeaux button now uses pure white text instead of ivory, including Power On, Yes Begin, and the Forge\'s ADD button.',
+    ]},
     {version:'v11.419', date:'Sep 24, 2026', major:false, kind:'design', notes:[
       'Vanguard\'s main background is back to plain white — locking this in as the final call.',
     ]},
@@ -21064,7 +21067,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // elsewhere in this same card, and a gradient string is not a valid `color` value.
       perfBtnBg:S.prefs.ultraStyle==='Vanguard'?'linear-gradient(135deg,#420A07 0%,#9E1811 100%)':S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A',
       perfBtnBgHover:S.prefs.ultraStyle==='Vanguard'?'linear-gradient(135deg,#5C1512 0%,#B82C22 100%)':S.prefs.ultraStyle==='Noir'?'#B7AFA2':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#4A1515',
-      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#EDEBE7':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
+      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#FFFFFF':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
       toggleWhatsNewSigned:()=>this.setState(s=>({whatsNewSigned:!s.whatsNewSigned})),
       whatsNewCheckBd:S.whatsNewSigned?'#FFFFFF':'rgba(255,255,255,0.3)', whatsNewCheckBg:S.whatsNewSigned?'#FFFFFF':'transparent', whatsNewCheckMark:S.whatsNewSigned?'\u2713':'',
       whatsNewBtnCursor:S.whatsNewSigned?'pointer':'not-allowed', whatsNewBtnOpacity:S.whatsNewSigned?1:0.4, whatsNewBtnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)',
