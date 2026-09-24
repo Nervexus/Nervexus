@@ -49,6 +49,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Pinyon+Script&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=gambarino@400&amp;display=swap">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=boska@400,500,600,700&amp;display=swap">
 <style>
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; background:#050506; }
@@ -902,10 +903,10 @@
   .theme-ultra.theme-vanguard [style*="rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="rgba(91, 26, 26"]{ border-color:rgba(199,199,199,0.35) !important; }
   .theme-ultra.theme-vanguard [style*="rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32"]{ border-color:rgba(199,199,199,0.3) !important; }
   .theme-ultra.theme-vanguard [style*="box-shadow:0 20px 50px rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="box-shadow:0 16px 40px rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="box-shadow:0 50px 100px rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32, 0.18) 0px 20px 50px"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32, 0.16) 0px 16px 40px"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32, 0.28) 0px 50px 100px"]{ box-shadow:none !important; }
-  .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard *:not(h1):not(h2):not(h3):not([style*="JetBrains Mono"]):not([style*="Pinyon"]):not(canvas){ font-family:'Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard *:not(h1):not(h2):not(h3):not([style*="JetBrains Mono"]):not([style*="Pinyon"]):not(canvas){ font-family:'Boska','Cormorant Garamond',Georgia,serif !important; }
   .theme-ultra.theme-vanguard [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
   .theme-ultra.theme-vanguard [style*="Pinyon"]{ font-family:'Pinyon Script',cursive !important; }
-  .theme-ultra.theme-vanguard h1, .theme-ultra.theme-vanguard h2, .theme-ultra.theme-vanguard h3{ font-family:'Cormorant Garamond',Georgia,serif !important; font-weight:500 !important; font-style:normal !important; letter-spacing:0 !important; color:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard h1, .theme-ultra.theme-vanguard h2, .theme-ultra.theme-vanguard h3{ font-family:'Boska','Cormorant Garamond',Georgia,serif !important; font-weight:500 !important; font-style:normal !important; letter-spacing:0 !important; color:var(--u-accent) !important; }
   .theme-ultra.theme-vanguard .cc-home-hero p:not(.cc-home-wordmark), .theme-ultra.theme-vanguard .cc-home-hero span{ color:var(--u-ink) !important; }
   .theme-ultra.theme-vanguard .cc-home-hero [style*="JetBrains Mono"]{ color:rgba(239,231,216,0.78) !important; }
   .theme-ultra.theme-vanguard [data-icon]{ color:var(--u-accent) !important; }
@@ -9808,7 +9809,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-410 · v11.410 vanguard-walnut-crimson-gold';
+const NOTIF_BUILD_VERSION = '2026.09.24-411 · v11.411 vanguard-boska-font';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15043,6 +15044,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.411', date:'Sep 24, 2026', major:false, kind:'design', notes:[
+      'Vanguard now sets its own display type instead of borrowing Cormorant Garamond — Boska, a bolder editorial serif, on every heading and the general body text, keeping JetBrains Mono and the Pinyon Script wordmark exactly as they were.',
+    ]},
     {version:'v11.410', date:'Sep 24, 2026', major:true, kind:'design', notes:[
       'Vanguard’s families reshuffle again from a new reference: Walnut Noir takes over as the main app and card colour (what Crimson Velvet was last build), Crimson Velvet itself steps down to the secondary/sub role it displaced teal from, and the ring and chart colour moves from navy to a warm Golden Hour tone. Buttons keep their cream-to-latte gradient unchanged.',
     ]},
