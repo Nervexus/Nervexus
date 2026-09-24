@@ -774,7 +774,7 @@
      pewter-foil accent, taken from an embossed house crest. Scoped to the home screen for now
      by themeClass, so the rest of the app stays Ultra X until the look is approved. */
   .theme-ultra.theme-vanguard{ --u-bg:#434451; --u-card:rgba(237,235,231,0.94); --u-ink:#EDEBE7; --u-muted:#9C9CA8; --u-line:rgba(199,199,199,0.22); --u-accent:#EDEBE7; --v-deep:#282931; --v-mid:#EDEBE7; --v-pewter:#EDEBE7;
-             --v-main:#434451; --v-main-mid:#696974; --v-sub:#420A07; --v-sub-mid:#9E1811; --v-chart:#AD9462; --v-chart-dark:#7A6845; --v-chart-light:#C9B98F;
+             --v-main:#434451; --v-main-mid:#434451; --v-sub:#420A07; --v-sub-mid:#9E1811; --v-chart:#AD9462; --v-chart-dark:#7A6845; --v-chart-light:#C9B98F;
              --v-btn:linear-gradient(135deg,#420A07 0%,#9E1811 100%); --v-btn-hover:linear-gradient(135deg,#5C1512 0%,#B82C22 100%); --v-btn-text:#EDEBE7; }
   /* The reference is embossed kraft paper, not a flat gradient — the same fractalNoise
      technique Noir already uses for its own grain, pushed harder (Noir's own 0.55 read as
@@ -783,7 +783,7 @@
   .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard .cc-scene, .theme-ultra.theme-vanguard .cc-top, .theme-ultra.theme-vanguard .cc-side{
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E"),
-      linear-gradient(135deg, #434451 0%, #696974 55%, #434451 100%) !important;
+      linear-gradient(135deg, #434451 0%, #434451 100%) !important;
     background-blend-mode:overlay, normal !important;
     background-color:#434451 !important; }
   .theme-ultra.theme-maison{ --u-bg:#F2ECE0; --u-card:#FBF7EF; --u-ink:#2E4560; --u-muted:#6E82A0; --u-line:rgba(60,90,125,0.18); --u-accent:#3C5A7D; --m-blue:#8FAAC9; --m-deep:#4E6E96; --m-cream:#F6F0E4; }
@@ -9824,7 +9824,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-415 · v11.415 mobdrawer-raiment-fix';
+const NOTIF_BUILD_VERSION = '2026.09.24-416 · v11.416 vanguard-flat-bg';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15059,6 +15059,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.416', date:'Sep 24, 2026', major:false, kind:'fix', notes:[
+      'Vanguard\'s main background was a diagonal gradient sweeping through a noticeably lighter band across nearly half the screen, so it read lighter than the flat Juicy Blackberries swatch it was meant to match. Flattened it to a single tone (with the grain texture still doing the work of adding depth), so the background now matches the reference colour throughout instead of just at its two darkest corners.',
+    ]},
     {version:'v11.415', date:'Sep 24, 2026', major:false, kind:'fix', notes:[
       'Fixed the "All Pages" side drawer (and the hamburger icon that opens it): it was hardcoded to Ultra X\'s own cream-and-maroon regardless of which Ultra style was active, a bug that predates this round\'s palette work. Noir, Maison Élysée and Vanguard all now get their own drawer colours to match their own cards — Vanguard\'s is ivory with dark ink, matching every other card on the app.',
     ]},
