@@ -1604,27 +1604,27 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     <div style="position:fixed; inset:0; z-index:999; background:{{ wnBackdrop }}; display:flex; align-items:center; justify-content:center; padding:24px;">
       <sc-if value="{{ wnIsUltra }}" hint-placeholder-val="{{ false }}">
         <div style="width:100%; max-width:560px; max-height:86vh; overflow-y:auto; border-radius:24px; background:{{ wnModalBg }}; padding:16px; box-shadow:0 50px 100px rgba(58,42,32,0.28);">
-        <div style="border:1px solid rgba(91,26,26,0.35); border-radius:14px; padding:40px 40px 44px; font-family:'Cormorant Garamond',Georgia,serif;">
+        <div style="border:1px solid {{ perfUAccent35 }}; border-radius:14px; padding:40px 40px 44px; font-family:'Cormorant Garamond',Georgia,serif;">
           <img src="favicon.png" alt="" style="display:block; width:64px; height:64px; object-fit:contain; margin:0 auto 20px; opacity:0.9;">
-          <div style="text-align:center; font-size:16px; letter-spacing:4px; color:#8a6a5a;">NERVEXUS ULTRA</div>
+          <div style="text-align:center; font-size:16px; letter-spacing:4px; color:{{ perfUMuted }};">NERVEXUS ULTRA</div>
           <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:18px auto 22px;">
-            <div style="width:56px; height:1px; background:#5B1A1A;"></div>
-            <span style="color:#5B1A1A; font-size:13px;">&#10086;</span>
-            <div style="width:56px; height:1px; background:#5B1A1A;"></div>
+            <div style="width:56px; height:1px; background:{{ perfUAccent }};"></div>
+            <span style="color:{{ perfUAccent }}; font-size:13px;">&#10086;</span>
+            <div style="width:56px; height:1px; background:{{ perfUAccent }};"></div>
           </div>
-          <h1 style="font-style:normal; font-weight:500; letter-spacing:2px; font-size:26px; color:#3A2A20; text-align:center; margin:0 0 6px;">{{ latestVersion }}</h1>
-          <div style="font-size:13px; color:#8a6a5a; text-align:center; letter-spacing:0.5px; margin-bottom:26px;">{{ latestDate }}</div>
+          <h1 style="font-style:normal; font-weight:500; letter-spacing:2px; font-size:26px; color:{{ perfUInk }}; text-align:center; margin:0 0 6px;">{{ latestVersion }}</h1>
+          <div style="font-size:13px; color:{{ perfUMuted }}; text-align:center; letter-spacing:0.5px; margin-bottom:26px;">{{ latestDate }}</div>
           <sc-for list="{{ latestNotes }}" as="n" hint-placeholder-count="2">
-            <div style="display:flex; gap:9px; font-size:14px; color:#5A473C; line-height:1.6; margin-bottom:12px; text-align:left;"><span style="color:#5B1A1A;">&middot;</span><span>{{ n }}</span></div>
+            <div style="display:flex; gap:9px; font-size:14px; color:{{ perfUInk }}; line-height:1.6; margin-bottom:12px; text-align:left;"><span style="color:{{ perfUAccent }};">&middot;</span><span>{{ n }}</span></div>
           </sc-for>
           <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin:22px auto 22px;">
-            <div style="width:56px; height:1px; background:rgba(91,26,26,0.3);"></div>
-            <span style="color:rgba(91,26,26,0.5); font-size:11px;">&#10086;</span>
-            <div style="width:56px; height:1px; background:rgba(91,26,26,0.3);"></div>
+            <div style="width:56px; height:1px; background:{{ perfUAccent30 }};"></div>
+            <span style="color:{{ perfUAccent50 }}; font-size:11px;">&#10086;</span>
+            <div style="width:56px; height:1px; background:{{ perfUAccent30 }};"></div>
           </div>
-          <div onClick="{{ closeWhatsNew }}" style="text-align:center; padding:16px; cursor:pointer; background:#5B1A1A; color:#F5F1E8; font-size:11px; letter-spacing:3px; font-weight:500; border-radius:999px;" style-hover="{ background:'#4A1515' }">ACKNOWLEDGED</div>
+          <div onClick="{{ closeWhatsNew }}" style="text-align:center; padding:16px; cursor:pointer; background:{{ perfUAccent }}; color:{{ perfUBtnText }}; font-size:11px; letter-spacing:3px; font-weight:500; border-radius:999px;" style-hover="{ background:'{{ perfUAccentHover }}' }">ACKNOWLEDGED</div>
           <sc-if value="{{ wnHasDestination }}" hint-placeholder-val="{{ false }}">
-            <div onClick="{{ goToWhatsNewTarget }}" style="margin-top:10px; text-align:center; padding:15px; cursor:pointer; background:transparent; border:1px solid rgba(91,26,26,0.35); color:#5B1A1A; font-size:11px; letter-spacing:3px; font-weight:500; border-radius:999px;" style-hover="{ background:'rgba(91,26,26,0.06)' }">TAKE ME TO IT</div>
+            <div onClick="{{ goToWhatsNewTarget }}" style="margin-top:10px; text-align:center; padding:15px; cursor:pointer; background:transparent; border:1px solid {{ perfUAccent35 }}; color:{{ perfUAccent }}; font-size:11px; letter-spacing:3px; font-weight:500; border-radius:999px;" style-hover="{ background:'{{ perfUAccent03 }}' }">TAKE ME TO IT</div>
           </sc-if>
         </div>
         </div>
@@ -9711,7 +9711,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-399 · v11.399 settings-gate-vanguard-redesign';
+const NOTIF_BUILD_VERSION = '2026.09.24-400 · v11.400 everpine-theme-fixes';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13273,31 +13273,38 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // Voice Assistant screen's per-theme palette. dark=true keeps the original black look
   // (base theme + Spline background, and Noir); Ultra X and Maison Élysée get their own
   // light card/ink/accent set instead of inheriting a black screen that doesn't match them.
+  // Éverpine used to fall through to that light Ultra X set too — the one raiment whose Home
+  // screen is a dark moss-green field getting flipped to a cream-and-maroon screen the moment
+  // it left Home, a jarring switch nothing else in the app does. It sits in the dark bucket
+  // now, alongside Noir, with its own champagne-and-moss identity rather than Noir's black
+  // and taupe or the light cream card.
   _voiceTokens(){
     const P=this.state.prefs||{}; const isUltra=P.theme==='Ultra'; const isMaison=P.ultraStyle==='Maison Élysée';
-    const dark=!isUltra||P.ultraStyle==='Noir'; const accent=dark?'#FFFFFF':(isMaison?'#4E6E96':'#5B1A1A');
+    const isEverpine=P.ultraStyle==='Maison Éverpine';
+    const dark=!isUltra||P.ultraStyle==='Noir'||isEverpine;
+    const accent=dark?(isEverpine?'#E7D8A6':'#FFFFFF'):(isMaison?'#4E6E96':'#5B1A1A');
     return {
       vDark:dark,
       vLight:!dark,
-      vOverlay:dark?'#000':'transparent',
-      vGlow:dark?'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)':('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
-      vCard:dark?'#141416':(isMaison?'#FBF7EF':'#F5F1E8'),
-      vInk:dark?'#eef0f2':(isMaison?'#2E4560':'#3A2A20'),
-      vInk2:dark?'#c8c8ce':(isMaison?'#3C5A7D':'#5A473C'),
-      vMuted:dark?'#8a8a92':(isMaison?'#6E82A0':'#8a6a5a'),
-      vMuted2:dark?'#7c7c84':(isMaison?'#7f93AE':'#9c8674'),
-      vMuted3:dark?'#6f6f78':(isMaison?'#8fa2ba':'#a8927e'),
+      vOverlay:dark?(isEverpine?'#0F1813':'#000'):'transparent',
+      vGlow:dark?(isEverpine?'radial-gradient(circle at 50% 40%, rgba(231,216,166,0.10) 0%, rgba(15,24,19,0.55) 60%, rgba(15,24,19,0.78) 100%)':'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)'):('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
+      vCard:dark?(isEverpine?'#16211A':'#141416'):(isMaison?'#FBF7EF':'#F5F1E8'),
+      vInk:dark?(isEverpine?'#F2F1E9':'#eef0f2'):(isMaison?'#2E4560':'#3A2A20'),
+      vInk2:dark?(isEverpine?'#D9CFA8':'#c8c8ce'):(isMaison?'#3C5A7D':'#5A473C'),
+      vMuted:dark?(isEverpine?'#8E9C92':'#8a8a92'):(isMaison?'#6E82A0':'#8a6a5a'),
+      vMuted2:dark?(isEverpine?'#7C8A80':'#7c7c84'):(isMaison?'#7f93AE':'#9c8674'),
+      vMuted3:dark?(isEverpine?'#6B786F':'#6f6f78'):(isMaison?'#8fa2ba':'#a8927e'),
       vAccent:accent,
-      vLine:dark?'rgba(255,255,255,0.1)':(isMaison?'rgba(60,90,125,0.18)':'rgba(91,26,26,0.18)'),
-      vLine2:dark?'rgba(255,255,255,0.14)':(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
-      vLine3:dark?'rgba(255,255,255,0.06)':(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
-      vInputBg:dark?'rgba(255,255,255,0.03)':(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
-      vBubbleAI:dark?'#1e2024':(isMaison?'#F2ECE0':'#EFE7DA'),
-      vBubbleYou:dark?'rgba(255,255,255,0.05)':(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
-      vTrack:dark?'rgba(255,255,255,0.08)':(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
-      vBtnBg:dark?'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)':accent,
-      vBtnText:dark?'#0a0a0b':(isMaison?'#F6F0E4':'#F5F1E8'),
-      vBtnShadow:dark?'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)':'none',
+      vLine:dark?(isEverpine?'rgba(231,216,166,0.16)':'rgba(255,255,255,0.1)'):(isMaison?'rgba(60,90,125,0.18)':'rgba(91,26,26,0.18)'),
+      vLine2:dark?(isEverpine?'rgba(231,216,166,0.24)':'rgba(255,255,255,0.14)'):(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
+      vLine3:dark?(isEverpine?'rgba(231,216,166,0.08)':'rgba(255,255,255,0.06)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
+      vInputBg:dark?(isEverpine?'rgba(231,216,166,0.05)':'rgba(255,255,255,0.03)'):(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
+      vBubbleAI:dark?(isEverpine?'#243228':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
+      vBubbleYou:dark?(isEverpine?'rgba(231,216,166,0.08)':'rgba(255,255,255,0.05)'):(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
+      vTrack:dark?(isEverpine?'rgba(231,216,166,0.12)':'rgba(255,255,255,0.08)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
+      vBtnBg:dark?(isEverpine?accent:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)'):accent,
+      vBtnText:dark?(isEverpine?'#16211A':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
+      vBtnShadow:dark?(isEverpine?'0 2px 6px rgba(0,0,0,0.35)':'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)'):'none',
     };
   }
   _sbBoot(){
@@ -14938,6 +14945,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.400', date:'Sep 24, 2026', major:false, kind:'design', notes:[
+      'Maison Éverpine was falling back to Ultra X’s oxblood in several places that never learned about the fourth raiment — the Dashboard’s Log Activity button, the Profile card, the Performance Terminal’s check-in popups, the What’s New card, and the sidebar/voice orb. All five now render in Éverpine’s own champagne-on-moss palette instead.',
+    ]},
     {version:'v11.399', date:'Sep 24, 2026', major:true, kind:'design', goTo:'settings', notes:[
       'The Settings password gate is redesigned from a reference: a small ring of dots turning slowly above the title, a full pill-shaped password field with a SHOW/HIDE toggle, and one large primary Unlock button rather than a side-by-side pair, with Cancel demoted to a small text link underneath. Every colour still comes from the active raiment.',
     ]},
@@ -19767,6 +19777,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!isUltra) return {c1:[0.910,0.910,0.925], c2:[0.541,0.541,0.573], c3:[0.149,0.149,0.165], glow:'rgba(200,200,210,0.5)'};
     if(P.ultraStyle==='Noir') return {c1:[0.788,0.635,0.290], c2:[0.541,0.416,0.165], c3:[0.227,0.165,0.063], glow:'rgba(201,162,74,0.5)'};
     if(P.ultraStyle==='Maison Élysée') return {c1:[0.306,0.431,0.588], c2:[0.235,0.353,0.490], c3:[0.102,0.145,0.188], glow:'rgba(78,110,150,0.5)'};
+    if(P.ultraStyle==='Maison Éverpine') return {c1:[0.906,0.847,0.651], c2:[0.761,0.655,0.416], c3:[0.290,0.235,0.122], glow:'rgba(231,216,166,0.5)'};
     return {c1:[0.62,0.14,0.14], c2:[0.42,0.07,0.07], c3:[0.18,0.03,0.03], glow:'rgba(91,26,26,0.5)'};
   }
   // The floating launcher in the bottom-right corner. Uses the void orb so no page still
@@ -20102,16 +20113,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
-      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
-      profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
-      profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
-      profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
-      profChipBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#8a8a92,#c8c8ce)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#C9A24A,#8a6a2a)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#4E6E96,#6E86A8)' : 'linear-gradient(135deg,#5B1A1A,#7A2626)',
-      profMuted: S.prefs.theme!=='Ultra' ? '#7c7c84' : S.prefs.ultraStyle==='Noir' ? '#968F82' : S.prefs.ultraStyle==='Maison Élysée' ? '#6E82A0' : '#6E5B4E',
-      profAccent: S.prefs.theme!=='Ultra' ? '#FFFFFF' : S.prefs.ultraStyle==='Noir' ? '#C9A24A' : S.prefs.ultraStyle==='Maison Élysée' ? '#4E6E96' : '#5B1A1A',
-      profTrack: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.14)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.1)' : 'rgba(58,42,32,0.1)',
-      profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
-      profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
+      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'linear-gradient(135deg,#243228 0%,#0F1813 55%,#243228 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
+      profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'rgba(231,216,166,0.22)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
+      profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Maison Éverpine') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+      profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'radial-gradient(circle, rgba(231,216,166,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
+      profChipBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#8a8a92,#c8c8ce)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#C9A24A,#8a6a2a)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'linear-gradient(135deg,#E7D8A6,#C2A76A)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#4E6E96,#6E86A8)' : 'linear-gradient(135deg,#5B1A1A,#7A2626)',
+      profMuted: S.prefs.theme!=='Ultra' ? '#7c7c84' : S.prefs.ultraStyle==='Noir' ? '#968F82' : S.prefs.ultraStyle==='Maison Éverpine' ? '#8E9C92' : S.prefs.ultraStyle==='Maison Élysée' ? '#6E82A0' : '#6E5B4E',
+      profAccent: S.prefs.theme!=='Ultra' ? '#FFFFFF' : S.prefs.ultraStyle==='Noir' ? '#C9A24A' : S.prefs.ultraStyle==='Maison Éverpine' ? '#E7D8A6' : S.prefs.ultraStyle==='Maison Élysée' ? '#4E6E96' : '#5B1A1A',
+      profTrack: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.14)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'rgba(231,216,166,0.14)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.1)' : 'rgba(58,42,32,0.1)',
+      profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Maison Éverpine' ? '#F2F1E9' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
+      profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'rgba(231,216,166,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
       powerLevel:P.level, rankName:P.rank.n, rankDesc:P.rank.d, powerPct:P.pct+'%', xpIn:P.xpInLevel, xpNext:P.xpForNext, nextRankName:P.next?P.next.n:'MAX RANK', nextRankLevel:P.next?P.next.min:'—',
       /* The learning streak moved here off the Learning Centre's stats bar. It is the same
          real figure it always was — consecutive days with a logged Learning activity — and
@@ -20562,8 +20573,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ...this._safe(()=>{
         const P=S.perfStatus||{}; const missStreak=P.missStreak||0; const banned=!!P.banned; const appealStatus=P.appealStatus||'none';
         const todayLbl=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-        const perfAcc=S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A';
-        const perfAccSoft22=S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.22)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.22)':'rgba(91,26,26,0.22)';
+        const perfAcc=S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Éverpine'?'#E7D8A6':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A';
+        const perfAccSoft22=S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.22)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.22)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.22)':'rgba(91,26,26,0.22)';
         const stars=[1,2,3,4,5].map(n=>{ const on=n<=(S.perfDraftRating||0); return { n, set:()=>this.setPerfRating(n), c:S.prefs.theme==='Ultra'?(on?perfAcc:perfAccSoft22):(on?'#ffb020':'rgba(255,255,255,0.16)'), cU:on?perfAcc:perfAccSoft22 }; });
         const year=new Date().getFullYear(); const used=this._perfDaysUsed(year); const cap=this._perfCap();
         const perfHolidayList=(S.perfHolidays||[]).slice().sort((a,b)=>a.start.localeCompare(b.start)).map(h=>({ label:this._niceDate(h.start)+' – '+this._niceDate(h.end), days:h.days, cancel:()=>this.cancelHoliday(h.id) }));
@@ -20621,7 +20632,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           perfDraftLearnedVal:S.perfDraftLearned||'', setPerfDraftLearned:(e)=>this.setPerfDraftLearned(e),
           perfDraftImprovementVal:S.perfDraftImprovement||'', setPerfDraftImprovement:(e)=>this.setPerfDraftImprovement(e),
           togglePerfTrained:()=>this.togglePerfTrained(),
-          perfTrainedBg:S.perfDraftTrained?'var(--lc-accent)':'var(--lc-line)', perfTrainedPos:S.perfDraftTrained?'22px':'2px', perfTrainedBgU:S.perfDraftTrained?perfAcc:(S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.16)':'rgba(91,26,26,0.16)'),
+          perfTrainedBg:S.perfDraftTrained?'var(--lc-accent)':'var(--lc-line)', perfTrainedPos:S.perfDraftTrained?'22px':'2px', perfTrainedBgU:S.perfDraftTrained?perfAcc:(S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.16)':'rgba(91,26,26,0.16)'),
           perfStars:stars, perfSubmitErrShow:!!S.perfSubmitErr, perfSubmitErrVal:S.perfSubmitErr||'', submitPerfLog:()=>this.submitPerfLog(),
           submitPerfCheckinFromModal:()=>this.submitPerfCheckinFromModal(),
           perfSubmitLabel:this._perfHasLoggedToday()?'Update today’s check-in':'Submit check-in',
@@ -20866,21 +20877,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true, perfGateStage:'ready'}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
-      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
-      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
+      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(15,24,19,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
+      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Maison Éverpine'?'#16211A':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
       // Performance Terminal check-in popup — per-Ultra-style tokens (Noir needs light ink on a
       // dark card, Maison needs its blue accent; these were previously hardcoded to Ultra X's
       // maroon/cream everywhere, so Noir rendered near-invisible dark-brown text on a dark card).
-      perfUAccent:S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A',
-      perfUAccentHover:S.prefs.ultraStyle==='Noir'?'#B7AFA2':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#4A1515',
-      perfUAccent50:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.5)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.5)':'rgba(91,26,26,0.5)',
-      perfUAccent35:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.35)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.35)':'rgba(91,26,26,0.35)',
-      perfUAccent30:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.3)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.3)':'rgba(91,26,26,0.3)',
-      perfUAccent14:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.14)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.14)':'rgba(91,26,26,0.14)',
-      perfUAccent03:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.03)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.03)':'rgba(91,26,26,0.03)',
-      perfUInk:S.prefs.ultraStyle==='Noir'?'#EDE7DD':S.prefs.ultraStyle==='Maison Élysée'?'#2E4560':'#3A2A20',
-      perfUMuted:S.prefs.ultraStyle==='Noir'?'#968F82':S.prefs.ultraStyle==='Maison Élysée'?'#6E82A0':'#8a6a5a',
-      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
+      perfUAccent:S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Éverpine'?'#E7D8A6':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A',
+      perfUAccentHover:S.prefs.ultraStyle==='Noir'?'#B7AFA2':S.prefs.ultraStyle==='Maison Éverpine'?'#D4C48F':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#4A1515',
+      perfUAccent50:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.5)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.5)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.5)':'rgba(91,26,26,0.5)',
+      perfUAccent35:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.35)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.35)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.35)':'rgba(91,26,26,0.35)',
+      perfUAccent30:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.3)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.3)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.3)':'rgba(91,26,26,0.3)',
+      perfUAccent14:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.14)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.14)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.14)':'rgba(91,26,26,0.14)',
+      perfUAccent03:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.03)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.03)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.03)':'rgba(91,26,26,0.03)',
+      perfUInk:S.prefs.ultraStyle==='Noir'?'#EDE7DD':S.prefs.ultraStyle==='Maison Éverpine'?'#F2F1E9':S.prefs.ultraStyle==='Maison Élysée'?'#2E4560':'#3A2A20',
+      perfUMuted:S.prefs.ultraStyle==='Noir'?'#968F82':S.prefs.ultraStyle==='Maison Éverpine'?'#8E9C92':S.prefs.ultraStyle==='Maison Élysée'?'#6E82A0':'#8a6a5a',
+      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Maison Éverpine'?'#0F1813':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
       toggleWhatsNewSigned:()=>this.setState(s=>({whatsNewSigned:!s.whatsNewSigned})),
       whatsNewCheckBd:S.whatsNewSigned?'#FFFFFF':'rgba(255,255,255,0.3)', whatsNewCheckBg:S.whatsNewSigned?'#FFFFFF':'transparent', whatsNewCheckMark:S.whatsNewSigned?'\u2713':'',
       whatsNewBtnCursor:S.whatsNewSigned?'pointer':'not-allowed', whatsNewBtnOpacity:S.whatsNewSigned?1:0.4, whatsNewBtnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)',
@@ -22438,9 +22449,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       logMove:()=>this.markMovedToday(false),
       logMoveLabel: movedToday?('Logged Today · '+moveStreakDisp+'d'):'Log Activity',
       logMoveIcon: movedToday?'\u2713':'\uFF0B',
-      logMoveBg: movedToday?'rgba(255,255,255,0.04)':(S.prefs.theme==='Ultra'?'#5B1A1A':'#FFFFFF'),
+      logMoveBg: movedToday?'rgba(255,255,255,0.04)':(S.prefs.theme==='Ultra'?'var(--lc-accent)':'#FFFFFF'),
       logMoveBd: movedToday?'rgba(255,255,255,0.12)':'transparent',
-      logMoveC: movedToday?'#8a8a92':(S.prefs.theme==='Ultra'?'#F5F1E8':'#0c0c0d'),
+      logMoveC: movedToday?'#8a8a92':(S.prefs.theme==='Ultra'?'var(--lc-on-accent)':'#0c0c0d'),
       logMoveCursor: movedToday?'default':'pointer',
       logMoveShadow: 'none',
       missDoneToday, missTotalToday, missRemainToday, missionList, missionHistoryList,
