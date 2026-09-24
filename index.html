@@ -9824,7 +9824,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-414 · v11.414 vanguard-palette-reset';
+const NOTIF_BUILD_VERSION = '2026.09.24-415 · v11.415 mobdrawer-raiment-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15059,6 +15059,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.415', date:'Sep 24, 2026', major:false, kind:'fix', notes:[
+      'Fixed the "All Pages" side drawer (and the hamburger icon that opens it): it was hardcoded to Ultra X\'s own cream-and-maroon regardless of which Ultra style was active, a bug that predates this round\'s palette work. Noir, Maison Élysée and Vanguard all now get their own drawer colours to match their own cards — Vanguard\'s is ivory with dark ink, matching every other card on the app.',
+    ]},
     {version:'v11.414', date:'Sep 24, 2026', major:true, kind:'design', notes:[
       'Vanguard resets to a new four-colour spec: Juicy Blackberries (a dark blue-grey) for the main app background, Ivory for every card surface, Bordeaux for buttons, and a new ornate display face on headings in place of Boska (its foundry font wasn\'t freely licensable, so this substitutes the closest available match). Card ink, muted text and accents were rebuilt for the new ivory surfaces, and button text is ivory-on-bordeaux instead of the old black-on-cream. Also fixed a tie in CSS specificity that let an older rule silently force some card headings back to the page\'s light colour, invisible on the new ivory cards.',
     ]},
@@ -21276,9 +21279,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // there was no logout path at all below the 900px breakpoint. Reuses the same
       // logout() the desktop button calls, just also closes the drawer first.
       mobLogout:()=>{ this.setState({mobDrawerOpen:false}); this.logout(); },
-      mobHamC:S.prefs.theme==='Ultra'?'#5B1A1A':'#eef0f2',
-      mobDrawerBg:S.prefs.theme==='Ultra'?'#F5F1E8':'#111214', mobDrawerBorder:S.prefs.theme==='Ultra'?'1px solid rgba(91,26,26,0.14)':'1px solid rgba(255,255,255,0.1)',
-      mobDrawerHeaderC:S.prefs.theme==='Ultra'?'#8a6a5a':'#7c7c84', mobDrawerLabelC:S.prefs.theme==='Ultra'?'#3A2A20':'#e0e0e4', mobDrawerIconC:S.prefs.theme==='Ultra'?'#5B1A1A':'#dcdce0',
+      // These used to be a blind theme==='Ultra' check, so every Ultra style (Noir, Maison,
+      // Vanguard) inherited Ultra X's own light cream/maroon regardless of its own card colour —
+      // invisible-ish on Noir's dark drawer, and a stray cream patch against Vanguard's ivory
+      // cards on a slate background. Branched per ultraStyle so each gets its own card treatment.
+      mobHamC:S.prefs.theme!=='Ultra'?'#eef0f2':(S.prefs.ultraStyle==='Vanguard'?'#EDEBE7':S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#5B1A1A'),
+      mobDrawerBg:S.prefs.theme!=='Ultra'?'#111214':(S.prefs.ultraStyle==='Vanguard'?'#EDEBE7':S.prefs.ultraStyle==='Noir'?'#1e1e1e':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'),
+      mobDrawerBorder:S.prefs.theme!=='Ultra'?'1px solid rgba(255,255,255,0.1)':(S.prefs.ultraStyle==='Vanguard'?'1px solid rgba(67,68,81,0.14)':S.prefs.ultraStyle==='Noir'?'1px solid rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'1px solid rgba(60,90,125,0.14)':'1px solid rgba(91,26,26,0.14)'),
+      mobDrawerHeaderC:S.prefs.theme!=='Ultra'?'#7c7c84':(S.prefs.ultraStyle==='Vanguard'?'#6E6E7A':S.prefs.ultraStyle==='Noir'?'#968F82':S.prefs.ultraStyle==='Maison Élysée'?'#6E82A0':'#8a6a5a'),
+      mobDrawerLabelC:S.prefs.theme!=='Ultra'?'#e0e0e4':(S.prefs.ultraStyle==='Vanguard'?'#434451':S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#2E4560':'#3A2A20'),
+      mobDrawerIconC:S.prefs.theme!=='Ultra'?'#dcdce0':(S.prefs.ultraStyle==='Vanguard'?'#420A07':S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A'),
       floatOrbOpacity: scene==='voice'?0:1, floatOrbDisplay: scene==='voice'?'none':'block',
       ...(()=>{ const exp=S.expenses||[]; const budgets=S.prefs.financeBudgets||{};
         const y=S.moneyCalY, m=S.moneyCalM;
