@@ -112,11 +112,11 @@
   /* ===== ULTRA THEME (AURA-inspired: ivory/stone, thin serif italic headings, glass panels, grain) ===== */
   /* The add button on a Forge exercise block takes its colour from the raiment rather than
      carrying one theme's hex, so it matches whichever of the four is on. Keyed off raiment-*
-     instead of theme-*: theme-everpine is only stamped on the home screen, so an Éverpine
+     instead of theme-*: theme-vanguard is only stamped on the home screen, so an Vanguard
      user on any other page would otherwise get the Ultra X oxblood. */
   /* The Forge's accent — the crest, the wordmark, the section tag, the lit sidebar rail, the
      priority label, a scheduled day, a logged block — follows the raiment rather than being
-     champagne everywhere. Éverpine keeps the champagne, because that is its own accent, and
+     champagne everywhere. Vanguard keeps the champagne, because that is its own accent, and
      the base themes keep it too since the page is dark under them. The add button's ADDED
      outline is the accent as well, so a block that is in your session matches the page. */
   /* The calendar is one size. It sat in a grid row with the day panel beside it, so grid
@@ -138,7 +138,7 @@
      background: a white dashed border and #c3c3ca text, which on an ivory card is very nearly
      nothing at all. Written out per raiment rather than derived, because the ink has to be
      readable against that raiment's own card and no single formula gets all four right —
-     Éverpine's champagne in particular is an accent for dark green, and everywhere a
+     Vanguard's pewter in particular is an accent for deep espresso, and everywhere a
      drop zone appears it is wearing the ivory card instead. */
   .cc-shell{ --quiet-ink:#c3c3ca; --quiet-line:rgba(255,255,255,0.2); --quiet-bg:rgba(255,255,255,0.02); --quiet-hover:rgba(255,255,255,0.4); }
   /* Reading ink, for pages that are mostly prose. The dark themes want body copy a step below
@@ -149,12 +149,12 @@
   .cc-shell.raiment-x{ --quiet-ink:#5B1A1A; --quiet-line:rgba(91,26,26,0.34); --quiet-bg:rgba(91,26,26,0.035); --quiet-hover:rgba(91,26,26,0.7); }
   .cc-shell.raiment-noir{ --quiet-ink:#C4BDB0; --quiet-line:rgba(196,189,176,0.3); --quiet-bg:rgba(196,189,176,0.035); --quiet-hover:rgba(196,189,176,0.62); }
   .cc-shell.raiment-maison{ --quiet-ink:#3C5A7D; --quiet-line:rgba(60,90,125,0.34); --quiet-bg:rgba(60,90,125,0.04); --quiet-hover:rgba(60,90,125,0.7); }
-  .cc-shell.raiment-everpine{ --quiet-ink:#7C6A38; --quiet-line:rgba(124,106,56,0.34); --quiet-bg:rgba(124,106,56,0.04); --quiet-hover:rgba(124,106,56,0.7); }
+  .cc-shell.raiment-vanguard{ --quiet-ink:#5A4632; --quiet-line:rgba(90,70,50,0.34); --quiet-bg:rgba(90,70,50,0.04); --quiet-hover:rgba(90,70,50,0.7); }
   .cc-shell{ --forge-accent:#E7D8A6; --forge-add-bg:#5B1A1A; --forge-add-ink:#F5F1E8; --forge-add-on:var(--forge-accent); }
   .cc-shell.raiment-x{ --forge-accent:#5B1A1A; }
   .cc-shell.raiment-noir{ --forge-accent:#FFFFFF; --forge-add-bg:#625B50; --forge-add-ink:#F2EFE9; }
   .cc-shell.raiment-maison{ --forge-accent:#3C5A7D; --forge-add-bg:#4E6E96; --forge-add-ink:#F6F0E4; }
-  .cc-shell.raiment-everpine{ --forge-accent:#E7D8A6; --forge-add-bg:#E7D8A6; --forge-add-ink:#16211A; }
+  .cc-shell.raiment-vanguard{ --forge-accent:#C7BFA8; --forge-add-bg:#C7BFA8; --forge-add-ink:#2A211B; }
   /* ===== THE GENTLEMEN'S CENTRE — one ruled chrome for every subpage =====
      The subpage row was eight loose chips on a wrapping flex line: on a phone it broke into a
      ragged two-three-three block whose shape changed with the active tab. It is one box now,
@@ -178,15 +178,15 @@
              --ab-accent:#FFFFFF; --ab-fill:#ECE8E0; --ab-on-fill:#0B0B0C; }
   /* The field stays white — that is the whole idea of it — but everything drawn ON the field
      is the raiment's own colour: every hairline, every filled pill, the clock as it descends.
-     Ultra X is oxblood, Maison Élysée its blue, Éverpine its gold, Noir white, which it
+     Ultra X is oxblood, Maison Élysée its blue, Vanguard its bronze, Noir white, which it
      already was. Those are the same hexes --quiet-ink uses rather than --forge-accent, because
-     these lines land on an ivory ground and Éverpine's champagne is invisible there. */
+     these lines land on an ivory ground and Vanguard's pewter is invisible there. */
   .cc-shell.raiment-x{ --ab-accent:#5B1A1A; --ab-line:rgba(91,26,26,0.32);
              --ab-fill:#5B1A1A; --ab-on-fill:#FCFCFB; }
   .cc-shell.raiment-maison{ --ab-accent:#3C5A7D; --ab-line:rgba(60,90,125,0.34);
              --ab-fill:#3C5A7D; --ab-on-fill:#F6F0E4; }
-  .cc-shell.raiment-everpine{ --ab-accent:#7C6A38; --ab-line:rgba(124,106,56,0.34);
-             --ab-fill:#7C6A38; --ab-on-fill:#FCFCFB; }
+  .cc-shell.raiment-vanguard{ --ab-accent:#5A4632; --ab-line:rgba(90,70,50,0.34);
+             --ab-fill:#5A4632; --ab-on-fill:#FCFCFB; }
   /* The ground: a wide pale field, then the horizon \u2014 a vast sphere's edge just below the
      frame, lit from behind. Two gradients rather than an image, so it is sharp at any size. */
   .rest-abyss{ position:absolute; inset:0; pointer-events:none;
@@ -220,7 +220,7 @@
      raiment instead of a flat fill — the per-raiment values below are light where the
      raiment's ground is light, which is what keeps the rewritten ink readable on it. */
   /* The ground comes from the tokens the page is already wearing rather than from a second
-     per-raiment table. Keying it off raiment-* looked right and was wrong: Éverpine's
+     per-raiment table. Keying it off raiment-* looked right and was wrong: Vanguard's
      dark-green card is the home scene only — everywhere else, the calendar included, it is
      wearing the ivory one, so a card painted dark green from the raiment name came out with
      the page's dark ink on a dark ground and the month vanished.
@@ -248,13 +248,13 @@
      accent that sits ON that card is a different question: a plain neutral ink here read as
      the raiment having no personality at all, so it goes back to naming the raiment the way
      it always has elsewhere in the app (the Forge wordmark, Learning Center's Maths hub,
-     Home's own hero) — Ultra X's oxblood, Maison's blue, Éverpine's olive-gold. Noir's own
+     Home's own hero) — Ultra X's oxblood, Maison's blue, Vanguard's dark bronze. Noir's own
      accent (a pale taupe) was tuned for its old dark card and reads as almost nothing on the
      cream one every raiment now shares, so it gets a dark, warm gold instead — the same
      family Noir already wears as a gradient partner in Settings' profile chip. */
   .cc-shell.raiment-x{ --lc-accent:#5B1A1A; }
   .cc-shell.raiment-maison{ --lc-accent:#3C5A7D; }
-  .cc-shell.raiment-everpine{ --lc-accent:#7C6A38; }
+  .cc-shell.raiment-vanguard{ --lc-accent:#5A4632; }
   .cc-shell.raiment-noir{ --lc-accent:#8a6a2a; }
 
   /* Ultra X's original card: a flat bordered pane rather than a glass edge catching light —
@@ -739,10 +739,10 @@
       linear-gradient(168deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.16) 100%),
       #1E1E1E !important; }
   /* ===== MAISON ÉLYSÉE (quiet luxury: cornflower blue on cream, didone display) ===== */
-  /* Maison Éverpine — the second dark style: a deep forest ground, cream ink and a
-     champagne accent, taken from the house card. Scoped to the home screen for now by
-     themeClass, so the rest of the app stays Ultra X until the look is approved. */
-  .theme-ultra.theme-everpine{ --u-bg:#16211A; --u-card:rgba(30,44,36,0.86); --u-ink:#F2F1E9; --u-muted:#8E9C92; --u-line:rgba(142,156,146,0.26); --u-accent:#E7D8A6; --e-deep:#0F1813; --e-moss:#243228; --e-champagne:#E7D8A6; }
+  /* Vanguard — the second dark style: a deep espresso ground, ivory ink and a
+     pewter-foil accent, taken from an embossed house crest. Scoped to the home screen for now
+     by themeClass, so the rest of the app stays Ultra X until the look is approved. */
+  .theme-ultra.theme-vanguard{ --u-bg:#2A211B; --u-card:rgba(58,46,34,0.86); --u-ink:#EFE7D8; --u-muted:#948A7A; --u-line:rgba(199,191,168,0.22); --u-accent:#C7BFA8; --v-deep:#211911; --v-mid:#3D3129; --v-pewter:#C7BFA8; }
   .theme-ultra.theme-maison{ --u-bg:#F2ECE0; --u-card:#FBF7EF; --u-ink:#2E4560; --u-muted:#6E82A0; --u-line:rgba(60,90,125,0.18); --u-accent:#3C5A7D; --m-blue:#8FAAC9; --m-deep:#4E6E96; --m-cream:#F6F0E4; }
   .theme-ultra.theme-maison, .theme-ultra.theme-maison .cc-scene, .theme-ultra.theme-maison .cc-top, .theme-ultra.theme-maison .cc-side{ background-color:var(--u-bg) !important; background-image:none !important; }
   .theme-ultra.theme-maison .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-radius:14px !important; box-shadow:0 1px 0 rgba(255,255,255,0.75) inset, 0 10px 28px rgba(60,90,125,0.07) !important; }
@@ -777,9 +777,9 @@
   .theme-ultra.theme-maison .cc-home-hero h1, .theme-ultra.theme-maison .cc-home-hero h1.cc-home-greeting{ color:#FDFAF4 !important; }
   /* Same reason as the line above: `.theme-ultra h1,h2,h3` sets colour to var(--u-accent)
      with !important, so the inline cream on the greeting loses. On the house card the big
-     script is cream and only the diamond is champagne — champagne stays on the frame and the
-     ornament, the greeting is cream. */
-  .theme-ultra.theme-everpine .cc-home-hero h1, .theme-ultra.theme-everpine .cc-home-hero h1.cc-home-greeting{ color:#F2F1E9 !important; }
+     script is ivory and only the diamond is pewter — pewter stays on the frame and the
+     ornament, the greeting is ivory. */
+  .theme-ultra.theme-vanguard .cc-home-hero h1, .theme-ultra.theme-vanguard .cc-home-hero h1.cc-home-greeting{ color:#EFE7D8 !important; }
   .theme-ultra.theme-maison .cc-home-hero p, .theme-ultra.theme-maison .cc-home-hero span{ color:#FDFAF4 !important; }
   .theme-ultra.theme-maison .cc-home-hero [style*="JetBrains Mono"]{ color:rgba(253,250,244,0.78) !important; }
   .theme-ultra.theme-maison [data-icon]{ color:var(--m-deep) !important; }
@@ -2277,9 +2277,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
-        <sc-if value="{{ isUltraEverpine }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute; inset:18px; border:1px solid rgba(231,216,166,0.55); border-radius:14px; pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; inset:26px; border:1px solid rgba(231,216,166,0.22); border-radius:10px; pointer-events:none; z-index:1;"></div>
+        <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:18px; border:1px solid rgba(199,191,168,0.55); border-radius:14px; pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; inset:26px; border:1px solid rgba(199,191,168,0.22); border-radius:10px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -2322,17 +2322,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#968F82; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
           </sc-if>
-          <sc-if value="{{ isUltraEverpine }}" hint-placeholder-val="{{ false }}">
-            <div class="cc-home-logo" style="border-color:rgba(231,216,166,0.5);"><img src="favicon.png" alt="Nervexus"></div>
-            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#F2F1E9;">{{ homeWordmark }}</p>
-            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#F2F1E9; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
+          <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
+            <div class="cc-home-logo" style="border-color:rgba(199,191,168,0.5);"><img src="favicon.png" alt="Nervexus"></div>
+            <p class="cc-home-wordmark" style="font-family:'Pinyon Script',cursive; font-size:30px; color:#EFE7D8;">{{ homeWordmark }}</p>
+            <h1 class="cc-home-greeting" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:{{ homeGreetingSize }}; letter-spacing:0; line-height:1.15; color:#EFE7D8; margin:0; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ homeGreeting }}</h1>
             <div style="margin:56px 0 12px;">
               <svg width="360" height="26" viewBox="0 0 600 28" style="display:block;">
-                <g fill="none" stroke="#E7D8A6" stroke-width="1.5" stroke-linecap="round">
+                <g fill="none" stroke="#C7BFA8" stroke-width="1.5" stroke-linecap="round">
                   <line x1="10" y1="14" x2="235" y2="14"/>
                   <line x1="365" y1="14" x2="590" y2="14"/>
                 </g>
-                <g fill="#E7D8A6">
+                <g fill="#C7BFA8">
                   <circle cx="10" cy="14" r="2.2"/>
                   <circle cx="590" cy="14" r="2.2"/>
                   <circle cx="248" cy="14" r="1.6"/>
@@ -2340,15 +2340,15 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <circle cx="342" cy="14" r="1.6"/>
                   <circle cx="352" cy="14" r="1.6"/>
                 </g>
-                <g fill="none" stroke="#E7D8A6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <g fill="none" stroke="#C7BFA8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M270,14 C280,4 292,4 296,10 C300,16 292,20 286,16 C282,13 284,9 288,9"/>
                   <path d="M330,14 C320,4 308,4 304,10 C300,16 308,20 314,16 C318,13 316,9 312,9"/>
                 </g>
-                <rect x="296" y="2" width="8" height="8" fill="#E7D8A6" transform="rotate(45 300 6)"/>
+                <rect x="296" y="2" width="8" height="8" fill="#C7BFA8" transform="rotate(45 300 6)"/>
               </svg>
             </div>
-            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#8E9C92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#E7D8A6; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#E7D8A6' }">{{ powerOnLabel }}</span>
+            <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#948A7A; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(199,191,168,0.45); color:#C7BFA8; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(199,191,168,0.12)', borderColor:'#C7BFA8' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
             <div class="cc-home-logo" style="border-color:rgba(246,240,228,0.8);"><img src="favicon.png" alt="Nervexus"></div>
@@ -3764,7 +3764,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
              exist, so they are gone with them. The crest and the wordmark stay: they name the
              page, and without them the three cleared centres are four tabs on a blank screen. -->
         <div style="display:flex; align-items:center; gap:15px; min-width:0; margin-bottom:18px;">
-          <!-- the house crest: Éverpine's double rule around its own lozenge -->
+          <!-- the house crest: Vanguard's double rule around its own lozenge -->
           <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
             <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
             <span style="width:27px; height:27px; color:var(--forge-accent); display:flex; position:relative;" data-icon="forge"></span>
@@ -9711,7 +9711,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-400 · v11.400 everpine-theme-fixes';
+const NOTIF_BUILD_VERSION = '2026.09.24-401 · v11.401 vanguard-rename-recolor';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9900,7 +9900,7 @@ activities: this._mergeShipLog(s.activities),
       musicPlaying:false, musicInputUrl:'', musicAddErr:'', musicAddLoading:false, musicVolume: s.musicVolume!=null?s.musicVolume:80, musicReady:false, musicProgressPct:0,
       customQuotes: s.customQuotes || [],
       quoteDraft: '', openQuoteId:null,
-      prefs: {...this._defaultPrefs(), ...(s.prefs||{})},
+      prefs: (()=>{ const p={...this._defaultPrefs(), ...(s.prefs||{})}; if(p.ultraStyle==='Maison Éverpine') p.ultraStyle='Vanguard'; return p; })(),
       users: s.users || [ {name:'Maddox Harvey',email:'maddoxsharvey@icloud.com',role:'Owner',status:'active'} ],
     };
     this.loops=[];
@@ -13273,38 +13273,38 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // Voice Assistant screen's per-theme palette. dark=true keeps the original black look
   // (base theme + Spline background, and Noir); Ultra X and Maison Élysée get their own
   // light card/ink/accent set instead of inheriting a black screen that doesn't match them.
-  // Éverpine used to fall through to that light Ultra X set too — the one raiment whose Home
-  // screen is a dark moss-green field getting flipped to a cream-and-maroon screen the moment
-  // it left Home, a jarring switch nothing else in the app does. It sits in the dark bucket
-  // now, alongside Noir, with its own champagne-and-moss identity rather than Noir's black
-  // and taupe or the light cream card.
+  // Vanguard used to fall through to that light Ultra X set too — the one raiment whose Home
+  // screen is a dark espresso-brown field getting flipped to a cream-and-maroon screen the
+  // moment it left Home, a jarring switch nothing else in the app does. It sits in the dark
+  // bucket now, alongside Noir, with its own espresso-and-pewter identity rather than Noir's
+  // black and taupe or the light cream card.
   _voiceTokens(){
     const P=this.state.prefs||{}; const isUltra=P.theme==='Ultra'; const isMaison=P.ultraStyle==='Maison Élysée';
-    const isEverpine=P.ultraStyle==='Maison Éverpine';
-    const dark=!isUltra||P.ultraStyle==='Noir'||isEverpine;
-    const accent=dark?(isEverpine?'#E7D8A6':'#FFFFFF'):(isMaison?'#4E6E96':'#5B1A1A');
+    const isVanguard=P.ultraStyle==='Vanguard';
+    const dark=!isUltra||P.ultraStyle==='Noir'||isVanguard;
+    const accent=dark?(isVanguard?'#C7BFA8':'#FFFFFF'):(isMaison?'#4E6E96':'#5B1A1A');
     return {
       vDark:dark,
       vLight:!dark,
-      vOverlay:dark?(isEverpine?'#0F1813':'#000'):'transparent',
-      vGlow:dark?(isEverpine?'radial-gradient(circle at 50% 40%, rgba(231,216,166,0.10) 0%, rgba(15,24,19,0.55) 60%, rgba(15,24,19,0.78) 100%)':'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)'):('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
-      vCard:dark?(isEverpine?'#16211A':'#141416'):(isMaison?'#FBF7EF':'#F5F1E8'),
-      vInk:dark?(isEverpine?'#F2F1E9':'#eef0f2'):(isMaison?'#2E4560':'#3A2A20'),
-      vInk2:dark?(isEverpine?'#D9CFA8':'#c8c8ce'):(isMaison?'#3C5A7D':'#5A473C'),
-      vMuted:dark?(isEverpine?'#8E9C92':'#8a8a92'):(isMaison?'#6E82A0':'#8a6a5a'),
-      vMuted2:dark?(isEverpine?'#7C8A80':'#7c7c84'):(isMaison?'#7f93AE':'#9c8674'),
-      vMuted3:dark?(isEverpine?'#6B786F':'#6f6f78'):(isMaison?'#8fa2ba':'#a8927e'),
+      vOverlay:dark?(isVanguard?'#211911':'#000'):'transparent',
+      vGlow:dark?(isVanguard?'radial-gradient(circle at 50% 40%, rgba(199,191,168,0.10) 0%, rgba(26,20,14,0.55) 60%, rgba(26,20,14,0.78) 100%)':'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)'):('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
+      vCard:dark?(isVanguard?'#2A211B':'#141416'):(isMaison?'#FBF7EF':'#F5F1E8'),
+      vInk:dark?(isVanguard?'#EFE7D8':'#eef0f2'):(isMaison?'#2E4560':'#3A2A20'),
+      vInk2:dark?(isVanguard?'#D6CDBB':'#c8c8ce'):(isMaison?'#3C5A7D':'#5A473C'),
+      vMuted:dark?(isVanguard?'#948A7A':'#8a8a92'):(isMaison?'#6E82A0':'#8a6a5a'),
+      vMuted2:dark?(isVanguard?'#8A8071':'#7c7c84'):(isMaison?'#7f93AE':'#9c8674'),
+      vMuted3:dark?(isVanguard?'#766C5D':'#6f6f78'):(isMaison?'#8fa2ba':'#a8927e'),
       vAccent:accent,
-      vLine:dark?(isEverpine?'rgba(231,216,166,0.16)':'rgba(255,255,255,0.1)'):(isMaison?'rgba(60,90,125,0.18)':'rgba(91,26,26,0.18)'),
-      vLine2:dark?(isEverpine?'rgba(231,216,166,0.24)':'rgba(255,255,255,0.14)'):(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
-      vLine3:dark?(isEverpine?'rgba(231,216,166,0.08)':'rgba(255,255,255,0.06)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
-      vInputBg:dark?(isEverpine?'rgba(231,216,166,0.05)':'rgba(255,255,255,0.03)'):(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
-      vBubbleAI:dark?(isEverpine?'#243228':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
-      vBubbleYou:dark?(isEverpine?'rgba(231,216,166,0.08)':'rgba(255,255,255,0.05)'):(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
-      vTrack:dark?(isEverpine?'rgba(231,216,166,0.12)':'rgba(255,255,255,0.08)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
-      vBtnBg:dark?(isEverpine?accent:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)'):accent,
-      vBtnText:dark?(isEverpine?'#16211A':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
-      vBtnShadow:dark?(isEverpine?'0 2px 6px rgba(0,0,0,0.35)':'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)'):'none',
+      vLine:dark?(isVanguard?'rgba(199,191,168,0.16)':'rgba(255,255,255,0.1)'):(isMaison?'rgba(60,90,125,0.18)':'rgba(91,26,26,0.18)'),
+      vLine2:dark?(isVanguard?'rgba(199,191,168,0.24)':'rgba(255,255,255,0.14)'):(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
+      vLine3:dark?(isVanguard?'rgba(199,191,168,0.08)':'rgba(255,255,255,0.06)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
+      vInputBg:dark?(isVanguard?'rgba(199,191,168,0.05)':'rgba(255,255,255,0.03)'):(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
+      vBubbleAI:dark?(isVanguard?'#3D3129':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
+      vBubbleYou:dark?(isVanguard?'rgba(199,191,168,0.08)':'rgba(255,255,255,0.05)'):(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
+      vTrack:dark?(isVanguard?'rgba(199,191,168,0.12)':'rgba(255,255,255,0.08)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
+      vBtnBg:dark?(isVanguard?accent:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)'):accent,
+      vBtnText:dark?(isVanguard?'#211911':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
+      vBtnShadow:dark?(isVanguard?'0 2px 6px rgba(0,0,0,0.35)':'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)'):'none',
     };
   }
   _sbBoot(){
@@ -13751,8 +13751,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   _shade(hex,amt){ const c=this._rgb(hex); if(!c) return hex;
     const f=(v)=>Math.max(0,Math.min(255,Math.round(amt>=0 ? v+(255-v)*amt : v*(1+amt))));
     return '#'+c.map(v=>f(v).toString(16).padStart(2,'0')).join(''); }
-  // Is the surface under the calendar a pale one? Ultra is, except Noir. Éverpine's dark
-  // green is the home scene only, so everywhere a calendar lives it is wearing the ivory card.
+  // Is the surface under the calendar a pale one? Ultra is, except Noir. Vanguard's dark
+  // espresso is the home scene only, so everywhere a calendar lives it is wearing the ivory card.
   _lightSurface(){ const P=this.state.prefs||{}; return P.theme==='Ultra' && P.ultraStyle!=='Noir'; }
   /* How well a colour will show, which is not the same as how bright it is. Luminance
      underweights red badly — a deep red reads perfectly well on a dark card while scoring
@@ -14020,9 +14020,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
        white lead colour needs the same pale backing Ultra X and Maison Élysée already get. */
     if(P.ultraStyle==='Noir')            return {cols:['#FFFFFF','#C9A24A','#8B8578'], light:true};
     if(P.ultraStyle==='Maison Élysée')   return {cols:['#4E6E96','#1E2F4A','#FFFFFF'], light:true};
-    /* Éverpine's dark-green card is the home scene only — everywhere a ring set lives it is
-       wearing the ivory card, so its champagne needs the same backing Ultra X's white does. */
-    if(P.ultraStyle==='Maison Éverpine') return {cols:['#E7D8A6','#C2A76A','#7E9080'], light:true};
+    /* Vanguard's deep-espresso card is the home scene only — everywhere a ring set lives it is
+       wearing the ivory card, so its pewter needs the same backing Ultra X's white does. */
+    if(P.ultraStyle==='Vanguard') return {cols:['#C7BFA8','#A99878','#7A6F5E'], light:true};
     return {cols:['#8E1F1F','#FFFFFF','#1C1917'], light:true};        // Ultra X
   }
   _ringPale(hex){ const h=String(hex||'').replace('#',''); if(h.length!==6) return false;
@@ -14573,7 +14573,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          recognisable, but it read as clip-art beside an ornament. Three solid shapes and a
          line survive 19px; the hat's brim did not. */
       gentlemen:'<path d="M8.1 5.4 L2.6 3.2 v8.4 L8.1 9.4 Z" fill="currentColor" stroke="none"/><path d="M9.9 5.4 L15.4 3.2 v8.4 L9.9 9.4 Z" fill="currentColor" stroke="none"/><rect x="7.5" y="5.2" width="3" height="4.4" rx="0.9" fill="currentColor" stroke="none"/><path d="M3.3 15.2h11.4"/><circle cx="3.3" cy="15.2" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.2" r="0.75" fill="currentColor" stroke="none"/>',
-      /* The Forge wears Maison Éverpine's mark: the champagne lozenge inside its own
+      /* The Forge wears Vanguard's mark: the pewter lozenge inside its own
          outline, struck onto a ruled base with the paired end-dots from the house
          divider. Everything else on this page is drawn at 19px, so the ornament had to
          survive that size — the anvil and the double-frame versions did not. */
@@ -14704,7 +14704,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   /* The Level ring used to be handed a flat '#FFFFFF' regardless of raiment — the same
      hard-coded-white bug the Forge/Health rings had before RING_PALETTE() existed to fix it.
      This reads the same palette they do, including the pale-ring backing a light raiment's
-     card needs (Éverpine's champagne is invisible without it), instead of repeating the bug
+     card needs (Vanguard's pewter is invisible without it), instead of repeating the bug
      for a ring that palette was never wired up to. */
   startRingOnly(cv,val){
     const pal=this.RING_PALETTE(); const isU=this.state.prefs.theme==='Ultra'; const isNoir=isU&&this.state.prefs.ultraStyle==='Noir';
@@ -14945,8 +14945,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.401', date:'Sep 24, 2026', major:true, kind:'design', notes:[
+      'Maison Éverpine is renamed Vanguard and recoloured from scratch, from an embossed house-crest reference: a deep espresso ground in place of the dark forest green, and a warm pewter-silver foil in place of the champagne-gold. Every place that wears the raiment — Home, the Profile card, Performance Terminal, What’s New, the Forge, Brain Rest, the sidebar and voice orb — carries the new palette; nothing about the layout changed, only the two colours underneath it.',
+    ]},
     {version:'v11.400', date:'Sep 24, 2026', major:false, kind:'design', notes:[
-      'Maison Éverpine was falling back to Ultra X’s oxblood in several places that never learned about the fourth raiment — the Dashboard’s Log Activity button, the Profile card, the Performance Terminal’s check-in popups, the What’s New card, and the sidebar/voice orb. All five now render in Éverpine’s own champagne-on-moss palette instead.',
+      'Vanguard was falling back to Ultra X’s oxblood in several places that never learned about the fourth raiment — the Dashboard’s Log Activity button, the Profile card, the Performance Terminal’s check-in popups, the What’s New card, and the sidebar/voice orb. All five now render in the raiment’s own palette instead.',
     ]},
     {version:'v11.399', date:'Sep 24, 2026', major:true, kind:'design', goTo:'settings', notes:[
       'The Settings password gate is redesigned from a reference: a small ring of dots turning slowly above the title, a full pill-shaped password field with a SHOW/HIDE toggle, and one large primary Unlock button rather than a side-by-side pair, with Cancel demoted to a small text link underneath. Every colour still comes from the active raiment.',
@@ -15095,7 +15098,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       'The Forge drops its white card for Noir specifically. A light block read as a mismatch against Noir’s own dark chrome everywhere else the raiment shows up. Calendar, Power Level, Settings and Gentlemen keep the shared white card exactly as before; this is Forge-only.',
     ]},
     {version:'v11.352', date:'Sep 19, 2026', major:true, notes:[
-      'The Forge, Gentlemen’s Etiquette, Calendar, Power Level, and Settings had their colour back. The card material stays last week’s flat cream and white, but the accent on top, main buttons, the day you’re on, progress fills, key labels, is the raiment’s own again: Ultra X’s oxblood, Maison Élysée’s blue, Éverpine’s olive-gold, and Noir a dark gold in place of its old pale taupe, which read as nearly nothing once its card went light too. Gentlemen’s Etiquette specifically goes back to wearing Ultra X’s oxblood on its buttons and dividers regardless of raiment, matching how it always used to look.',
+      'The Forge, Gentlemen’s Etiquette, Calendar, Power Level, and Settings had their colour back. The card material stays last week’s flat cream and white, but the accent on top, main buttons, the day you’re on, progress fills, key labels, is the raiment’s own again: Ultra X’s oxblood, Maison Élysée’s blue, Vanguard’s olive-gold, and Noir a dark gold in place of its old pale taupe, which read as nearly nothing once its card went light too. Gentlemen’s Etiquette specifically goes back to wearing Ultra X’s oxblood on its buttons and dividers regardless of raiment, matching how it always used to look.',
     ]},
     {version:'v11.351', date:'Sep 19, 2026', major:true, notes:[
       'The theme-switch veil now has a proper look, house crest, wordmark, and a slow ten-second progress sweep, instead of just a line of text on a plain backdrop, and the hold itself is smoother: the sweep runs on the compositor so it can’t stutter against the rotating message underneath.',
@@ -15280,7 +15283,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     ]},
     {version:'v11.285', date:'Sep 7, 2026', major:false, notes:[
       'The MOVE rings were boxed in. They were drawn hard against the edge of their canvas while glowing outward, so the glow was cut off square on all four sides, the whole thing looked trapped in an invisible box. The rings now leave room for their own glow, and the set is drawn larger and sharper.',
-      'Each raiment wears its own three ring colours: red, white and black on Ultra X; white, gold and grey on Noir; blue, navy and white on Maison Élysée; champagne, gold and sage on Éverpine. Everything that was not Noir used to share one palette, which is how Maison ended up wearing Ultra X\u2019s oxblood.',
+      'Each raiment wears its own three ring colours: red, white and black on Ultra X; white, gold and grey on Noir; blue, navy and white on Maison Élysée; champagne, gold and sage on Vanguard. Everything that was not Noir used to share one palette, which is how Maison ended up wearing Ultra X\u2019s oxblood.',
       'A white ring on an ivory card was invisible, so a pale ring now gets a hairline of the card\u2019s own ink under it rather than being quietly darkened into a colour nobody asked for.',
       'Switching raiment repaints the rings. Every chart picks its colours when it is drawn, and the check that decides whether to redraw never looked at the raiment, so the rings kept the colours of whichever one you had on before.',
       'The third ring was the number 0.9, written into the page. It sat at 90% on an account that had never logged a workout. It is the week against a weekly target now, like the row it sits beside.',
@@ -15342,7 +15345,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       'Carries and sled pulls are in metres, holds and intervals in seconds, rope climbs in climbs. Each one is converted on the way into your log rather than dropped into the nearest field, metres become a distance, seconds become minutes, a climb is a rep.',
     ]},
     {version:'v11.273', date:'Sep 6, 2026', major:true, notes:[
-      'The Forge\u2019s accent follows your raiment instead of being champagne on all of them: red on Ultra X, white on Noir, blue on Maison Élysée. Éverpine keeps the champagne, since that is its own accent, and so do the base themes because the page is dark under them.',
+      'The Forge\u2019s accent follows your raiment instead of being champagne on all of them: red on Ultra X, white on Noir, blue on Maison Élysée. Vanguard keeps the champagne, since that is its own accent, and so do the base themes because the page is dark under them.',
       'That is the crest, the wordmark, the section tag, the lit rail on the section list, the training priority label, a scheduled day on the week, and the outline on a block already in your session, all one colour, so they move together.',
     ]},
     {version:'v11.272', date:'Sep 6, 2026', major:true, notes:[
@@ -15382,7 +15385,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     ]},
     {version:'v11.264', date:'Sep 6, 2026', major:true, notes:[
       'The exercise blocks, the number fields and the add button are curved again.',
-      'The add button now takes its colour from whichever raiment you are wearing, oxblood on Ultra X, warm grey on Noir, blue on Maison Élysée, champagne on Maison Éverpine, instead of carrying one theme\u2019s colour everywhere.',
+      'The add button now takes its colour from whichever raiment you are wearing, oxblood on Ultra X, warm grey on Noir, blue on Maison Élysée, champagne on Vanguard, instead of carrying one theme\u2019s colour everywhere.',
     ]},
     {version:'v11.263', date:'Sep 6, 2026', major:true, notes:[
       'Chest is now the fighter/wrestler session: twelve exercises in priority order, strength, then explosiveness, then unilateral stability, then endurance, with real ranges rather than one fixed number. The block starts at the bottom of the range; the top is what you work up to.',
@@ -16007,10 +16010,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       'Removed dead code found in a full audit: an old land-mask/world-map subsystem superseded by the real globe, a duplicate black-hole shader canvas no longer used (the live one is an iframe), a half-built mute-topic voice command that was never wired up, an old voice-picker replaced by the current one, and roughly 45 leftover settings/UI bindings from earlier iterations of Notifications, Push, Account Requests, and a few other screens. No visible change. This only removes code nothing in the app was calling.',
     ]},
     {version:'v11.50', date:'Aug 20, 2026', major:true, notes:[
-      'Added a raiment switcher to the top bar, on every screen except Settings, four small glyphs (◆ Ultra X, ☾ Noir, ❦ Maison Élysée, ❖ Maison Éverpine) let you jump straight into any Ultra style from anywhere, no need to go into Settings → Appearance first. The active one is highlighted; clicking any of them switches your theme to Ultra with that style immediately.',
+      'Added a raiment switcher to the top bar, on every screen except Settings, four small glyphs (◆ Ultra X, ☾ Noir, ❦ Maison Élysée, ❖ Vanguard) let you jump straight into any Ultra style from anywhere, no need to go into Settings → Appearance first. The active one is highlighted; clicking any of them switches your theme to Ultra with that style immediately.',
     ]},
     {version:'v11.49', date:'Aug 20, 2026', major:true, notes:[
-      'Added a fourth Ultra style: "Maison Éverpine", to Settings → Appearance → Ultra Style. Like Maison Élysée at launch, it currently renders identically to Ultra X (its own look is coming in a later update); the chip and preference plumbing are in place so it can be styled independently going forward.',
+      'Added a fourth Ultra style: "Vanguard", to Settings → Appearance → Ultra Style. Like Maison Élysée at launch, it currently renders identically to Ultra X (its own look is coming in a later update); the chip and preference plumbing are in place so it can be styled independently going forward.',
       'Settings → Appearance now has a clear divider between the Background (Spline and friends) section and the Ultra Style picker, so the two are visually separated instead of running straight into each other.',
     ]},
     {version:'v11.48', date:'Aug 20, 2026', major:false, notes:[
@@ -19777,7 +19780,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!isUltra) return {c1:[0.910,0.910,0.925], c2:[0.541,0.541,0.573], c3:[0.149,0.149,0.165], glow:'rgba(200,200,210,0.5)'};
     if(P.ultraStyle==='Noir') return {c1:[0.788,0.635,0.290], c2:[0.541,0.416,0.165], c3:[0.227,0.165,0.063], glow:'rgba(201,162,74,0.5)'};
     if(P.ultraStyle==='Maison Élysée') return {c1:[0.306,0.431,0.588], c2:[0.235,0.353,0.490], c3:[0.102,0.145,0.188], glow:'rgba(78,110,150,0.5)'};
-    if(P.ultraStyle==='Maison Éverpine') return {c1:[0.906,0.847,0.651], c2:[0.761,0.655,0.416], c3:[0.290,0.235,0.122], glow:'rgba(231,216,166,0.5)'};
+    if(P.ultraStyle==='Vanguard') return {c1:[0.780,0.749,0.659], c2:[0.663,0.596,0.471], c3:[0.290,0.231,0.173], glow:'rgba(199,191,168,0.5)'};
     return {c1:[0.62,0.14,0.14], c2:[0.42,0.07,0.07], c3:[0.18,0.03,0.03], glow:'rgba(91,26,26,0.5)'};
   }
   // The floating launcher in the bottom-right corner. Uses the void orb so no page still
@@ -20113,16 +20116,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
-      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'linear-gradient(135deg,#243228 0%,#0F1813 55%,#243228 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
-      profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'rgba(231,216,166,0.22)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
-      profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Maison Éverpine') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
-      profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'radial-gradient(circle, rgba(231,216,166,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
-      profChipBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#8a8a92,#c8c8ce)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#C9A24A,#8a6a2a)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'linear-gradient(135deg,#E7D8A6,#C2A76A)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#4E6E96,#6E86A8)' : 'linear-gradient(135deg,#5B1A1A,#7A2626)',
-      profMuted: S.prefs.theme!=='Ultra' ? '#7c7c84' : S.prefs.ultraStyle==='Noir' ? '#968F82' : S.prefs.ultraStyle==='Maison Éverpine' ? '#8E9C92' : S.prefs.ultraStyle==='Maison Élysée' ? '#6E82A0' : '#6E5B4E',
-      profAccent: S.prefs.theme!=='Ultra' ? '#FFFFFF' : S.prefs.ultraStyle==='Noir' ? '#C9A24A' : S.prefs.ultraStyle==='Maison Éverpine' ? '#E7D8A6' : S.prefs.ultraStyle==='Maison Élysée' ? '#4E6E96' : '#5B1A1A',
-      profTrack: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.14)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'rgba(231,216,166,0.14)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.1)' : 'rgba(58,42,32,0.1)',
-      profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Maison Éverpine' ? '#F2F1E9' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
-      profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Maison Éverpine' ? 'rgba(231,216,166,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
+      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#3D3129 0%,#211911 55%,#3D3129 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
+      profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(199,191,168,0.22)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
+      profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Vanguard') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
+      profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Vanguard' ? 'radial-gradient(circle, rgba(199,191,168,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
+      profChipBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#8a8a92,#c8c8ce)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#C9A24A,#8a6a2a)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#C7BFA8,#A99878)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#4E6E96,#6E86A8)' : 'linear-gradient(135deg,#5B1A1A,#7A2626)',
+      profMuted: S.prefs.theme!=='Ultra' ? '#7c7c84' : S.prefs.ultraStyle==='Noir' ? '#968F82' : S.prefs.ultraStyle==='Vanguard' ? '#948A7A' : S.prefs.ultraStyle==='Maison Élysée' ? '#6E82A0' : '#6E5B4E',
+      profAccent: S.prefs.theme!=='Ultra' ? '#FFFFFF' : S.prefs.ultraStyle==='Noir' ? '#C9A24A' : S.prefs.ultraStyle==='Vanguard' ? '#C7BFA8' : S.prefs.ultraStyle==='Maison Élysée' ? '#4E6E96' : '#5B1A1A',
+      profTrack: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.08)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.14)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(199,191,168,0.14)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.1)' : 'rgba(58,42,32,0.1)',
+      profInk: S.prefs.theme!=='Ultra' ? '#eef0f2' : S.prefs.ultraStyle==='Noir' ? '#F5F1E8' : S.prefs.ultraStyle==='Vanguard' ? '#EFE7D8' : S.prefs.ultraStyle==='Maison Élysée' ? '#2E4560' : '#3A2A20',
+      profDivider: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.14)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(199,191,168,0.25)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(78,110,150,0.25)' : 'rgba(91,26,26,0.25)',
       powerLevel:P.level, rankName:P.rank.n, rankDesc:P.rank.d, powerPct:P.pct+'%', xpIn:P.xpInLevel, xpNext:P.xpForNext, nextRankName:P.next?P.next.n:'MAX RANK', nextRankLevel:P.next?P.next.min:'—',
       /* The learning streak moved here off the Learning Centre's stats bar. It is the same
          real figure it always was — consecutive days with a logged Learning activity — and
@@ -20573,8 +20576,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ...this._safe(()=>{
         const P=S.perfStatus||{}; const missStreak=P.missStreak||0; const banned=!!P.banned; const appealStatus=P.appealStatus||'none';
         const todayLbl=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-        const perfAcc=S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Éverpine'?'#E7D8A6':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A';
-        const perfAccSoft22=S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.22)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.22)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.22)':'rgba(91,26,26,0.22)';
+        const perfAcc=S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Vanguard'?'#C7BFA8':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A';
+        const perfAccSoft22=S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.22)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.22)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.22)':'rgba(91,26,26,0.22)';
         const stars=[1,2,3,4,5].map(n=>{ const on=n<=(S.perfDraftRating||0); return { n, set:()=>this.setPerfRating(n), c:S.prefs.theme==='Ultra'?(on?perfAcc:perfAccSoft22):(on?'#ffb020':'rgba(255,255,255,0.16)'), cU:on?perfAcc:perfAccSoft22 }; });
         const year=new Date().getFullYear(); const used=this._perfDaysUsed(year); const cap=this._perfCap();
         const perfHolidayList=(S.perfHolidays||[]).slice().sort((a,b)=>a.start.localeCompare(b.start)).map(h=>({ label:this._niceDate(h.start)+' – '+this._niceDate(h.end), days:h.days, cancel:()=>this.cancelHoliday(h.id) }));
@@ -20632,7 +20635,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           perfDraftLearnedVal:S.perfDraftLearned||'', setPerfDraftLearned:(e)=>this.setPerfDraftLearned(e),
           perfDraftImprovementVal:S.perfDraftImprovement||'', setPerfDraftImprovement:(e)=>this.setPerfDraftImprovement(e),
           togglePerfTrained:()=>this.togglePerfTrained(),
-          perfTrainedBg:S.perfDraftTrained?'var(--lc-accent)':'var(--lc-line)', perfTrainedPos:S.perfDraftTrained?'22px':'2px', perfTrainedBgU:S.perfDraftTrained?perfAcc:(S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.16)':'rgba(91,26,26,0.16)'),
+          perfTrainedBg:S.perfDraftTrained?'var(--lc-accent)':'var(--lc-line)', perfTrainedPos:S.perfDraftTrained?'22px':'2px', perfTrainedBgU:S.perfDraftTrained?perfAcc:(S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.16)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.16)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.16)':'rgba(91,26,26,0.16)'),
           perfStars:stars, perfSubmitErrShow:!!S.perfSubmitErr, perfSubmitErrVal:S.perfSubmitErr||'', submitPerfLog:()=>this.submitPerfLog(),
           submitPerfCheckinFromModal:()=>this.submitPerfCheckinFromModal(),
           perfSubmitLabel:this._perfHasLoggedToday()?'Update today’s check-in':'Submit check-in',
@@ -20671,12 +20674,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       appearToggles:[ this._tog('animations','Animations','Cinematic transitions & motion'), this._tog('particles','Particle effects','AI orb & ambient particles'), this._tog('glass','Glassmorphism','Panel blur & transparency'), this._tog('reduceMotion','Reduce motion','Minimize non-essential movement') ],
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
-      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraEverpine:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Éverpine', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée' && S.prefs.ultraStyle!=='Maison Éverpine',
-      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Maison Éverpine']),
+      isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraVanguard:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée' && S.prefs.ultraStyle!=='Vanguard',
+      ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Vanguard']),
       ...(()=>{
         const tab=S.themeMenuTab||'themes';
         const P=S.prefs||{}; const cur=P.theme==='Ultra'?P.ultraStyle:null;
-        const themeDefs=[{k:'Ultra X',g:'◆'},{k:'Noir',g:'☾'},{k:'Maison Élysée',g:'❦'},{k:'Maison Éverpine',g:'❖'}];
+        const themeDefs=[{k:'Ultra X',g:'◆'},{k:'Noir',g:'☾'},{k:'Maison Élysée',g:'❦'},{k:'Vanguard',g:'❖'}];
         return {
           themeMenuOpen:!!S.themeMenuOpen,
           themeMenuAnchorTop:S.themeMenuAnchorTop||74, themeMenuAnchorRight:S.themeMenuAnchorRight||26,
@@ -20877,21 +20880,21 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true, perfGateStage:'ready'}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
-      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(15,24,19,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
-      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Maison Éverpine'?'#16211A':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
+      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Vanguard'?'rgba(26,20,14,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
+      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#2A211B':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
       // Performance Terminal check-in popup — per-Ultra-style tokens (Noir needs light ink on a
       // dark card, Maison needs its blue accent; these were previously hardcoded to Ultra X's
       // maroon/cream everywhere, so Noir rendered near-invisible dark-brown text on a dark card).
-      perfUAccent:S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Éverpine'?'#E7D8A6':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A',
-      perfUAccentHover:S.prefs.ultraStyle==='Noir'?'#B7AFA2':S.prefs.ultraStyle==='Maison Éverpine'?'#D4C48F':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#4A1515',
-      perfUAccent50:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.5)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.5)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.5)':'rgba(91,26,26,0.5)',
-      perfUAccent35:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.35)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.35)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.35)':'rgba(91,26,26,0.35)',
-      perfUAccent30:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.3)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.3)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.3)':'rgba(91,26,26,0.3)',
-      perfUAccent14:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.14)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.14)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.14)':'rgba(91,26,26,0.14)',
-      perfUAccent03:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.03)':S.prefs.ultraStyle==='Maison Éverpine'?'rgba(231,216,166,0.03)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.03)':'rgba(91,26,26,0.03)',
-      perfUInk:S.prefs.ultraStyle==='Noir'?'#EDE7DD':S.prefs.ultraStyle==='Maison Éverpine'?'#F2F1E9':S.prefs.ultraStyle==='Maison Élysée'?'#2E4560':'#3A2A20',
-      perfUMuted:S.prefs.ultraStyle==='Noir'?'#968F82':S.prefs.ultraStyle==='Maison Éverpine'?'#8E9C92':S.prefs.ultraStyle==='Maison Élysée'?'#6E82A0':'#8a6a5a',
-      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Maison Éverpine'?'#0F1813':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
+      perfUAccent:S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Vanguard'?'#C7BFA8':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A',
+      perfUAccentHover:S.prefs.ultraStyle==='Noir'?'#B7AFA2':S.prefs.ultraStyle==='Vanguard'?'#B5AB92':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#4A1515',
+      perfUAccent50:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.5)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.5)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.5)':'rgba(91,26,26,0.5)',
+      perfUAccent35:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.35)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.35)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.35)':'rgba(91,26,26,0.35)',
+      perfUAccent30:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.3)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.3)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.3)':'rgba(91,26,26,0.3)',
+      perfUAccent14:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.14)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.14)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.14)':'rgba(91,26,26,0.14)',
+      perfUAccent03:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.03)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.03)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.03)':'rgba(91,26,26,0.03)',
+      perfUInk:S.prefs.ultraStyle==='Noir'?'#EDE7DD':S.prefs.ultraStyle==='Vanguard'?'#EFE7D8':S.prefs.ultraStyle==='Maison Élysée'?'#2E4560':'#3A2A20',
+      perfUMuted:S.prefs.ultraStyle==='Noir'?'#968F82':S.prefs.ultraStyle==='Vanguard'?'#948A7A':S.prefs.ultraStyle==='Maison Élysée'?'#6E82A0':'#8a6a5a',
+      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#211911':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
       toggleWhatsNewSigned:()=>this.setState(s=>({whatsNewSigned:!s.whatsNewSigned})),
       whatsNewCheckBd:S.whatsNewSigned?'#FFFFFF':'rgba(255,255,255,0.3)', whatsNewCheckBg:S.whatsNewSigned?'#FFFFFF':'transparent', whatsNewCheckMark:S.whatsNewSigned?'\u2713':'',
       whatsNewBtnCursor:S.whatsNewSigned?'pointer':'not-allowed', whatsNewBtnOpacity:S.whatsNewSigned?1:0.4, whatsNewBtnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)',
@@ -20970,15 +20973,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ]; })(),
       shellDisplay: S.loggedIn?'grid':'block', asideDisplay:this._isPrivatePageOpen()?'none':(typeof window!=='undefined' && window.innerWidth<=900)?'none':'flex', shellCols: (typeof window!=='undefined' && window.innerWidth<=900)?'1fr':((S.focusMode||this._isPrivatePageOpen())?'0px 1fr':'84px 1fr'),
       themeFilter:(()=>{ const t=S.prefs.theme; return t==='Ember'?'hue-rotate(83deg) saturate(1.1) brightness(0.95)':t==='Onyx'?'saturate(0) brightness(1.08)':t==='Ghost'?'saturate(0) contrast(1.08)':t==='Snow'?'hue-rotate(218deg) saturate(1.05)':'none'; })(),
-      /* Éverpine's class is only added on the home screen. It is the one style whose look is
+      /* Vanguard's class is only added on the home screen. It is the one style whose look is
          still being judged, and scoping it here means every other page keeps the Ultra X it
          has always had rather than half-inheriting a theme that has no chart, tile or card
          palettes behind it yet. Drop the scene test to take it app-wide. */
       raimentClass: S.prefs.theme!=='Ultra' ? 'raiment-base'
         : (S.prefs.ultraStyle==='Noir' ? 'raiment-noir'
           : S.prefs.ultraStyle==='Maison Élysée' ? 'raiment-maison'
-          : S.prefs.ultraStyle==='Maison Éverpine' ? 'raiment-everpine' : 'raiment-x'),
-      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':(S.prefs.ultraStyle==='Maison Éverpine'&&scene==='home')?' theme-everpine':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
+          : S.prefs.ultraStyle==='Vanguard' ? 'raiment-vanguard' : 'raiment-x'),
+      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':(S.prefs.ultraStyle==='Vanguard'&&scene==='home')?' theme-vanguard':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
       showBanGate: S.loggedIn && !!(S.perfStatus && S.perfStatus.banned),
       showSuspendedGate: S.loggedIn && !!(S.profile && S.profile.account_status==='suspended' && S.profile.role!=='owner'),
       notifOpen:S.notifOpen, sidebarX:S.notifOpen?'0':'110%',
