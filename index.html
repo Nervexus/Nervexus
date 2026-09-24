@@ -422,6 +422,25 @@
   .toast-bars{ position:relative; display:flex; align-items:center; gap:3px; margin:11px 0 10px; height:17px; }
   .toast-bars i{ display:block; width:2px; border-radius:2px; background:var(--lc-line); }
 
+  /* ---- SETTINGS GATE MARK — a small ring of dots fading round its circumference, built off
+     a reference (Cosmos, by Mobbin): the one decorative flourish above the title, a slow
+     rotation the only thing on the gate that moves besides the cursor. --lc-accent, so it
+     carries whichever raiment is active rather than a fixed colour. */
+  .gate-dots{ position:relative; width:26px; height:26px; margin:0 auto 20px;
+    animation:gateDotsSpin 7s linear infinite; }
+  .gate-dots i{ position:absolute; top:50%; left:50%; width:4px; height:4px; margin:-2px;
+    border-radius:50%; background:var(--lc-accent); }
+  .gate-dots i:nth-child(1){ transform:translate(0,-11px); opacity:0.9; }
+  .gate-dots i:nth-child(2){ transform:translate(7.8px,-7.8px); opacity:0.76; }
+  .gate-dots i:nth-child(3){ transform:translate(11px,0); opacity:0.6; }
+  .gate-dots i:nth-child(4){ transform:translate(7.8px,7.8px); opacity:0.44; }
+  .gate-dots i:nth-child(5){ transform:translate(0,11px); opacity:0.3; }
+  .gate-dots i:nth-child(6){ transform:translate(-7.8px,7.8px); opacity:0.44; }
+  .gate-dots i:nth-child(7){ transform:translate(-11px,0); opacity:0.6; }
+  .gate-dots i:nth-child(8){ transform:translate(-7.8px,-7.8px); opacity:0.76; }
+  @keyframes gateDotsSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .gate-dots{ animation:none !important; } }
+
   /* ---- GENTLEMEN CENTRE — Learning Center's own design, placements untouched -------------
      The layout below (blocks, a labelled header, card-at-a-time navigation with a dot row)
      is unchanged from the reference-image pass that built it. What it's made of now matches
@@ -1420,16 +1439,18 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <div class="rest-thread" style="background:linear-gradient(to bottom, transparent 0%, var(--lc-line) 14%, var(--lc-line) 86%, transparent 100%);"><i style="height:0%; background:var(--lc-accent);"></i></div>
 
         <div style="flex:0 0 auto; width:100%; max-width:340px; padding-bottom:6px;">
-          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:34px; font-weight:300; line-height:1.08; letter-spacing:-0.5px; color:var(--lc-accent);">Enter your password</div>
-          <div class="rest-body" style="font-size:14px; line-height:1.6; color:var(--lc-muted); max-width:32ch; margin:14px auto 0;">Settings stays out of view until you confirm it's you.</div>
+          <div class="gate-dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-size:32px; font-weight:300; line-height:1.1; letter-spacing:-0.5px; color:var(--lc-accent);">Enter your password</div>
+          <div class="rest-body" style="font-size:13.5px; line-height:1.6; color:var(--lc-muted); max-width:32ch; margin:12px auto 0;">Settings stays out of view until you confirm it's you.</div>
 
-          <input value="{{ settingsGatePass }}" onInput="{{ setSettingsGatePass }}" onKeyDown="{{ unlockSettingsGateKey }}" type="password" autoFocus placeholder="Password" style="margin-top:28px; width:100%; box-sizing:border-box; padding:14px 16px; border-radius:11px; border:1px solid {{ settingsGateErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:15px; outline:none; text-align:center; letter-spacing:2px;">
+          <div style="position:relative; margin-top:30px;">
+            <input value="{{ settingsGatePass }}" onInput="{{ setSettingsGatePass }}" onKeyDown="{{ unlockSettingsGateKey }}" type="{{ settingsGatePassType }}" autoFocus placeholder="Password" style="width:100%; box-sizing:border-box; padding:16px 60px 16px 22px; border-radius:999px; border:1px solid {{ settingsGateErrBorder }}; background:var(--lc-sub); color:var(--lc-accent); font-size:14.5px; outline:none; text-align:left;">
+            <span onClick="{{ toggleSettingsGatePassVis }}" style="position:absolute; right:20px; top:50%; transform:translateY(-50%); font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.5px; color:var(--lc-muted); cursor:pointer;" style-hover="{ color:'var(--lc-accent)' }">{{ settingsGatePassEyeLabel }}</span>
+          </div>
           <sc-if value="{{ settingsGateErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px; color:#ff3b4a; margin-top:10px;">Incorrect password.</div></sc-if>
 
-          <div style="margin-top:24px; display:flex; gap:12px; align-items:stretch; justify-content:center;">
-            <span onClick="{{ closeSettingsGate }}" style="flex:1; padding:15px 22px; border-radius:999px; cursor:pointer; border:1px solid var(--lc-line); background:transparent; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; display:flex; align-items:center; justify-content:center;">CANCEL</span>
-            <span onClick="{{ unlockSettingsGate }}" style="flex:1 1 auto; max-width:180px; padding:15px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center;">{{ unlockSettingsGateLabel }}</span>
-          </div>
+          <div onClick="{{ unlockSettingsGate }}" style="margin-top:26px; width:100%; box-sizing:border-box; padding:17px 22px; border-radius:999px; cursor:pointer; background:var(--lc-accent); color:var(--lc-on-accent); font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:2.6px; display:flex; align-items:center; justify-content:center; box-shadow:0 16px 34px rgba(0,0,0,0.18);">{{ unlockSettingsGateLabel }}</div>
+          <div onClick="{{ closeSettingsGate }}" style="margin-top:16px; text-align:center; cursor:pointer; color:var(--lc-muted); font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:2px;" style-hover="{ color:'var(--lc-accent)' }">CANCEL</div>
         </div>
       </div>
     </div>
@@ -9690,7 +9711,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-398 · v11.398 toast-redesign';
+const NOTIF_BUILD_VERSION = '2026.09.24-399 · v11.399 settings-gate-vanguard-redesign';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9820,7 +9841,7 @@ activities: this._mergeShipLog(s.activities),
       // sits in front of the whole thing, the same way Brain Rest covers the whole app
       // rather than opening as a card over it. settingsUnlocked persists only for the
       // running session (never saved) — closing and reopening the app asks again.
-      settingsUnlocked:false, settingsGateOpen:false, settingsGatePass:'', settingsGateErr:false, settingsGateBusy:false, _settingsGateTab:null,
+      settingsUnlocked:false, settingsGateOpen:false, settingsGatePass:'', settingsGateErr:false, settingsGateBusy:false, settingsGatePassVisible:false, _settingsGateTab:null,
       twoFAWarnOpen:false, twoFAWarnMode:'', twoFAWarnAck:false,
       staleOpen:false, staleReason:'', staleTitle:'',
       briefTab:'exec', briefStamp:new Date().toLocaleTimeString('en-GB').slice(0,5),
@@ -10032,7 +10053,7 @@ activities: this._mergeShipLog(s.activities),
   // Gentlemen's Test "Settings" shortcut) wanted, and is applied once the gate opens.
   _openSettings(tab){
     if(this.state.settingsUnlocked){ this.setState({scene:'settings', ...(tab?{settingsTab:tab}:{})}); return; }
-    this.setState({settingsGateOpen:true, settingsGatePass:'', settingsGateErr:false, _settingsGateTab:tab||null});
+    this.setState({settingsGateOpen:true, settingsGatePass:'', settingsGateErr:false, settingsGatePassVisible:false, _settingsGateTab:tab||null});
   }
   async unlockSettingsGate(){
     const pw=this.state.settingsGatePass;
@@ -10044,9 +10065,9 @@ activities: this._mergeShipLog(s.activities),
       if(error){ this.setState({settingsGateErr:true}); return; }
     } else if(pw!==this.state.account.password){ this.setState({settingsGateErr:true}); return; }
     const tab=this.state._settingsGateTab;
-    this.setState({settingsUnlocked:true, settingsGateOpen:false, settingsGatePass:'', settingsGateErr:false, _settingsGateTab:null, scene:'settings', ...(tab?{settingsTab:tab}:{})});
+    this.setState({settingsUnlocked:true, settingsGateOpen:false, settingsGatePass:'', settingsGateErr:false, settingsGatePassVisible:false, _settingsGateTab:null, scene:'settings', ...(tab?{settingsTab:tab}:{})});
   }
-  closeSettingsGate(){ this.setState({settingsGateOpen:false, settingsGatePass:'', settingsGateErr:false, _settingsGateTab:null}); }
+  closeSettingsGate(){ this.setState({settingsGateOpen:false, settingsGatePass:'', settingsGateErr:false, settingsGatePassVisible:false, _settingsGateTab:null}); }
   // It used to only call Notification.requestPermission() and stop there — permission
   // granted, but no push subscription ever got created or saved, so nothing could ever
   // arrive out-of-app. Now it drives the full subscribe flow (enablePushNotifications,
@@ -14917,6 +14938,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.399', date:'Sep 24, 2026', major:true, kind:'design', goTo:'settings', notes:[
+      'The Settings password gate is redesigned from a reference: a small ring of dots turning slowly above the title, a full pill-shaped password field with a SHOW/HIDE toggle, and one large primary Unlock button rather than a side-by-side pair, with Cancel demoted to a small text link underneath. Every colour still comes from the active raiment.',
+    ]},
     {version:'v11.398', date:'Sep 24, 2026', major:true, kind:'design', notes:[
       'Toast pop-ups redesigned from a reference: a glowing icon, a category pill with its own dismiss, a bold title, a row of ticks standing in for a waveform, then the body. Built on the app’s own card material rather than a fixed dark box, so it now re-colours with whichever raiment is active — the one part that stays per-notification is the icon’s own colour, which still says what kind of alert it is at a glance.',
     ]},
@@ -20195,6 +20219,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       isSettings:scene==='settings',
       settingsGateOpen:!!S.settingsGateOpen,
       settingsGatePass:S.settingsGatePass, setSettingsGatePass:(e)=>this.setState({settingsGatePass:e.target.value, settingsGateErr:false}),
+      settingsGatePassType:S.settingsGatePassVisible?'text':'password',
+      settingsGatePassEyeLabel:S.settingsGatePassVisible?'HIDE':'SHOW',
+      toggleSettingsGatePassVis:()=>this.setState(s=>({settingsGatePassVisible:!s.settingsGatePassVisible})),
       settingsGateErr:!!S.settingsGateErr, settingsGateErrBorder:S.settingsGateErr?'rgba(255,59,74,0.6)':'var(--lc-line)',
       unlockSettingsGate:()=>this.unlockSettingsGate(), unlockSettingsGateKey:enterKey(()=>this.unlockSettingsGate()),
       unlockSettingsGateLabel:S.settingsGateBusy?'Checking…':'Unlock',
