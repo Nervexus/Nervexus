@@ -742,7 +742,7 @@
   /* Vanguard — the second dark style: a deep espresso ground, ivory ink and a
      pewter-foil accent, taken from an embossed house crest. Scoped to the home screen for now
      by themeClass, so the rest of the app stays Ultra X until the look is approved. */
-  .theme-ultra.theme-vanguard{ --u-bg:#2F211A; --u-card:rgba(67,53,46,0.86); --u-ink:#D8CBB5; --u-muted:#9E8D76; --u-line:rgba(229,217,196,0.22); --u-accent:#E5D9C4; --v-deep:#201712; --v-mid:#43352E; --v-pewter:#E5D9C4; }
+  .theme-ultra.theme-vanguard{ --u-bg:#2F211A; --u-card:rgba(47,33,26,0.86); --u-ink:#D8CBB5; --u-muted:#9E8D76; --u-line:rgba(229,217,196,0.22); --u-accent:#E5D9C4; --v-deep:#201712; --v-mid:#2F211A; --v-pewter:#E5D9C4; }
   /* The reference is embossed kraft paper, not a flat gradient — the same fractalNoise
      technique Noir already uses for its own grain, pushed harder (Noir's own 0.55 read as
      barely-there once the encoder bug above was actually fixed) so the fibre is visible
@@ -9754,7 +9754,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-405 · v11.405 vanguard-exact-palette';
+const NOTIF_BUILD_VERSION = '2026.09.24-406 · v11.406 vanguard-cards-match-bg';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14988,6 +14988,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.406', date:'Sep 24, 2026', major:false, kind:'design', notes:[
+      'Vanguard’s card blocks (Daily Missions, Training Checklist, the Profile card and its own kin) were a visibly lighter brown than the app background behind them. They now share the exact same colour, so a card reads as a bordered region of one continuous ground rather than a separate lighter panel dropped on top of it.',
+    ]},
     {version:'v11.405', date:'Sep 24, 2026', major:false, kind:'design', notes:[
       'Vanguard now runs on an exact four-colour spec rather than an eyeballed approximation: background #2F211A, primary text #D8CBB5, secondary text #9E8D76, bright accent #E5D9C4, with every derived shade (cards, gradients, hovers, the ring/orb palettes) recomputed from those four. Also fixed the Home script name reading a shade paler than the greeting above it — a retint rule meant for other paragraphs in the hero was catching the wordmark too.',
     ]},
@@ -20171,7 +20174,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
-      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#43352E 0%,#201712 55%,#43352E 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
+      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#2F211A 0%,#201712 55%,#2F211A 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
       profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(229,217,196,0.22)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
       profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Vanguard') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
       profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Vanguard' ? 'radial-gradient(circle, rgba(229,217,196,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
