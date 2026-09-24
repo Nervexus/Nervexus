@@ -816,20 +816,55 @@
   .theme-ultra.theme-maison [style*="color:#ff8a92"], .theme-ultra.theme-maison [style*="color: rgb(255, 138, 146)"]{ color:#4E6E96 !important; }
   .theme-ultra.theme-maison [style*="background:#1b1416"], .theme-ultra.theme-maison [style*="background: rgb(27, 20, 22)"]{ background:var(--u-card) !important; }
   .theme-ultra.theme-maison [style*="color:#f1e6d0"], .theme-ultra.theme-maison [style*="color: rgb(241, 230, 208)"]{ color:var(--u-ink) !important; }
+  /* ===== VANGUARD — the same literal-hex retint sheet Noir and Maison get, so pages built
+     straight against Ultra X's hardcoded hex (rather than the --u-* tokens) stop showing its
+     oxblood-on-cream once Vanguard is the active style everywhere, not just Home. Card
+     material and shadow follow Noir's dark-card, no-blur treatment; ink stays a separate
+     softer ivory from the pewter accent, the way Maison keeps ink and --m-deep apart. */
+  .theme-ultra.theme-vanguard .gent-stat, .theme-ultra.theme-vanguard .gent-row{ border-color:rgba(199,191,168,0.30); }
+  .theme-ultra.theme-vanguard .cc-glowcard.cc-glowcard{ background:var(--v-mid) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
+  .theme-ultra.theme-vanguard .cc-home-hero{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
+  .theme-ultra.theme-vanguard .cc-glowcard[style*="box-shadow"], .theme-ultra.theme-vanguard .cc-home-hero[style*="box-shadow"]{ box-shadow:none !important; }
+  .theme-ultra.theme-vanguard [style*="linear-gradient(180deg"]{ background:var(--v-mid) !important; }
+  .theme-ultra.theme-vanguard [style*="background:#F5F1E8"], .theme-ultra.theme-vanguard [style*="background: rgb(245, 241, 232)"]{ background:var(--v-mid) !important; }
+  .theme-ultra.theme-vanguard [style*="background:#FAF7F0"], .theme-ultra.theme-vanguard [style*="background: rgb(250, 247, 240)"]{ background:var(--v-mid) !important; }
+  .theme-ultra.theme-vanguard [style*="background:#F8F4EC"], .theme-ultra.theme-vanguard [style*="background: rgb(248, 244, 236)"]{ background:var(--v-mid) !important; }
+  .theme-ultra.theme-vanguard [style*="background:#FEFCF8"], .theme-ultra.theme-vanguard [style*="background: rgb(254, 252, 248)"]{ background:var(--v-mid) !important; }
+  .theme-ultra.theme-vanguard [style*="color:#F5F1E8"], .theme-ultra.theme-vanguard [style*="color: rgb(245, 241, 232)"]{ color:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard [style*="color:#3A2A20"], .theme-ultra.theme-vanguard [style*="color: rgb(58, 42, 32)"]{ color:var(--u-ink) !important; }
+  .theme-ultra.theme-vanguard [style*="color:#8a6a5a"], .theme-ultra.theme-vanguard [style*="color: rgb(138, 106, 90)"]{ color:var(--u-muted) !important; }
+  .theme-ultra.theme-vanguard [style*="color:#6b5a4e"], .theme-ultra.theme-vanguard [style*="color: rgb(107, 90, 78)"], .theme-ultra.theme-vanguard [style*="color:#5A473C"], .theme-ultra.theme-vanguard [style*="color: rgb(90, 71, 60)"], .theme-ultra.theme-vanguard [style*="color:#6E5B4E"], .theme-ultra.theme-vanguard [style*="color: rgb(110, 91, 78)"]{ color:#A69C8C !important; }
+  .theme-ultra.theme-vanguard [style*="color:#8a3030"], .theme-ultra.theme-vanguard [style*="color: rgb(138, 48, 48)"]{ color:var(--u-muted) !important; }
+  .theme-ultra.theme-vanguard [style*="background:#5B1A1A"], .theme-ultra.theme-vanguard [style*="background: rgb(91, 26, 26)"]{ background:#4A3C30 !important; }
+  .theme-ultra.theme-vanguard [style*="color:#5B1A1A"], .theme-ultra.theme-vanguard [style*="color: rgb(91, 26, 26)"], .theme-ultra.theme-vanguard [style*="border:1px solid #5B1A1A"]{ color:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard svg [stroke="#5B1A1A"]{ stroke:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard svg [fill="#5B1A1A"]{ fill:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard [style*="background: rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="background:rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="background: rgba(91, 26, 26"]{ background:rgba(199,191,168,0.15) !important; }
+  .theme-ultra.theme-vanguard [style*="rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="rgba(91, 26, 26"]{ border-color:rgba(199,191,168,0.35) !important; }
+  .theme-ultra.theme-vanguard [style*="rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32"]{ border-color:rgba(199,191,168,0.3) !important; }
+  .theme-ultra.theme-vanguard [style*="box-shadow:0 20px 50px rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="box-shadow:0 16px 40px rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="box-shadow:0 50px 100px rgba(58,42,32"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32, 0.18) 0px 20px 50px"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32, 0.16) 0px 16px 40px"], .theme-ultra.theme-vanguard [style*="rgba(58, 42, 32, 0.28) 0px 50px 100px"]{ box-shadow:none !important; }
+  .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard *:not(h1):not(h2):not(h3):not([style*="JetBrains Mono"]):not([style*="Pinyon"]):not(canvas){ font-family:'Cormorant Garamond',Georgia,serif !important; }
+  .theme-ultra.theme-vanguard [style*="JetBrains Mono"]{ font-family:'JetBrains Mono',monospace !important; }
+  .theme-ultra.theme-vanguard [style*="Pinyon"]{ font-family:'Pinyon Script',cursive !important; }
+  .theme-ultra.theme-vanguard h1, .theme-ultra.theme-vanguard h2, .theme-ultra.theme-vanguard h3{ font-family:'Cormorant Garamond',Georgia,serif !important; font-weight:500 !important; font-style:normal !important; letter-spacing:0 !important; color:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard .cc-home-hero p, .theme-ultra.theme-vanguard .cc-home-hero span{ color:var(--u-ink) !important; }
+  .theme-ultra.theme-vanguard .cc-home-hero [style*="JetBrains Mono"]{ color:rgba(239,231,216,0.78) !important; }
+  .theme-ultra.theme-vanguard [data-icon]{ color:var(--u-accent) !important; }
+  .theme-ultra.theme-vanguard ::-webkit-scrollbar-thumb{ background:rgba(199,191,168,0.28) !important; }
   /* Ultra X — Black Book / Dark Psychology vault pages on cream + maroon */
-  .theme-ultra:not(.theme-noir):not(.theme-maison) .cc-vault-card, .theme-ultra:not(.theme-noir):not(.theme-maison) .cc-vault-tile{ --vault-accent:#5B1A1A !important; --vault-line:rgba(91,26,26,0.22) !important; --vault-bg:#FBF7EF !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="linear-gradient(160deg,#1b1613,#0c0a08)"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="linear-gradient(160deg, rgb(27, 22, 19), rgb(12, 10, 8))"]{ background:#FBF7EF !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background:#161310"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background: rgb(22, 19, 16)"]{ background:#FBF7EF !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background:#1b1416"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background: rgb(27, 20, 22)"]{ background:#FBF7EF !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background:#c9a24a"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background: rgb(201, 162, 74)"]{ background:#5B1A1A !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#c9a24a"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(201, 162, 74)"]{ color:#5B1A1A !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="rgba(201,162,74"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="rgba(201, 162, 74"]{ border-color:rgba(91,26,26,0.25) !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#f1e6d0"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(241, 230, 208)"]{ color:#3A2A20 !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#a1836f"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(161, 131, 111)"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#9c8f78"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(156, 143, 120)"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#5f5346"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(95, 83, 70)"]{ color:#8a6a5a !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#0a0806"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(10, 8, 6)"]{ color:#F5F1E8 !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background:#8c1414"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="background: rgb(140, 20, 20)"]{ background:#5B1A1A !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#8c1414"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(140, 20, 20)"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color:#ff8a92"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="color: rgb(255, 138, 146)"]{ color:#5B1A1A !important; }
-  .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="rgba(140,20,20"], .theme-ultra:not(.theme-noir):not(.theme-maison) [style*="rgba(140, 20, 20"]{ border-color:rgba(91,26,26,0.25) !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) .cc-vault-card, .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) .cc-vault-tile{ --vault-accent:#5B1A1A !important; --vault-line:rgba(91,26,26,0.22) !important; --vault-bg:#FBF7EF !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="linear-gradient(160deg,#1b1613,#0c0a08)"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="linear-gradient(160deg, rgb(27, 22, 19), rgb(12, 10, 8))"]{ background:#FBF7EF !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background:#161310"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background: rgb(22, 19, 16)"]{ background:#FBF7EF !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background:#1b1416"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background: rgb(27, 20, 22)"]{ background:#FBF7EF !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background:#c9a24a"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background: rgb(201, 162, 74)"]{ background:#5B1A1A !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#c9a24a"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(201, 162, 74)"]{ color:#5B1A1A !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="rgba(201,162,74"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="rgba(201, 162, 74"]{ border-color:rgba(91,26,26,0.25) !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#f1e6d0"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(241, 230, 208)"]{ color:#3A2A20 !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#a1836f"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(161, 131, 111)"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#9c8f78"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(156, 143, 120)"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#5f5346"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(95, 83, 70)"]{ color:#8a6a5a !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#0a0806"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(10, 8, 6)"]{ color:#F5F1E8 !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background:#8c1414"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="background: rgb(140, 20, 20)"]{ background:#5B1A1A !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#8c1414"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(140, 20, 20)"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color:#ff8a92"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="color: rgb(255, 138, 146)"]{ color:#5B1A1A !important; }
+  .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="rgba(140,20,20"], .theme-ultra:not(.theme-noir):not(.theme-maison):not(.theme-vanguard) [style*="rgba(140, 20, 20"]{ border-color:rgba(91,26,26,0.25) !important; }
   .theme-ultra .cc-grain-overlay{ display:block !important; }
   [style*="background: rgb(27, 29, 33)"],[style*="background: rgb(22, 24, 28)"],[style*="background: rgb(23, 25, 29)"],[style*="background: rgb(20, 20, 22)"],[style*="background: rgb(16, 16, 18)"],[style*="background:rgb(27, 29, 33)"],[style*="background:rgb(22, 24, 28)"],[style*="background:rgb(23, 25, 29)"],[style*="background:rgb(20, 20, 22)"],[style*="background:rgb(16, 16, 18)"],[style*="#1b1d21"],[style*="#16181c"],[style*="#17191d"],[style*="#141416"],[style*="#101012"]{ background:transparent !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
   .blackhole-active .cc-glowcard.cc-glowcard{ background:rgba(30,32,36,0.18) !important; backdrop-filter:blur(14px) brightness(1.3) saturate(1.4) !important; -webkit-backdrop-filter:blur(14px) brightness(1.3) saturate(1.4) !important; }
@@ -9714,7 +9749,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-401 · v11.401 vanguard-rename-recolor';
+const NOTIF_BUILD_VERSION = '2026.09.24-402 · v11.402 vanguard-app-wide';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14948,6 +14983,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.402', date:'Sep 24, 2026', major:true, kind:'design', notes:[
+      'Vanguard now applies app-wide instead of just on Home. It was scoped to one screen the same way an early Maison Éverpine was, so every other page — Dashboard, the Forge, Learning, Settings, Finance, Gentlemen’s Etiquette — still showed Ultra X’s cream and oxblood underneath. It carries the same espresso-and-pewter palette everywhere now, through the same literal-hex retint sheet Noir and Maison already use for pages built against Ultra X’s hardcoded colours. The Home hero is also fixed to read as one consistent pewter foil (script name, greeting and ornament) instead of a brighter ivory carved out for the words, and the ground is warmed a touch to sit closer to the reference.',
+    ]},
     {version:'v11.401', date:'Sep 24, 2026', major:true, kind:'design', notes:[
       'Maison Éverpine is renamed Vanguard and recoloured from scratch, from an embossed house-crest reference: a deep espresso ground in place of the dark forest green, and a warm pewter-silver foil in place of the champagne-gold. Every place that wears the raiment — Home, the Profile card, Performance Terminal, What’s New, the Forge, Brain Rest, the sidebar and voice orb — carries the new palette; nothing about the layout changed, only the two colours underneath it.',
     ]},
@@ -20976,15 +21014,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ]; })(),
       shellDisplay: S.loggedIn?'grid':'block', asideDisplay:this._isPrivatePageOpen()?'none':(typeof window!=='undefined' && window.innerWidth<=900)?'none':'flex', shellCols: (typeof window!=='undefined' && window.innerWidth<=900)?'1fr':((S.focusMode||this._isPrivatePageOpen())?'0px 1fr':'84px 1fr'),
       themeFilter:(()=>{ const t=S.prefs.theme; return t==='Ember'?'hue-rotate(83deg) saturate(1.1) brightness(0.95)':t==='Onyx'?'saturate(0) brightness(1.08)':t==='Ghost'?'saturate(0) contrast(1.08)':t==='Snow'?'hue-rotate(218deg) saturate(1.05)':'none'; })(),
-      /* Vanguard's class is only added on the home screen. It is the one style whose look is
-         still being judged, and scoping it here means every other page keeps the Ultra X it
-         has always had rather than half-inheriting a theme that has no chart, tile or card
-         palettes behind it yet. Drop the scene test to take it app-wide. */
       raimentClass: S.prefs.theme!=='Ultra' ? 'raiment-base'
         : (S.prefs.ultraStyle==='Noir' ? 'raiment-noir'
           : S.prefs.ultraStyle==='Maison Élysée' ? 'raiment-maison'
           : S.prefs.ultraStyle==='Vanguard' ? 'raiment-vanguard' : 'raiment-x'),
-      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':(S.prefs.ultraStyle==='Vanguard'&&scene==='home')?' theme-vanguard':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
+      themeClass: S.prefs.theme==='Ultra'?('theme-ultra'+(S.prefs.ultraStyle==='Noir'?' theme-noir':S.prefs.ultraStyle==='Maison Élysée'?' theme-maison':S.prefs.ultraStyle==='Vanguard'?' theme-vanguard':'')):'sovereign-lite', privateClass: this._isPrivatePageOpen()?'cc-private-open':'',
       showBanGate: S.loggedIn && !!(S.perfStatus && S.perfStatus.banned),
       showSuspendedGate: S.loggedIn && !!(S.profile && S.profile.account_status==='suspended' && S.profile.role!=='owner'),
       notifOpen:S.notifOpen, sidebarX:S.notifOpen?'0':'110%',
