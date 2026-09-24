@@ -742,11 +742,12 @@
   /* Vanguard — the second dark style: a deep espresso ground, ivory ink and a
      pewter-foil accent, taken from an embossed house crest. Scoped to the home screen for now
      by themeClass, so the rest of the app stays Ultra X until the look is approved. */
-  .theme-ultra.theme-vanguard{ --u-bg:#362B22; --u-card:rgba(70,56,44,0.86); --u-ink:#EFE7D8; --u-muted:#948A7A; --u-line:rgba(199,191,168,0.22); --u-accent:#C7BFA8; --v-deep:#211911; --v-mid:#3D3129; --v-pewter:#C7BFA8; }
+  .theme-ultra.theme-vanguard{ --u-bg:#241C16; --u-card:rgba(58,46,36,0.86); --u-ink:#EFE7D8; --u-muted:#948A7A; --u-line:rgba(199,191,168,0.22); --u-accent:#C7BFA8; --v-deep:#150F0A; --v-mid:#3A2E24; --v-pewter:#C7BFA8; }
   /* The reference is embossed kraft paper, not a flat gradient — the same fractalNoise
-     technique Noir already uses for its own grain, just lighter (Vanguard's ground is a
-     mid brown, not near-black, so the same 0.55 opacity would wash it out). */
-  .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard .cc-scene, .theme-ultra.theme-vanguard .cc-top, .theme-ultra.theme-vanguard .cc-side{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.85'%20numOctaves='3'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E") !important; background-blend-mode:overlay !important; background-color:var(--u-bg) !important; }
+     technique Noir already uses for its own grain, pushed harder (Noir's own 0.55 read as
+     barely-there once the encoder bug above was actually fixed) so the fibre is visible
+     rather than smooth. */
+  .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard .cc-scene, .theme-ultra.theme-vanguard .cc-top, .theme-ultra.theme-vanguard .cc-side{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E") !important; background-blend-mode:overlay !important; background-color:var(--u-bg) !important; }
   .theme-ultra.theme-maison{ --u-bg:#F2ECE0; --u-card:#FBF7EF; --u-ink:#2E4560; --u-muted:#6E82A0; --u-line:rgba(60,90,125,0.18); --u-accent:#3C5A7D; --m-blue:#8FAAC9; --m-deep:#4E6E96; --m-cream:#F6F0E4; }
   .theme-ultra.theme-maison, .theme-ultra.theme-maison .cc-scene, .theme-ultra.theme-maison .cc-top, .theme-ultra.theme-maison .cc-side{ background-color:var(--u-bg) !important; background-image:none !important; }
   .theme-ultra.theme-maison .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-radius:14px !important; box-shadow:0 1px 0 rgba(255,255,255,0.75) inset, 0 10px 28px rgba(60,90,125,0.07) !important; }
@@ -9753,7 +9754,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-403 · v11.403 grain-texture-fix';
+const NOTIF_BUILD_VERSION = '2026.09.24-404 · v11.404 vanguard-darker-grainier';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13328,7 +13329,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     return {
       vDark:dark,
       vLight:!dark,
-      vOverlay:dark?(isVanguard?'#211911':'#000'):'transparent',
+      vOverlay:dark?(isVanguard?'#150F0A':'#000'):'transparent',
       vGlow:dark?(isVanguard?'radial-gradient(circle at 50% 40%, rgba(199,191,168,0.10) 0%, rgba(26,20,14,0.55) 60%, rgba(26,20,14,0.78) 100%)':'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)'):('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
       vCard:dark?(isVanguard?'#2A211B':'#141416'):(isMaison?'#FBF7EF':'#F5F1E8'),
       vInk:dark?(isVanguard?'#EFE7D8':'#eef0f2'):(isMaison?'#2E4560':'#3A2A20'),
@@ -13341,11 +13342,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       vLine2:dark?(isVanguard?'rgba(199,191,168,0.24)':'rgba(255,255,255,0.14)'):(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
       vLine3:dark?(isVanguard?'rgba(199,191,168,0.08)':'rgba(255,255,255,0.06)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
       vInputBg:dark?(isVanguard?'rgba(199,191,168,0.05)':'rgba(255,255,255,0.03)'):(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
-      vBubbleAI:dark?(isVanguard?'#3D3129':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
+      vBubbleAI:dark?(isVanguard?'#3A2E24':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
       vBubbleYou:dark?(isVanguard?'rgba(199,191,168,0.08)':'rgba(255,255,255,0.05)'):(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
       vTrack:dark?(isVanguard?'rgba(199,191,168,0.12)':'rgba(255,255,255,0.08)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
       vBtnBg:dark?(isVanguard?accent:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)'):accent,
-      vBtnText:dark?(isVanguard?'#211911':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
+      vBtnText:dark?(isVanguard?'#150F0A':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
       vBtnShadow:dark?(isVanguard?'0 2px 6px rgba(0,0,0,0.35)':'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)'):'none',
     };
   }
@@ -14987,6 +14988,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.404', date:'Sep 24, 2026', major:false, kind:'design', notes:[
+      'Vanguard’s ground darkened further (#362B22 → #241C16) and its grain turned up hard — the fix that made the texture render at all last build was still too faint against the reference’s visibly-fibrous kraft paper. Every dark surface built from the same tokens (the Profile card, Performance Terminal, What’s New) moved with it.',
+    ]},
     {version:'v11.403', date:'Sep 24, 2026', major:false, kind:'design', notes:[
       'Vanguard’s ground was a flat colour, not the embossed kraft paper in the reference — it turns out the grain texture Noir already wears the same way had quietly never rendered at all, in either raiment, because the app’s own template compiler was mistaking a filter attribute inside the SVG for one of its own template attributes and corrupting it before the browser ever saw it. Fixed for both, so Noir’s background finally has its intended grain too, not just Vanguard’s.',
     ]},
@@ -20164,7 +20168,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
-      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#3D3129 0%,#211911 55%,#3D3129 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
+      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#3A2E24 0%,#150F0A 55%,#3A2E24 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
       profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(199,191,168,0.22)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
       profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Vanguard') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
       profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Vanguard' ? 'radial-gradient(circle, rgba(199,191,168,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
@@ -20928,8 +20932,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true, perfGateStage:'ready'}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
-      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Vanguard'?'rgba(26,20,14,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
-      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#2A211B':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
+      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Vanguard'?'rgba(21,15,10,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
+      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#241C16':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
       // Performance Terminal check-in popup — per-Ultra-style tokens (Noir needs light ink on a
       // dark card, Maison needs its blue accent; these were previously hardcoded to Ultra X's
       // maroon/cream everywhere, so Noir rendered near-invisible dark-brown text on a dark card).
@@ -20942,7 +20946,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       perfUAccent03:S.prefs.ultraStyle==='Noir'?'rgba(196,189,176,0.03)':S.prefs.ultraStyle==='Vanguard'?'rgba(199,191,168,0.03)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(78,110,150,0.03)':'rgba(91,26,26,0.03)',
       perfUInk:S.prefs.ultraStyle==='Noir'?'#EDE7DD':S.prefs.ultraStyle==='Vanguard'?'#EFE7D8':S.prefs.ultraStyle==='Maison Élysée'?'#2E4560':'#3A2A20',
       perfUMuted:S.prefs.ultraStyle==='Noir'?'#968F82':S.prefs.ultraStyle==='Vanguard'?'#948A7A':S.prefs.ultraStyle==='Maison Élysée'?'#6E82A0':'#8a6a5a',
-      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#211911':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
+      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#150F0A':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
       toggleWhatsNewSigned:()=>this.setState(s=>({whatsNewSigned:!s.whatsNewSigned})),
       whatsNewCheckBd:S.whatsNewSigned?'#FFFFFF':'rgba(255,255,255,0.3)', whatsNewCheckBg:S.whatsNewSigned?'#FFFFFF':'transparent', whatsNewCheckMark:S.whatsNewSigned?'\u2713':'',
       whatsNewBtnCursor:S.whatsNewSigned?'pointer':'not-allowed', whatsNewBtnOpacity:S.whatsNewSigned?1:0.4, whatsNewBtnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)',
