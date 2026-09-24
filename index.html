@@ -268,6 +268,19 @@
              --lcb-far:#1E1610; --lcb-near:#1E1610; --lcb-lit:rgba(0,0,0,0); --lcb-dim:rgba(0,0,0,0); --lcb-sheen:rgba(0,0,0,0); }
   .cc-shell.raiment-vanguard .lc-card, .cc-shell.raiment-vanguard .lcb-stage{ color:#D8CBB5; }
   .cc-shell.raiment-vanguard .lc-sig-btn:hover{ background:#8C2636 !important; }
+  /* Same reasoning as the .cc-glowcard grain above: --lc-bg/--lcb-far/--lcb-near match the page
+     background's hex exactly, but without the page's own grain layer a card still reads as a
+     flatter, different surface next to it. */
+  .cc-shell.raiment-vanguard .lc-card{ background-color:var(--lc-bg); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E"); background-blend-mode:overlay; }
+  .cc-shell.raiment-vanguard .lcb-field{
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 62% 74% at 86% 4%,   var(--lcb-lit) 0%, transparent 58%),
+      radial-gradient(ellipse 72% 66% at 8% 96%,   var(--lcb-dim) 0%, transparent 60%),
+      radial-gradient(ellipse 120% 34% at 34% 46%, var(--lcb-sheen) 0%, transparent 70%),
+      linear-gradient(158deg, var(--lcb-far) 0%, var(--lcb-near) 62%, var(--lcb-far) 100%);
+    background-blend-mode: overlay, normal, normal, normal, normal;
+  }
 
   /* Ultra X's original card: a flat bordered pane rather than a glass edge catching light —
      --lc-rim/--lc-rim-low are transparent now, so the inset highlight lines draw nothing, and
@@ -839,7 +852,11 @@
      material and shadow follow Noir's dark-card, no-blur treatment; ink stays a separate
      softer ivory from the pewter accent, the way Maison keeps ink and --m-deep apart. */
   .theme-ultra.theme-vanguard .gent-stat, .theme-ultra.theme-vanguard .gent-row{ border-color:rgba(199,199,199,0.30); }
-  .theme-ultra.theme-vanguard .cc-glowcard.cc-glowcard{ background:var(--v-mid) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
+  /* The main background carries the grain texture (further up this sheet); a card sharing its
+     exact hex but with no grain of its own still read as a different, flatter surface. Given
+     the same texture here too, longhand rather than the `background` shorthand so it does not
+     wipe out background-image/blend-mode the way a shorthand reset would. */
+  .theme-ultra.theme-vanguard .cc-glowcard.cc-glowcard{ background-color:var(--v-mid) !important; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E") !important; background-blend-mode:overlay !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
   .theme-ultra.theme-vanguard .cc-home-hero{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
   .theme-ultra.theme-vanguard .cc-glowcard[style*="box-shadow"], .theme-ultra.theme-vanguard .cc-home-hero[style*="box-shadow"]{ box-shadow:none !important; }
   .theme-ultra.theme-vanguard [style*="linear-gradient(180deg"]{ background:var(--v-mid) !important; }
@@ -9766,7 +9783,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-407 · v11.407 vanguard-burgundy-silver';
+const NOTIF_BUILD_VERSION = '2026.09.24-408 · v11.408 vanguard-card-grain-match';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15001,6 +15018,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.408', date:'Sep 24, 2026', major:false, kind:'design', notes:[
+      'Vanguard’s cards were the exact same hex as the app background behind them and still read as a different surface, because the background carries a grain texture the cards never got — flat colour next to a textured one looks like two different colours even when they are not. Every card (Dashboard, the Forge, Settings, Power Level, Calendar) now carries the same grain, so they sit flush with the ground instead of standing out as a plain patch on top of it.',
+    ]},
     {version:'v11.407', date:'Sep 24, 2026', major:true, kind:'design', notes:[
       'Vanguard gets a proper colour system instead of one all-purpose accent. The ground darkened again, Settings, Power Level and Calendar now wear the same dark card material as the rest of the raiment instead of the ivory block every other style keeps, every button and filled pill runs burgundy, and its three ring/chart colours are white, grey and burgundy — with silver left to carry everything else: headings, icons, borders, the sidebar and voice orb.',
     ]},
