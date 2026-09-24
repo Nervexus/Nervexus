@@ -264,18 +264,18 @@
      the general silver — the same call every other raiment makes by giving --lc-accent its
      own colour instead of a neutral. --lc-on-accent is white so button labels stay readable
      on it. */
-  .cc-shell.raiment-vanguard{ --lc-accent:linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%); --lc-bg:#2C0F12; --lc-sub:#0B3037; --lc-line:rgba(199,199,199,0.22); --lc-edge:rgba(199,199,199,0.22); --lc-muted:#9E8D76; --lc-glow:rgba(0,0,0,0.35); --lc-raise:rgba(255,255,255,0.05); --lc-on-accent:#2C0F12;
-             --lcb-far:#2C0F12; --lcb-near:#6B1E23; --lcb-lit:rgba(0,0,0,0); --lcb-dim:rgba(0,0,0,0); --lcb-sheen:rgba(0,0,0,0); }
+  .cc-shell.raiment-vanguard{ --lc-accent:linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%); --lc-bg:#2E1F1B; --lc-sub:#2C0F12; --lc-line:rgba(199,199,199,0.22); --lc-edge:rgba(199,199,199,0.22); --lc-muted:#9E8D76; --lc-glow:rgba(0,0,0,0.35); --lc-raise:rgba(255,255,255,0.05); --lc-on-accent:#2E1F1B;
+             --lcb-far:#2E1F1B; --lcb-near:#5E4B43; --lcb-lit:rgba(0,0,0,0); --lcb-dim:rgba(0,0,0,0); --lcb-sheen:rgba(0,0,0,0); }
   .cc-shell.raiment-vanguard .lc-card, .cc-shell.raiment-vanguard .lcb-stage{ color:#D8CBB5; }
   .cc-shell.raiment-vanguard .lc-sig-btn:hover{ background:linear-gradient(135deg,#E3D6C6 0%,#A8967F 100%) !important; }
   /* Same reasoning as the .cc-glowcard grain above: --lc-bg/--lcb-far/--lcb-near match the page
      background's hex exactly, but without the page's own grain layer a card still reads as a
      flatter, different surface next to it. */
   .cc-shell.raiment-vanguard .lc-card{
-    background-color:#2C0F12;
+    background-color:#2E1F1B;
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E"),
-      linear-gradient(135deg, #2C0F12 0%, #6B1E23 55%, #2C0F12 100%);
+      linear-gradient(135deg, #2E1F1B 0%, #5E4B43 55%, #2E1F1B 100%);
     background-blend-mode:overlay, normal; }
   .cc-shell.raiment-vanguard .lcb-field{
     background:
@@ -772,9 +772,9 @@
   /* Vanguard — the second dark style: a deep espresso ground, ivory ink and a
      pewter-foil accent, taken from an embossed house crest. Scoped to the home screen for now
      by themeClass, so the rest of the app stays Ultra X until the look is approved. */
-  .theme-ultra.theme-vanguard{ --u-bg:#2C0F12; --u-card:rgba(44,15,18,0.86); --u-ink:#D8CBB5; --u-muted:#9E8D76; --u-line:rgba(199,199,199,0.22); --u-accent:#C7C7C7; --v-deep:#1A0A0C; --v-mid:#2C0F12; --v-pewter:#C7C7C7;
-             --v-crimson:#2C0F12; --v-crimson-mid:#6B1E23; --v-teal:#0B3037; --v-teal-mid:#134E5E; --v-navy:#141E30; --v-navy-mid:#35577D;
-             --v-btn:linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%); --v-btn-hover:linear-gradient(135deg,#E3D6C6 0%,#A8967F 100%); --v-btn-text:#2C0F12; }
+  .theme-ultra.theme-vanguard{ --u-bg:#2E1F1B; --u-card:rgba(46,31,27,0.86); --u-ink:#D8CBB5; --u-muted:#9E8D76; --u-line:rgba(199,199,199,0.22); --u-accent:#C7C7C7; --v-deep:#1C1310; --v-mid:#2E1F1B; --v-pewter:#C7C7C7;
+             --v-main:#2E1F1B; --v-main-mid:#5E4B43; --v-sub:#2C0F12; --v-sub-mid:#6B1E23; --v-chart:#AD9462; --v-chart-dark:#7A6845; --v-chart-light:#C9B98F;
+             --v-btn:linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%); --v-btn-hover:linear-gradient(135deg,#E3D6C6 0%,#A8967F 100%); --v-btn-text:#2E1F1B; }
   /* The reference is embossed kraft paper, not a flat gradient — the same fractalNoise
      technique Noir already uses for its own grain, pushed harder (Noir's own 0.55 read as
      barely-there once the encoder bug above was actually fixed) so the fibre is visible
@@ -782,9 +782,9 @@
   .theme-ultra.theme-vanguard, .theme-ultra.theme-vanguard .cc-scene, .theme-ultra.theme-vanguard .cc-top, .theme-ultra.theme-vanguard .cc-side{
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E"),
-      linear-gradient(135deg, #2C0F12 0%, #6B1E23 55%, #2C0F12 100%) !important;
+      linear-gradient(135deg, #2E1F1B 0%, #5E4B43 55%, #2E1F1B 100%) !important;
     background-blend-mode:overlay, normal !important;
-    background-color:#2C0F12 !important; }
+    background-color:#2E1F1B !important; }
   .theme-ultra.theme-maison{ --u-bg:#F2ECE0; --u-card:#FBF7EF; --u-ink:#2E4560; --u-muted:#6E82A0; --u-line:rgba(60,90,125,0.18); --u-accent:#3C5A7D; --m-blue:#8FAAC9; --m-deep:#4E6E96; --m-cream:#F6F0E4; }
   .theme-ultra.theme-maison, .theme-ultra.theme-maison .cc-scene, .theme-ultra.theme-maison .cc-top, .theme-ultra.theme-maison .cc-side{ background-color:var(--u-bg) !important; background-image:none !important; }
   .theme-ultra.theme-maison .cc-glowcard.cc-glowcard{ background:var(--u-card) !important; border:1px solid var(--u-line) !important; color:var(--u-ink) !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border-radius:14px !important; box-shadow:0 1px 0 rgba(255,255,255,0.75) inset, 0 10px 28px rgba(60,90,125,0.07) !important; }
@@ -869,10 +869,10 @@
      the same texture here too, longhand rather than the `background` shorthand so it does not
      wipe out background-image/blend-mode the way a shorthand reset would. */
   .theme-ultra.theme-vanguard .cc-glowcard.cc-glowcard{
-    background-color:#2C0F12 !important;
+    background-color:#2E1F1B !important;
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E"),
-      linear-gradient(135deg, #2C0F12 0%, #6B1E23 55%, #2C0F12 100%) !important;
+      linear-gradient(135deg, #2E1F1B 0%, #5E4B43 55%, #2E1F1B 100%) !important;
     background-blend-mode:overlay, normal !important;
     backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
   .theme-ultra.theme-vanguard .cc-home-hero{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; box-shadow:none !important; }
@@ -895,7 +895,7 @@
      cream text (i.e. a button's own label) needs dark text specifically; higher specificity
      than the plain cream-text rule wins it back without touching cream text used standalone
      elsewhere on the dark page. */
-  .theme-ultra.theme-vanguard [style*="background:#5B1A1A"][style*="color:#F5F1E8"], .theme-ultra.theme-vanguard [style*="background: rgb(91, 26, 26)"][style*="color: rgb(245, 241, 232)"]{ color:#2C0F12 !important; }
+  .theme-ultra.theme-vanguard [style*="background:#5B1A1A"][style*="color:#F5F1E8"], .theme-ultra.theme-vanguard [style*="background: rgb(91, 26, 26)"][style*="color: rgb(245, 241, 232)"]{ color:#2E1F1B !important; }
   .theme-ultra.theme-vanguard svg [stroke="#5B1A1A"]{ stroke:var(--u-accent) !important; }
   .theme-ultra.theme-vanguard svg [fill="#5B1A1A"]{ fill:var(--u-accent) !important; }
   .theme-ultra.theme-vanguard [style*="background: rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="background:rgba(91,26,26"], .theme-ultra.theme-vanguard [style*="background: rgba(91, 26, 26"]{ background:rgba(199,199,199,0.15) !important; }
@@ -2445,7 +2445,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </svg>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#9E8D76; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
-            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid #B8A895; background:linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%); color:#2C0F12; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'linear-gradient(135deg,#E3D6C6 0%,#A8967F 100%)', borderColor:'#A8967F' }">{{ powerOnLabel }}</span>
+            <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid #B8A895; background:linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%); color:#2E1F1B; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'linear-gradient(135deg,#E3D6C6 0%,#A8967F 100%)', borderColor:'#A8967F' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
             <div class="cc-home-logo" style="border-color:rgba(246,240,228,0.8);"><img src="favicon.png" alt="Nervexus"></div>
@@ -9808,7 +9808,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.24-409 · v11.409 vanguard-crimson-teal-navy-cream';
+const NOTIF_BUILD_VERSION = '2026.09.24-410 · v11.410 vanguard-walnut-crimson-gold';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13384,9 +13384,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     return {
       vDark:dark,
       vLight:!dark,
-      vOverlay:dark?(isVanguard?'#1A0A0C':'#000'):'transparent',
-      vGlow:dark?(isVanguard?'radial-gradient(circle at 50% 40%, rgba(107,30,35,0.14) 0%, rgba(26,10,12,0.55) 60%, rgba(26,10,12,0.78) 100%)':'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)'):('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
-      vCard:dark?(isVanguard?'#2C0F12':'#141416'):(isMaison?'#FBF7EF':'#F5F1E8'),
+      vOverlay:dark?(isVanguard?'#1C1310':'#000'):'transparent',
+      vGlow:dark?(isVanguard?'radial-gradient(circle at 50% 40%, rgba(94,75,67,0.14) 0%, rgba(28,19,16,0.55) 60%, rgba(28,19,16,0.78) 100%)':'radial-gradient(circle at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.82) 100%)'):('radial-gradient(circle at 50% 40%, '+(isMaison?'rgba(78,110,150,0.08)':'rgba(91,26,26,0.08)')+' 0%, '+(isMaison?'rgba(60,90,125,0.03)':'rgba(58,42,32,0.03)')+' 60%, transparent 100%)'),
+      vCard:dark?(isVanguard?'#2E1F1B':'#141416'):(isMaison?'#FBF7EF':'#F5F1E8'),
       vInk:dark?(isVanguard?'#D8CBB5':'#eef0f2'):(isMaison?'#2E4560':'#3A2A20'),
       vInk2:dark?(isVanguard?'#D6CDBB':'#c8c8ce'):(isMaison?'#3C5A7D':'#5A473C'),
       vMuted:dark?(isVanguard?'#9E8D76':'#8a8a92'):(isMaison?'#6E82A0':'#8a6a5a'),
@@ -13397,11 +13397,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       vLine2:dark?(isVanguard?'rgba(199,199,199,0.24)':'rgba(255,255,255,0.14)'):(isMaison?'rgba(60,90,125,0.26)':'rgba(91,26,26,0.26)'),
       vLine3:dark?(isVanguard?'rgba(199,199,199,0.08)':'rgba(255,255,255,0.06)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.12)'),
       vInputBg:dark?(isVanguard?'rgba(199,199,199,0.05)':'rgba(255,255,255,0.03)'):(isMaison?'rgba(60,90,125,0.04)':'rgba(91,26,26,0.03)'),
-      vBubbleAI:dark?(isVanguard?'#0B3037':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
+      vBubbleAI:dark?(isVanguard?'#2C0F12':'#1e2024'):(isMaison?'#F2ECE0':'#EFE7DA'),
       vBubbleYou:dark?(isVanguard?'rgba(199,199,199,0.08)':'rgba(255,255,255,0.05)'):(isMaison?'rgba(60,90,125,0.06)':'rgba(91,26,26,0.05)'),
       vTrack:dark?(isVanguard?'rgba(199,199,199,0.12)':'rgba(255,255,255,0.08)'):(isMaison?'rgba(60,90,125,0.12)':'rgba(91,26,26,0.1)'),
       vBtnBg:dark?(isVanguard?btnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)'):accent,
-      vBtnText:dark?(isVanguard?'#2C0F12':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
+      vBtnText:dark?(isVanguard?'#2E1F1B':'#0a0a0b'):(isMaison?'#F6F0E4':'#F5F1E8'),
       vBtnShadow:dark?(isVanguard?'0 2px 6px rgba(0,0,0,0.35)':'inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25)'):'none',
     };
   }
@@ -14120,7 +14120,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(P.ultraStyle==='Maison Élysée')   return {cols:['#4E6E96','#1E2F4A','#FFFFFF'], light:true};
     /* Vanguard's own card is dark crimson everywhere now, not the shared ivory the other three
        raiments draw these rings on, so it does not need their pale-backing compensation. */
-    if(P.ultraStyle==='Vanguard') return {cols:['#35577D','#141E30','#8FA8C4'], light:false};
+    if(P.ultraStyle==='Vanguard') return {cols:['#AD9462','#7A6845','#C9B98F'], light:false};
     return {cols:['#8E1F1F','#FFFFFF','#1C1917'], light:true};        // Ultra X
   }
   _ringPale(hex){ const h=String(hex||'').replace('#',''); if(h.length!==6) return false;
@@ -15043,6 +15043,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.410', date:'Sep 24, 2026', major:true, kind:'design', notes:[
+      'Vanguard’s families reshuffle again from a new reference: Walnut Noir takes over as the main app and card colour (what Crimson Velvet was last build), Crimson Velvet itself steps down to the secondary/sub role it displaced teal from, and the ring and chart colour moves from navy to a warm Golden Hour tone. Buttons keep their cream-to-latte gradient unchanged.',
+    ]},
     {version:'v11.409', date:'Sep 24, 2026', major:true, kind:'design', notes:[
       'Vanguard moves from espresso-and-silver to a four-family palette: crimson velvet for the main app and its cards, deep teal for secondary surfaces (stat tiles, the active Settings tab, nested panels), navy for the ring and chart colours, and every button now a cream-to-latte gradient rather than a flat fill — Log Activity, Log Set, ADD, Unlock, ACKNOWLEDGED and the rest all carry the same mix.',
     ]},
@@ -20238,7 +20241,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
       goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
-      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#2C0F12 0%,#1A0A0C 55%,#2C0F12 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
+      profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#2E1F1B 0%,#1C1310 55%,#2E1F1B 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
       profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(199,199,199,0.22)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
       profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Vanguard') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
       profCardGlow: S.prefs.theme!=='Ultra' ? 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' : S.prefs.ultraStyle==='Noir' ? 'radial-gradient(circle, rgba(201,162,74,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Vanguard' ? 'radial-gradient(circle, rgba(199,199,199,0.08) 0%, transparent 70%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'radial-gradient(circle, rgba(78,110,150,0.06) 0%, transparent 70%)' : 'radial-gradient(circle, rgba(91,26,26,0.06) 0%, transparent 70%)',
@@ -21002,8 +21005,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       openPerfCheckinBtn:()=>this.setState({perfCheckinOpen:true, perfGateStage:'ready'}),
       sendPerfReminderNow:()=>this.sendPerfReminderNow(),
       wnIsUltra:S.prefs.theme==='Ultra', wnIsNotUltra:S.prefs.theme!=='Ultra',
-      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Vanguard'?'rgba(20,14,10,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
-      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#2C0F12':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
+      wnBackdrop:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'rgba(0,0,0,0.78)':S.prefs.ultraStyle==='Vanguard'?'rgba(28,19,16,0.62)':S.prefs.ultraStyle==='Maison Élysée'?'rgba(46,69,96,0.32)':'rgba(58,42,32,0.35)'):'rgba(0,0,0,0.7)',
+      wnModalBg:S.prefs.theme==='Ultra'?(S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#2E1F1B':S.prefs.ultraStyle==='Maison Élysée'?'#FBF7EF':'#F5F1E8'):'#101012',
       // Performance Terminal check-in popup — per-Ultra-style tokens (Noir needs light ink on a
       // dark card, Maison needs its blue accent; these were previously hardcoded to Ultra X's
       // maroon/cream everywhere, so Noir rendered near-invisible dark-brown text on a dark card).
@@ -21021,7 +21024,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // elsewhere in this same card, and a gradient string is not a valid `color` value.
       perfBtnBg:S.prefs.ultraStyle==='Vanguard'?'linear-gradient(135deg,#EDE4D9 0%,#B8A895 100%)':S.prefs.ultraStyle==='Noir'?'#C4BDB0':S.prefs.ultraStyle==='Maison Élysée'?'#4E6E96':'#5B1A1A',
       perfBtnBgHover:S.prefs.ultraStyle==='Vanguard'?'linear-gradient(135deg,#E3D6C6 0%,#A8967F 100%)':S.prefs.ultraStyle==='Noir'?'#B7AFA2':S.prefs.ultraStyle==='Maison Élysée'?'#3C5A7D':'#4A1515',
-      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#2C0F12':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
+      perfUBtnText:S.prefs.ultraStyle==='Noir'?'#181818':S.prefs.ultraStyle==='Vanguard'?'#2E1F1B':S.prefs.ultraStyle==='Maison Élysée'?'#F6F0E4':'#F5F1E8',
       toggleWhatsNewSigned:()=>this.setState(s=>({whatsNewSigned:!s.whatsNewSigned})),
       whatsNewCheckBd:S.whatsNewSigned?'#FFFFFF':'rgba(255,255,255,0.3)', whatsNewCheckBg:S.whatsNewSigned?'#FFFFFF':'transparent', whatsNewCheckMark:S.whatsNewSigned?'\u2713':'',
       whatsNewBtnCursor:S.whatsNewSigned?'pointer':'not-allowed', whatsNewBtnOpacity:S.whatsNewSigned?1:0.4, whatsNewBtnBg:'linear-gradient(180deg,#ffffff 0%,#dcdce0 100%)',
