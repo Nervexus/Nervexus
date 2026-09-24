@@ -400,6 +400,28 @@
   }
   @media (max-width:480px){ .qlog-card{ max-width:100%; padding:28px 20px 24px; } }
 
+  /* ---- NOTIFICATION TOAST — a floating live-activity card, built off a reference image: a
+     warm glow behind a circular icon, a pill in the corner, a title, a row of small ticks
+     standing in for a waveform, then the body. Unlike Quick Log's deliberately fixed dark
+     glass, this one uses the app's own --lc-* tokens for its material (background, border,
+     pill, ink), so it re-colours with whichever raiment is active rather than staying one
+     hardcoded dark card regardless of theme. The icon's own glow keeps the notification's
+     per-category colour (fitness green, finance red, etc.) — that distinction is worth more
+     than uniform theming for the one part of the card that identifies what kind of alert it
+     is at a glance. */
+  .toast-card{ position:relative; overflow:hidden; border-radius:26px; padding:16px 16px 15px;
+    box-sizing:border-box; background:var(--lc-bg); border:1px solid var(--lc-line);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    box-shadow:0 16px 40px rgba(0,0,0,0.35); }
+  .toast-icon{ position:relative; width:40px; height:40px; border-radius:50%; flex:0 0 40px;
+    display:flex; align-items:center; justify-content:center; }
+  .toast-pill{ position:relative; font-family:'JetBrains Mono',monospace; font-size:9px;
+    letter-spacing:1px; color:var(--lc-muted); background:var(--lc-sub);
+    border:1px solid var(--lc-line); border-radius:999px; padding:5px 10px;
+    display:flex; align-items:center; gap:7px; white-space:nowrap; }
+  .toast-bars{ position:relative; display:flex; align-items:center; gap:3px; margin:11px 0 10px; height:17px; }
+  .toast-bars i{ display:block; width:2px; border-radius:2px; background:var(--lc-line); }
+
   /* ---- GENTLEMEN CENTRE — Learning Center's own design, placements untouched -------------
      The layout below (blocks, a labelled header, card-at-a-time navigation with a dot row)
      is unchanged from the reference-image pass that built it. What it's made of now matches
@@ -9578,12 +9600,22 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
   <!-- toast stack -->
   <div class="cc-toaststack" style="position:absolute; top:82px; right:22px; z-index:50; display:flex; flex-direction:column; gap:10px; pointer-events:none; max-width:330px;">
     <sc-for list="{{ toasts }}" as="t" hint-placeholder-count="0">
-      <div ref="{{ t.swipeRef }}" style="pointer-events:auto; border:1px solid rgba(255,255,255,0.1); border-left:3px solid {{ t.color }}; border-radius:12px; background:rgba(18,18,22,0.97); backdrop-filter:blur(12px); padding:12px 15px; box-shadow:0 12px 34px rgba(0,0,0,0.55); animation:toastIn .42s cubic-bezier(.2,.8,.2,1) both; position:relative;">
-        <span onClick="{{ t.dismiss }}" style="position:absolute; top:8px; right:10px; cursor:pointer; color:#6f6f78; font-size:13px; line-height:1;" style-hover="{ color:'#fff' }">✕</span>
-        <div style="font-size:9px; letter-spacing:1.5px; color:{{ t.color }}; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:7px;"><span style="font-size:11px;">{{ t.glyph }}</span><span>{{ t.cat }}</span></div>
-        <div style="font-size:13px; font-weight:600; margin-top:3px; color:#eef0f2; padding-right:16px;">{{ t.title }}</div>
-        <div style="font-size:12px; color:#b8b8c0; margin-top:2px; line-height:1.4;">{{ t.body }}</div>
-        <sc-if value="{{ t.context }}" hint-placeholder-val="{{ false }}"><div style="margin-top:7px; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.6px; color:#7c7c84;">▹ {{ t.context }}</div></sc-if>
+      <div ref="{{ t.swipeRef }}" class="toast-card" style="pointer-events:auto; animation:toastIn .42s cubic-bezier(.2,.8,.2,1) both;">
+        <div style="position:absolute; inset:-40% auto auto -20%; width:70%; height:180%; pointer-events:none; background:radial-gradient(circle, {{ t.color }} 0%, transparent 68%); opacity:0.16;"></div>
+        <div style="position:relative; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span class="toast-icon" style="background:radial-gradient(circle, {{ t.color }} 0%, transparent 72%); border:1px solid {{ t.color }};"><span style="font-size:15px; font-weight:700; color:{{ t.color }}; font-family:'JetBrains Mono',monospace;">{{ t.glyph }}</span></span>
+          <span class="toast-pill">{{ t.cat }}<span onClick="{{ t.dismiss }}" style="cursor:pointer; color:var(--lc-muted); font-size:12px; line-height:1;" style-hover="{ color:'var(--lc-accent)' }">✕</span></span>
+        </div>
+        <div style="position:relative; font-size:14.5px; font-weight:700; margin-top:12px; color:var(--lc-accent); line-height:1.3;">{{ t.title }}</div>
+        <div class="toast-bars">
+          <i style="height:6px;"></i><i style="height:9px;"></i><i style="height:6px;"></i>
+          <i style="height:15px; background:{{ t.color }};"></i><i style="height:17px; background:{{ t.color }};"></i><i style="height:14px; background:{{ t.color }};"></i>
+          <i style="height:7px;"></i><i style="height:10px;"></i><i style="height:6px;"></i><i style="height:12px;"></i>
+          <i style="height:8px;"></i><i style="height:6px;"></i><i style="height:10px;"></i><i style="height:7px;"></i>
+          <i style="height:13px;"></i><i style="height:6px;"></i>
+        </div>
+        <div style="position:relative; font-size:12.5px; color:var(--lc-muted); line-height:1.45;">{{ t.body }}</div>
+        <sc-if value="{{ t.context }}" hint-placeholder-val="{{ false }}"><div style="position:relative; margin-top:7px; font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.6px; color:var(--lc-muted);">▹ {{ t.context }}</div></sc-if>
       </div>
     </sc-for>
   </div>
@@ -9658,7 +9690,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.23-397 · v11.397 bulk-import-typo-correction';
+const NOTIF_BUILD_VERSION = '2026.09.24-398 · v11.398 toast-redesign';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -14885,6 +14917,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.398', date:'Sep 24, 2026', major:true, kind:'design', notes:[
+      'Toast pop-ups redesigned from a reference: a glowing icon, a category pill with its own dismiss, a bold title, a row of ticks standing in for a waveform, then the body. Built on the app’s own card material rather than a fixed dark box, so it now re-colours with whichever raiment is active — the one part that stays per-notification is the icon’s own colour, which still says what kind of alert it is at a glance.',
+    ]},
     {version:'v11.397', date:'Sep 23, 2026', major:true, kind:'design', goTo:'dashboard', notes:[
       'Bulk Import now catches a typo close enough to one real Forge exercise — "Landline rotation" imports as "Landmine rotation", body part and all, instead of filing under Mixed forever over one wrong letter. Deliberately conservative: a plural, a dropped hyphen or an apostrophe (“squats”, “push ups”) is left exactly as typed, since those are normal spelling, not a mistake to fix.',
     ]},
