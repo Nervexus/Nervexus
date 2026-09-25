@@ -931,6 +931,40 @@
   .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:26px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 26px"]{ font-size:19px !important; }
   .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:52px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 52px"]{ font-size:34px !important; }
   .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:21px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 21px"]{ font-size:16px !important; }
+
+  /* ===== Gentlemen Center — Vanguard layout ==========================================
+     Two references drove this: a minimal fashion-site landing (thin uppercase nav, one big
+     display-weight welcome moment, no duplicate headers) and a polished stat-panel dashboard
+     (clean elevated cards, no hairline borders). Vanguard-scoped only — every other raiment
+     keeps the original layout untouched. */
+
+  /* The page used to open with a small icon+title row, then the crest card repeated the same
+     icon/kicker/title a few lines down. One hero beats two stacked headers, so the small row
+     is dropped here and the crest becomes the actual opening moment. */
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] .gent-header-row{ display:none !important; }
+
+  /* Thin uppercase nav instead of a filled pill row — the tab colours are hardcoded per-theme
+     in JS (#0a0a0b active / #c5c5ca inactive), so they're caught here by their literal value
+     rather than a variable. Both the raw and browser-normalized forms of each are matched,
+     since which one survives depends on how that particular style got set. */
+  .theme-ultra.theme-vanguard .gent-tabs{ gap:22px; border-bottom:1px solid rgba(67,68,81,0.14); padding-bottom:0; margin:6px 0 40px; }
+  .theme-ultra.theme-vanguard .gent-tab{ background:transparent !important; border-radius:0 !important; padding:0 0 14px !important; font-family:'Times New Roman',Times,serif !important; font-weight:300 !important; font-size:11px !important; letter-spacing:2px; text-transform:uppercase; color:#9a9aa8 !important; border-bottom:2px solid transparent; }
+  .theme-ultra.theme-vanguard .gent-tab[style*="color:#0a0a0b"], .theme-ultra.theme-vanguard .gent-tab[style*="color: rgb(10, 10, 11)"]{ color:#420A07 !important; border-bottom-color:#420A07; }
+
+  /* The crest: no card chrome of its own, just a big thin display title (this is the one
+     place on the page allowed a large size — big and thin reads as elegant, not loud) plus
+     the existing description and divider, with a small decorative dot row underneath standing
+     in for a carousel's page indicator. */
+  .theme-ultra.theme-vanguard .gent-crest{ background:transparent !important; box-shadow:none !important; padding:8px 14px 34px !important; }
+  .theme-ultra.theme-vanguard .gent-crest-inner{ border:none !important; padding:0 !important; }
+  .theme-ultra.theme-vanguard .gent-crest .rest-title.rest-title{ font-size:46px !important; font-weight:300 !important; letter-spacing:.5px !important; margin:16px 0 12px !important; color:#2b2c35 !important; }
+  .theme-ultra.theme-vanguard .gent-crest-desc{ font-size:14.5px !important; max-width:400px !important; }
+  .theme-ultra.theme-vanguard .gent-crest-inner::after{ content:'· · ·'; display:block; margin-top:26px; letter-spacing:8px; color:rgba(67,68,81,0.3); font-size:11px; }
+
+  /* Daily Test / results cards: flat cream with a hairline border reads as a form on Ultra X's
+     own light palette, but Vanguard's cards elsewhere are all soft elevation with no border —
+     matching that here instead of the hairline-bordered original. */
+  .theme-ultra.theme-vanguard .gent-block{ background:#EDEBE7 !important; border:none !important; box-shadow:0 30px 60px rgba(67,68,81,0.12), 0 1px 0 rgba(255,255,255,0.6) inset !important; }
   /* Only headings with no colour of their own (plain page titles, sitting straight on the
      walnut background) fall back to --u-accent. A heading that already computes its own inline
      colour — a card/popup title using perfUInk or similar, meant to sit on the cream card
@@ -8647,7 +8681,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
            so this is only the page that renders it. -->
       <sc-if value="{{ isGentlemen }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Gentlemen Center" style="animation:rise .5s ease both;">
-        <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
+        <div class="gent-header-row" style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
           <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
             <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
             <span style="width:27px; height:27px; color:var(--forge-accent); display:flex; position:relative;" data-icon="gentlemen"></span>
@@ -8676,7 +8710,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <img src="favicon.png" alt="" style="display:block; width:36px; height:36px; object-fit:contain; margin:0 auto 10px; opacity:0.9;">
               <div style="font-size:10.5px; letter-spacing:3px; color:#8a6a5a;">◆ GENTLEMEN'S ETIQUETTE</div>
               <div class="rest-title" style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:24px; color:#3A2A20; margin:10px 0 8px;">{{ gentCrestTitle }}</div>
-              <div style="font-size:13px; color:#6b5a4e; line-height:1.5; max-width:480px; margin:0 auto;">{{ gentCrestDesc }}</div>
+              <div class="gent-crest-desc" style="font-size:13px; color:#6b5a4e; line-height:1.5; max-width:480px; margin:0 auto;">{{ gentCrestDesc }}</div>
               <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin:16px auto 0;">
                 <div style="width:40px; height:1px; background:#5B1A1A;"></div>
                 <span style="color:#5B1A1A; font-size:11px;">❦</span>
@@ -9838,7 +9872,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-426 · v11.426 vanguard-gentlemen-size-fix';
+const NOTIF_BUILD_VERSION = '2026.09.25-427 · v11.427 vanguard-gentlemen-redesign';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15073,6 +15107,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.427', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'Redesigned Gentlemen Center\'s layout for Vanguard: the small icon+title header and the crest below it used to repeat the same heading twice, so the header row is dropped and the crest is now the one opening moment, with a large thin title and a small dot divider. The tab row is now a thin uppercase underline nav instead of filled pills, and the Daily Test/reference cards are borderless with soft elevation instead of a hairline-bordered fill, matching the rest of Vanguard\'s card treatment. Every other Ultra style keeps its original layout.',
+    ]},
     {version:'v11.426', date:'Sep 25, 2026', major:false, kind:'fix', notes:[
       'Scaled down Gentlemen Center\'s oversized type for Vanguard — the page title, the Daily Test/reference-card titles, the quiz question, and the results score (previously 52px) all read too heavy once the rest of Vanguard went light. Voice Core was checked too but had nothing large enough to need changing.',
     ]},
