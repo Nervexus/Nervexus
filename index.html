@@ -965,6 +965,16 @@
      own light palette, but Vanguard's cards elsewhere are all soft elevation with no border —
      matching that here instead of the hairline-bordered original. */
   .theme-ultra.theme-vanguard .gent-block{ background:#EDEBE7 !important; border:none !important; box-shadow:0 30px 60px rgba(67,68,81,0.12), 0 1px 0 rgba(255,255,255,0.6) inset !important; }
+
+  /* The full-page cover screen (gentShowWelcome, Vanguard-only): a fashion-landing-page-style
+     hero that fills the whole content area before the tabbed page. Centered, no card chrome —
+     the ENTER button is the only interactive element. */
+  .theme-ultra.theme-vanguard .gent-welcome{ min-height:calc(100vh - 140px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 20px; }
+  .theme-ultra.theme-vanguard .gent-welcome-kicker{ font-family:'JetBrains Mono',monospace !important; font-size:11px; letter-spacing:3px; color:#420A07; margin-bottom:22px; }
+  .theme-ultra.theme-vanguard .gent-welcome-title{ font-size:42px; font-weight:300; letter-spacing:.5px; line-height:1.2; color:#2b2c35; margin-bottom:22px; max-width:320px; }
+  .theme-ultra.theme-vanguard .gent-welcome-desc{ font-size:15px; line-height:1.65; color:#6E6E7A; max-width:440px; margin-bottom:36px; }
+  .theme-ultra.theme-vanguard .gent-welcome-enter{ display:inline-flex; align-items:center; justify-content:center; padding:15px 46px; border-radius:999px; cursor:pointer; background:linear-gradient(135deg,#420A07 0%,#9E1811 100%); color:#FFFFFF !important; font-family:'JetBrains Mono',monospace !important; font-size:11px; letter-spacing:3px; }
+  .theme-ultra.theme-vanguard .gent-welcome-dots{ margin-top:34px; font-size:10px; letter-spacing:6px; color:rgba(67,68,81,0.35); }
   /* Only headings with no colour of their own (plain page titles, sitting straight on the
      walnut background) fall back to --u-accent. A heading that already computes its own inline
      colour — a card/popup title using perfUInk or similar, meant to sit on the cream card
@@ -8681,6 +8691,20 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
            so this is only the page that renders it. -->
       <sc-if value="{{ isGentlemen }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Gentlemen Center" style="animation:rise .5s ease both;">
+        <!-- Vanguard-only cover screen, styled after a minimal fashion-site landing page: a
+             big thin display title as the one opening moment, a short line of context, an
+             ENTER button, and a decorative dot row standing in for a carousel indicator.
+             Every other Ultra style skips straight to the tabbed page below. -->
+        <sc-if value="{{ gentShowWelcome }}" hint-placeholder-val="{{ false }}">
+          <div class="gent-welcome">
+            <div class="gent-welcome-kicker">◆ GENTLEMEN'S ETIQUETTE</div>
+            <div class="gent-welcome-title">Gentlemen's Code</div>
+            <div class="gent-welcome-desc">Etiquette, poise and the details that separate the deliberate man from the rest — carried, not performed.</div>
+            <span onClick="{{ enterGentlemen }}" class="gent-welcome-enter">ENTER</span>
+            <div class="gent-welcome-dots">● ○ ○ ○</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ !gentShowWelcome }}" hint-placeholder-val="{{ true }}">
         <div class="gent-header-row" style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
           <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid rgba(231,216,166,0.42); display:flex; align-items:center; justify-content:center; position:relative; background:linear-gradient(158deg, rgba(231,216,166,0.11), rgba(231,216,166,0.015));">
             <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
@@ -8896,6 +8920,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             </div>
           </sc-if>
         </div>
+        </sc-if>
       </div>
       </sc-if>
 
@@ -9872,7 +9897,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-427 · v11.427 vanguard-gentlemen-redesign';
+const NOTIF_BUILD_VERSION = '2026.09.25-428 · v11.428 vanguard-gentlemen-welcome';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9953,7 +9978,7 @@ class Component extends DCLogic {
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
       quickLogOpen:false, quickLogStep:'confirm', quickLogGreetIdx:0, quickLogBlocks:s.quickLogBlocks||[''],
       rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
-      gentSub:'test', gentIdx:0, gentTestIdx:0,
+      gentSub:'test', gentIdx:0, gentTestIdx:0, gentEntered:false,
       // The subject test (Test yourself → Easy/Medium/Hard/Extra Hard), Brain Rest's own
       // full-screen shape reused for a different flow. Not persisted: closing it forgets it,
       // the same as walking away from Brain Rest's gate before starting.
@@ -15107,6 +15132,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.428', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'Added a full-page welcome cover to Gentlemen Center for Vanguard, styled after a minimal fashion-site landing page: a large thin title, a line of context, and an ENTER button before the tabbed page. Shown once per visit to the section. Every other Ultra style skips straight to the tabbed page as before.',
+    ]},
     {version:'v11.427', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Redesigned Gentlemen Center\'s layout for Vanguard: the small icon+title header and the crest below it used to repeat the same heading twice, so the header row is dropped and the crest is now the one opening moment, with a large thin title and a small dot divider. The tab row is now a thin uppercase underline nav instead of filled pills, and the Daily Test/reference cards are borderless with soft elevation instead of a hairline-bordered fill, matching the rest of Vanguard\'s card treatment. Every other Ultra style keeps its original layout.',
     ]},
@@ -22439,6 +22467,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       ...this._safe(()=>{
         const G=this._gent(); if(!G) throw new Error('gentlemen engine missing');
         const sub=S.gentSub||'test';
+        // The full-page cover is Vanguard-only, matching the rest of this section's redesign —
+        // every other Ultra style (and every non-Ultra theme) goes straight to the tabbed page.
+        const gentIsVanguard=S.prefs.ultraStyle==='Vanguard';
         const PAGES=[['test','DAILY TEST'],['money','MONEY & POWER'],['history','HISTORY & CULTURE'],
                      ['taste','TASTE'],['conversation','CONVERSATION'],['foundation','FOUNDATION'],
                      ['dining','DINING']];
@@ -22489,6 +22520,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           gentTabs:PAGES.map(p=>({ label:p[1], go:()=>this.setGentSub(p[0]),
             ink:sub===p[0]?'#0a0a0b':'#c5c5ca',
             bg:sub===p[0]?'#F4F4F5':'transparent' })),
+          // A full-page cover screen shown once per visit to the section — not persisted,
+          // so leaving and coming back (or reloading) shows it again, the same as the rest
+          // of this feature's session-only state.
+          gentShowWelcome:gentIsVanguard && !S.gentEntered,
+          enterGentlemen:()=>this.setState({gentEntered:true}),
           gentCrestTitle:crest[0], gentCrestDesc:crest[1],
           gentCrestHasTest:SUBJECT_KEYS.includes(sub),
           openGentSubjectTest:()=>this.openGentQuiz(sub),
