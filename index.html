@@ -970,6 +970,11 @@
      hero that fills the whole content area before the tabbed page. Centered, no card chrome —
      the ENTER button is the only interactive element. */
   .theme-ultra.theme-vanguard .gent-welcome{ min-height:calc(100vh - 140px); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px 20px; }
+  /* Same ring-and-laurel mark Home's own hero uses per theme (.cc-home-logo) — the emblem sits
+     high in favicon.png (centred at 42% of its height, not 50%), so it's oversized and nudged
+     down within the ring to read as centred rather than as a smudge. */
+  .theme-ultra.theme-vanguard .gent-welcome-logo{ width:64px; height:64px; margin-bottom:20px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .theme-ultra.theme-vanguard .gent-welcome-logo img{ width:70px; height:70px; object-fit:contain; display:block; transform:translateY(5px); }
   .theme-ultra.theme-vanguard .gent-welcome-kicker{ font-family:'JetBrains Mono',monospace !important; font-size:11px; letter-spacing:3px; color:#420A07; margin-bottom:22px; }
   .theme-ultra.theme-vanguard .gent-welcome-title{ font-size:42px; font-weight:300; letter-spacing:.5px; line-height:1.2; color:#2b2c35; margin-bottom:22px; max-width:320px; }
   .theme-ultra.theme-vanguard .gent-welcome-desc{ font-size:15px; line-height:1.65; color:#6E6E7A; max-width:440px; margin-bottom:36px; }
@@ -8697,6 +8702,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
              Every other Ultra style skips straight to the tabbed page below. -->
         <sc-if value="{{ gentShowWelcome }}" hint-placeholder-val="{{ false }}">
           <div class="gent-welcome">
+            <div class="gent-welcome-logo" style="border-color:rgba(66,10,7,0.35);"><img src="favicon.png" alt="Nervexus"></div>
             <div class="gent-welcome-kicker">◆ GENTLEMEN'S ETIQUETTE</div>
             <div class="gent-welcome-title">Gentlemen's Code</div>
             <div class="gent-welcome-desc">Etiquette, poise and the details that separate the deliberate man from the rest — carried, not performed.</div>
@@ -9897,7 +9903,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-428 · v11.428 vanguard-gentlemen-welcome';
+const NOTIF_BUILD_VERSION = '2026.09.25-429 · v11.429 vanguard-gentlemen-welcome-logo';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15132,6 +15138,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.429', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'Added the app\'s crest mark to Gentlemen Center\'s Vanguard welcome screen — the same ring-and-laurel treatment Home\'s hero uses per theme, tinted Bordeaux, sitting above the kicker.',
+    ]},
     {version:'v11.428', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Added a full-page welcome cover to Gentlemen Center for Vanguard, styled after a minimal fashion-site landing page: a large thin title, a line of context, and an ENTER button before the tabbed page. Shown once per visit to the section. Every other Ultra style skips straight to the tabbed page as before.',
     ]},
