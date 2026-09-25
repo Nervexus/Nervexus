@@ -995,6 +995,23 @@
      ACKNOWLEDGED holds inside the What's New card, so the base rule's top margin is redundant
      with the fleuron's own spacing above it. */
   .theme-ultra.theme-vanguard .gent-nav-inner{ margin-top:0 !important; }
+  /* The Daily Test's answer options were the one part of the card still reading as plain app
+     buttons (boxed pills, monospace letters) rather than the invitation the rest of the card
+     had become. Restyled as a hairline-divided list instead: no box or fill, a coloured accent
+     bar on the left doing the job the tinted background used to (still correct/incorrect,
+     colour-coded via the same o.bd value, just thinner and quieter), and the letter recast as
+     a small italic serif mark rather than a monospace tag. */
+  .theme-ultra.theme-vanguard .gent-options{ gap:0 !important; }
+  .theme-ultra.theme-vanguard .gent-option{ border-radius:0 !important; border-top:none !important; border-right:none !important; border-left-width:3px !important; background:transparent !important; padding:20px 6px 20px 22px !important; font-size:16.5px !important; }
+  .theme-ultra.theme-vanguard .gent-option:last-child{ border-bottom:none !important; }
+  .theme-ultra.theme-vanguard .gent-option-letter{ font-family:'Cormorant Garamond',Georgia,serif !important; font-style:italic !important; font-size:15px !important; width:20px !important; flex:0 0 20px !important; opacity:1 !important; color:#420A07 !important; text-transform:lowercase; }
+  .theme-ultra.theme-vanguard .gent-option-letter::after{ content:'.'; }
+  /* A touch more ceremony on the titles and the answered-state verdict, matching the rest of
+     the "Vlog" treatment — italic serif rather than the app's plain upright weight. */
+  .theme-ultra.theme-vanguard .gent-block-title{ font-style:italic !important; }
+  .theme-ultra.theme-vanguard .gent-verdict{ border-top-color:rgba(66,10,7,0.16) !important; text-align:center; }
+  .theme-ultra.theme-vanguard .gent-verdict > div:first-child{ text-align:center; }
+  .theme-ultra.theme-vanguard .gent-verdict > div:last-child{ font-style:italic; max-width:52ch; margin:0 auto; }
   /* BACK/NEXT sit directly under every card, so they carry the same oxblood-vs-Bordeaux
      mismatch the tabs had — Learning's own hardcoded fill (#5B1A1A/#F5F1E8), not raiment-aware. */
   .theme-ultra.theme-vanguard .gent-pill-light{ background:linear-gradient(135deg,#420A07 0%,#9E1811 100%) !important; color:#FFFFFF !important; border-radius:999px !important; }
@@ -8808,10 +8825,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     <div class="gent-fleuron">❦</div>
                     <div class="gent-body" style="flex:1; display:flex; flex-direction:column; min-width:0;">
                     <div class="gent-block-title" style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.3; color:#3A2A20; margin-bottom:26px;">{{ gentQ }}</div>
-                    <div style="display:flex; flex-direction:column; gap:11px;">
+                    <div class="gent-options" style="display:flex; flex-direction:column; gap:11px;">
                       <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
-                        <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:15px; padding:18px 20px; border-radius:14px; border:1px solid {{ o.bd }}; background:{{ o.bg }}; color:{{ o.ink }}; font-size:16px; line-height:1.45; cursor:{{ o.cursor }};">
-                          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; width:16px; flex:0 0 16px; opacity:.7;">{{ o.letter }}</span>
+                        <div onClick="{{ o.pick }}" class="gent-option" style="display:flex; align-items:center; gap:15px; padding:18px 20px; border-radius:14px; border:1px solid {{ o.bd }}; background:{{ o.bg }}; color:{{ o.ink }}; font-size:16px; line-height:1.45; cursor:{{ o.cursor }};">
+                          <span class="gent-option-letter" style="font-family:'JetBrains Mono',monospace; font-size:11px; width:16px; flex:0 0 16px; opacity:.7;">{{ o.letter }}</span>
                           <span style="flex:1; min-width:0;">{{ o.text }}</span>
                           <span style="font-size:15px;">{{ o.mark }}</span>
                         </div>
@@ -8819,7 +8836,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </div>
                     </div>
                     <sc-if value="{{ gentAnswered }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding-top:18px; margin-top:18px; border-top:1px solid rgba(91,26,26,0.14);">
+                      <div class="gent-verdict" style="padding-top:18px; margin-top:18px; border-top:1px solid rgba(91,26,26,0.14);">
                         <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:{{ gentVerdictInk }}; margin-bottom:11px;">{{ gentVerdict }}</div>
                         <div style="font-size:16.5px; line-height:1.65; color:#6b5a4e;">{{ gentWhy }}</div>
                       </div>
@@ -9975,7 +9992,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-432 · v11.432 vanguard-gentlemen-side-panels';
+const NOTIF_BUILD_VERSION = '2026.09.25-433 · v11.433 vanguard-gentlemen-invitation-options';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15210,6 +15227,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.433', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'The Daily Test question card’s answer options were the one part still reading as plain app buttons — boxed pills with monospace letters — next to the rest of the card’s invitation styling. Recast as a hairline-divided list instead: no fill or box, a slim colour-coded accent bar on the left standing in for the old tinted background, and the letters set as small italic serif marks. The question title and the answered-state verdict also went italic to match.',
+    ]},
     {version:'v11.432', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Daily Test’s STANDING and DRAWN FROM side panels now stretch to match the question card’s full height instead of ending well short of it, and dropped the crest icon they were each repeating — it now shows once, on the page’s one primary card, instead of three times side by side.',
     ]},
