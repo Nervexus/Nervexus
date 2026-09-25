@@ -507,6 +507,9 @@
   @media (max-width:900px){ .gent-block{ padding:18px 18px 20px; border-radius:12px; } }
   .gent-bhead{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap;
     margin-bottom:20px; }
+  /* Vanguard-only divider (see the "Vlog" block treatment below) — hidden by default so it
+     doesn't render as a bare, unstyled glyph on every other raiment. */
+  .gent-fleuron{ display:none; }
   .gent-sub{ border-radius:12px; padding:14px 16px; box-sizing:border-box; }
   /* gent-nav (BACK/NEXT, the dots, the progress bar) sits below the block, straight on the
      page — same dark-on-light-or-light-on-dark ink as the block now wears, so nothing here
@@ -961,10 +964,22 @@
   .theme-ultra.theme-vanguard .gent-crest-desc{ font-size:14.5px !important; max-width:400px !important; }
   .theme-ultra.theme-vanguard .gent-crest-inner::after{ content:'· · ·'; display:block; margin-top:26px; letter-spacing:8px; color:rgba(67,68,81,0.3); font-size:11px; }
 
-  /* Daily Test / results cards: flat cream with a hairline border reads as a form on Ultra X's
-     own light palette, but Vanguard's cards elsewhere are all soft elevation with no border —
-     matching that here instead of the hairline-bordered original. */
-  .theme-ultra.theme-vanguard .gent-block{ background:#EDEBE7 !important; border:none !important; box-shadow:0 30px 60px rgba(67,68,81,0.12), 0 1px 0 rgba(255,255,255,0.6) inset !important; }
+  /* Every block on this page takes the "Vlog" treatment — the same ceremonial look as the
+     What's New popup (a bordered ivory panel, a centred eyebrow, a line-fleuron-line divider,
+     generous padding) — by explicit request, replacing the earlier borderless-elevation card. */
+  .theme-ultra.theme-vanguard .gent-block{ background:#EDEBE7 !important; border:1px solid rgba(66,10,7,0.22) !important; border-radius:16px !important; box-shadow:0 20px 50px rgba(67,68,81,0.10) !important; padding:34px !important; }
+  @media (max-width:900px){ .theme-ultra.theme-vanguard .gent-block{ padding:26px 22px !important; } }
+  .theme-ultra.theme-vanguard .gent-bhead{ flex-direction:column !important; align-items:center !important; justify-content:center !important; text-align:center !important; gap:7px !important; margin-bottom:0 !important; }
+  .theme-ultra.theme-vanguard .gent-fleuron{ display:flex; align-items:center; justify-content:center; gap:10px; margin:20px 0 24px; color:#420A07; font-size:13px; }
+  .theme-ultra.theme-vanguard .gent-fleuron::before, .theme-ultra.theme-vanguard .gent-fleuron::after{ content:''; flex:1; max-width:64px; height:1px; background:rgba(66,10,7,0.28); }
+  .theme-ultra.theme-vanguard .gent-block-title{ text-align:center !important; font-weight:300 !important; }
+  .theme-ultra.theme-vanguard .gent-result-body{ text-align:center !important; align-items:center !important; }
+  /* BACK/NEXT sit directly under every card, so they carry the same oxblood-vs-Bordeaux
+     mismatch the tabs had — Learning's own hardcoded fill (#5B1A1A/#F5F1E8), not raiment-aware. */
+  .theme-ultra.theme-vanguard .gent-pill-light{ background:linear-gradient(135deg,#420A07 0%,#9E1811 100%) !important; color:#FFFFFF !important; border-radius:999px !important; }
+  .theme-ultra.theme-vanguard .gent-pill-ghost{ color:#6E6E7A !important; border-color:rgba(66,10,7,0.22) !important; border-radius:999px !important; }
+  .theme-ultra.theme-vanguard .gent-prog{ background:rgba(66,10,7,0.14) !important; }
+  .theme-ultra.theme-vanguard .gent-prog > span{ background:#420A07 !important; }
 
   /* The full-page cover screen (gentShowWelcome, Vanguard-only): a fashion-landing-page-style
      hero that fills the whole content area before the tabbed page. Centered, no card chrome —
@@ -8767,8 +8782,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentCat }}</span>
                       <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentQPos }}</span>
                     </div>
+                    <div class="gent-fleuron">❦</div>
                     <div class="gent-body" style="flex:1; display:flex; flex-direction:column; min-width:0;">
-                    <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.3; color:#3A2A20; margin-bottom:26px;">{{ gentQ }}</div>
+                    <div class="gent-block-title" style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.3; color:#3A2A20; margin-bottom:26px;">{{ gentQ }}</div>
                     <div style="display:flex; flex-direction:column; gap:11px;">
                       <sc-for list="{{ gentOptions }}" as="o" hint-placeholder-count="4">
                         <div onClick="{{ o.pick }}" style="display:flex; align-items:center; gap:15px; padding:18px 20px; border-radius:14px; border:1px solid {{ o.bd }}; background:{{ o.bg }}; color:{{ o.ink }}; font-size:16px; line-height:1.45; cursor:{{ o.cursor }};">
@@ -8793,7 +8809,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                       <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">TODAY&#39;S TEST</span>
                       <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentDateLabel }}</span>
                     </div>
-                    <div class="gent-body" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                    <div class="gent-fleuron">❦</div>
+                    <div class="gent-body gent-result-body" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
                       <div style="font-family:'JetBrains Mono',monospace; font-size:52px; font-weight:700; color:#3A2A20; line-height:1;">{{ gentScore }}</div>
                       <div style="font-size:18px; line-height:1.55; color:#6b5a4e; margin-top:18px; max-width:52ch;">{{ gentResultLine }}</div>
                     </div>
@@ -8824,6 +8841,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div class="gent-bhead" style="margin-bottom:8px;">
                     <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">STANDING</span>
                   </div>
+                  <div class="gent-fleuron">❦</div>
                   <div class="gent-stats">
                     <sc-for list="{{ gentStats }}" as="s" hint-placeholder-count="4">
                       <div class="gent-stat">
@@ -8837,6 +8855,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <div class="gent-bhead" style="margin-bottom:4px;">
                     <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">DRAWN FROM</span>
                   </div>
+                  <div class="gent-fleuron">❦</div>
                   <sc-for list="{{ gentCatRows }}" as="c" hint-placeholder-count="4">
                     <div class="gent-row">
                       <span style="font-size:13px; color:{{ c.ink }};">{{ c.name }}</span>
@@ -8858,6 +8877,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <div class="gent-bhead">
                   <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentFactsEyebrow }}</span>
                 </div>
+                <div class="gent-fleuron">❦</div>
                 <div class="gent-body" style="flex:1; display:flex; flex-direction:column; gap:24px; min-width:0;">
                   <sc-for list="{{ gentFacts }}" as="f" hint-placeholder-count="4">
                     <div style="display:flex; align-items:flex-start; gap:16px;">
@@ -8895,13 +8915,14 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentCardEyebrow }}</span>
                   <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentPos }}</span>
                 </div>
+                <div class="gent-fleuron">❦</div>
                 <div class="gent-body" style="flex:1; display:flex; flex-direction:column; min-width:0;">
                   <!-- On Dress Code the drawing sits beside the rule; everywhere else the text
                        takes the full width and the grid collapses to one column. -->
                   <div style="min-width:0;">
-                      <div style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:#3A2A20;">{{ gentCardTitle }}</div>
+                      <div class="gent-block-title" style="font-size:26px; font-weight:700; letter-spacing:-.3px; line-height:1.25; color:#3A2A20;">{{ gentCardTitle }}</div>
                       <sc-if value="{{ gentCardNote }}" hint-placeholder-val="{{ false }}">
-                        <div style="font-size:11px; letter-spacing:1px; color:#8a6a5a; margin-top:8px;">{{ gentCardNote }}</div>
+                        <div class="gent-block-title" style="font-size:11px; letter-spacing:1px; color:#8a6a5a; margin-top:8px;">{{ gentCardNote }}</div>
                       </sc-if>
                       <!-- One concept, set large. The heading above it is what keeps a rule
                            readable on its own: "peak lapel or shawl collar" means nothing
@@ -9903,7 +9924,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-429 · v11.429 vanguard-gentlemen-welcome-logo';
+const NOTIF_BUILD_VERSION = '2026.09.25-430 · v11.430 vanguard-gentlemen-vlog-cards';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15138,6 +15159,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.430', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'Every block on Gentlemen Center now takes the "Vlog" treatment for Vanguard — the same ceremonial look as the What’s New popup: a bordered ivory panel, a centred eyebrow, a line-fleuron-line divider, and a centred title, replacing the earlier borderless card. BACK/NEXT also switched from Learning’s hardcoded oxblood fill to Vanguard’s own Bordeaux, since they sit directly under every one of these cards.',
+    ]},
     {version:'v11.429', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Added the app\'s crest mark to Gentlemen Center\'s Vanguard welcome screen — the same ring-and-laurel treatment Home\'s hero uses per theme, tinted Bordeaux, sitting above the kicker.',
     ]},
