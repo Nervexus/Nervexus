@@ -981,6 +981,16 @@
   .theme-ultra.theme-vanguard .gent-fleuron::before, .theme-ultra.theme-vanguard .gent-fleuron::after{ content:''; flex:1; max-width:64px; height:1px; background:rgba(66,10,7,0.28); }
   .theme-ultra.theme-vanguard .gent-block-title{ text-align:center !important; font-weight:300 !important; }
   .theme-ultra.theme-vanguard .gent-result-body{ text-align:center !important; align-items:center !important; }
+  /* The STANDING/DRAWN FROM side panels have far less content than the question card next to
+     them, so on their own they read short and empty underneath — stretch them to match the
+     question card's full height instead, splitting the extra space evenly between the two and
+     centring each one's content within it. Repeating the crest icon on every one of these small
+     panels also read as clutter once they were this size, so it's dropped here and kept only on
+     the page's one primary card. */
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] .cc-grid2{ align-items:stretch !important; }
+  .theme-ultra.theme-vanguard .gent-side-col{ height:100%; }
+  .theme-ultra.theme-vanguard .gent-side-col .gent-frame{ flex:1; display:flex; flex-direction:column; }
+  .theme-ultra.theme-vanguard .gent-side-col .gent-block{ flex:1; justify-content:center; }
   /* BACK/NEXT now live inside .gent-block (after their own fleuron), the same position
      ACKNOWLEDGED holds inside the What's New card, so the base rule's top margin is redundant
      with the fleuron's own spacing above it. */
@@ -8865,10 +8875,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                   </div>
                 </sc-if>
               </div>
-              <div style="display:flex; flex-direction:column; gap:16px;">
+              <div class="gent-side-col" style="display:flex; flex-direction:column; gap:16px;">
                 <div class="gent-frame">
                 <div class="gent-block" style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
-                  <img src="favicon.png" alt="" class="gent-block-icon">
                   <div class="gent-bhead" style="margin-bottom:8px;">
                     <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">STANDING</span>
                   </div>
@@ -8885,7 +8894,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
                 <div class="gent-frame">
                 <div class="gent-block" style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
-                  <img src="favicon.png" alt="" class="gent-block-icon">
                   <div class="gent-bhead" style="margin-bottom:4px;">
                     <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">DRAWN FROM</span>
                   </div>
@@ -9967,7 +9975,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-431 · v11.431 vanguard-gentlemen-vlog-cards-2';
+const NOTIF_BUILD_VERSION = '2026.09.25-432 · v11.432 vanguard-gentlemen-side-panels';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15202,6 +15210,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.432', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'Daily Test’s STANDING and DRAWN FROM side panels now stretch to match the question card’s full height instead of ending well short of it, and dropped the crest icon they were each repeating — it now shows once, on the page’s one primary card, instead of three times side by side.',
+    ]},
     {version:'v11.431', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Closed the remaining gap between Gentlemen Center’s cards and the What’s New popup they’re modelled on: added the crest icon above each card’s eyebrow, nested every card in the same two-layer frame (a soft outer wrapper around the bordered inner panel), and moved BACK/NEXT inside the panel behind a second divider — the same spot ACKNOWLEDGED holds in the popup, instead of sitting outside the card as a separate row.',
     ]},
