@@ -964,16 +964,27 @@
   .theme-ultra.theme-vanguard .gent-crest-desc{ font-size:14.5px !important; max-width:400px !important; }
   .theme-ultra.theme-vanguard .gent-crest-inner::after{ content:'· · ·'; display:block; margin-top:26px; letter-spacing:8px; color:rgba(67,68,81,0.3); font-size:11px; }
 
-  /* Every block on this page takes the "Vlog" treatment — the same ceremonial look as the
-     What's New popup (a bordered ivory panel, a centred eyebrow, a line-fleuron-line divider,
-     generous padding) — by explicit request, replacing the earlier borderless-elevation card. */
-  .theme-ultra.theme-vanguard .gent-block{ background:#EDEBE7 !important; border:1px solid rgba(66,10,7,0.22) !important; border-radius:16px !important; box-shadow:0 20px 50px rgba(67,68,81,0.10) !important; padding:34px !important; }
-  @media (max-width:900px){ .theme-ultra.theme-vanguard .gent-block{ padding:26px 22px !important; } }
+  /* Every block on this page takes the "Vlog" treatment — the exact two-layer structure of the
+     What's New popup: an outer ivory wrapper (.gent-frame, big soft shadow, generous padding)
+     around an inner bordered panel (.gent-block, thin Bordeaux hairline, smaller radius) that
+     shares the same fill, so the border reads as a ring inset within the frame rather than a
+     seam. The crest icon and a second divider before BACK/NEXT (moved inside the panel, where
+     the popup's own ACKNOWLEDGED button sits) round out the match. */
+  .theme-ultra.theme-vanguard .gent-frame{ background:#EDEBE7; border-radius:22px; padding:14px; box-shadow:0 20px 50px rgba(67,68,81,0.10); }
+  @media (max-width:900px){ .theme-ultra.theme-vanguard .gent-frame{ padding:10px; border-radius:18px; } }
+  .theme-ultra.theme-vanguard .gent-block{ background:#EDEBE7 !important; border:1px solid rgba(66,10,7,0.22) !important; border-radius:14px !important; box-shadow:none !important; padding:32px !important; }
+  @media (max-width:900px){ .theme-ultra.theme-vanguard .gent-block{ padding:24px 20px !important; } }
+  .gent-block-icon{ display:none; }
+  .theme-ultra.theme-vanguard .gent-block-icon{ display:block; width:36px; height:36px; object-fit:contain; margin:0 auto 16px; opacity:0.88; }
   .theme-ultra.theme-vanguard .gent-bhead{ flex-direction:column !important; align-items:center !important; justify-content:center !important; text-align:center !important; gap:7px !important; margin-bottom:0 !important; }
   .theme-ultra.theme-vanguard .gent-fleuron{ display:flex; align-items:center; justify-content:center; gap:10px; margin:20px 0 24px; color:#420A07; font-size:13px; }
   .theme-ultra.theme-vanguard .gent-fleuron::before, .theme-ultra.theme-vanguard .gent-fleuron::after{ content:''; flex:1; max-width:64px; height:1px; background:rgba(66,10,7,0.28); }
   .theme-ultra.theme-vanguard .gent-block-title{ text-align:center !important; font-weight:300 !important; }
   .theme-ultra.theme-vanguard .gent-result-body{ text-align:center !important; align-items:center !important; }
+  /* BACK/NEXT now live inside .gent-block (after their own fleuron), the same position
+     ACKNOWLEDGED holds inside the What's New card, so the base rule's top margin is redundant
+     with the fleuron's own spacing above it. */
+  .theme-ultra.theme-vanguard .gent-nav-inner{ margin-top:0 !important; }
   /* BACK/NEXT sit directly under every card, so they carry the same oxblood-vs-Bordeaux
      mismatch the tabs had — Learning's own hardcoded fill (#5B1A1A/#F5F1E8), not raiment-aware. */
   .theme-ultra.theme-vanguard .gent-pill-light{ background:linear-gradient(135deg,#420A07 0%,#9E1811 100%) !important; color:#FFFFFF !important; border-radius:999px !important; }
@@ -8777,7 +8788,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div class="cc-grid2" style="display:grid; grid-template-columns:1.5fr 1fr; gap:18px; align-items:start;">
               <div style="min-width:0;">
                 <sc-if value="{{ gentQShow }}" hint-placeholder-val="{{ true }}">
+                  <div class="gent-frame">
                   <div class="gent-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                    <img src="favicon.png" alt="" class="gent-block-icon">
                     <div class="gent-bhead">
                       <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentCat }}</span>
                       <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentQPos }}</span>
@@ -8801,10 +8814,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         <div style="font-size:16.5px; line-height:1.65; color:#6b5a4e;">{{ gentWhy }}</div>
                       </div>
                     </sc-if>
+                    <div class="gent-fleuron gent-fleuron-nav">❦</div>
+                    <div class="gent-nav gent-nav-inner">
+                      <span onClick="{{ gentTestBack }}" class="gent-pill-ghost" style="cursor:{{ gentTBackCursor }}; opacity:{{ gentTBackOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
+                      <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentTestProgPct }}; background:#5B1A1A;"></span></div>
+                      <div class="gent-dots">
+                        <sc-for list="{{ gentTestDots }}" as="d" hint-placeholder-count="5">
+                          <span title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; background:{{ d.bg }};"></span>
+                        </sc-for>
+                      </div>
+                      <span onClick="{{ gentTestNext }}" class="gent-pill-light" style="cursor:{{ gentTNextCursor }}; opacity:{{ gentTNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentTNextLabel }}</span>
+                    </div>
+                  </div>
                   </div>
                 </sc-if>
                 <sc-if value="{{ gentResultShow }}" hint-placeholder-val="{{ false }}">
+                  <div class="gent-frame">
                   <div class="gent-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                    <img src="favicon.png" alt="" class="gent-block-icon">
                     <div class="gent-bhead">
                       <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">TODAY&#39;S TEST</span>
                       <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentDateLabel }}</span>
@@ -8823,21 +8850,25 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                         </div>
                       </sc-for>
                     </div>
+                    <div class="gent-fleuron gent-fleuron-nav">❦</div>
+                    <div class="gent-nav gent-nav-inner">
+                      <span onClick="{{ gentTestBack }}" class="gent-pill-ghost" style="cursor:{{ gentTBackCursor }}; opacity:{{ gentTBackOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
+                      <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentTestProgPct }}; background:#5B1A1A;"></span></div>
+                      <div class="gent-dots">
+                        <sc-for list="{{ gentTestDots }}" as="d" hint-placeholder-count="5">
+                          <span title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; background:{{ d.bg }};"></span>
+                        </sc-for>
+                      </div>
+                      <span onClick="{{ gentTestNext }}" class="gent-pill-light" style="cursor:{{ gentTNextCursor }}; opacity:{{ gentTNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentTNextLabel }}</span>
+                    </div>
+                  </div>
                   </div>
                 </sc-if>
-                <div class="gent-nav">
-                  <span onClick="{{ gentTestBack }}" class="gent-pill-ghost" style="cursor:{{ gentTBackCursor }}; opacity:{{ gentTBackOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
-                  <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentTestProgPct }}; background:#5B1A1A;"></span></div>
-                  <div class="gent-dots">
-                    <sc-for list="{{ gentTestDots }}" as="d" hint-placeholder-count="5">
-                      <span title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; background:{{ d.bg }};"></span>
-                    </sc-for>
-                  </div>
-                  <span onClick="{{ gentTestNext }}" class="gent-pill-light" style="cursor:{{ gentTNextCursor }}; opacity:{{ gentTNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentTNextLabel }}</span>
-                </div>
               </div>
               <div style="display:flex; flex-direction:column; gap:16px;">
+                <div class="gent-frame">
                 <div class="gent-block" style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                  <img src="favicon.png" alt="" class="gent-block-icon">
                   <div class="gent-bhead" style="margin-bottom:8px;">
                     <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">STANDING</span>
                   </div>
@@ -8851,7 +8882,10 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </sc-for>
                   </div>
                 </div>
+                </div>
+                <div class="gent-frame">
                 <div class="gent-block" style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                  <img src="favicon.png" alt="" class="gent-block-icon">
                   <div class="gent-bhead" style="margin-bottom:4px;">
                     <span style="font-size:10px; letter-spacing:2px; color:#8a6a5a;">DRAWN FROM</span>
                   </div>
@@ -8863,6 +8897,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </div>
                   </sc-for>
                 </div>
+                </div>
               </div>
             </div>
           </sc-if>
@@ -8873,7 +8908,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                as easy to skip past. -->
           <sc-if value="{{ gentShowFacts }}" hint-placeholder-val="{{ false }}">
             <div style="max-width:820px;">
+              <div class="gent-frame">
               <div class="gent-block" style="background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                <img src="favicon.png" alt="" class="gent-block-icon">
                 <div class="gent-bhead">
                   <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentFactsEyebrow }}</span>
                 </div>
@@ -8886,22 +8923,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </div>
                   </sc-for>
                 </div>
-              </div>
-              <!-- More than four facts, in case the reader wants to keep going: BACK/NEXT the
-                   same shape as everywhere else on this page, a page of facts at a time rather
-                   than a line at a time. -->
-              <sc-if value="{{ gentFactsHasNav }}" hint-placeholder-val="{{ false }}">
-                <div class="gent-nav">
-                  <span onClick="{{ gentFactsPrev }}" class="gent-pill-ghost" style="cursor:{{ gentFactsPrevCursor }}; opacity:{{ gentFactsPrevOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
-                  <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentFactsProgPct }}; background:#5B1A1A;"></span></div>
-                  <div class="gent-dots">
-                    <sc-for list="{{ gentFactsDots }}" as="d" hint-placeholder-count="2">
-                      <span onClick="{{ d.go }}" style="width:{{ d.w }}; height:8px; border-radius:5px; cursor:pointer; background:{{ d.bg }};"></span>
-                    </sc-for>
+                <!-- More than four facts, in case the reader wants to keep going: BACK/NEXT the
+                     same shape as everywhere else on this page, a page of facts at a time rather
+                     than a line at a time. -->
+                <sc-if value="{{ gentFactsHasNav }}" hint-placeholder-val="{{ false }}">
+                  <div class="gent-fleuron gent-fleuron-nav">❦</div>
+                  <div class="gent-nav gent-nav-inner">
+                    <span onClick="{{ gentFactsPrev }}" class="gent-pill-ghost" style="cursor:{{ gentFactsPrevCursor }}; opacity:{{ gentFactsPrevOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
+                    <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentFactsProgPct }}; background:#5B1A1A;"></span></div>
+                    <div class="gent-dots">
+                      <sc-for list="{{ gentFactsDots }}" as="d" hint-placeholder-count="2">
+                        <span onClick="{{ d.go }}" style="width:{{ d.w }}; height:8px; border-radius:5px; cursor:pointer; background:{{ d.bg }};"></span>
+                      </sc-for>
+                    </div>
+                    <span onClick="{{ gentFactsNext }}" class="gent-pill-light" style="cursor:{{ gentFactsNextCursor }}; opacity:{{ gentFactsNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentFactsNextLabel }}</span>
                   </div>
-                  <span onClick="{{ gentFactsNext }}" class="gent-pill-light" style="cursor:{{ gentFactsNextCursor }}; opacity:{{ gentFactsNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentFactsNextLabel }}</span>
-                </div>
-              </sc-if>
+                </sc-if>
+              </div>
+              </div>
             </div>
           </sc-if>
 
@@ -8910,7 +8949,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                is cut is a judgement about the material and not a layout detail. -->
           <sc-if value="{{ gentShowPages }}" hint-placeholder-val="{{ false }}">
             <div style="max-width:820px;">
+              <div class="gent-frame">
               <div class="gent-block" style="min-height:340px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                <img src="favicon.png" alt="" class="gent-block-icon">
                 <div class="gent-bhead">
                   <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">{{ gentCardEyebrow }}</span>
                   <span style="font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentPos }}</span>
@@ -8933,16 +8974,18 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <sc-if value="{{ gentCardHasStep }}" hint-placeholder-val="{{ false }}">
                   <div style="padding-top:14px; margin-top:14px; border-top:1px solid rgba(91,26,26,0.14); font-size:10.5px; letter-spacing:1px; color:#8a6a5a;">{{ gentCardStep }}</div>
                 </sc-if>
-              </div>
-              <div class="gent-nav">
-                <span onClick="{{ gentPrev }}" class="gent-pill-ghost" style="cursor:{{ gentPrevCursor }}; opacity:{{ gentPrevOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
-                <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentProgPct }}; background:#5B1A1A;"></span></div>
-                <div class="gent-dots">
-                  <sc-for list="{{ gentDots }}" as="d" hint-placeholder-count="6">
-                    <span onClick="{{ d.go }}" title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; cursor:pointer; background:{{ d.bg }};"></span>
-                  </sc-for>
+                <div class="gent-fleuron gent-fleuron-nav">❦</div>
+                <div class="gent-nav gent-nav-inner">
+                  <span onClick="{{ gentPrev }}" class="gent-pill-ghost" style="cursor:{{ gentPrevCursor }}; opacity:{{ gentPrevOpacity }}; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14);">‹ BACK</span>
+                  <div class="gent-prog" style="background:rgba(91,26,26,0.14);"><span style="width:{{ gentProgPct }}; background:#5B1A1A;"></span></div>
+                  <div class="gent-dots">
+                    <sc-for list="{{ gentDots }}" as="d" hint-placeholder-count="6">
+                      <span onClick="{{ d.go }}" title="{{ d.title }}" style="width:{{ d.w }}; height:8px; border-radius:5px; cursor:pointer; background:{{ d.bg }};"></span>
+                    </sc-for>
+                  </div>
+                  <span onClick="{{ gentNext }}" class="gent-pill-light" style="cursor:{{ gentNextCursor }}; opacity:{{ gentNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentNextLabel }}</span>
                 </div>
-                <span onClick="{{ gentNext }}" class="gent-pill-light" style="cursor:{{ gentNextCursor }}; opacity:{{ gentNextOpacity }}; background:#5B1A1A; color:#F5F1E8;">{{ gentNextLabel }}</span>
+              </div>
               </div>
             </div>
           </sc-if>
@@ -9924,7 +9967,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-430 · v11.430 vanguard-gentlemen-vlog-cards';
+const NOTIF_BUILD_VERSION = '2026.09.25-431 · v11.431 vanguard-gentlemen-vlog-cards-2';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15159,6 +15202,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.431', date:'Sep 25, 2026', major:false, kind:'design', notes:[
+      'Closed the remaining gap between Gentlemen Center’s cards and the What’s New popup they’re modelled on: added the crest icon above each card’s eyebrow, nested every card in the same two-layer frame (a soft outer wrapper around the bordered inner panel), and moved BACK/NEXT inside the panel behind a second divider — the same spot ACKNOWLEDGED holds in the popup, instead of sitting outside the card as a separate row.',
+    ]},
     {version:'v11.430', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Every block on Gentlemen Center now takes the "Vlog" treatment for Vanguard — the same ceremonial look as the What’s New popup: a bordered ivory panel, a centred eyebrow, a line-fleuron-line divider, and a centred title, replacing the earlier borderless card. BACK/NEXT also switched from Learning’s hardcoded oxblood fill to Vanguard’s own Bordeaux, since they sit directly under every one of these cards.',
     ]},
