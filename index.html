@@ -923,6 +923,14 @@
      heavier weight — everywhere else on Vanguard now reads lighter/thinner. */
   .theme-ultra.theme-vanguard .cc-home-hero h1, .theme-ultra.theme-vanguard .cc-home-hero h2, .theme-ultra.theme-vanguard .cc-home-hero h3,
   .theme-ultra.theme-vanguard .cc-home-hero p, .theme-ultra.theme-vanguard .cc-home-hero span, .theme-ultra.theme-vanguard .cc-home-hero div{ font-weight:500 !important; }
+  /* Gentlemen Center runs noticeably larger type than the rest of the app (a 52px results
+     score, 24-26px titles) — harmless on Ultra X's own serif, but reading as loud/heavy once
+     everything else on Vanguard is this light. Scaled down for Vanguard specifically. */
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] h1{ font-size:22px !important; }
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:24px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 24px"]{ font-size:19px !important; }
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:26px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 26px"]{ font-size:19px !important; }
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:52px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 52px"]{ font-size:34px !important; }
+  .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size:21px"], .theme-ultra.theme-vanguard [data-screen-label="Gentlemen Center"] [style*="font-size: 21px"]{ font-size:16px !important; }
   /* Only headings with no colour of their own (plain page titles, sitting straight on the
      walnut background) fall back to --u-accent. A heading that already computes its own inline
      colour — a card/popup title using perfUInk or similar, meant to sit on the cream card
@@ -9830,7 +9838,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-425 · v11.425 vanguard-times-weight-scope';
+const NOTIF_BUILD_VERSION = '2026.09.25-426 · v11.426 vanguard-gentlemen-size-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15065,6 +15073,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.426', date:'Sep 25, 2026', major:false, kind:'fix', notes:[
+      'Scaled down Gentlemen Center\'s oversized type for Vanguard — the page title, the Daily Test/reference-card titles, the quiz question, and the results score (previously 52px) all read too heavy once the rest of Vanguard went light. Voice Core was checked too but had nothing large enough to need changing.',
+    ]},
     {version:'v11.425', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'Vanguard\'s Times New Roman is lighter/thinner everywhere except Home\'s hero (the wordmark, greeting, sysline and Power On button), which keeps its heavier weight.',
     ]},
