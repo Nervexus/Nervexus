@@ -991,6 +991,14 @@
   .theme-ultra.theme-vanguard .gent-side-col{ height:100%; }
   .theme-ultra.theme-vanguard .gent-side-col .gent-frame{ flex:1; display:flex; flex-direction:column; }
   .theme-ultra.theme-vanguard .gent-side-col .gent-block{ flex:1; justify-content:center; }
+  /* The stretch above also hands the LEFT column a taller box whenever the start/picking cards
+     (much shorter than the question card) leave the two panels on the right taller than they
+     are — without this, the column itself would stretch to match but the visible card inside it
+     wouldn't, leaving a mismatched gap of bare page below the card instead of an aligned edge. */
+  .theme-ultra.theme-vanguard .gent-main-col{ height:100%; display:flex; flex-direction:column; }
+  .theme-ultra.theme-vanguard .gent-main-col > .gent-frame{ flex:1; display:flex; flex-direction:column; }
+  .theme-ultra.theme-vanguard .gent-main-col > .gent-frame > .gent-block{ flex:1; }
+  .theme-ultra.theme-vanguard .gent-picking-block{ justify-content:center !important; }
   /* BACK/NEXT now live inside .gent-block (after their own fleuron), the same position
      ACKNOWLEDGED holds inside the What's New card, so the base rule's top margin is redundant
      with the fleuron's own spacing above it. */
@@ -8820,7 +8828,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <!-- The test is a deck like the pages: one question per card, answer it, advance.
                  Forward is locked until the question in front of you has been answered. -->
             <div class="cc-grid2" style="display:grid; grid-template-columns:1.5fr 1fr; gap:18px; align-items:start;">
-              <div style="min-width:0;">
+              <div class="gent-main-col" style="min-width:0;">
                 <!-- Nothing to answer yet today: one button, styled after the section's own
                      welcome cover (icon, kicker, centred title, one line of context, one
                      button) but living inside this card rather than as a full-page screen. -->
@@ -8845,7 +8853,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                      way as the rest of this feature, so it's still identical on every device. -->
                 <sc-if value="{{ gentShowTestPicking }}" hint-placeholder-val="{{ false }}">
                   <div class="gent-frame">
-                  <div class="gent-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                  <div class="gent-block gent-picking-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
                     <img src="favicon.png" alt="" class="gent-block-icon">
                     <div class="gent-bhead">
                       <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">CHOOSE A LENGTH</span>
@@ -10042,7 +10050,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.26-434 · v11.434 gentlemen-daily-test-tiers';
+const NOTIF_BUILD_VERSION = '2026.09.26-435 · v11.435 vanguard-gentlemen-daily-test-align';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15277,6 +15285,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.435', date:'Sep 26, 2026', major:false, kind:'fix', notes:[
+      'Verified the new Max (40-question) Daily Test end to end on mobile — all 40 questions, the review list and FINISHED all work at phone width. Also fixed the Daily Test card’s height on Vanguard: the start and tier-picker screens are shorter than the question card, so once STANDING/DRAWN FROM stretched to match them the outer column matched but the visible card inside it didn’t — it now stretches too, so its bottom edge lines up with the two panels beside it instead of leaving a gap of bare page underneath.',
+    ]},
     {version:'v11.434', date:'Sep 26, 2026', major:false, kind:'feature', notes:[
       'The Daily Test now opens on a start screen instead of dropping straight into a question: press DAILY TEST, then choose a length — Quick (5), Mid (15), High (22) or Max (40). Quick/Mid/High draw from the 25-question bank without repeats; Max goes past it, so it repeats some questions, seeded the same way as the rest of the test so it’s still identical on every device and reload. FINISHED, on the result card, used to be a dead click (there was nowhere further forward to go past the last question) — it now actually closes the card and returns to the start screen, which shows today’s score and a TAKE ANOTHER TEST option instead of staying stuck.',
     ]},
