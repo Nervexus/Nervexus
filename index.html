@@ -10050,7 +10050,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.26-436 · v11.436 gentlemen-daily-test-retake-fix';
+const NOTIF_BUILD_VERSION = '2026.09.26-437 · v11.437 gentlemen-daily-test-tier-wording';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15285,6 +15285,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.437', date:'Sep 26, 2026', major:false, kind:'design', notes:[
+      'Renamed the Daily Test’s four lengths to read more like a considered choice than a difficulty setting: Quick/Mid/High/Max are now Brief/Standard/Extended/Comprehensive (still 5/15/22/40 questions — only the wording changed).',
+    ]},
     {version:'v11.436', date:'Sep 26, 2026', major:false, kind:'fix', notes:[
       'Verified STREAK, DAYS DONE and CORRECT % against a seeded log spanning several days at different tiers — all three compute right. Along the way, found and fixed a real bug in TAKE ANOTHER TEST: since today already had a completed tier on record, the picker it was supposed to open immediately lost out to that existing tier and landed back on the old, already-finished result card instead. The picker now correctly takes priority, and BACK out of it returns to the plain start/recap screen rather than risking the same stale result.',
     ]},

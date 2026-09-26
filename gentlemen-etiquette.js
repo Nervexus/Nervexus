@@ -581,10 +581,10 @@
     return out;
   }
   var DAILY_TIERS = [
-    { key: 'quick', label: 'Quick', n: 5 },
-    { key: 'mid', label: 'Mid', n: 15 },
-    { key: 'high', label: 'High', n: 22 },
-    { key: 'max', label: 'Max', n: 40 },
+    { key: 'quick', label: 'Brief', n: 5 },
+    { key: 'mid', label: 'Standard', n: 15 },
+    { key: 'high', label: 'Extended', n: 22 },
+    { key: 'max', label: 'Comprehensive', n: 40 },
   ];
 
   root.GentlemenEtiquette = {
