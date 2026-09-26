@@ -954,6 +954,18 @@
   .theme-ultra.theme-vanguard .gent-tab{ background:transparent !important; border-radius:0 !important; padding:0 0 14px !important; font-family:'Times New Roman',Times,serif !important; font-weight:300 !important; font-size:11px !important; letter-spacing:2px; text-transform:uppercase; color:#9a9aa8 !important; border-bottom:2px solid transparent; }
   .theme-ultra.theme-vanguard .gent-tab[style*="color:#0a0a0b"], .theme-ultra.theme-vanguard .gent-tab[style*="color: rgb(10, 10, 11)"]{ color:#420A07 !important; border-bottom-color:#420A07; }
 
+  /* The top bar's "Themes & more" gem — hardcoded near-white (#cfcfd4 stroke, rgba(255,255,255,..)
+     chrome) for a dark app background, so on Vanguard's white background both the icon and its
+     button all but disappear. Recast the gem itself as a faceted ruby (a two-tone gradient fill
+     on the crown/pavilion halves, each already a closed shape via SVG's implicit fill-closing,
+     with the girdle and inner facet lines kept as pale gold sparkle strokes on top) and the
+     button as a Bordeaux-tinted glass tile so it reads as a real control, not a ghost. */
+  .theme-ultra.theme-vanguard .cc-theme-btn{ border-color:rgba(66,10,7,0.22) !important; background:rgba(66,10,7,0.05) !important; }
+  .theme-ultra.theme-vanguard .cc-theme-gem{ stroke:rgba(246,224,190,0.75) !important; stroke-width:1px !important; }
+  .theme-ultra.theme-vanguard .cc-theme-gem-crown{ fill:url(#vgGemCrown) !important; }
+  .theme-ultra.theme-vanguard .cc-theme-gem-pavilion{ fill:url(#vgGemPavilion) !important; }
+  .theme-ultra.theme-vanguard .cc-theme-gem-facet{ stroke:rgba(246,224,190,0.75) !important; }
+
   /* The crest: no card chrome of its own, just a big thin display title (this is the one
      place on the page allowed a large size — big and thin reads as elegant, not loud) plus
      the existing description and divider, with a small decorative dot row underneath standing
@@ -2473,12 +2485,22 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
       <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
         <div style="flex:0 0 auto;">
-          <span onClick="{{ toggleThemeMenu }}" title="Themes &amp; more" style="width:40px; height:40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
-            <svg viewBox="0 0 18 18" width="17" height="17" fill="none" stroke="#cfcfd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 6.6L9 2.2l5 4.4"></path>
-              <path d="M4 6.6L9 15.8l5-9.2"></path>
-              <path d="M4 6.6h10"></path>
-              <path d="M7.2 6.6L9 2.2l1.8 4.4"></path>
+          <span onClick="{{ toggleThemeMenu }}" title="Themes &amp; more" class="cc-theme-btn" style="width:40px; height:40px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.07)' }">
+            <svg viewBox="0 0 18 18" width="17" height="17" fill="none" stroke="#cfcfd4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="cc-theme-gem">
+              <defs>
+                <linearGradient id="vgGemCrown" x1="4" y1="2.2" x2="14" y2="6.6" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#E8746B"></stop>
+                  <stop offset="1" stop-color="#9E1811"></stop>
+                </linearGradient>
+                <linearGradient id="vgGemPavilion" x1="9" y1="6.6" x2="9" y2="15.8" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#9E1811"></stop>
+                  <stop offset="1" stop-color="#3A0705"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M4 6.6L9 2.2l5 4.4" class="cc-theme-gem-crown"></path>
+              <path d="M4 6.6L9 15.8l5-9.2" class="cc-theme-gem-pavilion"></path>
+              <path d="M4 6.6h10" class="cc-theme-gem-facet"></path>
+              <path d="M7.2 6.6L9 2.2l1.8 4.4" class="cc-theme-gem-facet"></path>
             </svg>
           </span>
         </div>
@@ -10050,7 +10072,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.26-437 · v11.437 gentlemen-daily-test-tier-wording';
+const NOTIF_BUILD_VERSION = '2026.09.26-438 · v11.438 vanguard-theme-gem';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15285,6 +15307,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.438', date:'Sep 26, 2026', major:false, kind:'design', notes:[
+      'The top bar’s "Themes & more" gem was hardcoded a near-white outline for a dark background, so on Vanguard’s white app it all but vanished. Recast as a faceted ruby for Vanguard — a two-tone red gradient fill on the crown and pavilion with pale gold facet lines on top — in a Bordeaux-tinted button, instead of a ghost icon in a ghost box. Every other Ultra style keeps the original outline.',
+    ]},
     {version:'v11.437', date:'Sep 26, 2026', major:false, kind:'design', notes:[
       'Renamed the Daily Test’s four lengths to read more like a considered choice than a difficulty setting: Quick/Mid/High/Max are now Brief/Standard/Extended/Comprehensive (still 5/15/22/40 questions — only the wording changed).',
     ]},
