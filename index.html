@@ -954,17 +954,16 @@
   .theme-ultra.theme-vanguard .gent-tab{ background:transparent !important; border-radius:0 !important; padding:0 0 14px !important; font-family:'Times New Roman',Times,serif !important; font-weight:300 !important; font-size:11px !important; letter-spacing:2px; text-transform:uppercase; color:#9a9aa8 !important; border-bottom:2px solid transparent; }
   .theme-ultra.theme-vanguard .gent-tab[style*="color:#0a0a0b"], .theme-ultra.theme-vanguard .gent-tab[style*="color: rgb(10, 10, 11)"]{ color:#420A07 !important; border-bottom-color:#420A07; }
 
-  /* The top bar's "Themes & more" gem — hardcoded near-white (#cfcfd4 stroke, rgba(255,255,255,..)
+  /* The top bar's "Themes & more" gem was hardcoded near-white (#cfcfd4 stroke, rgba(255,255,255,..)
      chrome) for a dark app background, so on Vanguard's white background both the icon and its
-     button all but disappear. Recast the gem itself as a faceted ruby (a two-tone gradient fill
-     on the crown/pavilion halves, each already a closed shape via SVG's implicit fill-closing,
-     with the girdle and inner facet lines kept as pale gold sparkle strokes on top) and the
-     button as a Bordeaux-tinted glass tile so it reads as a real control, not a ghost. */
+     button all but disappeared. Swapped the abstract gem for the app's own crest (the same
+     favicon.png laurel mark used on Home's hero and the Gentlemen Center welcome screen) rather
+     than inventing a new icon, so the button reads as the app's own mark instead of a random
+     gem; the button itself gets a Bordeaux-tinted glass tile to match. */
   .theme-ultra.theme-vanguard .cc-theme-btn{ border-color:rgba(66,10,7,0.22) !important; background:rgba(66,10,7,0.05) !important; }
-  .theme-ultra.theme-vanguard .cc-theme-gem{ stroke:rgba(246,224,190,0.75) !important; stroke-width:1px !important; }
-  .theme-ultra.theme-vanguard .cc-theme-gem-crown{ fill:url(#vgGemCrown) !important; }
-  .theme-ultra.theme-vanguard .cc-theme-gem-pavilion{ fill:url(#vgGemPavilion) !important; }
-  .theme-ultra.theme-vanguard .cc-theme-gem-facet{ stroke:rgba(246,224,190,0.75) !important; }
+  .theme-ultra.theme-vanguard .cc-theme-gem{ display:none !important; }
+  .cc-theme-logo{ display:none; }
+  .theme-ultra.theme-vanguard .cc-theme-logo{ display:block; width:28px; height:28px; object-fit:contain; transform:translateY(2px); opacity:0.95; }
 
   /* The crest: no card chrome of its own, just a big thin display title (this is the one
      place on the page allowed a large size — big and thin reads as elegant, not loud) plus
@@ -2502,6 +2501,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <path d="M4 6.6h10" class="cc-theme-gem-facet"></path>
               <path d="M7.2 6.6L9 2.2l1.8 4.4" class="cc-theme-gem-facet"></path>
             </svg>
+            <img src="favicon.png" alt="" class="cc-theme-logo">
           </span>
         </div>
         <div class="cc-nw" style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#8a8a92; text-align:right; line-height:1.3; flex:0 0 auto;">
@@ -10072,7 +10072,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.26-438 · v11.438 vanguard-theme-gem';
+const NOTIF_BUILD_VERSION = '2026.09.26-439 · v11.439 vanguard-theme-btn-crest';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15307,6 +15307,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.439', date:'Sep 26, 2026', major:false, kind:'design', notes:[
+      'Swapped the top bar’s ruby gem for the app’s own crest — the same laurel mark used on Home’s hero and the Gentlemen Center welcome screen — so the button reads as the app’s own icon rather than an invented gem. Vanguard only; every other Ultra style keeps its original diamond outline.',
+    ]},
     {version:'v11.438', date:'Sep 26, 2026', major:false, kind:'design', notes:[
       'The top bar’s "Themes & more" gem was hardcoded a near-white outline for a dark background, so on Vanguard’s white app it all but vanished. Recast as a faceted ruby for Vanguard — a two-tone red gradient fill on the crown and pavilion with pale gold facet lines on top — in a Bordeaux-tinted button, instead of a ghost icon in a ghost box. Every other Ultra style keeps the original outline.',
     ]},
