@@ -10050,7 +10050,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.26-435 · v11.435 vanguard-gentlemen-daily-test-align';
+const NOTIF_BUILD_VERSION = '2026.09.26-436 · v11.436 gentlemen-daily-test-retake-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15285,6 +15285,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.436', date:'Sep 26, 2026', major:false, kind:'fix', notes:[
+      'Verified STREAK, DAYS DONE and CORRECT % against a seeded log spanning several days at different tiers — all three compute right. Along the way, found and fixed a real bug in TAKE ANOTHER TEST: since today already had a completed tier on record, the picker it was supposed to open immediately lost out to that existing tier and landed back on the old, already-finished result card instead. The picker now correctly takes priority, and BACK out of it returns to the plain start/recap screen rather than risking the same stale result.',
+    ]},
     {version:'v11.435', date:'Sep 26, 2026', major:false, kind:'fix', notes:[
       'Verified the new Max (40-question) Daily Test end to end on mobile — all 40 questions, the review list and FINISHED all work at phone width. Also fixed the Daily Test card’s height on Vanguard: the start and tier-picker screens are shorter than the question card, so once STANDING/DRAWN FROM stretched to match them the outer column matched but the visible card inside it didn’t — it now stretches too, so its bottom edge lines up with the two panels beside it instead of leaving a gap of bare page underneath.',
     ]},
@@ -22695,10 +22698,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         /* Quick/Mid/High/Max, chosen once per day via the tier picker and stored on the day's
            own log record — a blank record (or no record at all) means today's test hasn't been
            started, which is the "start" phase below; FINISHED sets gentTestDismissed to move a
-           completed day back to that same screen instead of leaving it stuck on the result. */
+           completed day back to that same screen instead of leaving it stuck on the result.
+           gentPickingTier has to outrank an existing tier, not just a missing one — otherwise
+           TAKE ANOTHER TEST (which re-opens the picker on a day that already has a completed
+           tier on record) would find that tier still set and land straight back on the old
+           result card instead of the picker it just asked for. */
         const gentRec=this._gentTodayRec();
         const gentTierInfo=this._gentTierInfo(gentRec);
-        const gentTestPhase=S.gentTestDismissed?'start':(gentTierInfo?'test':(S.gentPickingTier?'picking':'start'));
+        const gentTestPhase=S.gentTestDismissed?'start':(S.gentPickingTier?'picking':(gentTierInfo?'test':'start'));
         const set=gentTierInfo?G.dailySetN(this._gentToday(), gentRec.tier, gentTierInfo.n):[];
         const picks=this._gentPicks();
         const at=Math.max(0, Math.min(set.length, S.gentTestIdx||0));
@@ -22798,7 +22805,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
             : 'One test a day, at whichever length you choose — drawn from every category, dining, money, history, taste and conversation.',
           gentDailyStartLabel:(gentRec && gentRec.done)?'TAKE ANOTHER TEST ›':'DAILY TEST',
           startGentDailyTest:()=>this.startGentDailyTest(),
-          backFromTierPicking:()=>this.setState({gentPickingTier:false}),
+          // gentTestDismissed:true too — otherwise backing out of a re-opened picker (reached
+          // via TAKE ANOTHER TEST, on a day that already has a completed tier on record) would
+          // fall through to that old result card instead of the plain start/recap screen.
+          backFromTierPicking:()=>this.setState({gentPickingTier:false, gentTestDismissed:true}),
           gentTierOptions:(G.DAILY_TIERS||[]).map(t=>({ key:t.key, label:t.label.toUpperCase(),
             desc:t.n+' QUESTION'+(t.n===1?'':'S'), go:()=>this.chooseGentTier(t.key) })),
           finishGentTest:()=>this.finishGentTest(),
