@@ -542,10 +542,55 @@
     return set.length ? set[0] : null;
   }
 
+  /* ---- the daily test, at a chosen length ----------------------------------------------
+     The one-per-category draw above is the original, minimal "nothing to configure" test.
+     This is the same idea stretched to a chosen length: Quick/Mid/High/Max. The question
+     bank is 25 questions across three categories, so anything past 25 has to repeat — Max
+     (40) always will. Repeats are seeded per (day, tier, lap) so the order is still stable
+     across reloads and devices, and a lap is reshuffled rather than replayed in the same
+     order so a repeat doesn't read as an obvious rerun of the same 25. */
+  function dailySetN(dateKey, tier, count) {
+    if (!QUESTIONS.length || !count) return [];
+    var pool = QUESTIONS.slice();
+    var shuffle = function (arr, seedKey) {
+      var r = seed(seedKey);
+      for (var k = arr.length - 1; k > 0; k--) {
+        r = (Math.imul(r, 48271) + 11) >>> 0;
+        var j = r % (k + 1), t = arr[k]; arr[k] = arr[j]; arr[j] = t;
+      }
+      return arr;
+    };
+    shuffle(pool, String(dateKey) + '#' + tier + '#lap0');
+    var out = [];
+    for (var idx = 0; idx < count; idx++) {
+      var lap = Math.floor(idx / pool.length);
+      if (idx > 0 && idx % pool.length === 0) shuffle(pool, String(dateKey) + '#' + tier + '#lap' + lap);
+      var q = pool[idx % pool.length];
+      var order = q.a.map(function (_, i) { return i; });
+      var rr = seed(String(dateKey) + '#' + tier + '#opt#' + idx);
+      for (var m = order.length - 1; m > 0; m--) {
+        rr = (Math.imul(rr, 48271) + 11) >>> 0;
+        var jj = rr % (m + 1), tt = order[m]; order[m] = order[jj]; order[jj] = tt;
+      }
+      out.push({
+        cat: q.cat, q: q.q, why: q.why,
+        options: order.map(function (o) { return q.a[o]; }),
+        correct: order.indexOf(q.c),
+      });
+    }
+    return out;
+  }
+  var DAILY_TIERS = [
+    { key: 'quick', label: 'Quick', n: 5 },
+    { key: 'mid', label: 'Mid', n: 15 },
+    { key: 'high', label: 'High', n: 22 },
+    { key: 'max', label: 'Max', n: 40 },
+  ];
+
   root.GentlemenEtiquette = {
     SUBJECTS: SUBJECTS, DINING: DINING,
     QUESTIONS: QUESTIONS, CATEGORIES: CATEGORIES,
-    dailyQuestion: dailyQuestion, dailySet: dailySet, cards: cards, _seed: seed,
+    dailyQuestion: dailyQuestion, dailySet: dailySet, dailySetN: dailySetN, DAILY_TIERS: DAILY_TIERS, cards: cards, _seed: seed,
     SUBJECT_TESTS: SUBJECT_TESTS, SUBJECT_TEST_TIERS: SUBJECT_TEST_TIERS, subjectTest: subjectTest,
     subjectFacts: subjectFacts,
   };

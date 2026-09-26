@@ -1012,6 +1012,13 @@
   .theme-ultra.theme-vanguard .gent-verdict{ border-top-color:rgba(66,10,7,0.16) !important; text-align:center; }
   .theme-ultra.theme-vanguard .gent-verdict > div:first-child{ text-align:center; }
   .theme-ultra.theme-vanguard .gent-verdict > div:last-child{ font-style:italic; max-width:52ch; margin:0 auto; }
+  /* The pre-test start card: centred like the section's own welcome cover, but scaled to sit
+     inside this card rather than fill the page. */
+  .theme-ultra.theme-vanguard .gent-start-body{ align-items:center !important; justify-content:center !important; text-align:center; gap:16px; min-height:220px; }
+  .theme-ultra.theme-vanguard .gent-start-btn{ margin-top:6px; }
+  /* The tier picker's BACK sits under its own divider, centred rather than spanning the row
+     the way BACK/NEXT do together elsewhere. */
+  .theme-ultra.theme-vanguard .gent-block > span.gent-pill-ghost{ display:table; margin:0 auto; }
   /* BACK/NEXT sit directly under every card, so they carry the same oxblood-vs-Bordeaux
      mismatch the tabs had — Learning's own hardcoded fill (#5B1A1A/#F5F1E8), not raiment-aware. */
   .theme-ultra.theme-vanguard .gent-pill-light{ background:linear-gradient(135deg,#420A07 0%,#9E1811 100%) !important; color:#FFFFFF !important; border-radius:999px !important; }
@@ -8814,6 +8821,49 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                  Forward is locked until the question in front of you has been answered. -->
             <div class="cc-grid2" style="display:grid; grid-template-columns:1.5fr 1fr; gap:18px; align-items:start;">
               <div style="min-width:0;">
+                <!-- Nothing to answer yet today: one button, styled after the section's own
+                     welcome cover (icon, kicker, centred title, one line of context, one
+                     button) but living inside this card rather than as a full-page screen. -->
+                <sc-if value="{{ gentShowTestStart }}" hint-placeholder-val="{{ false }}">
+                  <div class="gent-frame">
+                  <div class="gent-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                    <img src="favicon.png" alt="" class="gent-block-icon">
+                    <div class="gent-bhead">
+                      <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">GENTLEMEN'S ETIQUETTE</span>
+                    </div>
+                    <div class="gent-fleuron">❦</div>
+                    <div class="gent-body gent-start-body" style="flex:1; display:flex; flex-direction:column; min-width:0;">
+                      <div class="gent-block-title" style="font-size:26px; font-weight:700; letter-spacing:-.3px; color:#3A2A20;">Daily Test</div>
+                      <div style="font-size:15px; line-height:1.65; color:#6b5a4e; max-width:44ch;">{{ gentDailyDoneLine }}</div>
+                      <span onClick="{{ startGentDailyTest }}" class="gent-pill-light gent-start-btn">{{ gentDailyStartLabel }}</span>
+                    </div>
+                  </div>
+                  </div>
+                </sc-if>
+                <!-- The four lengths. Quick/Mid/High are all within the question bank; Max
+                     goes past it, so a day's Max test repeats some questions — seeded the same
+                     way as the rest of this feature, so it's still identical on every device. -->
+                <sc-if value="{{ gentShowTestPicking }}" hint-placeholder-val="{{ false }}">
+                  <div class="gent-frame">
+                  <div class="gent-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
+                    <img src="favicon.png" alt="" class="gent-block-icon">
+                    <div class="gent-bhead">
+                      <span style="font-size:10.5px; letter-spacing:2.5px; color:#8a6a5a;">CHOOSE A LENGTH</span>
+                    </div>
+                    <div class="gent-fleuron">❦</div>
+                    <div class="gent-options" style="display:flex; flex-direction:column; gap:11px;">
+                      <sc-for list="{{ gentTierOptions }}" as="t" hint-placeholder-count="4">
+                        <div onClick="{{ t.go }}" class="gent-option" style="display:flex; align-items:center; gap:15px; padding:18px 20px; border-radius:14px; border:1px solid rgba(91,26,26,0.16); background:transparent; color:#3A2A20; font-size:16px; line-height:1.45; cursor:pointer;">
+                          <span style="flex:1; min-width:0;">{{ t.label }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:1px; color:#8a6a5a;">{{ t.desc }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div class="gent-fleuron gent-fleuron-nav">❦</div>
+                    <span onClick="{{ backFromTierPicking }}" class="gent-pill-ghost" style="cursor:pointer; color:#8a6a5a; border:1px solid rgba(91,26,26,0.14); align-self:center;">‹ BACK</span>
+                  </div>
+                  </div>
+                </sc-if>
                 <sc-if value="{{ gentQShow }}" hint-placeholder-val="{{ true }}">
                   <div class="gent-frame">
                   <div class="gent-block" style="min-height:360px; background:#FAF7F0; border:1px solid rgba(91,26,26,0.14); color:#3A2A20;">
@@ -9992,7 +10042,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.25-433 · v11.433 vanguard-gentlemen-invitation-options';
+const NOTIF_BUILD_VERSION = '2026.09.26-434 · v11.434 gentlemen-daily-test-tiers';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10073,7 +10123,7 @@ class Component extends DCLogic {
       woImportOpen:false, woImportText:'', woImportLoading:false, woImportErr:'', woImportRows:[], woImportDayOffset:0, woImportBodyWeight:'',
       quickLogOpen:false, quickLogStep:'confirm', quickLogGreetIdx:0, quickLogBlocks:s.quickLogBlocks||[''],
       rotaOpen:false, rotaText:'', rotaMe:'', rotaErr:'', rotaRows:[], rotaSkip:{}, rotaPhotoLoading:false, rotaOff:[], rotaUntimed:[],
-      gentSub:'test', gentIdx:0, gentTestIdx:0, gentEntered:false,
+      gentSub:'test', gentIdx:0, gentTestIdx:0, gentEntered:false, gentPickingTier:false, gentTestDismissed:false,
       // The subject test (Test yourself → Easy/Medium/Hard/Extra Hard), Brain Rest's own
       // full-screen shape reused for a different flow. Not persisted: closing it forgets it,
       // the same as walking away from Brain Rest's gate before starting.
@@ -15227,6 +15277,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.434', date:'Sep 26, 2026', major:false, kind:'feature', notes:[
+      'The Daily Test now opens on a start screen instead of dropping straight into a question: press DAILY TEST, then choose a length — Quick (5), Mid (15), High (22) or Max (40). Quick/Mid/High draw from the 25-question bank without repeats; Max goes past it, so it repeats some questions, seeded the same way as the rest of the test so it’s still identical on every device and reload. FINISHED, on the result card, used to be a dead click (there was nowhere further forward to go past the last question) — it now actually closes the card and returns to the start screen, which shows today’s score and a TAKE ANOTHER TEST option instead of staying stuck.',
+    ]},
     {version:'v11.433', date:'Sep 25, 2026', major:false, kind:'design', notes:[
       'The Daily Test question card’s answer options were the one part still reading as plain app buttons — boxed pills with monospace letters — next to the rest of the card’s invitation styling. Recast as a hairline-divided list instead: no fill or box, a slim colour-coded accent bar on the left standing in for the old tinted background, and the letters set as small italic serif marks. The question title and the answered-state verdict also went italic to match.',
     ]},
@@ -18758,9 +18811,37 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(Array.isArray(r.picks)) return r.picks;
     return (typeof r.pick==='number') ? [r.pick] : [];
   }
+  /* The tier chosen for today lives on the day's own log record, alongside its picks — so a
+     reload mid-test (or a return visit later the same day) picks the same tier back up rather
+     than silently reverting to a different length. */
+  _gentTierInfo(rec){
+    const G=this._gent(); if(!G || !rec || !rec.tier) return null;
+    return (G.DAILY_TIERS||[]).find(t=>t.key===rec.tier)||null;
+  }
+  _gentDailySet(){
+    const G=this._gent(); if(!G) return [];
+    const rec=this._gentTodayRec(), info=this._gentTierInfo(rec);
+    return info ? G.dailySetN(this._gentToday(), rec.tier, info.n) : [];
+  }
+  /* Shows the tier picker. Re-entered from the "already done today" start screen too — taking
+     another test overwrites today's record, which is a deliberate choice the owner asked for. */
+  startGentDailyTest(){ this.setState({gentPickingTier:true, gentTestDismissed:false}); }
+  chooseGentTier(key){
+    const day=this._gentToday();
+    this.mut(s=>{
+      const log={...(((s.prefs||{}).gentTest)||{})};
+      log[day]={tier:key, picks:[], right:0, of:0, done:false};
+      return {prefs:{...s.prefs, gentTest:log}};
+    });
+    this.setState({gentTestIdx:0, gentPickingTier:false, gentTestDismissed:false});
+  }
+  /* FINISHED, on the result card: there is nowhere further forward to go in the test itself,
+     so it instead closes the card and returns to the start screen — which then reads as
+     "today's test is done" rather than staying on a dead-end result screen forever. */
+  finishGentTest(){ this.setState({gentTestDismissed:true}); }
   answerGentTest(i){
-    const G=this._gent(); if(!G) return;
-    const day=this._gentToday(), set=G.dailySet(day);
+    const rec=this._gentTodayRec(); if(!rec || !rec.tier) return;
+    const set=this._gentDailySet();
     const picks=this._gentPicks();
     const at=this.state.gentTestIdx||0;
     if(at>=set.length) return;                 // past the last question: the card is the result
@@ -18769,18 +18850,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* Kept for a year and no longer: the streak needs history, a decade of it does not. */
     const cut=new Date(); cut.setDate(cut.getDate()-400); const cutKey=this._fbLocal(cut);
     const right=next.reduce((a,p,n)=>a+((set[n]&&p===set[n].correct)?1:0),0);
+    const day=this._gentToday();
     this.mut(s=>{
       const log={...(((s.prefs||{}).gentTest)||{})};
       Object.keys(log).forEach(k=>{ if(k<cutKey) delete log[k]; });
-      log[day]={picks:next, right, of:set.length, done:next.filter(p=>p!=null).length>=set.length};
+      log[day]={...log[day], tier:rec.tier, picks:next, right, of:set.length, done:next.filter(p=>p!=null).length>=set.length};
       return {prefs:{...s.prefs, gentTest:log}};
     });
   }
   /* Forward only, and only once the question in front of you has been answered — a test you
      can page past without answering is a reading exercise. */
   gentTestNext(){
-    const G=this._gent(); if(!G) return;
-    const set=G.dailySet(this._gentToday());
+    const rec=this._gentTodayRec(); if(!rec || !rec.tier) return;
+    const set=this._gentDailySet();
     const at=this.state.gentTestIdx||0;
     if(at>=set.length) return;
     if(this._gentPicks()[at]==null) return;
@@ -22599,10 +22681,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           dining:['Dining','The table, in full, from the napkin to the last course.'],
         };
         const crest=CREST[sub]||CREST.test;
-        const set=G.dailySet(this._gentToday());
+        /* Quick/Mid/High/Max, chosen once per day via the tier picker and stored on the day's
+           own log record — a blank record (or no record at all) means today's test hasn't been
+           started, which is the "start" phase below; FINISHED sets gentTestDismissed to move a
+           completed day back to that same screen instead of leaving it stuck on the result. */
+        const gentRec=this._gentTodayRec();
+        const gentTierInfo=this._gentTierInfo(gentRec);
+        const gentTestPhase=S.gentTestDismissed?'start':(gentTierInfo?'test':(S.gentPickingTier?'picking':'start'));
+        const set=gentTierInfo?G.dailySetN(this._gentToday(), gentRec.tier, gentTierInfo.n):[];
         const picks=this._gentPicks();
         const at=Math.max(0, Math.min(set.length, S.gentTestIdx||0));
-        const onResult=at>=set.length;
+        const onResult=set.length>0 && at>=set.length;
         const q=set[at]||null;
         const pick=picks[at];
         const answered=pick!=null;
@@ -22690,7 +22779,19 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               gentProgPct:cards.length?(Math.round((idx+1)/cards.length*100)+'%'):'0%',
             };
           })(),
-          gentQShow:!onResult, gentResultShow:onResult,
+          gentShowTestStart:gentTestPhase==='start',
+          gentShowTestPicking:gentTestPhase==='picking',
+          gentDailyDone:!!(gentRec && gentRec.done),
+          gentDailyDoneLine:(gentRec && gentRec.done && gentTierInfo)
+            ? ('Today’s '+gentTierInfo.label.toLowerCase()+' test: '+gentRec.right+' / '+gentTierInfo.n+' — come back tomorrow, or take another now.')
+            : 'One test a day, at whichever length you choose — drawn from every category, dining, money, history, taste and conversation.',
+          gentDailyStartLabel:(gentRec && gentRec.done)?'TAKE ANOTHER TEST ›':'DAILY TEST',
+          startGentDailyTest:()=>this.startGentDailyTest(),
+          backFromTierPicking:()=>this.setState({gentPickingTier:false}),
+          gentTierOptions:(G.DAILY_TIERS||[]).map(t=>({ key:t.key, label:t.label.toUpperCase(),
+            desc:t.n+' QUESTION'+(t.n===1?'':'S'), go:()=>this.chooseGentTier(t.key) })),
+          finishGentTest:()=>this.finishGentTest(),
+          gentQShow:gentTestPhase==='test' && !onResult, gentResultShow:gentTestPhase==='test' && onResult,
           gentCat:q?q.cat.toUpperCase():'', gentQ:q?q.q:'', gentWhy:q?q.why:'',
           gentQPos:set.length?('QUESTION '+Math.min(at+1,set.length)+' OF '+set.length):'',
           gentDateLabel:(()=>{ try{ return new Date(this._gentToday()+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short', day:'numeric', month:'short'}).toUpperCase(); }catch(e){ return ''; } })(),
@@ -22709,11 +22810,17 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
               bd:isRight?'rgba(31,138,85,0.45)':(isPick?'rgba(193,80,46,0.45)':'rgba(91,26,26,0.16)'),
               bg:isRight?'rgba(31,138,85,0.12)':(isPick?'rgba(193,80,46,0.12)':'transparent') };
           }),
-          gentTestBack:()=>this.gentTestBack(), gentTestNext:()=>this.gentTestNext(),
+          gentTestBack:()=>this.gentTestBack(),
+          /* On the result card, NEXT becomes FINISHED and switches to actually closing the
+             card (finishGentTest) instead of gentTestNext, which has nowhere further to go
+             once at>=set.length and so used to leave FINISHED as a dead click. */
+          gentTestNext:onResult?(()=>this.finishGentTest()):(()=>this.gentTestNext()),
           gentTBackCursor:at>0?'pointer':'default', gentTBackOpacity:at>0?'1':'0.35',
-          /* Forward is dark until the question in front of you has been answered. */
-          gentTNextCursor:(!onResult&&answered)?'pointer':'default',
-          gentTNextOpacity:(!onResult&&answered)?'1':'0.35',
+          /* Forward is dark until the question in front of you has been answered \u2014 except on
+             the result card, where FINISHED is always live since there is nothing left to
+             answer. */
+          gentTNextCursor:(onResult||answered)?'pointer':'default',
+          gentTNextOpacity:(onResult||answered)?'1':'0.35',
           gentTNextLabel:onResult?'FINISHED':(at===set.length-1?'SEE RESULT \u203a':'NEXT \u203a'),
           gentTestProgPct:Math.round((Math.min(at,set.length)+1)/(set.length+1)*100)+'%',
           gentTestDots:set.concat([null]).map((x,i)=>({ title:x?x.cat:'Result',
