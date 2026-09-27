@@ -2544,29 +2544,30 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
-          <!-- The hero's page-frame, after an invitation-suite reference: a plain ruled double
-               line whose corner is a single concentric coved curve — both lines' arcs share one
-               centre (28+32=34+26=60), so the gap between them stays constant all the way round
-               instead of pinching or crossing. A bigger, bolder sweep than the first pass, sized
-               to read clearly at a glance rather than needing a zoom-in to notice. One 80x80
-               corner motif (drawn once, top-left) is rotated 90° per corner rather than redrawn
-               four times; the straight runs between corners are plain CSS lines picking up
-               exactly where each corner tile's own stub ends, so nothing here depends on the
-               hero's exact size and the seams line up regardless of viewport width. -->
+          <!-- The hero's page-frame, after an invitation-suite reference: a bold outer rule with
+               a thin inner rule, corner curved as a single concentric coved sweep — both lines'
+               arcs share one centre (28+32=36+24=60), so the gap between them stays constant all
+               the way round instead of pinching or crossing. One 80x80 corner motif (drawn once,
+               top-left) is rotated 90° per corner rather than redrawn four times; the straight
+               runs between corners are plain CSS lines picking up exactly where each corner
+               tile's own stub ends. Each line's CSS div is centred on the same coordinate as its
+               SVG stroke (div inset minus half its own width) rather than the div's own top/left
+               edge, so the two constructions don't visibly step at the seam now that the strokes
+               are thick enough for that half-pixel gap to actually show. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
-              <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
-              <path d="M80,34 L60,34 A26,26 0 0,1 34,60 L34,80" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
+              <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.78)" stroke-width="3"></path>
+              <path d="M80,36 L60,36 A24,24 0 0,1 36,60 L36,80" fill="none" stroke="rgba(66,10,7,0.55)" stroke-width="1.1"></path>
             </svg>
           </sc-for>
-          <div style="position:absolute; top:46px; left:98px; right:98px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; top:52px; left:98px; right:98px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:46px; left:98px; right:98px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:52px; left:98px; right:98px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:46px; top:98px; bottom:98px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:52px; top:98px; bottom:98px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:46px; top:98px; bottom:98px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:52px; top:98px; bottom:98px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:44.5px; left:98px; right:98px; height:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:53.45px; left:98px; right:98px; height:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:44.5px; left:98px; right:98px; height:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:53.45px; left:98px; right:98px; height:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:44.5px; top:98px; bottom:98px; width:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:53.45px; top:98px; bottom:98px; width:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:44.5px; top:98px; bottom:98px; width:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:53.45px; top:98px; bottom:98px; width:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10099,7 +10100,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-447 · v11.447 vanguard-home-frame-corner-bigger';
+const NOTIF_BUILD_VERSION = '2026.09.27-448 · v11.448 vanguard-home-frame-bold-thin-rule';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15334,6 +15335,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.448', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Home’s Vanguard page-frame read as thin and faint next to the reference — and at the new bigger corner size, a half-pixel gap between how the SVG corner and the straight CSS lines were each centred became visible as a slight step at the seam. Gave the outer rule real weight and solid colour with a fine inner rule alongside it (bold+thin, like the reference), and fixed the centring so the two constructions meet without a step.',
+    ]},
     {version:'v11.447', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Home’s Vanguard page-frame corner curve was too small to read clearly at a glance. Sized the corner motif up (80x80, from 40x40) so the sweep is bold and obvious like the reference ticket-frame border, keeping the same concentric double-line construction.',
     ]},
