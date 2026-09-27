@@ -4057,7 +4057,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="position:absolute; inset:4px; border:1px solid rgba(231,216,166,0.17); border-radius:9px;"></div>
             <span style="width:27px; height:27px; color:var(--forge-accent); display:flex; position:relative;" data-icon="forge"></span>
           </div>
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--forge-accent);">❖ THE FORGE</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--forge-accent);">❖ THE FITNESS LIBRARY</div>
         </div>
 
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
@@ -10116,7 +10116,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-457 · v11.457 forge-training-section-dropdown';
+const NOTIF_BUILD_VERSION = '2026.09.27-458 · v11.458 fitness-library-rename-and-hardening';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15351,6 +15351,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.458', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Renamed "THE FORGE" wordmark to "THE FITNESS LIBRARY" per request. Added a fifth centre, "THE HARDENING", alongside Home, Training, Mental and Health — a blank page for now, matching the same placeholder treatment the other centres used before they had content.',
+    ]},
     {version:'v11.457', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'The Forge\'s Training section picker (Chest, Shoulders, Arms, Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck, Hands & Forearms, Kettlebells, Full Body) was a permanently-visible sidebar list — fourteen rows always on screen, and a long stacked block above the exercises on a phone-width column. It\'s a dropdown now: one row showing whichever section is open, expanding into the same list — capped in height with a scrollbar — only while picking.',
     ]},
@@ -20942,7 +20945,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const TI=['#6f6f78','#c9c9ce','#6cffba','#e8b45a','#ffffff'];
         const centre=S.forgeCentre||'training';
         const sc=S.forgeScores||{}, dr=S.forgeDraft||{};
-        const centres=[['home','HOME'],['training','TRAINING'],['mental','MENTAL'],['health','HEALTH']].map(c=>({
+        const centres=[['home','HOME'],['training','TRAINING'],['mental','MENTAL'],['health','HEALTH'],['hardening','THE HARDENING']].map(c=>({
           label:c[1], go:()=>this.setForgeCentre(c[0]),
           ink:centre===c[0]?'#F4F4F5':'#9a9aa2',
           bg:centre===c[0]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)',
@@ -21139,7 +21142,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hrNoMeals:!hMeals.length,
           forgeShowMental:centre==='mental',
           forgeShowEmpty:centre!=='home' && centre!=='health' && centre!=='mental' && !(centre==='training' && trainSections.length),
-          forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
+          forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':centre==='hardening'?'THE HARDENING':'HEALTH'),
           trainSections:trainSections, trainPicker:trainPicker,
           trainDropdownOpen:trainDropdownOpen, trainDropdownLabel:trainDropdownLabel,
           toggleTrainDropdown:()=>this.setState(s=>({trainDropdownOpen:!s.trainDropdownOpen})),
