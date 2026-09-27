@@ -2544,33 +2544,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
-          <!-- The hero's page-frame: a refined double-ruled invitation border, outer line only
-               slightly stronger than the inner (2px / 1.5px — restrained, not heavy), corner
-               curved as a single concentric coved sweep — both lines' arcs share one centre
-               (28+32=36+24=60), so the gap between them stays constant all the way round instead
-               of pinching or crossing. Inset 30px from the card's own edge (up from an initial
-               18px) so there's visible breathing room between the card's own rounded corner and
-               the frame's, especially noticeable right at the corners where a tight inset reads
-               as the frame crowding the card edge. One 80x80 corner motif (drawn once, top-left)
-               is rotated 90° per corner rather than redrawn four times; the straight runs between
-               corners are plain CSS lines picking up exactly where each corner tile's own stub
-               ends. Each line's CSS div is centred on the same coordinate as its SVG stroke (div
-               inset minus half its own width) rather than the div's own top/left edge, so the two
-               constructions don't visibly step at the seam. -->
+          <!-- The hero's page-frame: a single ruled invitation border (the inner line was
+               dropped per request — this is just the outer 2px rule now), corner curved as a
+               coved sweep. Inset 30px from the card's own edge so there's visible breathing room
+               between the card's own rounded corner and the frame's. One 80x80 corner motif
+               (drawn once, top-left) is rotated 90° per corner rather than redrawn four times;
+               the straight runs between corners are plain CSS lines picking up exactly where the
+               corner tile's own stub ends. The CSS div is centred on the same coordinate as the
+               SVG stroke (div inset minus half its own width) rather than the div's own top/left
+               edge, so the two constructions don't visibly step at the seam. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
               <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.72)" stroke-width="2"></path>
-              <path d="M60,36 A24,24 0 0,1 36,60" fill="none" stroke="rgba(66,10,7,0.5)" stroke-width="1.5"></path>
             </svg>
           </sc-for>
           <div style="position:absolute; top:57px; left:110px; right:110px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; top:65.25px; left:90px; right:90px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
           <div style="position:absolute; bottom:57px; left:110px; right:110px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:65.25px; left:90px; right:90px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
           <div style="position:absolute; left:57px; top:110px; bottom:110px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:65.25px; top:90px; bottom:90px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
           <div style="position:absolute; right:57px; top:110px; bottom:110px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:65.25px; top:90px; bottom:90px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px; margin-top:{{ vgTopRowClearance }}; margin-right:{{ vgTopRowRightClearance }};" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10103,7 +10094,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-451 · v11.451 vanguard-home-frame-corner-spacing';
+const NOTIF_BUILD_VERSION = '2026.09.27-452 · v11.452 vanguard-home-frame-single-line';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15338,6 +15329,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.452', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Dropped the second (inner, thinner) rule from Home\'s Vanguard page-frame per request — it\'s now a single 2px outer line with the same coved corner curve.',
+    ]},
     {version:'v11.451', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Home\'s Vanguard page-frame was inset only 18px from the card\'s own rounded corner, so there was almost no breathing room between the two — most noticeable right at the corners, where the frame\'s own curve nearly ran into the card\'s edge. Pushed the whole frame in to a 30px inset so there\'s clear, intentional matting space around it, like a proper picture frame.',
     ]},
