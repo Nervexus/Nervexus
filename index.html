@@ -3088,135 +3088,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
       </sc-if>
 
-      <!-- ===== POWER LEVEL ===== -->
-      <sc-if value="{{ isPower }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
-        <div style="margin-bottom:18px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ POWER LEVEL</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Life Performance Index</h1>
-        </div>
-        <!-- The block design, applied: glass over the pearl ground, each panel with its
-             numbered mark and letterspaced title, and things grouped as panes inside a panel
-             rather than ruled apart — the same language Calendar wears now. The one thing in
-             each panel that is the hero of it (the ring, the focus callout) is raised, the
-             way the clock tile is on Calendar; things that are one of several sit as a plain
-             grouped pane, the way the day’s events do. -->
-        <div class="lcb-stage">
-          <div class="lcb-field"></div>
-          <div style="position:relative; display:flex; flex-direction:column; gap:18px;">
-
-            <!-- LEVEL -->
-            <div class="lc-card">
-              <div class="lc-head">
-                <span class="lc-badge">01 - LV</span>
-                <div class="lc-title">Level</div>
-              </div>
-              <div style="background:var(--lc-raise); border:1px solid transparent; box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); border-radius:14px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; padding:22px 18px;">
-                <div style="position:relative; width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
-                  <canvas data-chart="powerRing" style="position:absolute; inset:0; width:150px; height:150px;"></canvas>
-                  <div style="text-align:center; position:relative;">
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--lc-muted);">LEVEL</div>
-                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:46px; font-weight:300; line-height:1;">{{ powerLevel }}</div>
-                  </div>
-                </div>
-              </div>
-              <div style="text-align:center; margin-top:18px;">
-                <h2 style="font-size:26px; font-weight:800; letter-spacing:-.5px; margin:0;">{{ rankName }}</h2>
-                <div style="font-size:13px; color:var(--lc-muted); margin-top:4px;">{{ rankDesc }}</div>
-              </div>
-              <div style="width:100%; max-width:520px; margin:20px auto 0;">
-                <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-muted); margin-bottom:7px;"><span>{{ xpIn }} XP</span><span>{{ xpNext }} XP</span></div>
-                <div style="height:10px; border-radius:6px; background:var(--lc-line); overflow:hidden;"><div style="height:100%; width:{{ powerPct }}; border-radius:6px; background:var(--lc-accent);"></div></div>
-                <div style="text-align:center; font-size:11.5px; color:var(--lc-muted); margin-top:10px;">Next rank: <b style="color:var(--lc-accent);">{{ nextRankName }}</b> at Level {{ nextRankLevel }}</div>
-              </div>
-            </div>
-
-            <!-- STATS -->
-            <div class="lc-card">
-              <div class="lc-head">
-                <span class="lc-badge">02 - ST</span>
-                <div class="lc-title">Stats</div>
-              </div>
-              <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(5,1fr); gap:14px;">
-                <sc-for list="{{ powerStats }}" as="s" hint-placeholder-count="5">
-                  <div class="lc-sub">
-                    <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted);">{{ s.label }}</div>
-                    <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; margin-top:8px; color:{{ s.c }};">{{ s.value }}</div>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-
-            <div class="cc-grid2" style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px;">
-              <!-- ATTRIBUTES -->
-              <div class="lc-card">
-                <div class="lc-head">
-                  <span class="lc-badge">03 - AT</span>
-                  <div class="lc-title">Attributes</div>
-                </div>
-                <div class="lc-sub cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:14px 22px;">
-                  <sc-for list="{{ powerCats }}" as="c" hint-placeholder-count="12">
-                    <div>
-                      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;"><span style="font-size:12.5px;">{{ c.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--lc-accent);">LV {{ c.level }}</span></div>
-                      <div style="height:7px; border-radius:5px; background:var(--lc-line); overflow:hidden;"><div style="height:100%; width:{{ c.pct }}; border-radius:5px; background:var(--lc-accent);"></div></div>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-              <!-- RANKS -->
-              <div class="lc-card">
-                <div class="lc-head">
-                  <span class="lc-badge">04 - RK</span>
-                  <div class="lc-title">Rank Progression</div>
-                </div>
-                <!-- Fifty-one ranks rather than nineteen, so the ladder scrolls in its own box
-                     and the panel keeps the height it always had. It opens on your current
-                     rank. -->
-                <div id="rankLadder" class="lc-sub" style="max-height:430px; overflow-y:auto;">
-                <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="51">
-                  <div data-rank-cur="{{ r.isCur }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--lc-line); opacity:{{ r.op }};">
-                    <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid {{ r.bd }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ r.numC }};">{{ r.min }}</span>
-                    <div style="flex:1;"><div style="font-size:13px; color:{{ r.nameC }}; font-weight:600;">{{ r.n }}</div><div style="font-size:10.5px; color:var(--lc-muted);">{{ r.d }}</div></div>
-                    <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ r.tagC }}; border:1px solid {{ r.tagBd }}; border-radius:6px; padding:2px 7px;">{{ r.tag }}</span>
-                  </div>
-                </sc-for>
-                </div>
-              </div>
-            </div>
-
-            <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1.3fr; gap:18px;">
-              <!-- SPECIALIST -->
-              <div class="lc-card">
-                <div class="lc-head">
-                  <span class="lc-badge">05 - AI</span>
-                  <div class="lc-title">Specialist</div>
-                </div>
-                <p style="font-size:13px; line-height:1.6;">Continuously analyzing your performance data to find the fastest path forward. Strongest attribute: <b style="color:var(--lc-accent);">{{ powerStrong }}</b>. Weakest: <b style="color:var(--lc-accent);">{{ powerWeak }}</b> — closing this gap is the highest-leverage way to raise your Power Level.</p>
-                <div style="background:var(--lc-raise); border:1px solid transparent; box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); border-radius:14px; box-sizing:border-box; padding:12px 14px; margin-top:12px;"><div style="font-size:10px; letter-spacing:1.5px; color:var(--lc-accent); font-family:'JetBrains Mono',monospace; margin-bottom:6px;">RECOMMENDED FOCUS</div><div style="font-size:12.5px; line-height:1.5;">{{ powerMission }}</div></div>
-              </div>
-              <!-- ACHIEVEMENTS -->
-              <div class="lc-card">
-                <div class="lc-head">
-                  <span class="lc-badge">06 - AC</span>
-                  <div class="lc-title">Achievements</div>
-                </div>
-                <div class="lc-sub cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                  <sc-for list="{{ powerAch }}" as="a" hint-placeholder-count="8">
-                    <div style="display:flex; align-items:center; gap:11px; padding:11px; border-radius:12px; border:1px solid {{ a.bd }}; opacity:{{ a.op }};">
-                      <span style="font-size:15px; color:{{ a.c }};">{{ a.icon }}</span>
-                      <div><div style="font-size:12px; font-weight:600;">{{ a.name }}</div><div style="font-size:10px; color:var(--lc-muted);">{{ a.desc }}</div></div>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      </sc-if>
-
-
       <!-- ===== FINANCE ===== -->
       <!-- ===== WORLD INTELLIGENCE HQ ===== -->
       <sc-if value="{{ isGlobe }}" hint-placeholder-val="{{ false }}">
@@ -4587,6 +4458,23 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </div>
         </sc-if>
 
+      </div>
+      </sc-if>
+
+      <!-- ===== THE HARDENING =====
+           Its own top-level page now, not a tab buried inside the Fitness Library's centre
+           switcher. Blank for now — the wordmark and page shell are here so the rail entry
+           opens onto something, the same way Training's own sections started as empty pages
+           before they were filled in one at a time. -->
+      <sc-if value="{{ isHardening }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:rise .5s ease both;">
+        <div style="margin-bottom:18px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ THE HARDENING</div>
+        </div>
+        <div class="cc-glowcard" style="border-radius:16px; padding:64px 24px; text-align:center;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2.5px; color:#8f8f99;">THE HARDENING</div>
+          <div style="font-size:12.5px; color:#6f6f78; margin-top:10px;">Nothing here yet.</div>
+        </div>
       </div>
       </sc-if>
 
@@ -9190,94 +9078,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       </div>
       </sc-if>
 
-      <!-- ===== AI COMMAND CENTER =====
-           Was a tab inside Settings, which buried the routing, the keys and the live
-           usage three clicks deep behind a page about preferences. It is a place you
-           work in, not a setting you flip, so it gets the rail like every other one. -->
-      <sc-if value="{{ isAI }}" hint-placeholder-val="{{ false }}">
-      <div style="animation:rise .5s ease both;">
-        <div style="margin-bottom:20px;">
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">&#9670; AI COMMAND CENTER</div>
-          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Intelligence Hub</h1>
-          <div style="font-size:12.5px; color:#8a8a92; margin-top:6px; line-height:1.5; max-width:620px;">The connections this app actually makes. Only the voice is wired up &mdash; everything else Loura does runs on your device, against your own logs.</div>
-        </div>
-              <div class="cc-api-dark">
-
-              <!-- Provider constellation. Desktop only via cc-hide-mobile: a labelled node
-                   cannot be read on a phone, and the card below carries the same information
-                   in a form that works there. Full-bleed and viewport-tall: this is the page's
-                   main view, not a widget sitting on top of one. Ground is jet black so the map
-                   and the page behind it are one surface. -->
-              <div class="cc-glowcard cc-hide-mobile" data-api-ground="1" style="position:relative; border-radius:18px; background:#000000; border:1px solid rgba(255,255,255,0.07); padding:0; margin-bottom:18px; overflow:hidden;">
-                <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
-                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
-                </div>
-                <div style="position:absolute; top:14px; right:18px; z-index:2; display:flex; gap:12px; pointer-events:none;">
-                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#FFB347;">&#9679; VOICE</span>
-                </div>
-                <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
-                <!-- The real voice-assistant orb, parked over the canvas centre and moved by
-                     the same pan/zoom transform the constellation uses. pointer-events:none so
-                     dragging still grabs the map underneath it. -->
-                <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
-                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO ORBIT · SCROLL TO FLY · DOUBLE-CLICK TO RESET</div>
-              </div>
-              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
-                <sc-if value="{{ noConnections }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing connected yet, save a key and switch it on above.</div></sc-if>
-                <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                  <sc-for list="{{ activeConnections }}" as="c" hint-placeholder-count="4">
-                    <div style="display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);">
-                      <span style="width:6px; height:6px; border-radius:50%; background:{{ c.dotColor }};"></span>
-                      <span style="font-size:11.5px; color:#dbdbe0;">{{ c.name }}</span>
-                      <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:#6f6f78;">{{ c.kind }}</span>
-                    </div>
-                  </sc-for>
-                </div>
-              </div>
-
-              <div style="display:flex; align-items:center; gap:8px; padding:10px 13px; border-radius:11px; border:1px solid rgba(47,206,134,0.25); background:rgba(47,206,134,0.06); margin-bottom:14px;">
-                <span style="color:#2fce86; font-size:12px;">&#10003;</span>
-                <span style="font-size:11px; color:#a9d9c2; line-height:1.5;">Vetted connections only. The provider below has been reviewed and is a trusted, established company. There is no way to connect an unlisted or unverified provider inside the app.</span>
-              </div>
-
-
-
-
-
-              <!-- The voice provider is an API like any other; only the connection lives here.
-                   Which voice actually speaks stays in Settings -> Voice, next to the library it
-                   feeds and the rate/pitch controls it belongs with. -->
-                <div style="display:grid; grid-template-columns:1fr; max-width:460px; gap:12px;">
-                    <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px; margin-bottom:20px;">
-                      <div style="display:flex; align-items:center; gap:11px;">
-                        <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ elColor }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">EL</span>
-                        <div style="flex:1; min-width:0;">
-                          <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">ElevenLabs, realistic AI voice</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.4); border-radius:5px; padding:1px 5px;">FREEMIUM</span></div>
-                          <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ elStatusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ elStatusColor }};">{{ elStatusLabel }}</span></div>
-                        </div>
-                        <div onClick="{{ elToggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ elToggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ elTogglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
-                      </div>
-                      <div style="margin-top:11px; display:flex; flex-direction:column; gap:11px;">
-                        <sc-if value="{{ elSaved }}" hint-placeholder-val="{{ false }}">
-                          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ elMasked }}" readonly style="flex:1 1 120px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elTest }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ elReplace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
-                        </sc-if>
-                        <sc-if value="{{ elNotSaved }}" hint-placeholder-val="{{ true }}">
-                          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ elDraft }}" onInput="{{ onElDraft }}" placeholder="Paste ElevenLabs API key" style="flex:1 1 160px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elSave }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
-                        </sc-if>
-                        <sc-if value="{{ elErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ elErr }}</div></sc-if>
-                        <div style="font-size:11px; color:#8a8a92; line-height:1.5;">When connected &amp; enabled, the assistant speaks with your chosen voice below instead of your browser's built-in voice. Falls back automatically if unavailable.</div>
-                      </div>
-                    </div>
-                </div>
-                <div style="margin-top:12px; font-size:11px; color:#6f6f78; line-height:1.5;">Choosing which voice she speaks with, and the rate, pitch and volume, live in Settings &rarr; Voice.</div>
-
-              <div style="margin-top:16px; font-size:11px; color:#6f6f78; display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><span style="color:#ffd66b;">&#9888;</span><span>Paste a key and hit Connect &mdash; it's validated against the real provider and saved server-side in one step. Keys are masked here and never shown again.</span></div>
-              </div>
-      </div>
-      </sc-if>
-
       <!-- ===== SETTINGS ===== -->
       <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
       <div style="animation:rise .5s ease both;">
@@ -9868,6 +9668,219 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </div>
               </sc-for>
             </sc-if>
+      <!-- ===== POWER LEVEL ===== -->
+      <sc-if value="{{ tabPowerLevel }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:rise .5s ease both;">
+        <div style="margin-bottom:18px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">◆ POWER LEVEL</div>
+          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Life Performance Index</h1>
+        </div>
+        <!-- The block design, applied: glass over the pearl ground, each panel with its
+             numbered mark and letterspaced title, and things grouped as panes inside a panel
+             rather than ruled apart — the same language Calendar wears now. The one thing in
+             each panel that is the hero of it (the ring, the focus callout) is raised, the
+             way the clock tile is on Calendar; things that are one of several sit as a plain
+             grouped pane, the way the day’s events do. -->
+        <div class="lcb-stage">
+          <div class="lcb-field"></div>
+          <div style="position:relative; display:flex; flex-direction:column; gap:18px;">
+
+            <!-- LEVEL -->
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">01 - LV</span>
+                <div class="lc-title">Level</div>
+              </div>
+              <div style="background:var(--lc-raise); border:1px solid transparent; box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); border-radius:14px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; padding:22px 18px;">
+                <div style="position:relative; width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
+                  <canvas data-chart="powerRing" style="position:absolute; inset:0; width:150px; height:150px;"></canvas>
+                  <div style="text-align:center; position:relative;">
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3px; color:var(--lc-muted);">LEVEL</div>
+                    <div style="font-family:'Cormorant Garamond',Georgia,serif; font-size:46px; font-weight:300; line-height:1;">{{ powerLevel }}</div>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:center; margin-top:18px;">
+                <h2 style="font-size:26px; font-weight:800; letter-spacing:-.5px; margin:0;">{{ rankName }}</h2>
+                <div style="font-size:13px; color:var(--lc-muted); margin-top:4px;">{{ rankDesc }}</div>
+              </div>
+              <div style="width:100%; max-width:520px; margin:20px auto 0;">
+                <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--lc-muted); margin-bottom:7px;"><span>{{ xpIn }} XP</span><span>{{ xpNext }} XP</span></div>
+                <div style="height:10px; border-radius:6px; background:var(--lc-line); overflow:hidden;"><div style="height:100%; width:{{ powerPct }}; border-radius:6px; background:var(--lc-accent);"></div></div>
+                <div style="text-align:center; font-size:11.5px; color:var(--lc-muted); margin-top:10px;">Next rank: <b style="color:var(--lc-accent);">{{ nextRankName }}</b> at Level {{ nextRankLevel }}</div>
+              </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="lc-card">
+              <div class="lc-head">
+                <span class="lc-badge">02 - ST</span>
+                <div class="lc-title">Stats</div>
+              </div>
+              <div class="cc-stat5" style="display:grid; grid-template-columns:repeat(5,1fr); gap:14px;">
+                <sc-for list="{{ powerStats }}" as="s" hint-placeholder-count="5">
+                  <div class="lc-sub">
+                    <div style="font-size:11px; letter-spacing:1px; color:var(--lc-muted);">{{ s.label }}</div>
+                    <div style="font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:600; margin-top:8px; color:{{ s.c }};">{{ s.value }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div class="cc-grid2" style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px;">
+              <!-- ATTRIBUTES -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">03 - AT</span>
+                  <div class="lc-title">Attributes</div>
+                </div>
+                <div class="lc-sub cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:14px 22px;">
+                  <sc-for list="{{ powerCats }}" as="c" hint-placeholder-count="12">
+                    <div>
+                      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;"><span style="font-size:12.5px;">{{ c.name }}</span><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--lc-accent);">LV {{ c.level }}</span></div>
+                      <div style="height:7px; border-radius:5px; background:var(--lc-line); overflow:hidden;"><div style="height:100%; width:{{ c.pct }}; border-radius:5px; background:var(--lc-accent);"></div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <!-- RANKS -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">04 - RK</span>
+                  <div class="lc-title">Rank Progression</div>
+                </div>
+                <!-- Fifty-one ranks rather than nineteen, so the ladder scrolls in its own box
+                     and the panel keeps the height it always had. It opens on your current
+                     rank. -->
+                <div id="rankLadder" class="lc-sub" style="max-height:430px; overflow-y:auto;">
+                <sc-for list="{{ powerRanks }}" as="r" hint-placeholder-count="51">
+                  <div data-rank-cur="{{ r.isCur }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--lc-line); opacity:{{ r.op }};">
+                    <span style="width:26px; height:26px; flex:0 0 26px; border-radius:8px; border:1px solid {{ r.bd }}; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:{{ r.numC }};">{{ r.min }}</span>
+                    <div style="flex:1;"><div style="font-size:13px; color:{{ r.nameC }}; font-weight:600;">{{ r.n }}</div><div style="font-size:10.5px; color:var(--lc-muted);">{{ r.d }}</div></div>
+                    <span style="font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:1px; color:{{ r.tagC }}; border:1px solid {{ r.tagBd }}; border-radius:6px; padding:2px 7px;">{{ r.tag }}</span>
+                  </div>
+                </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div class="cc-grid2" style="display:grid; grid-template-columns:1fr 1.3fr; gap:18px;">
+              <!-- SPECIALIST -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">05 - AI</span>
+                  <div class="lc-title">Specialist</div>
+                </div>
+                <p style="font-size:13px; line-height:1.6;">Continuously analyzing your performance data to find the fastest path forward. Strongest attribute: <b style="color:var(--lc-accent);">{{ powerStrong }}</b>. Weakest: <b style="color:var(--lc-accent);">{{ powerWeak }}</b> — closing this gap is the highest-leverage way to raise your Power Level.</p>
+                <div style="background:var(--lc-raise); border:1px solid transparent; box-shadow:inset 0 1px 0 var(--lc-rim), 0 8px 22px var(--lc-glow); border-radius:14px; box-sizing:border-box; padding:12px 14px; margin-top:12px;"><div style="font-size:10px; letter-spacing:1.5px; color:var(--lc-accent); font-family:'JetBrains Mono',monospace; margin-bottom:6px;">RECOMMENDED FOCUS</div><div style="font-size:12.5px; line-height:1.5;">{{ powerMission }}</div></div>
+              </div>
+              <!-- ACHIEVEMENTS -->
+              <div class="lc-card">
+                <div class="lc-head">
+                  <span class="lc-badge">06 - AC</span>
+                  <div class="lc-title">Achievements</div>
+                </div>
+                <div class="lc-sub cc-grid2" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <sc-for list="{{ powerAch }}" as="a" hint-placeholder-count="8">
+                    <div style="display:flex; align-items:center; gap:11px; padding:11px; border-radius:12px; border:1px solid {{ a.bd }}; opacity:{{ a.op }};">
+                      <span style="font-size:15px; color:{{ a.c }};">{{ a.icon }}</span>
+                      <div><div style="font-size:12px; font-weight:600;">{{ a.name }}</div><div style="font-size:10px; color:var(--lc-muted);">{{ a.desc }}</div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== AI COMMAND CENTER =====
+           Moved back into Settings per request, as its own tab there. -->
+      <sc-if value="{{ tabAICmd }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:rise .5s ease both;">
+        <div style="margin-bottom:20px;">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:#C9C9CE; margin-bottom:7px;">&#9670; AI COMMAND CENTER</div>
+          <h1 style="font-size:28px; font-weight:700; letter-spacing:-.5px;">Intelligence Hub</h1>
+          <div style="font-size:12.5px; color:#8a8a92; margin-top:6px; line-height:1.5; max-width:620px;">The connections this app actually makes. Only the voice is wired up &mdash; everything else Loura does runs on your device, against your own logs.</div>
+        </div>
+              <div class="cc-api-dark">
+
+              <!-- Provider constellation. Desktop only via cc-hide-mobile: a labelled node
+                   cannot be read on a phone, and the card below carries the same information
+                   in a form that works there. Full-bleed and viewport-tall: this is the page's
+                   main view, not a widget sitting on top of one. Ground is jet black so the map
+                   and the page behind it are one surface. -->
+              <div class="cc-glowcard cc-hide-mobile" data-api-ground="1" style="position:relative; border-radius:18px; background:#000000; border:1px solid rgba(255,255,255,0.07); padding:0; margin-bottom:18px; overflow:hidden;">
+                <div style="position:absolute; top:14px; left:18px; z-index:2; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#C9C9CE;">◆ CONNECTION MAP</span>
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#6f6f78; margin-top:4px;">{{ constellationCaption }}</div>
+                </div>
+                <div style="position:absolute; top:14px; right:18px; z-index:2; display:flex; gap:12px; pointer-events:none;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#FFB347;">&#9679; VOICE</span>
+                </div>
+                <div data-constellation="1" style="width:100%; height:min(760px, calc(100vh - 210px)); min-height:520px;"></div>
+                <!-- The real voice-assistant orb, parked over the canvas centre and moved by
+                     the same pan/zoom transform the constellation uses. pointer-events:none so
+                     dragging still grabs the map underneath it. -->
+                <div data-constellation-orb="1" style="position:absolute; width:230px; height:230px; left:50%; top:50%; margin:-115px 0 0 -115px; pointer-events:none; z-index:1;"></div>
+                <div style="position:absolute; bottom:14px; left:18px; z-index:2; pointer-events:none; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#5a5a66;">DRAG TO ORBIT · SCROLL TO FLY · DOUBLE-CLICK TO RESET</div>
+              </div>
+              <div class="cc-glowcard" style="border-radius:16px; background:#16181c; padding:16px 18px; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"><span style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#7c7c84;">◆ ALL ACTIVE CONNECTIONS</span><span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:#8a8a92;">{{ connCountLabel }}</span></div>
+                <sc-if value="{{ noConnections }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px; color:#6f6f78;">Nothing connected yet, save a key and switch it on above.</div></sc-if>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <sc-for list="{{ activeConnections }}" as="c" hint-placeholder-count="4">
+                    <div style="display:flex; align-items:center; gap:7px; padding:6px 11px; border-radius:9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);">
+                      <span style="width:6px; height:6px; border-radius:50%; background:{{ c.dotColor }};"></span>
+                      <span style="font-size:11.5px; color:#dbdbe0;">{{ c.name }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:#6f6f78;">{{ c.kind }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:center; gap:8px; padding:10px 13px; border-radius:11px; border:1px solid rgba(47,206,134,0.25); background:rgba(47,206,134,0.06); margin-bottom:14px;">
+                <span style="color:#2fce86; font-size:12px;">&#10003;</span>
+                <span style="font-size:11px; color:#a9d9c2; line-height:1.5;">Vetted connections only. The provider below has been reviewed and is a trusted, established company. There is no way to connect an unlisted or unverified provider inside the app.</span>
+              </div>
+
+
+
+
+
+              <!-- The voice provider is an API like any other; only the connection lives here.
+                   Which voice actually speaks stays in Settings -> Voice, next to the library it
+                   feeds and the rate/pitch controls it belongs with. -->
+                <div style="display:grid; grid-template-columns:1fr; max-width:460px; gap:12px;">
+                    <div class="cc-glowcard" style="border-radius:15px; background:#16181c; padding:14px; margin-bottom:20px;">
+                      <div style="display:flex; align-items:center; gap:11px;">
+                        <span style="width:38px; height:38px; flex:0 0 38px; border-radius:10px; background:{{ elColor }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700;">EL</span>
+                        <div style="flex:1; min-width:0;">
+                          <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:13px; font-weight:600; color:#eef0f2;">ElevenLabs, realistic AI voice</span><span style="font-family:'JetBrains Mono',monospace; font-size:7.5px; letter-spacing:.5px; color:#e8b45a; border:1px solid rgba(232,180,90,0.4); border-radius:5px; padding:1px 5px;">FREEMIUM</span></div>
+                          <div style="display:flex; align-items:center; gap:6px; margin-top:3px;"><span style="width:6px; height:6px; border-radius:50%; background:{{ elStatusColor }};"></span><span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.5px; color:{{ elStatusColor }};">{{ elStatusLabel }}</span></div>
+                        </div>
+                        <div onClick="{{ elToggle }}" style="width:42px; height:23px; flex:0 0 42px; border-radius:14px; background:{{ elToggleBg }}; position:relative; cursor:pointer;"><div style="position:absolute; top:2px; left:{{ elTogglePos }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .2s;"></div></div>
+                      </div>
+                      <div style="margin-top:11px; display:flex; flex-direction:column; gap:11px;">
+                        <sc-if value="{{ elSaved }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ elMasked }}" readonly style="flex:1 1 120px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#9a9aa2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elTest }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">RETEST</span><span onClick="{{ elReplace }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#c8c8ce; border:1px solid rgba(255,255,255,0.14); border-radius:9px; padding:9px 11px; cursor:pointer; white-space:nowrap;">DISCONNECT</span></div>
+                        </sc-if>
+                        <sc-if value="{{ elNotSaved }}" hint-placeholder-val="{{ true }}">
+                          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;"><input value="{{ elDraft }}" onInput="{{ onElDraft }}" placeholder="Paste ElevenLabs API key" style="flex:1 1 160px; min-width:0; padding:9px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:12px; font-family:'JetBrains Mono',monospace; outline:none;"><span onClick="{{ elSave }}" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#F4F4F5; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.12); border-radius:9px; padding:9px 13px; cursor:pointer; font-weight:600;">CONNECT</span></div>
+                        </sc-if>
+                        <sc-if value="{{ elErr }}" hint-placeholder-val="{{ false }}"><div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:#ff3b4a;">{{ elErr }}</div></sc-if>
+                        <div style="font-size:11px; color:#8a8a92; line-height:1.5;">When connected &amp; enabled, the assistant speaks with your chosen voice below instead of your browser's built-in voice. Falls back automatically if unavailable.</div>
+                      </div>
+                    </div>
+                </div>
+                <div style="margin-top:12px; font-size:11px; color:#6f6f78; line-height:1.5;">Choosing which voice she speaks with, and the rate, pitch and volume, live in Settings &rarr; Voice.</div>
+
+              <div style="margin-top:16px; font-size:11px; color:#6f6f78; display:flex; align-items:flex-start; gap:8px; line-height:1.5;"><span style="color:#ffd66b;">&#9888;</span><span>Paste a key and hit Connect &mdash; it's validated against the real provider and saved server-side in one step. Keys are masked here and never shown again.</span></div>
+              </div>
+      </div>
+      </sc-if>
           </div>
         </div>
         </div>
@@ -10116,7 +10129,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-458 · v11.458 fitness-library-rename-and-hardening';
+const NOTIF_BUILD_VERSION = '2026.09.27-459 · v11.459 hardening-own-page-settings-restructure';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -10320,15 +10333,14 @@ activities: this._mergeShipLog(s.activities),
   navDefs=[
     {id:'home',label:'Home'},
     {id:'dashboard',label:'Command'},
-    {id:'forge',label:'The Forge'},
+    {id:'forge',label:'The Fitness Library'},
+    {id:'hardening',label:'The Hardening'},
     {id:'gentlemen',label:'Gentlemen Center'},
     {id:'calendar',label:'Calendar'},
     {id:'business',label:'Finance Terminal'},
     {id:'learning',label:'Learning'},
-    {id:'power',label:'Power Level'},
     {id:'voice',label:'Voice Core'},
     {id:'globe',label:'World Intel'},
-    {id:'ai',label:'AI Command Center'},
     {id:'settings',label:'Settings'},
   ];
 
@@ -14983,7 +14995,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          outline, struck onto a ruled base with the paired end-dots from the house
          divider. Everything else on this page is drawn at 19px, so the ornament had to
          survive that size — the anvil and the double-frame versions did not. */
-      forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>' };
+      forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>',
+      // The Hardening has no page of its own yet, so borrows the flame mark rather than
+      // shipping blind on what its own icon should look like once there is real content to draw one for.
+      hardening:'<path d="M9 16.2c-3.4 0-5.9-2.4-5.9-5.7 0-2.1 1-3.7 2.2-5.4.3 1.4 1 2.1 1.8 2.1-.2-2.9 1-5.5 3.5-7-.4 2.1.1 3.7 1.4 5 1.5 1.5 3 3.1 3 5.3 0 3.3-2.5 5.7-5.9 5.7z"/><path d="M9 13.6c-1.3 0-2.3-.9-2.3-2.2 0-.9.5-1.5 1-2.1.1.6.4.9.8.9-.1-1.1.4-2 1.3-2.6-.1.8 0 1.4.5 1.9.6.6 1.1 1.1 1.1 1.9 0 1.3-1 2.2-2.4 2.2z" opacity="0.4"/>' };
     this.root.querySelectorAll('[data-icon]').forEach(el=>{ const k=el.dataset.icon; if(el._k===k) return; el._k=k; el.innerHTML='<svg viewBox="0 0 18 18" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(ic[k]||'')+'</svg>'; });
   }
 
@@ -15351,6 +15366,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.459', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'The Hardening wasn\'t in the right place as a tab buried inside the Fitness Library\'s centre switcher — it\'s a top-level page of its own now, in the rail right after the Fitness Library, blank until there\'s real content for it. Made room by moving AI Command Center and Power Level into Settings as tabs there, rather than pages of their own on the rail (the profile card\'s Power Level link now opens straight to that tab).',
+    ]},
     {version:'v11.458', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Renamed "THE FORGE" wordmark to "THE FITNESS LIBRARY" per request. Added a fifth centre, "THE HARDENING", alongside Home, Training, Mental and Health — a blank page for now, matching the same placeholder treatment the other centres used before they had content.',
     ]},
@@ -20718,10 +20736,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       refreshBarFillC:S.prefs.theme==='Ultra'?'#5B1A1A':'#eef0f2', startRefresh:()=>this.startRefresh(),
       refreshBtnCursor:S.refreshing?'default':'pointer', refreshBtnBg:S.refreshing?'rgba(255,255,255,0.14)':'rgba(255,255,255,0.03)', refreshBtnBd:S.refreshing?'rgba(255,255,255,0.4)':'rgba(255,255,255,0.1)', refreshIconStroke:S.refreshing?'#FFFFFF':'#cfcfd4', refreshIconAnim:S.refreshing?'spin 1s linear infinite':'none',
       notifBtnBd:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.3)':'rgba(255,255,255,0.1)', notifBtnBg:S.prefs.theme==='Ultra'?'rgba(91,26,26,0.06)':'rgba(255,255,255,0.03)', notifIconStroke:S.prefs.theme==='Ultra'?'#5B1A1A':'#cfcfd4',
-      isPower:scene==='power',
       profileCardOpen:!!S.profileCardOpen, openProfileCard:()=>this.setState({profileCardOpen:true}), closeProfileCard:()=>this.setState({profileCardOpen:false}), stopProp:(e)=>{ e.stopPropagation && e.stopPropagation(); },
       profilePowerLevel:P.level, profileRankName:P.rank.n, profilePowerPct:P.pct+'%',
-      goPowerFromProfile:()=>this.setState({scene:'power', profileCardOpen:false}),
+      // Power Level moved into Settings as a tab (was its own rail page) — the profile card's
+      // link opens Settings straight to it rather than a scene of its own.
+      goPowerFromProfile:()=>{ this._openSettings('Power Level'); this.setState({profileCardOpen:false}); },
       profCardBg: S.prefs.theme!=='Ultra' ? 'linear-gradient(135deg,#1c1c1f 0%,#0d0d0e 55%,#1c1c1f 100%)' : S.prefs.ultraStyle==='Noir' ? 'linear-gradient(135deg,#161616 0%,#0a0a0a 55%,#161616 100%)' : S.prefs.ultraStyle==='Vanguard' ? 'linear-gradient(135deg,#EDEBE7 0%,#F6F5F3 55%,#EDEBE7 100%)' : S.prefs.ultraStyle==='Maison Élysée' ? 'linear-gradient(135deg,#FBF7EF 0%,#F2ECE0 55%,#FBF7EF 100%)' : 'linear-gradient(135deg,#FBF8F1 0%,#F5F0E6 55%,#FBF8F1 100%)',
       profCardBorder: S.prefs.theme!=='Ultra' ? 'rgba(255,255,255,0.15)' : S.prefs.ultraStyle==='Noir' ? 'rgba(201,162,74,0.25)' : S.prefs.ultraStyle==='Vanguard' ? 'rgba(67,68,81,0.15)' : S.prefs.ultraStyle==='Maison Élysée' ? 'rgba(60,90,125,0.18)' : 'rgba(58,42,32,0.18)',
       profCardShadow: S.prefs.theme!=='Ultra' ? '0 30px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)' : (S.prefs.ultraStyle==='Noir'||S.prefs.ultraStyle==='Vanguard') ? '0 30px 70px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)' : '0 30px 70px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6)',
@@ -20835,8 +20854,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           ...this._healthExtra(H,S),
           ...(window.HealthKit?this._energyExtra(H,S,window.HealthKit,(()=>{ try{ return window.HealthKit.today(); }catch(e){ return ''; } })()):{}),
         }; }, {}),
-      isAI:scene==='ai',
       isSettings:scene==='settings',
+      isHardening:scene==='hardening',
       settingsGateOpen:!!S.settingsGateOpen,
       settingsGatePass:S.settingsGatePass, setSettingsGatePass:(e)=>this.setState({settingsGatePass:e.target.value, settingsGateErr:false}),
       settingsGatePassType:S.settingsGatePassVisible?'text':'password',
@@ -20916,7 +20935,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           anatomyFrontCount: nF?(' \u25cf'+nF):'', anatomyBackCount: nB?(' \u25cf'+nB):'',
           anatomyActive:active, noAnatomyActive:!active.length };
       })(),
-      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'var(--lc-accent)':'var(--lc-muted)', bg:n===S.settingsTab?'var(--lc-sub)':'transparent', bd:n===S.settingsTab?'var(--lc-accent)':'var(--lc-line)', soon:''})),
+      settingsTabs:['Account','Appearance',...((typeof window!=='undefined' && window.innerWidth<=900)?[]:['Voice']),'Memory','Notifications','Assistant Coaching','Privacy & Security','Power Level','AI Command Center','Performance Terminal','Update Terminal','Troubleshooting',...(this._isOwner()?['Admin']:[])].map(n=>({name:n, set:()=>this.setState({settingsTab:n}), c:n===S.settingsTab?'var(--lc-accent)':'var(--lc-muted)', bg:n===S.settingsTab?'var(--lc-sub)':'transparent', bd:n===S.settingsTab?'var(--lc-accent)':'var(--lc-line)', soon:''})),
       // 'AI Providers' is a page of its own now; a state still naming it would render an empty panel.
       settingsTab:S.settingsTab==='AI Providers'?'Account':S.settingsTab,
       ...(()=>{ const c=this._provCfg('elevenlabs'); const PD=this._pd(); const tts=(PD&&PD.TTS_PROVIDERS&&PD.TTS_PROVIDERS[0])||{voices:[]};
@@ -20936,7 +20955,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       memDraft:S.memDraft||'', setMemDraft:(e)=>this.setState({memDraft:e.target.value}),
       addMemBtn:()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } },
       addMemKey:enterKey(()=>{ const v=(this.state.memDraft||'').trim(); if(v){ this.addMemory(v); this.setState({memDraft:''}); } }),
-      tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security',  tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabTrouble:S.settingsTab==='Troubleshooting', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
+      tabAccount:S.settingsTab==='Account', tabAppear:S.settingsTab==='Appearance', tabVoiceSet:S.settingsTab==='Voice', tabNotif:S.settingsTab==='Notifications', tabCoach:S.settingsTab==='Assistant Coaching', tabPrivacy:S.settingsTab==='Privacy & Security', tabPowerLevel:S.settingsTab==='Power Level', tabAICmd:S.settingsTab==='AI Command Center', tabPerf:S.settingsTab==='Performance Terminal', tabWhatsNewPage:S.settingsTab==='Update Terminal', tabTrouble:S.settingsTab==='Troubleshooting', tabAdmin:S.settingsTab==='Admin' && this._isOwner(),
       /* THE FORGE. The engine holds the standards; this turns them into a page. Colour
          escalates with tier so the difference between Baseline and Unit is visible before
          anything is read. Unmeasured is grey, never red — not tested is not a failure. */
@@ -20945,7 +20964,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const TI=['#6f6f78','#c9c9ce','#6cffba','#e8b45a','#ffffff'];
         const centre=S.forgeCentre||'training';
         const sc=S.forgeScores||{}, dr=S.forgeDraft||{};
-        const centres=[['home','HOME'],['training','TRAINING'],['mental','MENTAL'],['health','HEALTH'],['hardening','THE HARDENING']].map(c=>({
+        const centres=[['home','HOME'],['training','TRAINING'],['mental','MENTAL'],['health','HEALTH']].map(c=>({
           label:c[1], go:()=>this.setForgeCentre(c[0]),
           ink:centre===c[0]?'#F4F4F5':'#9a9aa2',
           bg:centre===c[0]?'rgba(255,255,255,0.16)':'rgba(255,255,255,0.02)',
@@ -21142,7 +21161,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hrNoMeals:!hMeals.length,
           forgeShowMental:centre==='mental',
           forgeShowEmpty:centre!=='home' && centre!=='health' && centre!=='mental' && !(centre==='training' && trainSections.length),
-          forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':centre==='hardening'?'THE HARDENING':'HEALTH'),
+          forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
           trainSections:trainSections, trainPicker:trainPicker,
           trainDropdownOpen:trainDropdownOpen, trainDropdownLabel:trainDropdownLabel,
           toggleTrainDropdown:()=>this.setState(s=>({trainDropdownOpen:!s.trainDropdownOpen})),
