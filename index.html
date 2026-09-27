@@ -2544,18 +2544,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
-          <!-- The hero's page-frame, after an invitation-suite reference: plain straight double
-               lines (equal weight, equal opacity) that round smoothly into each other at the
-               corner — the outer line on a wider radius, the inner on a tighter one, so the pair
-               crosses and re-separates through the curve exactly like a stationer's ruled border,
-               not a closed loop or spiral. One 40x40 corner motif (drawn once, top-left) is
+          <!-- The hero's page-frame, after an invitation-suite reference: a plain ruled double
+               line whose corner is a single concentric coved curve — both lines' arcs share one
+               centre (14+16=17+13=30), so the gap between them stays constant all the way round
+               instead of pinching or crossing. One 40x40 corner motif (drawn once, top-left) is
                rotated 90° per corner rather than redrawn four times; the straight runs between
                corners are plain CSS lines picking up exactly where each corner tile's own stub
                ends, so nothing here depends on the hero's exact size and the seams line up
                regardless of viewport width. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="40" height="40" viewBox="0 0 40 40" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
-              <path d="M40,14 L32,14 A18,18 0 0,1 14,32 L14,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
+              <path d="M40,14 L30,14 A16,16 0 0,1 14,30 L14,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
               <path d="M40,17 L30,17 A13,13 0 0,1 17,30 L17,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
             </svg>
           </sc-for>
@@ -10099,7 +10098,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-445 · v11.445 vanguard-home-frame-corner-fix';
+const NOTIF_BUILD_VERSION = '2026.09.27-446 · v11.446 vanguard-home-frame-corner-concentric';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15334,6 +15333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.446', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'The rounded corner on Home’s Vanguard page-frame was messy — the two ruled lines used different arc centres, so instead of a constant gap they pinched together and crossed through the curve. Gave both lines the same centre (a genuinely concentric curve) so the gap stays even all the way round, matching the reference cleanly.',
+    ]},
     {version:'v11.445', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'The spiral-loop corners on Home’s Vanguard page-frame were wrong — re-examined the actual invitation references closely and they show a plain rounded double-line corner (outer line on a wider radius, inner on a tighter one, crossing smoothly through the curve), not a closed loop. Replaced the spiral and its centre bud with that simpler curve.',
     ]},
