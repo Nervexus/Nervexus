@@ -1195,13 +1195,6 @@
      desktop sizing or disabling the user's own pinch-zoom. */
   input, textarea, select { font-size:16px !important; }
   .cc-grid2, .cc-grid-globe, .cc-grid-fit, .cc-grid-fin { grid-template-columns: 1fr !important; }
-  /* The section list is sticky so it stays beside the exercises while they scroll. Under
-     900px the grid folds to one column and it is above them instead — pinned there it stayed
-     put while the blocks slid over the top of it, and its rows showed through the gaps
-     between them. Beside the content it pins; above it, it scrolls away like anything else. */
-  @media (max-width:900px){
-    .forge-secnav{ position:static !important; top:auto !important; }
-  }
 
   /* Multiple-choice answer grids (every subject's practice + test screens) forced a
      minimum 160px column, which on a phone often still fits 2 columns — fine for short
@@ -4354,10 +4347,11 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </div>
         </sc-if>
 
-        <!-- TRAINING — the pearl block, same as Home and Health. The section list stays a
-             sidebar (folds to one column under 900px on the existing cc-grid2 rule); the
-             open section is one card whose badge and title track whichever is chosen, the
-             way Calendar's Month card names whichever month is showing. -->
+        <!-- TRAINING — the pearl block, same as Home and Health. The section list is a
+             dropdown (was a permanently-visible sidebar, which read as a long stacked block
+             on a phone-width column); the open section is one card whose badge and title
+             track whichever is chosen, the way Calendar's Month card names whichever month
+             is showing. -->
         <sc-if value="{{ forgeShowTraining }}" hint-placeholder-val="{{ false }}">
         <div class="lcb-stage">
           <div class="lcb-field"></div>
@@ -4416,16 +4410,31 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ noTrainSearch }}" hint-placeholder-val="{{ true }}">
-          <div class="cc-grid2" style="position:relative; display:grid; grid-template-columns:224px 1fr; gap:16px; align-items:start;">
+          <div style="position:relative;">
 
-            <div class="lc-card forge-secnav" style="position:sticky; top:14px; padding:8px;">
-              <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="13">
-                <div onClick="{{ p.go }}" style="position:relative; display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:11px; cursor:pointer; background:{{ p.bg }};">
-                  <span style="position:absolute; left:0; top:11px; bottom:11px; width:2px; border-radius:2px; background:var(--lc-accent); opacity:{{ p.barOpacity }};"></span>
-                  <span style="width:17px; height:17px; flex:0 0 17px; display:flex; color:{{ p.mark }};" data-icon="forge"></span>
-                  <span style="font-size:13px; color:{{ p.ink }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.name }}</span>
+            <!-- The section picker used to be a permanently-visible sidebar list (fourteen rows,
+                 always on screen, folding to a long stacked block above the content on mobile).
+                 It's a dropdown now: a single row showing whichever section is open, expanding
+                 into the same row list — scrollable and capped in height — only while picking. -->
+            <div style="position:relative; margin-bottom:16px;">
+              <div onClick="{{ toggleTrainDropdown }}" class="lc-card" style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; cursor:pointer;">
+                <span style="display:flex; align-items:center; gap:10px; min-width:0;">
+                  <span style="width:17px; height:17px; flex:0 0 17px; display:flex; color:var(--lc-accent);" data-icon="forge"></span>
+                  <span style="font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ trainDropdownLabel }}</span>
+                </span>
+                <span style="font-size:11px; color:var(--lc-muted); transform:{{ trainDropdownChevron }}; transition:transform .15s ease; flex:0 0 auto;">▾</span>
+              </div>
+              <sc-if value="{{ trainDropdownOpen }}" hint-placeholder-val="{{ false }}">
+                <div class="lc-card" style="position:absolute; top:calc(100% + 6px); left:0; right:0; max-height:320px; overflow-y:auto; padding:8px; z-index:10;">
+                  <sc-for list="{{ trainPicker }}" as="p" hint-placeholder-count="13">
+                    <div onClick="{{ p.go }}" style="position:relative; display:flex; align-items:center; gap:10px; padding:10px 11px; border-radius:11px; cursor:pointer; background:{{ p.bg }};">
+                      <span style="position:absolute; left:0; top:11px; bottom:11px; width:2px; border-radius:2px; background:var(--lc-accent); opacity:{{ p.barOpacity }};"></span>
+                      <span style="width:17px; height:17px; flex:0 0 17px; display:flex; color:{{ p.mark }};" data-icon="forge"></span>
+                      <span style="font-size:13px; color:{{ p.ink }}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ p.name }}</span>
+                    </div>
+                  </sc-for>
                 </div>
-              </sc-for>
+              </sc-if>
             </div>
 
             <div>
@@ -10107,7 +10116,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-456 · v11.456 vanguard-home-frame-mobile-more-space';
+const NOTIF_BUILD_VERSION = '2026.09.27-457 · v11.457 forge-training-section-dropdown';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15342,6 +15351,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.457', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'The Forge\'s Training section picker (Chest, Shoulders, Arms, Back, Core, Hips & Glutes, Quads, Hamstrings, Calves, Feet & Ankles, Neck, Hands & Forearms, Kettlebells, Full Body) was a permanently-visible sidebar list — fourteen rows always on screen, and a long stacked block above the exercises on a phone-width column. It\'s a dropdown now: one row showing whichever section is open, expanding into the same list — capped in height with a scrollbar — only while picking.',
+    ]},
     {version:'v11.456', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Spaced Home\'s Vanguard page-frame out further on mobile (24px inset, up from 14px) per follow-up feedback. Desktop\'s 6px inset is unaffected.',
     ]},
@@ -20942,11 +20954,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const secs=(TR?TR.SECTIONS:[]);
         const secKey=(S.forgeSection && secs.some(x=>x.key===S.forgeSection)) ? S.forgeSection : (secs[0]||{}).key;
         const trainPicker=secs.map(x=>({
-          name:x.name, go:()=>this.setForgeSection(x.key),
+          name:x.name, go:()=>{ this.setForgeSection(x.key); this.setState({trainDropdownOpen:false}); },
           ink:x.key===secKey?'var(--lc-on-accent, #fff)':'var(--lc-muted)',
           mark:x.key===secKey?'var(--lc-on-accent, #fff)':'var(--lc-muted)',
           bg:x.key===secKey?'var(--lc-accent)':'rgba(0,0,0,0)',
           barOpacity:x.key===secKey?1:0 }));
+        // The section picker is a dropdown now (was a permanently-visible sidebar list) —
+        // a button showing the open section's name, expanding into the same row list on click.
+        const trainDropdownOpen=!!S.trainDropdownOpen;
+        const trainDropdownLabel=(secs.find(x=>x.key===secKey)||{}).name || 'Choose a section';
         const fb=this._fb(), fbDone=fb.done||{}, fbW=fb.w||{}, fbMode=fb.mode||'day';
         const dr0=S.fbDraft||{}, pool0=S.forgePool||'gym', pt=S.poolText||{};
         const POOL_LABEL={gym:'GYM', home:'HOME', all:'ALL'};
@@ -21125,6 +21141,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           forgeShowEmpty:centre!=='home' && centre!=='health' && centre!=='mental' && !(centre==='training' && trainSections.length),
           forgeEmptyLabel:(centre==='home'?'HOME':centre==='training'?'TRAINING':centre==='mental'?'MENTAL':'HEALTH'),
           trainSections:trainSections, trainPicker:trainPicker,
+          trainDropdownOpen:trainDropdownOpen, trainDropdownLabel:trainDropdownLabel,
+          toggleTrainDropdown:()=>this.setState(s=>({trainDropdownOpen:!s.trainDropdownOpen})),
+          trainDropdownChevron:trainDropdownOpen?'rotate(180deg)':'rotate(0deg)',
           trainSearch:S.trainSearch||'', setTrainSearch:(e)=>this.setState({trainSearch:e.target.value}),
           clearTrainSearch:()=>this.setState({trainSearch:''}),
           hasTrainSearch:hasTrainSearch, noTrainSearch:noTrainSearch,
@@ -21133,6 +21152,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           trainSearchCountLabel:trainSearchCount+' match'+(trainSearchCount===1?'':'es')
         };
       }, { forgeCentres:[], forgeShowHome:false, forgeShowHealth:false, forgeShowMental:false, forgeShowEmpty:false, forgeShowTraining:false, forgeEmptyLabel:'', trainSections:[], trainPicker:[],
+           trainDropdownOpen:false, trainDropdownLabel:'', toggleTrainDropdown:()=>{}, trainDropdownChevron:'rotate(0deg)',
            hrFuel:'', hrProtein:'', hrWater:'', hrWaterHint:'', hrDate:'', hydPlus:()=>{}, hydMinus:()=>{}, hydMinusInk:'var(--ab-muted)', addMealKey:()=>{}, hrMeals:[], hrNoMeals:true,
            trainSearch:'', setTrainSearch:()=>{}, clearTrainSearch:()=>{}, hasTrainSearch:false, noTrainSearch:true,
            noTrainSearchResults:false, trainSearchResults:[], trainSearchCount:0, trainSearchCountLabel:'' }),
