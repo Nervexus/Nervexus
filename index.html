@@ -2556,6 +2556,9 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <svg width="40" height="40" viewBox="0 0 40 40" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
               <path d="M40,14 L20,14 A9,9 0 1,0 14,20 L14,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
               <path d="M40,17 L22,17 A6,6 0 1,0 17,22 L17,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
+              <!-- A small bud at the spiral's own centre — the finishing touch an ornamental
+                   scroll usually ends on, rather than leaving the loop reading as a bare ring. -->
+              <circle cx="18" cy="18" r="1.4" fill="rgba(66,10,7,0.32)"></circle>
             </svg>
           </sc-for>
           <div style="position:absolute; top:32px; left:58px; right:58px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
@@ -10098,7 +10101,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-443 · v11.443 vanguard-home-frame-spiral-corners';
+const NOTIF_BUILD_VERSION = '2026.09.27-444 · v11.444 vanguard-home-frame-corner-bud';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15333,6 +15336,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.444', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Gave Home’s Vanguard frame corners a small bud at the spiral’s own centre, so each corner reads as a finished ornament rather than a bare loop.',
+    ]},
     {version:'v11.443', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Home’s Vanguard page-frame corners now spiral into a small closed loop instead of a plain curve, after an invitation-suite reference — one 40x40 corner motif drawn once and rotated 90° per corner, with plain straight double lines between them picking up exactly where each corner’s own stub ends. Holds up correctly at both desktop and phone width.',
     ]},
