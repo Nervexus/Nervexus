@@ -2544,12 +2544,28 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
-          <!-- The hero's page-frame, after an invitation-suite reference: two plain straight
-               lines, equal weight and equal opacity (no heavier outer line, no ornament, no
-               wave) with a small shared corner radius so the pair reads as one parallel-ruled
-               border rather than two independent boxes. -->
-          <div style="position:absolute; inset:18px; border:1.5px solid rgba(66,10,7,0.28); border-radius:8px; pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; inset:21px; border:1.5px solid rgba(66,10,7,0.28); border-radius:5px; pointer-events:none; z-index:1;"></div>
+          <!-- The hero's page-frame, after an invitation-suite reference: plain straight double
+               lines (equal weight, equal opacity — no heavier outer line) that spiral into a
+               small closed loop at each corner instead of a plain curve or a sharp right angle,
+               the way a formal invitation's own border corner does. One 40x40 corner motif
+               (drawn once, top-left) is rotated 90° per corner rather than redrawn four times;
+               the straight runs between corners are plain CSS lines picking up exactly where
+               each corner tile's own stub ends, so nothing here depends on the hero's exact
+               size and the seams line up regardless of viewport width. -->
+          <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
+            <svg width="40" height="40" viewBox="0 0 40 40" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
+              <path d="M40,14 L20,14 A9,9 0 1,0 14,20 L14,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
+              <path d="M40,17 L22,17 A6,6 0 1,0 17,22 L17,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
+            </svg>
+          </sc-for>
+          <div style="position:absolute; top:32px; left:58px; right:58px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:35px; left:58px; right:58px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:32px; left:58px; right:58px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:35px; left:58px; right:58px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:32px; top:58px; bottom:58px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:35px; top:58px; bottom:58px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:32px; top:58px; bottom:58px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:35px; top:58px; bottom:58px; width:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10082,7 +10098,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-442 · v11.442 vanguard-home-frame-equal-lines';
+const NOTIF_BUILD_VERSION = '2026.09.27-443 · v11.443 vanguard-home-frame-spiral-corners';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15317,6 +15333,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.443', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Home’s Vanguard page-frame corners now spiral into a small closed loop instead of a plain curve, after an invitation-suite reference — one 40x40 corner motif drawn once and rotated 90° per corner, with plain straight double lines between them picking up exactly where each corner’s own stub ends. Holds up correctly at both desktop and phone width.',
+    ]},
     {version:'v11.442', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Per another invitation-suite reference: evened out Home’s Vanguard page-frame so both ruled lines carry the exact same weight and opacity (the outer line had been the heavier of the two), and gave the corners a small shared radius instead of a sharp right angle, so the pair reads as one plain, unornamented parallel-ruled border.',
     ]},
@@ -22649,6 +22668,15 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         return out; })(),
       learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
       homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, homeWordmark:(S.prefs.ultraStyle||'Ultra X'), powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
+      // The Vanguard hero frame's one corner motif, placed at all four corners by rotation
+      // rather than drawn four times — 90° per corner keeps the loop's spiral direction
+      // consistent all the way around rather than mirroring it.
+      vgFrameCorners:[
+        {pos:'top:18px; left:18px;', rot:'rotate(0deg)'},
+        {pos:'top:18px; right:18px;', rot:'rotate(90deg)'},
+        {pos:'bottom:18px; right:18px;', rot:'rotate(180deg)'},
+        {pos:'bottom:18px; left:18px;', rot:'rotate(270deg)'},
+      ],
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',
 
       // login
