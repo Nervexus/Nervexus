@@ -2544,32 +2544,32 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
-          <!-- The hero's page-frame, after an invitation-suite reference: a bold outer rule with
-               a thin inner rule, corner curved as a single concentric coved sweep — both lines'
-               arcs share one centre (28+32=36+24=60), so the gap between them stays constant all
-               the way round instead of pinching or crossing. One 80x80 corner motif (drawn once,
-               top-left) is rotated 90° per corner rather than redrawn four times; the straight
-               runs between corners are plain CSS lines picking up exactly where each corner
-               tile's own stub ends. Each line's CSS div is centred on the same coordinate as its
-               SVG stroke (div inset minus half its own width) rather than the div's own top/left
-               edge, so the two constructions don't visibly step at the seam now that the strokes
-               are thick enough for that half-pixel gap to actually show. -->
+          <!-- The hero's page-frame: a refined double-ruled invitation border, outer line only
+               slightly stronger than the inner (2px / 1.5px — restrained, not heavy), corner
+               curved as a single concentric coved sweep — both lines' arcs share one centre
+               (28+32=36+24=60), so the gap between them stays constant all the way round instead
+               of pinching or crossing. One 80x80 corner motif (drawn once, top-left) is rotated
+               90° per corner rather than redrawn four times; the straight runs between corners
+               are plain CSS lines picking up exactly where each corner tile's own stub ends.
+               Each line's CSS div is centred on the same coordinate as its SVG stroke (div inset
+               minus half its own width) rather than the div's own top/left edge, so the two
+               constructions don't visibly step at the seam. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
-              <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.78)" stroke-width="3"></path>
-              <path d="M80,36 L60,36 A24,24 0 0,1 36,60 L36,80" fill="none" stroke="rgba(66,10,7,0.55)" stroke-width="1.1"></path>
+              <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.72)" stroke-width="2"></path>
+              <path d="M80,36 L60,36 A24,24 0 0,1 36,60 L36,80" fill="none" stroke="rgba(66,10,7,0.5)" stroke-width="1.5"></path>
             </svg>
           </sc-for>
-          <div style="position:absolute; top:44.5px; left:98px; right:98px; height:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; top:53.45px; left:98px; right:98px; height:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:44.5px; left:98px; right:98px; height:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:53.45px; left:98px; right:98px; height:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:44.5px; top:98px; bottom:98px; width:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:53.45px; top:98px; bottom:98px; width:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:44.5px; top:98px; bottom:98px; width:3px; background:rgba(66,10,7,0.78); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:53.45px; top:98px; bottom:98px; width:1.1px; background:rgba(66,10,7,0.55); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:45px; left:98px; right:98px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:53.25px; left:98px; right:98px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:45px; left:98px; right:98px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:53.25px; left:98px; right:98px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:45px; top:98px; bottom:98px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:53.25px; top:98px; bottom:98px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:45px; top:98px; bottom:98px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:53.25px; top:98px; bottom:98px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
         </sc-if>
-        <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
+        <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px; margin-top:{{ vgTopRowClearance }}; margin-right:{{ vgTopRowRightClearance }};" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
             <sc-if value="{{ showChrome }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex; gap:26px; flex-wrap:wrap;" class="cc-home-navlinks">
@@ -10100,7 +10100,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-448 · v11.448 vanguard-home-frame-bold-thin-rule';
+const NOTIF_BUILD_VERSION = '2026.09.27-449 · v11.449 vanguard-home-frame-refine-and-focus-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15335,6 +15335,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.449', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Refined Home’s Vanguard page-frame to a more restrained weight (2px outer / 1.5px inner, down from the heavier 3px/1.1px pass) — elegant rather than bold. Also fixed a real layout bug: the top-right corner curve was running directly through the Focus Mode button’s text. Gave the top utility row enough vertical and horizontal clearance to sit fully clear of both the straight rule and the corner sweep, checked at desktop and mobile.',
+    ]},
     {version:'v11.448', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Home’s Vanguard page-frame read as thin and faint next to the reference — and at the new bigger corner size, a half-pixel gap between how the SVG corner and the straight CSS lines were each centred became visible as a slight step at the seam. Gave the outer rule real weight and solid colour with a fine inner rule alongside it (bold+thin, like the reference), and fixed the centring so the two constructions meet without a step.',
     ]},
@@ -21235,6 +21238,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       themeChips:this._chips('theme',['Lime','Onyx','Ember','Ghost','Snow']),
       isUltraTheme:S.prefs.theme==='Ultra', isBaseTheme:S.prefs.theme!=='Ultra', isMinorAccount:!!(S.prefs && S.prefs.isMinor),
       isUltraNoir:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Noir', isUltraMaison:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Maison Élysée', isUltraVanguard:S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard', isUltraLight:S.prefs.theme==='Ultra' && S.prefs.ultraStyle!=='Noir' && S.prefs.ultraStyle!=='Maison Élysée' && S.prefs.ultraStyle!=='Vanguard',
+      // Clears the Vanguard hero frame's top rule and its 80px-wide corner tiles so the toprow's
+      // Focus Mode pill never visually collides with either; '0px'/'0' everywhere else since only
+      // Vanguard draws that frame. Needs clearance on BOTH axes: the straight top rule runs the
+      // full width at ~y45-55 (vertical clearance handles that), but the corner tiles themselves
+      // are 80px wide, and the toprow sits flush-right inside them without the horizontal margin.
+      vgTopRowClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '26px' : '0px',
+      vgTopRowRightClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '90px' : '0px',
       ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Vanguard']),
       ...(()=>{
         const tab=S.themeMenuTab||'themes';
