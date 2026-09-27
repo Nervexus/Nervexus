@@ -2546,22 +2546,23 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
           <!-- The hero's page-frame: a single ruled invitation border (the inner line was
                dropped per request — this is just the outer 2px rule now), corner curved as a
-               coved sweep. Inset 30px from the card's own edge so there's visible breathing room
-               between the card's own rounded corner and the frame's. One 80x80 corner motif
-               (drawn once, top-left) is rotated 90° per corner rather than redrawn four times;
-               the straight runs between corners are plain CSS lines picking up exactly where the
-               corner tile's own stub ends. The CSS div is centred on the same coordinate as the
-               SVG stroke (div inset minus half its own width) rather than the div's own top/left
-               edge, so the two constructions don't visibly step at the seam. -->
+               coved sweep. Inset 22px from the card's own edge (nudged in from 30px, closer to
+               the edge per request, while still keeping clear breathing room from the card's own
+               rounded corner). One 80x80 corner motif (drawn once, top-left) is rotated 90° per
+               corner rather than redrawn four times; the straight runs between corners are plain
+               CSS lines picking up exactly where the corner tile's own stub ends. The CSS div is
+               centred on the same coordinate as the SVG stroke (div inset minus half its own
+               width) rather than the div's own top/left edge, so the two constructions don't
+               visibly step at the seam. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
               <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.72)" stroke-width="2"></path>
             </svg>
           </sc-for>
-          <div style="position:absolute; top:57px; left:110px; right:110px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:57px; left:110px; right:110px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:57px; top:110px; bottom:110px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:57px; top:110px; bottom:110px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:49px; left:102px; right:102px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:49px; left:102px; right:102px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:49px; top:102px; bottom:102px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:49px; top:102px; bottom:102px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px; margin-top:{{ vgTopRowClearance }}; margin-right:{{ vgTopRowRightClearance }};" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10094,7 +10095,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-452 · v11.452 vanguard-home-frame-single-line';
+const NOTIF_BUILD_VERSION = '2026.09.27-453 · v11.453 vanguard-home-frame-closer-inset';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15329,6 +15330,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.453', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Nudged Home\'s Vanguard page-frame in closer to the card\'s edge (22px inset, down from 30px) per request, while keeping enough margin that it doesn\'t crowd the card\'s own rounded corner.',
+    ]},
     {version:'v11.452', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Dropped the second (inner, thinner) rule from Home\'s Vanguard page-frame per request — it\'s now a single 2px outer line with the same coved corner curve.',
     ]},
@@ -21246,8 +21250,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // Vanguard draws that frame. Needs clearance on BOTH axes: the straight top rule runs the
       // full width at ~y45-55 (vertical clearance handles that), but the corner tiles themselves
       // are 80px wide, and the toprow sits flush-right inside them without the horizontal margin.
-      vgTopRowClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '38px' : '0px',
-      vgTopRowRightClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '102px' : '0px',
+      vgTopRowClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '30px' : '0px',
+      vgTopRowRightClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '94px' : '0px',
       ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Vanguard']),
       ...(()=>{
         const tab=S.themeMenuTab||'themes';
@@ -22702,10 +22706,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // rather than drawn four times — 90° per corner keeps the curve's orientation
       // consistent all the way around rather than mirroring it.
       vgFrameCorners:[
-        {pos:'top:30px; left:30px;', rot:'rotate(0deg)'},
-        {pos:'top:30px; right:30px;', rot:'rotate(90deg)'},
-        {pos:'bottom:30px; right:30px;', rot:'rotate(180deg)'},
-        {pos:'bottom:30px; left:30px;', rot:'rotate(270deg)'},
+        {pos:'top:22px; left:22px;', rot:'rotate(0deg)'},
+        {pos:'top:22px; right:22px;', rot:'rotate(90deg)'},
+        {pos:'bottom:22px; right:22px;', rot:'rotate(180deg)'},
+        {pos:'bottom:22px; left:22px;', rot:'rotate(270deg)'},
       ],
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',
 
