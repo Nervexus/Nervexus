@@ -2544,13 +2544,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="position:absolute; inset:18px; border:3px solid #5B1A1A; border-radius:14px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
-          <!-- The hero's page-frame: was two distant rounded rectangles in a stale pre-white-
-               background grey (rgba(199,199,199,..), left over from the old dark ground).
-               Recast as a single tight double-ruled line — the two rules close enough together
-               to read as one engraved border, like an invitation's own edge — in Bordeaux, with
-               sharp corners rather than rounded ones to match. -->
-          <div style="position:absolute; inset:18px; border:1px solid rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; inset:21px; border:1px solid rgba(66,10,7,0.16); pointer-events:none; z-index:1;"></div>
+          <!-- The hero's page-frame, after an invitation-suite reference: two plain straight
+               lines, equal weight and equal opacity (no heavier outer line, no ornament, no
+               wave) with a small shared corner radius so the pair reads as one parallel-ruled
+               border rather than two independent boxes. -->
+          <div style="position:absolute; inset:18px; border:1.5px solid rgba(66,10,7,0.28); border-radius:8px; pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; inset:21px; border:1.5px solid rgba(66,10,7,0.28); border-radius:5px; pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px;" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10083,7 +10082,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-441 · v11.441 vanguard-home-frame-lines';
+const NOTIF_BUILD_VERSION = '2026.09.27-442 · v11.442 vanguard-home-frame-equal-lines';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15318,6 +15317,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.442', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Per another invitation-suite reference: evened out Home’s Vanguard page-frame so both ruled lines carry the exact same weight and opacity (the outer line had been the heavier of the two), and gave the corners a small shared radius instead of a sharp right angle, so the pair reads as one plain, unornamented parallel-ruled border.',
+    ]},
     {version:'v11.441', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Home’s Vanguard page-frame was two distant rounded rectangles in a stale grey left over from before the background went white. Recast as a single tight double-ruled line in Bordeaux with sharp corners, after an invitation-suite reference — reads as one engraved border rather than two separate boxes.',
     ]},
