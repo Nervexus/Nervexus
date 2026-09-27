@@ -2557,17 +2557,17 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
               <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.72)" stroke-width="2"></path>
-              <path d="M80,36 L60,36 A24,24 0 0,1 36,60 L36,80" fill="none" stroke="rgba(66,10,7,0.5)" stroke-width="1.5"></path>
+              <path d="M60,36 A24,24 0 0,1 36,60" fill="none" stroke="rgba(66,10,7,0.5)" stroke-width="1.5"></path>
             </svg>
           </sc-for>
           <div style="position:absolute; top:45px; left:98px; right:98px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; top:53.25px; left:98px; right:98px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; top:53.25px; left:78px; right:78px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
           <div style="position:absolute; bottom:45px; left:98px; right:98px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:53.25px; left:98px; right:98px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; bottom:53.25px; left:78px; right:78px; height:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
           <div style="position:absolute; left:45px; top:98px; bottom:98px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:53.25px; top:98px; bottom:98px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; left:53.25px; top:78px; bottom:78px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
           <div style="position:absolute; right:45px; top:98px; bottom:98px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:53.25px; top:98px; bottom:98px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
+          <div style="position:absolute; right:53.25px; top:78px; bottom:78px; width:1.5px; background:rgba(66,10,7,0.5); pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px; margin-top:{{ vgTopRowClearance }}; margin-right:{{ vgTopRowRightClearance }};" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10100,7 +10100,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-449 · v11.449 vanguard-home-frame-refine-and-focus-fix';
+const NOTIF_BUILD_VERSION = '2026.09.27-450 · v11.450 vanguard-home-frame-inner-line-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15335,6 +15335,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.450', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Found the real cause of the inner rule looking "off" on Home\'s Vanguard page-frame: its SVG corner tile drew a short flat lead-in before the curve, and that particular thin, low-opacity segment was rendering visibly lighter than the same line drawn as a plain CSS rule — a ~20px washed-out patch right where each corner meets the straight run. The outer rule (thicker, more opaque) didn\'t show it, which is why only the inner line looked wrong. Fixed by having the SVG draw only the curve itself and letting the CSS rule cover the full straight run right up to the curve\'s own tangent point, so nothing renders that faded segment at all.',
+    ]},
     {version:'v11.449', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Refined Home’s Vanguard page-frame to a more restrained weight (2px outer / 1.5px inner, down from the heavier 3px/1.1px pass) — elegant rather than bold. Also fixed a real layout bug: the top-right corner curve was running directly through the Focus Mode button’s text. Gave the top utility row enough vertical and horizontal clearance to sit fully clear of both the straight rule and the corner sweep, checked at desktop and mobile.',
     ]},
