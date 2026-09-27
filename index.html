@@ -2545,20 +2545,18 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         </sc-if>
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
           <!-- The hero's page-frame, after an invitation-suite reference: plain straight double
-               lines (equal weight, equal opacity — no heavier outer line) that spiral into a
-               small closed loop at each corner instead of a plain curve or a sharp right angle,
-               the way a formal invitation's own border corner does. One 40x40 corner motif
-               (drawn once, top-left) is rotated 90° per corner rather than redrawn four times;
-               the straight runs between corners are plain CSS lines picking up exactly where
-               each corner tile's own stub ends, so nothing here depends on the hero's exact
-               size and the seams line up regardless of viewport width. -->
+               lines (equal weight, equal opacity) that round smoothly into each other at the
+               corner — the outer line on a wider radius, the inner on a tighter one, so the pair
+               crosses and re-separates through the curve exactly like a stationer's ruled border,
+               not a closed loop or spiral. One 40x40 corner motif (drawn once, top-left) is
+               rotated 90° per corner rather than redrawn four times; the straight runs between
+               corners are plain CSS lines picking up exactly where each corner tile's own stub
+               ends, so nothing here depends on the hero's exact size and the seams line up
+               regardless of viewport width. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
             <svg width="40" height="40" viewBox="0 0 40 40" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
-              <path d="M40,14 L20,14 A9,9 0 1,0 14,20 L14,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
-              <path d="M40,17 L22,17 A6,6 0 1,0 17,22 L17,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
-              <!-- A small bud at the spiral's own centre — the finishing touch an ornamental
-                   scroll usually ends on, rather than leaving the loop reading as a bare ring. -->
-              <circle cx="18" cy="18" r="1.4" fill="rgba(66,10,7,0.32)"></circle>
+              <path d="M40,14 L32,14 A18,18 0 0,1 14,32 L14,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
+              <path d="M40,17 L30,17 A13,13 0 0,1 17,30 L17,40" fill="none" stroke="rgba(66,10,7,0.32)" stroke-width="1.3"></path>
             </svg>
           </sc-for>
           <div style="position:absolute; top:32px; left:58px; right:58px; height:1.3px; background:rgba(66,10,7,0.32); pointer-events:none; z-index:1;"></div>
@@ -10101,7 +10099,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-444 · v11.444 vanguard-home-frame-corner-bud';
+const NOTIF_BUILD_VERSION = '2026.09.27-445 · v11.445 vanguard-home-frame-corner-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15336,6 +15334,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.445', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'The spiral-loop corners on Home’s Vanguard page-frame were wrong — re-examined the actual invitation references closely and they show a plain rounded double-line corner (outer line on a wider radius, inner on a tighter one, crossing smoothly through the curve), not a closed loop. Replaced the spiral and its centre bud with that simpler curve.',
+    ]},
     {version:'v11.444', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Gave Home’s Vanguard frame corners a small bud at the spiral’s own centre, so each corner reads as a finished ornament rather than a bare loop.',
     ]},
@@ -22675,7 +22676,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
       homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, homeWordmark:(S.prefs.ultraStyle||'Ultra X'), powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
       // The Vanguard hero frame's one corner motif, placed at all four corners by rotation
-      // rather than drawn four times — 90° per corner keeps the loop's spiral direction
+      // rather than drawn four times — 90° per corner keeps the curve's orientation
       // consistent all the way around rather than mirroring it.
       vgFrameCorners:[
         {pos:'top:18px; left:18px;', rot:'rotate(0deg)'},
