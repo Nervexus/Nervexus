@@ -541,14 +541,24 @@
   .theme-ultra.theme-noir .gent-stat, .theme-ultra.theme-noir .gent-row{ border-color:rgba(150,143,130,0.35); }
   .theme-ultra.theme-maison .gent-stat, .theme-ultra.theme-maison .gent-row{ border-color:rgba(78,110,150,0.30); }
 
-  /* THE HARDENING. Its own gritty dark iron/rust palette, kept as custom properties on
-     .hard-page so markup can reach it with var(--hard-*) the same way the rest of the app
-     writes real colour inline rather than baking it into a class. Structure only lives in
-     these classes, same convention as .gent-* above. */
-  .hard-page{ --hard-bg:#131211; --hard-card:#1c1a18; --hard-card-2:#221f1c;
-    --hard-border:rgba(194,65,12,0.28); --hard-border-soft:rgba(255,255,255,0.07);
-    --hard-accent:#C2410C; --hard-accent-strong:#E85D2C;
-    --hard-ink:#EDEAE5; --hard-muted:#95897c; --hard-muted-2:#5f5a54; }
+  /* THE HARDENING. Started as its own fixed gritty dark iron/rust palette; now the --hard-*
+     custom properties alias the app's own theme tokens instead, so the page runs whatever
+     raiment is selected (Ultra X, Noir, Maison, Vanguard) the same way Home/Health/Calendar/
+     Power Level/Settings already do — --u-* (theme-ultra.theme-*) for the base surfaces and
+     ink, --forge-accent/--forge-add-bg/--forge-add-ink (the same tokens Gentlemen's and the
+     Forge's own accents use) for the highlight colour and filled-button pairs, so a filled
+     pill's text always has a themed-correct ink (e.g. white on Vanguard's dark maroon, not a
+     fixed near-black that would go unreadable there). --forge-* is declared straight on the
+     bare .cc-shell (no raiment class needed) so it always resolves; --u-* only exists under
+     .theme-ultra, which isn't applied at all on the non-Ultra base theme — so those four get
+     the original gritty values as an explicit var() fallback rather than resolving to nothing
+     there. Markup and the producer block are untouched below — only what these variables
+     resolve to changed. */
+  .hard-page{ --hard-bg:var(--u-bg, #131211); --hard-card:var(--u-card, #1c1a18); --hard-card-2:var(--u-bg, #221f1c);
+    --hard-border:var(--u-line, rgba(194,65,12,0.28)); --hard-border-soft:var(--u-line, rgba(255,255,255,0.07));
+    --hard-accent:var(--forge-accent); --hard-accent-strong:var(--forge-accent);
+    --hard-ink:var(--u-ink, #EDEAE5); --hard-muted:var(--u-muted, #95897c); --hard-muted-2:var(--u-muted, #5f5a54);
+    --hard-cta-bg:var(--forge-add-bg); --hard-cta-ink:var(--forge-add-ink); }
   .hard-welcome{ min-height:70vh; display:flex; flex-direction:column; align-items:center;
     justify-content:center; text-align:center; gap:14px; padding:40px 20px; }
   .hard-tabs{ position:relative; display:flex; align-items:stretch; gap:6px; overflow-x:auto;
@@ -4523,7 +4533,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <!-- ---- ONBOARDING: a deck, one question-group per card, BACK/dots/progress/NEXT ---- -->
         <sc-if value="{{ !hardOnboarded }}" hint-placeholder-val="{{ true }}">
         <div class="hard-welcome">
-          <div style="width:54px; height:54px; border-radius:13px; border:1px solid var(--hard-border); display:flex; align-items:center; justify-content:center; background:linear-gradient(158deg, rgba(194,65,12,0.16), rgba(194,65,12,0.02));">
+          <div style="width:54px; height:54px; border-radius:13px; border:1px solid var(--hard-border); display:flex; align-items:center; justify-content:center; background:var(--hard-card);">
             <span style="width:27px; height:27px; color:var(--hard-accent); display:flex;" data-icon="flame"></span>
           </div>
           <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--hard-accent);">◆ THE HARDENING</div>
@@ -4651,7 +4661,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </sc-for>
             </div>
             <div class="hard-prog"><span style="width:{{ hardOnboardProgPct }};"></span></div>
-            <span onClick="{{ hardNextGo }}" class="hard-pill" style="background:var(--hard-accent); color:#1a1410;">{{ hardNextLabel }}</span>
+            <span onClick="{{ hardNextGo }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">{{ hardNextLabel }}</span>
           </div>
         </div>
         </div>
@@ -4660,7 +4670,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <!-- ---- MAIN APP (post-onboarding) ---- -->
         <sc-if value="{{ hardOnboarded }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-          <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid var(--hard-border); display:flex; align-items:center; justify-content:center; background:linear-gradient(158deg, rgba(194,65,12,0.16), rgba(194,65,12,0.02));">
+          <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid var(--hard-border); display:flex; align-items:center; justify-content:center; background:var(--hard-card);">
             <span style="width:27px; height:27px; color:var(--hard-accent); display:flex;" data-icon="flame"></span>
           </div>
           <div>
@@ -4708,7 +4718,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <sc-if value="{{ hardNeedsProgramGen }}" hint-placeholder-val="{{ false }}">
             <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); text-align:center; padding:40px 24px;">
               <div style="font-size:14px; color:var(--hard-muted); margin-bottom:16px;">No program generated yet.</div>
-              <span onClick="{{ hardRegenerateProgram }}" class="hard-pill" style="background:var(--hard-accent); color:#1a1410;">GENERATE MY PROGRAM</span>
+              <span onClick="{{ hardRegenerateProgram }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">GENERATE MY PROGRAM</span>
             </div>
           </sc-if>
           <sc-if value="{{ hardHasProgram }}" hint-placeholder-val="{{ true }}">
@@ -4726,7 +4736,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:var(--hard-muted);">{{ hardProgramSource }}</span>
               </div>
               <sc-if value="{{ hardHasDayNote }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:12.5px; color:var(--hard-accent-strong); background:rgba(194,65,12,0.09); border:1px solid var(--hard-border); border-radius:10px; padding:10px 12px; margin-bottom:14px;">{{ hardOpenDayNote }}</div>
+                <div style="font-size:12.5px; color:var(--hard-accent-strong); background:var(--hard-border); border:1px solid var(--hard-border); border-radius:10px; padding:10px 12px; margin-bottom:14px;">{{ hardOpenDayNote }}</div>
               </sc-if>
 
               <sc-if value="{{ hardIsRestDay }}" hint-placeholder-val="{{ false }}">
@@ -4784,8 +4794,8 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                 </sc-if>
 
                 <div style="display:flex; gap:10px; margin-top:18px;">
-                  <span onClick="{{ hardMakeHarder }}" class="hard-pill" style="background:var(--hard-accent); color:#1a1410; flex:1; justify-content:center;">MAKE IT HARDER</span>
-                  <span onClick="{{ hardTooMuch }}" class="hard-pill-ghost" style="border:1px solid var(--hard-border-soft); color:var(--hard-muted); flex:1; justify-content:center;">TOO MUCH</span>
+                  <span onClick="{{ hardMakeHarder }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink); flex:1; justify-content:center; opacity:{{ hardAdjustOpacity }}; cursor:{{ hardAdjustCursor }};">{{ hardMakeHarderLabel }}</span>
+                  <span onClick="{{ hardTooMuch }}" class="hard-pill-ghost" style="border:1px solid var(--hard-border-soft); color:var(--hard-muted); flex:1; justify-content:center; opacity:{{ hardAdjustOpacity }}; cursor:{{ hardAdjustCursor }};">{{ hardTooMuchLabel }}</span>
                 </div>
 
                 <div style="margin-top:18px; border-top:1px solid var(--hard-border-soft); padding-top:16px;">
@@ -4795,7 +4805,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     <input value="{{ hardSessionRpe }}" onInput="{{ setHardSessionRpe }}" type="number" min="1" max="10" class="hard-input" style="width:60px; padding:8px 10px; text-align:center;">
                   </div>
                   <textarea value="{{ hardSessionNotes }}" onInput="{{ setHardSessionNotes }}" placeholder="Notes on today's session…" class="hard-input" style="width:100%; min-height:60px; box-sizing:border-box; resize:vertical; margin-bottom:10px;"></textarea>
-                  <span onClick="{{ hardLogThisSession }}" class="hard-pill" style="background:var(--hard-accent); color:#1a1410;">LOG SESSION</span>
+                  <span onClick="{{ hardLogThisSession }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">LOG SESSION</span>
                 </div>
 
                 <sc-if value="{{ hardHasRecentLogs }}" hint-placeholder-val="{{ false }}">
@@ -4881,7 +4891,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="font-size:20px; font-weight:700; margin-bottom:10px;">Confront the truth. Take responsibility.</div>
               <div style="font-size:13px; color:var(--hard-muted); max-width:400px; margin:0 auto 20px; line-height:1.6;">Ten questions, generated for you today. No shame, no theatrics — just an honest look at where you're actually lying to yourself.</div>
               <sc-if value="{{ hardHasReframeErr }}" hint-placeholder-val="{{ false }}"><div style="color:#ff8a6a; font-size:12.5px; margin-bottom:12px;">{{ hardReframeErr }}</div></sc-if>
-              <span onClick="{{ hardBeginReframe }}" class="hard-pill" style="background:var(--hard-accent); color:#1a1410;">{{ hardBeginLabel }}</span>
+              <span onClick="{{ hardBeginReframe }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">{{ hardBeginLabel }}</span>
             </div>
           </sc-if>
           <sc-if value="{{ hardReframeStarted }}" hint-placeholder-val="{{ false }}">
@@ -4898,7 +4908,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
                     </sc-for>
                   </div>
                   <div class="hard-prog"><span style="width:{{ hardReframeProgPct }};"></span></div>
-                  <span onClick="{{ hardReframeNext }}" class="hard-pill" style="background:var(--hard-accent); color:#1a1410; opacity:{{ hardReframeNextOpacity }};">{{ hardReframeNextLabel }}</span>
+                  <span onClick="{{ hardReframeNext }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink); opacity:{{ hardReframeNextOpacity }};">{{ hardReframeNextLabel }}</span>
                 </div>
               </div>
             </sc-if>
@@ -10618,7 +10628,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-460 · v11.460 the-hardening-full-build';
+const NOTIF_BUILD_VERSION = '2026.09.27-461 · v11.461 hardening-theme-supabase-ai-adjust';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -11332,6 +11342,12 @@ activities: this._mergeShipLog(s.activities),
       // watch-and-push pattern as learning progress above, into two small JSONB-blob tables.
       if(this._lastSyncedWiPins!==S.wiSavedPins){ this._lastSyncedWiPins=S.wiSavedPins; this._debounce('sbWiPins', ()=>window.SB.upsert('world_intel_pins', {user_id:this.state.authUserId, data:this.state.wiSavedPins||[]}, 'user_id').then(r=>{ if(r&&r.error) console.error('[sb] world intel pins save failed', r.error); })); }
       if(this._lastSyncedWiRoutes!==S.wiRoutes){ this._lastSyncedWiRoutes=S.wiRoutes; this._debounce('sbWiRoutes', ()=>window.SB.upsert('world_intel_routes', {user_id:this.state.authUserId, data:this.state.wiRoutes||[]}, 'user_id').then(r=>{ if(r&&r.error) console.error('[sb] world intel routes save failed', r.error); })); }
+      // THE HARDENING — one JSONB blob, same shape as learning_progress/world_intel_pins
+      // above. Debounced like prefs/world-intel rather than fired instantly like learning:
+      // most changes here are freeform typing (onboarding fields, exercise edits, notes)
+      // rather than learning's discrete test-finished events, so coalescing matters more
+      // than it does there.
+      if(this._lastSyncedHardening!==S.hardening){ this._lastSyncedHardening=S.hardening; this._debounce('sbHardening', ()=>window.SB.upsert('hardening_progress', {user_id:this.state.authUserId, data:this.state.hardening}, 'user_id').then(r=>{ if(r&&r.error) console.error('[sb] hardening save failed', r.error); }), 300); }
     }
   }
   _hkEnsure(){ if(this._hkReady) return; if(!window.HealthKit){ if(!this._hkWait){ this._hkWait=setInterval(()=>{ if(window.HealthKit){ clearInterval(this._hkWait); this._hkWait=null; this._hkEnsure(); } },120); } return; } this._hkReady=true; let H=window.HealthKit.ensure(this.state.health||{}); if(!H._energyLogCleared){ H={...H, energyLog:[], _energyLogCleared:true}; } this.mut(()=>({health:H})); }
@@ -12095,7 +12111,7 @@ activities: this._mergeShipLog(s.activities),
       experience:'', years:'', prevSports:'', prevStrength:'', conditioning:'', running:'', carrying:'', bodyweight:'',
       squat:'', deadlift:'', bench:'', ohp:'', pullups:'', pushups:'', plank:'', farmerCarry:'', runPerf:'', sprintPerf:'',
       limitations:[], medicalNote:'', equipmentMode:'', equipment:[], level:2, goals:[] },
-    program:null, programLoading:false, programErr:'',
+    program:null, programLoading:false, programErr:'', adjustLoading:{}, adjustErr:'',
     edits:{}, logs:[], habits:{}, mentalLog:{}, reframe:{}, weeklyReview:{}
   }; }
   // Self-healing cleanup: briefingVoice/convoVoice used to default to hardcoded
@@ -14076,7 +14092,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     if(!this._sbOn()) return;
     const uid=this.state.authUserId;
     try{
-      const [tasks,notes,missions,missionHistory,events,income,expenses,savings,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes,usageLogRes]=await Promise.all([
+      const [tasks,notes,missions,missionHistory,events,income,expenses,savings,workouts,meals,sleepLogs,hydrationLogs,bodyMetrics,notifs,progressPhotos,goalsRes,worldIntel,dayColorsRes,noteVault,learningRes,memoriesRes,musicRes,activitiesRes,loginXPRes,wiPinsRes,wiRoutesRes,usageLogRes,hardeningRes]=await Promise.all([
         window.SB.list('tasks',{match:{user_id:uid},order:{column:'position',ascending:true}}),
         window.SB.list('notes',{match:{user_id:uid},order:{column:'created_at',ascending:false},columns:'id,deleted_at,title,body,created_at'}),
         window.SB.list('missions',{match:{user_id:uid}}),
@@ -14110,6 +14126,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         window.SB.list('world_intel_pins',{match:{user_id:uid}}),
         window.SB.list('world_intel_routes',{match:{user_id:uid}}),
         window.SB.list('ai_usage_log',{match:{user_id:uid},order:{column:'created_at',ascending:false},limit:300}),
+        window.SB.list('hardening_progress',{match:{user_id:uid}}),
       ]);
       const patch={};
       if(tasks && tasks.data) patch.checklist=tasks.data.filter(r=>!r.deleted_at).map(r=>({id:r.id,label:r.label,tag:r.tag||'TASK',done:!!r.done,xpAwarded:!!r.done}));
@@ -14128,6 +14145,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       if(dayColorsRes && dayColorsRes.data && dayColorsRes.data.length){ const dc={}; dayColorsRes.data.forEach(r=>{ dc[r.day]=r.color; }); patch.dayColors=dc; }
       if(noteVault && noteVault.data && noteVault.data[0] && noteVault.data[0].pw_hash){ patch.notesPw=noteVault.data[0].pw_hash; }
       if(learningRes && learningRes.data && learningRes.data[0] && learningRes.data[0].data){ patch.learning={...this.state.learning, ...learningRes.data[0].data}; }
+      if(hardeningRes && hardeningRes.data && hardeningRes.data[0] && hardeningRes.data[0].data){ patch.hardening={...this._defaultHardening(), ...this.state.hardening, ...hardeningRes.data[0].data}; }
       if(wiPinsRes && wiPinsRes.data && wiPinsRes.data[0]){ patch.wiSavedPins=wiPinsRes.data[0].data||[]; this._lastSyncedWiPins=patch.wiSavedPins; }
       if(wiRoutesRes && wiRoutesRes.data && wiRoutesRes.data[0]){ patch.wiRoutes=wiRoutesRes.data[0].data||[]; this._lastSyncedWiRoutes=patch.wiRoutes; }
       if(memoriesRes && memoriesRes.data) patch.memories=memoriesRes.data.map(r=>({id:r.id,fact:r.fact,category:r.category||'general',source:r.source||'user',ts:new Date(r.created_at).getTime()}));
@@ -15869,6 +15887,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.461', date:'Sep 27, 2026', major:false, kind:'feature', notes:[
+      'THE HARDENING\'s three known gaps from v11.460 are closed. It now retints with whichever raiment is selected (Ultra X, Noir, Maison Élysée, Vanguard) instead of a fixed dark palette, the same way Home/Health/Calendar/Power Level/Settings already do — falling back to the original look only on the non-Ultra base theme. A hardening_progress table (one JSONB blob per user, same shape as learning_progress) now syncs it across devices instead of staying local-only — the migration is written but needs to be applied to the live database. Make It Harder / Too Much is now a real AI call that reads the day\'s actual blocks and adjusts whichever variable makes sense per exercise, falling back to the original deterministic nudge offline. Reframe Yourself\'s Coach\'s Summary now has an offline fallback too, built from your own answers (the action is literally your answer to the always-last action-question) rather than erroring out with no AI provider connected.',
+    ]},
     {version:'v11.460', date:'Sep 27, 2026', major:true, kind:'feature', notes:[
       'THE HARDENING is built out — full onboarding (basics, experience, capability, limitations, equipment, "how hard do you want to push" level, goals), an AI-generated six-day training program personalized to what you entered (with a static template if no AI provider is connected), per-exercise editing, Make It Harder / Too Much adjusters, session logging, morning/evening habits, a daily mental drill, lifestyle fundamentals, a scoreboard with a weekly review, and Reframe Yourself — ten AI-generated self-confrontation questions each day ending in a Coach\'s Summary. Its own gritty dark iron/rust look, same page shape as Gentlemen Center. Saved locally on this device for now — nothing here syncs to other devices yet.',
     ]},
@@ -18622,12 +18643,40 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const override=((this._hard().edits[dayKey]||{})[idx])||{}; return {...base, ...override}; }
   _hardFinisherFor(dayKey){ const day=this._hardProgramDay(dayKey)||{}; const base=day.finisher||{};
     const override=((this._hard().edits[dayKey]||{}).finisher)||{}; return {...base, ...override}; }
-  // "MAKE IT HARDER" / "TOO MUCH" (spec §13-14) — a deterministic, single-variable nudge
-  // rather than another AI round trip per click: add/remove one set on the day's heaviest
-  // compound block, or scale the finisher's distance/time ~15% up/down when there's no
-  // clean "add a set" target (a Reset day, or a conditioning circuit). Never touches more
-  // than one block at once, matching "choose the variable, don't multiply everything."
-  hardAdjustDay(dayKey, harder){
+  // "MAKE IT HARDER" / "TOO MUCH" (spec §13-14) — a real AI call: the model sees the day's
+  // actual current blocks and picks whichever variable(s) make sense per exercise, rather
+  // than one hardcoded rule applied everywhere. Falls back to the original deterministic,
+  // single-variable nudge (add/remove one set on the heaviest compound block, or scale the
+  // finisher ~15%) when no AI provider is connected or the response doesn't parse cleanly,
+  // so the buttons still do something either way.
+  async hardAdjustDay(dayKey, harder){
+    const day=(this._hardProgramDay(dayKey)||{});
+    const blocks=(day.blocks||[]).map((b,i)=>this._hardExerciseAt(dayKey, i));
+    if(!blocks.length && !day.finisher) return; // rest day — nothing to adjust
+    const HE=window.HardeningEngine;
+    this._hardSet(h=>({adjustLoading:{...(h.adjustLoading||{}), [dayKey]:true}, adjustErr:''}));
+    if(!HE || !window.claude){ this._hardAdjustDayFallback(dayKey, harder); this._hardSet(h=>({adjustLoading:{...(h.adjustLoading||{}), [dayKey]:false}})); return; }
+    try{
+      const finisher=day.finisher?this._hardFinisherFor(dayKey):null;
+      const {system, prompt}=HE.buildAdjustDayPrompt({name:day.name, focus:day.focus, blocks, finisher}, harder, this._hard().profile);
+      const raw=await window.claude.complete({role:'workout', system, messages:[{role:'user', content:prompt}], max_tokens:700});
+      const j=this._extractJSON(raw);
+      if(j && Array.isArray(j.blocks) && j.blocks.length===blocks.length){
+        j.blocks.forEach((nb,i)=>{
+          if(nb.sets!=null) this.hardEditExercise(dayKey, i, 'sets', nb.sets);
+          if(nb.reps!=null) this.hardEditExercise(dayKey, i, 'reps', nb.reps);
+          if(nb.rest!=null) this.hardEditExercise(dayKey, i, 'rest', nb.rest);
+        });
+        if(finisher && j.finisher && j.finisher.reps!=null) this.hardEditExercise(dayKey, 'finisher', 'reps', j.finisher.reps);
+      } else {
+        this._hardAdjustDayFallback(dayKey, harder);
+      }
+    }catch(e){
+      this._hardAdjustDayFallback(dayKey, harder);
+    }
+    this._hardSet(h=>({adjustLoading:{...(h.adjustLoading||{}), [dayKey]:false}}));
+  }
+  _hardAdjustDayFallback(dayKey, harder){
     const day=(this._hardProgramDay(dayKey)||{});
     const blocks=day.blocks||[];
     if(blocks.length){
@@ -18726,7 +18775,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     const d=this._hardToday(); const rec=this._hard().reframe[d]; if(!rec) return;
     this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:rec.questions.length, summaryLoading:true}}}));
     if(!window.claude){
-      this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:rec.questions.length, summaryLoading:false, summary:null, summaryErr:'AI unavailable in this environment — answers are saved, but the summary needs a connected provider.'}}}));
+      const fb=HE.buildFallbackReframeSummary(rec.questions, rec.answers);
+      this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:rec.questions.length, summaryLoading:false, summary:fb, summaryErr:'AI unavailable in this environment — showing a standard summary drawn from your own answers instead.'}}}));
       return;
     }
     try{
@@ -18735,10 +18785,12 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       const j=this._extractJSON(raw);
       const rec2=this._hard().reframe[d]||rec;
       if(j && j.pattern){ this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summary:j, summaryErr:''}}})); }
-      else { this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summaryErr:'Could not parse the summary — your answers are still saved.'}}})); }
+      else { const fb=HE.buildFallbackReframeSummary(rec.questions, rec.answers);
+        this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summary:fb, summaryErr:'Could not parse the AI summary — showing a standard summary drawn from your own answers instead.'}}})); }
     }catch(e){
       const rec2=this._hard().reframe[d]||rec;
-      this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summaryErr:(e&&e.message)||'Summary generation failed — your answers are still saved.'}}}));
+      const fb=HE.buildFallbackReframeSummary(rec.questions, rec.answers);
+      this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summary:fb, summaryErr:((e&&e.message)||'Summary generation failed')+' — showing a standard summary drawn from your own answers instead.'}}}));
     }
   }
 
@@ -21578,10 +21630,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
         const hardTextField=(field, ph)=>({ val:p[field]||'', ph:ph||'', set:this.hardSetProfileEvt(field) });
         const hardChipList=(list, field)=>list.map(v=>({ label:v, on:(p[field]||[]).includes(v),
-          bg:(p[field]||[]).includes(v)?'var(--hard-accent)':'transparent', ink:(p[field]||[]).includes(v)?'#1a1410':'var(--hard-ink)',
+          bg:(p[field]||[]).includes(v)?'var(--hard-cta-bg)':'transparent', ink:(p[field]||[]).includes(v)?'var(--hard-cta-ink)':'var(--hard-ink)',
           toggle:()=>this.hardToggleProfileList(field, v) }));
 
-        const onboardDots=ONBOARD_STEPS.map((n,i)=>({ title:n, w:i===step?'22px':'8px', bg:i===step?'var(--hard-accent)':(i<step?'rgba(194,65,12,0.5)':'rgba(255,255,255,0.14)') }));
+        const onboardDots=ONBOARD_STEPS.map((n,i)=>({ title:n, w:i===step?'22px':'8px', bg:i===step?'var(--hard-accent)':(i<step?'var(--hard-muted)':'var(--hard-border)') }));
         const onboardProgPct=Math.round(((step+1)/ONBOARD_STEPS.length)*100)+'%';
 
         // Program day tabs — always the fixed seven, regardless of source (AI or default).
@@ -21589,7 +21641,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const dayMeta=(program?program.days:HE.DEFAULT_PROGRAM.days)||[];
         const openDayKey=(h.openDay && dayMeta.some(d=>d.key===h.openDay)) ? h.openDay : (dayMeta[0]||{}).key;
         const hardDayTabs=dayMeta.map(d=>({ key:d.key, label:d.name, on:d.key===openDayKey,
-          bg:d.key===openDayKey?'var(--hard-accent)':'transparent', ink:d.key===openDayKey?'#1a1410':'var(--hard-ink)',
+          bg:d.key===openDayKey?'var(--hard-cta-bg)':'transparent', ink:d.key===openDayKey?'var(--hard-cta-ink)':'var(--hard-ink)',
           go:()=>this._hardSet({openDay:d.key}) }));
         const openDay=dayMeta.find(d=>d.key===openDayKey)||{};
         const dayEdits=h.edits[openDayKey]||{};
@@ -21627,14 +21679,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const reframeRec=h.reframe[today]||null;
         const rIdx=reframeRec?(reframeRec.idx||0):0;
         const rDone=!!(reframeRec && rIdx>=(reframeRec.questions||[]).length);
-        const reframeDots=(reframeRec?reframeRec.questions:[]||[]).map((q,i)=>({ title:'Q'+(i+1), w:i===rIdx?'22px':'8px', bg:i===rIdx?'var(--hard-accent)':(i<rIdx?'rgba(194,65,12,0.5)':'rgba(255,255,255,0.14)') }));
+        const reframeDots=(reframeRec?reframeRec.questions:[]||[]).map((q,i)=>({ title:'Q'+(i+1), w:i===rIdx?'22px':'8px', bg:i===rIdx?'var(--hard-accent)':(i<rIdx?'var(--hard-muted)':'var(--hard-border)') }));
 
         return {
           hardOnboarded:!!h.onboarded, hardTab:h.tab||'dashboard',
           setHardTab:(t)=>this._hardSet({tab:t}),
           hardTabs:['dashboard','program','habits','mind','reframe','scoreboard','profile'].map(t=>({
             key:t, label:t==='mind'?'MIND':t.toUpperCase(), on:(h.tab||'dashboard')===t,
-            bg:(h.tab||'dashboard')===t?'var(--hard-accent)':'transparent', ink:(h.tab||'dashboard')===t?'#1a1410':'var(--hard-ink)',
+            bg:(h.tab||'dashboard')===t?'var(--hard-cta-bg)':'transparent', ink:(h.tab||'dashboard')===t?'var(--hard-cta-ink)':'var(--hard-ink)',
             go:()=>this._hardSet({tab:t}) })),
           hardTabDashboard:(h.tab||'dashboard')==='dashboard', hardTabProgram:h.tab==='program',
           hardTabHabits:h.tab==='habits', hardTabMind:h.tab==='mind', hardTabReframe:h.tab==='reframe',
@@ -21655,7 +21707,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hardDays:hardTextField('days','Training days available per week'), hardSessionTime:hardTextField('sessionTime','Minutes available per session'),
 
           hardExperienceOptions:HE.EXPERIENCE_LEVELS.map(l=>({ key:l.key, name:l.name, desc:l.desc, on:p.experience===l.key,
-            bg:p.experience===l.key?'var(--hard-accent)':'transparent', ink:p.experience===l.key?'#1a1410':'var(--hard-ink)',
+            bg:p.experience===l.key?'var(--hard-cta-bg)':'transparent', ink:p.experience===l.key?'var(--hard-cta-ink)':'var(--hard-ink)',
             pick:()=>this.hardSetProfile('experience', l.key) })),
           hardYears:hardTextField('years','Years/months of consistent training'),
           hardPrevSports:hardTextField('prevSports','Previous sports'), hardPrevStrength:hardTextField('prevStrength','Previous strength training'),
@@ -21672,14 +21724,14 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hardMedicalNote:hardTextField('medicalNote','Any movements a medical professional has told you to avoid?'),
 
           hardEquipmentModes:HE.EQUIPMENT_MODES.map(m=>({ key:m.key, name:m.name, on:p.equipmentMode===m.key,
-            bg:p.equipmentMode===m.key?'var(--hard-accent)':'transparent', ink:p.equipmentMode===m.key?'#1a1410':'var(--hard-ink)',
+            bg:p.equipmentMode===m.key?'var(--hard-cta-bg)':'transparent', ink:p.equipmentMode===m.key?'var(--hard-cta-ink)':'var(--hard-ink)',
             pick:()=>this.hardSetEquipmentMode(m.key) })),
           hardShowEquipmentPicker:p.equipmentMode==='home_gym',
           hardEquipmentChips:hardChipList(HE.ALL_EQUIPMENT,'equipment'),
 
           hardLevelOptions:HE.HARDENING_LEVELS.map(l=>({ key:l.key, name:'LEVEL '+l.key+' — '+l.name, line:l.line,
             focus:l.focus.join(' · '), note:l.note||'', on:(p.level||2)===l.key,
-            bg:(p.level||2)===l.key?'var(--hard-accent)':'transparent', ink:(p.level||2)===l.key?'#1a1410':'var(--hard-ink)',
+            bg:(p.level||2)===l.key?'var(--hard-cta-bg)':'transparent', ink:(p.level||2)===l.key?'var(--hard-cta-ink)':'var(--hard-ink)',
             pick:()=>this.hardSetLevel(l.key) })),
 
           hardGoalChips:hardChipList(HE.GOALS,'goals'),
@@ -21703,6 +21755,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hardBlocks, hardExtras, hardHasFinisher:!!hardFinisher, hardFinisher,
           hardAddExercise:()=>this.hardAddExercise(openDayKey),
           hardMakeHarder:()=>this.hardAdjustDay(openDayKey, true), hardTooMuch:()=>this.hardAdjustDay(openDayKey, false),
+          hardAdjustLoading:!!(h.adjustLoading||{})[openDayKey],
+          hardMakeHarderLabel:(h.adjustLoading||{})[openDayKey]?'ADJUSTING…':'MAKE IT HARDER',
+          hardTooMuchLabel:(h.adjustLoading||{})[openDayKey]?'ADJUSTING…':'TOO MUCH',
+          hardAdjustOpacity:(h.adjustLoading||{})[openDayKey]?'0.6':'1', hardAdjustCursor:(h.adjustLoading||{})[openDayKey]?'default':'pointer',
           hardSessionRpe:sessionRpe, setHardSessionRpe:(e)=>this._hardSet({sessionRpe:e.target.value}),
           hardSessionNotes:sessionNotes, setHardSessionNotes:(e)=>this._hardSet({sessionNotes:e.target.value}),
           hardLogThisSession:()=>{ this.hardLogSession(openDayKey, sessionRpe, sessionNotes); this._hardSet({sessionNotes:''}); },
@@ -21754,8 +21810,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           setHardReviewLifestyle:(e)=>this.hardSetWeeklyReview('lifestyle', e.target.value),
           hardReviewVerdictOptions:['PROGRESS','MAINTAIN','MODIFY','DELOAD'].map(v=>({ label:v,
             on:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v,
-            bg:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v?'var(--hard-accent)':'transparent',
-            ink:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v?'#1a1410':'var(--hard-ink)',
+            bg:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v?'var(--hard-cta-bg)':'transparent',
+            ink:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v?'var(--hard-cta-ink)':'var(--hard-ink)',
             pick:()=>this.hardSetWeeklyReview('verdict', v) })),
 
           // Profile (read-back + edit re-entry)
@@ -21782,6 +21838,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         hardLevelOptions:[], hardGoalChips:[], hardExperienceOptions:[],
         hardHasProgram:false, hardProgramLoading:false, hardProgramErr:'', hardHasProgramErr:false, hardNeedsProgramGen:false,
         hardDayTabs:[], hardBlocks:[], hardExtras:[], hardHasFinisher:false, hardFinisher:null, hardIsRestDay:false, hardRestItems:[],
+        hardAdjustLoading:false, hardMakeHarderLabel:'MAKE IT HARDER', hardTooMuchLabel:'TOO MUCH', hardAdjustOpacity:'1', hardAdjustCursor:'pointer',
         hardWarmupItems:[], hardRecentLogs:[],
         hardMorningHabits:[], hardMoveSequence:[], hardNutritionStandards:[], hardAuditQuestions:[], hardHasRecentLogs:false,
         hardLifestyleFundamentals:[], hardReframeStarted:false, hardReframeDots:[], hardProfileSummary:[],

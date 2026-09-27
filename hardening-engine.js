@@ -86,8 +86,7 @@
   ];
 
   // Fallback REFRAME YOURSELF questions — used only when no AI provider is connected, so the
-  // section still works offline. Fixed rather than daily-adaptive in that case; the coach's
-  // summary is likewise unavailable offline (it needs the model to read the actual answers).
+  // section still works offline. Fixed rather than daily-adaptive in that case.
   var FALLBACK_REFRAME_QUESTIONS = [
     'What did you knowingly avoid today?',
     'What excuse did you use today that you know is not completely true?',
@@ -100,6 +99,30 @@
     'What do you already know needs to change?',
     'What is one thing you will do tomorrow that your current self has been avoiding?'
   ];
+
+  // Offline fallback for the Coach's Summary — used when no AI provider is connected, or the
+  // model's response doesn't parse, so a finished Reframe deck always ends in something
+  // rather than a dead-end error. Grounded in what was actually written rather than invented:
+  // the spec always makes the 10th question the action-question (true for both an
+  // AI-generated day and the static fallback set above), so its answer IS the action, quoted
+  // verbatim; "truth" points back at whichever answer got the most words rather than
+  // synthesizing a claim this heuristic has no way to actually judge.
+  function buildFallbackReframeSummary(questions, answers) {
+    var qs = questions || [], as = answers || [];
+    var lastIdx = qs.length - 1;
+    var action = (as[lastIdx] || '').trim() || 'Pick the smallest concrete fix from what you wrote above and do it before the day ends.';
+    var longestIdx = -1, longestLen = -1;
+    for (var i = 0; i < lastIdx; i++) { var len = (as[i] || '').trim().length; if (len > longestLen) { longestLen = len; longestIdx = i; } }
+    var truth = (longestIdx >= 0 && longestLen > 0)
+      ? 'Look again at what you wrote for "' + qs[longestIdx] + '" — that is the one you spent the most words on.'
+      : 'Only you know which answer above you did not fully commit to.';
+    return {
+      pattern: 'Read back over your own answers above and look for the one thing that repeats.',
+      truth: truth,
+      action: action,
+      standard: 'Answer honestly again tomorrow, then do what you told yourself you would do today.'
+    };
+  }
 
   // Why each staple movement exists — spec §29, shown as a short line under any exercise card.
   var EXERCISE_WHY = {
@@ -254,6 +277,36 @@
     return { system: system, prompt: lines.join('\n') };
   }
 
+  // "Make It Harder" / "Too Much" (spec §13-14) as a real AI call rather than a fixed
+  // heuristic: the model sees the day's actual current blocks and is told to move the WHOLE
+  // day one clear notch in one direction, choosing whichever variable(s) — load, volume,
+  // rest, tempo — actually make sense for that specific exercise, rather than a single
+  // hardcoded rule applied everywhere. It must keep the same exercises in the same order
+  // (no swapping movements, no adding/removing blocks) so this stays a dial, not a rewrite.
+  function buildAdjustDayPrompt(day, harder, profile) {
+    var dir = harder ? 'HARDER' : 'EASIER';
+    var system = "You are the same programming coach for THE HARDENING ('BUILD THE BODY. HARDEN THE MIND. BECOME DIFFICULT TO "
+      + "BREAK.'). The user tapped '" + (harder ? 'MAKE IT HARDER' : 'TOO MUCH') + "' on today's session. Adjust this ONE day " + dir
+      + " by one clear, sensible notch — pick whichever variable(s) (sets, reps, rest, or the finisher's reps/distance) actually make "
+      + "sense per exercise; you do not have to change every block the same way. Keep the exact same exercises in the exact same "
+      + "order — do not add, remove, or swap movements, this is a dial on the existing day, not a rewrite. Never push a beginner "
+      + "into an unsafe jump; a harder notch is meaningfully more, not extreme, and an easier notch stays a real session, not nothing. "
+      + "Return ONLY valid minified JSON, no markdown fences, no commentary.";
+    var shape = '{"blocks":[{"sets":"same or new value","reps":"same or new value","rest":"same or new value"}, '
+      + '... one entry per block, same order as given ...],"finisher":{"reps":"same or new value"} or null}';
+    var p = profile || {};
+    var lines = [];
+    lines.push('Day: ' + (day.name || '') + ' — ' + (day.focus || ''));
+    lines.push('Direction: ' + dir);
+    lines.push('Experience: ' + (p.experience || 'unknown') + ', Hardening level: ' + (p.level || 2));
+    lines.push('Current blocks (same order, adjust in place): ' + JSON.stringify((day.blocks || []).map(function (b) {
+      return { exercise: b.exercise, sets: b.sets, reps: b.reps, rest: b.rest };
+    })));
+    lines.push('Current finisher: ' + (day.finisher ? JSON.stringify({ exercise: day.finisher.exercise, reps: day.finisher.reps }) : 'none'));
+    lines.push('Return JSON exactly matching this shape, same number of blocks in the same order: ' + shape);
+    return { system: system, prompt: lines.join('\n') };
+  }
+
   function buildReframeQuestionsPrompt(context) {
     var system = "You are a serious, direct coach — not a therapist, not a motivational speaker, not a friend trying to make the "
       + "user feel better. Your job is REFRAME YOURSELF: ten short, specific, uncomfortable questions per day that force honest "
@@ -304,8 +357,10 @@
     LIFESTYLE_FUNDAMENTALS: LIFESTYLE_FUNDAMENTALS,
     EXERCISE_WHY: EXERCISE_WHY,
     FALLBACK_REFRAME_QUESTIONS: FALLBACK_REFRAME_QUESTIONS,
+    buildFallbackReframeSummary: buildFallbackReframeSummary,
     DEFAULT_PROGRAM: DEFAULT_PROGRAM,
     buildProgramPrompt: buildProgramPrompt,
+    buildAdjustDayPrompt: buildAdjustDayPrompt,
     buildReframeQuestionsPrompt: buildReframeQuestionsPrompt,
     buildReframeSummaryPrompt: buildReframeSummaryPrompt
   };
