@@ -1244,6 +1244,17 @@
      divider overflowing the card by 9px a side. Padding now clears the innermost line. */
   .cc-home-hero{ padding:26px 34px !important; min-height:calc(100vh - 220px) !important; }
   .cc-home-focus{ display:none !important; }
+  /* The Vanguard page-frame's 6px desktop inset is too tight on a narrow phone card — the
+     80x80 corner tiles read as cramped against the edge. Mobile only: back it out to what an
+     ~14px inset gives (matches the last desktop value that was already verified clean here). */
+  .cc-vg-frame-corner[style*="top:6px; left:6px"]{ top:14px !important; left:14px !important; }
+  .cc-vg-frame-corner[style*="top:6px; right:6px"]{ top:14px !important; right:14px !important; }
+  .cc-vg-frame-corner[style*="bottom:6px; right:6px"]{ bottom:14px !important; right:14px !important; }
+  .cc-vg-frame-corner[style*="bottom:6px; left:6px"]{ bottom:14px !important; left:14px !important; }
+  .cc-vg-frame-line-h[style*="top:33px"]{ top:41px !important; left:94px !important; right:94px !important; }
+  .cc-vg-frame-line-h[style*="bottom:33px"]{ bottom:41px !important; left:94px !important; right:94px !important; }
+  .cc-vg-frame-line-v[style*="left:33px"]{ left:41px !important; top:94px !important; bottom:94px !important; }
+  .cc-vg-frame-line-v[style*="right:33px"]{ right:41px !important; top:94px !important; bottom:94px !important; }
   .cc-home-logo{ width:74px !important; height:74px !important; margin-bottom:10px !important; }
   .cc-home-logo img{ width:82px !important; height:82px !important; transform:translateY(6px) !important; }
   .cc-home-hero svg{ max-width:100% !important; height:auto !important; }
@@ -2546,23 +2557,24 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
           <!-- The hero's page-frame: a single ruled invitation border (the inner line was
                dropped per request — this is just the outer 2px rule now), corner curved as a
-               coved sweep. Inset 14px from the card's own edge (nudged in further per request,
-               from 30px to 22px to 14px), while still keeping a sliver of breathing room from the
-               card's own rounded corner. One 80x80 corner motif (drawn once, top-left) is rotated
-               90° per corner rather than redrawn four times; the straight runs between corners are
-               plain CSS lines picking up exactly where the corner tile's own stub ends. The CSS
-               div is centred on the same coordinate as the SVG stroke (div inset minus half its
-               own width) rather than the div's own top/left edge, so the two constructions don't
-               visibly step at the seam. -->
+               coved sweep. Inset 6px from the card's own edge (nudged in further per request,
+               from 30px to 22px to 14px to 6px), the closest it can sit before the frame's own
+               arc (radius 32) would start pushing outside the card's own rounded corner (radius
+               24). One 80x80 corner motif (drawn once, top-left) is rotated 90° per corner rather
+               than redrawn four times; the straight runs between corners are plain CSS lines
+               picking up exactly where the corner tile's own stub ends. The CSS div is centred on
+               the same coordinate as the SVG stroke (div inset minus half its own width) rather
+               than the div's own top/left edge, so the two constructions don't visibly step at
+               the seam. -->
           <sc-for list="{{ vgFrameCorners }}" as="fc" hint-placeholder-count="4">
-            <svg width="80" height="80" viewBox="0 0 80 80" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
+            <svg width="80" height="80" viewBox="0 0 80 80" class="cc-vg-frame-corner" style="position:absolute; {{ fc.pos }}; transform:{{ fc.rot }}; pointer-events:none; z-index:1;">
               <path d="M80,28 L60,28 A32,32 0 0,1 28,60 L28,80" fill="none" stroke="rgba(66,10,7,0.72)" stroke-width="2"></path>
             </svg>
           </sc-for>
-          <div style="position:absolute; top:41px; left:94px; right:94px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; bottom:41px; left:94px; right:94px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; left:41px; top:94px; bottom:94px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
-          <div style="position:absolute; right:41px; top:94px; bottom:94px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div class="cc-vg-frame-line cc-vg-frame-line-h" style="position:absolute; top:33px; left:86px; right:86px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div class="cc-vg-frame-line cc-vg-frame-line-h" style="position:absolute; bottom:33px; left:86px; right:86px; height:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div class="cc-vg-frame-line cc-vg-frame-line-v" style="position:absolute; left:33px; top:86px; bottom:86px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
+          <div class="cc-vg-frame-line cc-vg-frame-line-v" style="position:absolute; right:33px; top:86px; bottom:86px; width:2px; background:rgba(66,10,7,0.72); pointer-events:none; z-index:1;"></div>
         </sc-if>
         <div style="position:relative; z-index:1; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:14px; margin-top:{{ vgTopRowClearance }}; margin-right:{{ vgTopRowRightClearance }};" class="cc-home-toprow">
           <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
@@ -10095,7 +10107,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-454 · v11.454 vanguard-home-frame-closer-inset-2';
+const NOTIF_BUILD_VERSION = '2026.09.27-455 · v11.455 vanguard-home-frame-mobile-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15330,6 +15342,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.455', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Home\'s Vanguard page-frame moved in to a 6px inset on desktop per request, but that read as cramped on a narrow phone card. Added a mobile-only override that keeps the frame at the roomier 14px inset there, leaving the tighter 6px desktop look untouched.',
+    ]},
     {version:'v11.454', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Nudged Home\'s Vanguard page-frame in closer still (14px inset, down from 22px) per request.',
     ]},
@@ -21253,8 +21268,8 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // Vanguard draws that frame. Needs clearance on BOTH axes: the straight top rule runs the
       // full width at ~y45-55 (vertical clearance handles that), but the corner tiles themselves
       // are 80px wide, and the toprow sits flush-right inside them without the horizontal margin.
-      vgTopRowClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '22px' : '0px',
-      vgTopRowRightClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '86px' : '0px',
+      vgTopRowClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '14px' : '0px',
+      vgTopRowRightClearance:(S.prefs.theme==='Ultra' && S.prefs.ultraStyle==='Vanguard') ? '78px' : '0px',
       ultraStyleChips:this._chips('ultraStyle',['Ultra X','Noir','Maison Élysée','Vanguard']),
       ...(()=>{
         const tab=S.themeMenuTab||'themes';
@@ -22709,10 +22724,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       // rather than drawn four times — 90° per corner keeps the curve's orientation
       // consistent all the way around rather than mirroring it.
       vgFrameCorners:[
-        {pos:'top:14px; left:14px;', rot:'rotate(0deg)'},
-        {pos:'top:14px; right:14px;', rot:'rotate(90deg)'},
-        {pos:'bottom:14px; right:14px;', rot:'rotate(180deg)'},
-        {pos:'bottom:14px; left:14px;', rot:'rotate(270deg)'},
+        {pos:'top:6px; left:6px;', rot:'rotate(0deg)'},
+        {pos:'top:6px; right:6px;', rot:'rotate(90deg)'},
+        {pos:'bottom:6px; right:6px;', rot:'rotate(180deg)'},
+        {pos:'bottom:6px; left:6px;', rot:'rotate(270deg)'},
       ],
       showChrome:!S.focusMode && !this._isPrivatePageOpen(), focusMode:!!S.focusMode, toggleFocus:()=>this.setState(s=>({focusMode:!s.focusMode})), focusBtnLabel:S.focusMode?'✕ Exit Focus':'◎ Focus Mode',
 
