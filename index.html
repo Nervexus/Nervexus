@@ -1245,16 +1245,16 @@
   .cc-home-hero{ padding:26px 34px !important; min-height:calc(100vh - 220px) !important; }
   .cc-home-focus{ display:none !important; }
   /* The Vanguard page-frame's 6px desktop inset is too tight on a narrow phone card — the
-     80x80 corner tiles read as cramped against the edge. Mobile only: back it out to what an
-     ~14px inset gives (matches the last desktop value that was already verified clean here). */
-  .cc-vg-frame-corner[style*="top:6px; left:6px"]{ top:14px !important; left:14px !important; }
-  .cc-vg-frame-corner[style*="top:6px; right:6px"]{ top:14px !important; right:14px !important; }
-  .cc-vg-frame-corner[style*="bottom:6px; right:6px"]{ bottom:14px !important; right:14px !important; }
-  .cc-vg-frame-corner[style*="bottom:6px; left:6px"]{ bottom:14px !important; left:14px !important; }
-  .cc-vg-frame-line-h[style*="top:33px"]{ top:41px !important; left:94px !important; right:94px !important; }
-  .cc-vg-frame-line-h[style*="bottom:33px"]{ bottom:41px !important; left:94px !important; right:94px !important; }
-  .cc-vg-frame-line-v[style*="left:33px"]{ left:41px !important; top:94px !important; bottom:94px !important; }
-  .cc-vg-frame-line-v[style*="right:33px"]{ right:41px !important; top:94px !important; bottom:94px !important; }
+     80x80 corner tiles read as cramped against the edge. Mobile only: back it out further, to
+     what a ~24px inset gives (bumped up from an initial 14px per follow-up feedback). */
+  .cc-vg-frame-corner[style*="top:6px; left:6px"]{ top:24px !important; left:24px !important; }
+  .cc-vg-frame-corner[style*="top:6px; right:6px"]{ top:24px !important; right:24px !important; }
+  .cc-vg-frame-corner[style*="bottom:6px; right:6px"]{ bottom:24px !important; right:24px !important; }
+  .cc-vg-frame-corner[style*="bottom:6px; left:6px"]{ bottom:24px !important; left:24px !important; }
+  .cc-vg-frame-line-h[style*="top:33px"]{ top:51px !important; left:104px !important; right:104px !important; }
+  .cc-vg-frame-line-h[style*="bottom:33px"]{ bottom:51px !important; left:104px !important; right:104px !important; }
+  .cc-vg-frame-line-v[style*="left:33px"]{ left:51px !important; top:104px !important; bottom:104px !important; }
+  .cc-vg-frame-line-v[style*="right:33px"]{ right:51px !important; top:104px !important; bottom:104px !important; }
   .cc-home-logo{ width:74px !important; height:74px !important; margin-bottom:10px !important; }
   .cc-home-logo img{ width:82px !important; height:82px !important; transform:translateY(6px) !important; }
   .cc-home-hero svg{ max-width:100% !important; height:auto !important; }
@@ -10107,7 +10107,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-455 · v11.455 vanguard-home-frame-mobile-fix';
+const NOTIF_BUILD_VERSION = '2026.09.27-456 · v11.456 vanguard-home-frame-mobile-more-space';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15342,6 +15342,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.456', date:'Sep 27, 2026', major:false, kind:'design', notes:[
+      'Spaced Home\'s Vanguard page-frame out further on mobile (24px inset, up from 14px) per follow-up feedback. Desktop\'s 6px inset is unaffected.',
+    ]},
     {version:'v11.455', date:'Sep 27, 2026', major:false, kind:'design', notes:[
       'Home\'s Vanguard page-frame moved in to a 6px inset on desktop per request, but that read as cramped on a narrow phone card. Added a mobile-only override that keeps the frame at the roomier 14px inset there, leaving the tighter 6px desktop look untouched.',
     ]},
