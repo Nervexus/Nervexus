@@ -559,8 +559,29 @@
     --hard-accent:var(--forge-accent); --hard-accent-strong:var(--forge-accent);
     --hard-ink:var(--u-ink, #EDEAE5); --hard-muted:var(--u-muted, #95897c); --hard-muted-2:var(--u-muted, #5f5a54);
     --hard-cta-bg:var(--forge-add-bg); --hard-cta-ink:var(--forge-add-ink); }
-  .hard-welcome{ min-height:70vh; display:flex; flex-direction:column; align-items:center;
-    justify-content:center; text-align:center; gap:14px; padding:40px 20px; }
+  /* Onboarding reuses Gentlemen Center's own welcome-cover template (icon circle, kicker,
+     big title, description, one filled pill, a dot row) for every step rather than a
+     separate deck-card style — generic and theme-following here (var(--hard-*)) instead of
+     Gentlemen's own Vanguard-only hardcoded hex, since every step needs it, not just a
+     one-time cover. */
+  .hard-welcome{ min-height:auto; display:flex; flex-direction:column; align-items:center;
+    justify-content:flex-start; text-align:center; padding:40px 20px 8px; }
+  .hard-welcome-logo{ width:64px; height:64px; margin-bottom:20px; border-radius:50%;
+    border:1.5px solid var(--hard-accent); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; flex:0 0 auto; }
+  .hard-welcome-kicker{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px;
+    color:var(--hard-accent); margin-bottom:18px; }
+  .hard-welcome-title{ font-size:32px; font-weight:300; letter-spacing:.3px; line-height:1.2;
+    color:var(--hard-ink); margin-bottom:14px; max-width:440px; }
+  .hard-welcome-desc{ font-size:14.5px; line-height:1.6; color:var(--hard-muted); max-width:440px; }
+  .hard-welcome-body{ width:100%; max-width:440px; text-align:left; margin-top:26px; }
+  .hard-welcome-enter{ display:inline-flex; align-items:center; justify-content:center;
+    padding:15px 46px; border-radius:999px; cursor:pointer;
+    background:var(--hard-cta-bg); color:var(--hard-cta-ink);
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; margin-top:30px; }
+  .hard-welcome-back{ margin-top:14px; cursor:pointer; font-family:'JetBrains Mono',monospace;
+    font-size:10px; letter-spacing:2px; color:var(--hard-muted); }
+  .hard-welcome-dots{ margin-top:26px; display:flex; gap:7px; align-items:center; justify-content:center; }
   .hard-tabs{ position:relative; display:flex; align-items:stretch; gap:6px; overflow-x:auto;
     padding-bottom:3px; margin:18px 0; -webkit-overflow-scrolling:touch; }
   .hard-tabs::-webkit-scrollbar{ display:none; }
@@ -596,8 +617,9 @@
     padding:12px 0; border-top:1px solid var(--hard-border-soft); }
   .hard-row:first-child{ border-top:0; }
   .hard-field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
-  .hard-input{ border-radius:10px; padding:12px 14px; font-size:14.5px; font-family:inherit;
+  .hard-input{ width:100%; box-sizing:border-box; border-radius:10px; padding:12px 14px; font-size:14.5px; font-family:inherit;
     background:var(--hard-card-2); border:1px solid var(--hard-border-soft); color:var(--hard-ink); }
+  .hard-input::placeholder{ color:var(--hard-muted); opacity:0.85; }
 
   /* The month across the top, then the clock and the day side by side under it. The clock
      is a fixed measure — it holds a dial and three rows and nothing else — so the day takes
@@ -2483,7 +2505,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     <nav style="display:flex; flex-direction:column; gap:8px; align-items:center;">
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="9">
         <div onClick="{{ item.go }}" title="{{ item.label }}" style="position:relative; width:44px; height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:center; border-radius:13px; cursor:pointer; background:{{ item.bg }};" style-hover="{ background:'rgba(255,255,255,0.1)' }">
-          <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
+          <sc-if value="{{ item.useLogo }}" hint-placeholder-val="{{ false }}">
+            <img src="favicon.png" alt="" style="width:22px; height:22px; object-fit:contain; display:block; opacity:{{ item.logoOpacity }};">
+          </sc-if>
+          <sc-if value="{{ !item.useLogo }}" hint-placeholder-val="{{ true }}">
+            <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
+          </sc-if>
           <sc-if value="{{ item.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:2px; right:2px; min-width:15px; height:15px; padding:0 4px; border-radius:8px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:8.5px; font-weight:700; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; justify-content:center; box-shadow:none;">{{ item.badge }}</span></sc-if>
         </div>
       </sc-for>
@@ -4530,26 +4557,20 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <sc-if value="{{ isHardening }}" hint-placeholder-val="{{ false }}">
       <div class="hard-page" data-screen-label="The Hardening" style="animation:rise .5s ease both; background:var(--hard-bg); margin:-20px; padding:20px; border-radius:18px;">
 
-        <!-- ---- ONBOARDING: a deck, one question-group per card, BACK/dots/progress/NEXT ---- -->
+        <!-- ---- ONBOARDING: Gentlemen Center's own welcome-cover template (icon, kicker, big
+             title, description, one filled pill, a dot row), reused per step rather than a
+             one-time cover, since this section has seven steps rather than Gentlemen's one. ---- -->
         <sc-if value="{{ !hardOnboarded }}" hint-placeholder-val="{{ true }}">
         <div class="hard-welcome">
-          <div style="width:54px; height:54px; border-radius:13px; border:1px solid var(--hard-border); display:flex; align-items:center; justify-content:center; background:var(--hard-card);">
+          <div class="hard-welcome-logo">
             <span style="width:27px; height:27px; color:var(--hard-accent); display:flex;" data-icon="flame"></span>
           </div>
-          <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--hard-accent);">◆ THE HARDENING</div>
-          <div style="font-size:28px; font-weight:800; letter-spacing:-.5px; color:var(--hard-ink);">Build the body. Harden the mind.</div>
-          <div style="font-size:14px; color:var(--hard-muted); max-width:440px; line-height:1.6;">Answer honestly. Every question here shapes a program built for exactly where you are — not where you wish you were. Become difficult to break.</div>
-        </div>
+          <div class="hard-welcome-kicker">◆ THE HARDENING · STEP {{ hardStepIdx }} / {{ hardStepCount }}</div>
+          <div class="hard-welcome-title">{{ hardStepTitle }}</div>
+          <div class="hard-welcome-desc">{{ hardStepDesc }}</div>
 
-        <div class="hard-frame">
-        <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); min-height:320px;">
-          <div class="hard-bhead">
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:var(--hard-muted);">STEP {{ hardStepIdx }} / {{ hardStepCount }}</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:var(--hard-accent-strong);">{{ hardStepName }}</span>
-          </div>
-
+          <div class="hard-welcome-body">
           <sc-if value="{{ hardIsStep0 }}" hint-placeholder-val="{{ true }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">The basics — who you are and what your week actually looks like.</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 14px;">
               <div class="hard-field"><input class="hard-input" value="{{ hardAge.val }}" onInput="{{ hardAge.set }}" placeholder="{{ hardAge.ph }}"></div>
               <div class="hard-field"><input class="hard-input" value="{{ hardSex.val }}" onInput="{{ hardSex.set }}" placeholder="{{ hardSex.ph }}"></div>
@@ -4566,7 +4587,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ hardIsStep1 }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">Where you're starting from.</div>
             <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
               <sc-for list="{{ hardExperienceOptions }}" as="x" hint-placeholder-count="3">
                 <div onClick="{{ x.pick }}" class="hard-option" style="border:1px solid var(--hard-border-soft); background:{{ x.bg }}; color:{{ x.ink }};">
@@ -4587,7 +4607,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ hardIsStep2 }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">What you can do right now. "Don't know" is a fine answer.</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 14px;">
               <div class="hard-field"><input class="hard-input" value="{{ hardSquat.val }}" onInput="{{ hardSquat.set }}" placeholder="{{ hardSquat.ph }}"></div>
               <div class="hard-field"><input class="hard-input" value="{{ hardDeadlift.val }}" onInput="{{ hardDeadlift.set }}" placeholder="{{ hardDeadlift.ph }}"></div>
@@ -4603,7 +4622,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ hardIsStep3 }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">Anything the program must never aggravate. Tap all that apply.</div>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
               <sc-for list="{{ hardLimitationChips }}" as="c" hint-placeholder-count="11">
                 <span onClick="{{ c.toggle }}" class="hard-chip" style="border:1px solid var(--hard-border-soft); background:{{ c.bg }}; color:{{ c.ink }};">{{ c.label }}</span>
@@ -4613,7 +4631,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ hardIsStep4 }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">What you're training with.</div>
             <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;">
               <sc-for list="{{ hardEquipmentModes }}" as="x" hint-placeholder-count="4">
                 <div onClick="{{ x.pick }}" class="hard-option" style="border:1px solid var(--hard-border-soft); background:{{ x.bg }}; color:{{ x.ink }};">
@@ -4632,7 +4649,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ hardIsStep5 }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">How hard do you want to push?</div>
             <div style="display:flex; flex-direction:column; gap:10px;">
               <sc-for list="{{ hardLevelOptions }}" as="l" hint-placeholder-count="5">
                 <div onClick="{{ l.pick }}" class="hard-option" style="border:1px solid var(--hard-border-soft); background:{{ l.bg }}; color:{{ l.ink }}; flex-direction:column; gap:4px;">
@@ -4645,25 +4661,22 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           </sc-if>
 
           <sc-if value="{{ hardIsStep6 }}" hint-placeholder-val="{{ false }}">
-            <div style="font-size:12.5px; color:var(--hard-muted); margin-bottom:14px;">What are you actually after? Tap all that apply.</div>
             <div style="display:flex; flex-wrap:wrap; gap:8px;">
               <sc-for list="{{ hardGoalChips }}" as="c" hint-placeholder-count="14">
                 <span onClick="{{ c.toggle }}" class="hard-chip" style="border:1px solid var(--hard-border-soft); background:{{ c.bg }}; color:{{ c.ink }};">{{ c.label }}</span>
               </sc-for>
             </div>
           </sc-if>
-
-          <div class="hard-nav">
-            <span onClick="{{ hardBack }}" class="hard-pill-ghost" style="opacity:{{ hardBackOpacity }}; cursor:{{ hardBackCursor }}; color:var(--hard-muted); border:1px solid var(--hard-border-soft);">‹ BACK</span>
-            <div class="hard-dots">
-              <sc-for list="{{ hardOnboardDots }}" as="d" hint-placeholder-count="7">
-                <span title="{{ d.title }}" style="display:block; width:{{ d.w }}; height:8px; border-radius:4px; background:{{ d.bg }}; transition:width .2s,background .2s;"></span>
-              </sc-for>
-            </div>
-            <div class="hard-prog"><span style="width:{{ hardOnboardProgPct }};"></span></div>
-            <span onClick="{{ hardNextGo }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">{{ hardNextLabel }}</span>
           </div>
-        </div>
+
+          <span onClick="{{ hardNextGo }}" class="hard-welcome-enter">{{ hardNextLabel }}</span>
+          <span onClick="{{ hardBack }}" class="hard-welcome-back" style="opacity:{{ hardBackOpacity }}; cursor:{{ hardBackCursor }};">‹ BACK</span>
+
+          <div class="hard-welcome-dots">
+            <sc-for list="{{ hardOnboardDots }}" as="d" hint-placeholder-count="7">
+              <span title="{{ d.title }}" style="display:block; width:{{ d.w }}; height:8px; border-radius:4px; background:{{ d.bg }}; transition:width .2s,background .2s;"></span>
+            </sc-for>
+          </div>
         </div>
         </sc-if>
 
@@ -10628,7 +10641,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.27-461 · v11.461 hardening-theme-supabase-ai-adjust';
+const NOTIF_BUILD_VERSION = '2026.09.28-462 · v11.462 hardening-rail-logo-gentlemen-entrance-onboarding';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15887,6 +15900,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.462', date:'Sep 28, 2026', major:false, kind:'design', notes:[
+      'THE HARDENING\'s rail icon is the app\'s own crest (the laurel-wreath "N", the same logo used on Home\'s hero and Gentlemen\'s welcome cover) instead of a bespoke flame glyph. Its onboarding now reuses Gentlemen Center\'s own welcome-cover template — icon circle, kicker, a big title, a description, one filled pill, a dot row — for every one of its seven steps rather than a compact deck-card, so it reads as one consistent "entrance" moment all the way through instead of switching styles partway; the dashboard and its tabs only open once onboarding is complete. Also fixed paired fields (Age/Sex, Height/Weight, …) overflowing off the right edge on narrow phones — the inputs had no explicit width, so they held their browser-default size instead of filling their grid cell.',
+    ]},
     {version:'v11.461', date:'Sep 27, 2026', major:false, kind:'feature', notes:[
       'THE HARDENING\'s three known gaps from v11.460 are closed. It now retints with whichever raiment is selected (Ultra X, Noir, Maison Élysée, Vanguard) instead of a fixed dark palette, the same way Home/Health/Calendar/Power Level/Settings already do — falling back to the original look only on the non-Ultra base theme. A hardening_progress table (one JSONB blob per user, same shape as learning_progress) now syncs it across devices instead of staying local-only — the migration is written but needs to be applied to the live database. Make It Harder / Too Much is now a real AI call that reads the day\'s actual blocks and adjusts whichever variable makes sense per exercise, falling back to the original deterministic nudge offline. Reframe Yourself\'s Coach\'s Summary now has an offline fallback too, built from your own answers (the action is literally your answer to the always-last action-question) rather than erroring out with no AI provider connected.',
     ]},
@@ -21260,7 +21276,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* The pending-requests badge moved to Settings with the page it counts. Taking Account
        Requests off the rail would otherwise have taken the only sign that anyone is waiting. */
     const _pending=this._isOwner() ? (S.requests||[]).filter(r=>r.status==='pending').length : 0;
-    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
+    /* THE HARDENING's rail entry wears the app's own crest (favicon.png — the same "Ultra X"
+       logo used on Home's hero, Gentlemen's welcome cover and the top bar's theme button)
+       instead of a bespoke line-glyph, per request — every other entry keeps its own icon. */
+    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6', useLogo:n.id==='hardening', logoOpacity:navActive(n.id)?'1':'0.55' }));
     /* The bottom bar keeps its own six, deliberately — it is not the top of the rail. These
        are the screens that are actually used from a phone; the rail's order is about how the
        app is arranged, which is a different question. Everything else falls through to More.
@@ -21627,6 +21646,16 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         const today=this._hardToday();
         const ONBOARD_STEPS=['BASIC','EXPERIENCE','CAPABILITY','LIMITATIONS','EQUIPMENT','LEVEL','GOALS'];
         const step=Math.max(0, Math.min(ONBOARD_STEPS.length-1, h.step||0));
+        const ONBOARD_TITLES=['The Basics','Your Experience','Capability','Limitations','Equipment','How Hard Do You Want To Push?','Your Goals'];
+        const ONBOARD_DESCS=[
+          "Who you are and what your week actually looks like.",
+          "Where you're starting from.",
+          'What you can do right now. "Don’t know" is a fine answer.',
+          'Anything the program must never aggravate.',
+          "What you're training with.",
+          "Choose your level — this sets the whole program's intensity.",
+          'What are you actually after?'
+        ];
 
         const hardTextField=(field, ph)=>({ val:p[field]||'', ph:ph||'', set:this.hardSetProfileEvt(field) });
         const hardChipList=(list, field)=>list.map(v=>({ label:v, on:(p[field]||[]).includes(v),
@@ -21694,6 +21723,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
 
           // Onboarding
           hardStepIdx:step, hardStepName:ONBOARD_STEPS[step], hardStepCount:ONBOARD_STEPS.length,
+          hardStepTitle:ONBOARD_TITLES[step], hardStepDesc:ONBOARD_DESCS[step],
           hardOnboardDots:onboardDots, hardOnboardProgPct:onboardProgPct,
           hardIsStep0:step===0, hardIsStep1:step===1, hardIsStep2:step===2, hardIsStep3:step===3, hardIsStep4:step===4, hardIsStep5:step===5, hardIsStep6:step===6,
           hardBack:()=>this.hardStep(-1), hardNext:()=>this.hardStep(1),
@@ -21832,6 +21862,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         hardOnboarded:false, hardTab:'dashboard', hardTabs:[], setHardTab:()=>{},
         hardTabDashboard:true, hardTabProgram:false, hardTabHabits:false, hardTabMind:false, hardTabReframe:false, hardTabScoreboard:false, hardTabProfile:false,
         hardStepIdx:0, hardStepName:'', hardStepCount:7, hardOnboardDots:[], hardOnboardProgPct:'0%',
+        hardStepTitle:'', hardStepDesc:'',
         hardIsStep0:true, hardIsStep1:false, hardIsStep2:false, hardIsStep3:false, hardIsStep4:false, hardIsStep5:false, hardIsStep6:false,
         hardBack:()=>{}, hardNext:()=>{}, hardBackOpacity:'0.3', hardBackCursor:'default', hardNextLabel:'NEXT ›', hardNextGo:()=>{},
         hardLimitationChips:[], hardEquipmentModes:[], hardShowEquipmentPicker:false, hardEquipmentChips:[],
