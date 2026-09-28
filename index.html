@@ -2505,7 +2505,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     <nav style="display:flex; flex-direction:column; gap:8px; align-items:center;">
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="9">
         <div onClick="{{ item.go }}" title="{{ item.label }}" style="position:relative; width:44px; height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:center; border-radius:13px; cursor:pointer; background:{{ item.bg }};" style-hover="{ background:'rgba(255,255,255,0.1)' }">
-          <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
+          <sc-if value="{{ item.useLogo }}" hint-placeholder-val="{{ false }}">
+            <img src="favicon.png" alt="" style="width:22px; height:22px; object-fit:contain; display:block;">
+          </sc-if>
+          <sc-if value="{{ !item.useLogo }}" hint-placeholder-val="{{ true }}">
+            <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
+          </sc-if>
           <sc-if value="{{ item.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:2px; right:2px; min-width:15px; height:15px; padding:0 4px; border-radius:8px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:8.5px; font-weight:700; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; justify-content:center; box-shadow:none;">{{ item.badge }}</span></sc-if>
         </div>
       </sc-for>
@@ -10419,7 +10424,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
             <sc-for list="{{ mobMoreList }}" as="m" hint-placeholder-count="6">
               <div onClick="{{ m.go }}" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; padding:12px 4px; min-height:44px; border-radius:12px;" style-hover="{ background:'rgba(255,255,255,0.06)' }">
-                <span style="width:20px; height:20px; color:#dcdce0; display:flex;" data-icon="{{ m.id }}"></span>
+                <sc-if value="{{ m.useLogo }}" hint-placeholder-val="{{ false }}">
+                  <img src="favicon.png" alt="" style="width:20px; height:20px; object-fit:contain; display:block;">
+                </sc-if>
+                <sc-if value="{{ !m.useLogo }}" hint-placeholder-val="{{ true }}">
+                  <span style="width:20px; height:20px; color:#dcdce0; display:flex;" data-icon="{{ m.id }}"></span>
+                </sc-if>
                 <span style="font-size:10px; color:#c5c5ca; text-align:center;">{{ m.label }}</span>
               </div>
             </sc-for>
@@ -10434,7 +10444,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ mobDrawerHeaderC }}; padding:0 8px 14px;">ALL PAGES</div>
           <sc-for list="{{ mobDrawerList }}" as="m" hint-placeholder-count="12">
             <div onClick="{{ m.go }}" style="display:flex; align-items:center; gap:14px; cursor:pointer; padding:13px 10px; min-height:44px; border-radius:12px;" style-hover="{ background:'rgba(255,255,255,0.06)' }">
-              <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
+              <sc-if value="{{ m.useLogo }}" hint-placeholder-val="{{ false }}">
+                <img src="favicon.png" alt="" style="width:20px; height:20px; flex:0 0 20px; object-fit:contain; display:block;">
+              </sc-if>
+              <sc-if value="{{ !m.useLogo }}" hint-placeholder-val="{{ true }}">
+                <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
+              </sc-if>
               <span style="font-size:13.5px; color:{{ mobDrawerLabelC }};">{{ m.label }}</span>
             </div>
           </sc-for>
@@ -10636,7 +10651,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-464 · v11.464 hardening-shield-icon';
+const NOTIF_BUILD_VERSION = '2026.09.28-465 · v11.465 hardening-ultra-x-logo';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15897,6 +15912,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.465', date:'Sep 28, 2026', major:false, kind:'design', notes:[
+      "THE HARDENING's rail icon is the app's own crest (favicon.png, the \"Ultra X\" logo) again, in place of the drawn shield — this time everywhere it appears: the desktop sidebar, the mobile \"All Pages\" drawer, and the mobile bottom bar's More sheet.",
+    ]},
     {version:'v11.464', date:'Sep 28, 2026', major:false, kind:'design', notes:[
       "THE HARDENING's rail icon is a drawn shield now — its own bespoke line-glyph, in the same stroked style as every other rail icon, rather than the app's shared crest image it briefly wore. Reads as \"hold the line\" against the section's own standard rather than borrowing a mark that already means \"Nervexus\" elsewhere on the rail.",
     ]},
@@ -21279,7 +21297,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* The pending-requests badge moved to Settings with the page it counts. Taking Account
        Requests off the rail would otherwise have taken the only sign that anyone is waiting. */
     const _pending=this._isOwner() ? (S.requests||[]).filter(r=>r.status==='pending').length : 0;
-    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
+    /* THE HARDENING's rail entry wears the app's own crest (favicon.png, the "Ultra X" logo)
+       instead of a bespoke line-glyph — every other entry keeps its own icon. */
+    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6', useLogo:n.id==='hardening' }));
     /* The bottom bar keeps its own six, deliberately — it is not the top of the rail. These
        are the screens that are actually used from a phone; the rail's order is about how the
        app is arranged, which is a different question. Everything else falls through to More.
