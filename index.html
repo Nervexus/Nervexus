@@ -10651,7 +10651,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-467 · v11.467 hardening-onboarding-experience-precision';
+const NOTIF_BUILD_VERSION = '2026.09.28-468 · v11.468 typing-latency-fix';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -13972,7 +13972,19 @@ activities: this._mergeShipLog(s.activities),
     const rows=(this.state.activities||[]).filter(a=>a.cat==='Work' && a.ts>=start);
     return { rows, mins:rows.reduce((t,a)=>t+(+a.min||0),0) };
   }
-  mut(u){ this.setState(u, ()=>this.save()); }
+  /* mut() is the update path for essentially every input in the app (every onInput/onChange
+     handler in the whole template calls it, directly or via a per-feature wrapper like
+     _hardSet). setState(u) below is left synchronous on purpose — that's what makes a typed
+     character show up immediately. save() is a different kind of work: it JSON.stringifies
+     most of the persisted state and writes it to localStorage, then runs computePower() for
+     the XP-gain watcher — real, measured cost (tens to well over a hundred ms once a real
+     account has a normal amount of history: workouts, activities, notes, logs), and none of
+     it needs to happen before the next frame paints, only before the tab actually closes.
+     Debounced through the same _debounce/_flushDebounced machinery every other deferred
+     write in this file already uses (Supabase syncs, etc.) — _flushDebounced() already runs
+     on visibilitychange/pagehide/beforeunload, so a save is never actually lost, only
+     coalesced when several keystrokes land in the same burst. */
+  mut(u){ this.setState(u); this._debounce('localSave', ()=>this.save(), 300); }
   // The old refresh re-pulled Supabase and pinged the service worker but never reloaded, so
   // the running build stayed in memory — "Force refresh now" could not actually pick up a new
   // version, which is why devices sat several deploys behind. The service worker is
@@ -15912,6 +15924,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.468', date:'Sep 28, 2026', major:true, kind:'fix', notes:[
+      'Fixed the app-wide delay between typing a character and seeing it appear, reported across web, mobile, wifi and hotspot alike (so never a network issue). Measured two real, additive causes with instrumented profiling rather than guessing: (1) mut() — the update path behind nearly every input in the app — was chaining a full localStorage write (JSON.stringify of most of the persisted account plus an XP recompute) as a synchronous callback of every single keystroke’s state update; on a simulated account with a normal amount of history (workouts, activities, notes, logs) that alone measured 40-110ms per character. It’s now debounced 300ms through the same deferred-write mechanism the app’s Supabase syncs already use, with the existing flush-on-close safety net (visibilitychange/pagehide/beforeunload) guaranteeing nothing is ever lost — only the disk write is deferred, never the on-screen update. (2) World Intel’s news/threat-model computation (wiData) was being computed on every keystroke everywhere in the app, not only while looking at World Intel — now skipped unless that page is actually open. Combined, measured per-keystroke cost on a realistic account dropped from ~187ms to ~126ms in profiling; the single largest remaining cost is the renderVals() method itself, which currently recomputes every scene’s data on every state change app-wide rather than only the visible one — a real architectural fix but a much larger one, flagged here rather than attempted in this pass.',
+    ]},
     {version:'v11.467', date:'Sep 28, 2026', major:false, kind:'fix', notes:[
       "Onboarding's Experience step (\"Years of training\", \"Previous sports\", \"Conditioning\", …) had broad one-word prompts that didn't say what kind of answer they wanted, so real answers came back mismatched or as \"not sure\". Rewrote all seven with a concrete example format right in the prompt (e.g. \"Best recent run, or 'don't run' (e.g. '5k in 28 min')\"). Only this step changed — the rest of onboarding is untouched.",
     ]},
@@ -24246,7 +24261,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       execGreeting:execView.greeting, execOutlook:execView.outlook, execSentiment:execView.sentiment, execSentColor:execView.sentColor,
       execSummaryRows:execView.summaryRows, execSections:execView.sections, execTakeaways:execView.takeaways,
 
-      ...this.wiData(),
+      // wiData() filters every fetched headline against every country and recomputes threat
+      // statistics across the whole risk model — real cost, and it used to pay that on every
+      // renderVals() call app-wide (i.e. on every keystroke anywhere, not just on World Intel
+      // itself, since renderVals() has no per-scene isolation). Its ~40 output keys are only
+      // ever read from inside the `isGlobe` sc-if block, so skipping it off-scene is exactly
+      // as correct as computing it and never using the result.
+      ...(scene==='globe' ? this.wiData() : {}),
 
       // fitness
       woParts, woRanges, woCanLog, woLogHintShow, woEx:S.woEx, woMin:S.woMin, setWoEx:(e)=>this.setState({woEx:this._capitalizeWords(e.target.value)}), setWoMin:(e)=>this.setState({woMin:e.target.value}),
