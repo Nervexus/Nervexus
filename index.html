@@ -10651,7 +10651,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-466 · v11.466 hardening-ultra-x-diamond-mark';
+const NOTIF_BUILD_VERSION = '2026.09.28-467 · v11.467 hardening-onboarding-experience-precision';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15912,6 +15912,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.467', date:'Sep 28, 2026', major:false, kind:'fix', notes:[
+      "Onboarding's Experience step (\"Years of training\", \"Previous sports\", \"Conditioning\", …) had broad one-word prompts that didn't say what kind of answer they wanted, so real answers came back mismatched or as \"not sure\". Rewrote all seven with a concrete example format right in the prompt (e.g. \"Best recent run, or 'don't run' (e.g. '5k in 28 min')\"). Only this step changed — the rest of onboarding is untouched.",
+    ]},
     {version:'v11.466', date:'Sep 28, 2026', major:false, kind:'design', notes:[
       "THE HARDENING's rail icon was the app's shared crest (favicon.png) — the wrong mark. Ultra X's actual own mark is the ◆ diamond the Themes menu (Settings → Appearance) already uses to represent it (Noir gets ☾, Maison Élysée gets ❦, Vanguard gets ❖). Swapped to that everywhere the icon appears: the desktop sidebar, the mobile \"All Pages\" drawer, and the mobile bottom bar's More sheet.",
     ]},
@@ -21764,10 +21767,13 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           hardExperienceOptions:HE.EXPERIENCE_LEVELS.map(l=>({ key:l.key, name:l.name, desc:l.desc, on:p.experience===l.key,
             bg:p.experience===l.key?'var(--hard-cta-bg)':'transparent', ink:p.experience===l.key?'var(--hard-cta-ink)':'var(--hard-ink)',
             pick:()=>this.hardSetProfile('experience', l.key) })),
-          hardYears:hardTextField('years','Years/months of consistent training'),
-          hardPrevSports:hardTextField('prevSports','Previous sports'), hardPrevStrength:hardTextField('prevStrength','Previous strength training'),
-          hardConditioning:hardTextField('conditioning','Current conditioning level'), hardRunning:hardTextField('running','Current running ability'),
-          hardCarrying:hardTextField('carrying','Current carrying ability'), hardBodyweight:hardTextField('bodyweight','Current bodyweight-training ability'),
+          hardYears:hardTextField('years','How long have you trained consistently? (e.g. "18 months")'),
+          hardPrevSports:hardTextField('prevSports','Sports you’ve played, if any (e.g. "rugby, boxing" or "none")'),
+          hardPrevStrength:hardTextField('prevStrength','Your strength training background (e.g. "3 years general gym work", "just started")'),
+          hardConditioning:hardTextField('conditioning','How’s your cardio right now? (e.g. "can do 20 min steady", "gets winded on stairs")'),
+          hardRunning:hardTextField('running','Best recent run, or "don’t run" (e.g. "5k in 28 min")'),
+          hardCarrying:hardTextField('carrying','Heaviest you can carry ~20m, or "not sure" (e.g. "2x24kg kettlebells")'),
+          hardBodyweight:hardTextField('bodyweight','Max push-ups and pull-ups right now (e.g. "20 push-ups, 5 pull-ups")'),
 
           hardSquat:hardTextField('squat','Squat (or "don\'t know")'), hardDeadlift:hardTextField('deadlift','Deadlift'),
           hardBench:hardTextField('bench','Bench press'), hardOhp:hardTextField('ohp','Overhead press'),
