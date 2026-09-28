@@ -2506,7 +2506,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="9">
         <div onClick="{{ item.go }}" title="{{ item.label }}" style="position:relative; width:44px; height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:center; border-radius:13px; cursor:pointer; background:{{ item.bg }};" style-hover="{ background:'rgba(255,255,255,0.1)' }">
           <sc-if value="{{ item.useLogo }}" hint-placeholder-val="{{ false }}">
-            <img src="favicon.png" alt="" style="width:22px; height:22px; object-fit:contain; display:block;">
+            <span style="font-size:20px; line-height:1; color:{{ item.iconColor }}; display:flex; align-items:center; justify-content:center;">◆</span>
           </sc-if>
           <sc-if value="{{ !item.useLogo }}" hint-placeholder-val="{{ true }}">
             <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
@@ -10425,7 +10425,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <sc-for list="{{ mobMoreList }}" as="m" hint-placeholder-count="6">
               <div onClick="{{ m.go }}" style="display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; padding:12px 4px; min-height:44px; border-radius:12px;" style-hover="{ background:'rgba(255,255,255,0.06)' }">
                 <sc-if value="{{ m.useLogo }}" hint-placeholder-val="{{ false }}">
-                  <img src="favicon.png" alt="" style="width:20px; height:20px; object-fit:contain; display:block;">
+                  <span style="font-size:19px; line-height:1; color:#dcdce0; display:flex; align-items:center; justify-content:center; width:20px; height:20px;">◆</span>
                 </sc-if>
                 <sc-if value="{{ !m.useLogo }}" hint-placeholder-val="{{ true }}">
                   <span style="width:20px; height:20px; color:#dcdce0; display:flex;" data-icon="{{ m.id }}"></span>
@@ -10445,7 +10445,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <sc-for list="{{ mobDrawerList }}" as="m" hint-placeholder-count="12">
             <div onClick="{{ m.go }}" style="display:flex; align-items:center; gap:14px; cursor:pointer; padding:13px 10px; min-height:44px; border-radius:12px;" style-hover="{ background:'rgba(255,255,255,0.06)' }">
               <sc-if value="{{ m.useLogo }}" hint-placeholder-val="{{ false }}">
-                <img src="favicon.png" alt="" style="width:20px; height:20px; flex:0 0 20px; object-fit:contain; display:block;">
+                <span style="font-size:19px; line-height:1; color:{{ mobDrawerIconC }}; display:flex; align-items:center; justify-content:center; width:20px; height:20px; flex:0 0 20px;">◆</span>
               </sc-if>
               <sc-if value="{{ !m.useLogo }}" hint-placeholder-val="{{ true }}">
                 <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
@@ -10651,7 +10651,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-465 · v11.465 hardening-ultra-x-logo';
+const NOTIF_BUILD_VERSION = '2026.09.28-466 · v11.466 hardening-ultra-x-diamond-mark';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15912,6 +15912,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.466', date:'Sep 28, 2026', major:false, kind:'design', notes:[
+      "THE HARDENING's rail icon was the app's shared crest (favicon.png) — the wrong mark. Ultra X's actual own mark is the ◆ diamond the Themes menu (Settings → Appearance) already uses to represent it (Noir gets ☾, Maison Élysée gets ❦, Vanguard gets ❖). Swapped to that everywhere the icon appears: the desktop sidebar, the mobile \"All Pages\" drawer, and the mobile bottom bar's More sheet.",
+    ]},
     {version:'v11.465', date:'Sep 28, 2026', major:false, kind:'design', notes:[
       "THE HARDENING's rail icon is the app's own crest (favicon.png, the \"Ultra X\" logo) again, in place of the drawn shield — this time everywhere it appears: the desktop sidebar, the mobile \"All Pages\" drawer, and the mobile bottom bar's More sheet.",
     ]},
@@ -21297,8 +21300,10 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* The pending-requests badge moved to Settings with the page it counts. Taking Account
        Requests off the rail would otherwise have taken the only sign that anyone is waiting. */
     const _pending=this._isOwner() ? (S.requests||[]).filter(r=>r.status==='pending').length : 0;
-    /* THE HARDENING's rail entry wears the app's own crest (favicon.png, the "Ultra X" logo)
-       instead of a bespoke line-glyph — every other entry keeps its own icon. */
+    /* THE HARDENING's rail entry wears Ultra X's own mark — the ◆ diamond the Themes menu
+       (Settings → Appearance) already uses to represent Ultra X itself (Noir gets ☾, Maison
+       Élysée gets ❦, Vanguard gets ❖) — instead of a bespoke line-glyph. Every other entry
+       keeps its own icon. */
     const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6', useLogo:n.id==='hardening' }));
     /* The bottom bar keeps its own six, deliberately — it is not the top of the rail. These
        are the screens that are actually used from a phone; the rail's order is about how the
