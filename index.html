@@ -2505,12 +2505,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
     <nav style="display:flex; flex-direction:column; gap:8px; align-items:center;">
       <sc-for list="{{ nav }}" as="item" hint-placeholder-count="9">
         <div onClick="{{ item.go }}" title="{{ item.label }}" style="position:relative; width:44px; height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:center; border-radius:13px; cursor:pointer; background:{{ item.bg }};" style-hover="{ background:'rgba(255,255,255,0.1)' }">
-          <sc-if value="{{ item.useLogo }}" hint-placeholder-val="{{ false }}">
-            <img src="favicon.png" alt="" style="width:22px; height:22px; object-fit:contain; display:block; opacity:{{ item.logoOpacity }};">
-          </sc-if>
-          <sc-if value="{{ !item.useLogo }}" hint-placeholder-val="{{ true }}">
-            <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
-          </sc-if>
+          <span style="width:19px; height:19px; color:{{ item.iconColor }}; display:flex;" data-icon="{{ item.id }}"></span>
           <sc-if value="{{ item.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="position:absolute; top:2px; right:2px; min-width:15px; height:15px; padding:0 4px; border-radius:8px; background:linear-gradient(180deg,#ffffff 0%,#dcdce0 100%); box-shadow:inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.25); color:#0a0a0b; font-size:8.5px; font-weight:700; font-family:'JetBrains Mono',monospace; display:flex; align-items:center; justify-content:center; box-shadow:none;">{{ item.badge }}</span></sc-if>
         </div>
       </sc-for>
@@ -10439,12 +10434,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ mobDrawerHeaderC }}; padding:0 8px 14px;">ALL PAGES</div>
           <sc-for list="{{ mobDrawerList }}" as="m" hint-placeholder-count="12">
             <div onClick="{{ m.go }}" style="display:flex; align-items:center; gap:14px; cursor:pointer; padding:13px 10px; min-height:44px; border-radius:12px;" style-hover="{ background:'rgba(255,255,255,0.06)' }">
-              <sc-if value="{{ m.useLogo }}" hint-placeholder-val="{{ false }}">
-                <img src="favicon.png" alt="" style="width:20px; height:20px; flex:0 0 20px; object-fit:contain; display:block;">
-              </sc-if>
-              <sc-if value="{{ !m.useLogo }}" hint-placeholder-val="{{ true }}">
-                <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
-              </sc-if>
+              <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
               <span style="font-size:13.5px; color:{{ mobDrawerLabelC }};">{{ m.label }}</span>
             </div>
           </sc-for>
@@ -10646,7 +10636,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-463 · v11.463 hardening-mobile-drawer-logo';
+const NOTIF_BUILD_VERSION = '2026.09.28-464 · v11.464 hardening-shield-icon';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15535,9 +15525,11 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
          divider. Everything else on this page is drawn at 19px, so the ornament had to
          survive that size — the anvil and the double-frame versions did not. */
       forge:'<path d="M9 2.2 L14.5 7.6 L9 13 L3.5 7.6 Z"/><path d="M9 4.7 L11.9 7.6 L9 10.5 L6.1 7.6 Z" fill="currentColor" stroke="none"/><path d="M3.3 15.4h11.4"/><circle cx="3.3" cy="15.4" r="0.75" fill="currentColor" stroke="none"/><circle cx="14.7" cy="15.4" r="0.75" fill="currentColor" stroke="none"/>',
-      // The Hardening has no page of its own yet, so borrows the flame mark rather than
-      // shipping blind on what its own icon should look like once there is real content to draw one for.
-      hardening:'<path d="M9 16.2c-3.4 0-5.9-2.4-5.9-5.7 0-2.1 1-3.7 2.2-5.4.3 1.4 1 2.1 1.8 2.1-.2-2.9 1-5.5 3.5-7-.4 2.1.1 3.7 1.4 5 1.5 1.5 3 3.1 3 5.3 0 3.3-2.5 5.7-5.9 5.7z"/><path d="M9 13.6c-1.3 0-2.3-.9-2.3-2.2 0-.9.5-1.5 1-2.1.1.6.4.9.8.9-.1-1.1.4-2 1.3-2.6-.1.8 0 1.4.5 1.9.6.6 1.1 1.1 1.1 1.9 0 1.3-1 2.2-2.4 2.2z" opacity="0.4"/>' };
+      // A shield rather than the flame it borrowed before it had a page of its own — the rail
+      // icon should read as "protect/hold the line," matching the section's own standard
+      // ("become difficult to break") better than a flame reads once there is real content
+      // sharing the rail with actual per-page marks (Gentlemen's bow tie, the Forge's lozenge).
+      hardening:'<path d="M9 16.5s6-3 6-7.5V3.75l-6-2.25-6 2.25v7.5c0 4.5 6 7.5 6 7.5z"/>' };
     this.root.querySelectorAll('[data-icon]').forEach(el=>{ const k=el.dataset.icon; if(el._k===k) return; el._k=k; el.innerHTML='<svg viewBox="0 0 18 18" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">'+(ic[k]||'')+'</svg>'; });
   }
 
@@ -15905,6 +15897,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.464', date:'Sep 28, 2026', major:false, kind:'design', notes:[
+      "THE HARDENING's rail icon is a drawn shield now — its own bespoke line-glyph, in the same stroked style as every other rail icon, rather than the app's shared crest image it briefly wore. Reads as \"hold the line\" against the section's own standard rather than borrowing a mark that already means \"Nervexus\" elsewhere on the rail.",
+    ]},
     {version:'v11.463', date:'Sep 28, 2026', major:false, kind:'fix', notes:[
       "Checked THE HARDENING on mobile end to end — onboarding, the program's exercise-editing cards, Make It Harder/Too Much, and the scoreboard all hold up at phone width with no overflow. Found one thing the desktop pass missed: the phone's \"All Pages\" drawer has its own separate icon list from the sidebar rail, so v11.462's crest swap hadn't reached it — The Hardening was still showing the old flame glyph there. Fixed.",
     ]},
@@ -21284,10 +21279,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
     /* The pending-requests badge moved to Settings with the page it counts. Taking Account
        Requests off the rail would otherwise have taken the only sign that anyone is waiting. */
     const _pending=this._isOwner() ? (S.requests||[]).filter(r=>r.status==='pending').length : 0;
-    /* THE HARDENING's rail entry wears the app's own crest (favicon.png — the same "Ultra X"
-       logo used on Home's hero, Gentlemen's welcome cover and the top bar's theme button)
-       instead of a bespoke line-glyph, per request — every other entry keeps its own icon. */
-    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6', useLogo:n.id==='hardening', logoOpacity:navActive(n.id)?'1':'0.55' }));
+    const nav=this.navDefs.filter(n=>!n.owner||this._isOwner()).map(n=>({ id:n.id, label:n.label, go:go(n.id), badge:(n.id==='settings'?_pending:0), hasBadge:(n.id==='settings'&&_pending>0), bg:navActive(n.id)?'rgba(255,255,255,0.08)':'rgba(0,0,0,0)', barOpacity:navActive(n.id)?1:0, iconColor:navActive(n.id)?'#FFFFFF':'#7c7c84', txt:navActive(n.id)?'#ffffff':'#aeaeb6' }));
     /* The bottom bar keeps its own six, deliberately — it is not the top of the rail. These
        are the screens that are actually used from a phone; the rail's order is about how the
        app is arranged, which is a different question. Everything else falls through to More.
