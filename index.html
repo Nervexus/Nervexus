@@ -10439,7 +10439,12 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
           <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:{{ mobDrawerHeaderC }}; padding:0 8px 14px;">ALL PAGES</div>
           <sc-for list="{{ mobDrawerList }}" as="m" hint-placeholder-count="12">
             <div onClick="{{ m.go }}" style="display:flex; align-items:center; gap:14px; cursor:pointer; padding:13px 10px; min-height:44px; border-radius:12px;" style-hover="{ background:'rgba(255,255,255,0.06)' }">
-              <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
+              <sc-if value="{{ m.useLogo }}" hint-placeholder-val="{{ false }}">
+                <img src="favicon.png" alt="" style="width:20px; height:20px; flex:0 0 20px; object-fit:contain; display:block;">
+              </sc-if>
+              <sc-if value="{{ !m.useLogo }}" hint-placeholder-val="{{ true }}">
+                <span style="width:20px; height:20px; color:{{ mobDrawerIconC }}; display:flex; flex:0 0 20px;" data-icon="{{ m.id }}"></span>
+              </sc-if>
               <span style="font-size:13.5px; color:{{ mobDrawerLabelC }};">{{ m.label }}</span>
             </div>
           </sc-for>
@@ -10641,7 +10646,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-462 · v11.462 hardening-rail-logo-gentlemen-entrance-onboarding';
+const NOTIF_BUILD_VERSION = '2026.09.28-463 · v11.463 hardening-mobile-drawer-logo';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -15900,6 +15905,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.463', date:'Sep 28, 2026', major:false, kind:'fix', notes:[
+      "Checked THE HARDENING on mobile end to end — onboarding, the program's exercise-editing cards, Make It Harder/Too Much, and the scoreboard all hold up at phone width with no overflow. Found one thing the desktop pass missed: the phone's \"All Pages\" drawer has its own separate icon list from the sidebar rail, so v11.462's crest swap hadn't reached it — The Hardening was still showing the old flame glyph there. Fixed.",
+    ]},
     {version:'v11.462', date:'Sep 28, 2026', major:false, kind:'design', notes:[
       'THE HARDENING\'s rail icon is the app\'s own crest (the laurel-wreath "N", the same logo used on Home\'s hero and Gentlemen\'s welcome cover) instead of a bespoke flame glyph. Its onboarding now reuses Gentlemen Center\'s own welcome-cover template — icon circle, kicker, a big title, a description, one filled pill, a dot row — for every one of its seven steps rather than a compact deck-card, so it reads as one consistent "entrance" moment all the way through instead of switching styles partway; the dashboard and its tabs only open once onboarding is complete. Also fixed paired fields (Age/Sex, Height/Weight, …) overflowing off the right edge on narrow phones — the inputs had no explicit width, so they held their browser-default size instead of filling their grid cell.',
     ]},
