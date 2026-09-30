@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAREA Residences | Port Aurelia</title>
+<meta name="description" content="MAREA Residences — cinq résidences privées en bord de mer à Port Aurelia. Architecture méditerranéenne, art de vivre sur mesure.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (window.tailwind) tailwind.config = {
+    theme: {
+      extend: {
+        colors: { copper: '#C17F59', sage: '#8A9A7B', ink: '#0F0F0E' },
+        fontFamily: {
+          sans: ['Inter', '-apple-system', 'sans-serif'],
+          serif: ['"Playfair Display"', 'Georgia', 'serif']
+        },
+        transitionTimingFunction: { 'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)' }
+      }
+    }
+  };
+</script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
+
+<link rel="stylesheet" href="style.css">
+<script>
+/* Set before first paint so the reveal animation has no flash of visible content.
+   The watchdog is the safety net: if main.js hasn't confirmed the observer is
+   running within 3s — blocked, errored, or never arrived — the hiding is dropped
+   so the page stays readable rather than permanently blank below the hero. */
+(function(){var d=document.documentElement;d.className+=' js-reveal';
+setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.className.replace(' js-reveal','');},3000);})();
+</script>
+</head>
+<body class="font-sans" data-theme="dark">
+
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<nav id="siteNav" class="fixed top-0 inset-x-0 z-[100]">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 flex items-center justify-between h-20">
+    <a href="#top" class="brand-mark font-serif text-lg md:text-xl tracking-wide flex items-center gap-3">
+      <span class="brand-badge">M</span>
+      MAREA <span class="hidden sm:inline text-copper/70 font-sans text-[11px] tracking-[0.25em] font-medium ml-1">RESIDENCES</span>
+    </a>
+    <div class="hidden lg:flex items-center gap-9 text-sm nav-links">
+      <a href="#philosophy" class="nav-link">Philosophie</a>
+      <a href="#infrastructures" class="nav-link">Infrastructures</a>
+      <a href="#layouts" class="nav-link">Résidences</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Changer de thème">
+        <iconify-icon icon="solar:sun-linear" class="icon-sun"></iconify-icon>
+        <iconify-icon icon="solar:moon-linear" class="icon-moon"></iconify-icon>
+      </button>
+      <button class="btn nav-cta hidden md:inline-flex" type="button" data-modal-trigger>
+        <span>Prendre rendez-vous</span>
+        <i class="nav-cta-shimmer"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></i>
+      </button>
+      <button id="navToggle" class="nav-toggle lg:hidden" type="button" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div id="mobileNav" class="mobile-nav">
+    <a href="#philosophy">Philosophie</a>
+    <a href="#infrastructures">Infrastructures</a>
+    <a href="#layouts">Résidences</a>
+    <a href="#contact">Contact</a>
+    <button class="btn nav-cta" type="button" data-modal-trigger><span>Prendre rendez-vous</span></button>
+  </div>
+</nav>
+
+<section id="top" class="hero relative min-h-screen flex overflow-hidden">
+  <div class="hero-bg absolute inset-0 z-0" aria-hidden="true"></div>
+  <div class="hero-vignette absolute inset-0 z-0" aria-hidden="true"></div>
+  <div class="hero-inner relative z-[2] max-w-7xl mx-auto px-6 md:px-10 w-full">
+    <div class="reveal-clip-left">
+      <span class="hero-eyebrow">RÉSIDENCE PRIVÉE EN BORD DE MER</span>
+    </div>
+    <h1 class="hero-title reveal-clip-left" style="transition-delay:.1s">Première ligne à <em>Port Aurelia</em></h1>
+    <p class="hero-sub reveal-clip-left" style="transition-delay:.2s">Cinq résidences, une seule adresse — là où l'architecture méditerranéenne rencontre un art de vivre entièrement sur mesure.</p>
+
+    <div class="hero-stats reveal-clip-left" style="transition-delay:.3s">
+      <div class="hero-stat">
+        <span class="hero-stat-num">30 m</span>
+        <span class="hero-stat-label">de la plage</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">5</span>
+        <span class="hero-stat-label">Résidences</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">8 ha</span>
+        <span class="hero-stat-label">de domaine paysager</span>
+      </div>
+    </div>
+
+    <div class="hero-actions reveal-clip-left" style="transition-delay:.4s">
+      <button class="btn-hero-webgl" type="button" data-modal-trigger>
+        <canvas id="heroCanvas" width="280" height="58" aria-hidden="true"></canvas>
+        <span>Recevoir les plans</span>
+        <iconify-icon icon="solar:arrow-right-linear"></iconify-icon>
+      </button>
+      <a href="#layouts" class="hero-link">Voir les résidences ↓</a>
+    </div>
+  </div>
+</section>
+
+<section id="philosophy" class="section-philosophy relative py-28 md:py-36">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+    <div class="philosophy-image-wrap reveal-slide-right">
+      <div class="philosophy-image" role="img" aria-label="Architecture méditerranéenne durable, rendu artistique"></div>
+    </div>
+    <div class="reveal-pop">
+      <span class="section-label">◆ NOTRE PHILOSOPHIE</span>
+      <h2 class="section-title">L'art de vivre <em>en bord de mer</em></h2>
+      <p class="section-copy">MAREA n'est pas une résidence de plus sur la côte. C'est une réponse à une question simple : à quoi ressemblerait une maison pensée uniquement pour la lumière, le vent marin et le temps qui passe lentement.</p>
+      <ul class="feature-list">
+        <li class="reveal-pop" style="transition-delay:.05s">
+          <iconify-icon icon="solar:leaf-bold"></iconify-icon>
+          <div><h4>Architecture durable</h4><p>Matériaux bas carbone, ventilation naturelle, toitures végétalisées.</p></div>
+        </li>
+        <li class="reveal-pop" style="transition-delay:.1s">
+          <iconify-icon icon="solar:pallete-2-bold"></iconify-icon>
+          <div><h4>Design sur mesure</h4><p>Chaque intérieur est dessiné avec l'acquéreur, pas après lui.</p></div>
+        </li>
+        <li class="reveal-pop" style="transition-delay:.15s">
+          <iconify-icon icon="solar:compass-big-bold"></iconify-icon>
+          <div><h4>Orientation étudiée</h4><p>Chaque résidence est orientée pour la lumière du matin et l'ombre de l'après-midi.</p></div>
+        </li>
+        <li class="reveal-pop" style="transition-delay:.2s">
+          <iconify-icon icon="solar:buildings-2-bold"></iconify-icon>
+          <div><h4>Architecture signature</h4><p>Conçue par un atelier méditerranéen, pensée pour traverser les décennies.</p></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="infrastructures" class="section-infra relative py-28">
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <div class="text-center max-w-xl mx-auto mb-16 reveal-pop">
+      <span class="section-label">◆ ART DE VIVRE</span>
+      <h2 class="section-title">Des infrastructures <em>pensées pour vous</em></h2>
+      <p class="section-sub">Tout ce qu'une vie en bord de mer devrait inclure — rien de superflu, rien qui manque.</p>
+    </div>
+    <div class="infra-grid grid sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-scale">
+      <div class="service-card" data-index="0">
+        <iconify-icon icon="solar:cup-first-bold-duotone" class="service-icon"></iconify-icon>
+        <h3>Club-house &amp; spa</h3>
+        <p>Piscine à débordement, spa nordique, salle de sport avec vue mer.</p>
+      </div>
+      <div class="service-card" data-index="1">
+        <iconify-icon icon="solar:leaf-bold-duotone" class="service-icon"></iconify-icon>
+        <h3>Jardins paysagers</h3>
+        <p>8 hectares dessinés par un paysagiste méditerranéen, sentiers privés.</p>
+      </div>
+      <div class="service-card" data-index="2">
+        <iconify-icon icon="solar:medal-star-circle-bold-duotone" class="service-icon"></iconify-icon>
+        <h3>Conciergerie privée</h3>
+        <p>Un service disponible sept jours sur sept, du ménage à la réservation de table.</p>
+      </div>
+      <div class="service-card" data-index="3">
+        <iconify-icon icon="solar:global-bold-duotone" class="service-icon"></iconify-icon>
+        <h3>Accès international</h3>
+        <p>À 35 minutes de l'aéroport, navette privée sur demande.</p>
+      </div>
+      <div class="service-card" data-index="4">
+        <iconify-icon icon="solar:buildings-3-bold-duotone" class="service-icon"></iconify-icon>
+        <h3>Sécurité &amp; discrétion</h3>
+        <p>Accès gardé, vidéosurveillance périmétrique, entrée résidents dédiée.</p>
+      </div>
+      <div class="service-card" data-index="5">
+        <iconify-icon icon="solar:map-point-bold" class="service-icon"></iconify-icon>
+        <h3>Plage privée</h3>
+        <p>Accès direct et exclusif, à 30 mètres du hall d'entrée.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item">Paiement échelonné 0%</span><span class="ticker-dot"></span>
+    <span class="ticker-item">Livraison 2027</span><span class="ticker-dot"></span>
+    <span class="ticker-item">5 résidences seulement</span><span class="ticker-dot"></span>
+    <span class="ticker-item">Plage privée à 30 m</span><span class="ticker-dot"></span>
+    <span class="ticker-item">Paiement échelonné 0%</span><span class="ticker-dot"></span>
+    <span class="ticker-item">Livraison 2027</span><span class="ticker-dot"></span>
+    <span class="ticker-item">5 résidences seulement</span><span class="ticker-dot"></span>
+    <span class="ticker-item">Plage privée à 30 m</span><span class="ticker-dot"></span>
+  </div>
+</div>
+
+<section id="layouts" class="section-layouts relative py-28">
+  <div class="max-w-7xl mx-auto px-6 md:px-10">
+    <div class="text-center max-w-xl mx-auto mb-16 reveal-pop">
+      <span class="section-label">◆ PLANS &amp; RÉSIDENCES</span>
+      <h2 class="section-title">Neuf typologies, <em>une seule exigence</em></h2>
+      <p class="section-sub">Du studio d'exception au penthouse panoramique — chaque plan est disponible sur demande.</p>
+    </div>
+
+    <div class="layouts-grid grid sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger-scale">
+      <div class="layout-card layout-card-center" style="padding-top:1.5rem;padding-right:1.5rem;padding-bottom:1.5rem;padding-left:1.5rem;text-align:center;">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>Studio Horizon</h3>
+        <div class="layout-meta">38 m² · Résidence 1</div>
+        <div class="layout-price">à partir de 310 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>T2 Riviera</h3>
+        <div class="layout-meta">54 m² · Résidence 1</div>
+        <div class="layout-price">à partir de 465 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>T2 Lumière</h3>
+        <div class="layout-meta">61 m² · Résidence 2</div>
+        <div class="layout-price">à partir de 520 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>T3 Méridien</h3>
+        <div class="layout-meta">78 m² · Résidence 2</div>
+        <div class="layout-price">à partir de 690 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>T3 Belvédère</h3>
+        <div class="layout-meta">85 m² · Résidence 3</div>
+        <div class="layout-price">à partir de 740 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>T4 Littoral</h3>
+        <div class="layout-meta">102 m² · Résidence 3</div>
+        <div class="layout-price">à partir de 890 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>Duplex Azur</h3>
+        <div class="layout-meta">128 m² · Résidence 4</div>
+        <div class="layout-price">à partir de 1 150 000 €</div>
+      </div>
+      <div class="layout-card layout-card-featured">
+        <div class="layout-badge">Meilleur choix</div>
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>Villa Aurelia</h3>
+        <div class="layout-meta-row">
+          <span><iconify-icon icon="solar:buildings-2-bold"></iconify-icon> Bâtiment 2</span>
+          <span><iconify-icon icon="solar:map-point-bold"></iconify-icon> 30 m de la plage</span>
+        </div>
+        <div class="layout-meta">165 m² · terrasse privée 40 m²</div>
+        <div class="layout-price">à partir de 1 780 000 €</div>
+      </div>
+      <div class="layout-card">
+        <iconify-icon icon="solar:ruler-bold" class="layout-icon"></iconify-icon>
+        <h3>Penthouse Panorama</h3>
+        <div class="layout-meta">210 m² · Résidence 5</div>
+        <div class="layout-price">à partir de 2 450 000 €</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="section-cta relative py-32 overflow-hidden">
+  <div class="cta-bg absolute inset-0 z-0" aria-hidden="true"></div>
+  <div class="cta-overlay absolute inset-0 z-0" aria-hidden="true"></div>
+  <div class="relative z-[2] max-w-xl mx-auto px-6 text-center reveal-zoom">
+    <span class="section-label">◆ RÉSERVATION PRIVÉE</span>
+    <h2 class="cta-title">Une résidence. <em>Une vie, repensée.</em></h2>
+    <p class="cta-sub">Laissez vos coordonnées — nous vous recontactons sous 24h avec les plans complets et les disponibilités actuelles.</p>
+    <form id="ctaForm" class="cta-form" novalidate>
+      <div class="glass-field">
+        <input type="text" name="name" placeholder="Nom complet" required>
+      </div>
+      <div class="glass-field">
+        <input type="email" name="email" placeholder="Email" required>
+      </div>
+      <div class="glass-field">
+        <input type="tel" name="phone" placeholder="Téléphone" required>
+      </div>
+      <button type="submit" class="btn-glow">
+        <span>Réserver ma visite privée</span>
+      </button>
+    </form>
+    <div class="cta-success hidden">
+      <iconify-icon icon="solar:medal-star-circle-bold-duotone"></iconify-icon>
+      <h3>Merci — c'est envoyé.</h3>
+      <p>Un conseiller MAREA vous recontacte sous 24h.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer relative py-16">
+  <div class="max-w-7xl mx-auto px-6 md:px-10 grid md:grid-cols-4 gap-12">
+    <div>
+      <a href="#top" class="brand-mark font-serif text-lg flex items-center gap-3 mb-4">
+        <span class="brand-badge">M</span> MAREA
+      </a>
+      <p class="footer-tagline">Cinq résidences privées, une seule adresse, à Port Aurelia.</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><iconify-icon icon="fa6-brands:instagram"></iconify-icon></a>
+        <a href="#" aria-label="LinkedIn"><iconify-icon icon="fa6-brands:linkedin-in"></iconify-icon></a>
+        <a href="#" aria-label="Pinterest"><iconify-icon icon="fa6-brands:pinterest-p"></iconify-icon></a>
+        <a href="#" aria-label="X"><iconify-icon icon="fa6-brands:x-twitter"></iconify-icon></a>
+      </div>
+    </div>
+    <div>
+      <h4 class="footer-heading">Menu</h4>
+      <a href="#philosophy">Philosophie</a>
+      <a href="#infrastructures">Infrastructures</a>
+      <a href="#layouts">Résidences</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div>
+      <h4 class="footer-heading">Contact</h4>
+      <p><iconify-icon icon="solar:map-point-bold"></iconify-icon> Port Aurelia, Méditerranée</p>
+      <p><iconify-icon icon="solar:buildings-2-bold"></iconify-icon> +33 (0)4 00 00 00 00</p>
+      <p>contact@marea-residences.example</p>
+    </div>
+    <div>
+      <h4 class="footer-heading">Être rappelé</h4>
+      <form id="footerForm" class="footer-form" novalidate>
+        <input type="email" name="email" placeholder="Votre email" required>
+        <button type="submit" aria-label="Envoyer"><iconify-icon icon="solar:arrow-right-linear"></iconify-icon></button>
+      </form>
+      <p class="footer-form-note" id="footerFormNote"></p>
+    </div>
+  </div>
+  <div class="footer-bottom max-w-7xl mx-auto px-6 md:px-10 mt-12 pt-8 border-t border-white/10 text-center">
+    <p>© <span id="year">2026</span> MAREA Residences. Projet fictif à but de démonstration — tous droits réservés.</p>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="leadModal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Fermer">✕</button>
+    <span class="section-label">◆ BROCHURE PRIVÉE</span>
+    <h3 id="modalTitle">Recevoir les plans complets</h3>
+    <p class="modal-sub">Plans, prix et disponibilités des cinq résidences, envoyés directement.</p>
+    <form id="modalForm" class="modal-form" novalidate>
+      <div class="glass-field">
+        <input type="text" name="name" placeholder="Nom complet" required>
+      </div>
+      <div class="glass-field">
+        <input type="email" name="email" placeholder="Email" required>
+      </div>
+      <div class="glass-field">
+        <input type="tel" name="phone" placeholder="Téléphone" required>
+      </div>
+      <button type="submit" class="btn-glow"><span>Recevoir les plans</span></button>
+    </form>
+    <div class="modal-success hidden">
+      <iconify-icon icon="solar:medal-star-circle-bold-duotone"></iconify-icon>
+      <h3>Merci — c'est envoyé.</h3>
+      <p>Vous recevrez la brochure complète par email sous quelques minutes.</p>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
