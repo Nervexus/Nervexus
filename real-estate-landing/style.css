@@ -259,6 +259,7 @@ header.is-scrolled .nav-toggle span{ background:var(--ink); }
 /* =========================================================
    LISTINGS — horizontal carousel
 ========================================================= */
+#listings .wrap{ max-width:1520px; }
 .listings-carousel{ position:relative; }
 .listings-grid{
   display:flex; gap:28px; overflow-x:auto; scroll-snap-type:x mandatory;
