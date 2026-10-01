@@ -18,42 +18,42 @@
     {
       id: 'marlborough-terrace', icon: 0, tag: 'New Listing', price: 4250000,
       title: '14 Marlborough Terrace', location: 'Harbor Heights',
-      beds: 5, baths: 6, sqft: 6200, tintA: '#37472F', tintB: '#1A1B16',
+      beds: 5, baths: 6, sqft: 6200, tintA: '#1B3A6B', tintB: '#0B1829',
       description: 'A restored 1920s estate on Harbor Heights’ quietest cul-de-sac, with the original millwork intact and a kitchen rebuilt for the way people actually entertain now.',
       features: ['Restored original millwork', 'Chef’s kitchen, dual islands', 'Heated pool & pool house', 'Three-car carriage garage']
     },
     {
       id: 'lighthouse-point', icon: 1, tag: 'Waterfront', price: 6980000,
       title: '2 Lighthouse Point', location: 'Cape Ellery',
-      beds: 6, baths: 7, sqft: 8450, tintA: '#8A6423', tintB: '#1A1B16',
+      beds: 6, baths: 7, sqft: 8450, tintA: '#2C5282', tintB: '#0B1829',
       description: 'Unobstructed water on three sides, a private deep-water dock, and floor-to-ceiling glass throughout the main level to make sure you never forget it.',
       features: ['Private deep-water dock', '180° water views', 'Guest cottage, 2 bd', 'Whole-home generator']
     },
     {
       id: 'fenwick-row', icon: 2, tag: 'Exclusive', price: 3120000,
       title: '88 Fenwick Row', location: 'Old Charlton',
-      beds: 4, baths: 4, sqft: 4780, tintA: '#5B1A1A', tintB: '#1A1B16',
+      beds: 4, baths: 4, sqft: 4780, tintA: '#16294A', tintB: '#0B1829',
       description: 'A townhouse on one of Old Charlton’s most photographed blocks, updated top to bottom without losing a single period detail worth keeping.',
       features: ['Walk to Old Charlton square', 'Wine cellar, 400-bottle', 'Roof terrace, city views', 'Smart home system throughout']
     },
     {
       id: 'ashworth-lane', icon: 3, tag: 'Price Reduced', price: 2395000,
       title: '410 Ashworth Lane', location: 'Greystone',
-      beds: 4, baths: 3, sqft: 3910, tintA: '#6B2D4A', tintB: '#1A1B16',
+      beds: 4, baths: 3, sqft: 3910, tintA: '#3B5A82', tintB: '#0B1829',
       description: 'Quiet, well-built, and priced to move for a family that wants Greystone’s schools without Greystone’s usual asking price.',
       features: ['Top-rated school district', 'Finished lower level', 'Fenced half-acre lot', 'New roof & HVAC, 2025']
     },
     {
       id: 'windermere-close', icon: 4, tag: 'Under Contract', price: 5600000,
       title: '7 Windermere Close', location: 'Harbor Heights',
-      beds: 5, baths: 5, sqft: 5940, tintA: '#22301F', tintB: '#1A1B16',
+      beds: 5, baths: 5, sqft: 5940, tintA: '#1E3A5F', tintB: '#0B1829',
       description: 'A gated modern build that went under contract in six days — shown here as a reference for what moves fastest in this market right now.',
       features: ['Gated, private drive', 'Home theater & gym', 'Radiant floor heating', 'EV charging, 2 bays']
     },
     {
       id: 'belgrave-crescent', icon: 5, tag: 'Coming Soon', price: 8750000,
       title: '1 Belgrave Crescent', location: 'Old Charlton',
-      beds: 7, baths: 8, sqft: 9800, tintA: '#8B2A2A', tintB: '#1A1B16',
+      beds: 7, baths: 8, sqft: 9800, tintA: '#4A6FA5', tintB: '#0B1829',
       description: 'The largest lot on the Crescent, not yet on the open market — early access is going to Aldridge & Co. clients first.',
       features: ['Largest lot on the Crescent', 'Indoor pool & spa wing', 'Staff quarters, separate entrance', 'Motor court, 6+ cars']
     }
