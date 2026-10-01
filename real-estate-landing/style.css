@@ -271,7 +271,7 @@ header.is-scrolled .nav-toggle span{ background:var(--ink); }
   background:var(--card); border:1px solid var(--line-soft);
   overflow:hidden; transition:transform .45s var(--ease), box-shadow .45s var(--ease), border-color .45s var(--ease);
 }
-.listing-card:hover{ transform:translateY(-6px); box-shadow:var(--shadow); border-color:var(--line); }
+.listing-card:hover{ transform:translateY(-6px); border-color:var(--line); }
 .carousel-arrow{
   position:absolute; top:142px; z-index:3;
   width:44px; height:44px; border-radius:50%; background:var(--card);
