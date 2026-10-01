@@ -463,33 +463,6 @@
     window.addEventListener('resize', onProgress);
   }
 
-  /* =======================================================
-     CUSTOM CURSOR (desktop, fine pointer, motion-safe only)
-  ======================================================= */
-  (function () {
-    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (reduceMotion || !canHover) return;
-    var dot = document.getElementById('cursorDot');
-    if (!dot) return;
-    document.documentElement.classList.add('has-custom-cursor');
-    var x = 0, y = 0, rafId = null;
-    var move = function () {
-      dot.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0) translate(-50%,-50%)';
-      rafId = null;
-    };
-    window.addEventListener('mousemove', function (e) {
-      x = e.clientX; y = e.clientY;
-      dot.classList.add('is-ready');
-      if (!rafId) rafId = requestAnimationFrame(move);
-    });
-    document.addEventListener('mouseover', function (e) {
-      var interactive = e.target.closest('a, button, select, input, .listing-card, .drawer-item, .palette-row');
-      dot.classList.toggle('is-active', !!interactive);
-    });
-    document.addEventListener('mouseleave', function () { dot.classList.remove('is-ready'); });
-  })();
-
   /* ---------- scroll reveal ----------
      html.js-reveal is set inline in <head> before first paint so sections start
      hidden with no flash. If this script fails to load or throws before it
