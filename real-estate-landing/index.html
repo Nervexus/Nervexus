@@ -104,6 +104,37 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
   </div>
 </section>
 
+<section class="intro-strip tight">
+  <div class="wrap intro-grid">
+    <div class="intro-copy reveal">
+      <div class="section-label">◆ ALDRIDGE &amp; CO.</div>
+      <p>A boutique brokerage built around one principle: fewer clients, more attention. Every property on this page has been personally walked, priced, and vetted — not pulled from a syndicated feed.</p>
+    </div>
+    <div class="intro-services">
+      <div class="intro-service reveal">
+        <div class="intro-service-icon">⌂</div>
+        <h4>Residential Sales</h4>
+        <p>Buying and selling, handled start to close.</p>
+      </div>
+      <div class="intro-service reveal">
+        <div class="intro-service-icon">✦</div>
+        <h4>Private Listings</h4>
+        <p>Off-market homes shared before they go public.</p>
+      </div>
+      <div class="intro-service reveal">
+        <div class="intro-service-icon">◈</div>
+        <h4>Valuations</h4>
+        <p>A straight read on what your home is worth today.</p>
+      </div>
+      <div class="intro-service reveal">
+        <div class="intro-service-icon">⇄</div>
+        <h4>Relocation</h4>
+        <p>Moving in or out of the region, coordinated end to end.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="listings">
   <div class="wrap">
     <div class="section-head reveal">
@@ -143,7 +174,11 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
       </div>
       <div class="listings-count" id="listingsCount"></div>
     </div>
-    <div class="listings-grid" id="listingsGrid"></div>
+    <div class="listings-carousel reveal">
+      <button class="carousel-arrow carousel-prev" id="listingsPrev" type="button" aria-label="Previous listings">←</button>
+      <div class="listings-grid" id="listingsGrid"></div>
+      <button class="carousel-arrow carousel-next" id="listingsNext" type="button" aria-label="Next listings">→</button>
+    </div>
     <p class="listings-empty" id="listingsEmpty" hidden>No listings match those filters — try widening your search.</p>
     <div class="listings-foot reveal">
       <a class="btn btn-ghost" href="#contact">Request Full Availability →</a>
@@ -238,6 +273,10 @@ setTimeout(function(){if(!d.hasAttribute('data-reveal-ready'))d.className=d.clas
           <div class="about-badge"><b>Top 1%</b> Regional Agent</div>
           <div class="about-badge"><b>$480M+</b> Career Sales</div>
           <div class="about-badge"><b>Licensed</b> Broker, DRE #00000000</div>
+        </div>
+        <div class="about-contact">
+          <a href="tel:+15550142200">☏ (555) 014-2200</a>
+          <a href="mailto:eleanor@aldridgeandco.example">✉ eleanor@aldridgeandco.example</a>
         </div>
       </div>
     </div>

@@ -89,7 +89,8 @@
   var filterBeds = document.getElementById('filterBeds');
   var filterPrice = document.getElementById('filterPrice');
   var sortBy = document.getElementById('sortBy');
-  var firstRender = true;
+  var carouselPrev = document.getElementById('listingsPrev');
+  var carouselNext = document.getElementById('listingsNext');
 
   function cardHTML(l) {
     return (
@@ -125,17 +126,35 @@
     grid.innerHTML = '';
     list.forEach(function (l) {
       var card = document.createElement('article');
-      card.className = 'listing-card' + (firstRender ? ' reveal' : '');
+      card.className = 'listing-card';
       card.setAttribute('data-id', l.id);
       card.innerHTML = cardHTML(l);
       grid.appendChild(card);
     });
-    if (!firstRender) {
-      grid.querySelectorAll('.listing-card').forEach(function (c) { c.classList.add('is-visible'); });
-    }
     countEl.textContent = 'Showing ' + list.length + ' of ' + LISTINGS.length + ' homes';
     emptyEl.hidden = list.length !== 0;
     grid.hidden = list.length === 0;
+    grid.scrollLeft = 0;
+    updateCarouselArrows();
+  }
+
+  function updateCarouselArrows() {
+    if (!carouselPrev || !carouselNext) return;
+    var tolerance = 8; /* .listings-grid has a few px of padding for card shadows */
+    var max = grid.scrollWidth - grid.clientWidth;
+    carouselPrev.disabled = grid.scrollLeft <= tolerance;
+    carouselNext.disabled = grid.scrollLeft >= max - tolerance;
+  }
+  if (carouselPrev && carouselNext) {
+    var scrollByCard = function (dir) {
+      var card = grid.querySelector('.listing-card');
+      var step = card ? card.getBoundingClientRect().width + 28 : 340;
+      grid.scrollBy({ left: dir * step, behavior: 'smooth' });
+    };
+    carouselPrev.addEventListener('click', function () { scrollByCard(-1); });
+    carouselNext.addEventListener('click', function () { scrollByCard(1); });
+    grid.addEventListener('scroll', updateCarouselArrows, { passive: true });
+    window.addEventListener('resize', updateCarouselArrows);
   }
 
   grid.addEventListener('click', function (e) {
@@ -150,11 +169,10 @@
     if (card) openModal(card.getAttribute('data-id'));
   });
   [filterBeds, filterPrice, sortBy].forEach(function (el) {
-    el.addEventListener('change', function () { renderGrid(); firstRender = false; });
+    el.addEventListener('change', renderGrid);
   });
 
   renderGrid();
-  firstRender = false;
 
   savedListeners.push(function () {
     grid.querySelectorAll('[data-fav]').forEach(function (btn) {
