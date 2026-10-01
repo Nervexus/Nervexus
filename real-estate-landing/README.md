@@ -11,6 +11,7 @@ built as a standalone demo/template under a placeholder brand, "Aldridge & Co."
 | `style.css`   | all styling                                                        |
 | `main.js`     | listings data/render/filter, detail modal + mortgage calculator, favorites + saved drawer, ⌘K command palette, scroll reveal, sticky header, mobile nav, stat counters, testimonial slider, contact form, scroll progress bar, custom cursor |
 | `favicon.svg` | monogram favicon                                                   |
+| `hero-bg.jpg` | hero background photo                                              |
 
 ## Features
 
@@ -20,11 +21,20 @@ built as a standalone demo/template under a placeholder brand, "Aldridge & Co."
 - **Command palette (⌘K / Ctrl+K)** — click the search icon or press the shortcut to jump to a section or open a listing directly; arrow keys + Enter to navigate.
 - **Scroll progress bar** and a **custom cursor** (desktop, fine-pointer, motion-safe only — see below).
 
-Nothing else is referenced — no external images. Listing photography is
-represented with CSS gradient + SVG line-art placeholders rather than hotlinked
-stock photos, so the page renders identically offline and never breaks on a
-dead image link. Swap `.listing-media` backgrounds for real photography when
-there is a real listing to show.
+Nothing else is referenced — no hotlinked images. Listing photography is
+represented with CSS gradient + SVG line-art placeholders, so the page
+renders identically offline and never breaks on a dead image link. Swap
+`.listing-media` backgrounds for real photography when there is a real
+listing to show.
+
+The one real photo on the page is `hero-bg.jpg`, a free-licensed Unsplash
+photo (a private pool at dusk, by Aalo Lens — unsplash.com/photos/
+luxury-infinity-pool-at-sunset-with-lounge-chairs-KgybDitNR18), downloaded
+and checked into the repo rather than hotlinked, matching the "no external
+dependency" approach above. It's used under the Unsplash License (free for
+commercial and non-commercial use); attribution isn't required but is
+credited here as good practice. Swap it for real property photography
+before this goes live for an actual listing.
 
 ## Rebranding
 
