@@ -12,6 +12,7 @@ built as a standalone demo/template under a placeholder brand, "Aldridge & Co."
 | `main.js`     | listings data/render/filter, detail modal + mortgage calculator, favorites + saved drawer, ⌘K command palette, scroll reveal, sticky header, mobile nav, stat counters, testimonial slider, contact form, scroll progress bar |
 | `favicon.svg` | monogram favicon                                                   |
 | `hero-bg.jpg` | hero background photo                                              |
+| `listing-*.jpg` | the 6 listing photos (one per property in the `LISTINGS` array)  |
 
 ## Features
 
@@ -21,20 +22,26 @@ built as a standalone demo/template under a placeholder brand, "Aldridge & Co."
 - **Command palette (⌘K / Ctrl+K)** — press the shortcut to jump to a section or open a listing directly; arrow keys + Enter to navigate. (There's no visible trigger button for it anymore — keyboard-only.)
 - **Scroll progress bar** at the top of the viewport.
 
-Nothing else is referenced — no hotlinked images. Listing photography is
-represented with CSS gradient + SVG line-art placeholders, so the page
-renders identically offline and never breaks on a dead image link. Swap
-`.listing-media` backgrounds for real photography when there is a real
-listing to show.
+Nothing is hotlinked — every photo on the page, hero included, is a
+free-licensed Unsplash photo downloaded and checked into the repo rather
+than referenced by URL, so the page renders identically offline and never
+breaks on a dead image link. All are used under the Unsplash License (free
+for commercial and non-commercial use; attribution not required but
+credited here as good practice). None are of a real listing — swap them
+for actual property photography before this goes live for a real address.
 
-The one real photo on the page is `hero-bg.jpg`, a free-licensed Unsplash
-photo (a private pool at dusk, by Aalo Lens — unsplash.com/photos/
-luxury-infinity-pool-at-sunset-with-lounge-chairs-KgybDitNR18), downloaded
-and checked into the repo rather than hotlinked, matching the "no external
-dependency" approach above. It's used under the Unsplash License (free for
-commercial and non-commercial use); attribution isn't required but is
-credited here as good practice. Swap it for real property photography
-before this goes live for an actual listing.
+| file                       | subject                          | credit |
+|-----------------------------|-----------------------------------|--------|
+| `hero-bg.jpg`               | private pool at dusk              | Aalo Lens — unsplash.com/photos/luxury-infinity-pool-at-sunset-with-lounge-chairs-KgybDitNR18 |
+| `listing-marlborough.jpg`   | red brick traditional house       | Roger Starnes Sr — unsplash.com/photos/a-large-red-brick-house-with-white-trim-UwPFdRCQW1o |
+| `listing-lighthouse.jpg`    | new-build houses by a pond        | unsplash.com/photos/row-of-modern-houses-by-a-calm-lake-Ph06_YFjRu0 |
+| `listing-fenwick.jpg`       | modern townhouses                 | Troy Mortier — unsplash.com/photos/modern-townhouses-with-geometric-designs-on-a-street-44FRvkxNwcY |
+| `listing-ashworth.jpg`      | red-sided house with chimney      | unsplash.com/photos/a-red-brick-house-with-a-chimney-in-the-front-yard-OS1rDVqpaD4 |
+| `listing-windermere.jpg`    | concrete modern house             | mdreza jalali — unsplash.com/photos/a-modern-house-with-concrete-pillars-GrmNIIId5LM |
+| `listing-belgrave.jpg`      | white villa with pool             | John Fornander — unsplash.com/photos/modern-white-villa-with-swimming-pool-Id7u0EkTjBE |
+
+Two entries have no photographer name listed — it wasn't reliably available
+when these were sourced; the URL still credits the right photo.
 
 ## Rebranding
 

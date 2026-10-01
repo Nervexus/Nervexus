@@ -5,55 +5,46 @@
      LISTINGS DATA — single source of truth for the grid,
      the detail modal, favorites, and the command palette.
   ======================================================= */
-  var ICONS = [
-    '<path d="M20 110 L100 60 L180 110 Z"/><rect x="40" y="110" width="120" height="30"/>',
-    '<rect x="35" y="70" width="130" height="60"/><line x1="20" y1="130" x2="180" y2="130"/>',
-    '<rect x="55" y="55" width="90" height="75"/><path d="M55 55 L100 30 L145 55"/>',
-    '<rect x="30" y="80" width="60" height="50"/><rect x="100" y="60" width="70" height="70"/>',
-    '<rect x="40" y="65" width="120" height="65"/><line x1="100" y1="65" x2="100" y2="130"/>',
-    '<rect x="45" y="50" width="110" height="80"/><rect x="80" y="90" width="40" height="40"/>'
-  ];
-
   var LISTINGS = [
     {
-      id: 'marlborough-terrace', icon: 0, tag: 'New Listing', price: 4250000,
+      id: 'marlborough-terrace', image: 'listing-marlborough.jpg', tag: 'New Listing', price: 4250000,
       title: '14 Marlborough Terrace', location: 'Harbor Heights',
-      beds: 5, baths: 6, sqft: 6200, tintA: '#1B3A6B', tintB: '#0B1829',
+      beds: 5, baths: 6, sqft: 6200,
       description: 'A restored 1920s estate on Harbor Heights’ quietest cul-de-sac, with the original millwork intact and a kitchen rebuilt for the way people actually entertain now.',
       features: ['Restored original millwork', 'Chef’s kitchen, dual islands', 'Heated pool & pool house', 'Three-car carriage garage']
     },
     {
-      id: 'lighthouse-point', icon: 1, tag: 'Waterfront', price: 6980000,
+      id: 'lighthouse-point', image: 'listing-lighthouse.jpg', tag: 'Waterfront', price: 6980000,
       title: '2 Lighthouse Point', location: 'Cape Ellery',
-      beds: 6, baths: 7, sqft: 8450, tintA: '#2C5282', tintB: '#0B1829',
+      beds: 6, baths: 7, sqft: 8450,
       description: 'Unobstructed water on three sides, a private deep-water dock, and floor-to-ceiling glass throughout the main level to make sure you never forget it.',
       features: ['Private deep-water dock', '180° water views', 'Guest cottage, 2 bd', 'Whole-home generator']
     },
     {
-      id: 'fenwick-row', icon: 2, tag: 'Exclusive', price: 3120000,
+      id: 'fenwick-row', image: 'listing-fenwick.jpg', tag: 'Exclusive', price: 3120000,
       title: '88 Fenwick Row', location: 'Old Charlton',
-      beds: 4, baths: 4, sqft: 4780, tintA: '#16294A', tintB: '#0B1829',
+      beds: 4, baths: 4, sqft: 4780,
       description: 'A townhouse on one of Old Charlton’s most photographed blocks, updated top to bottom without losing a single period detail worth keeping.',
       features: ['Walk to Old Charlton square', 'Wine cellar, 400-bottle', 'Roof terrace, city views', 'Smart home system throughout']
     },
     {
-      id: 'ashworth-lane', icon: 3, tag: 'Price Reduced', price: 2395000,
+      id: 'ashworth-lane', image: 'listing-ashworth.jpg', tag: 'Price Reduced', price: 2395000,
       title: '410 Ashworth Lane', location: 'Greystone',
-      beds: 4, baths: 3, sqft: 3910, tintA: '#3B5A82', tintB: '#0B1829',
+      beds: 4, baths: 3, sqft: 3910,
       description: 'Quiet, well-built, and priced to move for a family that wants Greystone’s schools without Greystone’s usual asking price.',
       features: ['Top-rated school district', 'Finished lower level', 'Fenced half-acre lot', 'New roof & HVAC, 2025']
     },
     {
-      id: 'windermere-close', icon: 4, tag: 'Under Contract', price: 5600000,
+      id: 'windermere-close', image: 'listing-windermere.jpg', tag: 'Under Contract', price: 5600000,
       title: '7 Windermere Close', location: 'Harbor Heights',
-      beds: 5, baths: 5, sqft: 5940, tintA: '#1E3A5F', tintB: '#0B1829',
+      beds: 5, baths: 5, sqft: 5940,
       description: 'A gated modern build that went under contract in six days — shown here as a reference for what moves fastest in this market right now.',
       features: ['Gated, private drive', 'Home theater & gym', 'Radiant floor heating', 'EV charging, 2 bays']
     },
     {
-      id: 'belgrave-crescent', icon: 5, tag: 'Coming Soon', price: 8750000,
+      id: 'belgrave-crescent', image: 'listing-belgrave.jpg', tag: 'Coming Soon', price: 8750000,
       title: '1 Belgrave Crescent', location: 'Old Charlton',
-      beds: 7, baths: 8, sqft: 9800, tintA: '#4A6FA5', tintB: '#0B1829',
+      beds: 7, baths: 8, sqft: 9800,
       description: 'The largest lot on the Crescent, not yet on the open market — early access is going to Aldridge & Co. clients first.',
       features: ['Largest lot on the Crescent', 'Indoor pool & spa wing', 'Staff quarters, separate entrance', 'Motor court, 6+ cars']
     }
@@ -94,10 +85,9 @@
 
   function cardHTML(l) {
     return (
-      '<div class="listing-media" style="--tint-a:' + l.tintA + '; --tint-b:' + l.tintB + ';">' +
+      '<div class="listing-media" style="--photo:url(\'' + l.image + '\');">' +
         '<div class="listing-tag">' + l.tag + '</div>' +
         '<button class="card-fav' + (isSaved(l.id) ? ' is-saved' : '') + '" type="button" data-fav="' + l.id + '" aria-label="Save this home"><svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 17.2s-6.9-4.1-6.9-9.1C3.1 5.4 5 3.7 7.2 3.7c1.3 0 2.4.6 2.8 1.6.4-1 1.5-1.6 2.8-1.6 2.2 0 4.1 1.7 4.1 4.4 0 5-6.9 9.1-6.9 9.1z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button>' +
-        '<svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><g fill="none" stroke="#fff" stroke-width="1">' + ICONS[l.icon] + '</g></svg>' +
         '<div class="listing-price">' + currency(l.price) + '</div>' +
       '</div>' +
       '<div class="listing-body">' +
@@ -186,7 +176,6 @@
   var modal = document.getElementById('listingModal');
   var modalMedia = document.getElementById('modalMedia');
   var modalTag = document.getElementById('modalTag');
-  var modalIcon = document.getElementById('modalIcon');
   var modalPrice = document.getElementById('modalPrice');
   var modalTitle = document.getElementById('modalTitle');
   var modalLoc = document.getElementById('modalLoc');
@@ -234,10 +223,8 @@
     var l = LISTINGS.filter(function (x) { return x.id === id; })[0];
     if (!l) return;
     currentListing = l;
-    modalMedia.style.setProperty('--tint-a', l.tintA);
-    modalMedia.style.setProperty('--tint-b', l.tintB);
+    modalMedia.style.setProperty('--photo', "url('" + l.image + "')");
     modalTag.textContent = l.tag;
-    modalIcon.innerHTML = '<g fill="none" stroke="#fff" stroke-width="1">' + ICONS[l.icon] + '</g>';
     modalPrice.textContent = currency(l.price);
     modalTitle.textContent = l.title;
     modalLoc.textContent = l.location;
@@ -301,7 +288,7 @@
       if (!l) return '';
       return (
         '<div class="drawer-item" data-id="' + l.id + '">' +
-          '<div class="drawer-item-media" style="--tint-a:' + l.tintA + '; --tint-b:' + l.tintB + ';"></div>' +
+          '<div class="drawer-item-media" style="--photo:url(\'' + l.image + '\');"></div>' +
           '<div class="drawer-item-body">' +
             '<h4>' + l.title + '</h4>' +
             '<div class="price">' + currency(l.price) + '</div>' +
