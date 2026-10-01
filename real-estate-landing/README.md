@@ -67,6 +67,12 @@ replace them.
   `localStorage` on that one visitor's browser — there's no server, so
   nothing is shared across devices or visible to the agent. Fine for a
   demo; a real deployment would need a backend for that.
+- **The contact section's map is a real OpenStreetMap embed** (no API key
+  needed), but it points at a real waterfront location used purely for a
+  believable visual — it does not correspond to the fictional office
+  address above it. The on-map caption says so. Swap the `bbox`/`marker`
+  coordinates in the iframe `src` for the real office location before
+  this goes live.
 
 ## Viewing it
 
