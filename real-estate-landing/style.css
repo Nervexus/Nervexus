@@ -215,11 +215,9 @@ header.is-scrolled .nav-toggle span{ background:var(--ink); }
 }
 .eyebrow-dot{ width:6px; height:6px; border-radius:50%; background:var(--gold); }
 .hero h1{
-  font-size:clamp(38px,4vw,54px); line-height:1.06; max-width:none;
-  white-space:nowrap;
+  font-size:clamp(38px,6vw,70px); line-height:1.06;
   color:#FFFFFF;
 }
-.hero h1 .accent{ color:var(--gold-light); font-style:italic; }
 .hero-sub{
   margin-top:26px; font-size:18px; line-height:1.65; max-width:560px;
   color:rgba(255,255,255,0.78);
@@ -761,9 +759,6 @@ body.no-scroll{ overflow:hidden; }
   .nav-links, header .nav-cta{ display:none; }
   .nav-toggle{ display:flex; }
   .mobile-nav{ display:flex; }
-  /* Below this width there's no font size that both stays legible and
-     keeps the full sentence on one line — the hero reverts to wrapping. */
-  .hero h1{ white-space:normal; font-size:clamp(32px,6.5vw,46px); }
   .hero-stats{ grid-template-columns:repeat(2,1fr); row-gap:28px; }
   .listing-card{ flex-basis:300px; }
   .intro-grid{ grid-template-columns:1fr; gap:36px; text-align:center; }
