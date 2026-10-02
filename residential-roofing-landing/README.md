@@ -13,12 +13,14 @@ brand, "Thornridge Roofing Co."
 | `main.js`            | projects data/render, detail modal, material comparison tool, scroll reveal, sticky header, mobile nav, stat counters, testimonial slider, contact form, scroll progress bar |
 | `favicon.svg`        | monogram favicon                                                   |
 | `hero-bg.jpg`        | hero background photo                                              |
-| `shape-*.jpg`         | the 6 project photos (one per roof shape in the `PROJECTS` array)  |
+| `shape-<shape>.jpg`   | each project's card thumbnail (one per roof shape in the `PROJECTS` array) |
+| `shape-<shape>-2.jpg`, `-3.jpg` | extra angles/detail shots for that project's modal gallery (2-3 photos per project, not a fixed count) |
 | `founder.jpg`        | the About section's founder photo                                  |
 
 ## Features
 
-- **Project gallery carousel doubling as client stories** — six recent projects, one per roof shape (gable, hip, Dutch gable, dormer, shed, mansard), each built in a different material so the gallery shows range in both form and material. Each card pairs the completed-roof photo with that homeowner's testimonial quote; the detail modal adds full specs (sqft, roof pitch, year completed), a description, the quote, and a feature list.
+- **Project gallery carousel doubling as client stories** — six recent projects, one per roof shape (gable, hip, Dutch gable, dormer, shed, mansard), each built in a different material so the gallery shows range in both form and material. Each card pairs the completed-roof photo with that homeowner's testimonial quote.
+- **Per-project photo gallery in the detail modal** — clicking a project opens a modal with 2-3 photos of that job (prev/next arrows, dots, a counter, and left/right arrow-key navigation), not just one static image. Each project's `images` array in `PROJECTS` (in `main.js`) drives it — add more entries there to add more photos. Counts vary by project on purpose; see the note below on why they're not all identical stock-photo sets pretending to be one real property.
 - **Material comparison tool** — pick any two of five roofing materials to compare lifespan, typical cost, maintenance, and what each is best suited for. Data lives in the `MATERIALS` array at the top of `main.js`.
 - **Animated hero stats**, scroll-reveal sections, sticky header, mobile nav, and a scroll progress bar — all vanilla JS, no dependencies.
 
@@ -34,12 +36,30 @@ for actual project photography before this goes live for a real company.
 |------------------------|--------------------------------------------|--------|
 | `hero-bg.jpg`          | two roofers working on a tile/slate roof    | Immo Wegmann — unsplash.com/photos/sKiCvM6sPtU |
 | `shape-gable.jpg`      | steep gable roofline, dramatic sunset light | Valentin — unsplash.com/photos/mzkx33pU2go |
+| `shape-gable-2.jpg`    | close-up of fresh cedar shake shingles      | Peter Burdon — unsplash.com/photos/SNs1KMPF82Q |
+| `shape-gable-3.jpg`    | roofer tearing off old shingles (in-progress) | Zohair Mirza — unsplash.com/photos/GXITWKvgm-k |
 | `shape-hip.jpg`        | modern house, clean hip roof, dark dimensional shingle | Troy Mortier — unsplash.com/photos/HckCpdBDeDk |
+| `shape-hip-2.jpg`      | aerial view, house with dimensional shingle roof | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
+| `shape-hip-3.jpg`      | close-up of two dormer windows on a shingled roof | Patrick Wadden — unsplash.com/photos/AE9VxuuxfQ4 |
 | `shape-dutch.jpg`      | farmhouse with hip-and-gable roofline, copper standing-seam | Roger Starnes Sr — unsplash.com/photos/a-nice-stone-front-modern-farmhouse-CMbIJY92NJ0 |
+| `shape-dutch-2.jpg`    | same farmhouse style, second angle, copper standing-seam | Roger Starnes Sr — unsplash.com/photos/NFjz6BSzDXQ |
+| `shape-dutch-3.jpg`    | close-up of a green standing-seam metal roof | Earl Wilcox — unsplash.com/photos/-S4l2EsOQhc |
 | `shape-dormer.jpg`     | brick cottage with tiled roof and dormer windows | T (Tanya Barrow) — unsplash.com/photos/y4iBCffm3n0 |
+| `shape-dormer-2.jpg`   | white cottage with tiled roof and dormer windows | T (Tanya Barrow) — unsplash.com/photos/my9L4aEug6k |
+| `shape-dormer-3.jpg`   | white mansion with grey clay tile roof      | Edwin Petrus — unsplash.com/photos/_TJ5YqJlJAE |
 | `shape-shed.jpg`       | modern home with an angled shed/skillion roofline | Brad Chapman — unsplash.com/photos/Vfdqsbjrrjg |
+| `shape-shed-2.jpg`     | brick farmhouse with a dark standing-seam metal roof | Roger Starnes Sr — unsplash.com/photos/eYHIj0NQTPo |
 | `shape-mansard.jpg`    | historic brick house with a slate mansard roof | Rylan Hoots — unsplash.com/photos/qfCWOH_2L0A |
+| `shape-mansard-2.jpg`  | close-up of scalloped dark slate tiles      | Alexander Philipp — unsplash.com/photos/Mh5LFaR5arM |
+| `shape-mansard-3.jpg`  | close-up of an ornate slate roof with gabled dormers | Roger Starnes Sr — unsplash.com/photos/jCheJgJVN0g |
 | `founder.jpg`          | studio headshot, founder placeholder        | The Connected Narrative — unsplash.com/photos/N8lRH2uxih4 |
+
+All extra gallery angles are free-licensed stock photos of *different* real
+properties sharing a similar roof style/material to the project's main
+photo — not six angles of one literal house (that level of access doesn't
+exist in stock photography). They're framed as general exterior/detail
+shots rather than claiming to be the same address. Swap them for actual
+job-site photography before this goes live for a real company.
 
 ## Rebranding
 

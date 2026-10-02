@@ -7,7 +7,7 @@
   ======================================================= */
   var PROJECTS = [
     {
-      id: 'oakhaven-gable', image: 'shape-gable.jpg', tag: 'Gable Roof',
+      id: 'oakhaven-gable', images: ['shape-gable.jpg', 'shape-gable-2.jpg', 'shape-gable-3.jpg'], tag: 'Gable Roof',
       title: 'The Oakhaven Residence', location: 'Oakhaven',
       sqft: 2800, pitch: '10/12', year: 2024,
       description: 'A steep, classic gable rebuilt in hand-split cedar shake — a simple roofline with no shortcuts taken on the material.',
@@ -16,7 +16,7 @@
       author: 'Grace Fenwick, Oakhaven'
     },
     {
-      id: 'ridgemont-hip', image: 'shape-hip.jpg', tag: 'Hip Roof',
+      id: 'ridgemont-hip', images: ['shape-hip.jpg', 'shape-hip-2.jpg', 'shape-hip-3.jpg'], tag: 'Hip Roof',
       title: 'The Ridgemont House', location: 'Ridgemont',
       sqft: 3400, pitch: '6/12', year: 2025,
       description: 'A four-sided hip roof re-covered in dimensional architectural shingle, chosen for clean lines on every elevation — there’s no gable end left exposed.',
@@ -25,7 +25,7 @@
       author: 'Marcus Webb, Ridgemont'
     },
     {
-      id: 'harrow-dutch-gable', image: 'shape-dutch.jpg', tag: 'Dutch Gable Roof',
+      id: 'harrow-dutch-gable', images: ['shape-dutch.jpg', 'shape-dutch-2.jpg', 'shape-dutch-3.jpg'], tag: 'Dutch Gable Roof',
       title: 'The Harrow Farmhouse', location: 'Harrow Crossing',
       sqft: 5200, pitch: '7/12', year: 2023,
       description: 'A hip roof with a gable accent at the ridge, re-clad in standing-seam copper — the small gable gave us a place to vent the attic without breaking the roofline.',
@@ -34,7 +34,7 @@
       author: 'Eleanor Voss, Harrow Crossing'
     },
     {
-      id: 'beaulieu-dormer', image: 'shape-dormer.jpg', tag: 'Dormer Roof',
+      id: 'beaulieu-dormer', images: ['shape-dormer.jpg', 'shape-dormer-2.jpg', 'shape-dormer-3.jpg'], tag: 'Dormer Roof',
       title: 'The Beaulieu Cottage', location: 'Beaulieu Row',
       sqft: 2100, pitch: '9/12', year: 2024,
       description: 'Two dormers re-flashed and re-roofed in clay tile matched to the original, without disturbing the window frames beneath them.',
@@ -43,7 +43,7 @@
       author: 'Simon Okafor, Beaulieu Row'
     },
     {
-      id: 'millbrook-shed', image: 'shape-shed.jpg', tag: 'Shed Roof',
+      id: 'millbrook-shed', images: ['shape-shed.jpg', 'shape-shed-2.jpg'], tag: 'Shed Roof',
       title: 'The Millbrook Addition', location: 'Millbrook',
       sqft: 980, pitch: '3/12', year: 2025,
       description: 'A low-slope shed roof over a new addition, finished in standing-seam metal to match the main house and shed water fast off a shallow pitch.',
@@ -52,7 +52,7 @@
       author: 'Priya Chandra, Millbrook'
     },
     {
-      id: 'thornfield-mansard', image: 'shape-mansard.jpg', tag: 'Mansard Roof',
+      id: 'thornfield-mansard', images: ['shape-mansard.jpg', 'shape-mansard-2.jpg', 'shape-mansard-3.jpg'], tag: 'Mansard Roof',
       title: 'The Thornfield House', location: 'Thornfield',
       sqft: 4600, pitch: '17/12', year: 2022,
       description: 'A Second Empire mansard re-slated top to bottom, with the steep lower slope carrying both the weight of the design and the attic space it was built to create.',
@@ -109,7 +109,7 @@
 
   function cardHTML(p) {
     return (
-      '<div class="listing-media" style="--photo:url(\'' + p.image + '\');">' +
+      '<div class="listing-media" style="--photo:url(\'' + p.images[0] + '\');">' +
         '<div class="listing-tag">' + p.tag + '</div>' +
       '</div>' +
       '<div class="listing-body">' +
@@ -153,18 +153,53 @@
   var modalFeatures = document.getElementById('modalFeatures');
   var modalClose = document.getElementById('modalClose');
   var modalCta = document.getElementById('modalCta');
+  var galleryPrev = document.getElementById('galleryPrev');
+  var galleryNext = document.getElementById('galleryNext');
+  var galleryCounter = document.getElementById('galleryCounter');
+  var galleryDots = document.getElementById('galleryDots');
   var currentProject = null;
+  var galleryIndex = 0;
 
   function lockScroll() { document.body.classList.add('no-scroll'); }
   function unlockScroll() {
     if (!modal.classList.contains('is-open')) document.body.classList.remove('no-scroll');
   }
 
+  function renderGalleryImage() {
+    if (!currentProject) return;
+    var images = currentProject.images;
+    modalMedia.style.setProperty('--photo', "url('" + images[galleryIndex] + "')");
+    galleryCounter.textContent = (galleryIndex + 1) + ' / ' + images.length;
+    var multi = images.length > 1;
+    galleryPrev.hidden = !multi;
+    galleryNext.hidden = !multi;
+    galleryCounter.hidden = !multi;
+    galleryDots.hidden = !multi;
+    if (multi) {
+      galleryDots.innerHTML = images.map(function (_, i) {
+        return '<button class="gallery-dot' + (i === galleryIndex ? ' is-active' : '') + '" type="button" data-index="' + i + '" aria-label="Photo ' + (i + 1) + '"></button>';
+      }).join('');
+    }
+  }
+  function goToGalleryImage(i) {
+    if (!currentProject) return;
+    var count = currentProject.images.length;
+    galleryIndex = (i + count) % count;
+    renderGalleryImage();
+  }
+  galleryPrev.addEventListener('click', function () { goToGalleryImage(galleryIndex - 1); });
+  galleryNext.addEventListener('click', function () { goToGalleryImage(galleryIndex + 1); });
+  galleryDots.addEventListener('click', function (e) {
+    var dot = e.target.closest('[data-index]');
+    if (dot) goToGalleryImage(parseInt(dot.getAttribute('data-index'), 10));
+  });
+
   function openModal(id) {
     var p = PROJECTS.filter(function (x) { return x.id === id; })[0];
     if (!p) return;
     currentProject = p;
-    modalMedia.style.setProperty('--photo', "url('" + p.image + "')");
+    galleryIndex = 0;
+    renderGalleryImage();
     modalTag.textContent = p.tag;
     modalTitle.textContent = p.title;
     modalLoc.textContent = p.location;
@@ -187,7 +222,10 @@
   modalClose.addEventListener('click', closeModal);
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    if (!modal.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'ArrowLeft') goToGalleryImage(galleryIndex - 1);
+    else if (e.key === 'ArrowRight') goToGalleryImage(galleryIndex + 1);
   });
   modalCta.addEventListener('click', function (e) {
     e.preventDefault();
