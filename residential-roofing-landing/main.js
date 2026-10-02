@@ -7,12 +7,12 @@
   ======================================================= */
   var PROJECTS = [
     {
-      id: 'oakhaven-gable', images: ['shape-gable.jpg'], tag: 'Gable Roof',
+      id: 'oakhaven-gable', images: ['shape-gable.jpg', 'shape-gable-2.jpg', 'shape-gable-3.jpg'], tag: 'Gable Roof',
       title: 'The Oakhaven Residence', location: 'Oakhaven',
-      sqft: 2800, pitch: '10/12', year: 2024,
-      description: 'A steep, classic gable rebuilt in hand-split cedar shake — a simple roofline with no shortcuts taken on the material.',
-      features: ['Hand-split cedar shake', 'Steep 10/12 pitch', 'Ridge vent, full length', 'Ice & water shield at the eaves'],
-      quote: 'The old shake was falling apart in sheets. This one will outlast the rest of the house.',
+      sqft: 4200, pitch: '10/12', year: 2024,
+      description: 'A steep, symmetrical gable re-slated in natural grey-blue slate, with the dormer and chimney re-flashed to match — a roofline this clean doesn’t forgive a sloppy tie-in.',
+      features: ['Natural slate, straight coursing', 'Dormer & chimney re-flashed', 'Steep 10/12 pitch', 'Copper valleys throughout'],
+      quote: 'They matched the slate blend so well you can’t tell where the dormer repair ends and the original roof begins.',
       author: 'Grace Fenwick, Oakhaven'
     },
     {

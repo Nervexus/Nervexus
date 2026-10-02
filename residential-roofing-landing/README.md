@@ -15,12 +15,13 @@ brand, "Thornridge Roofing Co."
 | `hero-bg.jpg`        | hero background photo                                              |
 | `shape-<shape>.jpg`   | each project's card thumbnail / first gallery photo (one per roof shape in the `PROJECTS` array) |
 | `shape-dutch-2.jpg`  | a second, genuinely different angle of the Harrow Farmhouse — see below |
+| `shape-gable-2.jpg`, `shape-gable-3.jpg` | two more photos of the Oakhaven Residence — see below |
 | `founder.jpg`        | the About section's founder photo                                  |
 
 ## Features
 
 - **Project gallery carousel doubling as client stories** — six recent projects, one per roof shape (gable, hip, Dutch gable, dormer, shed, mansard), each built in a different material so the gallery shows range in both form and material. Each card pairs the completed-roof photo with that homeowner's testimonial quote.
-- **Per-project photo gallery in the detail modal** — clicking a project opens a modal that can show multiple photos of that job (prev/next arrows, dots, a counter, and left/right arrow-key navigation) when more than one is available. Each project's `images` array in `PROJECTS` (in `main.js`) drives it; the gallery controls auto-hide for a single-photo project. Only **the Harrow Farmhouse** currently has a second photo, because it's the one project where I could verify — same photographer, same day, visibly the same building — that both photos are actually the same house. See the note below before adding more.
+- **Per-project photo gallery in the detail modal** — clicking a project opens a modal that can show multiple photos of that job (prev/next arrows, dots, a counter, and left/right arrow-key navigation) when more than one is available. Each project's `images` array in `PROJECTS` (in `main.js`) drives it; the gallery controls auto-hide for a single-photo project. **The Harrow Farmhouse** (2 photos) and **The Oakhaven Residence** (3 photos) currently have galleries; the rest are single-photo. See the note below before adding more.
 - **Material comparison tool** — pick any two of five roofing materials to compare lifespan, typical cost, maintenance, and what each is best suited for. Data lives in the `MATERIALS` array at the top of `main.js`.
 - **Animated hero stats**, scroll-reveal sections, sticky header, mobile nav, and a scroll progress bar — all vanilla JS, no dependencies.
 
@@ -35,7 +36,6 @@ for actual project photography before this goes live for a real company.
 | file                  | subject                                   | credit |
 |------------------------|--------------------------------------------|--------|
 | `hero-bg.jpg`          | two roofers working on a tile/slate roof    | Immo Wegmann — unsplash.com/photos/sKiCvM6sPtU |
-| `shape-gable.jpg`      | steep gable roofline, dramatic sunset light | Valentin — unsplash.com/photos/mzkx33pU2go |
 | `shape-hip.jpg`        | modern house, clean hip roof, dark dimensional shingle | Troy Mortier — unsplash.com/photos/HckCpdBDeDk |
 | `shape-dutch.jpg`      | farmhouse with hip-and-gable roofline, copper standing-seam | Roger Starnes Sr — unsplash.com/photos/a-nice-stone-front-modern-farmhouse-CMbIJY92NJ0 |
 | `shape-dutch-2.jpg`    | the same farmhouse, a second angle          | Roger Starnes Sr — unsplash.com/photos/NFjz6BSzDXQ |
@@ -44,19 +44,32 @@ for actual project photography before this goes live for a real company.
 | `shape-mansard.jpg`    | historic brick house with a slate mansard roof | Rylan Hoots — unsplash.com/photos/qfCWOH_2L0A |
 | `founder.jpg`          | studio headshot, founder placeholder        | The Connected Narrative — unsplash.com/photos/N8lRH2uxih4 |
 
-**Why only one project has a multi-photo gallery.** I tried hard to find
-real multi-angle photo sets for all six projects — checking whether each
+`shape-gable.jpg`, `shape-gable-2.jpg`, and `shape-gable-3.jpg` (the
+Oakhaven Residence — grey-brick Tudor, slate gable roof) are **not**
+Unsplash and don't fit the table above. The first two were supplied
+directly by the project owner, who found them via Pinterest/reverse image
+search and asserted they're free to use; unlike every other photo on this
+page, I could not independently verify the photographer, source, or
+license — so if this goes anywhere public-facing, confirm usage rights
+(or replace them with verified-licensed or real job-site photos) before
+relying on them. `shape-gable-3.jpg` isn't a separate stock photo at all —
+it's a cropped detail of the slate roof cut directly from `shape-gable.jpg`,
+since it's the one material shot guaranteed to be the actual roof.
+
+**Why only two projects have a multi-photo gallery.** For the other four,
+I tried hard to find real multi-angle photo sets — checking whether each
 photographer had shot the same property more than once (matching siding,
 trim, landscaping, and publish date), not just a similar-looking house.
-`shape-dutch.jpg` and `shape-dutch-2.jpg` passed that check: same
+`shape-dutch.jpg` / `shape-dutch-2.jpg` passed that check: same
 photographer, same publish date, visibly the same farmhouse from two
-sides. Every other candidate I found turned out to be a *different* house
-by the same photographer (rural America and suburban Australia both have
-a lot of similar-looking homes) — so rather than present unrelated houses
-as if they were one property, those projects stay single-photo. If you
-want multi-photo galleries for the rest, you'll need either real job-site
-photos or a stock set you've personally verified is one property; just
-add more paths to that project's `images` array in `main.js`.
+sides. Every other Unsplash candidate I found turned out to be a
+*different* house by the same photographer (rural America and suburban
+Australia both have a lot of similar-looking homes) — so rather than
+present unrelated houses as if they were one property, those four stay
+single-photo. If you want multi-photo galleries for them too, you'll need
+either real job-site photos or a stock set you've personally verified is
+one property; just add more paths to that project's `images` array in
+`main.js`.
 
 ## Rebranding
 
