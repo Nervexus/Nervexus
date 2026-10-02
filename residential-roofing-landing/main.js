@@ -7,58 +7,58 @@
   ======================================================= */
   var PROJECTS = [
     {
-      id: 'hollowmere-estate', image: 'project-slate.jpg', tag: 'Natural Slate',
-      title: 'The Hollowmere Estate', location: 'Hollowmere',
-      sqft: 6800, pitch: '8/12', year: 2024,
-      description: 'A full slate re-roof on a century-old stone manor, matched to the original slate down to the color blend so the repair line disappears from the street.',
-      features: ['Hand-sorted slate blend', 'Copper valleys & flashing', 'Snow guards, full perimeter', '~100-year projected lifespan'],
-      quote: 'They matched our new slate to the original down to the color — you can’t even tell where the fifty-year-old roof ends and the new section begins.',
-      author: 'Helena Brock, Hollowmere'
+      id: 'oakhaven-gable', image: 'shape-gable.jpg', tag: 'Gable Roof',
+      title: 'The Oakhaven Residence', location: 'Oakhaven',
+      sqft: 2800, pitch: '10/12', year: 2024,
+      description: 'A steep, classic gable rebuilt in hand-split cedar shake — a simple roofline with no shortcuts taken on the material.',
+      features: ['Hand-split cedar shake', 'Steep 10/12 pitch', 'Ridge vent, full length', 'Ice & water shield at the eaves'],
+      quote: 'The old shake was falling apart in sheets. This one will outlast the rest of the house.',
+      author: 'Grace Fenwick, Oakhaven'
     },
     {
-      id: 'edgewater-residence', image: 'project-metal.jpg', tag: 'Standing-Seam Metal',
-      title: 'Edgewater Residence', location: 'Edgewater',
-      sqft: 4200, pitch: '6/12', year: 2023,
-      description: 'A standing-seam system replacing a failing architectural shingle roof, with every panel hand-formed on site to the exact roofline.',
-      features: ['24-gauge steel panels', 'Hand-formed on-site', 'Concealed fastener system', 'Snow retention engineered for the slope'],
-      quote: 'The metal work on our roofline is honestly a piece of art. Worth every penny, and it’ll outlast all of us.',
-      author: 'Daniel Ferro, Edgewater'
+      id: 'ridgemont-hip', image: 'shape-hip.jpg', tag: 'Hip Roof',
+      title: 'The Ridgemont House', location: 'Ridgemont',
+      sqft: 3400, pitch: '6/12', year: 2025,
+      description: 'A four-sided hip roof re-covered in dimensional architectural shingle, chosen for clean lines on every elevation — there’s no gable end left exposed.',
+      features: ['Designer dimensional shingle', 'All four hips re-flashed', 'New ridge caps, full length', '50-year manufacturer warranty'],
+      quote: 'Every side of the house gets seen from the street here, so it needed to look finished from every angle. It does.',
+      author: 'Marcus Webb, Ridgemont'
     },
     {
-      id: 'casa-del-vento', image: 'project-tile.jpg', tag: 'Clay Tile',
-      title: 'Casa del Vento', location: 'Lakeside Point',
-      sqft: 5100, pitch: '5/12', year: 2024,
-      description: 'A full clay tile re-roof on a Mediterranean-style home, engineered with a reinforced deck to carry the extra weight properly.',
-      features: ['Mission-profile clay tile', 'Reinforced roof deck', 'Foam closures, full ridge line', '60-year manufacturer warranty'],
-      quote: 'They reinforced the deck before a single tile went up — something the last roofer never even mentioned. No more cracked tiles after every storm.',
-      author: 'Isabel Duarte, Lakeside Point'
+      id: 'harrow-dutch-gable', image: 'shape-dutch.jpg', tag: 'Dutch Gable Roof',
+      title: 'The Harrow Farmhouse', location: 'Harrow Crossing',
+      sqft: 5200, pitch: '7/12', year: 2023,
+      description: 'A hip roof with a gable accent at the ridge, re-clad in standing-seam copper — the small gable gave us a place to vent the attic without breaking the roofline.',
+      features: ['Standing-seam copper panels', 'Hand-formed hip and ridge caps', 'Gable vent built into the cap', 'Snow retention, full perimeter'],
+      quote: 'The copper already has that patina starting. In twenty years it’s going to look even better than it does now.',
+      author: 'Eleanor Voss, Harrow Crossing'
     },
     {
-      id: 'birchcombe-house', image: 'project-shake.jpg', tag: 'Cedar Shake',
-      title: 'The Birchcombe House', location: 'Birchcombe',
-      sqft: 3600, pitch: '9/12', year: 2022,
-      description: 'Hand-split cedar shake, pressure-treated and installed over a ventilated deck so it weathers the way cedar is supposed to.',
-      features: ['Hand-split #1 grade cedar', 'Ventilated batten system', 'Class B fire treatment', 'Copper ridge cap'],
-      quote: 'Our cedar still looks freshly installed years later — they clearly knew what they were doing with the ventilation.',
-      author: 'Owen Castellane, Birchcombe'
+      id: 'beaulieu-dormer', image: 'shape-dormer.jpg', tag: 'Dormer Roof',
+      title: 'The Beaulieu Cottage', location: 'Beaulieu Row',
+      sqft: 2100, pitch: '9/12', year: 2024,
+      description: 'Two dormers re-flashed and re-roofed in clay tile matched to the original, without disturbing the window frames beneath them.',
+      features: ['Matched clay tile profile', 'Both dormer cheeks re-flashed', 'New valley flashing, both dormers', 'Original trim preserved'],
+      quote: 'They matched the tile close enough that you’d never know half the roof is new.',
+      author: 'Simon Okafor, Beaulieu Row'
     },
     {
-      id: 'ashgrove-drive', image: 'project-shingle.jpg', tag: 'Designer Shingle',
-      title: '28 Ashgrove Drive', location: 'Ashgrove',
-      sqft: 3100, pitch: '7/12', year: 2025,
-      description: 'A premium dimensional shingle re-roof, chosen to read like slate from the street without the structural upgrade a real slate roof would need.',
-      features: ['Designer dimensional shingle', 'Ice & water shield underlayment', 'Ridge vent, full length', '50-year manufacturer warranty'],
-      quote: 'Looks like a slate roof from the curb for a fraction of the price. Exactly what they promised, nothing oversold.',
-      author: 'Naomi Patel, Ashgrove'
+      id: 'millbrook-shed', image: 'shape-shed.jpg', tag: 'Shed Roof',
+      title: 'The Millbrook Addition', location: 'Millbrook',
+      sqft: 980, pitch: '3/12', year: 2025,
+      description: 'A low-slope shed roof over a new addition, finished in standing-seam metal to match the main house and shed water fast off a shallow pitch.',
+      features: ['Standing-seam metal panels', 'Low-slope engineered underlayment', 'Color-matched to the main roof', 'Tied into the existing gutter line'],
+      quote: 'It matches the rest of the house so well you can’t tell it was ever added on.',
+      author: 'Priya Chandra, Millbrook'
     },
     {
-      id: 'thistle-hollow-reroof', image: 'project-reroof.jpg', tag: 'Full Re-Roof',
-      title: 'Full Re-Roof, Thistle Hollow', location: 'Thistle Hollow',
-      sqft: 4700, pitch: '6/12', year: 2025,
-      description: 'A full tear-off after wind damage stripped half the original roof, rebuilt the same week the insurance claim was approved.',
-      features: ['Full tear-off to the deck', 'Decking replaced where rotted', 'New roof within three weeks', 'Insurance documentation handled'],
-      quote: 'A storm took half our roof off. Thornridge had a tarp up within four hours and a full new roof inside three weeks.',
-      author: 'Renata & Paul Kessler, Thistle Hollow'
+      id: 'thornfield-mansard', image: 'shape-mansard.jpg', tag: 'Mansard Roof',
+      title: 'The Thornfield House', location: 'Thornfield',
+      sqft: 4600, pitch: '17/12', year: 2022,
+      description: 'A Second Empire mansard re-slated top to bottom, with the steep lower slope carrying both the weight of the design and the attic space it was built to create.',
+      features: ['Natural slate, diamond pattern', 'Dormer windows re-flashed', 'Copper ridge and hip caps', 'Full structural inspection before install'],
+      quote: 'It’s the roof that makes the whole house — they treated it that way.',
+      author: 'Walter Byrne, Thornfield'
     }
   ];
 

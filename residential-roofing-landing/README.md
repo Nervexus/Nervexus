@@ -13,12 +13,12 @@ brand, "Thornridge Roofing Co."
 | `main.js`            | projects data/render, detail modal, material comparison tool, scroll reveal, sticky header, mobile nav, stat counters, testimonial slider, contact form, scroll progress bar |
 | `favicon.svg`        | monogram favicon                                                   |
 | `hero-bg.jpg`        | hero background photo                                              |
-| `project-*.jpg`      | the 6 project photos (one per entry in the `PROJECTS` array)       |
+| `shape-*.jpg`         | the 6 project photos (one per roof shape in the `PROJECTS` array)  |
 | `founder.jpg`        | the About section's founder photo                                  |
 
 ## Features
 
-- **Project gallery carousel doubling as client stories** — six recent projects, one per roofing material/service, each card pairing the completed-roof photo with that homeowner's testimonial quote. The detail modal adds full specs (sqft, roof pitch, year completed), a description, the quote, and a feature list.
+- **Project gallery carousel doubling as client stories** — six recent projects, one per roof shape (gable, hip, Dutch gable, dormer, shed, mansard), each built in a different material so the gallery shows range in both form and material. Each card pairs the completed-roof photo with that homeowner's testimonial quote; the detail modal adds full specs (sqft, roof pitch, year completed), a description, the quote, and a feature list.
 - **Material comparison tool** — pick any two of five roofing materials to compare lifespan, typical cost, maintenance, and what each is best suited for. Data lives in the `MATERIALS` array at the top of `main.js`.
 - **Animated hero stats**, scroll-reveal sections, sticky header, mobile nav, and a scroll progress bar — all vanilla JS, no dependencies.
 
@@ -33,12 +33,12 @@ for actual project photography before this goes live for a real company.
 | file                  | subject                                   | credit |
 |------------------------|--------------------------------------------|--------|
 | `hero-bg.jpg`          | two roofers working on a tile/slate roof    | Immo Wegmann — unsplash.com/photos/sKiCvM6sPtU |
-| `project-slate.jpg`    | close-up of a fresh dark slate roof, diamond pattern | Kay Nauwelaerts — unsplash.com/photos/RECyNQXnVas |
-| `project-metal.jpg`    | modern house, green standing-seam metal roof | Earl Wilcox — unsplash.com/photos/-S4l2EsOQhc |
-| `project-tile.jpg`     | white house with grey clay tile roof        | Edwin Petrus — unsplash.com/photos/_TJ5YqJlJAE |
-| `project-shake.jpg`    | close-up of fresh cedar shake shingles      | Peter Burdon — unsplash.com/photos/SNs1KMPF82Q |
-| `project-shingle.jpg`  | aerial view, house with new dimensional shingle roof | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
-| `project-reroof.jpg`   | close-up of a fresh dark grey tile roof     | Michael Jasmund — unsplash.com/photos/m_vEaZizd2s |
+| `shape-gable.jpg`      | steep gable roofline, dramatic sunset light | Valentin — unsplash.com/photos/mzkx33pU2go |
+| `shape-hip.jpg`        | modern house, clean hip roof, dark dimensional shingle | Troy Mortier — unsplash.com/photos/HckCpdBDeDk |
+| `shape-dutch.jpg`      | farmhouse with hip-and-gable roofline, copper standing-seam | Roger Starnes Sr — unsplash.com/photos/a-nice-stone-front-modern-farmhouse-CMbIJY92NJ0 |
+| `shape-dormer.jpg`     | brick cottage with tiled roof and dormer windows | T (Tanya Barrow) — unsplash.com/photos/y4iBCffm3n0 |
+| `shape-shed.jpg`       | modern home with an angled shed/skillion roofline | Brad Chapman — unsplash.com/photos/Vfdqsbjrrjg |
+| `shape-mansard.jpg`    | historic brick house with a slate mansard roof | Rylan Hoots — unsplash.com/photos/qfCWOH_2L0A |
 | `founder.jpg`          | studio headshot, founder placeholder        | The Connected Narrative — unsplash.com/photos/N8lRH2uxih4 |
 
 ## Rebranding
