@@ -7,7 +7,7 @@
   ======================================================= */
   var PROJECTS = [
     {
-      id: 'oakhaven-gable', images: ['shape-gable.jpg', 'shape-gable-2.jpg', 'shape-gable-3.jpg'], tag: 'Gable Roof',
+      id: 'oakhaven-gable', images: ['shape-gable.jpg'], tag: 'Gable Roof',
       title: 'The Oakhaven Residence', location: 'Oakhaven',
       sqft: 2800, pitch: '10/12', year: 2024,
       description: 'A steep, classic gable rebuilt in hand-split cedar shake — a simple roofline with no shortcuts taken on the material.',
@@ -16,7 +16,7 @@
       author: 'Grace Fenwick, Oakhaven'
     },
     {
-      id: 'ridgemont-hip', images: ['shape-hip.jpg', 'shape-hip-2.jpg', 'shape-hip-3.jpg'], tag: 'Hip Roof',
+      id: 'ridgemont-hip', images: ['shape-hip.jpg'], tag: 'Hip Roof',
       title: 'The Ridgemont House', location: 'Ridgemont',
       sqft: 3400, pitch: '6/12', year: 2025,
       description: 'A four-sided hip roof re-covered in dimensional architectural shingle, chosen for clean lines on every elevation — there’s no gable end left exposed.',
@@ -25,7 +25,7 @@
       author: 'Marcus Webb, Ridgemont'
     },
     {
-      id: 'harrow-dutch-gable', images: ['shape-dutch.jpg', 'shape-dutch-2.jpg', 'shape-dutch-3.jpg'], tag: 'Dutch Gable Roof',
+      id: 'harrow-dutch-gable', images: ['shape-dutch.jpg', 'shape-dutch-2.jpg'], tag: 'Dutch Gable Roof',
       title: 'The Harrow Farmhouse', location: 'Harrow Crossing',
       sqft: 5200, pitch: '7/12', year: 2023,
       description: 'A hip roof with a gable accent at the ridge, re-clad in standing-seam copper — the small gable gave us a place to vent the attic without breaking the roofline.',
@@ -34,7 +34,7 @@
       author: 'Eleanor Voss, Harrow Crossing'
     },
     {
-      id: 'beaulieu-dormer', images: ['shape-dormer.jpg', 'shape-dormer-2.jpg', 'shape-dormer-3.jpg'], tag: 'Dormer Roof',
+      id: 'beaulieu-dormer', images: ['shape-dormer.jpg'], tag: 'Dormer Roof',
       title: 'The Beaulieu Cottage', location: 'Beaulieu Row',
       sqft: 2100, pitch: '9/12', year: 2024,
       description: 'Two dormers re-flashed and re-roofed in clay tile matched to the original, without disturbing the window frames beneath them.',
@@ -43,7 +43,7 @@
       author: 'Simon Okafor, Beaulieu Row'
     },
     {
-      id: 'millbrook-shed', images: ['shape-shed.jpg', 'shape-shed-2.jpg'], tag: 'Shed Roof',
+      id: 'millbrook-shed', images: ['shape-shed.jpg'], tag: 'Shed Roof',
       title: 'The Millbrook Addition', location: 'Millbrook',
       sqft: 980, pitch: '3/12', year: 2025,
       description: 'A low-slope shed roof over a new addition, finished in standing-seam metal to match the main house and shed water fast off a shallow pitch.',
@@ -52,7 +52,7 @@
       author: 'Priya Chandra, Millbrook'
     },
     {
-      id: 'thornfield-mansard', images: ['shape-mansard.jpg', 'shape-mansard-2.jpg', 'shape-mansard-3.jpg'], tag: 'Mansard Roof',
+      id: 'thornfield-mansard', images: ['shape-mansard.jpg'], tag: 'Mansard Roof',
       title: 'The Thornfield House', location: 'Thornfield',
       sqft: 4600, pitch: '17/12', year: 2022,
       description: 'A Second Empire mansard re-slated top to bottom, with the steep lower slope carrying both the weight of the design and the attic space it was built to create.',
