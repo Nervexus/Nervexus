@@ -44,17 +44,20 @@ for actual project photography before this goes live for a real company.
 | `shape-mansard.jpg`    | historic brick house with a slate mansard roof | Rylan Hoots — unsplash.com/photos/qfCWOH_2L0A |
 | `founder.jpg`          | studio headshot, founder placeholder        | The Connected Narrative — unsplash.com/photos/N8lRH2uxih4 |
 
-`shape-gable.jpg`, `shape-gable-2.jpg`, and `shape-gable-3.jpg` (the
-Oakhaven Residence — grey-brick Tudor, slate gable roof) are **not**
-Unsplash and don't fit the table above. The first two were supplied
-directly by the project owner, who found them via Pinterest/reverse image
-search and asserted they're free to use; unlike every other photo on this
-page, I could not independently verify the photographer, source, or
-license — so if this goes anywhere public-facing, confirm usage rights
-(or replace them with verified-licensed or real job-site photos) before
-relying on them. `shape-gable-3.jpg` isn't a separate stock photo at all —
-it's a cropped detail of the slate roof cut directly from `shape-gable.jpg`,
-since it's the one material shot guaranteed to be the actual roof.
+`shape-gable.jpg` and `shape-gable-2.jpg` (the Oakhaven Residence —
+grey-brick Tudor, slate gable roof) are **not** Unsplash and don't fit the
+table above. They were supplied directly by the project owner, who found
+them via Pinterest/reverse image search and asserted they're free to use;
+unlike every other photo on this page, I could not independently verify
+the photographer, source, or license — so if this goes anywhere
+public-facing, confirm usage rights (or replace them with
+verified-licensed or real job-site photos) before relying on them.
+
+`shape-gable-3.jpg` is a stand-in "material" shot rather than a third
+angle of the actual house — a real, differently-styled roof photo, used
+to represent the general look of the slate rather than claim to be this
+property. It's an Unsplash photo: stone roof tiles under a cloudy sky,
+by Vladimir Khoteev — unsplash.com/photos/stone-roof-tiles-under-a-cloudy-sky-a8HSfbSQp8s.
 
 **Why only two projects have a multi-photo gallery.** For the other four,
 I tried hard to find real multi-angle photo sets — checking whether each
