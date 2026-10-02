@@ -33,12 +33,12 @@ for actual project photography before this goes live for a real company.
 | file                  | subject                                   | credit |
 |------------------------|--------------------------------------------|--------|
 | `hero-bg.jpg`          | two roofers working on a tile/slate roof    | Immo Wegmann — unsplash.com/photos/sKiCvM6sPtU |
-| `project-slate.jpg`    | ornate slate roof with gabled dormers      | Mark Stuckey — unsplash.com/photos/u7F0MrTkjSI |
+| `project-slate.jpg`    | close-up of a fresh dark slate roof, diamond pattern | Kay Nauwelaerts — unsplash.com/photos/RECyNQXnVas |
 | `project-metal.jpg`    | modern house, green standing-seam metal roof | Earl Wilcox — unsplash.com/photos/-S4l2EsOQhc |
 | `project-tile.jpg`     | white house with grey clay tile roof        | Edwin Petrus — unsplash.com/photos/_TJ5YqJlJAE |
-| `project-shake.jpg`    | weathered wood shingle roof with dormers    | Patrick Wadden — unsplash.com/photos/AE9VxuuxfQ4 |
-| `project-shingle.jpg`  | modern two-story house, dark shingle roof   | Troy Mortier — unsplash.com/photos/HckCpdBDeDk |
-| `project-reroof.jpg`   | roofer tearing off old shingles             | Zohair Mirza — unsplash.com/photos/GXITWKvgm-k |
+| `project-shake.jpg`    | close-up of fresh cedar shake shingles      | Peter Burdon — unsplash.com/photos/SNs1KMPF82Q |
+| `project-shingle.jpg`  | aerial view, house with new dimensional shingle roof | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
+| `project-reroof.jpg`   | close-up of a fresh dark grey tile roof     | Michael Jasmund — unsplash.com/photos/m_vEaZizd2s |
 | `founder.jpg`          | studio headshot, founder placeholder        | The Connected Narrative — unsplash.com/photos/N8lRH2uxih4 |
 
 ## Rebranding
