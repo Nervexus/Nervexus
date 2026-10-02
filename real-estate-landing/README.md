@@ -13,6 +13,7 @@ built as a standalone demo/template under a placeholder brand, "Aldridge & Co."
 | `favicon.svg` | monogram favicon                                                   |
 | `hero-bg.jpg` | hero background photo                                              |
 | `listing-*.jpg` | the 6 listing photos (one per property in the `LISTINGS` array)  |
+| `team-*.jpg` | headshots for the 3 supporting agents in the Team section         |
 
 ## Features
 
@@ -43,12 +44,18 @@ for actual property photography before this goes live for a real address.
 Two entries have no photographer name listed — it wasn't reliably available
 when these were sourced; the URL still credits the right photo.
 
+| file             | subject                        | credit |
+|------------------|---------------------------------|--------|
+| `team-mara.jpg`  | woman in a light blazer, outdoors | Troy Spoelma — unsplash.com/photos/EV8PPQG6zxY |
+| `team-jonah.jpg` | man in a dark blazer, studio headshot | Tony Luginsland — unsplash.com/photos/bbOOTiq-EPA |
+| `team-devon.jpg` | man, studio headshot            | The Connected Narrative — unsplash.com/photos/N8lRH2uxih4 |
+
 ## Rebranding
 
 Everything is placeholder content: the brand name, agent name/bio, phone,
-email, office address, DRE license number, and all listing/testimonial data.
-Search `index.html` for "Aldridge", "Eleanor", and the contact-info block to
-replace them.
+email, office address, DRE license number, the Team section's agents, and
+all listing/testimonial data. Search `index.html` for "Aldridge", "Eleanor",
+the `#team` section, and the contact-info block to replace them.
 
 ## Things worth knowing before editing
 

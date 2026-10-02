@@ -364,6 +364,36 @@ header.is-scrolled .nav-toggle span{ background:var(--ink); }
 .t-dot.is-active{ background:var(--gold); transform:scale(1.3); }
 
 /* =========================================================
+   TEAM — supporting agents carousel
+========================================================= */
+.team-carousel{ position:relative; }
+.team-carousel .carousel-arrow{ top:50%; transform:translateY(-50%); }
+.team-grid{
+  display:flex; gap:28px; overflow-x:auto; scroll-snap-type:x mandatory;
+  padding:4px 4px 12px; margin:-4px -4px 0; scrollbar-width:none;
+}
+.team-grid::-webkit-scrollbar{ display:none; }
+.team-card{
+  flex:0 0 300px; scroll-snap-align:start; text-align:center;
+  background:var(--card); border:1px solid var(--line-soft);
+  padding:36px 28px; display:flex; flex-direction:column; align-items:center;
+}
+.team-photo{
+  width:128px; height:128px; border-radius:50%; margin-bottom:20px; flex:none;
+  background:var(--photo) center/cover no-repeat;
+  box-shadow:0 0 0 4px var(--ivory-deep);
+}
+.team-card h3{ font-size:19px; margin-bottom:4px; }
+.team-role{
+  font-size:11.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:16px;
+}
+.team-contact{ display:flex; gap:10px; font-size:13.5px; color:var(--ink-faint); margin-bottom:22px; }
+.team-contact a{ color:var(--ink-soft); transition:color .3s var(--ease); }
+.team-contact a:hover{ color:var(--gold); }
+.team-view{ margin-top:auto; padding:10px 22px; font-size:13px; }
+
+/* =========================================================
    ABOUT
 ========================================================= */
 .about-grid{
@@ -767,6 +797,7 @@ body.no-scroll{ overflow:hidden; }
   .mobile-nav{ display:flex; }
   .hero-stats{ grid-template-columns:repeat(2,1fr); row-gap:28px; }
   .listing-card{ flex-basis:300px; }
+  .team-card{ flex-basis:260px; }
   .intro-grid{ grid-template-columns:1fr; gap:36px; text-align:center; }
   .intro-copy p{ margin-left:auto; margin-right:auto; }
   .intro-services{ grid-template-columns:repeat(2,1fr); }
@@ -784,6 +815,7 @@ body.no-scroll{ overflow:hidden; }
   .hero{ padding:150px 0 80px; }
   .hero-stats{ grid-template-columns:repeat(2,1fr); }
   .listing-card{ flex-basis:84vw; }
+  .team-card{ flex-basis:84vw; }
   .carousel-arrow{ display:none; }
   .intro-services{ grid-template-columns:1fr; }
   .process-steps{ grid-template-columns:1fr; }

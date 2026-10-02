@@ -80,8 +80,34 @@
   var filterBeds = document.getElementById('filterBeds');
   var filterPrice = document.getElementById('filterPrice');
   var sortBy = document.getElementById('sortBy');
-  var carouselPrev = document.getElementById('listingsPrev');
-  var carouselNext = document.getElementById('listingsNext');
+
+  /* A horizontal scroll-snap carousel with boundary-aware arrow buttons.
+     Shared by the listings grid (re-synced on every render) and the
+     static team grid (synced once, plus on scroll/resize). */
+  function makeCarousel(gridEl, prevBtn, nextBtn, cardSelector, fallbackWidth) {
+    if (!gridEl || !prevBtn || !nextBtn) return { update: function () {} };
+    var tolerance = 8; /* a few px of grid padding, reserved for card shadows */
+    function update() {
+      var max = gridEl.scrollWidth - gridEl.clientWidth;
+      prevBtn.disabled = gridEl.scrollLeft <= tolerance;
+      nextBtn.disabled = gridEl.scrollLeft >= max - tolerance;
+    }
+    function scrollByCard(dir) {
+      var card = gridEl.querySelector(cardSelector);
+      var step = card ? card.getBoundingClientRect().width + 28 : fallbackWidth;
+      gridEl.scrollBy({ left: dir * step, behavior: 'smooth' });
+    }
+    prevBtn.addEventListener('click', function () { scrollByCard(-1); });
+    nextBtn.addEventListener('click', function () { scrollByCard(1); });
+    gridEl.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return { update: update };
+  }
+
+  var listingsCarousel = makeCarousel(
+    grid, document.getElementById('listingsPrev'), document.getElementById('listingsNext'),
+    '.listing-card', 340
+  );
 
   function cardHTML(l) {
     return (
@@ -125,26 +151,7 @@
     emptyEl.hidden = list.length !== 0;
     grid.hidden = list.length === 0;
     grid.scrollLeft = 0;
-    updateCarouselArrows();
-  }
-
-  function updateCarouselArrows() {
-    if (!carouselPrev || !carouselNext) return;
-    var tolerance = 8; /* .listings-grid has a few px of padding for card shadows */
-    var max = grid.scrollWidth - grid.clientWidth;
-    carouselPrev.disabled = grid.scrollLeft <= tolerance;
-    carouselNext.disabled = grid.scrollLeft >= max - tolerance;
-  }
-  if (carouselPrev && carouselNext) {
-    var scrollByCard = function (dir) {
-      var card = grid.querySelector('.listing-card');
-      var step = card ? card.getBoundingClientRect().width + 28 : 340;
-      grid.scrollBy({ left: dir * step, behavior: 'smooth' });
-    };
-    carouselPrev.addEventListener('click', function () { scrollByCard(-1); });
-    carouselNext.addEventListener('click', function () { scrollByCard(1); });
-    grid.addEventListener('scroll', updateCarouselArrows, { passive: true });
-    window.addEventListener('resize', updateCarouselArrows);
+    listingsCarousel.update();
   }
 
   grid.addEventListener('click', function (e) {
@@ -327,6 +334,15 @@
     var item = e.target.closest('.drawer-item');
     if (item) { closeDrawer(); openModal(item.getAttribute('data-id')); }
   });
+
+  /* =======================================================
+     TEAM CAROUSEL
+  ======================================================= */
+  var teamCarousel = makeCarousel(
+    document.getElementById('teamGrid'), document.getElementById('teamPrev'), document.getElementById('teamNext'),
+    '.team-card', 300
+  );
+  teamCarousel.update();
 
   /* =======================================================
      COMMAND PALETTE
