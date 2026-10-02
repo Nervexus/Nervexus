@@ -18,9 +18,9 @@ brand, "Thornridge Roofing Co."
 
 ## Features
 
-- **Project gallery carousel** — six recent projects, one per roofing material/service, each with specs (sqft, roof pitch, year completed) and a detail modal with description + feature list.
+- **Project gallery carousel doubling as client stories** — six recent projects, one per roofing material/service, each card pairing the completed-roof photo with that homeowner's testimonial quote. The detail modal adds full specs (sqft, roof pitch, year completed), a description, the quote, and a feature list.
 - **Material comparison tool** — pick any two of five roofing materials to compare lifespan, typical cost, maintenance, and what each is best suited for. Data lives in the `MATERIALS` array at the top of `main.js`.
-- **Animated hero stats**, scroll-reveal sections, sticky header, mobile nav, scroll progress bar, and a testimonial slider — all vanilla JS, no dependencies.
+- **Animated hero stats**, scroll-reveal sections, sticky header, mobile nav, and a scroll progress bar — all vanilla JS, no dependencies.
 
 Nothing is hotlinked — every photo on the page, hero included, is a
 free-licensed Unsplash photo downloaded and checked into the repo rather
@@ -32,7 +32,7 @@ for actual project photography before this goes live for a real company.
 
 | file                  | subject                                   | credit |
 |------------------------|--------------------------------------------|--------|
-| `hero-bg.jpg`          | modern house exterior at dusk, lit interior | Michael Brown — unsplash.com/photos/G48h926L2qo |
+| `hero-bg.jpg`          | two roofers working on a tile/slate roof    | Immo Wegmann — unsplash.com/photos/sKiCvM6sPtU |
 | `project-slate.jpg`    | ornate slate roof with gabled dormers      | Mark Stuckey — unsplash.com/photos/u7F0MrTkjSI |
 | `project-metal.jpg`    | modern house, green standing-seam metal roof | Earl Wilcox — unsplash.com/photos/-S4l2EsOQhc |
 | `project-tile.jpg`     | white house with grey clay tile roof        | Edwin Petrus — unsplash.com/photos/_TJ5YqJlJAE |
