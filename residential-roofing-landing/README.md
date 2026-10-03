@@ -16,12 +16,13 @@ brand, "Thornridge Roofing Co."
 | `shape-<shape>.jpg`   | each project's card thumbnail / first gallery photo (one per roof shape in the `PROJECTS` array) |
 | `shape-dutch-2.jpg`  | a second, genuinely different angle of the Harrow Farmhouse — see below |
 | `shape-gable-2.jpg`, `shape-gable-3.jpg` | two more photos of the Oakhaven Residence — see below |
+| `shape-hip-2.jpg`    | a close-up of the Ridgemont House's roof tile — see below |
 | `founder.jpg`        | the About section's founder photo                                  |
 
 ## Features
 
 - **Project gallery carousel doubling as client stories** — six recent projects, one per roof shape (gable, hip, Dutch gable, dormer, shed, mansard), each built in a different material so the gallery shows range in both form and material. Each card pairs the completed-roof photo with that homeowner's testimonial quote.
-- **Per-project photo gallery in the detail modal** — clicking a project opens a modal that can show multiple photos of that job (prev/next arrows, dots, a counter, and left/right arrow-key navigation) when more than one is available. Each project's `images` array in `PROJECTS` (in `main.js`) drives it; the gallery controls auto-hide for a single-photo project. **The Harrow Farmhouse** (2 photos) and **The Oakhaven Residence** (3 photos) currently have galleries; the rest are single-photo. See the note below before adding more.
+- **Per-project photo gallery in the detail modal** — clicking a project opens a modal that can show multiple photos of that job (prev/next arrows, dots, a counter, and left/right arrow-key navigation) when more than one is available. Each project's `images` array in `PROJECTS` (in `main.js`) drives it; the gallery controls auto-hide for a single-photo project. **The Harrow Farmhouse** (2 photos), **The Oakhaven Residence** (3 photos), and **The Ridgemont House** (2 photos) currently have galleries; the rest are single-photo. See the note below before adding more.
 - **Material comparison tool** — pick any two of five roofing materials to compare lifespan, typical cost, maintenance, and what each is best suited for. Data lives in the `MATERIALS` array at the top of `main.js`.
 - **Animated hero stats**, scroll-reveal sections, sticky header, mobile nav, and a scroll progress bar — all vanilla JS, no dependencies.
 
@@ -36,7 +37,6 @@ for actual project photography before this goes live for a real company.
 | file                  | subject                                   | credit |
 |------------------------|--------------------------------------------|--------|
 | `hero-bg.jpg`          | two roofers working on a tile/slate roof    | Immo Wegmann — unsplash.com/photos/sKiCvM6sPtU |
-| `shape-hip.jpg`        | modern house, clean hip roof, dark dimensional shingle | Troy Mortier — unsplash.com/photos/HckCpdBDeDk |
 | `shape-dutch.jpg`      | farmhouse with hip-and-gable roofline, copper standing-seam | Roger Starnes Sr — unsplash.com/photos/a-nice-stone-front-modern-farmhouse-CMbIJY92NJ0 |
 | `shape-dutch-2.jpg`    | the same farmhouse, a second angle          | Roger Starnes Sr — unsplash.com/photos/NFjz6BSzDXQ |
 | `shape-dormer.jpg`     | brick cottage with tiled roof and dormer windows | T (Tanya Barrow) — unsplash.com/photos/y4iBCffm3n0 |
@@ -54,6 +54,15 @@ if this goes anywhere public-facing, confirm usage rights (or replace
 them with verified-licensed or real job-site photos) before relying on
 them. `shape-gable-3.jpg` is an up-close shot of the same slate, supplied
 the same way.
+
+`shape-hip.jpg` and `shape-hip-2.jpg` (the Ridgemont House) are the same
+situation — supplied by the project owner via Pinterest, license
+unverified, swap before going live. **Note the mismatch:** the project
+copy describes "a four-sided hip roof... no gable end left exposed," but
+`shape-hip.jpg` shows a roofline with at least two visible gable ends. I
+left the copy as-is since this is placeholder content either way, but if
+this project goes live, either the description/tag or the photo should
+change so they agree.
 
 **Why only two projects have a multi-photo gallery.** For the other four,
 I tried hard to find real multi-angle photo sets — checking whether each

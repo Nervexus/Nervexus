@@ -16,7 +16,7 @@
       author: 'Grace Fenwick, Oakhaven'
     },
     {
-      id: 'ridgemont-hip', images: ['shape-hip.jpg'], tag: 'Hip Roof',
+      id: 'ridgemont-hip', images: ['shape-hip.jpg', 'shape-hip-2.jpg'], tag: 'Hip Roof',
       title: 'The Ridgemont House', location: 'Ridgemont',
       sqft: 3400, pitch: '6/12', year: 2025,
       description: 'A four-sided hip roof re-covered in dimensional architectural shingle, chosen for clean lines on every elevation — there’s no gable end left exposed.',
