@@ -5,6 +5,8 @@ import { GlassCard } from "./GlassCard";
 import { ProgressRing } from "./ProgressRing";
 import { PlusIcon, TrashIcon } from "./icons";
 import { uid } from "@/lib/useLocalStorage";
+import { useXp } from "@/lib/useXp";
+import { XP_REWARDS } from "@/lib/xp";
 import type { Checklist } from "@/lib/types";
 
 export function ChecklistCard({
@@ -17,6 +19,7 @@ export function ChecklistCard({
   onDelete: () => void;
 }) {
   const [draft, setDraft] = useState("");
+  const [, addXp] = useXp();
 
   const { done, total, progress } = useMemo(() => {
     const done = checklist.items.filter((i) => i.done).length;
@@ -25,6 +28,9 @@ export function ChecklistCard({
   }, [checklist.items]);
 
   function toggle(id: string) {
+    const item = checklist.items.find((i) => i.id === id);
+    if (!item) return;
+    addXp(item.done ? -XP_REWARDS.checklistToggle : XP_REWARDS.checklistToggle);
     onChange({
       ...checklist,
       items: checklist.items.map((i) =>

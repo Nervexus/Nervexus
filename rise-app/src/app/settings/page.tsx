@@ -17,15 +17,20 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Settings" title="Settings" back />
+      <PageHeader
+        eyebrow="Settings"
+        title="Settings"
+        back
+        backHref="/profile"
+        backLabel="Profile"
+      />
 
       <GlassCard className="mb-4 p-5">
         <p className="text-sm font-semibold">About Rise</p>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">
-          Everything you track — checklists, goals, and daily habits across
-          self improvement, health, social media and looks — is stored only
-          on this device. There are no accounts and nothing is sent to a
-          server.
+          Everything you track — checklists, goals, daily habits, your
+          profile, and XP — is stored only on this device. There are no
+          accounts and nothing is sent to a server.
         </p>
       </GlassCard>
 

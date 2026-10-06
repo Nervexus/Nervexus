@@ -5,6 +5,8 @@ import { GlassCard } from "./GlassCard";
 import { ProgressRing } from "./ProgressRing";
 import { PlusIcon, TrashIcon } from "./icons";
 import { uid, useLocalStorage } from "@/lib/useLocalStorage";
+import { useXp } from "@/lib/useXp";
+import { XP_REWARDS } from "@/lib/xp";
 import type { RoutineItem } from "@/lib/types";
 
 export function DailyChecklist({
@@ -24,11 +26,15 @@ export function DailyChecklist({
     defaultItems.map((text) => ({ id: uid(), text, done: false }))
   );
   const [draft, setDraft] = useState("");
+  const [, addXp] = useXp();
 
   const done = useMemo(() => items.filter((i) => i.done).length, [items]);
   const progress = items.length ? done / items.length : 0;
 
   function toggle(id: string) {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    addXp(item.done ? -XP_REWARDS.habitToggle : XP_REWARDS.habitToggle);
     setItems((prev) =>
       prev.map((i) => (i.id === id ? { ...i, done: !i.done } : i))
     );

@@ -160,3 +160,21 @@ export function CalendarIcon({ className, strokeWidth = 1.8, style }: IconProps)
     </svg>
   );
 }
+
+export function PersonIcon({ className, strokeWidth = 1.8, style }: IconProps) {
+  return (
+    <svg className={className} style={style} strokeWidth={strokeWidth} {...base}>
+      <circle cx="12" cy="8" r="3.6" />
+      <path d="M4.5 20c1.1-3.9 4-5.8 7.5-5.8s6.4 1.9 7.5 5.8" />
+    </svg>
+  );
+}
+
+export function CameraIcon({ className, strokeWidth = 1.8, style }: IconProps) {
+  return (
+    <svg className={className} style={style} strokeWidth={strokeWidth} {...base}>
+      <path d="M4 8.5a1.5 1.5 0 0 1 1.5-1.5h2l1-2h7l1 2h2A1.5 1.5 0 0 1 20 8.5V18a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18Z" />
+      <circle cx="12" cy="13" r="3.3" />
+    </svg>
+  );
+}

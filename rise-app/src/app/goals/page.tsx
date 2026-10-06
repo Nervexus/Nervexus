@@ -6,6 +6,8 @@ import { GlassCard } from "@/components/GlassCard";
 import { ProgressRing } from "@/components/ProgressRing";
 import { PlusIcon, TrashIcon, XIcon } from "@/components/icons";
 import { uid, useLocalStorage } from "@/lib/useLocalStorage";
+import { useXp } from "@/lib/useXp";
+import { XP_REWARDS } from "@/lib/xp";
 import { CATEGORIES } from "@/lib/categories";
 import type { Goal } from "@/lib/types";
 
@@ -20,6 +22,7 @@ function categoryColor(key: string) {
 
 export default function GoalsPage() {
   const [goals, setGoals] = useLocalStorage<Goal[]>("goals", []);
+  const [, addXp] = useXp();
   const [formOpen, setFormOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("general");
@@ -55,12 +58,19 @@ export default function GoalsPage() {
   }
 
   function bump(id: string, delta: number) {
+    const goal = goals.find((g) => g.id === id);
+    if (!goal) return;
+    const nextCurrent = Math.max(0, Math.min(goal.target, goal.current + delta));
+    const actualDelta = nextCurrent - goal.current;
+    if (actualDelta !== 0) addXp(XP_REWARDS.goalStep * actualDelta);
+
+    const wasComplete = goal.current >= goal.target;
+    const nowComplete = nextCurrent >= goal.target;
+    if (!wasComplete && nowComplete) addXp(XP_REWARDS.goalComplete);
+    if (wasComplete && !nowComplete) addXp(-XP_REWARDS.goalComplete);
+
     setGoals((prev) =>
-      prev.map((g) =>
-        g.id === id
-          ? { ...g, current: Math.max(0, Math.min(g.target, g.current + delta)) }
-          : g
-      )
+      prev.map((g) => (g.id === id ? { ...g, current: nextCurrent } : g))
     );
   }
 
