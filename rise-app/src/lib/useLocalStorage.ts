@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const PREFIX = "ascent:";
+const PREFIX = "rise:";
 
 export function useLocalStorage<T>(key: string, initial: T) {
   const fullKey = `${PREFIX}${key}`;

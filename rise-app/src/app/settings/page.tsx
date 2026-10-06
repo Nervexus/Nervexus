@@ -10,7 +10,7 @@ export default function SettingsPage() {
 
   function resetAll() {
     Object.keys(window.localStorage)
-      .filter((k) => k.startsWith("ascent:"))
+      .filter((k) => k.startsWith("rise:"))
       .forEach((k) => window.localStorage.removeItem(k));
     window.location.href = "/";
   }
@@ -20,7 +20,7 @@ export default function SettingsPage() {
       <PageHeader eyebrow="Settings" title="Settings" back />
 
       <GlassCard className="mb-4 p-5">
-        <p className="text-sm font-semibold">About Ascent</p>
+        <p className="text-sm font-semibold">About Rise</p>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">
           Everything you track — checklists, goals, and daily habits across
           self improvement, health, social media and looks — is stored only

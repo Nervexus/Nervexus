@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ascent — Maximum Results",
+  title: "Rise — Maximum Results",
   description:
     "Checklists, goals, health, looks and social growth — one system for becoming your best self.",
 };

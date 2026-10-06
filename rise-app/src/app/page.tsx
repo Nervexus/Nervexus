@@ -17,7 +17,7 @@ export default function HomePage() {
           {today}
         </p>
         <h1 className="mt-1 text-[32px] font-semibold tracking-tight">
-          Ascent
+          Rise
         </h1>
         <p className="mt-1 text-sm text-muted">
           Maximum results, every single day.
