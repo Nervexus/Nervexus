@@ -84,7 +84,7 @@ export function DailyChecklist({
               }}
             >
               {item.done && (
-                <svg viewBox="0 0 24 24" className="h-3 w-3 text-black" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                <svg viewBox="0 0 24 24" className="h-3 w-3 text-accent-ink" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
                   <path d="m5 12 5 5L19 7" />
                 </svg>
               )}

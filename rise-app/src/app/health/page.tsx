@@ -30,7 +30,7 @@ export default function HealthPage() {
         eyebrow="Health Improvements"
         title="Body & Recovery"
         subtitle={category.tagline}
-        color={category.color}
+        color="var(--cat-health-page)"
         back
       />
 

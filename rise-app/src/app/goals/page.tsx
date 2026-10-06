@@ -135,7 +135,7 @@ export default function GoalsPage() {
                   background:
                     category === c.key
                       ? c.color
-                      : "rgba(255,255,255,0.06)",
+                      : "rgba(36,28,21,0.06)",
                   color: category === c.key ? "var(--accent-ink)" : "var(--foreground)",
                 }}
               >
@@ -226,7 +226,7 @@ export default function GoalsPage() {
           );
         })}
         {sorted.length === 0 && (
-          <p className="py-10 text-center text-sm text-muted">
+          <p className="py-10 text-center text-sm text-muted-page">
             No goals yet. Set your first target above.
           </p>
         )}

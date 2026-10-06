@@ -89,12 +89,12 @@ export function ChecklistCard({
               aria-label={item.done ? "Mark as not done" : "Mark as done"}
               className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all"
               style={{
-                borderColor: item.done ? "#fff" : "var(--border-strong)",
-                background: item.done ? "#fff" : "transparent",
+                borderColor: item.done ? "var(--accent)" : "var(--border-strong)",
+                background: item.done ? "var(--accent)" : "transparent",
               }}
             >
               {item.done && (
-                <svg viewBox="0 0 24 24" className="h-3 w-3 text-black" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                <svg viewBox="0 0 24 24" className="h-3 w-3 text-accent-ink" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
                   <path d="m5 12 5 5L19 7" />
                 </svg>
               )}

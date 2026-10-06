@@ -15,13 +15,13 @@ export default function HomePage() {
     <div>
       <header className="animate-fade-up mb-6 flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-page">
             {today}
           </p>
-          <h1 className="mt-1 text-[32px] font-semibold tracking-tight">
+          <h1 className="mt-1 text-[32px] font-semibold tracking-tight text-foreground-page">
             Rise
           </h1>
-          <p className="mt-1 text-sm text-muted">
+          <p className="mt-1 text-sm text-muted-page">
             Maximum results, every single day.
           </p>
         </div>
@@ -32,7 +32,7 @@ export default function HomePage() {
         <TodayOverview />
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.1em] text-muted">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.1em] text-muted-page">
         Categories
       </h2>
       <div className="mb-6 grid grid-cols-2 gap-3">
@@ -41,7 +41,7 @@ export default function HomePage() {
         ))}
       </div>
 
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.1em] text-muted">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.1em] text-muted-page">
         Quick Tools
       </h2>
       <div className="grid grid-cols-2 gap-3">

@@ -72,7 +72,7 @@ export default function ChecklistsPage() {
           />
         ))}
         {checklists.length === 0 && (
-          <p className="py-10 text-center text-sm text-muted">
+          <p className="py-10 text-center text-sm text-muted-page">
             No checklists yet. Create your first one above.
           </p>
         )}

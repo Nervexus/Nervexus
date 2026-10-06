@@ -24,7 +24,7 @@ export function PageHeader({
         {back && (
           <Link
             href={backHref}
-            className="mb-3 inline-flex items-center gap-1 text-xs text-muted hover:text-foreground"
+            className="mb-3 inline-flex items-center gap-1 text-xs text-muted-page hover:text-foreground-page"
           >
             <ChevronRightIcon className="h-3.5 w-3.5 rotate-180" />
             {backLabel}
@@ -33,16 +33,16 @@ export function PageHeader({
         {eyebrow && (
           <p
             className="mb-1.5 text-xs font-semibold uppercase tracking-[0.16em]"
-            style={{ color: color ?? "var(--muted)" }}
+            style={{ color: color ?? "var(--muted-page)" }}
           >
             {eyebrow}
           </p>
         )}
-        <h1 className="text-balance text-[28px] font-semibold leading-tight tracking-tight">
+        <h1 className="text-balance text-[28px] font-semibold leading-tight tracking-tight text-foreground-page">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-1.5 text-sm text-muted">{subtitle}</p>
+          <p className="mt-1.5 text-sm text-muted-page">{subtitle}</p>
         )}
       </div>
     </header>

@@ -41,7 +41,7 @@ export default function SocialMediaPage() {
             eyebrow="Social Media Improvement"
             title="Reach & Influence"
             subtitle={category.tagline}
-            color={category.color}
+            color="var(--cat-social-page)"
             back
           />
         </div>

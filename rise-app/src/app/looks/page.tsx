@@ -21,7 +21,7 @@ export default function LooksPage() {
         eyebrow="Looks Improvements"
         title="Grooming & Style"
         subtitle={category.tagline}
-        color={category.color}
+        color="var(--cat-looks-page)"
         back
       />
 

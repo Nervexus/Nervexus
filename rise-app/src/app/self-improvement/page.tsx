@@ -29,7 +29,7 @@ export default function SelfImprovementPage() {
         eyebrow="Self Improvement"
         title="Mindset & Growth"
         subtitle={category.tagline}
-        color={category.color}
+        color="var(--cat-self-page)"
         back
       />
 

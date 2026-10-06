@@ -1,24 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #15110e;
-  --surface: #1e1915;
-  --surface-strong: #251f19;
-  --foreground: #f2ece3;
-  --muted: #9c9288;
-  --border: rgba(242, 235, 226, 0.08);
-  --border-strong: rgba(242, 235, 226, 0.14);
-  --accent: #d9c2a0;
-  --accent-ink: #1a1410;
-  --positive: #93c4a4;
-  --negative: #d99a81;
+  --background: #111010;
+  --surface: #cdb6a1;
+  --surface-strong: #c2a890;
 
-  --cat-checklists: #d9c2a0;
-  --cat-goals: #d99a81;
-  --cat-self: #b6a2d9;
-  --cat-health: #93c4a4;
-  --cat-social: #8fb4d6;
-  --cat-looks: #d9ae6e;
+  /* Nearly all text sits on the tan card surface now, so the default
+     text color is dark ink. The few elements that sit directly on the
+     dark page background (page headers) opt into --foreground-page. */
+  --foreground: #241d16;
+  --foreground-page: #f2ece3;
+  --muted: #6f5c49;
+  --muted-page: rgba(242, 235, 226, 0.6);
+
+  --border: rgba(36, 28, 21, 0.12);
+  --border-strong: rgba(36, 28, 21, 0.2);
+
+  --accent: #1a130e;
+  --accent-ink: #f5efe6;
+  --positive: #2f6b45;
+  --negative: #9c4a2f;
+
+  --cat-checklists: #241d16;
+  --cat-goals: #9c4a2f;
+  --cat-self: #5c4391;
+  --cat-health: #2f6b45;
+  --cat-social: #2a5f87;
+  --cat-looks: #8a5a1f;
+
+  /* Lighter variants of the category colors, for the rare spot (the
+     page eyebrow label) that sits directly on the dark page background
+     instead of a tan card - the dark variants above would vanish there. */
+  --cat-self-page: #b9a2e8;
+  --cat-health-page: #8ecaa4;
+  --cat-social-page: #8cbbdd;
+  --cat-looks-page: #e0b36e;
 }
 
 @theme inline {
@@ -26,7 +42,9 @@
   --color-surface: var(--surface);
   --color-surface-strong: var(--surface-strong);
   --color-foreground: var(--foreground);
+  --color-foreground-page: var(--foreground-page);
   --color-muted: var(--muted);
+  --color-muted-page: var(--muted-page);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-accent: var(--accent);
@@ -109,8 +127,8 @@ body {
     to right,
     var(--slider-color, var(--accent)) 0%,
     var(--slider-color, var(--accent)) var(--slider-fill, 50%),
-    rgba(242, 235, 226, 0.12) var(--slider-fill, 50%),
-    rgba(242, 235, 226, 0.12) 100%
+    rgba(36, 28, 21, 0.14) var(--slider-fill, 50%),
+    rgba(36, 28, 21, 0.14) 100%
   );
   outline: none;
 }
