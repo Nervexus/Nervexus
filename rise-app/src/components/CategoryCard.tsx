@@ -40,19 +40,15 @@ export function CategoryCard({ category }: { category: CategoryMeta }) {
 
   return (
     <Link href={category.href}>
-      <GlassCard className="group relative h-full overflow-hidden p-4 transition-transform duration-200 active:scale-[0.98]">
-        <div
-          className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-[0.12] blur-xl"
-          style={{ background: category.color }}
-        />
+      <GlassCard className="group h-full p-4 transition-transform duration-200 active:scale-[0.98]">
         <div className="flex items-start justify-between">
           <div
-            className="flex h-9 w-9 items-center justify-center rounded-full"
-            style={{ background: `color-mix(in srgb, ${category.color} 18%, transparent)` }}
+            className="flex h-10 w-10 items-center justify-center rounded-2xl"
+            style={{ background: "var(--surface-strong)" }}
           >
             <Icon className="h-4.5 w-4.5" style={{ color: category.color } as CSSProperties} />
           </div>
-          <ProgressRing value={progress} size={34} stroke={3.5} color={category.color}>
+          <ProgressRing value={progress} size={32} stroke={3.5} color={category.color}>
             <span className="text-[9px] font-semibold">
               {Math.round(progress * 100)}
             </span>

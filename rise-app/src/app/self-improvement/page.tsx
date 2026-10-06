@@ -51,7 +51,7 @@ export default function SelfImprovementPage() {
           onChange={(e) => setJournal(e.target.value)}
           placeholder="Write a few lines..."
           rows={4}
-          className="w-full resize-none rounded-2xl bg-white/5 p-4 text-sm leading-relaxed placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-white/20"
+          className="w-full resize-none rounded-2xl bg-foreground/5 p-4 text-sm leading-relaxed placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-foreground/20"
         />
       </GlassCard>
     </div>

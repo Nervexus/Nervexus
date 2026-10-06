@@ -6,7 +6,6 @@ import { useLocalStorage } from "@/lib/useLocalStorage";
 import type { RoutineItem } from "@/lib/types";
 import { categoryStorageKey } from "./CategoryCard";
 import { ProgressRing } from "./ProgressRing";
-import { GlassCard, Pill } from "./GlassCard";
 
 function useCategoryItems(key: string, defaults: string[]) {
   return useLocalStorage<RoutineItem[]>(
@@ -40,36 +39,25 @@ export function TodayOverview() {
       : "Fully maxed today";
 
   return (
-    <GlassCard strong className="animate-fade-up relative overflow-hidden p-6">
-      <div
-        className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full opacity-20 blur-3xl"
-        style={{ background: "var(--cat-self)" }}
-      />
-      <div
-        className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full opacity-10 blur-3xl"
-        style={{ background: "var(--cat-health)" }}
-      />
-      <div className="relative flex items-center justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
-            Today&apos;s Progress
-          </p>
-          <p className="mt-2 text-4xl font-semibold tracking-tight">
-            {done}
-            <span className="text-xl text-muted">/{total}</span>
-          </p>
-          <p className="mt-1 text-sm text-muted">{label}</p>
-        </div>
-        <ProgressRing value={progress} size={84} stroke={7} color="#ffffff">
-          <span className="text-lg font-semibold">
+    <div className="animate-fade-up grid grid-cols-5 gap-3">
+      <div className="col-span-3 rounded-3xl bg-accent p-5 text-accent-ink">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent-ink/60">
+          Today&apos;s Progress
+        </p>
+        <p className="mt-3 text-3xl font-semibold tracking-tight">
+          {done}
+          <span className="text-lg text-accent-ink/55">/{total}</span>
+        </p>
+        <p className="mt-1 text-sm text-accent-ink/70">{label}</p>
+      </div>
+      <div className="col-span-2 flex flex-col items-center justify-center rounded-3xl glass p-4 text-center">
+        <ProgressRing value={progress} size={60} stroke={6} color="var(--accent)">
+          <span className="text-sm font-semibold">
             {Math.round(progress * 100)}%
           </span>
         </ProgressRing>
+        <p className="mt-2 text-xs text-muted">{total - done} left</p>
       </div>
-      <div className="relative mt-5 flex flex-wrap gap-2">
-        <Pill>{total - done} remaining</Pill>
-        <Pill>4 categories</Pill>
-      </div>
-    </GlassCard>
+    </div>
   );
 }

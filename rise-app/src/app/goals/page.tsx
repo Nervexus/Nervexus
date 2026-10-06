@@ -15,7 +15,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 function categoryColor(key: string) {
-  return CATEGORY_OPTIONS.find((c) => c.key === key)?.color ?? "#fff";
+  return CATEGORY_OPTIONS.find((c) => c.key === key)?.color ?? "var(--accent)";
 }
 
 export default function GoalsPage() {
@@ -112,7 +112,7 @@ export default function GoalsPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Run a half marathon"
-            className="mb-3 w-full rounded-2xl bg-white/5 px-4 py-3 text-sm placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-white/20"
+            className="mb-3 w-full rounded-2xl bg-foreground/5 px-4 py-3 text-sm placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-foreground/20"
           />
 
           <div className="mb-3 flex flex-wrap gap-1.5">
@@ -126,7 +126,7 @@ export default function GoalsPage() {
                     category === c.key
                       ? c.color
                       : "rgba(255,255,255,0.06)",
-                  color: category === c.key ? "#000" : "var(--foreground)",
+                  color: category === c.key ? "var(--accent-ink)" : "var(--foreground)",
                 }}
               >
                 {c.label}
@@ -140,13 +140,13 @@ export default function GoalsPage() {
               onChange={(e) => setTarget(e.target.value.replace(/[^0-9]/g, ""))}
               inputMode="numeric"
               placeholder="Target (e.g. 21)"
-              className="rounded-2xl bg-white/5 px-4 py-3 text-sm placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-white/20"
+              className="rounded-2xl bg-foreground/5 px-4 py-3 text-sm placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-foreground/20"
             />
             <input
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
               placeholder="Unit (km, days...)"
-              className="rounded-2xl bg-white/5 px-4 py-3 text-sm placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-white/20"
+              className="rounded-2xl bg-foreground/5 px-4 py-3 text-sm placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-foreground/20"
             />
           </div>
 
@@ -154,12 +154,12 @@ export default function GoalsPage() {
             type="date"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="mb-4 w-full rounded-2xl bg-white/5 px-4 py-3 text-sm text-foreground placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-white/20 [color-scheme:dark]"
+            className="mb-4 w-full rounded-2xl bg-foreground/5 px-4 py-3 text-sm text-foreground placeholder:text-muted/70 focus:outline-none focus:ring-1 focus:ring-foreground/20 [color-scheme:dark]"
           />
 
           <button
             onClick={createGoal}
-            className="w-full rounded-2xl bg-white py-3 text-sm font-semibold text-black transition-transform active:scale-[0.98]"
+            className="w-full rounded-2xl bg-accent py-3 text-sm font-semibold text-accent-ink transition-transform active:scale-[0.98]"
           >
             Create goal
           </button>
@@ -201,13 +201,13 @@ export default function GoalsPage() {
               <div className="mt-3 flex items-center gap-2">
                 <button
                   onClick={() => bump(goal.id, -1)}
-                  className="flex-1 rounded-xl bg-white/5 py-2 text-sm font-medium hover:bg-white/10"
+                  className="flex-1 rounded-xl bg-foreground/5 py-2 text-sm font-medium hover:bg-foreground/10"
                 >
                   −
                 </button>
                 <button
                   onClick={() => bump(goal.id, 1)}
-                  className="flex-1 rounded-xl bg-white/5 py-2 text-sm font-medium hover:bg-white/10"
+                  className="flex-1 rounded-xl bg-foreground/5 py-2 text-sm font-medium hover:bg-foreground/10"
                 >
                   +
                 </button>

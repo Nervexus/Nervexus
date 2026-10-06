@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { GlassCard } from "./GlassCard";
-import { CheckSquareIcon, ChevronRightIcon, TargetIcon } from "./icons";
+import { ChevronRightIcon, CheckSquareIcon, TargetIcon } from "./icons";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 import type { Checklist, Goal } from "@/lib/types";
+
+function ToolArrow() {
+  return (
+    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-accent-ink">
+      <ChevronRightIcon className="h-4 w-4" strokeWidth={2.2} />
+    </span>
+  );
+}
 
 export function ChecklistsSummary() {
   const [checklists] = useLocalStorage<Checklist[]>("checklists", []);
@@ -19,22 +27,21 @@ export function ChecklistsSummary() {
   }, [checklists]);
 
   return (
-    <Link href="/checklists">
-      <GlassCard className="flex items-center justify-between p-4 transition-transform active:scale-[0.98]">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-            <CheckSquareIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Checklists</p>
-            <p className="text-xs text-muted">
-              {checklists.length
-                ? `${done}/${total} items done`
-                : "Create your first list"}
-            </p>
-          </div>
+    <Link href="/checklists" className="block h-full">
+      <GlassCard className="flex h-full flex-col justify-between gap-5 p-4 transition-transform active:scale-[0.98]">
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-2xl"
+          style={{ background: "var(--surface-strong)" }}
+        >
+          <CheckSquareIcon className="h-4.5 w-4.5" style={{ color: "var(--cat-checklists)" }} />
         </div>
-        <ChevronRightIcon className="h-4 w-4 text-muted" />
+        <div>
+          <p className="text-sm font-semibold">Checklists</p>
+          <p className="mt-0.5 text-xs text-muted">
+            {checklists.length ? `${done}/${total} items done` : "Create your first list"}
+          </p>
+        </div>
+        <ToolArrow />
       </GlassCard>
     </Link>
   );
@@ -49,20 +56,21 @@ export function GoalsSummary() {
   );
 
   return (
-    <Link href="/goals">
-      <GlassCard className="flex items-center justify-between p-4 transition-transform active:scale-[0.98]">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
-            <TargetIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">Goals</p>
-            <p className="text-xs text-muted">
-              {goals.length ? `${active} active goal${active === 1 ? "" : "s"}` : "Set your first goal"}
-            </p>
-          </div>
+    <Link href="/goals" className="block h-full">
+      <GlassCard className="flex h-full flex-col justify-between gap-5 p-4 transition-transform active:scale-[0.98]">
+        <div
+          className="flex h-10 w-10 items-center justify-center rounded-2xl"
+          style={{ background: "var(--surface-strong)" }}
+        >
+          <TargetIcon className="h-4.5 w-4.5" style={{ color: "var(--cat-goals)" }} />
         </div>
-        <ChevronRightIcon className="h-4 w-4 text-muted" />
+        <div>
+          <p className="text-sm font-semibold">Goals</p>
+          <p className="mt-0.5 text-xs text-muted">
+            {goals.length ? `${active} active goal${active === 1 ? "" : "s"}` : "Set your first goal"}
+          </p>
+        </div>
+        <ToolArrow />
       </GlassCard>
     </Link>
   );

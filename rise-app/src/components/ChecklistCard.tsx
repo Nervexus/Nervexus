@@ -65,7 +65,7 @@ export function ChecklistCard({
           <button
             onClick={onDelete}
             aria-label="Delete checklist"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:bg-white/10 hover:text-negative"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted hover:bg-foreground/10 hover:text-negative"
           >
             <TrashIcon className="h-4 w-4" />
           </button>
@@ -76,7 +76,7 @@ export function ChecklistCard({
         {checklist.items.map((item) => (
           <li
             key={item.id}
-            className="group flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors hover:bg-white/[0.04]"
+            className="group flex items-center gap-3 rounded-2xl px-2 py-2 transition-colors hover:bg-foreground/[0.04]"
           >
             <button
               onClick={() => toggle(item.id)}
@@ -122,7 +122,7 @@ export function ChecklistCard({
         <button
           onClick={addItem}
           aria-label="Add item"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full glass-pill hover:bg-white/15"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full glass-pill hover:bg-foreground/15"
         >
           <PlusIcon className="h-4 w-4" />
         </button>

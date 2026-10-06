@@ -47,13 +47,13 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={resetAll}
-              className="flex-1 rounded-2xl bg-negative py-2.5 text-sm font-semibold text-black"
+              className="flex-1 rounded-2xl bg-negative py-2.5 text-sm font-semibold text-accent-ink"
             >
               Confirm reset
             </button>
             <button
               onClick={() => setConfirming(false)}
-              className="flex-1 rounded-2xl bg-white/5 py-2.5 text-sm font-medium"
+              className="flex-1 rounded-2xl bg-foreground/5 py-2.5 text-sm font-medium"
             >
               Cancel
             </button>

@@ -55,7 +55,7 @@ export default function ChecklistsPage() {
         />
         <button
           onClick={createChecklist}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black transition-transform active:scale-95"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-ink transition-transform active:scale-95"
           aria-label="Create checklist"
         >
           <PlusIcon className="h-5 w-5" />

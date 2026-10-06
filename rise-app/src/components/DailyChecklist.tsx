@@ -66,7 +66,7 @@ export function DailyChecklist({
         {items.map((item) => (
           <li
             key={item.id}
-            className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-white/[0.04]"
+            className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-foreground/[0.04]"
           >
             <button
               onClick={() => toggle(item.id)}
@@ -117,7 +117,7 @@ export function DailyChecklist({
         <button
           onClick={add}
           aria-label="Add item"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full glass-pill hover:bg-white/15"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full glass-pill hover:bg-foreground/15"
         >
           <PlusIcon className="h-4 w-4" />
         </button>

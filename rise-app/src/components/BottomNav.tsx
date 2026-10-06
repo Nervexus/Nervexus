@@ -31,13 +31,14 @@ export function BottomNav() {
               key={href}
               href={href}
               aria-label={label}
-              className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors duration-200 ${
+              className={`flex h-12 items-center justify-center gap-1.5 rounded-full transition-colors duration-200 ${
                 active
-                  ? "bg-white text-black"
-                  : "text-foreground/60 hover:text-foreground"
+                  ? "bg-accent px-4 text-accent-ink"
+                  : "w-12 text-foreground/55 hover:text-foreground"
               }`}
             >
-              <Icon className="h-5 w-5" strokeWidth={active ? 2 : 1.7} />
+              <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2 : 1.7} />
+              {active && <span className="text-xs font-semibold">{label}</span>}
             </Link>
           );
         })}

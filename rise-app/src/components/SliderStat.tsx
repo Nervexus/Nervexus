@@ -8,7 +8,7 @@ export function SliderStat({
   value,
   max,
   unit = "",
-  color = "#ffffff",
+  color = "var(--accent)",
   onChange,
 }: {
   label: string;

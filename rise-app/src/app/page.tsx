@@ -28,18 +28,21 @@ export default function HomePage() {
         <TodayOverview />
       </div>
 
-      <div className="mb-3 flex flex-col gap-3">
-        <ChecklistsSummary />
-        <GoalsSummary />
-      </div>
-
-      <h2 className="mb-3 mt-6 text-sm font-semibold uppercase tracking-[0.1em] text-muted">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.1em] text-muted">
         Categories
       </h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="mb-6 grid grid-cols-2 gap-3">
         {CATEGORIES.map((category) => (
           <CategoryCard key={category.key} category={category} />
         ))}
+      </div>
+
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.1em] text-muted">
+        Quick Tools
+      </h2>
+      <div className="grid grid-cols-2 gap-3">
+        <ChecklistsSummary />
+        <GoalsSummary />
       </div>
     </div>
   );
