@@ -3,6 +3,7 @@ import { CategoryCard } from "@/components/CategoryCard";
 import { TodayOverview } from "@/components/TodayOverview";
 import { ChecklistsSummary, GoalsSummary } from "@/components/SummaryCards";
 import { RankBadge } from "@/components/RankBadge";
+import { Greeting } from "@/components/Greeting";
 
 export default function HomePage() {
   const today = new Date().toLocaleDateString("en-US", {
@@ -14,16 +15,11 @@ export default function HomePage() {
   return (
     <div>
       <header className="animate-fade-up mb-6 flex items-start justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-page">
             {today}
           </p>
-          <h1 className="mt-1 text-[32px] font-semibold tracking-tight text-foreground-page">
-            Rise
-          </h1>
-          <p className="mt-1 text-sm text-muted-page">
-            Maximum results, every single day.
-          </p>
+          <Greeting />
         </div>
         <RankBadge />
       </header>
