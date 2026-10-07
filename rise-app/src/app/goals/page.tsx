@@ -135,7 +135,7 @@ export default function GoalsPage() {
                   background:
                     category === c.key
                       ? c.color
-                      : "rgba(36,28,21,0.06)",
+                      : "rgba(255,255,255,0.06)",
                   color: category === c.key ? "var(--accent-ink)" : "var(--foreground)",
                 }}
               >

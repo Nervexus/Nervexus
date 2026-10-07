@@ -12,7 +12,7 @@ export function MotivationalSpeech() {
   }, []);
 
   return (
-    <GlassCard strong className="animate-fade-up p-6">
+    <GlassCard strong className="featured-card animate-fade-up p-6">
       <p className="text-balance text-lg font-medium leading-relaxed">
         {speech ?? " "}
       </p>

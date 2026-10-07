@@ -15,10 +15,12 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-[65vh] flex-col justify-center">
-      <p className="animate-fade-up text-xs font-semibold uppercase tracking-[0.16em] text-muted-page">
-        {today}
-      </p>
-      <Greeting />
+      <div className="animate-fade-up text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-page">
+          {today}
+        </p>
+        <Greeting />
+      </div>
       <div className="mt-6">
         <MotivationalSpeech />
       </div>
