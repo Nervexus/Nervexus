@@ -34,7 +34,7 @@ export function Greeting() {
     : `${mode.line}.`;
 
   return (
-    <h1 className="text-balance mt-1 text-[26px] font-semibold leading-tight tracking-tight text-foreground-page">
+    <h1 className="text-balance mt-2 text-[34px] font-semibold leading-tight tracking-tight text-foreground-page">
       {text}
     </h1>
   );
