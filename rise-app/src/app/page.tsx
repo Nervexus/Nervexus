@@ -5,6 +5,11 @@ import { ChecklistsSummary, GoalsSummary } from "@/components/SummaryCards";
 import { RankBadge } from "@/components/RankBadge";
 import { Greeting } from "@/components/Greeting";
 
+// Rendered per-request rather than statically cached: the date label
+// and the greeting's time-of-day/harsh-line roll both need to reflect
+// "right now", not whatever moment this page last got prerendered.
+export const dynamic = "force-dynamic";
+
 export default function HomePage() {
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
