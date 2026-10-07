@@ -2182,23 +2182,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
         <textarea value="{{ perfAppealDraftVal }}" onInput="{{ setPerfAppealDraft }}" placeholder="Explain what happened…" style="width:100%; min-height:80px; padding:12px 14px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); color:#eef0f2; font-size:13px; resize:vertical; margin-bottom:14px;"></textarea>
         <div onClick="{{ submitPerfAppeal }}" style="padding:13px; border-radius:13px; cursor:pointer; background:#ff5563; color:#fff; font-size:13.5px; font-weight:700;">Submit appeal</div>
       </sc-if>
-      <sc-if value="{{ isOwner }}" hint-placeholder-val="{{ false }}">
-        <div style="margin-top:16px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.08); text-align:left;">
-          <span onClick="{{ toggleOwnerRecovery }}" style="text-align:center; display:block; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#b8b8c0' }">Owner recovery, bypass without waiting for appeal</span>
-          <sc-if value="{{ ownerRecoveryOpen }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
-              <div style="font-size:11px; color:#8b8b93; text-align:center;">Enter your 5-line recovery phrase, in order.</div>
-              <input value="{{ ownerRecLine0 }}" onInput="{{ setOwnerRecLine0 }}" placeholder="Line 1" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-              <input value="{{ ownerRecLine1 }}" onInput="{{ setOwnerRecLine1 }}" placeholder="Line 2" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-              <input value="{{ ownerRecLine2 }}" onInput="{{ setOwnerRecLine2 }}" placeholder="Line 3" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-              <input value="{{ ownerRecLine3 }}" onInput="{{ setOwnerRecLine3 }}" placeholder="Line 4" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-              <input value="{{ ownerRecLine4 }}" onInput="{{ setOwnerRecLine4 }}" placeholder="Line 5" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-              <sc-if value="{{ ownerRecoveryErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff3b4a; font-family:'JetBrains Mono',monospace; padding:2px 4px;">⚠ {{ ownerRecoveryErrVal }}</div></sc-if>
-              <div onClick="{{ submitOwnerRecovery }}" style="text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:#5B1A1A; color:#F5F1E8; font-size:13px; font-weight:700;">{{ ownerRecoveryBtnLabel }}</div>
-            </div>
-          </sc-if>
-        </div>
-      </sc-if>
       <div onClick="{{ logout }}" style="margin-top:14px; cursor:pointer; font-size:12px; color:#6f6f78;">Sign out</div>
     </div>
   </div>
@@ -2351,21 +2334,6 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
             <div style="font-size:12px; color:#ff3b4a; font-family:'JetBrains Mono',monospace; padding:2px 4px;">⚠ {{ loginErrDisplay }}</div>
           </sc-if>
           <div onClick="{{ doLogin2FA }}" style="margin-top:2px; text-align:center; padding:14px; border-radius:13px; cursor:pointer; background:{{ authBtnBg }}; color:{{ authBtnTextC }}; font-size:14px; font-weight:700; letter-spacing:.5px; box-shadow:0 4px 14px rgba(0,0,0,0.4); opacity:{{ authBtnOpacity }}; transition:box-shadow .15s,transform .15s;" style-hover="{ transform:'translateY(-1px)', boxShadow:'0 4px 20px rgba(196,255,61,0.3)' }">VERIFY →</div>
-          <sc-if value="{{ isPendingOwner }}" hint-placeholder-val="{{ false }}">
-            <span onClick="{{ toggleOwnerRecovery }}" style="text-align:center; font-size:11px; color:#7c7c84; cursor:pointer;" style-hover="{ color:'#b8b8c0' }">Forgot your 2FA code? Owner recovery</span>
-            <sc-if value="{{ ownerRecoveryOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex; flex-direction:column; gap:8px; margin-top:2px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08);">
-                <div style="font-size:11px; color:#8b8b93; text-align:center;">Enter your 5-line recovery phrase, in order.</div>
-                <input value="{{ ownerRecLine0 }}" onInput="{{ setOwnerRecLine0 }}" placeholder="Line 1" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-                <input value="{{ ownerRecLine1 }}" onInput="{{ setOwnerRecLine1 }}" placeholder="Line 2" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-                <input value="{{ ownerRecLine2 }}" onInput="{{ setOwnerRecLine2 }}" placeholder="Line 3" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-                <input value="{{ ownerRecLine3 }}" onInput="{{ setOwnerRecLine3 }}" placeholder="Line 4" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-                <input value="{{ ownerRecLine4 }}" onInput="{{ setOwnerRecLine4 }}" placeholder="Line 5" style="width:100%; padding:10px 13px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#eef0f2; font-size:13px; outline:none; box-sizing:border-box;">
-                <sc-if value="{{ ownerRecoveryErrShow }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px; color:#ff3b4a; font-family:'JetBrains Mono',monospace; padding:2px 4px;">⚠ {{ ownerRecoveryErrVal }}</div></sc-if>
-                <div onClick="{{ submitOwnerRecovery }}" style="text-align:center; padding:13px; border-radius:12px; cursor:pointer; background:#5B1A1A; color:#F5F1E8; font-size:13px; font-weight:700;">{{ ownerRecoveryBtnLabel }}</div>
-              </div>
-            </sc-if>
-          </sc-if>
           <div onClick="{{ backToCreds }}" style="text-align:center; font-size:11px; color:#6f6f78; margin-top:2px; cursor:pointer;" style-hover="{ color:'#b8b8c0' }">‹ Back to email &amp; password</div>
         </div>
         </sc-if>
@@ -9839,7 +9807,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.09.28-470 · v11.470 gentlemen-split';
+const NOTIF_BUILD_VERSION = '2026.10.07-471 · v11.471 remove-owner-recovery';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9856,7 +9824,6 @@ class Component extends DCLogic {
       loggedIn: !!s.loggedIn, scene:'home', listening:false, vLiveTranscript:'', voice:s.voice||'exec_f',
       loginEmail:'', loginPass:'', loginErr:'',
       sbReady:false, authUserId:'', profile:null, authBusy:false, signupPass:'', signupPass2:'', signupErr:'', _pendingProfile:null,
-      ownerRecoveryOpen:false, ownerRecoveryLines:['','','','',''], ownerRecoveryErr:'', ownerRecoveryBusy:false,
       loginStage:'creds', login2FAInput:'', pendingAuthEmail:'', loginFailCount:s.loginFailCount||0, loginLockUntil:s.loginLockUntil||0,
       focusMode:false,
       pwVisible:false, twoFAVisible:false, reqPwVisible:false,
@@ -11328,33 +11295,6 @@ activities: this._mergeShipLog(s.activities),
     const email=this.state.pendingAuthEmail; const code=this._getTwoFA(email);
     if((this.state.login2FAInput||'')===code && code!==''){ this._persistLock(0,0); this._completeLogin(email); }
     else { this._registerFail('Incorrect security code.'); this.setState({login2FAInput:''}); } }
-  // Owner-only emergency escape hatch — the one deliberate exception to "2FA has no
-  // recovery." Works from both the 2FA prompt (mid-login) and the Performance Terminal
-  // ban gate (after login) because a valid Supabase session already exists in both cases
-  // — the 2FA prompt and the ban gate are client-side UI overlays sitting in front of an
-  // already-authenticated session, not actual auth barriers, so the same authenticated
-  // edge function call works from either screen.
-  toggleOwnerRecovery(){ this.setState(s=>({ownerRecoveryOpen:!s.ownerRecoveryOpen, ownerRecoveryErr:'', ownerRecoveryLines:['','','','','']})); }
-  setOwnerRecoveryLine(i,e){ this.setState(s=>{ const lines=(s.ownerRecoveryLines||['','','','','']).slice(); lines[i]=e.target.value; return {ownerRecoveryLines:lines}; }); }
-  async submitOwnerRecovery(){
-    const lines=this.state.ownerRecoveryLines||['','','','',''];
-    if(lines.some(l=>!(l||'').trim())){ this.setState({ownerRecoveryErr:'Fill in all 5 lines.'}); return; }
-    this.setState({ownerRecoveryBusy:true, ownerRecoveryErr:''});
-    try{
-      const {data}=await window.sb.auth.getSession();
-      const token=data.session && data.session.access_token;
-      const res=await fetch(window.SUPABASE_CONFIG.url+'/functions/v1/ai-provider-proxy', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body:JSON.stringify({action:'verifyOwnerRecovery', lines}) });
-      const j=await res.json();
-      if(!j || !j.ok){ this.setState({ownerRecoveryBusy:false, ownerRecoveryErr:(j&&j.error)||'Recovery failed'}); return; }
-      this.setState(s=>({ ownerRecoveryBusy:false, ownerRecoveryOpen:false, ownerRecoveryLines:['','','','',''],
-        account:{...s.account, twoFA:''}, perfStatus:{...(s.perfStatus||{}), banned:false, missStreak:0, warnedAt:null} }));
-      if(this.state.loginStage==='twofa'){
-        const profile=this.state._pendingProfile;
-        this._persistLock(0,0);
-        this._sbCompleteLogin({user:{id:profile.id,email:profile.email}});
-      }
-    }catch(e){ this.setState({ownerRecoveryBusy:false, ownerRecoveryErr:(e&&e.message)||'Recovery failed'}); }
-  }
   backToCreds(){ this.setState({loginStage:'creds', login2FAInput:'', loginErr:'', forgotErr:'', forgotSent:false, recoveryErr:''}); }
   showForgot(){ this.setState({loginStage:'forgot', forgotErr:'', forgotSent:false, forgotEmail:this.state.loginEmail||'', show2FARecovery:false, recovery2FAInput:'', recovery2FANewPass:'', recovery2FAErr:''}); }
   toggle2FARecovery(){ this.setState(s=>({show2FARecovery:!s.show2FARecovery, recovery2FAErr:''})); }
@@ -15085,6 +15025,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.471', date:'Oct 7, 2026', major:false, kind:'fix', notes:[
+      "Removed Owner Recovery (the \"5-line recovery phrase\" bypass on the 2FA prompt and the Performance Terminal ban gate). Its server-side verification doesn't exist in what's actually deployed, so the form could never succeed, it just asked for a phrase and failed. Gone from both screens, the login-screen Troubleshooting FAQ entry that mentioned it, and the handful of state fields and methods behind it. No replacement, there wasn't a working feature here to replace.",
+    ]},
     {version:'v11.470', date:'Sep 28, 2026', major:true, kind:'perf', notes:[
       "Second scene split under the same renderVals() isolation work as v11.469: the Gentlemen's Centre (daily test, the five subject areas, dress and dining, and the subject quiz) moves out into its own component (gentlemen.dc.html), the same pattern as THE HARDENING. Confirmed with instrumented profiling that the parent's renderVals() no longer computes any of it — zero of that section's ~280 lines of derived data run on a keystroke anywhere else in the app, down from every keystroke everywhere. The daily-test streak gets its own dedicated local storage key with a one-time fallback from its old location, so an existing streak carries over. Verified functionally end to end — all eight subpages, the daily test through to a scored result, the subject quiz, mobile layout — with zero regressions elsewhere. Separately confirmed via CPU-throttled profiling against production that the mobile-specific slowness reported after v11.468 is this same fixed per-keystroke cost landing harder on real phone CPUs than on a desktop's — not a distinct mobile bug — so each scene split like this one narrows that gap directly.",
     ]},
@@ -20792,7 +20735,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
           { q:'My theme (Ultra / Noir / Maison Élysée) didn’t change', a:'Settings → Appearance → Theme applies immediately, but a stale cached build can hold the old look. Tap the refresh icon top-right (or Settings → Update Terminal) to force the latest version, then re-check.' },
           { q:'The voice assistant isn’t responding to the mic', a:'The browser needs microphone permission for this site. If it was denied once, it won’t ask again automatically. Check the site permissions in your browser’s address-bar icon and allow microphone access, then reload.' },
           { q:'A feature I was told about seems to be missing', a:'Tap the refresh icon top-right to force-pull the latest build, then compare the app version above against the newest entry in Settings → Update Terminal, if they don’t match you’re still on a cached older version.' },
-          { q:'I forgot my password, or I’m locked out of 2FA', a:'Password reset is available from the login screen via email. 2FA has no recovery path by design, if you’re locked out, use "Owner recovery" on the 2FA prompt, or ask the owner to review it from their side.' },
+          { q:'I forgot my password, or I’m locked out of 2FA', a:'Password reset is available from the login screen via email. 2FA has no recovery path by design, if you’re locked out, ask the owner to review it from their side.' },
         ];
         return { diagRows, troubleFaq, tsRefreshLabel:'Force refresh now' };
       }),
@@ -22384,14 +22327,6 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
       pendingAuthEmail:S.pendingAuthEmail||'',
       login2FAInput:S.login2FAInput||'', setLogin2FA:(e)=>this.setState({login2FAInput:e.target.value}), login2FAKey:enterKey(()=>this.doLogin2FA()), doLogin2FA:()=>this.doLogin2FA(), backToCreds:()=>this.backToCreds(),
       isPendingOwner:!!(S._pendingProfile && S._pendingProfile.role==='owner'),
-      ownerRecoveryOpen:!!S.ownerRecoveryOpen, toggleOwnerRecovery:()=>this.toggleOwnerRecovery(),
-      ownerRecLine0:(S.ownerRecoveryLines||['','','','',''])[0], setOwnerRecLine0:(e)=>this.setOwnerRecoveryLine(0,e),
-      ownerRecLine1:(S.ownerRecoveryLines||['','','','',''])[1], setOwnerRecLine1:(e)=>this.setOwnerRecoveryLine(1,e),
-      ownerRecLine2:(S.ownerRecoveryLines||['','','','',''])[2], setOwnerRecLine2:(e)=>this.setOwnerRecoveryLine(2,e),
-      ownerRecLine3:(S.ownerRecoveryLines||['','','','',''])[3], setOwnerRecLine3:(e)=>this.setOwnerRecoveryLine(3,e),
-      ownerRecLine4:(S.ownerRecoveryLines||['','','','',''])[4], setOwnerRecLine4:(e)=>this.setOwnerRecoveryLine(4,e),
-      ownerRecoveryErrShow:!!S.ownerRecoveryErr, ownerRecoveryErrVal:S.ownerRecoveryErr||'',
-      ownerRecoveryBtnLabel:S.ownerRecoveryBusy?'Verifying…':'RECOVER →', submitOwnerRecovery:()=>this.submitOwnerRecovery(),
       signupPass:S.signupPass||'', signupPass2:S.signupPass2||'', signupErr:S.signupErr||'', setSignupPass:(e)=>this.setState({signupPass:e.target.value}), setSignupPass2:(e)=>this.setState({signupPass2:e.target.value}), finishSetPw:()=>this._sbSetPassword(), setpwKey:enterKey(()=>this._sbSetPassword()), showLocalModeHint:!S.sbReady,
       loginErrDisplay:S.loginErr||'',
       authBtnBg:S.prefs.theme==='Ultra'?'#5B1A1A':'#FFFFFF', authBtnTextC:S.prefs.theme==='Ultra'?'#F5F1E8':'#0c0c0d', authBtnOpacity:1,
