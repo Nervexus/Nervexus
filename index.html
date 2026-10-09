@@ -2592,6 +2592,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </svg>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#968F82; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-motivation" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:16px; line-height:1.5; color:rgba(196,189,176,0.82); max-width:480px; margin:10px 0 0;">{{ homeMotivation }}</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid rgba(196,189,176,0.45); color:#C4BDB0; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'rgba(150,143,130,0.12)', borderColor:'#C4BDB0' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraVanguard }}" hint-placeholder-val="{{ false }}">
@@ -2620,6 +2621,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </svg>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:3px; color:#6E6E7A; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-motivation" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:16px; line-height:1.5; color:rgba(67,68,81,0.82); max-width:480px; margin:10px 0 0;">{{ homeMotivation }}</p>
             <span class="cc-home-powerbtn" onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:14px 34px; border-radius:999px; border:1px solid #9E1811; background:linear-gradient(135deg,#420A07 0%,#9E1811 100%); color:#FFFFFF; font-size:11px; letter-spacing:2px; font-weight:600; cursor:pointer;" style-hover="{ background:'linear-gradient(135deg,#5C1512 0%,#B82C22 100%)', borderColor:'#B82C22' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraMaison }}" hint-placeholder-val="{{ false }}">
@@ -2646,6 +2648,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               </svg>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:3.4px; color:rgba(253,250,244,0.78); text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-motivation" style="font-size:15px; font-weight:400; line-height:1.55; color:rgba(253,250,244,0.82); max-width:480px; margin:12px 0 0;">{{ homeMotivation }}</p>
             <span onClick="{{ powerOn }}" style="margin-top:14px; display:inline-flex; align-items:center; gap:10px; padding:13px 36px; border-radius:2px; border:1px solid rgba(246,240,228,0.7); color:#FDFAF4; font-size:10.5px; letter-spacing:2.6px; text-transform:uppercase; cursor:pointer;" style-hover="{ background:'rgba(253,250,244,0.14)', borderColor:'#FDFAF4' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isUltraLight }}" hint-placeholder-val="{{ false }}">
@@ -2658,6 +2661,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="width:120px; height:1px; background:rgba(91,26,26,0.32);"></div>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-motivation" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:16px; line-height:1.5; color:rgba(255,255,255,0.82); max-width:480px; margin:10px 0 0;">{{ homeMotivation }}</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
           <sc-if value="{{ isBaseTheme }}" hint-placeholder-val="{{ true }}">
@@ -2670,6 +2674,7 @@ html body .theme-maison .cc-api-dark.cc-api-dark textarea{
               <div style="width:120px; height:1px; background:rgba(255,255,255,0.42);"></div>
             </div>
             <p class="cc-home-sysline" style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:2.5px; color:#8a8a92; text-transform:uppercase;">{{ homeDateStr }} · Systems nominal</p>
+            <p class="cc-home-motivation" style="font-family:'Cormorant Garamond',Georgia,serif; font-style:italic; font-weight:500; font-size:16px; line-height:1.5; color:rgba(255,255,255,0.82); max-width:480px; margin:10px 0 0;">{{ homeMotivation }}</p>
             <span onClick="{{ powerOn }}" style="margin-top:10px; display:inline-flex; align-items:center; gap:10px; padding:15px 34px; border-radius:40px; border:1px solid rgba(255,255,255,0.5); color:#fff; font-size:12.5px; font-weight:600; letter-spacing:1.5px; cursor:pointer;" style-hover="{ background:'rgba(255,255,255,0.08)', borderColor:'#ffffff' }">{{ powerOnLabel }}</span>
           </sc-if>
         </div>
@@ -9807,7 +9812,7 @@ const UTTER_UNFINISHED = /(?:,|\b(?:and|or|but|so|then|also|plus|with|at|of|for|
 // for the rebuild; the mic, the transcript and the speech pipeline are all still live,
 // so it answers honestly instead of sitting mute or faking a canned reply.
 const VOICE_NO_BRAIN = 'My assistant engine is being rebuilt at the moment, so I can hear you and speak, but I can\u2019t act on anything yet.';
-const NOTIF_BUILD_VERSION = '2026.10.07-471 · v11.471 remove-owner-recovery';
+const NOTIF_BUILD_VERSION = '2026.10.09-472 · v11.472 home-motivation-line';
 class Component extends DCLogic {
   constructor(props){
     super(props);
@@ -9815,6 +9820,11 @@ class Component extends DCLogic {
        clicking through a 2FA login on every run is not a test of anything. Localhost only,
        so the live app exposes nothing. */
     try{ if(location.hostname==='127.0.0.1'||location.hostname==='localhost') window.__nvx=this; }catch(e){}
+    /* Home's motivational line. Picked once here, not in renderVals — renderVals runs on
+       every keystroke anywhere in the app, and re-rolling the line on every one of those
+       would make it flicker constantly instead of holding steady for the session. A fresh
+       page load re-runs the constructor, which is the "every refresh" the line is for. */
+    this._homeMotivation = this.HOME_MOTIVATION_LINES()[Math.floor(Math.random()*this.HOME_MOTIVATION_LINES().length)];
     const s=(()=>{ try{ return JSON.parse(localStorage.getItem('cc_v2')||'{}'); }catch(e){ return {}; } })();
     if(s.loggedIn && s.currentEmail && s.accounts){ const _acc=s.accounts[(s.currentEmail||'').trim().toLowerCase()]; if(_acc) Object.assign(s, _acc); }
     const D=86400000, now=Date.now();
@@ -10034,6 +10044,53 @@ activities: this._mergeShipLog(s.activities),
     // ElevenLabs key even though the user never meant to disable it. Force it back on once.
     const ec=this._provCfg('elevenlabs');
     if(ec.saved && ec.on===false && !ec._onCorrected) this._setProv('elevenlabs',{on:true,_onCorrected:true});
+  }
+  /* Harsh, not cruel — every line argues against a specific excuse rather than just insulting
+     effort in the abstract, same register as the rest of the app's own voice (direct, no
+     filler, no hedging). One per refresh, picked in the constructor. */
+  HOME_MOTIVATION_LINES(){
+    return [
+      "Motivation is for people who haven't started yet. You have. Stop waiting for it to come back.",
+      "Nobody is coming to do this for you. That was always true. Act like you finally believe it.",
+      "You don't feel ready because you haven't started. Start, then feel ready.",
+      "The version of you that keeps putting this off already knows how this ends.",
+      "Tired is not a reason. Tired is what doing hard things feels like. Keep going.",
+      "You've had this exact thought before and done nothing with it. Today's the day that changes, or it isn't.",
+      "Comfort is the only thing standing between you and the thing you say you want.",
+      "Nobody is impressed by how busy you've been avoiding the one thing that matters.",
+      "You don't need a better plan. You need to do the one you already have.",
+      "Every day you don't start is a day you've decided you're fine where you are. Are you?",
+      "Stop rehearsing the excuse. You already know it isn't true.",
+      "The work doesn't care how you feel about it. Show up anyway.",
+      "You can be tired and still show up. Those aren't mutually exclusive, you just treat them like they are.",
+      "Nobody owes you the result. You owe yourself the work.",
+      "If today were the only day that counted, would you be proud of it by now?",
+      "Discipline is what you call it when motivation didn't bother showing up and you did anyway.",
+      "You keep waiting for the week you'll feel like it. That week doesn't come. Move anyway.",
+      "The excuse sounds reasonable because you wrote it to be believed by exactly one person: you.",
+      "You're not behind because of bad luck. You're behind because of yesterday, and the day before that.",
+      "Nobody who's ever respected you did it for how hard you tried to avoid trying.",
+      "It doesn't get easier. You get capable of more. That only happens if you start now.",
+      "You already know what you should be doing right now. This is your reminder to go do it.",
+      "Stop negotiating with yourself over whether today counts. It counts. Start.",
+      "The goal doesn't move closer while you wait for the right mood.",
+      "You don't lack time. You lack a reason good enough to stop wasting it.",
+      "Say the thing you keep telling yourself out loud. Notice how little sense it makes.",
+      "Every day you don't show up, someone with less talent and more discipline closes the gap on you.",
+      "You're allowed to be scared. You're not allowed to let that be the whole story.",
+      "The hardest part was never the work. It's deciding, again, right now, to actually do it.",
+      "Quit measuring yourself against who you were last year. Measure against who you said you'd be today.",
+      "You don't need permission to take this seriously. Take it seriously.",
+      "Being busy is not the same as doing the thing that matters. You know which one this is.",
+      "The plan you keep perfecting instead of starting isn't a plan. It's a way of not starting.",
+      "If you wouldn't accept this excuse from someone you respect, don't accept it from yourself.",
+      "You don't have to want to. You just have to do it anyway. That's the whole skill.",
+      "Nobody's keeping score except you, and you already know the real number.",
+      "The person you want to become is built today, in the part you're currently avoiding.",
+      "You've survived every hard day so far. This one isn't going to be the exception.",
+      "Stop waiting to feel confident. Confidence is downstream of doing the work, not upstream of it.",
+      "Today is not a rehearsal for some better version of this later. This is it. Go.",
+    ];
   }
   _bootSeq(){
     const lines=['LOADING WORKSPACE…','CONNECTING SERVICES…','SYNCING DATA…','READY'];
@@ -15025,6 +15082,9 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
   // polish, layout and copy changes are NOT major — they belong in the log for whenever
   // someone goes looking. Roughly one in ten releases should qualify.
   _changelog(){ return [
+    {version:'v11.472', date:'Oct 9, 2026', major:false, kind:'design', notes:[
+      "Added a line to Home, under the date/systems line and above POWER ON: one short, deliberately blunt motivational line, picked from a built-in set of 40 on each fresh page load and held steady for the rest of the session (it doesn't re-roll while you're using the app, only on the next real refresh). Styled per raiment the same way the greeting above it is. Separate from the existing custom-quotes toast system in Settings, this one's app-authored and always on, no setup needed.",
+    ]},
     {version:'v11.471', date:'Oct 7, 2026', major:false, kind:'fix', notes:[
       "Removed Owner Recovery (the \"5-line recovery phrase\" bypass on the 2FA prompt and the Performance Terminal ban gate). Its server-side verification doesn't exist in what's actually deployed, so the form could never succeed, it just asked for a phrase and failed. Gone from both screens, the login-screen Troubleshooting FAQ entry that mentioned it, and the handful of state fields and methods behind it. No replacement, there wasn't a working feature here to replace.",
     ]},
@@ -22298,6 +22358,7 @@ _locDate(off){ const tz=(this.state&&this.state.account&&this.state.account.time
         return out; })(),
       learningTabs:['Maths','English','Science','Grammar','History','Speaking','Human Physiology','Money'].map(l=>({ label:l==='Human Physiology'?'Psychology':(l==='Money'?'Finance':l), go:()=>{ this._mtStopTicker(); if(S.qtMode!=='closed') this.qtClose(); this.setState({learningTab:l, mtMode:'hub'}); }, c:(S.learningTab||'Maths')===l?'#0a0a0b':'#c5c5ca', bg:(S.learningTab||'Maths')===l?'#F4F4F5':'transparent', active:(S.learningTab||'Maths')===l?'true':'false' })),
       homeGreeting, homeGreetingSize, homeDateStr, homeNavLinks, homeWordmark:(S.prefs.ultraStyle||'Ultra X'), powerOn:()=>this.powerOn(), powerOnLabel:S.powerChecking?'⏻ CHECKING SYSTEMS…':'⏻ POWER ON',
+      homeMotivation: this._homeMotivation,
       // The Vanguard hero frame's one corner motif, placed at all four corners by rotation
       // rather than drawn four times — 90° per corner keeps the curve's orientation
       // consistent all the way around rather than mirroring it.
