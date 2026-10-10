@@ -1,4 +1,5 @@
 import { siteConfig } from "@/config/site";
+import { ServicesCarousel } from "./ServicesCarousel";
 
 export function Services() {
   return (
@@ -17,21 +18,7 @@ export function Services() {
           </p>
         </div>
 
-        <div className="mt-20 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {siteConfig.services.map((service, index) => (
-            <div key={service.title} className="border-t border-warm/15 pt-6">
-              <span className="font-display text-sm text-gold-500">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-3 font-display text-xl text-warm">
-                {service.title}
-              </h3>
-              <p className="mt-3 text-[15px] leading-relaxed font-light text-warm/55">
-                {service.description}
-              </p>
-            </div>
-          ))}
-        </div>
+        <ServicesCarousel services={siteConfig.services} />
       </div>
     </section>
   );

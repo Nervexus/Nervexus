@@ -52,3 +52,13 @@ body {
 .text-balance {
   text-wrap: balance;
 }
+
+/* Hides the scrollbar on horizontally-scrolling carousels while keeping
+   native touch/trackpad scrolling and keyboard scroll intact. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
