@@ -46,7 +46,7 @@ export default async function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "80px 88px",
-          backgroundColor: "#0f1b2d",
+          backgroundColor: "#111111",
           fontFamily: "Inter",
         }}
       >
@@ -58,7 +58,7 @@ export default async function Image() {
             left: 36,
             right: 36,
             bottom: 36,
-            border: "1px solid rgba(176,141,87,0.35)",
+            border: "1px solid rgba(201,164,92,0.35)",
             display: "flex",
           }}
         />
@@ -70,13 +70,13 @@ export default async function Image() {
               width: 48,
               height: 48,
               borderRadius: 999,
-              border: "1px solid #b08d57",
+              border: "1px solid #c9a45c",
               alignItems: "center",
               justifyContent: "center",
               fontFamily: "Fraunces",
               fontStyle: "italic",
               fontSize: 24,
-              color: "#b08d57",
+              color: "#c9a45c",
             }}
           >
             C
@@ -85,7 +85,7 @@ export default async function Image() {
             style={{
               display: "flex",
               fontSize: 22,
-              color: "#cdc4b0",
+              color: "rgba(245,241,232,0.55)",
               letterSpacing: "0.2em",
             }}
           >
@@ -101,7 +101,7 @@ export default async function Image() {
               fontStyle: "italic",
               fontSize: 92,
               fontWeight: 500,
-              color: "#f7f4ee",
+              color: "#f5f1e8",
               lineHeight: 1.05,
               letterSpacing: "-0.01em",
             }}
@@ -113,7 +113,7 @@ export default async function Image() {
               display: "flex",
               fontSize: 30,
               fontWeight: 400,
-              color: "#9c9284",
+              color: "rgba(245,241,232,0.5)",
               maxWidth: 820,
             }}
           >
@@ -126,8 +126,8 @@ export default async function Image() {
             style={{
               display: "flex",
               alignItems: "center",
-              border: "1px solid #b08d57",
-              color: "#b08d57",
+              border: "1px solid #c9a45c",
+              color: "#c9a45c",
               fontSize: 26,
               letterSpacing: "0.04em",
               padding: "14px 30px",
@@ -141,7 +141,7 @@ export default async function Image() {
               fontSize: 22,
               fontWeight: 400,
               letterSpacing: "0.08em",
-              color: "#6e7788",
+              color: "rgba(245,241,232,0.35)",
             }}
           >
             FREE QUOTES · FULLY INSURED · 10-YEAR GUARANTEE

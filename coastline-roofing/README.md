@@ -15,7 +15,7 @@ below for how to turn it into one.
   image, so there's nothing slow to wait on.
 - **Tailwind CSS v4** — brand colours and fonts are defined once in
   `src/app/globals.css` (`@theme` block) and used as ordinary utility
-  classes (`bg-navy-950`, `text-brass-500`, etc.).
+  classes (`bg-ink-950`, `text-gold-500`, etc.).
 - **Fraunces** (an elegant serif, used italic for headlines) paired with
   **Inter** for body copy — self-hosted via `next/font/google`, no layout
   shift, no external font request at runtime.

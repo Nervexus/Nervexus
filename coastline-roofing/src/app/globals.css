@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 @theme {
-  /* Deep navy -- the single brand navy, used for dark section backgrounds
-     and as the body text colour on cream sections. */
-  --color-navy-950: #0f1b2d;
-  --color-navy-900: #0f1b2d;
-  --color-navy-800: #1c2d44;
-  --color-navy-700: #2a3f5c;
-  --color-navy-600: #3a5276;
+  /* Charcoal black -- the primary background (hero, header, footer, and
+     other "statement" sections) and the dark contrast colour used as text
+     on top of the gold accent. */
+  --color-ink-950: #111111;
+  /* Off-black -- the alternate section background, one notch lighter than
+     ink-950 so sections read as distinct without ever going light. */
+  --color-ink-900: #1c1c1c;
+  /* A touch lighter again -- hover states and borders on dark surfaces. */
+  --color-ink-800: #2a2a2a;
 
-  /* Brass -- the single accent colour. */
-  --color-brass-600: #96753f;
-  --color-brass-500: #b08d57;
-  --color-brass-400: #c6a97e;
-  --color-brass-300: #dbcbb3;
+  /* Muted gold -- the single accent colour. */
+  --color-gold-600: #a9824a;
+  --color-gold-500: #c9a45c;
+  --color-gold-400: #d7bb82;
+  --color-gold-300: #e4d3ab;
 
-  /* Soft cream -- the single section background, and the text colour on
-     navy sections. */
-  --color-cream: #f7f4ee;
-  --color-cream-dark: #e8e5df;
+  /* Warm white -- the single text colour. Every background in this theme
+     is dark, so there's no separate "text on light" variant to maintain;
+     this is used at full or reduced opacity everywhere. */
+  --color-warm: #f5f1e8;
 
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-inter);
@@ -26,8 +28,8 @@
   /* Quiet, barely-there shadows -- a wash of depth rather than a drop
      shadow. Luxury surfaces read as flat; a thin border does most of the
      separating work instead. */
-  --shadow-card: 0 1px 2px rgba(15, 27, 45, 0.03), 0 8px 20px -14px rgba(15, 27, 45, 0.12);
-  --shadow-card-lg: 0 1px 2px rgba(15, 27, 45, 0.04), 0 16px 40px -20px rgba(15, 27, 45, 0.16);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 20px -14px rgba(0, 0, 0, 0.4);
+  --shadow-card-lg: 0 1px 2px rgba(0, 0, 0, 0.25), 0 16px 40px -20px rgba(0, 0, 0, 0.5);
 }
 
 html {
@@ -35,16 +37,16 @@ html {
 }
 
 body {
-  background: var(--color-cream);
-  color: var(--color-navy-900);
+  background: var(--color-ink-900);
+  color: var(--color-warm);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Keep the brand consistent regardless of the visitor's OS colour-scheme
    setting -- this is a single-brand marketing page, not an app, so we
-   intentionally don't offer a dark variant. */
+   intentionally don't offer a light variant. */
 :root {
-  color-scheme: light only;
+  color-scheme: dark only;
 }
 
 .text-balance {

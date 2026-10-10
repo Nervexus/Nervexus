@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: siteConfig.colors.navy,
+  themeColor: siteConfig.colors.ink,
   width: "device-width",
   initialScale: 1,
 };
@@ -64,7 +64,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-GB" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="min-h-dvh bg-cream font-sans text-navy-950 antialiased">
+      <body className="min-h-dvh bg-ink-900 font-sans text-warm antialiased">
         {children}
       </body>
     </html>

@@ -193,11 +193,11 @@ export const siteConfig = {
 
   // --- Colours (also mirrored as CSS variables in globals.css) ----------
   colors: {
-    navy: "#0f1b2d",
-    navyDark: "#0f1b2d",
-    brass: "#b08d57",
-    brassDark: "#96753f",
-    cream: "#f7f4ee",
+    ink: "#111111",
+    inkSurface: "#1c1c1c",
+    gold: "#c9a45c",
+    goldDark: "#a9824a",
+    warm: "#f5f1e8",
   },
 
   // --- Misc --------------------------------------------------------------
