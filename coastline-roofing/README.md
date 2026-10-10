@@ -112,18 +112,14 @@ attribution appreciated but not required).
 | `hero.jpg` | roofer securing shingles on a pitched roof | Raze Solar — unsplash.com/photos/Scaj0T40nFI |
 | `gallery-before-1.jpg` | close-up of an aged, moss-covered shingle roof | supplied directly, not stock — genuine before photo |
 | `gallery-after-1.jpg` | the same roofline after a slate tile re-roof | supplied directly, not stock — genuine after photo |
-| `gallery-before-2.jpg` | roofer stripping old shingles mid-repair | Zohair Mirza — unsplash.com/photos/GXITWKvgm-k |
-| `gallery-after-2.jpg` | neat, intact dark shingle roof | Yucel M — unsplash.com/photos/TnhkSNZPXd8 |
+| `gallery-before-2.jpg` | a plain flat roof before a roof lantern was fitted | supplied directly, not stock — genuine before photo |
+| `gallery-after-2.jpg` | the same flat roof with a new glass roof lantern | supplied directly, not stock — genuine after photo |
 | `gallery-before-3.jpg` | rusted old guttering and moss-covered tiles | supplied directly, not stock — genuine before photo |
 | `gallery-after-3.jpg` | the same roofline with new tiles and black guttering | supplied directly, not stock — genuine after photo |
 
-**Honesty note on the gallery:** the `gallery-before-1.jpg` /
-`gallery-after-1.jpg` and `gallery-before-3.jpg` / `gallery-after-3.jpg`
-pairs are genuine matched before/afters of the same roof. The middle
-pair (`gallery-before-2.jpg` / `gallery-after-2.jpg`) is a representative
-stock pair chosen to illustrate "before" and "after" conditions — it is
-**not** an actual before/after of the same property. For a real client,
-replace all of these with their own job-site photos.
+**Honesty note on the gallery:** all three pairs are genuine matched
+before/afters of the same roof (not stock photography). For a real
+client, swap these for their own job-site photos.
 
 ## Rebranding for a real client
 

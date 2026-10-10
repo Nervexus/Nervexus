@@ -170,13 +170,13 @@ export const siteConfig = {
     {
       before: {
         src: "/images/gallery-before-2.jpg",
-        alt: "Roofer stripping old, damaged shingles during a repair",
+        alt: "A plain flat roof before a new roof lantern was fitted",
       },
       after: {
         src: "/images/gallery-after-2.jpg",
-        alt: "Neat, intact shingle roof after repair work is complete",
+        alt: "The same flat roof fitted with a new glass roof lantern",
       },
-      caption: "Roof repair & renewal",
+      caption: "Flat roof renewal — roof lantern installed",
     },
     {
       before: {
