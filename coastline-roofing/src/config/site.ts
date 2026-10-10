@@ -181,11 +181,11 @@ export const siteConfig = {
     {
       before: {
         src: "/images/gallery-before-3.jpg",
-        alt: "Grimy, moss-clogged old guttering before replacement",
+        alt: "Rusted old guttering and moss-covered roof tiles before replacement",
       },
       after: {
         src: "/images/gallery-after-3.jpg",
-        alt: "Clean new guttering and downpipe after replacement",
+        alt: "The same roofline fitted with new tiles and black guttering after replacement",
       },
       caption: "Guttering & fascia replacement",
     },
