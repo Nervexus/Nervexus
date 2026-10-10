@@ -3,10 +3,10 @@ import { BeforeAfterSlider } from "./BeforeAfterSlider";
 
 export function Gallery() {
   return (
-    <section id="gallery" className="bg-white py-20 sm:py-28">
+    <section id="gallery" className="bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-orange-600">
+          <p className="text-sm font-semibold uppercase tracking-wider text-brass-600">
             Our Work
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-950 sm:text-4xl">

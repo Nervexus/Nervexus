@@ -15,7 +15,7 @@ below for how to turn it into one.
   image, so there's nothing slow to wait on.
 - **Tailwind CSS v4** — brand colours and fonts are defined once in
   `src/app/globals.css` (`@theme` block) and used as ordinary utility
-  classes (`bg-navy-950`, `text-orange-500`, etc.).
+  classes (`bg-navy-950`, `text-brass-500`, etc.).
 - No database, no backend, no API keys required to run or deploy.
 
 ## The one config file

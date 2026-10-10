@@ -46,9 +46,9 @@ export default async function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px 80px",
-          backgroundColor: "#0c1f3d",
+          backgroundColor: "#0f1b2d",
           backgroundImage:
-            "radial-gradient(circle at 85% 18%, rgba(240,114,28,0.35), rgba(240,114,28,0) 45%)",
+            "radial-gradient(circle at 85% 18%, rgba(176,141,87,0.35), rgba(176,141,87,0) 45%)",
           fontFamily: "Inter",
         }}
       >
@@ -72,14 +72,14 @@ export default async function Image() {
             <polyline
               points="0,420 180,300 360,420 540,280 720,420 900,320 1080,420 1260,300"
               fill="none"
-              stroke="#f0721c"
+              stroke="#b08d57"
               strokeOpacity="0.25"
               strokeWidth="6"
             />
             <polyline
               points="-60,500 140,380 340,500 540,360 740,500 940,390 1140,500"
               fill="none"
-              stroke="#ffffff"
+              stroke="#f7f4ee"
               strokeOpacity="0.08"
               strokeWidth="6"
             />
@@ -93,7 +93,7 @@ export default async function Image() {
               width: 56,
               height: 56,
               borderRadius: 14,
-              backgroundColor: "#f0721c",
+              backgroundColor: "#b08d57",
               alignItems: "center",
               justifyContent: "center",
             }}
@@ -101,7 +101,7 @@ export default async function Image() {
             <svg width="30" height="30" viewBox="0 0 64 64">
               <path
                 d="M32 14 L52 32 H44 V48 H20 V32 H12 Z"
-                fill="#0c1f3d"
+                fill="#0f1b2d"
               />
             </svg>
           </div>
@@ -109,7 +109,7 @@ export default async function Image() {
             style={{
               display: "flex",
               fontSize: 30,
-              color: "#f7f5f1",
+              color: "#f7f4ee",
               letterSpacing: "0.02em",
             }}
           >
@@ -124,7 +124,7 @@ export default async function Image() {
               fontFamily: "Sora",
               fontSize: 96,
               fontWeight: 700,
-              color: "#ffffff",
+              color: "#f7f4ee",
               lineHeight: 1.02,
               letterSpacing: "-0.02em",
             }}
@@ -136,7 +136,7 @@ export default async function Image() {
               display: "flex",
               fontSize: 34,
               fontWeight: 400,
-              color: "#cbd5e1",
+              color: "#cdc4b0",
               maxWidth: 900,
             }}
           >
@@ -150,8 +150,8 @@ export default async function Image() {
               display: "flex",
               alignItems: "center",
               gap: 14,
-              backgroundColor: "#f0721c",
-              color: "#0c1f3d",
+              backgroundColor: "#b08d57",
+              color: "#0f1b2d",
               fontSize: 30,
               padding: "16px 32px",
               borderRadius: 999,
@@ -164,7 +164,7 @@ export default async function Image() {
               display: "flex",
               fontSize: 26,
               fontWeight: 400,
-              color: "#9fb0c9",
+              color: "#9c9284",
             }}
           >
             Free Quotes · Fully Insured · 10-Year Guarantee

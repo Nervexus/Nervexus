@@ -6,7 +6,7 @@ export function Services() {
     <section id="services" className="bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wider text-orange-600">
+          <p className="text-sm font-semibold uppercase tracking-wider text-brass-600">
             What We Do
           </p>
           <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-950 sm:text-4xl">
@@ -26,7 +26,7 @@ export function Services() {
                 key={service.title}
                 className="group rounded-2xl border border-navy-900/8 bg-white p-7 shadow-card transition-all hover:-translate-y-1 hover:shadow-card-lg"
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy-950 text-orange-400 transition-colors group-hover:bg-orange-500 group-hover:text-navy-950">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-navy-950 text-brass-400 transition-colors group-hover:bg-brass-500 group-hover:text-navy-950">
                   <Icon className="h-6 w-6" />
                 </span>
                 <h3 className="mt-5 font-display text-lg font-bold text-navy-950">

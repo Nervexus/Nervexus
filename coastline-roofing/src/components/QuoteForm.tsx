@@ -28,8 +28,8 @@ export function QuoteForm() {
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-orange-500/20 bg-orange-500/5 px-8 py-14 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-white">
+      <div className="flex flex-col items-center rounded-2xl border border-brass-500/20 bg-brass-500/5 px-8 py-14 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brass-500 text-navy-950">
           <CheckIcon className="h-7 w-7" />
         </span>
         <h3 className="mt-5 font-display text-2xl font-bold text-navy-950">
@@ -41,9 +41,9 @@ export function QuoteForm() {
         </p>
         <a
           href={siteConfig.phone.href}
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-navy-950 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-900"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-navy-950 px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-navy-900"
         >
-          <PhoneIcon className="h-4 w-4 text-orange-400" />
+          <PhoneIcon className="h-4 w-4 text-brass-400" />
           {siteConfig.phone.display}
         </a>
       </div>
@@ -65,7 +65,7 @@ export function QuoteForm() {
           type="text"
           required
           autoComplete="name"
-          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20"
           placeholder="Jane Smith"
         />
       </div>
@@ -80,7 +80,7 @@ export function QuoteForm() {
           type="tel"
           required
           autoComplete="tel"
-          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20"
           placeholder="07123 456789"
         />
       </div>
@@ -98,7 +98,7 @@ export function QuoteForm() {
           type="text"
           required
           autoComplete="postal-code"
-          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20"
           placeholder="SO14 5XX"
         />
       </div>
@@ -115,7 +115,7 @@ export function QuoteForm() {
           name="jobType"
           required
           defaultValue=""
-          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+          className="mt-1.5 w-full rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20"
         >
           <option value="" disabled>
             Select a job type
@@ -139,7 +139,7 @@ export function QuoteForm() {
           id="message"
           name="message"
           rows={4}
-          className="mt-1.5 w-full resize-none rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+          className="mt-1.5 w-full resize-none rounded-lg border border-navy-900/15 bg-white px-3.5 py-2.5 text-navy-950 outline-none transition-colors focus:border-brass-500 focus:ring-2 focus:ring-brass-500/20"
           placeholder="E.g. a few slates came off in the recent storm and there's a leak in the back bedroom..."
         />
       </div>
@@ -147,7 +147,7 @@ export function QuoteForm() {
       <div className="sm:col-span-2">
         <button
           type="submit"
-          className="w-full rounded-full bg-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-card transition-colors hover:bg-orange-600 sm:w-auto"
+          className="w-full rounded-full bg-brass-500 px-6 py-3.5 text-base font-semibold text-navy-950 shadow-card transition-colors hover:bg-brass-600 sm:w-auto"
         >
           Get My Free Quote
         </button>

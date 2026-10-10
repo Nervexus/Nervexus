@@ -1,25 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-950: #050d1c;
-  --color-navy-900: #0c1f3d;
-  --color-navy-800: #142c52;
-  --color-navy-700: #1d3b6b;
-  --color-navy-600: #2a4f86;
+  /* Deep navy -- the single brand navy, used for dark section backgrounds
+     and as the body text colour on cream sections. */
+  --color-navy-950: #0f1b2d;
+  --color-navy-900: #0f1b2d;
+  --color-navy-800: #1c2d44;
+  --color-navy-700: #2a3f5c;
+  --color-navy-600: #3a5276;
 
-  --color-orange-600: #d9570f;
-  --color-orange-500: #f0721c;
-  --color-orange-400: #f6903f;
-  --color-orange-300: #f9ab6b;
+  /* Brass -- the single accent colour. */
+  --color-brass-600: #96753f;
+  --color-brass-500: #b08d57;
+  --color-brass-400: #c6a97e;
+  --color-brass-300: #dbcbb3;
 
-  --color-cream: #f7f5f1;
-  --color-cream-dark: #ece7dd;
+  /* Soft cream -- the single section background, and the text colour on
+     navy sections. */
+  --color-cream: #f7f4ee;
+  --color-cream-dark: #e8e5df;
 
   --font-display: var(--font-sora);
   --font-sans: var(--font-inter);
 
-  --shadow-card: 0 1px 2px rgba(5, 13, 28, 0.04), 0 12px 24px -12px rgba(5, 13, 28, 0.18);
-  --shadow-card-lg: 0 2px 4px rgba(5, 13, 28, 0.06), 0 24px 48px -20px rgba(5, 13, 28, 0.25);
+  --shadow-card: 0 1px 2px rgba(15, 27, 45, 0.04), 0 12px 24px -12px rgba(15, 27, 45, 0.18);
+  --shadow-card-lg: 0 2px 4px rgba(15, 27, 45, 0.06), 0 24px 48px -20px rgba(15, 27, 45, 0.25);
 }
 
 html {
@@ -28,7 +33,7 @@ html {
 
 body {
   background: var(--color-cream);
-  color: var(--color-navy-950);
+  color: var(--color-navy-900);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 

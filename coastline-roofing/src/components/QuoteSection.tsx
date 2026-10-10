@@ -3,11 +3,11 @@ import { QuoteForm } from "./QuoteForm";
 
 export function QuoteSection() {
   return (
-    <section id="quote" className="bg-white py-20 sm:py-28">
+    <section id="quote" className="bg-cream py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-5 lg:gap-16">
           <div className="lg:col-span-2">
-            <p className="text-sm font-semibold uppercase tracking-wider text-orange-600">
+            <p className="text-sm font-semibold uppercase tracking-wider text-brass-600">
               Get In Touch
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-navy-950 sm:text-4xl">
