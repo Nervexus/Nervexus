@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Matches elements that are, or sit inside, the light theme's root
+   attribute -- lets us write `light:` utilities the same way `dark:` would
+   normally work, since here dark is the default brand and light is the
+   alternate. */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
 @theme {
   /* Charcoal black -- the primary background (hero, header, footer, and
      other "statement" sections) and the dark contrast colour used as text
@@ -24,6 +30,7 @@
 
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-inter);
+  --font-heading: var(--font-montserrat);
 
   /* Quiet, barely-there shadows -- a wash of depth rather than a drop
      shadow. Luxury surfaces read as flat; a thin border does most of the
@@ -42,11 +49,51 @@ body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Keep the brand consistent regardless of the visitor's OS colour-scheme
-   setting -- this is a single-brand marketing page, not an app, so we
-   intentionally don't offer a light variant. */
 :root {
-  color-scheme: dark only;
+  color-scheme: dark;
+}
+
+/*
+ * Light theme -- a separate, sharp navy-and-corporate palette rather than a
+ * simple inversion of the dark one. Every component already styles itself
+ * purely with the ink, gold, and warm tokens above, so redefining what those
+ * tokens resolve to here re-skins the whole site without touching component
+ * markup: ink-950 (statement surfaces: header, footer, hero, trust bar,
+ * reviews, carousel cards) becomes navy; ink-900 (the base/content
+ * sections) becomes white; ink-800 (secondary surfaces) becomes the light
+ * grey-blue; gold (the single accent) becomes the lighter navy, since this
+ * palette has no separate accent hue; warm (text) becomes dark slate, which
+ * is correct everywhere except the still-navy statement surfaces -- see
+ * `.dark-surface` below for that one exception.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --color-ink-950: #0b1f3a;
+  --color-ink-900: #ffffff;
+  --color-ink-800: #f4f6f9;
+
+  --color-gold-600: #0b1f3a;
+  --color-gold-500: #1e3a5f;
+  --color-gold-400: #1e3a5f;
+  --color-gold-300: #1e3a5f;
+
+  --color-warm: #1a1a1a;
+
+  --font-display: var(--font-heading);
+}
+
+/* The statement surfaces (ink-950) stay navy in light mode instead of
+   turning white, so their text and accents need to stay white too --
+   "white on navy", per the brief -- rather than picking up the dark-slate-
+   on-white pairing the rest of the light theme uses. Apply this class to
+   any element whose background is ink-950/ink-800 and needs that flip. */
+[data-theme="light"] .dark-surface {
+  --color-warm: #ffffff;
+  --color-gold-600: #ffffff;
+  --color-gold-500: #ffffff;
+  --color-gold-400: #ffffff;
+  --color-gold-300: #ffffff;
 }
 
 .text-balance {

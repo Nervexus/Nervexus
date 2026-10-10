@@ -2,7 +2,7 @@ import { siteConfig } from "@/config/site";
 
 export function TrustBar() {
   return (
-    <section className="bg-ink-950">
+    <section className="dark-surface bg-ink-950">
       <div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4">
         {siteConfig.trustPoints.map((point, index) => {
           const isLeftCol = index % 2 === 0;

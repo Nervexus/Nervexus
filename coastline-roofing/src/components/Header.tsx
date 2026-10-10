@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { PhoneIcon } from "./icons";
+import { ThemeToggle } from "./ThemeToggle";
 
 const navLinks = [
   { href: "#services", label: "Services" },
@@ -11,11 +12,13 @@ const navLinks = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-warm/10 bg-ink-950/95 backdrop-blur supports-[backdrop-filter]:bg-ink-950/80">
+    <header className="dark-surface sticky top-0 z-40 border-b border-warm/10 bg-ink-950/95 backdrop-blur supports-[backdrop-filter]:bg-ink-950/80">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="#top" className="flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold-400/60 text-gold-400">
-            <span className="font-display text-base italic">C</span>
+            <span className="font-display text-base italic light:not-italic">
+              C
+            </span>
           </span>
           <span className="font-display text-xl tracking-tight text-warm">
             {siteConfig.name}
@@ -44,10 +47,11 @@ export function Header() {
           </a>
           <a
             href="#quote"
-            className="border border-gold-500 px-5 py-2.5 text-xs font-medium tracking-[0.12em] text-gold-400 uppercase transition-colors hover:bg-gold-500 hover:text-ink-950"
+            className="border border-gold-500 px-5 py-2.5 text-xs font-medium tracking-[0.12em] text-gold-400 uppercase transition-colors hover:bg-gold-500 hover:text-ink-950 light:rounded-[3px]"
           >
             Free Quote
           </a>
+          <ThemeToggle />
         </div>
       </div>
     </header>

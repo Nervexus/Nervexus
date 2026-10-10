@@ -18,7 +18,7 @@ export function BeforeAfterSlider({
   const sliderId = useId();
 
   return (
-    <div className="overflow-hidden border border-warm/10 bg-ink-950">
+    <div className="dark-surface overflow-hidden border border-warm/10 bg-ink-950 light:rounded-[3px]">
       <div className="relative aspect-[4/3] select-none overflow-hidden bg-ink-800">
         <Image
           src={after.src}

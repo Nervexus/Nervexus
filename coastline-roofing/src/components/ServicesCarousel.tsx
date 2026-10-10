@@ -116,7 +116,7 @@ export function ServicesCarousel({
               initial={false}
               transition={{ type: "spring", stiffness: 260, damping: 32 }}
               className={cn(
-                "absolute w-[78vw] shrink-0 border border-warm/10 bg-ink-950 p-8 text-left sm:w-[340px]",
+                "dark-surface absolute w-[78vw] shrink-0 border border-warm/10 bg-ink-950 p-8 text-left sm:w-[340px] light:rounded-[3px]",
                 isActive ? "cursor-default" : "cursor-pointer"
               )}
               style={{ pointerEvents: Math.abs(offset) > VISIBLE_RADIUS ? "none" : "auto" }}

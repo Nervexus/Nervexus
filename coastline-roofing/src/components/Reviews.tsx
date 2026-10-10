@@ -3,7 +3,7 @@ import { StarIcon } from "./icons";
 
 export function Reviews() {
   return (
-    <section id="reviews" className="bg-ink-950 py-28 sm:py-36">
+    <section id="reviews" className="dark-surface bg-ink-950 py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium tracking-[0.2em] text-gold-400 uppercase">
@@ -34,7 +34,7 @@ export function Reviews() {
                   />
                 ))}
               </div>
-              <blockquote className="mt-5 flex-1 font-display text-lg leading-snug text-warm/90 italic">
+              <blockquote className="mt-5 flex-1 font-display text-lg leading-snug text-warm/90 italic light:not-italic">
                 &ldquo;{review.text}&rdquo;
               </blockquote>
               <figcaption className="mt-6 text-xs tracking-[0.08em] text-warm/45 uppercase">

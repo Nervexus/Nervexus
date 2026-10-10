@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, Inter, Montserrat } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -15,6 +16,13 @@ const fraunces = Fraunces({
   display: "swap",
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["500", "600", "700"],
 });
 
 const title = `${siteConfig.name} | Roofers in ${siteConfig.town}, ${siteConfig.county}`;
@@ -63,9 +71,20 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={`${inter.variable} ${fraunces.variable}`}>
+    <html
+      lang="en-GB"
+      className={`${inter.variable} ${fraunces.variable} ${montserrat.variable}`}
+      suppressHydrationWarning
+    >
       <body className="min-h-dvh bg-ink-900 font-sans text-warm antialiased">
-        {children}
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="dark"
+          themes={["dark", "light"]}
+          enableSystem={false}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

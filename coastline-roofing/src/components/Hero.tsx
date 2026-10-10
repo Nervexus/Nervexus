@@ -4,7 +4,7 @@ import { PhoneIcon } from "./icons";
 
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden bg-ink-950">
+    <section id="top" className="dark-surface relative overflow-hidden bg-ink-950">
       <div className="absolute inset-0">
         <Image
           src="/images/hero.jpg"
@@ -36,7 +36,7 @@ export function Hero() {
           <div className="mt-11 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
             <a
               href={siteConfig.phone.href}
-              className="inline-flex items-center justify-center gap-3 bg-gold-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-ink-950 uppercase transition-colors hover:bg-gold-400"
+              className="inline-flex items-center justify-center gap-3 bg-gold-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-ink-950 uppercase transition-colors hover:bg-gold-400 light:rounded-[3px]"
             >
               <PhoneIcon className="h-4 w-4" />
               Call Now

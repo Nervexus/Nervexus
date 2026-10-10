@@ -7,13 +7,15 @@ const year = new Date().getFullYear();
 
 export function Footer() {
   return (
-    <footer className="bg-ink-950 pt-20 pb-28 text-warm/70 sm:pb-20">
+    <footer className="dark-surface bg-ink-950 pt-20 pb-28 text-warm/70 sm:pb-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold-400/60 text-gold-400">
-                <span className="font-display text-base italic">C</span>
+                <span className="font-display text-base italic light:not-italic">
+                  C
+                </span>
               </span>
               <span className="font-display text-xl text-warm">
                 {siteConfig.name}

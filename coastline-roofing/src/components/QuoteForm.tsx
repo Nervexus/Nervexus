@@ -47,7 +47,7 @@ export function QuoteForm() {
         </p>
         <a
           href={siteConfig.phone.href}
-          className="mt-8 inline-flex items-center gap-2 border border-warm px-6 py-3 text-xs font-medium tracking-[0.12em] text-warm uppercase transition-colors hover:bg-warm hover:text-ink-950"
+          className="mt-8 inline-flex items-center gap-2 border border-warm px-6 py-3 text-xs font-medium tracking-[0.12em] text-warm uppercase transition-colors hover:bg-warm hover:text-ink-950 light:rounded-[3px] light:hover:text-white"
         >
           <PhoneIcon className="h-4 w-4" />
           {siteConfig.phone.display}
@@ -144,7 +144,7 @@ export function QuoteForm() {
       <div className="sm:col-span-2 mt-4">
         <button
           type="submit"
-          className="w-full bg-gold-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-ink-950 uppercase transition-colors hover:bg-gold-600 sm:w-auto"
+          className="w-full bg-gold-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-ink-950 uppercase transition-colors hover:bg-gold-600 sm:w-auto light:rounded-[3px] light:text-white"
         >
           Get My Free Quote
         </button>
