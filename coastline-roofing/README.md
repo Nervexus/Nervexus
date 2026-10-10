@@ -133,8 +133,8 @@ client, swap these for their own job-site photos.
 5. Wire up the quote form to a real backend (see above).
 6. Remove the `noindex` robots settings (in `layout.tsx` and
    `robots.ts`) once the real site is ready to be found by Google.
-7. Remove the "Demo site — business details shown are fictional." line
-   in `Footer.tsx`.
+7. Remove the "Demo site — Created by Madoxs Harvey" line in
+   `Footer.tsx`.
 
 ## Local development
 

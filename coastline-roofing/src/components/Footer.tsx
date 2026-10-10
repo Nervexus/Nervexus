@@ -90,7 +90,9 @@ export function Footer() {
           <p>
             &copy; {year} {siteConfig.name}. All rights reserved.
           </p>
-          <p>Demo site — business details shown are fictional.</p>
+          <p className="font-semibold text-warm/80">
+            Demo site — Created by Madoxs Harvey
+          </p>
         </div>
       </div>
     </footer>
