@@ -24,11 +24,14 @@ export function ServicesCarousel({
     const atStart = el.scrollLeft <= tolerance;
     const atEnd = el.scrollLeft >= maxScroll - tolerance;
 
-    // Endless loop: stepping past either edge wraps around to the other end.
+    // Endless loop: stepping past either edge wraps around to the other
+    // end. That wrap is an instant cut, not a smooth scroll -- animating it
+    // would visibly slide backwards through every card, which reads as
+    // "going back" instead of "looping forward to the first card".
     if (direction === 1 && atEnd) {
-      el.scrollTo({ left: 0, behavior: "smooth" });
+      el.scrollTo({ left: 0, behavior: "auto" });
     } else if (direction === -1 && atStart) {
-      el.scrollTo({ left: maxScroll, behavior: "smooth" });
+      el.scrollTo({ left: maxScroll, behavior: "auto" });
     } else {
       el.scrollBy({ left: step * direction, behavior: "smooth" });
     }
@@ -57,7 +60,7 @@ export function ServicesCarousel({
 
       <div
         ref={scrollerRef}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto scroll-smooth px-4 pb-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
       >
         {services.map((service, index) => (
           <div
