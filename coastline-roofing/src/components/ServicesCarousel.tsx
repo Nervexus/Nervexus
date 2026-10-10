@@ -16,8 +16,22 @@ export function ServicesCarousel({
     if (!el) return;
     const card = el.querySelector<HTMLElement>("[data-card]");
     const gap = 24;
-    const amount = card ? card.offsetWidth + gap : 320;
-    el.scrollBy({ left: amount * direction, behavior: "smooth" });
+    const step = card ? card.offsetWidth + gap : 320;
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    // A generous tolerance -- the container's own side padding means the
+    // resting scroll position at either end isn't exactly 0 / maxScroll.
+    const tolerance = step / 2;
+    const atStart = el.scrollLeft <= tolerance;
+    const atEnd = el.scrollLeft >= maxScroll - tolerance;
+
+    // Endless loop: stepping past either edge wraps around to the other end.
+    if (direction === 1 && atEnd) {
+      el.scrollTo({ left: 0, behavior: "smooth" });
+    } else if (direction === -1 && atStart) {
+      el.scrollTo({ left: maxScroll, behavior: "smooth" });
+    } else {
+      el.scrollBy({ left: step * direction, behavior: "smooth" });
+    }
   }
 
   return (
