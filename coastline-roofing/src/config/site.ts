@@ -203,7 +203,7 @@ export const siteConfig = {
   // --- Misc --------------------------------------------------------------
   // Used to build absolute URLs for Open Graph/Twitter images. Update this
   // once the real Vercel URL (or custom domain) is known.
-  siteUrl: "https://coastline-roofing-demo.vercel.app",
+  siteUrl: "https://coastline-roofing.vercel.app",
   isDemo: true,
 } as const;
 
