@@ -1,20 +1,25 @@
 import { siteConfig } from "@/config/site";
-import { trustIcons } from "./icons";
 
 export function TrustBar() {
   return (
-    <section className="border-b border-navy-900/5 bg-cream">
-      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:gap-8 lg:px-8">
-        {siteConfig.trustPoints.map((point) => {
-          const Icon = trustIcons[point.icon];
+    <section className="bg-navy-950">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 lg:grid-cols-4">
+        {siteConfig.trustPoints.map((point, index) => {
+          const isLeftCol = index % 2 === 0;
+          const isTopRow = index < 2;
           return (
-            <div key={point.label} className="flex items-center gap-3.5">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brass-500/10 text-brass-600">
-                <Icon className="h-5 w-5" />
-              </span>
-              <span className="text-sm font-semibold leading-tight text-navy-900 sm:text-base">
+            <div
+              key={point.label}
+              className={[
+                "border-cream/10 px-6 py-8 text-center sm:px-8",
+                isLeftCol ? "border-r lg:border-r-0" : "",
+                isTopRow ? "border-b lg:border-b-0" : "",
+                index > 0 ? "lg:border-l" : "",
+              ].join(" ")}
+            >
+              <p className="font-display text-base text-cream sm:text-lg">
                 {point.label}
-              </span>
+              </p>
             </div>
           );
         })}

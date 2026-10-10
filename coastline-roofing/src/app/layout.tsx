@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Sora } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -9,11 +9,12 @@ const inter = Inter({
   display: "swap",
 });
 
-const sora = Sora({
-  variable: "--font-sora",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
   display: "swap",
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 const title = `${siteConfig.name} | Roofers in ${siteConfig.town}, ${siteConfig.county}`;
@@ -62,7 +63,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={`${inter.variable} ${sora.variable}`}>
+    <html lang="en-GB" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="min-h-dvh bg-cream font-sans text-navy-950 antialiased">
         {children}
       </body>

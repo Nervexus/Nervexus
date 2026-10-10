@@ -30,8 +30,8 @@ export default async function Image() {
   const headline = siteConfig.name;
   const bodyText = `${siteConfig.tagline} ${siteConfig.phone.display} ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 •,`;
 
-  const [soraBold, interRegular] = await Promise.all([
-    loadGoogleFont("Sora:wght@700", headline),
+  const [frauncesItalic, interRegular] = await Promise.all([
+    loadGoogleFont("Fraunces:ital,wght@1,500", headline),
     loadGoogleFont("Inter:wght@400", bodyText),
   ]);
 
@@ -45,88 +45,65 @@ export default async function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          padding: "72px 80px",
+          padding: "80px 88px",
           backgroundColor: "#0f1b2d",
-          backgroundImage:
-            "radial-gradient(circle at 85% 18%, rgba(176,141,87,0.35), rgba(176,141,87,0) 45%)",
           fontFamily: "Inter",
         }}
       >
-        {/* Decorative rooflines */}
+        {/* Thin frame -- a quiet, editorial border rather than a graphic */}
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            top: 36,
+            left: 36,
+            right: 36,
+            bottom: 36,
+            border: "1px solid rgba(176,141,87,0.35)",
             display: "flex",
           }}
-        >
-          <svg
-            width="1200"
-            height="630"
-            viewBox="0 0 1200 630"
-            style={{ position: "absolute", top: 0, left: 0 }}
-          >
-            <polyline
-              points="0,420 180,300 360,420 540,280 720,420 900,320 1080,420 1260,300"
-              fill="none"
-              stroke="#b08d57"
-              strokeOpacity="0.25"
-              strokeWidth="6"
-            />
-            <polyline
-              points="-60,500 140,380 340,500 540,360 740,500 940,390 1140,500"
-              fill="none"
-              stroke="#f7f4ee"
-              strokeOpacity="0.08"
-              strokeWidth="6"
-            />
-          </svg>
-        </div>
+        />
 
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <div
             style={{
               display: "flex",
-              width: 56,
-              height: 56,
-              borderRadius: 14,
-              backgroundColor: "#b08d57",
+              width: 48,
+              height: 48,
+              borderRadius: 999,
+              border: "1px solid #b08d57",
               alignItems: "center",
               justifyContent: "center",
+              fontFamily: "Fraunces",
+              fontStyle: "italic",
+              fontSize: 24,
+              color: "#b08d57",
             }}
           >
-            <svg width="30" height="30" viewBox="0 0 64 64">
-              <path
-                d="M32 14 L52 32 H44 V48 H20 V32 H12 Z"
-                fill="#0f1b2d"
-              />
-            </svg>
+            C
           </div>
           <div
             style={{
               display: "flex",
-              fontSize: 30,
-              color: "#f7f4ee",
-              letterSpacing: "0.02em",
+              fontSize: 22,
+              color: "#cdc4b0",
+              letterSpacing: "0.2em",
             }}
           >
             {siteConfig.town.toUpperCase()} · {siteConfig.county.toUpperCase()}
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div
             style={{
               display: "flex",
-              fontFamily: "Sora",
-              fontSize: 96,
-              fontWeight: 700,
+              fontFamily: "Fraunces",
+              fontStyle: "italic",
+              fontSize: 92,
+              fontWeight: 500,
               color: "#f7f4ee",
-              lineHeight: 1.02,
-              letterSpacing: "-0.02em",
+              lineHeight: 1.05,
+              letterSpacing: "-0.01em",
             }}
           >
             {headline}
@@ -134,27 +111,26 @@ export default async function Image() {
           <div
             style={{
               display: "flex",
-              fontSize: 34,
+              fontSize: 30,
               fontWeight: 400,
-              color: "#cdc4b0",
-              maxWidth: 900,
+              color: "#9c9284",
+              maxWidth: 820,
             }}
           >
             {siteConfig.tagline}
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 14,
-              backgroundColor: "#b08d57",
-              color: "#0f1b2d",
-              fontSize: 30,
-              padding: "16px 32px",
-              borderRadius: 999,
+              border: "1px solid #b08d57",
+              color: "#b08d57",
+              fontSize: 26,
+              letterSpacing: "0.04em",
+              padding: "14px 30px",
             }}
           >
             {siteConfig.phone.display}
@@ -162,12 +138,13 @@ export default async function Image() {
           <div
             style={{
               display: "flex",
-              fontSize: 26,
+              fontSize: 22,
               fontWeight: 400,
-              color: "#9c9284",
+              letterSpacing: "0.08em",
+              color: "#6e7788",
             }}
           >
-            Free Quotes · Fully Insured · 10-Year Guarantee
+            FREE QUOTES · FULLY INSURED · 10-YEAR GUARANTEE
           </div>
         </div>
       </div>
@@ -175,7 +152,7 @@ export default async function Image() {
     {
       ...size,
       fonts: [
-        { name: "Sora", data: soraBold, weight: 700, style: "normal" },
+        { name: "Fraunces", data: frauncesItalic, weight: 500, style: "italic" },
         { name: "Inter", data: interRegular, weight: 400, style: "normal" },
       ],
     }

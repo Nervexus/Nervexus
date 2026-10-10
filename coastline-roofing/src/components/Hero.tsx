@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { siteConfig } from "@/config/site";
-import { MapPinIcon, PhoneIcon } from "./icons";
+import { PhoneIcon } from "./icons";
 
 export function Hero() {
   return (
@@ -12,46 +12,47 @@ export function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover opacity-45"
+          className="object-cover opacity-35"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/80 to-navy-950/40" />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/85 to-navy-950/50" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/55 to-transparent" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 sm:pt-20 sm:pb-28 lg:px-8 lg:pt-28 lg:pb-36">
+      <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-24 sm:px-6 sm:pt-28 sm:pb-32 lg:px-8 lg:pt-36 lg:pb-44">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-cream/15 bg-cream/5 px-4 py-1.5 text-sm font-medium text-cream/90 backdrop-blur">
-            <MapPinIcon className="h-4 w-4 text-brass-400" />
-            Proudly covering {siteConfig.town} &amp; the surrounding area
+          <div className="flex items-center gap-4 text-xs font-medium tracking-[0.2em] text-brass-400 uppercase">
+            <span className="h-px w-10 bg-brass-400/60" />
+            {siteConfig.town}, {siteConfig.county}
           </div>
 
-          <h1 className="mt-6 font-display text-4xl font-bold leading-[1.08] tracking-tight text-cream text-balance sm:text-5xl lg:text-6xl">
+          <h1 className="mt-8 font-display text-5xl leading-[1.08] text-cream text-balance sm:text-6xl lg:text-7xl">
             {siteConfig.heroHeadline}
           </h1>
 
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-cream/75 text-balance">
+          <p className="mt-7 max-w-lg text-lg leading-relaxed font-light text-cream/70 text-balance">
             {siteConfig.heroSubheadline}
           </p>
 
-          <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
+          <div className="mt-11 flex flex-col items-start gap-6 sm:flex-row sm:items-center">
             <a
               href={siteConfig.phone.href}
-              className="inline-flex items-center justify-center gap-2.5 rounded-full bg-brass-500 px-7 py-4 text-base font-semibold text-navy-950 shadow-card-lg transition-transform hover:scale-[1.02] hover:bg-brass-600 active:scale-[0.99]"
+              className="inline-flex items-center justify-center gap-3 bg-brass-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-navy-950 uppercase transition-colors hover:bg-brass-400"
             >
-              <PhoneIcon className="h-5 w-5" />
-              Call Now — {siteConfig.phone.display}
+              <PhoneIcon className="h-4 w-4" />
+              Call Now
             </a>
             <a
               href="#quote"
-              className="inline-flex items-center justify-center gap-2.5 rounded-full border border-cream/25 bg-cream/5 px-7 py-4 text-base font-semibold text-cream backdrop-blur transition-colors hover:bg-cream/15"
+              className="group inline-flex items-center gap-2 text-sm text-cream"
             >
               Get a Free Quote
+              <span className="h-px w-6 bg-brass-400 transition-all group-hover:w-9" />
             </a>
           </div>
 
-          <p className="mt-6 text-sm text-cream/55">
-            {siteConfig.yearsExperience}+ years experience · Fully insured ·
-            No call-out charge for quotes
+          <p className="mt-16 text-xs tracking-[0.08em] text-cream/40">
+            {siteConfig.yearsExperience}+ Years Experience&nbsp; · &nbsp;Fully
+            Insured&nbsp; · &nbsp;No Call-Out Charge For Quotes
           </p>
         </div>
       </div>

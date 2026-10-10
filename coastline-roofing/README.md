@@ -16,6 +16,9 @@ below for how to turn it into one.
 - **Tailwind CSS v4** — brand colours and fonts are defined once in
   `src/app/globals.css` (`@theme` block) and used as ordinary utility
   classes (`bg-navy-950`, `text-brass-500`, etc.).
+- **Fraunces** (an elegant serif, used italic for headlines) paired with
+  **Inter** for body copy — self-hosted via `next/font/google`, no layout
+  shift, no external font request at runtime.
 - No database, no backend, no API keys required to run or deploy.
 
 ## The one config file
@@ -57,9 +60,10 @@ component imports from `siteConfig` rather than hardcoding text.
 
 ### Extras
 
-- **Sticky mobile Call/WhatsApp bar** (`StickyMobileBar.tsx`) — fixed to
-  the bottom of the screen on mobile only (`md:hidden`), hidden on
-  desktop where the header's call button is already visible.
+- **Floating contact bubble** (`FloatingContactBubble.tsx`) — a fixed
+  circular button bottom-right, on every screen size, that expands into a
+  small panel with Call Now / WhatsApp Us options. Closes on an outside
+  click or by tapping it again.
 - **Open Graph image** — generated at build time
   (`src/app/opengraph-image.tsx`, via `next/og`'s `ImageResponse`), not a
   static photo, so it always matches the brand colours/name/phone in

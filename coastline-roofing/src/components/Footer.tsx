@@ -7,31 +7,26 @@ const year = new Date().getFullYear();
 
 export function Footer() {
   return (
-    <footer className="bg-navy-950 pt-16 pb-28 text-cream/70 sm:pb-16">
+    <footer className="bg-navy-950 pt-20 pb-28 text-cream/70 sm:pb-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brass-500">
-                <svg viewBox="0 0 64 64" className="h-5 w-5" aria-hidden="true">
-                  <path
-                    d="M32 14 L52 32 H44 V48 H20 V32 H12 Z"
-                    fill="#0f1b2d"
-                  />
-                </svg>
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full border border-brass-400/60 text-brass-400">
+                <span className="font-display text-base italic">C</span>
               </span>
-              <span className="font-display text-lg font-bold text-cream">
+              <span className="font-display text-xl text-cream">
                 {siteConfig.name}
               </span>
             </div>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed">
+            <p className="mt-5 max-w-xs text-sm leading-relaxed font-light">
               {siteConfig.tagline}. Local, fully insured, and straightforward
               to deal with.
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-cream/40">
+            <h3 className="text-xs font-medium tracking-[0.14em] text-cream/40 uppercase">
               Contact
             </h3>
             <ul className="mt-4 space-y-3 text-sm">
@@ -65,7 +60,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-cream/40">
+            <h3 className="text-xs font-medium tracking-[0.14em] text-cream/40 uppercase">
               Services
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">
@@ -80,7 +75,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-cream/40">
+            <h3 className="text-xs font-medium tracking-[0.14em] text-cream/40 uppercase">
               Areas Covered
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm">

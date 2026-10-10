@@ -18,7 +18,7 @@ export function BeforeAfterSlider({
   const sliderId = useId();
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-navy-900/8 bg-white shadow-card">
+    <div className="overflow-hidden border border-navy-900/10 bg-white">
       <div className="relative aspect-[4/3] select-none overflow-hidden bg-navy-900">
         <Image
           src={after.src}
@@ -45,7 +45,7 @@ export function BeforeAfterSlider({
           className="pointer-events-none absolute inset-y-0 w-0.5 bg-white/90 shadow-[0_0_0_1px_rgba(12,31,61,0.25)]"
           style={{ left: `${value}%` }}
         >
-          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-navy-900 shadow-card">
+          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-navy-900">
             <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
               <path
                 d="M9 7 4 12l5 5M15 7l5 5-5 5"
@@ -59,10 +59,10 @@ export function BeforeAfterSlider({
           </span>
         </div>
 
-        <span className="pointer-events-none absolute top-3 left-3 rounded-full bg-navy-950/80 px-3 py-1 text-xs font-semibold text-cream backdrop-blur">
+        <span className="pointer-events-none absolute top-3 left-3 bg-navy-950/80 px-3 py-1 text-[11px] font-medium tracking-[0.12em] text-cream uppercase backdrop-blur">
           Before
         </span>
-        <span className="pointer-events-none absolute top-3 right-3 rounded-full bg-brass-500/90 px-3 py-1 text-xs font-semibold text-navy-950 backdrop-blur">
+        <span className="pointer-events-none absolute top-3 right-3 bg-brass-500/90 px-3 py-1 text-[11px] font-medium tracking-[0.12em] text-navy-950 uppercase backdrop-blur">
           After
         </span>
 
@@ -79,7 +79,7 @@ export function BeforeAfterSlider({
           className="absolute inset-0 h-full w-full cursor-ew-resize appearance-none bg-transparent opacity-0"
         />
       </div>
-      <p className="px-5 py-4 text-sm font-semibold text-navy-900">
+      <p className="px-5 py-4 font-display text-base text-navy-950">
         {caption}
       </p>
     </div>
