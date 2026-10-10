@@ -101,7 +101,7 @@ CRM of choice.
 
 ## Photo credits
 
-Every photo is a free-to-use Unsplash photo, downloaded and checked into
+Most photos are free-to-use Unsplash photos, downloaded and checked into
 `public/images/` rather than hotlinked, so the page renders identically
 offline and never breaks on a dead link. Used under the [Unsplash
 License](https://unsplash.com/license) (free for commercial use,
@@ -110,18 +110,19 @@ attribution appreciated but not required).
 | file | subject | credit |
 |---|---|---|
 | `hero.jpg` | roofer securing shingles on a pitched roof | Raze Solar — unsplash.com/photos/Scaj0T40nFI |
-| `gallery-before-1.jpg` | close-up of moss-covered, aged shingles | Lukáš Patúc — unsplash.com/photos/eCqZW4t0D-A |
-| `gallery-after-1.jpg` | aerial view of a clean, uniform new roof | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
+| `gallery-before-1.jpg` | close-up of an aged, moss-covered shingle roof | supplied directly, not stock — genuine before photo |
+| `gallery-after-1.jpg` | the same roofline after a slate tile re-roof | supplied directly, not stock — genuine after photo |
 | `gallery-before-2.jpg` | roofer stripping old shingles mid-repair | Zohair Mirza — unsplash.com/photos/GXITWKvgm-k |
 | `gallery-after-2.jpg` | neat, intact dark shingle roof | Yucel M — unsplash.com/photos/TnhkSNZPXd8 |
 | `gallery-before-3.jpg` | grimy, moss-clogged old guttering | Aleksi Partanen — unsplash.com/photos/kBc9SXXjezA |
-| `gallery-after-3.jpg` | clean white fascia/guttering along a new roofline (cropped from the same photo as `gallery-after-1.jpg`) | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
+| `gallery-after-3.jpg` | clean white fascia/guttering along a new roofline (cropped from a Paragon Exterior photo) | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
 
-**Honesty note on the gallery:** these are representative stock photos
-chosen to illustrate "before" and "after" roof conditions — they are
-**not** actual before/after photos of the same property (genuine matched
-pairs like that essentially don't exist as free stock photography). For a
-real client, replace these with their own job-site photos.
+**Honesty note on the gallery:** the `gallery-before-1.jpg` /
+`gallery-after-1.jpg` pair is a genuine matched before/after of the same
+roof. The other two pairs are representative stock photos chosen to
+illustrate "before" and "after" conditions — they are **not** actual
+before/after photos of the same property. For a real client, replace
+all of these with their own job-site photos.
 
 ## Rebranding for a real client
 

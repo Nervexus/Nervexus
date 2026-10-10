@@ -159,13 +159,13 @@ export const siteConfig = {
     {
       before: {
         src: "/images/gallery-before-1.jpg",
-        alt: "Close-up of aged, moss-covered roof shingles before replacement",
+        alt: "Close-up of an aged, moss- and lichen-covered shingle roof before replacement",
       },
       after: {
         src: "/images/gallery-after-1.jpg",
-        alt: "Aerial view of a smart, uniform new shingle roof after replacement",
+        alt: "The same roofline fitted with a clean new slate tile roof after replacement",
       },
-      caption: "Full re-roof — tile & shingle replacement",
+      caption: "Full re-roof — slate tile replacement",
     },
     {
       before: {
