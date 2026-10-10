@@ -115,7 +115,7 @@ attribution appreciated but not required).
 | `gallery-before-2.jpg` | roofer stripping old shingles mid-repair | Zohair Mirza — unsplash.com/photos/GXITWKvgm-k |
 | `gallery-after-2.jpg` | neat, intact dark shingle roof | Yucel M — unsplash.com/photos/TnhkSNZPXd8 |
 | `gallery-before-3.jpg` | grimy, moss-clogged old guttering | Aleksi Partanen — unsplash.com/photos/kBc9SXXjezA |
-| `gallery-after-3.jpg` | clean new guttering and downpipe | Taylor Hammersla — unsplash.com/photos/6QYiR0utkvA |
+| `gallery-after-3.jpg` | clean white fascia/guttering along a new roofline (cropped from the same photo as `gallery-after-1.jpg`) | Paragon Exterior — unsplash.com/photos/-uvuU43FAwQ |
 
 **Honesty note on the gallery:** these are representative stock photos
 chosen to illustrate "before" and "after" roof conditions — they are
