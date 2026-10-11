@@ -1,67 +1,73 @@
+import Image from "next/image";
 import { siteConfig } from "@/config/site";
 import { StarIcon } from "./icons";
-import { ImageStreamHero } from "./ui/image-stream-hero";
 
-// Real job photos already used elsewhere on the site (hero + before/after
-// gallery), reused here for the testimonials banner's image corridor rather
-// than inventing or hotlinking anything new.
-const streamImages = [
-  { src: "/images/hero.jpg", alt: "Roofer securing new shingles on a pitched roof" },
+// Real "after" shots from the gallery, paired one-to-one with a review so
+// each testimonial sits next to a photo of the kind of finished job it's
+// talking about, rather than a generic stock image.
+const reviewPhotos = [
   { src: "/images/gallery-after-1.jpg", alt: "New slate tile roof after replacement" },
-  { src: "/images/gallery-before-2.jpg", alt: "A plain flat roof before a roof lantern was fitted" },
-  { src: "/images/gallery-after-3.jpg", alt: "New tiles and black guttering after replacement" },
-  { src: "/images/gallery-before-1.jpg", alt: "Aged, moss-covered shingle roof before replacement" },
   { src: "/images/gallery-after-2.jpg", alt: "Flat roof fitted with a new glass roof lantern" },
-  { src: "/images/gallery-before-3.jpg", alt: "Rusted old guttering before replacement" },
+  { src: "/images/gallery-after-3.jpg", alt: "New tiles and black guttering after replacement" },
+  { src: "/images/hero.jpg", alt: "Roofer securing new shingles on a pitched roof" },
 ];
 
 export function Reviews() {
   return (
-    <section id="reviews" className="dark-surface bg-ink-950">
-      <ImageStreamHero
-        images={streamImages}
-        className="h-[340px] bg-ink-950 sm:h-[420px]"
-      >
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/20" />
-        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 text-center sm:px-6">
+    <section id="reviews" className="dark-surface bg-ink-950 py-28 sm:py-36">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium tracking-[0.2em] text-gold-400 uppercase">
             Example Reviews — For Demo Purposes
           </p>
           <h2 className="mt-5 font-display text-4xl text-warm sm:text-5xl">
             What customers say
           </h2>
-          <p className="mt-5 text-lg font-light text-warm/65">
+          <p className="mt-5 text-lg font-light text-warm/55">
             Illustrative reviews showing the kind of feedback {siteConfig.name}{" "}
             aims to earn on every job.
           </p>
         </div>
-      </ImageStreamHero>
 
-      <div className="mx-auto max-w-7xl px-4 py-28 sm:px-6 sm:py-36 lg:px-8">
-        <div className="grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
-          {siteConfig.reviews.map((review) => (
-            <figure
-              key={`${review.name}-${review.area}`}
-              className="flex flex-col border-t border-warm/15 pt-6"
-            >
-              <div className="flex gap-0.5 text-gold-400">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <StarIcon
-                    key={index}
-                    className={`h-3.5 w-3.5 ${
-                      index < review.rating ? "" : "text-warm/15"
-                    }`}
+        <div className="mt-20 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-x-14 lg:gap-y-16">
+          {siteConfig.reviews.map((review, index) => {
+            const photo = reviewPhotos[index % reviewPhotos.length];
+            return (
+              <div
+                key={`${review.name}-${review.area}`}
+                className="grid grid-cols-2 gap-5 sm:gap-6"
+              >
+                <div className="relative aspect-[4/5] overflow-hidden border border-warm/10 light:rounded-[3px]">
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="(min-width: 1024px) 220px, 40vw"
+                    className="object-cover"
                   />
-                ))}
+                </div>
+
+                <figure className="flex flex-col justify-center">
+                  <div className="flex gap-0.5 text-gold-400">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <StarIcon
+                        key={i}
+                        className={`h-3.5 w-3.5 ${
+                          i < review.rating ? "" : "text-warm/15"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <blockquote className="mt-4 font-display text-base leading-snug text-warm/90 italic light:not-italic sm:text-lg">
+                    &ldquo;{review.text}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-4 text-xs tracking-[0.08em] text-warm/45 uppercase">
+                    {review.name} · {review.area}
+                  </figcaption>
+                </figure>
               </div>
-              <blockquote className="mt-5 flex-1 font-display text-lg leading-snug text-warm/90 italic light:not-italic">
-                &ldquo;{review.text}&rdquo;
-              </blockquote>
-              <figcaption className="mt-6 text-xs tracking-[0.08em] text-warm/45 uppercase">
-                {review.name} · {review.area}
-              </figcaption>
-            </figure>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
