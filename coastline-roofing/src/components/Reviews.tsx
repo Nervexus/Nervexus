@@ -20,6 +20,7 @@ export function Reviews() {
     <section id="reviews" className="dark-surface bg-ink-950">
       <ImageStreamHero
         images={streamImages}
+        cards={16}
         className="h-[340px] bg-ink-950 sm:h-[420px]"
       >
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/20" />
