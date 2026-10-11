@@ -41,7 +41,7 @@ export function ServicesCarousel({
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const wheelLocked = useRef(false);
   const wheelResetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -61,8 +61,10 @@ export function ServicesCarousel({
   // single swipe. Advance once per gesture instead: the first delta past the
   // threshold steps and locks further steps until the events stop arriving
   // (the gesture has ended), when the lock clears for the next swipe.
+  // Listens on the whole carousel footprint (not just the card track) so a
+  // swipe responds no matter which card the mouse happens to be over.
   useEffect(() => {
-    const el = trackRef.current;
+    const el = containerRef.current;
     if (!el) return;
 
     function handleWheel(e: WheelEvent) {
@@ -94,6 +96,7 @@ export function ServicesCarousel({
 
   return (
     <div
+      ref={containerRef}
       className="mt-14"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -118,7 +121,6 @@ export function ServicesCarousel({
       </div>
 
       <motion.div
-        ref={trackRef}
         role="group"
         aria-label="Our services"
         tabIndex={0}
