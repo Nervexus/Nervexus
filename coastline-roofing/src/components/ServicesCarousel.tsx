@@ -64,7 +64,7 @@ export function ServicesCarousel({
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="mb-8 flex justify-center gap-3 sm:justify-end">
+      <div className="mb-8 flex justify-center gap-3">
         <button
           type="button"
           onClick={() => go(-1)}
