@@ -104,9 +104,16 @@ export function Reviews() {
         </p>
       </div>
 
+      {/*
+        The corridor's card sizing is a percentage of the container's width,
+        so on a narrow phone screen the cards never grow large enough for
+        the text to read -- it ends up as the jumbled cluster seen on
+        mobile. It only works from tablet width up, so it's hidden below
+        that instead of showing a shrunken, illegible version of itself.
+      */}
       <ImageStreamHero
         items={streamItems}
-        className="mt-16 h-[340px] bg-ink-950 sm:h-[420px]"
+        className="mt-16 hidden h-[420px] bg-ink-950 sm:block"
       />
 
       <div className="mx-auto max-w-7xl px-4 py-28 sm:px-6 sm:py-36 lg:px-8">
