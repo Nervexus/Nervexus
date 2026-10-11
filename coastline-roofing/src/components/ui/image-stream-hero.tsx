@@ -113,13 +113,18 @@ function keyframes(dir: 1 | -1, name: string, p: Required<CorridorPath>) {
   return `@keyframes ${name}{${steps.join("")}}`;
 }
 
+export type StreamImage = {
+  src: string;
+  /** Only used if you drop the decorative treatment; the corridor is aria-hidden. */
+  alt?: string;
+};
+
 export type ImageStreamHeroProps = {
   /**
-   * Content cycled onto the rails -- one node per card (an image, a button,
-   * anything). Both rails run the same sequence, so the corridor reads as
-   * one mirrored stream. Fewer than `cards` simply repeat.
+   * Images cycled onto the rails. Both rails run the same sequence, so the
+   * corridor reads as one mirrored stream. Fewer than `cards` simply repeat.
    */
-  items: React.ReactNode[];
+  images: StreamImage[];
   /**
    * Cards on each rail at once. More cards means a denser corridor, not a
    * faster one — spacing is derived from this and `speed`. Drop it far below
@@ -146,7 +151,7 @@ export type ImageStreamHeroProps = {
 };
 
 export function ImageStreamHero({
-  items,
+  images,
   cards = 9,
   speed = 18,
   axis = 55,
@@ -196,7 +201,7 @@ export function ImageStreamHero({
             Array.from({ length: cards }, (_, i) => {
               // Both rails walk the same sequence, so the left side mirrors
               // the right at every depth.
-              const content = items[i % Math.max(items.length, 1)];
+              const img = images[i % Math.max(images.length, 1)];
               return (
                 <div
                   key={`${name}-${i}`}
@@ -216,7 +221,16 @@ export function ImageStreamHero({
                     backfaceVisibility: "hidden",
                   }}
                 >
-                  {content}
+                  {img ? (
+                    <img
+                      src={img.src}
+                      alt={img.alt ?? ""}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                      draggable={false}
+                    />
+                  ) : null}
                 </div>
               );
             }),
