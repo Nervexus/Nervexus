@@ -89,12 +89,13 @@ export function ServicesCarousel({
         tabIndex={0}
         onKeyDown={handleKeyDown}
         drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.15}
-        dragMomentum={false}
+        dragElastic={1}
+        dragSnapToOrigin
+        dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
         onDragEnd={(_, info) => {
-          if (info.offset.x < -60) go(1);
-          else if (info.offset.x > 60) go(-1);
+          const { offset, velocity } = info;
+          if (offset.x < -50 || velocity.x < -500) go(1);
+          else if (offset.x > 50 || velocity.x > 500) go(-1);
         }}
         className="relative flex h-[320px] touch-pan-y items-center justify-center overflow-hidden outline-none sm:h-[360px]"
       >
