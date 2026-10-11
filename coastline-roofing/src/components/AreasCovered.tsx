@@ -31,8 +31,8 @@ export function AreasCovered() {
             className="text-warm underline decoration-gold-400 decoration-1 underline-offset-4"
           >
             {siteConfig.phone.display}
-          </a>{" "}
-          — if we don&apos;t, we&apos;ll point you to someone who does.
+          </a>
+          . We are happy to help.
         </p>
       </div>
     </section>
