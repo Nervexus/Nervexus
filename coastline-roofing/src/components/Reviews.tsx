@@ -74,7 +74,7 @@ function ReviewDialog({ review, onClose }: { review: Review; onClose: () => void
           <CloseIcon className="h-5 w-5" />
         </button>
         <Stars rating={review.rating} className="h-4 w-4" />
-        <blockquote className="mt-5 font-display text-xl leading-snug text-warm italic light:not-italic">
+        <blockquote className="mt-5 font-display text-lg leading-snug text-warm italic light:not-italic">
           &ldquo;{review.text}&rdquo;
         </blockquote>
         <p className="mt-6 text-xs tracking-[0.08em] text-warm/50 uppercase">
