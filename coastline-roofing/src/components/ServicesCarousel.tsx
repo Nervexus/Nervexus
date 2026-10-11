@@ -41,6 +41,9 @@ export function ServicesCarousel({
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const wheelLocked = useRef(false);
+  const wheelResetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function go(direction: 1 | -1) {
     setActive((i) => (i + direction + count) % count);
@@ -52,6 +55,37 @@ export function ServicesCarousel({
     return () => clearTimeout(timer.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, paused]);
+
+  // A trackpad swipe fires a whole burst of wheel events with no pause in
+  // between, so a naive per-event threshold would step several cards for a
+  // single swipe. Advance once per gesture instead: the first delta past the
+  // threshold steps and locks further steps until the events stop arriving
+  // (the gesture has ended), when the lock clears for the next swipe.
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+
+    function handleWheel(e: WheelEvent) {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      e.preventDefault();
+
+      clearTimeout(wheelResetTimer.current);
+      wheelResetTimer.current = setTimeout(() => {
+        wheelLocked.current = false;
+      }, 300);
+
+      if (wheelLocked.current || Math.abs(e.deltaX) < 12) return;
+      wheelLocked.current = true;
+      go(e.deltaX > 0 ? 1 : -1);
+    }
+
+    el.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+      clearTimeout(wheelResetTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowLeft") go(-1);
@@ -84,6 +118,7 @@ export function ServicesCarousel({
       </div>
 
       <motion.div
+        ref={trackRef}
         role="group"
         aria-label="Our services"
         tabIndex={0}
