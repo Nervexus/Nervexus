@@ -18,21 +18,20 @@ const streamImages = [
 export function Reviews() {
   return (
     <section id="reviews" className="dark-surface bg-ink-950">
+      <div className="mx-auto max-w-2xl px-4 pt-28 text-center sm:px-6 sm:pt-36">
+        <h2 className="font-display text-4xl text-warm sm:text-5xl">
+          What customers say
+        </h2>
+        <p className="mt-5 text-lg font-light text-warm/65">
+          Illustrative reviews showing the kind of feedback {siteConfig.name}{" "}
+          aims to earn on every job.
+        </p>
+      </div>
+
       <ImageStreamHero
         images={streamImages}
-        className="h-[340px] bg-ink-950 sm:h-[420px]"
-      >
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/20" />
-        <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 text-center sm:px-6">
-          <h2 className="font-display text-4xl text-warm sm:text-5xl">
-            What customers say
-          </h2>
-          <p className="mt-5 text-lg font-light text-warm/65">
-            Illustrative reviews showing the kind of feedback {siteConfig.name}{" "}
-            aims to earn on every job.
-          </p>
-        </div>
-      </ImageStreamHero>
+        className="mt-16 h-[340px] bg-ink-950 sm:h-[420px]"
+      />
 
       <div className="mx-auto max-w-7xl px-4 py-28 sm:px-6 sm:py-36 lg:px-8">
         <div className="grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
