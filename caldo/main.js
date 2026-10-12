@@ -1,13 +1,12 @@
-import { createScene } from './scene.js';
+import { createBackdrop } from './backdrop.js';
 import { SECTIONS, SECTION_VH } from './data.js';
 import { setState } from './store.js';
 import { mountApp } from './app.js';
 
-const canvas = document.getElementById('c');
 const scroller = document.getElementById('scroller');
 const footer = document.getElementById('footer');
 
-const scene = createScene(canvas);
+const backdrop = createBackdrop();
 
 // Cumulative vh weights -> fraction of total scroller height at which each
 // section boundary falls. SECTION_VH lets later sections (testimonials,
@@ -42,8 +41,6 @@ function sectionFromFraction(f) {
   return { idx: n - 1, local: 1 };
 }
 
-let raf = null;
-
 function onScroll() {
   const scrollerRect = scroller.getBoundingClientRect();
   const scrollerTop = window.scrollY + scrollerRect.top;
@@ -53,7 +50,13 @@ function onScroll() {
   const { idx, local } = sectionFromFraction(f);
   const a = SECTIONS[idx];
   const b = SECTIONS[Math.min(idx + 1, SECTIONS.length - 1)];
-  scene.setKeyframe(a, b, local);
+  // Hold each photo at full opacity for most of its section's dwell and
+  // only dissolve into the next one right at the boundary — a linear
+  // crossfade across the whole section would leave a long, ghostly
+  // double-exposure instead of a clean cut.
+  const EDGE = 0.15;
+  const t = local <= 1 - EDGE ? 0 : (local - (1 - EDGE)) / EDGE;
+  backdrop.setSection(a.photo, b.photo, t);
 
   // Footer fade: compute how far the footer has risen past the viewport
   // bottom once the scroller is fully exhausted.
@@ -63,8 +66,8 @@ function onScroll() {
   const footerRect = footer.getBoundingClientRect();
   const footerSpan = Math.max(footerRect.height, 1);
   const footerT = Math.max(0, Math.min(1, (window.innerHeight - footerRect.top) / footerSpan));
-  scene.setAppOpacity(1 - footerT);
-  // Only the scroll-synced panels/labels fade with the canvas — nav and the
+  backdrop.setOpacity(1 - footerT);
+  // Only the scroll-synced panels fade with the backdrop — nav and the
   // support bubble are persistent chrome and stay put near the footer.
   const overlaysEl = document.getElementById('overlays');
   if (overlaysEl) {
@@ -80,18 +83,10 @@ function onScroll() {
     footerT,
     navSolid: window.scrollY > 4,
   });
-
-  if (!raf) raf = requestAnimationFrame(renderLoop);
-}
-
-function renderLoop() {
-  scene.tick();
-  raf = requestAnimationFrame(renderLoop);
 }
 
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', onScroll);
 onScroll();
-raf = requestAnimationFrame(renderLoop);
 
-mountApp(scene);
+mountApp();

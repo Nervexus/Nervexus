@@ -38,10 +38,33 @@ img{display:block;max-width:100%;}
     var(--paper);
 }
 
-#c{
+#photos{
   position:fixed;inset:0;z-index:2;
-  width:100%;height:100%;
+  width:100%;height:100%;overflow:hidden;
   transition:opacity .3s linear;
+  background:var(--ink);
+}
+#photos img{
+  position:absolute;inset:0;
+  width:100%;height:100%;max-width:none;
+  object-fit:cover;object-position:center;
+  opacity:0;
+  transition:opacity .6s ease;
+  animation:kenburns 26s ease-in-out infinite alternate;
+}
+#photos img:nth-child(even){animation-duration:32s;}
+@keyframes kenburns{
+  0%{transform:scale(1.0);}
+  100%{transform:scale(1.08);}
+}
+
+#scrim{
+  position:fixed;inset:0;z-index:3;
+  pointer-events:none;
+  transition:opacity .3s linear;
+  background:
+    linear-gradient(180deg, rgba(22,23,26,0.1), rgba(22,23,26,0.2) 60%, rgba(22,23,26,0.3)),
+    linear-gradient(90deg, rgba(22,23,26,0.28), transparent 45%);
 }
 
 #grain{
@@ -66,11 +89,14 @@ nav{
   z-index:20;
   display:flex;align-items:center;
   pointer-events:auto;
+  background:rgba(247,246,243,0.5);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid transparent;
   transition:border-color .3s, background .3s;
 }
 nav.solid{
-  background:rgba(251,251,253,0.72);
+  background:rgba(247,246,243,0.78);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--line);
@@ -107,7 +133,12 @@ nav.solid{
 .ov{
   position:absolute;
   max-width:460px;
-  padding:0 7vw;
+  padding:26px 34px;
+  margin:0 7vw;
+  border-radius:20px;
+  background:rgba(247,246,243,0.84);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:0 20px 50px rgba(22,23,26,0.1);
   transition:opacity .35s ease, transform .35s ease;
   will-change:opacity, transform;
 }
@@ -164,22 +195,6 @@ nav.solid{
 .swatches{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
 .swatch{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--ink-2);}
 .swatch span{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);}
-
-/* ---------- exploded labels ---------- */
-
-.labels{position:absolute;inset:0;pointer-events:none;z-index:11;}
-.plabel{
-  position:absolute;transform:translate(-50%,-50%);
-  display:flex;align-items:center;gap:7px;
-  padding:6px 12px;border-radius:999px;
-  background:rgba(251,251,253,0.85);backdrop-filter:blur(8px);
-  border:1px solid var(--line);
-  font-size:12px;font-weight:500;letter-spacing:0.02em;
-  box-shadow:0 4px 18px rgba(0,0,0,0.06);
-  transition:opacity .3s;
-}
-.plabel .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
-.plabel-focus{border-color:var(--accent);box-shadow:0 4px 18px rgba(196,85,31,0.18);}
 
 /* ---------- testimonials ---------- */
 
@@ -308,12 +323,7 @@ footer{
 @media (max-width:860px){
   .navlinks{display:none;}
   .buybarinner{padding-right:84px;}
-  .ov{
-    max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;
-    background:rgba(247,246,243,0.84);
-    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  }
-  .ov-hero{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0 7vw;}
+  .ov{max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;}
   .ov-right{right:3vw;left:3vw;text-align:left;}
   .tcardviewport{left:7vw;right:7vw;top:auto;bottom:14vh;transform:none;}
   .testi{top:16vh;transform:none;}
@@ -327,4 +337,5 @@ footer{
 @media (prefers-reduced-motion: reduce){
   .w i, .reveal.in .w i{transition:none;}
   .bob{animation:none;}
+  #photos img{animation:none;}
 }

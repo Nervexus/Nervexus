@@ -1,13 +1,14 @@
-// STRATA — scroll keyframes, copy and content data.
-// cam/tgt are world-space vectors for the Three.js camera; gap is the
-// 0..~1.3 explosion factor applied to the roof system's four layers.
+// STRATA — scroll pacing, copy and content data.
+// `photo` keys into the fixed photo backdrop (see index.html's #photos and
+// backdrop.js) — consecutive sections sharing a key hold the same image;
+// a change of key crossfades across the section boundary.
 
 export const SECTION_VH = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 170, 120];
 
 export const SECTIONS = [
   // 0 — Hero
   {
-    cam: [0, 0.55, 3.6], tgt: [0, 0.08, 0], gap: 0, fov: 30,
+    photo: 'aerial',
     eyebrow: 'STRATA',
     kind: 'hero',
     h: 'The last roof you will ever need.',
@@ -15,104 +16,104 @@ export const SECTIONS = [
   },
   // 1 — Problem
   {
-    cam: [1.6, 0.62, 3.1], tgt: [0, 0.1, 0], gap: 0, fov: 28,
+    photo: 'removing',
     eyebrow: 'THE PROBLEM', kind: 'text',
     h: 'Most roofs fail by year eight.',
     body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
   },
   // 2 — Engineering
   {
-    cam: [-1.7, 0.58, 2.9], tgt: [0, 0.12, 0], gap: 0.16, fov: 27,
+    photo: 'metal',
     eyebrow: 'ENGINEERING', kind: 'text',
     h: 'Four layers. Zero gaps.',
     body: 'A fully adhered ice-and-water membrane sits beneath an insulated steel deck and a continuous standing-seam shell — stopping water, wind and ice at every seam.',
   },
   // 3 — Performance stat
   {
-    cam: [0, 0.85, 3.3], tgt: [0, 0.18, 0], gap: 0, fov: 27,
+    photo: 'aerial',
     eyebrow: 'PERFORMANCE', kind: 'stat',
     h: '140mph wind rated. Lifetime warranty.',
     body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once — outlive the mortgage.',
   },
   // 4 — Material
   {
-    cam: [1.9, 0.42, 2.6], tgt: [0, 0.1, 0], gap: 0, fov: 27,
+    photo: 'tiles',
     eyebrow: 'MATERIAL', kind: 'text',
     h: 'Copper face. Aerospace steel.',
     body: 'A cold-rolled steel core with a hand-finished copper face, the same alloy family used in architectural façades — sealed against salt air, UV and corrosion for life.',
   },
   // 5 — Seal / seam
   {
-    cam: [0, 0.95, 2.3], tgt: [0, 0.3, 0], gap: 0.4, fov: 24,
+    photo: 'metal',
     eyebrow: 'THE SEAL', kind: 'text',
     h: 'A seam that actually seals.',
     body: 'Mechanically double-locked panels form one continuous, watertight shell rated for full submersion testing. No exposed fasteners — nothing for water to find.',
   },
   // 6 — Install / flashing
   {
-    cam: [-1.5, 0.78, 2.5], tgt: [0, 0.24, 0], gap: 0.24, fov: 26,
+    photo: 'drill',
     eyebrow: 'INSTALLATION', kind: 'text',
     h: 'One pass. No shortcuts.',
     body: 'Every panel is laser-measured and hand-fitted on site by a certified five-person crew. Most homes are fully dried-in within a single day.',
   },
   // 7 — Capacity / scale
   {
-    cam: [0, 0.3, 3.7], tgt: [0, 0.07, 0], gap: 0, fov: 32,
+    photo: 'aerial',
     eyebrow: 'SCALE', kind: 'text',
     h: '4,200 sq ft. Installed in three days.',
     body: 'From a single roofline to a full estate, our crews move fast without skipping a layer — fully licensed, bonded and insured in every state we serve.',
   },
   // 8 — Finishes
   {
-    cam: [1.6, 0.55, 2.9], tgt: [0, 0.1, 0], gap: 0, fov: 27,
+    photo: 'tiles',
     eyebrow: 'FINISH', kind: 'swatches',
     h: 'Five finishes. One standard.',
     body: 'Finished in small batches: Charcoal, Zinc Gray, Copper Patina, Bone White and Graphite. Every finish weathers the same way — beautifully.',
   },
   // 9 — Craft
   {
-    cam: [-1.7, 0.52, 2.9], tgt: [0, 0.1, 0], gap: 0, fov: 27,
+    photo: 'crew',
     eyebrow: 'CRAFT', kind: 'text',
     h: 'Built by people who will still be here in 20 years.',
     body: 'Every crew is factory-certified and every install is inspected twice before we leave the site. We would rather do fewer roofs, better.',
   },
-  // 10 — Exploded view
+  // 10 — Anatomy overview
   {
-    cam: [0, 0.15, 4.8], tgt: [0, 0.07, 0], gap: 1.3, fov: 42,
+    photo: 'carrying',
     eyebrow: 'ANATOMY', kind: 'exploded',
     h: 'Four layers, no shortcuts.',
     body: 'Deck, membrane, panel, ridge. Every layer is inspected on its own — nothing here is hidden once it is covered.',
   },
-  // 11 — Layer: Ridge cap (top, exploded world y ≈ 0.93)
+  // 11 — Layer: Ridge cap
   {
-    cam: [0.7, 1.05, 2.3], tgt: [0, 0.93, 0], gap: 1.3, fov: 24,
+    photo: 'working',
     eyebrow: 'LAYER 01', kind: 'part',
     h: 'The ridge cap',
     body: 'Hand-formed copper trim seals the ridge line and vents the attic — the final, most visible layer of the system.',
   },
-  // 12 — Layer: Standing-seam panel (exploded world y ≈ 0.45)
+  // 12 — Layer: Standing-seam panel
   {
-    cam: [0.75, 0.62, 2.1], tgt: [0, 0.45, 0], gap: 1.3, fov: 25,
+    photo: 'drill',
     eyebrow: 'LAYER 02', kind: 'part',
     h: 'The standing seam panel',
     body: '24-gauge steel with a copper face, mechanically seamed on site to aerospace tolerances — rated for a 50-year service life.',
   },
-  // 13 — Layer: Membrane & deck (framed between membrane -0.23 and deck -0.79)
+  // 13 — Layer: Membrane & deck
   {
-    cam: [0.8, -0.35, 2.4], tgt: [0, -0.5, 0], gap: 1.3, fov: 28,
+    photo: 'removing',
     eyebrow: 'LAYER 03–04', kind: 'part',
     h: 'The membrane & deck',
     body: 'A fully adhered ice-and-water membrane over an insulated steel deck — the quiet layer underneath doing most of the work.',
   },
   // 14 — Testimonials
   {
-    cam: [2.0, 0.55, 2.8], tgt: [0.5, 0.15, 0], gap: 0.45, fov: 27,
+    photo: 'crew',
     eyebrow: 'REVIEWS', kind: 'testimonials',
     h: 'Trusted by homeowners who do not like surprises.',
   },
   // 15 — FAQ
   {
-    cam: [-2.0, 0.55, 2.8], tgt: [-0.5, 0.15, 0], gap: 0.2, fov: 27,
+    photo: 'aerial',
     eyebrow: 'QUESTIONS', kind: 'faq',
     h: 'Everything you are wondering',
   },

@@ -180,54 +180,6 @@ function PartPanel({ idx }) {
   `;
 }
 
-// --- Exploded-view floating labels --------------------------------------
-
-function Labels({ scene }) {
-  const s = useStore();
-  const [pos, setPos] = useState({});
-  const active = s.sectionIdx >= 10 && s.sectionIdx <= 13;
-  useEffect(() => {
-    if (!active) return;
-    let raf;
-    const loop = () => {
-      setPos({
-        ridge: scene.labelScreenPos('ridge'),
-        panel: scene.labelScreenPos('panel'),
-        membrane: scene.labelScreenPos('membrane'),
-        deck: scene.labelScreenPos('deck'),
-      });
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [active, scene]);
-
-  if (!active) return null;
-  const baseW = weightFor(s.section, 10) > 0.15 || s.sectionIdx >= 11 ? 1 : weightFor(s.section, 10);
-  const focusPart = { 11: 'ridge', 12: 'panel', 13: 'membrane' }[s.sectionIdx];
-  const labels = [
-    { key: 'ridge', text: 'Ridge cap' },
-    { key: 'panel', text: 'Panel' },
-    { key: 'membrane', text: 'Membrane' },
-    { key: 'deck', text: 'Deck' },
-  ];
-  return html`
-    <div class="labels">
-      ${labels.map((l) => {
-        const p = pos[l.key];
-        if (!p || !p.visible) return null;
-        const dim = focusPart && l.key !== focusPart && !(focusPart === 'membrane' && l.key === 'deck');
-        const w = baseW * (dim ? 0.4 : 1);
-        return html`
-          <div class="plabel ${dim ? '' : 'plabel-focus'}" key=${l.key} style=${{ left: `${p.x}px`, top: `${p.y}px`, opacity: w }}>
-            <span class="dot"></span>${l.text}
-          </div>
-        `;
-      })}
-    </div>
-  `;
-}
-
 // --- Testimonials --------------------------------------------------------
 
 function TestimonialsPanel({ idx }) {
@@ -331,7 +283,7 @@ function SupportChat() {
 
 // --- Root app --------------------------------------------------------
 
-function Overlays({ scene }) {
+function Overlays() {
   return html`
     <div id="overlays">
       <${HeroPanel} idx=${0} />
@@ -350,7 +302,6 @@ function Overlays({ scene }) {
       <${PartPanel} idx=${13} />
       <${TestimonialsPanel} idx=${14} />
       <${FaqPanel} idx=${15} />
-      <${Labels} scene=${scene} />
     </div>
     <${BuyBar} />
     <${SupportChat} />
@@ -390,9 +341,9 @@ function Footer() {
   `;
 }
 
-export function mountApp(scene) {
+export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
   const footerRoot = document.getElementById('footer-root');
-  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${Overlays} scene=${scene} /><//>`);
+  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${Overlays} /><//>`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }
