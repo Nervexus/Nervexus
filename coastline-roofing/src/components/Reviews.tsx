@@ -23,7 +23,7 @@ export function Reviews() {
         cards={6}
         className="h-[340px] bg-ink-950 sm:h-[420px]"
       >
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/20" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/55 to-ink-950/10" />
         <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 text-center sm:px-6">
           <h2 className="font-display text-4xl text-warm sm:text-5xl">
             What customers say

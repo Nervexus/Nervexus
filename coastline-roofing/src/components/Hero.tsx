@@ -12,10 +12,10 @@ export function Hero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover opacity-30"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/90 to-ink-950/60" />
-        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/50 to-ink-950/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-950 via-ink-950/55 to-transparent" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-24 sm:px-6 sm:pt-28 sm:pb-32 lg:px-8 lg:pt-36 lg:pb-44">
