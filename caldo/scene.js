@@ -5,54 +5,49 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-const ACCENT = 0xc4551f;
-const STEEL = 0xd7d8dc;
-const STEEL_DARK = 0xb9bac0;
-const SEAL = 0x26262a;
+const ACCENT = 0xc0742f;
+const ACCENT_BRIGHT = 0xe08a3e;
+const DECK = 0x3a3d42;
+const MEMBRANE = 0x17181b;
+const PANEL = 0xb5641f;
 
-// Local-space height map for the flask silhouette, split into four parts.
-// Each part owns a height range; the lathe profile within that range is
-// built relative to the part's own origin so the part can be translated
-// independently for the exploded view.
+// The roof system as four stacked layers, bottom (deck) to top (ridge cap).
+// Each layer is built from simple box geometry local to its own origin so
+// it can be translated independently for the exploded view — the same
+// pattern a lathe-based model would use, just with slabs instead of a
+// radial profile.
 const PART_DEFS = [
   {
-    key: 'base', color: STEEL_DARK, metalness: 0.82, roughness: 0.32,
+    key: 'deck', color: DECK, metalness: 0.75, roughness: 0.4,
     explode: [0, -0.5, 0],
-    points: [[0.0, 0.0], [0.30, 0.0], [0.40, 0.02], [0.40, 0.095], [0.37, 0.12]],
+    size: [1.15, 0.14, 0.8],
   },
   {
-    key: 'body', color: STEEL, metalness: 0.88, roughness: 0.22,
-    explode: [0, -0.12, 0],
-    points: [[0.37, 0.0], [0.40, 0.08], [0.40, 1.02], [0.375, 1.28], [0.33, 1.43]],
+    key: 'membrane', color: MEMBRANE, metalness: 0.05, roughness: 0.8,
+    explode: [0, -0.14, 0],
+    size: [1.08, 0.05, 0.74],
   },
   {
-    key: 'stopper', color: SEAL, metalness: 0.08, roughness: 0.62,
+    key: 'panel', color: PANEL, metalness: 0.88, roughness: 0.24,
     explode: [0, 0.3, 0],
-    points: [[0.33, 0.0], [0.26, 0.035], [0.25, 0.14], [0.27, 0.17]],
+    size: [1.0, 0.16, 0.68],
+    ribs: 5,
   },
   {
-    key: 'cap', color: ACCENT, metalness: 0.55, roughness: 0.35,
+    key: 'ridge', color: ACCENT_BRIGHT, metalness: 0.55, roughness: 0.34,
     explode: [0, 0.58, 0],
-    points: [[0.27, 0.0], [0.295, 0.02], [0.295, 0.19], [0.14, 0.255], [0.06, 0.27], [0.0, 0.275]],
+    size: [1.0, 0.07, 0.16],
   },
 ];
 
-// Cumulative base-Y for each part so the lathe profiles line up into one
-// continuous silhouette when gap === 0.
+// Cumulative base-Y for each layer so the stack lines up continuously when
+// gap === 0.
 let cursor = 0;
 for (const def of PART_DEFS) {
   def.baseY = cursor;
-  const span = def.points[def.points.length - 1][1];
-  cursor += span;
+  cursor += def.size[1];
 }
 const TOTAL_H = cursor;
-
-function buildLathe(points, segments = 56) {
-  const pts = points.map(([r, y]) => new THREE.Vector2(Math.max(r, 0.0001), y));
-  const geo = new THREE.LatheGeometry(pts, segments);
-  geo.computeVertexNormals();
-  return geo;
-}
 
 function makeShadowTexture() {
   const size = 256;
@@ -76,28 +71,28 @@ export function createScene(canvas) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
-  renderer.setClearColor(0xfbfbfd, 1);
+  renderer.setClearColor(0xf7f6f3, 1);
 
   const scene = new THREE.Scene();
   // UnrealBloomPass's composite writes alpha=1 unconditionally, so the
   // canvas can never be transparent through post-processing — paint the
   // scene background directly instead of relying on CSS layering.
-  scene.background = new THREE.Color(0xfbfbfd);
-  const camera = new THREE.PerspectiveCamera(32, window.innerWidth / window.innerHeight, 0.1, 50);
+  scene.background = new THREE.Color(0xf7f6f3);
+  const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 50);
 
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xe7e2d6, 0.55);
+  const hemi = new THREE.HemisphereLight(0xfff6ec, 0x3a3228, 0.32);
   scene.add(hemi);
-  const key = new THREE.DirectionalLight(0xffffff, 2.1);
-  key.position.set(2.5, 4, 3);
+  const key = new THREE.DirectionalLight(0xfff1dd, 1.9);
+  key.position.set(3.4, 1.7, 1.9);
   scene.add(key);
-  const rim = new THREE.PointLight(ACCENT, 6, 10, 2);
-  rim.position.set(-2, 1.4, -1.5);
+  const rim = new THREE.PointLight(ACCENT, 4.5, 10, 2);
+  rim.position.set(-1.6, 0.9, -1.2);
   scene.add(rim);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.4);
-  fill.position.set(-2, 1, 2);
+  const fill = new THREE.DirectionalLight(0xdbe6ff, 0.3);
+  fill.position.set(-1.8, 0.6, 1.4);
   scene.add(fill);
 
   const rig = new THREE.Group();
@@ -106,37 +101,50 @@ export function createScene(canvas) {
 
   const shadowTex = makeShadowTexture();
   const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false });
-  const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.7), shadowMat);
+  const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 1.9), shadowMat);
   shadowMesh.rotation.x = -Math.PI / 2;
   shadowMesh.position.y = 0.002;
   rig.add(shadowMesh);
 
   const parts = {};
   for (const def of PART_DEFS) {
-    const geo = buildLathe(def.points);
+    const [w, h, d] = def.size;
+    const geo = new THREE.BoxGeometry(w, h, d);
+    const isMetalLayer = def.key === 'panel' || def.key === 'ridge';
     const mat = new THREE.MeshStandardMaterial({
       color: def.color, metalness: def.metalness, roughness: def.roughness,
-      envMapIntensity: 1.1,
+      envMapIntensity: isMetalLayer ? 0.8 : 1.1,
+      emissive: def.key === 'ridge' ? ACCENT : 0x000000,
+      emissiveIntensity: def.key === 'ridge' ? 0.15 : 0,
     });
     const mesh = new THREE.Mesh(geo, mat);
     const group = new THREE.Group();
-    group.position.y = def.baseY;
+    group.position.y = def.baseY + h * 0.5;
     group.add(mesh);
-    rig.add(group);
-    parts[def.key] = { group, restY: def.baseY, explode: def.explode, worldAnchorLocalY: def.baseY + def.points[def.points.length - 1][1] * 0.5 };
-  }
 
-  // A thin emissive accent ring at the collar, picked up nicely by bloom.
-  const ringGeo = new THREE.TorusGeometry(0.265, 0.01, 12, 64);
-  const ringMat = new THREE.MeshStandardMaterial({ color: ACCENT, emissive: ACCENT, emissiveIntensity: 1.6, metalness: 0.4, roughness: 0.3 });
-  const ring = new THREE.Mesh(ringGeo, ringMat);
-  ring.rotation.x = Math.PI / 2;
-  parts.stopper.group.add(ring);
-  ring.position.y = 0.16;
+    // Standing-seam ribs across the panel's top face — thin raised strips
+    // that catch the key light and read as seamed metal rather than a slab.
+    if (def.ribs) {
+      const ribMat = new THREE.MeshStandardMaterial({
+        color: def.color, metalness: def.metalness, roughness: Math.max(def.roughness - 0.08, 0.05),
+        envMapIntensity: 0.6,
+      });
+      const ribGeo = new THREE.BoxGeometry(0.03, 0.03, d + 0.02);
+      for (let i = 0; i < def.ribs; i++) {
+        const ribX = (i / (def.ribs - 1) - 0.5) * (w - 0.08);
+        const rib = new THREE.Mesh(ribGeo, ribMat);
+        rib.position.set(ribX, h * 0.5 + 0.015, 0);
+        group.add(rib);
+      }
+    }
+
+    rig.add(group);
+    parts[def.key] = { group, restY: group.position.y, explode: def.explode };
+  }
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.38, 0.4, 0.84);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.3, 0.4, 0.85);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
@@ -151,11 +159,11 @@ export function createScene(canvas) {
   resize();
   window.addEventListener('resize', resize);
 
-  const camCur = new THREE.Vector3(0, 0.95, 3.5);
-  const tgtCur = new THREE.Vector3(0, 0.78, 0);
+  const camCur = new THREE.Vector3(0, 0.55, 3.6);
+  const tgtCur = new THREE.Vector3(0, 0.08, 0);
   const camTarget = new THREE.Vector3();
   const tgtTarget = new THREE.Vector3();
-  let fovCur = 32, fovTarget = 32;
+  let fovCur = 30, fovTarget = 30;
   let gapCur = 0, gapTarget = 0;
 
   function setKeyframe(a, b, t) {

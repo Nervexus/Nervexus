@@ -1,179 +1,177 @@
-// CALDO — scroll keyframes, copy and content data.
+// STRATA — scroll keyframes, copy and content data.
 // cam/tgt are world-space vectors for the Three.js camera; gap is the
-// 0..~1.3 explosion factor applied to the flask's four parts.
+// 0..~1.3 explosion factor applied to the roof system's four layers.
 
 export const SECTION_VH = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 170, 120];
 
 export const SECTIONS = [
   // 0 — Hero
   {
-    cam: [0, 0.95, 3.5], tgt: [0, 0.78, 0], gap: 0, fov: 32,
-    eyebrow: 'CALDO',
+    cam: [0, 0.55, 3.6], tgt: [0, 0.08, 0], gap: 0, fov: 30,
+    eyebrow: 'STRATA',
     kind: 'hero',
-    h: 'Coffee that never goes cold',
-    lede: 'A vacuum-sealed flask engineered to hold heat for 12 hours and cold brew for 18 — so the first sip tastes exactly like the last.',
+    h: 'The last roof you will ever need.',
+    lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen — built for coastal storms and backed by a lifetime transferable warranty.',
   },
   // 1 — Problem
   {
-    cam: [1.7, 1.05, 2.55], tgt: [0, 0.8, 0], gap: 0, fov: 32,
+    cam: [1.6, 0.62, 3.1], tgt: [0, 0.1, 0], gap: 0, fov: 28,
     eyebrow: 'THE PROBLEM', kind: 'text',
-    h: 'Cold by 10am.',
-    body: 'Most travel mugs lose their fight with heat before lunch. Caldo is built around one idea: your coffee shouldn’t have an expiration time.',
+    h: 'Most roofs fail by year eight.',
+    body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
   },
-  // 2 — Vacuum wall
+  // 2 — Engineering
   {
-    cam: [-1.85, 0.95, 2.0], tgt: [0, 0.85, 0], gap: 0.16, fov: 30,
+    cam: [-1.7, 0.58, 2.9], tgt: [0, 0.12, 0], gap: 0.16, fov: 27,
     eyebrow: 'ENGINEERING', kind: 'text',
-    h: 'Two walls. Zero compromise.',
-    body: 'A medical-grade vacuum gap sits between double layers of 18/8 stainless steel, stopping heat transfer at the molecular level.',
+    h: 'Four layers. Zero gaps.',
+    body: 'A fully adhered ice-and-water membrane sits beneath an insulated steel deck and a continuous standing-seam shell — stopping water, wind and ice at every seam.',
   },
-  // 3 — Retention claim
+  // 3 — Performance stat
   {
-    cam: [0, 1.35, 2.75], tgt: [0, 0.92, 0], gap: 0, fov: 30,
+    cam: [0, 0.85, 3.3], tgt: [0, 0.18, 0], gap: 0, fov: 27,
     eyebrow: 'PERFORMANCE', kind: 'stat',
-    h: '12 hours hot. 18 hours cold.',
-    body: 'Independently tested at third-party labs. Fill it at 6am — it’s still sipping-hot at dinner.',
+    h: '140mph wind rated. Lifetime warranty.',
+    body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once — outlive the mortgage.',
   },
   // 4 — Material
   {
-    cam: [2.05, 0.6, 1.55], tgt: [0, 0.75, 0], gap: 0, fov: 30,
+    cam: [1.9, 0.42, 2.6], tgt: [0, 0.1, 0], gap: 0, fov: 27,
     eyebrow: 'MATERIAL', kind: 'text',
-    h: 'Aerospace-grade steel.',
-    body: 'The same 18/8 alloy used in surgical tooling, brushed by hand and sealed against rust, odor and flavor transfer — forever.',
+    h: 'Copper face. Aerospace steel.',
+    body: 'A cold-rolled steel core with a hand-finished copper face, the same alloy family used in architectural façades — sealed against salt air, UV and corrosion for life.',
   },
-  // 5 — Lid / seal
+  // 5 — Seal / seam
   {
-    cam: [0, 1.88, 1.3], tgt: [0, 1.66, 0], gap: 0.38, fov: 26,
+    cam: [0, 0.95, 2.3], tgt: [0, 0.3, 0], gap: 0.4, fov: 24,
     eyebrow: 'THE SEAL', kind: 'text',
-    h: 'A lid that actually seals.',
-    body: 'A silicone gasket and threaded cap form a 360° seal rated for full inversion. Toss it in your bag — it will not leak.',
+    h: 'A seam that actually seals.',
+    body: 'Mechanically double-locked panels form one continuous, watertight shell rated for full submersion testing. No exposed fasteners — nothing for water to find.',
   },
-  // 6 — Pour spout
+  // 6 — Install / flashing
   {
-    cam: [-1.25, 1.72, 1.4], tgt: [0, 1.62, 0], gap: 0.22, fov: 28,
-    eyebrow: 'DRINKING', kind: 'text',
-    h: 'One hand. One motion.',
-    body: 'The spout opens with a quarter-turn and closes with a click you can feel. No buttons, no spring to break.',
+    cam: [-1.5, 0.78, 2.5], tgt: [0, 0.24, 0], gap: 0.24, fov: 26,
+    eyebrow: 'INSTALLATION', kind: 'text',
+    h: 'One pass. No shortcuts.',
+    body: 'Every panel is laser-measured and hand-fitted on site by a certified five-person crew. Most homes are fully dried-in within a single day.',
   },
-  // 7 — Capacity
+  // 7 — Capacity / scale
   {
-    cam: [0, 0.42, 3.25], tgt: [0, 0.62, 0], gap: 0, fov: 34,
-    eyebrow: 'CAPACITY', kind: 'text',
-    h: '592ml. Built for a full day.',
-    body: 'Enough for a long commute, a half-day hike, or back-to-back meetings — refill once, not six times.',
+    cam: [0, 0.3, 3.7], tgt: [0, 0.07, 0], gap: 0, fov: 32,
+    eyebrow: 'SCALE', kind: 'text',
+    h: '4,200 sq ft. Installed in three days.',
+    body: 'From a single roofline to a full estate, our crews move fast without skipping a layer — fully licensed, bonded and insured in every state we serve.',
   },
   // 8 — Finishes
   {
-    cam: [1.45, 0.85, 2.15], tgt: [0, 0.8, 0], gap: 0, fov: 30,
+    cam: [1.6, 0.55, 2.9], tgt: [0, 0.1, 0], gap: 0, fov: 27,
     eyebrow: 'FINISH', kind: 'swatches',
     h: 'Five finishes. One standard.',
-    body: 'Anodized in small batches: Slate, Clay, Moss, Bone and Midnight. Every finish ages the same way — gracefully.',
+    body: 'Finished in small batches: Charcoal, Zinc Gray, Copper Patina, Bone White and Graphite. Every finish weathers the same way — beautifully.',
   },
   // 9 — Craft
   {
-    cam: [-1.65, 0.72, 2.0], tgt: [0, 0.8, 0], gap: 0, fov: 30,
+    cam: [-1.7, 0.52, 2.9], tgt: [0, 0.1, 0], gap: 0, fov: 27,
     eyebrow: 'CRAFT', kind: 'text',
-    h: 'Made to outlast the trend.',
-    body: 'Each flask is pressure-tested twice and hand-inspected before it ships. We’d rather make fewer, better.',
+    h: 'Built by people who will still be here in 20 years.',
+    body: 'Every crew is factory-certified and every install is inspected twice before we leave the site. We would rather do fewer roofs, better.',
   },
-  // 10 — Exploded view (centered on the full spread so all 4 parts fit)
+  // 10 — Exploded view
   {
-    cam: [0, 0.3, 5.3], tgt: [0, 0.05, 0], gap: 1.3, fov: 46,
+    cam: [0, 0.15, 4.8], tgt: [0, 0.07, 0], gap: 1.3, fov: 42,
     eyebrow: 'ANATOMY', kind: 'exploded',
-    h: 'Four parts, no more.',
-    body: 'Cap, seal, body, base. Every part unscrews, every part is replaceable — nothing here is designed to be thrown away.',
+    h: 'Four layers, no shortcuts.',
+    body: 'Deck, membrane, panel, ridge. Every layer is inspected on its own — nothing here is hidden once it is covered.',
   },
-  // 11 — Part: Cap (exploded center ≈ y 1.61)
+  // 11 — Layer: Ridge cap (top, exploded world y ≈ 0.93)
   {
-    cam: [0.5, 1.8, 1.9], tgt: [0, 1.61, 0], gap: 1.3, fov: 28,
-    eyebrow: 'PART 01', kind: 'part',
-    h: 'The cap',
-    body: 'Machined steel, threaded to the body with aircraft-spec tolerances.',
+    cam: [0.7, 1.05, 2.3], tgt: [0, 0.93, 0], gap: 1.3, fov: 24,
+    eyebrow: 'LAYER 01', kind: 'part',
+    h: 'The ridge cap',
+    body: 'Hand-formed copper trim seals the ridge line and vents the attic — the final, most visible layer of the system.',
   },
-  // 12 — Part: Stopper (exploded center ≈ y 1.03)
+  // 12 — Layer: Standing-seam panel (exploded world y ≈ 0.45)
   {
-    cam: [0.5, 1.2, 1.85], tgt: [0, 1.03, 0], gap: 1.3, fov: 27,
-    eyebrow: 'PART 02', kind: 'part',
-    h: 'The seal',
-    body: 'Food-grade silicone, rated for 10,000 open-close cycles.',
+    cam: [0.75, 0.62, 2.1], tgt: [0, 0.45, 0], gap: 1.3, fov: 25,
+    eyebrow: 'LAYER 02', kind: 'part',
+    h: 'The standing seam panel',
+    body: '24-gauge steel with a copper face, mechanically seamed on site to aerospace tolerances — rated for a 50-year service life.',
   },
-  // 13 — Part: Body & Base (framed between body center -0.32 and base top -1.53)
+  // 13 — Layer: Membrane & deck (framed between membrane -0.23 and deck -0.79)
   {
-    cam: [0.6, -0.15, 2.1], tgt: [0, -0.5, 0], gap: 1.3, fov: 32,
-    eyebrow: 'PART 03–04', kind: 'part',
-    h: 'The body & base',
-    body: 'Double-wall vacuum steel with a non-slip steel base — stable on any desk, any dash.',
+    cam: [0.8, -0.35, 2.4], tgt: [0, -0.5, 0], gap: 1.3, fov: 28,
+    eyebrow: 'LAYER 03–04', kind: 'part',
+    h: 'The membrane & deck',
+    body: 'A fully adhered ice-and-water membrane over an insulated steel deck — the quiet layer underneath doing most of the work.',
   },
   // 14 — Testimonials
   {
-    cam: [2.35, 0.82, 1.55], tgt: [0.55, 0.8, 0], gap: 0.45, fov: 30,
+    cam: [2.0, 0.55, 2.8], tgt: [0.5, 0.15, 0], gap: 0.45, fov: 27,
     eyebrow: 'REVIEWS', kind: 'testimonials',
-    h: 'Loved by people who hate cold coffee.',
+    h: 'Trusted by homeowners who do not like surprises.',
   },
   // 15 — FAQ
   {
-    cam: [-2.35, 0.82, 1.55], tgt: [-0.55, 0.8, 0], gap: 0.18, fov: 30,
+    cam: [-2.0, 0.55, 2.8], tgt: [-0.5, 0.15, 0], gap: 0.2, fov: 27,
     eyebrow: 'QUESTIONS', kind: 'faq',
-    h: 'Everything you’re wondering',
+    h: 'Everything you are wondering',
   },
 ];
 
 export const TESTIMONIALS = [
   {
-    name: 'Marisol Reyes', role: 'Early riser',
+    name: 'Marisol Reyes', role: 'Homeowner, Lakeview',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&h=160&fit=crop&crop=faces&q=80',
-    quote: 'I fill it at 5:30am and it’s still too hot to drink by the time I park at work. That’s the whole pitch.',
+    quote: 'They found two rotted rafters mid-tear-off and fixed it the same day — no change order, no surprise invoice.',
   },
   {
-    name: 'Dana Okafor', role: 'Field nurse',
+    name: 'Dana Okafor', role: 'Property Manager',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160&h=160&fit=crop&crop=faces&q=80',
-    quote: 'Twelve-hour shifts, one fill. I haven’t bought a bad vending-machine coffee since January.',
+    quote: 'We have used STRATA on six rental properties. Zero callbacks in three years — that is unheard of in this business.',
   },
   {
-    name: 'Theo Lindqvist', role: 'Remote, mostly outside',
+    name: 'Theo Lindqvist', role: 'Homeowner, Coastal Ridge',
     avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=160&h=160&fit=crop&crop=faces&q=80',
-    quote: 'Dropped it from a roof rack at 40mph. Dented, still sealed, still hot. Wild.',
+    quote: 'Rode out a category 2 without losing a single panel. The crew down the street was not so lucky.',
   },
   {
-    name: 'Priya Natarajan', role: 'Night-shift resident',
+    name: 'Priya Natarajan', role: 'Homeowner',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=faces&q=80',
-    quote: 'The lid doesn’t leak in my bag — first flask in a decade I can say that about.',
+    quote: 'The estimate was the final price, down to the dollar. That alone made them worth the premium.',
   },
 ];
 
 export const FAQS = [
   {
-    q: 'How long does it actually keep coffee hot?',
-    a: '12 hours hot, 18 hours cold, tested at third-party labs at 20°C ambient. Real-world results vary slightly with fill temperature and altitude.',
+    q: 'How long does a STRATA roof actually last?',
+    a: 'Our standing-seam systems carry a lifetime, transferable material warranty and a 25-year workmanship guarantee — most installs last 50+ years with no maintenance.',
   },
   {
-    q: 'Is it dishwasher safe?',
-    a: 'The body and base are top-rack safe. We recommend hand-washing the seal to extend its lifespan past 10,000 cycles.',
+    q: 'Is a metal roof noisy in the rain?',
+    a: 'No. With a solid deck and fully adhered underlayment, a STRATA roof is quieter than asphalt shingle in a storm. The classic "tin roof" sound comes from open-batten installs, which we do not do.',
   },
   {
-    q: 'Does it fit in a car cup holder?',
-    a: 'Yes — Caldo is sized to 7.4cm at its widest point, which fits every standard cup holder we’ve tested.',
+    q: 'How long does installation take?',
+    a: 'Most homes are fully installed in 2–4 days. Larger or multi-structure properties are scoped up front, with a firm completion date written into your contract.',
   },
   {
-    q: 'What’s the warranty?',
-    a: 'Every Caldo ships with a lifetime warranty against manufacturing defects. Parts are sold separately if something wears out.',
+    q: 'Do you work with insurance claims?',
+    a: 'Yes — we manage storm and insurance claims directly with your adjuster, from inspection through final sign-off.',
   },
   {
-    q: 'Can I buy replacement parts?',
-    a: 'Yes. Cap, seal and base are all sold individually — nothing about Caldo is designed to be thrown away.',
+    q: 'What is the warranty?',
+    a: 'Lifetime material warranty plus a 25-year workmanship guarantee, fully transferable to the next owner at no cost.',
   },
   {
-    q: 'Where is it made?',
-    a: 'Designed in-house and manufactured in a family-run steel works we’ve partnered with since day one.',
+    q: 'Do you offer financing?',
+    a: 'Yes — 0% financing is available for qualified homeowners, with same-as-cash terms up to 18 months.',
   },
 ];
 
 export const SWATCHES = [
-  { name: 'Slate', hex: '#5b6066' },
-  { name: 'Clay', hex: '#c4551f' },
-  { name: 'Moss', hex: '#5e6b4f' },
-  { name: 'Bone', hex: '#e7e2d6' },
-  { name: 'Midnight', hex: '#20232b' },
+  { name: 'Charcoal', hex: '#2c2f33' },
+  { name: 'Zinc Gray', hex: '#5b6066' },
+  { name: 'Copper Patina', hex: '#a9672f' },
+  { name: 'Bone White', hex: '#e7e2d6' },
+  { name: 'Graphite', hex: '#1f2126' },
 ];
-
-export const OG_IMAGE = 'https://hoirqrkdgbmvpwutwuwj.supabase.co/storage/v1/object/public/assets/assets/234405b5-3e0b-423d-a86d-c2171446bfe3_original.png';

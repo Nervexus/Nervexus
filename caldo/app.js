@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { SECTIONS, TESTIMONIALS, FAQS, SWATCHES, OG_IMAGE } from './data.js';
+import { SECTIONS, TESTIMONIALS, FAQS, SWATCHES } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
@@ -17,13 +17,6 @@ const AccountIcon = () => html`
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
     <circle cx="12" cy="8" r="3.4" />
     <path d="M4.5 20c1.4-4 4.3-6 7.5-6s6.1 2 7.5 6" />
-  </svg>
-`;
-
-const BagIcon = () => html`
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M6 8h12l-1 12H7L6 8z" />
-    <path d="M9 8V6a3 3 0 0 1 6 0v2" />
   </svg>
 `;
 
@@ -69,19 +62,16 @@ function Nav() {
   return html`
     <nav class=${s.navSolid ? 'solid' : ''}>
       <div class="navinner">
-        <a class="logo" href="#hero">CALDO</a>
+        <a class="logo" href="#hero">STRATA</a>
         <div class="navlinks">
-          <a href="#product">Product</a>
+          <a href="#product">Services</a>
           <a href="#reviews">Reviews</a>
           <a href="#faq">FAQ</a>
-          <a href="#support" onClick=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>Support</a>
+          <a href="#contact" onClick=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>Contact</a>
         </div>
         <div class="navicons">
-          <button class="iconbtn" aria-label="Account"><${AccountIcon} /></button>
-          <button class="iconbtn bagbtn" aria-label="Bag" onClick=${() => setState({ chatOpen: false })}>
-            <${BagIcon} />
-            <span class="cartcount ${s.cartCount > 0 ? 'show' : ''}">${s.cartCount}</span>
-          </button>
+          <button class="iconbtn" aria-label="Client login"><${AccountIcon} /></button>
+          <button class="btn btnprimary navcta" onClick=${() => setState({ chatOpen: true })}>Get Estimate</button>
         </div>
       </div>
     </nav>
@@ -143,8 +133,8 @@ function HeroPanel({ idx }) {
       <${Reveal} tag="h1" text=${data.h} />
       <p class="lede">${data.lede}</p>
       <div class="heroactions">
-        <button class="btn btnprimary" onClick=${() => setState({ cartCount: state.cartCount + 1 })}>Shop Caldo — $68</button>
-        <button class="btn btnghost" onClick=${() => window.scrollTo({ top: window.innerHeight * 1.1, behavior: 'smooth' })}>Watch the film</button>
+        <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
+        <button class="btn btnghost" onClick=${() => window.scrollTo({ top: window.innerHeight * 1.1, behavior: 'smooth' })}>See the install</button>
       </div>
       <div class="scrollhint"><${ArrowIcon} className="bob" /><span>Scroll</span></div>
     <//>
@@ -167,8 +157,6 @@ function TextPanel({ idx }) {
     <//>
   `;
 }
-
-const PART_LABELS = { 11: 'cap', 12: 'stopper', 13: 'body' };
 
 function ExplodedPanel({ idx }) {
   const data = SECTIONS[idx];
@@ -203,10 +191,10 @@ function Labels({ scene }) {
     let raf;
     const loop = () => {
       setPos({
-        cap: scene.labelScreenPos('cap'),
-        stopper: scene.labelScreenPos('stopper'),
-        body: scene.labelScreenPos('body'),
-        base: scene.labelScreenPos('base'),
+        ridge: scene.labelScreenPos('ridge'),
+        panel: scene.labelScreenPos('panel'),
+        membrane: scene.labelScreenPos('membrane'),
+        deck: scene.labelScreenPos('deck'),
       });
       raf = requestAnimationFrame(loop);
     };
@@ -216,19 +204,19 @@ function Labels({ scene }) {
 
   if (!active) return null;
   const baseW = weightFor(s.section, 10) > 0.15 || s.sectionIdx >= 11 ? 1 : weightFor(s.section, 10);
-  const focusPart = { 11: 'cap', 12: 'stopper', 13: 'body' }[s.sectionIdx];
+  const focusPart = { 11: 'ridge', 12: 'panel', 13: 'membrane' }[s.sectionIdx];
   const labels = [
-    { key: 'cap', text: 'Cap' },
-    { key: 'stopper', text: 'Seal' },
-    { key: 'body', text: 'Body' },
-    { key: 'base', text: 'Base' },
+    { key: 'ridge', text: 'Ridge cap' },
+    { key: 'panel', text: 'Panel' },
+    { key: 'membrane', text: 'Membrane' },
+    { key: 'deck', text: 'Deck' },
   ];
   return html`
     <div class="labels">
       ${labels.map((l) => {
         const p = pos[l.key];
         if (!p || !p.visible) return null;
-        const dim = focusPart && l.key !== focusPart && !(focusPart === 'body' && l.key === 'base');
+        const dim = focusPart && l.key !== focusPart && !(focusPart === 'membrane' && l.key === 'deck');
         const w = baseW * (dim ? 0.4 : 1);
         return html`
           <div class="plabel ${dim ? '' : 'plabel-focus'}" key=${l.key} style=${{ left: `${p.x}px`, top: `${p.y}px`, opacity: w }}>
@@ -297,7 +285,7 @@ function FaqPanel({ idx }) {
   `;
 }
 
-// --- Buy bar -------------------------------------------------------------
+// --- Sticky estimate bar ---------------------------------------------
 
 function BuyBar() {
   const s = useStore();
@@ -306,10 +294,10 @@ function BuyBar() {
     <div class="buybar ${show ? 'show' : ''}">
       <div class="buybarinner">
         <div class="buybarinfo">
-          <strong>Caldo Flask</strong>
-          <span>$68 · Ships in 2 days</span>
+          <strong>STRATA Roof System</strong>
+          <span>Free on-site estimate · Response within 1 business day</span>
         </div>
-        <button class="btn btnprimary" onClick=${() => setState({ cartCount: state.cartCount + 1 })}>Add to bag</button>
+        <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get Estimate</button>
       </div>
     </div>
   `;
@@ -323,11 +311,11 @@ function SupportChat() {
     <div class="supportwrap">
       <div class="chatpanel ${s.chatOpen ? 'open' : ''}">
         <div class="chathead">
-          <strong>Caldo Support</strong>
+          <strong>STRATA Concierge</strong>
           <button class="chatclose" onClick=${() => setState({ chatOpen: false })} aria-label="Close">×</button>
         </div>
         <div class="chatbody">
-          <div class="chatmsg">Hi — need a hand with sizing, shipping, or a replacement part? Ask away.</div>
+          <div class="chatmsg">Hi — tell us about your roof and we'll schedule a free on-site estimate, usually within one business day.</div>
         </div>
         <div class="chatinput">
           <input type="text" placeholder="Type a message…" />
@@ -373,19 +361,19 @@ function Footer() {
   return html`
     <div class="footerinner">
       <div class="footertop">
-        <div class="footerbrand">CALDO</div>
+        <div class="footerbrand">STRATA</div>
         <div class="footercols">
           <div>
-            <h4>Shop</h4>
-            <a href="#product">Caldo Flask</a>
-            <a href="#product">Replacement parts</a>
-            <a href="#faq">Gift cards</a>
+            <h4>Services</h4>
+            <a href="#product">Standing-Seam Roofing</a>
+            <a href="#product">Roof Repair &amp; Leak Detection</a>
+            <a href="#faq">Insurance Claims</a>
           </div>
           <div>
             <h4>Company</h4>
             <a href="#reviews">Reviews</a>
             <a href="#faq">FAQ</a>
-            <a href="#support" onClick=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>Support</a>
+            <a href="#contact" onClick=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>Contact</a>
           </div>
           <div>
             <h4>Legal</h4>
@@ -396,7 +384,7 @@ function Footer() {
         </div>
       </div>
       <div class="footerbottom">
-        <span>© ${new Date().getFullYear()} Caldo. Coffee that never goes cold.</span>
+        <span>© ${new Date().getFullYear()} STRATA Roofing. Built to outlast the weather.</span>
       </div>
     </div>
   `;
@@ -407,7 +395,4 @@ export function mountApp(scene) {
   const footerRoot = document.getElementById('footer-root');
   createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${Overlays} scene=${scene} /><//>`);
   createRoot(footerRoot).render(html`<${Footer} />`);
-
-  const ogMeta = document.querySelector('meta[property="og:image"]');
-  if (ogMeta) ogMeta.setAttribute('content', OG_IMAGE);
 }

@@ -14,7 +14,6 @@ export const state = {
   sectionIdx: 0,        // floored section index
   sectionLocal: 0,      // 0..1 progress within the current section
   footerT: 0,           // 0..1 how far the footer has risen into view
-  cartCount: 0,
   chatOpen: false,
   faqOpen: -1,
   navSolid: false,
