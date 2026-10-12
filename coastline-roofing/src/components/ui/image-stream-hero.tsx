@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /* ── the corridor ────────────────────────────────────────────────
@@ -219,15 +220,17 @@ export function ImageStreamHero({
                     // corridor is already full on the first frame.
                     animationDelay: `${-(i * speed) / cards}s`,
                     backfaceVisibility: "hidden",
+                    willChange: "transform",
                   }}
                 >
                   {img ? (
-                    <img
+                    <Image
                       src={img.src}
                       alt={img.alt ?? ""}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="20vw"
+                      quality={60}
+                      className="object-cover"
                       draggable={false}
                     />
                   ) : null}
