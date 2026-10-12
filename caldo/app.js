@@ -366,7 +366,7 @@ function Footer() {
           <div>
             <h4>Services</h4>
             <a href="#product">Standing-Seam Roofing</a>
-            <a href="#product">Roof Repair &amp; Leak Detection</a>
+            <a href="#product">Roof Repair & Leak Detection</a>
             <a href="#faq">Insurance Claims</a>
           </div>
           <div>

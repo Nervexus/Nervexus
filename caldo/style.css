@@ -123,7 +123,7 @@ nav.solid{
 
 .reveal{font-size:clamp(28px,4.2vw,48px);line-height:1.08;}
 .ov-hero h1.reveal{font-size:clamp(32px,4.6vw,54px);}
-.w{display:inline-block;overflow:hidden;vertical-align:top;}
+.w{display:inline-block;overflow:hidden;vertical-align:top;white-space:nowrap;}
 .w i{
   display:inline-block;font-style:normal;
   transform:translateY(0.9em);filter:blur(6px);opacity:0;
@@ -308,13 +308,18 @@ footer{
 @media (max-width:860px){
   .navlinks{display:none;}
   .buybarinner{padding-right:84px;}
-  .ov{max-width:92vw;padding:0 7vw;}
-  .ov-right{right:0;left:0;text-align:left;}
+  .ov{
+    max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;
+    background:rgba(247,246,243,0.84);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  }
+  .ov-hero{background:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0 7vw;}
+  .ov-right{right:3vw;left:3vw;text-align:left;}
   .tcardviewport{left:7vw;right:7vw;top:auto;bottom:14vh;transform:none;}
   .testi{top:16vh;transform:none;}
   .reveal{font-size:clamp(24px,7vw,36px);}
   .ov-hero h1.reveal{font-size:clamp(30px,9vw,42px);}
-  .faqwrap{max-width:92vw;}
+  .faqwrap{max-width:94vw;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
 }
