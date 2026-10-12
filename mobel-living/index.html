@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MØBEL — The Living Collection</title>
+<meta name="description" content="MØBEL is a furniture studio working in solid wood, wool and stone — a small collection of pieces built to last." />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body class="loading">
+
+  <!-- LAYER 4 — Loader -->
+  <div id="loader">
+    <div class="loader-mark">
+      <div class="mask"><span class="line">MØBEL</span></div>
+      <div class="mask loader-tag"><span class="line">The Living Collection</span></div>
+    </div>
+    <div class="loader-bar"><span id="loaderFill"></span></div>
+  </div>
+
+  <!-- LAYER 0 — persistent WebGL background -->
+  <canvas id="gl"></canvas>
+
+  <!-- LAYER 3 — Nav -->
+  <nav class="nav">
+    <a href="#top" class="nav-mark">MØBEL</a>
+    <div class="nav-links">
+      <a href="#shop">Shop</a>
+      <a href="#featured">Featured</a>
+      <a href="#materials">Materials</a>
+      <a href="#story">Story</a>
+    </div>
+    <a href="#shop" class="nav-cta">View Collection</a>
+  </nav>
+
+  <!-- LAYER 2 — UI overlay -->
+  <div id="ui">
+    <section id="intro" aria-label="Introduction">
+      <div class="intro-pin" id="top">
+        <div class="hero-inner">
+          <p class="eyebrow mask"><span class="line">Est. 2016 · Made in small batches</span></p>
+          <h1 class="mask"><span class="line">Scroll to shape</span></h1>
+          <h1 class="mask"><span class="line">the space</span></h1>
+          <p class="hero-sub mask"><span class="line">Solid wood, raw wool and quarried stone — five pieces, considered from every angle.</span></p>
+        </div>
+
+        <div class="index" aria-hidden="true">
+          <span class="index-current" id="indexCurrent">01</span>
+          <span class="index-track"><span class="index-fill" id="indexFill"></span></span>
+          <span class="index-total">05</span>
+        </div>
+
+        <div class="scroll-hint">
+          <span class="scroll-line"></span>
+          <span>Scroll</span>
+        </div>
+
+        <!-- captions triggered by scroll depth through #intro -->
+        <p class="cap" data-a="0.08" data-b="0.22">Every piece starts as a single idea —</p>
+        <p class="cap" data-a="0.22" data-b="0.36">a form worth living with for decades.</p>
+        <p class="cap" data-a="0.36" data-b="0.50">We choose material before silhouette.</p>
+        <p class="cap" data-a="0.50" data-b="0.66">Then we shape the room around it.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- LAYER 1 — Content -->
+  <main>
+
+    <section id="shop">
+      <div class="shop-head">
+        <h2 class="mask"><span class="line">The Collection</span></h2>
+        <p class="mask"><span class="line">Five pieces. No seasons, no re-runs — just the next good idea.</span></p>
+      </div>
+
+      <div id="grid">
+        <article class="card card--textile">
+          <div class="card-media"><div class="swatch swatch--textile"></div></div>
+          <div class="card-meta">
+            <h3>Fjord</h3>
+            <p>Modular sofa, wool bouclé</p>
+            <span class="price">€6,900</span>
+          </div>
+        </article>
+        <article class="card card--wood">
+          <div class="card-media"><div class="swatch swatch--wood"></div></div>
+          <div class="card-meta">
+            <h3>Bark</h3>
+            <p>Dining table, solid oak</p>
+            <span class="price">€3,400</span>
+          </div>
+        </article>
+        <article class="card card--stone">
+          <div class="card-media"><div class="swatch swatch--stone"></div></div>
+          <div class="card-meta">
+            <h3>Stein</h3>
+            <p>Side table, quarried travertine</p>
+            <span class="price">€1,250</span>
+          </div>
+        </article>
+        <article class="card card--wool">
+          <div class="card-media"><div class="swatch swatch--wool"></div></div>
+          <div class="card-meta">
+            <h3>Ull</h3>
+            <p>Lounge chair, raw wool</p>
+            <span class="price">€2,100</span>
+          </div>
+        </article>
+        <article class="card card--glow">
+          <div class="card-media"><div class="swatch swatch--glow"></div></div>
+          <div class="card-meta">
+            <h3>Glød</h3>
+            <p>Table lamp, hand-thrown ceramic</p>
+            <span class="price">€480</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="featured">
+      <div class="feat-sticky">
+        <div class="feat-media">
+          <div class="feat-image feat-image--1 is-active"></div>
+          <div class="feat-image feat-image--2"></div>
+          <div class="feat-image feat-image--3"></div>
+        </div>
+        <div class="feat-text">
+          <p class="feat-eyebrow">Featured — Fjord Sectional</p>
+
+          <div class="feat-progress"><span id="featFill"></span></div>
+
+          <div class="feat-chapters">
+            <div class="feat-chapter is-active" data-chapter="1">
+              <span class="feat-num">01</span>
+              <h3>Form</h3>
+              <p>Six modules, one silhouette. Fjord rearranges itself around however the room is actually used — reading corner one month, a seat for twelve the next.</p>
+            </div>
+            <div class="feat-chapter" data-chapter="2">
+              <span class="feat-num">02</span>
+              <h3>Material</h3>
+              <p>Undyed wool bouclé over a kiln-dried hardwood frame. The cover is woven, not printed — so the colour doesn't sit on top of the fibre, it runs through it.</p>
+            </div>
+            <div class="feat-chapter" data-chapter="3">
+              <span class="feat-num">03</span>
+              <h3>Comfort</h3>
+              <p>A 42° seat back and a down-wrapped foam core, tuned to hold its shape for years rather than feel soft for the first six months.</p>
+            </div>
+          </div>
+
+          <a href="#shop" class="feat-cta">€6,900 — Configure Fjord</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="materials">
+      <div class="mat-head">
+        <h2 class="mask"><span class="line">Four Materials</span></h2>
+      </div>
+      <div class="mat-viewport">
+        <div id="matTrack">
+          <article class="mat-panel">
+            <div class="mat-figure"><div class="swatch swatch--textile"></div></div>
+            <div class="mat-copy">
+              <span class="mat-no">01</span>
+              <h3>Textile</h3>
+              <p>Undyed wool bouclé, woven in small batches so every bolt reads slightly differently — the way a natural fibre should.</p>
+            </div>
+          </article>
+          <article class="mat-panel">
+            <div class="mat-figure"><div class="swatch swatch--wood"></div></div>
+            <div class="mat-copy">
+              <span class="mat-no">02</span>
+              <h3>Wood</h3>
+              <p>European oak, air-dried for eighteen months before it ever reaches a saw. No veneer, no laminate — the grain you see is the grain you get.</p>
+            </div>
+          </article>
+          <article class="mat-panel">
+            <div class="mat-figure"><div class="swatch swatch--stone"></div></div>
+            <div class="mat-copy">
+              <span class="mat-no">03</span>
+              <h3>Stone</h3>
+              <p>Quarried travertine, cut thick and left with a honed — not polished — face, so light sits in it rather than bounces off it.</p>
+            </div>
+          </article>
+          <article class="mat-panel">
+            <div class="mat-figure"><div class="swatch swatch--craft"></div></div>
+            <div class="mat-copy">
+              <span class="mat-no">04</span>
+              <h3>Craft</h3>
+              <p>Every piece passes through the same six hands from frame to finish. We keep the studio small enough that it still can.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="story">
+      <div class="story-shade"></div>
+      <div class="story-copy">
+        <p class="eyebrow mask"><span class="line">Our Story</span></p>
+        <h2 class="mask"><span class="line">Built slowly, on purpose</span></h2>
+        <p class="mask"><span class="line">MØBEL started in a single workshop with four people and a conviction that furniture should outlast the room it's bought for. Ten years on, that's still the only brief we work to.</span></p>
+      </div>
+    </section>
+
+    <section id="gallery">
+      <div class="gal-head">
+        <h2 class="mask"><span class="line">In the Home</span></h2>
+      </div>
+      <div class="gal-grid">
+        <div class="gal-item gal-item--1"></div>
+        <div class="gal-item gal-item--2"></div>
+        <div class="gal-item gal-item--3"></div>
+        <div class="gal-item gal-item--4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-col footer-brand">
+        <span class="nav-mark">MØBEL</span>
+        <p>The Living Collection — solid wood, raw wool and quarried stone, made in small batches.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="#shop">Fjord Sectional</a></li>
+          <li><a href="#shop">Bark Table</a></li>
+          <li><a href="#shop">Stein Side Table</a></li>
+          <li><a href="#shop">Ull Lounge Chair</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>MØBEL</h4>
+        <ul>
+          <li><a href="#story">Our Story</a></li>
+          <li><a href="#materials">Materials</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#top">Showroom Visits</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Service</h4>
+        <ul>
+          <li><a href="#top">Delivery &amp; Care</a></li>
+          <li><a href="#top">Returns</a></li>
+          <li><a href="#top">Warranty</a></li>
+          <li><a href="#top">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col footer-news">
+        <h4>Newsletter</h4>
+        <p>New pieces, twice a year. Nothing else.</p>
+        <form class="news-form" onsubmit="return false;">
+          <input type="email" placeholder="Email address" required />
+          <button type="submit" aria-label="Subscribe">→</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 MØBEL Studio</span>
+      <span>Demo portfolio piece — not a real retailer</span>
+    </div>
+  </footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.min.js"
+  }
+}
+</script>
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
