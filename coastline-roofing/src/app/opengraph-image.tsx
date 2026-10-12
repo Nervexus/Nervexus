@@ -63,24 +63,7 @@ export default async function Image() {
           }}
         />
 
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div
-            style={{
-              display: "flex",
-              width: 48,
-              height: 48,
-              borderRadius: 999,
-              border: "1px solid #c9a45c",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "Fraunces",
-              fontStyle: "italic",
-              fontSize: 24,
-              color: "#c9a45c",
-            }}
-          >
-            C
-          </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <div
             style={{
               display: "flex",

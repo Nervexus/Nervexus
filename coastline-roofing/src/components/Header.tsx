@@ -14,12 +14,7 @@ export function Header() {
   return (
     <header className="dark-surface sticky top-0 z-40 border-b border-warm/10 bg-ink-950/95 backdrop-blur supports-[backdrop-filter]:bg-ink-950/80">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="#top" className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-gold-400/60 text-gold-400">
-            <span className="font-display text-base italic light:not-italic">
-              C
-            </span>
-          </span>
+        <Link href="#top" className="flex items-center">
           <span className="font-display text-xl tracking-tight text-warm">
             {siteConfig.name}
           </span>
