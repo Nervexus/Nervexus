@@ -68,10 +68,18 @@ export const siteConfig = {
 
   // --- Social proof --------------------------------------------------
   trustPoints: [
-    { label: `${new Date().getFullYear() - 2007}+ Years Experience`, icon: "years" as const },
-    { label: "Fully Insured & Accredited", icon: "shield" as const },
-    { label: "Free, No-Obligation Quotes", icon: "quote" as const },
-    { label: "10-Year Workmanship Guarantee", icon: "guarantee" as const },
+    {
+      stat: `${new Date().getFullYear() - 2007}+`,
+      caption: "Years Experience",
+      icon: "years" as const,
+    },
+    { stat: "Fully Insured", caption: "& Accredited", icon: "shield" as const },
+    { stat: "Free Quotes", caption: "No Obligation", icon: "quote" as const },
+    {
+      stat: "10-Year",
+      caption: "Workmanship Guarantee",
+      icon: "guarantee" as const,
+    },
   ],
 
   // --- Services ------------------------------------------------------
