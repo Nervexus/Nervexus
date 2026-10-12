@@ -3,9 +3,9 @@ import { FloatingContactBubble } from "@/components/FloatingContactBubble";
 import { Footer } from "@/components/Footer";
 import { Gallery } from "@/components/Gallery";
 import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
 import { QuoteSection } from "@/components/QuoteSection";
 import { Reviews } from "@/components/Reviews";
+import { RoofExperience } from "@/components/roof-journey/RoofExperience";
 import { Services } from "@/components/Services";
 import { TrustBar } from "@/components/TrustBar";
 
@@ -14,7 +14,7 @@ export default function Home() {
     <>
       <Header />
       <main>
-        <Hero />
+        <RoofExperience />
         <TrustBar />
         <Services />
         <Gallery />
