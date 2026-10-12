@@ -25,10 +25,7 @@ export function Reviews() {
       >
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/80 to-ink-950/20" />
         <div className="relative z-10 mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 text-center sm:px-6">
-          <p className="text-xs font-medium tracking-[0.2em] text-gold-400 uppercase">
-            Example Reviews — For Demo Purposes
-          </p>
-          <h2 className="mt-5 font-display text-4xl text-warm sm:text-5xl">
+          <h2 className="font-display text-4xl text-warm sm:text-5xl">
             What customers say
           </h2>
           <p className="mt-5 text-lg font-light text-warm/65">
