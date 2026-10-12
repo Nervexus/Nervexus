@@ -22,14 +22,40 @@ const labelClasses =
 
 export function QuoteForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // NOTE: this is a static demo — there is no backend wired up, so
-  // submitting just shows a thank-you message. Before this goes live for a
-  // real client, replace handleSubmit with a real request (an API route, a
-  // server action, or a service like Formspree) that emails/stores the lead.
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError(null);
+
+    const form = new FormData(event.currentTarget);
+    try {
+      const res = await fetch("/api/quote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.get("name"),
+          phone: form.get("phone"),
+          postcode: form.get("postcode"),
+          jobType: form.get("jobType"),
+          message: form.get("message"),
+        }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        setError(body?.error ?? "Something went wrong. Please call us instead.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError("Couldn't reach the server. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -144,13 +170,18 @@ export function QuoteForm() {
       <div className="sm:col-span-2 mt-4">
         <button
           type="submit"
-          className="w-full bg-gold-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-ink-950 uppercase transition-colors hover:bg-gold-600 sm:w-auto light:rounded-[3px] light:text-white"
+          disabled={submitting}
+          className="w-full bg-gold-500 px-8 py-4 text-xs font-medium tracking-[0.14em] text-ink-950 uppercase transition-colors hover:bg-gold-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto light:rounded-[3px] light:text-white"
         >
-          Get My Free Quote
+          {submitting ? "Sending…" : "Get My Free Quote"}
         </button>
-        <p className="mt-4 text-xs text-warm/45">
-          No obligation. We usually reply within one working day.
-        </p>
+        {error ? (
+          <p className="mt-4 text-xs text-red-400">{error}</p>
+        ) : (
+          <p className="mt-4 text-xs text-warm/45">
+            No obligation. We usually reply within one working day.
+          </p>
+        )}
       </div>
     </form>
   );
