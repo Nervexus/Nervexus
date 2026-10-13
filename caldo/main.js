@@ -74,7 +74,13 @@ function onScroll() {
   // the normal static page underneath takes over. The dissolve happens in
   // the last stretch of the intro's own scroll range, not a fixed pixel
   // amount, so it still works at any viewport height.
-  const OUTRO_EDGE = 0.2;
+  //
+  // Scaled to match the same 15%-of-section crossfade window every other
+  // section boundary uses (0.15 * last section's 0.25 share of the total
+  // scroll = 0.0375) — the last section used to get only a fifth of its
+  // own dwell before dissolving away, far less settled time than every
+  // other section got before its own crossfade.
+  const OUTRO_EDGE = 0.0375;
   const introOpacity = f < 1 - OUTRO_EDGE ? 1 : 1 - (f - (1 - OUTRO_EDGE)) / OUTRO_EDGE;
   backdrop.setOpacity(introOpacity);
   grain.style.opacity = String(0.07 * introOpacity);
