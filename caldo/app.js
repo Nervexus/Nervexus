@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { SECTIONS, FEATURES, ANATOMY, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
+import { SECTIONS, STEPS, ANATOMY, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
@@ -158,14 +158,13 @@ function TextPanel({ idx }) {
 
 // --- Static page sections (normal document flow, below the intro) -------
 
-function FeatureCard({ f }) {
+function Step({ n, step }) {
   return html`
-    <div class="feature">
-      <img class="featureimg" src=${PHOTO_SRC[f.photo]} alt="" />
-      <div class="featurebody">
-        <${Eyebrow}>${f.eyebrow}<//>
-        <h3>${f.h}</h3>
-        <p class="body">${f.body}</p>
+    <div class="step">
+      <span class="stepnum">${String(n).padStart(2, '0')}</span>
+      <div class="stepbody">
+        <h3>${step.h}</h3>
+        <p class="body">${step.body}</p>
       </div>
     </div>
   `;
@@ -189,9 +188,10 @@ function ServicesSection() {
       <div class="page-head">
         <${Eyebrow}>WHAT'S INCLUDED<//>
         <h2>Every layer, engineered on purpose.</h2>
+        <p class="body">Six steps, start to finish. No surprises in between.</p>
       </div>
-      <div class="featuregrid">
-        ${FEATURES.map((f) => html`<${FeatureCard} key=${f.h} f=${f} />`)}
+      <div class="stepsgrid">
+        ${STEPS.map((s, i) => html`<${Step} key=${s.h} n=${i + 1} step=${s} />`)}
       </div>
       <${FinishesStrip} />
     </section>

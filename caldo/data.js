@@ -52,36 +52,32 @@ export const SECTIONS = [
 
 // --- Static page content (normal document flow, below the intro) ---------
 
-export const FEATURES = [
+// The six-step walkthrough replacing the old photo-card grid — a plain,
+// text-only process list (no images) covering estimate through warranty.
+export const STEPS = [
   {
-    photo: 'tiles',
-    eyebrow: 'MATERIAL',
-    h: 'Copper face. Aerospace steel.',
-    body: 'A cold-rolled steel core with a hand-finished copper face, the same alloy family used in architectural façades — sealed against salt air, UV and corrosion for life.',
+    h: 'Free on-site inspection',
+    body: 'A certified estimator walks your roof in person, documents every vulnerability and gives you a same-week quote — no obligation.',
   },
   {
-    photo: 'metal',
-    eyebrow: 'THE SEAL',
-    h: 'A seam that actually seals.',
-    body: 'Mechanically double-locked panels form one continuous, watertight shell rated for full submersion testing. No exposed fasteners — nothing for water to find.',
+    h: 'Material & finish selection',
+    body: 'Pick your finish from five standard colors. Every panel is then laser-measured and cut to your roof’s exact geometry before the crew ever arrives.',
   },
   {
-    photo: 'drill',
-    eyebrow: 'INSTALLATION',
-    h: 'One pass. No shortcuts.',
-    body: 'Every panel is laser-measured and hand-fitted on site by a certified five-person crew. Most homes are fully dried-in within a single day.',
+    h: 'Tear-off & deck prep',
+    body: 'Old roofing comes off down to the deck. Any rot or damage underneath is repaired first — nothing new goes down over a compromised base.',
   },
   {
-    photo: 'aerial',
-    eyebrow: 'SCALE',
-    h: '4,200 sq ft. Installed in three days.',
-    body: 'From a single roofline to a full estate, our crews move fast without skipping a layer — fully licensed, bonded and insured in every state we serve.',
+    h: 'Ice & water membrane',
+    body: 'A fully adhered ice-and-water membrane seals the deck — the quiet layer that does most of the actual waterproofing work.',
   },
   {
-    photo: 'crew',
-    eyebrow: 'CRAFT',
-    h: 'Built by people who will still be here in 20 years.',
-    body: 'Every crew is factory-certified and every install is inspected twice before we leave the site. We would rather do fewer roofs, better.',
+    h: 'Standing-seam install',
+    body: 'Panels are mechanically double-locked on site to aerospace tolerances. No exposed fasteners — nothing for water to find.',
+  },
+  {
+    h: 'Final walkthrough & warranty',
+    body: 'Every install is inspected twice before we leave the site, then backed by a lifetime transferable warranty.',
   },
 ];
 
