@@ -1,0 +1,106 @@
+==============================================================================
+01-full — Everything outstanding — the busiest the email gets
+==============================================================================
+SUBJECT: Good evening Sam — your Daily Performance log is due (+4 more)
+
+Good evening Sam,
+
+PERFORMANCE TERMINAL
+  - It’s 9pm UK time — in one hour you will need to fill out a mandatory Daily Performance log. This ensures that you are keeping yourself to a high standard. Failing this will lead to a strike on your account.
+
+DAILY TASKS
+  - You have 4 tasks pending, awaiting completion. You have 3 hours left until the day ends. Please log in as soon as possible.
+
+CALENDAR
+  - For tomorrow you have Dentist at 15:00, which you have set for yourself to do.
+
+LOGS
+  - Your logs are pending. You have Training, Finance, Body metrics still to fill in. You can do all of them in one place — open the app and tap "Log everything".
+
+APP UPDATE
+  - A new version is live. Open the app and check What’s New in Settings for details.
+
+Thank you,
+Ultra X Management team
+
+==============================================================================
+02-single — One item only — the most common real case
+==============================================================================
+SUBJECT: Hey Sam, you have 4 tasks pending completion
+
+Good evening Sam,
+
+DAILY TASKS
+  - You have 4 tasks pending, awaiting completion. You have 3 hours left until the day ends. Please log in as soon as possible.
+
+Thank you,
+Ultra X Management team
+
+==============================================================================
+03-two-sections — Two sections, no urgent item
+==============================================================================
+SUBJECT: Hey Sam, you have 4 tasks pending completion (+1 more)
+
+Good evening Sam,
+
+DAILY TASKS
+  - You have 4 tasks pending, awaiting completion. You have 3 hours left until the day ends. Please log in as soon as possible.
+
+CALENDAR
+  - For tomorrow you have Dentist at 15:00, which you have set for yourself to do.
+
+Thank you,
+Ultra X Management team
+
+==============================================================================
+04-critical — Account locked — the most severe email sent
+==============================================================================
+SUBJECT: Sam — Performance Terminal — account locked
+
+Good evening Sam,
+
+PERFORMANCE TERMINAL
+  - Your account has been locked after 7 consecutive missed daily check-ins. Log in to submit an appeal for the owner to review.
+
+Thank you,
+Ultra X Management team
+
+==============================================================================
+05-update-only — A release note on its own
+==============================================================================
+SUBJECT: Hey Sam — Nervexus v11.228 is out
+
+Good evening Sam,
+
+APP UPDATE
+  - A new version is live. Open the app and check What’s New in Settings for details.
+
+Thank you,
+Ultra X Management team
+
+==============================================================================
+06-long-text — Long mission names and a long checklist title — wrapping stress test
+==============================================================================
+SUBJECT: Sam — Cold shower before 7am, Read 20 pages of the Black Book, Stretch for 15 minutes, Review the week’s finance log, Call the accountant back about the quarterly filing — you have 5 missions pending completion. (+1 more)
+
+Good evening Sam,
+
+DAILY TASKS
+  - Cold shower before 7am, Read 20 pages of the Black Book, Stretch for 15 minutes, Review the week’s finance log, Call the accountant back about the quarterly filing — you have 5 missions pending completion.
+  - 11 checklist items open across 3 checklists: Weekly reset (4), Monthly admin and renewals (5), Travel prep for the Milan trip (2).
+
+Thank you,
+Ultra X Management team
+
+==============================================================================
+07-test-email — What the "Send test email" button produces
+==============================================================================
+SUBJECT: Sam — Test reminder from Nervexus
+
+Good evening Sam,
+
+LOGS
+  - This is a test email — your reminder emails are working.
+
+Thank you,
+Ultra X Management team

@@ -26,6 +26,9 @@
    onUpdate callback that receives playback state on every change.
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.VoiceEngine) return;
+
   'use strict';
 
   var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
@@ -41,7 +44,7 @@
   var PROFILES = [
     { id: 'pro_m',  name: 'Professional Male', desc: 'Clear · neutral · anchor', gender: 'm', lang: 'en-US', rate: 0.98, pitch: 0.92, style: 'Professional',
       prefer: ['Microsoft (Guy|Davis|Andrew)', 'Google US English', 'Aaron', 'Tom', 'Alex', 'Fred'],
-      sample: 'Good morning. Your briefing is ready — let us get straight to what matters.' },
+      sample: 'Good morning. Your briefing is ready. Let us get straight to what matters.' },
     { id: 'exec_f', name: 'Executive Female', desc: 'Poised · authoritative', gender: 'f', lang: 'en-US', rate: 0.96, pitch: 0.94, style: 'Executive',
       prefer: ['Karen', 'Victoria', 'Microsoft Aria', 'Serena', 'Samantha'],
       sample: 'Here is where we stand, and here is the decision I recommend you make.' },
@@ -272,6 +275,19 @@
          .replace(/\be\.g\.\b/gi, 'for example').replace(/\bi\.e\.\b/gi, 'that is')
          .replace(/\bvs\.?\b/gi, 'versus').replace(/\bapprox\.?\b/gi, 'approximately')
          .replace(/\bw\/\b/gi, 'with').replace(/&/g, ' and ');
+    /* Units the assistant actually emits that were being spelled out letter by letter:
+       "177.8 cm" came out as "see em", "2000 ml" as "em el", "30 min" as "min". Anchored to
+       a preceding digit rather than a word boundary, so a stray letter in ordinary prose is
+       never rewritten — which is the over-processing this function is careful to avoid.
+       Runs after the kg/kcal/km pass above so those are already expanded and the bare "g"
+       rule cannot chew the "g" off "kg". */
+    s = s.replace(/(\d)\s*cm\b/g, '$1 centimetres')
+         .replace(/(\d)\s*mm\b/g, '$1 millimetres')
+         .replace(/(\d)\s*ml\b/g, '$1 millilitres')
+         .replace(/(\d)\s*mins?\b/g, '$1 minutes')
+         .replace(/(\d)\s*hrs?\b/g, '$1 hours')
+         .replace(/(\d)\s*lbs?\b/g, '$1 pounds')
+         .replace(/(\d)\s*g\b/g, '$1 grams');
     return s.replace(/\s{2,}/g, ' ').trim();
   };
 

@@ -1,0 +1,208 @@
+/* Tests for the digest renderer: node digest-template.test.mjs
+   The renderer is the part of the email system that can be checked without a database, a
+   mail provider or a deploy, so it is checked properly. */
+import { buildDigest, buildSubject, groupBySection, SECTIONS, THEMES } from './supabase/functions/_shared/digest-template.js';
+
+const T=[]; const t=(n,f)=>T.push([n,f]);
+const has=(s,sub,m)=>{ if(!String(s).includes(sub)) throw new Error((m||'')+' missing '+JSON.stringify(sub)+' in '+JSON.stringify(String(s).slice(0,200))); };
+const not=(s,sub,m)=>{ if(String(s).includes(sub)) throw new Error((m||'')+' unexpectedly contains '+JSON.stringify(sub)); };
+
+const sample = [
+  { section:'performance', line:"Today's check-in is still pending — you have until 10pm.", subject:'Performance check-in pending', priority:'high' },
+  { section:'tasks', line:'Cold shower, Read 20 pages — 2 missions pending.', priority:'normal' },
+  { section:'tasks', line:'3 checklist items open on Weekly reset.', priority:'normal' },
+  { section:'calendar', line:'Dentist at 15:00 tomorrow.', meta:'Fri 4 Sep', priority:'normal' },
+  { section:'logs', line:'No training logged yet today.', priority:'normal' },
+  { section:'update', line:'Nervexus v11.227 is live.', priority:'low' },
+];
+
+t('one email carries every section', ()=>{
+  const d=buildDigest({ name:'Sam', items:sample });
+  // Labels are HTML-escaped on the way in, so "Tasks & Missions" is "Tasks &amp; Missions".
+  for(const label of ['Performance Terminal','Daily Tasks','Calendar','Logs','App Update'])
+    has(d.html,label,'html:');
+  if(d.count!==6) throw new Error('count '+d.count);
+});
+
+/* The whole point of the change: five concerns produce one message, not five. */
+t('every item appears exactly once, in both parts', ()=>{
+  const d=buildDigest({ name:'Sam', items:sample });
+  for(const it of sample){
+    has(d.text,it.line,'text:');
+    const needle=it.line.replace(/&/g,'&amp;').replace(/'/g,'&#39;');
+    has(d.html,needle,'html:');
+    const n=d.text.split(it.line).length-1;
+    if(n!==1) throw new Error('line repeated '+n+' times in text: '+it.line);
+  }
+});
+
+/* The subject names the most urgent item rather than a count, so the inbox preview is
+   worth reading. */
+t('the subject leads with the most urgent item', ()=>{
+  has(buildSubject('Sam', sample),'Performance check-in pending');
+  has(buildSubject('Sam', sample),'+5 more');
+  const one=buildSubject('Sam',[sample[1]]);
+  not(one,'+','a single item should not advertise extras');
+});
+
+t('priority ordering does not depend on input order', ()=>{
+  const shuffled=[sample[5],sample[3],sample[0],sample[1]];
+  has(buildSubject('Sam',shuffled),'Performance check-in pending');
+});
+
+/* Sections render in a fixed order regardless of how the sweeps happened to collect them,
+   so the email looks the same shape every day. */
+t('sections keep a fixed order', ()=>{
+  const g=groupBySection([sample[5],sample[3],sample[0]]).map(x=>x.key);
+  if(JSON.stringify(g)!==JSON.stringify(['performance','calendar','update']))
+    throw new Error('order '+JSON.stringify(g));
+});
+
+/* A caller typo must not silently drop somebody's reminder. */
+t('an unknown section is surfaced, never swallowed', ()=>{
+  const d=buildDigest({ name:'Sam', items:[{ section:'nonsense', line:'Something happened.', priority:'normal' }] });
+  has(d.html,'Other'); has(d.text,'Something happened.');
+});
+
+/* Values come from a database and from user-entered names; an apostrophe in a mission
+   title must not be able to close an attribute or inject a tag. */
+t('user content is escaped in the html', ()=>{
+  const d=buildDigest({ name:'Sam', items:[
+    { section:'tasks', line:'<script>alert(1)</script> & "quoted"', priority:'normal' }] });
+  not(d.html,'<script>','raw script tag reached the html');
+  has(d.html,'&lt;script&gt;');
+  has(d.html,'&amp;');
+  has(d.text,'<script>alert(1)</script>','the plain-text part is not escaped, correctly');
+});
+
+/* Email clients are not browsers. Outlook drops these outright. */
+t('the html uses no layout email clients cannot render', ()=>{
+  const d=buildDigest({ name:'Sam', items:sample });
+  for(const bad of ['display:flex','display:grid','<link','@media','position:absolute','var(--'])
+    not(d.html,bad,'unsupported in email:');
+});
+
+t('nothing outstanding still renders sanely', ()=>{
+  const d=buildDigest({ name:'Sam', items:[] });
+  if(d.count!==0) throw new Error('count');
+  has(d.subject,'Nothing outstanding');
+});
+
+t('an item with no line is dropped rather than rendered blank', ()=>{
+  const d=buildDigest({ name:'Sam', items:[{ section:'tasks', line:'', priority:'normal' }, sample[1]] });
+  if(d.count!==1) throw new Error('count '+d.count);
+});
+
+t('the signoff is appended once', ()=>{
+  const d=buildDigest({ name:'Sam', items:sample, signoff:'\n\nThank you,\nUltra X Management team' });
+  const n=d.text.split('Ultra X Management team').length-1;
+  if(n!==1) throw new Error('signoff appears '+n+' times');
+  if(!d.text.trimEnd().endsWith('Ultra X Management team')) throw new Error('signoff is not last');
+  // The plain-text and HTML sign-offs must agree — they drifted apart once already.
+  has(buildDigest({ name:'Sam', items:sample }).html, 'Ultra X Management team', 'html signoff:');
+});
+
+t('every declared section has a label', ()=>{
+  for(const s of SECTIONS) if(!s.key||!s.label) throw new Error('bad section '+JSON.stringify(s));
+});
+
+/* ---- themes ------------------------------------------------------------------------
+   A theme changes colour and type only. The table structure is shared, so the email-client
+   constraints are proved once for all of them rather than per theme — and a theme that
+   tried to introduce, say, a media query would fail here. */
+t('every theme renders the same content and breaks no client rules', ()=>{
+  for(const name of Object.keys(THEMES)){
+    const d=buildDigest({ name:'Sam', items:sample, theme:name });
+    for(const it of sample){
+      const needle=it.line.replace(/&/g,'&amp;').replace(/'/g,'&#39;');
+      has(d.html,needle,name+':');
+    }
+    for(const bad of ['display:flex','display:grid','<link','@media','position:absolute','var(--','@font-face'])
+      not(d.html,bad,name+' uses '+bad+', which email clients drop:');
+    has(d.html,'role="presentation"',name+': layout must stay table-based —');
+    if(/<style[\s>]/.test(d.html)) throw new Error(name+' has a <style> block; Gmail strips those');
+  }
+});
+
+/* Dark themes have one failure mode worth pinning: a card with no explicit background
+   inherits the client's own, which on a dark ground turns the text invisible. */
+t('every theme paints its own background and ink', ()=>{
+  for(const name of Object.keys(THEMES)){
+    const th=THEMES[name];
+    const d=buildDigest({ name:'Sam', items:sample, theme:name });
+    has(d.html,'background:'+th.ground,name+': page ground not painted —');
+    has(d.html,'background:'+th.card,name+': card ground not painted —');
+    has(d.html,'color:'+th.ink,name+': ink not set —');
+  }
+});
+
+t('an unknown theme name falls back rather than rendering unstyled', ()=>{
+  const d=buildDigest({ name:'Sam', items:sample, theme:'does-not-exist' });
+  has(d.html,'background:'+THEMES.maison.ground);
+});
+
+t('the plain-text part is identical whatever the theme', ()=>{
+  const a=buildDigest({ name:'Sam', items:sample, theme:'noir' }).text;
+  const b=buildDigest({ name:'Sam', items:sample, theme:'terminal' }).text;
+  if(a!==b) throw new Error('themes changed the plain-text part');
+});
+
+/* Contrast is arithmetic, not taste. Every theme's body ink, muted text and section
+   labels are checked against the card they sit on, at the WCAG AA threshold for normal
+   text. This is the check that caught Maison's --u-muted at 3.7:1 — fine on a bright
+   screen you are already looking at, not fine in an email read outdoors. */
+function relLum(hex){
+  const v=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
+    .map(c=>c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4));
+  return 0.2126*v[0]+0.7152*v[1]+0.0722*v[2];
+}
+const contrast=(a,b)=>{ const [x,y]=[relLum(a),relLum(b)].sort((p,q)=>q-p); return (x+0.05)/(y+0.05); };
+
+t('every theme meets AA contrast on its own card', ()=>{
+  for(const name of Object.keys(THEMES)){
+    const th=THEMES[name];
+    for(const [role,fg,bg,min] of [
+      ['ink',    th.ink,    th.card,  4.5],
+      ['muted',  th.muted,  th.card,  4.5],
+      ['accent', th.accent, th.card,  4.5],
+      ['button', th.btnInk, th.btnBg, 4.5],
+    ]){
+      const c=contrast(fg,bg);
+      if(c<min) throw new Error(name+' '+role+' '+fg+' on '+bg+' is '+c.toFixed(2)+':1, needs '+min);
+    }
+  }
+});
+
+t('maison uses the app\'s own Elysee values', ()=>{
+  const m=THEMES.maison;
+  if(m.ground!=='#F2ECE0') throw new Error('ground drifted from --u-bg: '+m.ground);
+  if(m.card!=='#FBF7EF')   throw new Error('card drifted from --u-card: '+m.card);
+  if(m.ink!=='#2E4560')    throw new Error('ink drifted from --u-ink: '+m.ink);
+  if(m.accent!=='#3C5A7D') throw new Error('accent drifted from --u-accent: '+m.accent);
+});
+
+t('maison is the default theme', ()=>{
+  const a=buildDigest({ name:'Sam', items:sample });
+  const b=buildDigest({ name:'Sam', items:sample, theme:'maison' });
+  if(a.html!==b.html) throw new Error('no theme given did not render maison');
+});
+
+/* The section subjects greet the reader themselves, so the wrapper must not greet them
+   again — "Sam — Good evening Sam — your logs are pending" reached a preview once. */
+t('the subject never says the name twice', ()=>{
+  const d=buildDigest({ name:'Sam', items:[
+    { section:'logs', line:'x', subject:'Good evening Sam — your logs are pending', priority:'normal' },
+    { section:'tasks', line:'y', priority:'normal' }] });
+  const n=d.subject.split('Sam').length-1;
+  if(n!==1) throw new Error('name appears '+n+' times: '+d.subject);
+});
+t('a subject without the name still gets it', ()=>{
+  const d=buildDigest({ name:'Sam', items:[
+    { section:'update', line:'x', subject:'Nervexus v11.228 is out', priority:'low' }] });
+  has(d.subject,'Sam — Nervexus');
+});
+
+let pass=0, fail=0;
+for(const [n,f] of T){ try{ await f(); console.log('  PASS  '+n); pass++; }catch(e){ console.log('  FAIL  '+n+' :: '+e.message); fail++; } }
+console.log('\n'+pass+' passed, '+fail+' failed');
+process.exit(fail?1:0);

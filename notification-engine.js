@@ -35,6 +35,9 @@
      vibrate(pattern)
    ============================================================================ */
 (function (root) {
+  // Runs once: the <helmet> relocation re-executes every engine script. See voice-assistant-engine.js.
+  if (root.NotificationManager) return;
+
   'use strict';
 
   // ---- Categories (every category must be configurable) --------------------
@@ -221,7 +224,7 @@
     var pct = total > 0 ? open / total : 1;
     var pool = [];
     if (open === 1) {
-      pool.push('Only one task left on ' + c.title + ' today.', 'One item stands between you and a finished ' + c.title + '.', 'Last one — finish ' + c.title + '.');
+      pool.push('Only one task left on ' + c.title + ' today.', 'One item stands between you and a finished ' + c.title + '.', 'Last one, finish ' + c.title + '.');
     } else {
       pool.push(
         'You still have ' + open + ' items remaining.',

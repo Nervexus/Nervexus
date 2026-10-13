@@ -7,6 +7,9 @@ window.SUPABASE_CONFIG = {
 };
 
 (function initSupabase(){
+  // Runs once: the <helmet> relocation re-executes every script, and a second client
+  // would replace window.SB while the app still holds the first. See engine-guards.test.mjs.
+  if (window.SB) return;
   if (!window.supabase || !window.supabase.createClient) { return; }
   if (!window.SUPABASE_CONFIG.url || window.SUPABASE_CONFIG.url === 'YOUR_SUPABASE_PROJECT_URL') {
     console.warn('[supabase-client] Add your project URL + anon key to supabase-client.js to go live.');
@@ -18,7 +21,10 @@ window.SUPABASE_CONFIG = {
 })();
 
 // Thin helpers the app's logic class will call. Every function resolves to {data, error}.
-window.SB = {
+/* The helper object is a top-level assignment, outside the IIFE above — so the guard in
+   there protected the client but not this, and a second execution still replaced
+   window.SB while the app held the first one. Both are guarded now. */
+if (!window.SB) window.SB = {
   ready(){ return !!window.sb; },
 
   async signUp(email, password, meta){ return window.sb.auth.signUp({ email, password, options:{ data: meta||{} } }); },
@@ -79,7 +85,10 @@ window.SB = {
   // is what makes the model picker in Settings -> AI Providers actually do something: it
   // used to be collected in the UI and never sent anywhere, so every call silently used
   // whichever model the edge function had hardcoded regardless of what was selected.
-  async callAI(provider, prompt, model){ return window.SB._providerFn({ action:'call', provider, prompt, model }); },
+  /* `image` is optional: {media_type, data} with data base64 and no data: prefix. It goes as
+     its own field rather than inside the prompt — the proxy builds the provider's own
+     multimodal shape from it. */
+  async callAI(provider, prompt, model, image){ return window.SB._providerFn({ action:'call', provider, prompt, model, ...(image?{image}:{}) }); },
   // Streaming counterpart of callAI — reads the proxy's SSE body as it arrives so the
   // caller (voice assistant) can act on partial text before the full reply is done.
   // onDelta(deltaText) fires per chunk. Resolves {result, citations} or {error}, same

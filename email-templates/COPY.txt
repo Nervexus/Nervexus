@@ -1,0 +1,90 @@
+NERVEXUS — EMAIL COPY  (as of v11.228)
+======================================
+Every line of text the system can send. {placeholders} are filled in at send time.
+
+THE WRAPPER — on every email
+  GREETING     Good morning / Good afternoon / Good evening {name},
+               (from the hour in YOUR timezone, not the server's)
+  SIGN-OFF     Thank you,
+               Ultra X Management team
+  BUTTON       OPEN NERVEXUS
+  FOOTER       Turn these off in Settings → Notifications.
+  SUBJECT      {the most urgent item's subject} (+{count} more)
+               The name is added only if that subject does not already contain it.
+
+SECTION HEADINGS
+  Performance Terminal
+  Daily Tasks          (was two sections: Daily Checklists + Tasks & Missions)
+  Calendar
+  Logs
+  App Update
+
+DAILY TASKS
+  SUBJECT  Hey {name}, you have {count} tasks pending completion
+  BODY     You have {count} tasks pending, awaiting completion. You have {hours}
+           hours left until the day ends. Please log in as soon as possible.
+
+PERFORMANCE TERMINAL — 21:00 UK, one hour before the deadline
+  SUBJECT  Good evening {name} — your Daily Performance log is due
+  BODY     It's 9pm UK time — in one hour you will need to fill out a mandatory
+           Daily Performance log. This ensures that you are keeping yourself to a
+           high standard. Failing this will lead to a strike on your account.
+
+PERFORMANCE TERMINAL — a strike
+  SUBJECT  Performance Terminal — strike {n} of 7
+  BODY     Yesterday's mandatory Daily Performance log wasn't filled out, so a
+           strike has been added to your account. This is strike {n} of 7 — the
+           account locks at 7, pending appeal. Log today's to clear the strikes.
+
+PERFORMANCE TERMINAL — locked
+  SUBJECT  Performance Terminal — account locked
+  BODY     Your account has been locked after 7 strikes. Log in to submit an
+           appeal for the owner to review.
+
+CALENDAR — a heads-up about tomorrow, sent in the same 21:00 slot
+  SUBJECT  Hey {name} — tomorrow: {title}
+  SMALL    {time}–{end} tomorrow   (or just {time})
+
+  WORK EVENT
+    For tomorrow you have {title} from {time} till {end} with {persons}.
+    Any part that was not filled in is left out rather than printed empty, so a
+    work event with only a start time reads "…{title} at {time}."
+
+  GENERAL TASK
+    For tomorrow you have {title} at {time}, which you have set for yourself to
+    do. This should take about {duration}.
+    Duration is spoken naturally — 90 becomes "an hour and 30 minutes".
+
+  Which sentence is used comes from the event's type, chosen on the calendar
+  form. An event created before that field existed counts as general.
+
+LOGS — same 21:00 trigger as the performance log
+  SUBJECT  Good evening {name} — your logs are pending
+  BODY     Your logs are pending. You have {list} still to fill in. You can do
+           all of them in one place — open the app and tap "Log everything".
+  SMALL    {n} of 5 outstanding
+
+  Only the MISSING logs are named. All seven are checked: Training, Finance,
+  Sleep & energy, Hydration, Nutrition, Body metrics, Work log.
+  Finance counts either side of the ledger — income alone satisfies it.
+  Energy is a field on the sleep row, not a separate log, so it is counted once
+  under Sleep & energy rather than nagged for twice.
+
+APP UPDATE
+  SUBJECT  Hey {name} — Nervexus {version} is out
+  BODY     A new version is live. Open the app and check What's New in Settings
+           for details.
+  SMALL    {version}
+
+LOGS — been away a while
+  SUBJECT  Haven't seen you in a few days
+  BODY     It's been {days} days since you last opened Nervexus. Nothing has been
+           logged in that time.
+
+TEST EMAIL — the "Send test email" button
+  SUBJECT  Test reminder from Nervexus
+  BODY     This is a test email — your reminder emails are working.
+
+YOUR OWN OVERRIDE — Settings → Notifications → Email template
+  Accepts {{title}} and {{message}}. Empty means "use the copy above".
+  Filling it in switches the email to plain text.

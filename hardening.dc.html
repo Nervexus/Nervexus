@@ -1,0 +1,966 @@
+<x-dc>
+<div class="hard-page" data-screen-label="The Hardening" style="animation:rise .5s ease both; background:var(--hard-bg); margin:-20px; padding:20px; border-radius:18px;">
+
+  <!-- ---- ONBOARDING: Gentlemen Center's own welcome-cover template (icon, kicker, big
+       title, description, one filled pill, a dot row), reused per step rather than a
+       one-time cover, since this section has seven steps rather than Gentlemen's one. ---- -->
+  <sc-if value="{{ !hardOnboarded }}" hint-placeholder-val="{{ true }}">
+  <div class="hard-welcome">
+    <div class="hard-welcome-logo">
+      <svg viewBox="0 0 18 18" width="27" height="27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hard-accent); display:block;"><path d="M9 16.2c-3.4 0-5.9-2.4-5.9-5.7 0-2.1 1-3.7 2.2-5.4.3 1.4 1 2.1 1.8 2.1-.2-2.9 1-5.5 3.5-7-.4 2.1.1 3.7 1.4 5 1.5 1.5 3 3.1 3 5.3 0 3.3-2.5 5.7-5.9 5.7z"/><path d="M9 13.6c-1.3 0-2.3-.9-2.3-2.2 0-.9.5-1.5 1-2.1.1.6.4.9.8.9-.1-1.1.4-2 1.3-2.6-.1.8 0 1.4.5 1.9.6.6 1.1 1.1 1.1 1.9 0 1.3-1 2.2-2.4 2.2z" opacity="0.4"/></svg>
+    </div>
+    <div class="hard-welcome-kicker">◆ THE HARDENING · STEP {{ hardStepIdx }} / {{ hardStepCount }}</div>
+    <div class="hard-welcome-title">{{ hardStepTitle }}</div>
+    <div class="hard-welcome-desc">{{ hardStepDesc }}</div>
+
+    <div class="hard-welcome-body">
+    <sc-if value="{{ hardIsStep0 }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 14px;">
+        <div class="hard-field"><input class="hard-input" value="{{ hardAge.val }}" onInput="{{ hardAge.set }}" placeholder="{{ hardAge.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardSex.val }}" onInput="{{ hardSex.set }}" placeholder="{{ hardSex.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardHeight.val }}" onInput="{{ hardHeight.set }}" placeholder="{{ hardHeight.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardWeight.val }}" onInput="{{ hardWeight.set }}" placeholder="{{ hardWeight.ph }}"></div>
+      </div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardOccupation.val }}" onInput="{{ hardOccupation.set }}" placeholder="{{ hardOccupation.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardActivity.val }}" onInput="{{ hardActivity.set }}" placeholder="{{ hardActivity.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardSteps.val }}" onInput="{{ hardSteps.set }}" placeholder="{{ hardSteps.ph }}"></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 14px;">
+        <div class="hard-field"><input class="hard-input" value="{{ hardDays.val }}" onInput="{{ hardDays.set }}" placeholder="{{ hardDays.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardSessionTime.val }}" onInput="{{ hardSessionTime.set }}" placeholder="{{ hardSessionTime.ph }}"></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hardIsStep1 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+        <sc-for list="{{ hardExperienceOptions }}" as="x" hint-placeholder-count="3">
+          <div onClick="{{ x.pick }}" class="hard-option" style="border:1px solid var(--hard-border-soft); background:{{ x.bg }}; color:{{ x.ink }};">
+            <div style="flex:1; min-width:0;">
+              <div style="font-weight:700; font-size:14.5px;">{{ x.name }}</div>
+              <div style="font-size:12px; opacity:.8; margin-top:3px;">{{ x.desc }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardYears.val }}" onInput="{{ hardYears.set }}" placeholder="{{ hardYears.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardPrevSports.val }}" onInput="{{ hardPrevSports.set }}" placeholder="{{ hardPrevSports.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardPrevStrength.val }}" onInput="{{ hardPrevStrength.set }}" placeholder="{{ hardPrevStrength.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardConditioning.val }}" onInput="{{ hardConditioning.set }}" placeholder="{{ hardConditioning.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardRunning.val }}" onInput="{{ hardRunning.set }}" placeholder="{{ hardRunning.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardCarrying.val }}" onInput="{{ hardCarrying.set }}" placeholder="{{ hardCarrying.ph }}"></div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardBodyweight.val }}" onInput="{{ hardBodyweight.set }}" placeholder="{{ hardBodyweight.ph }}"></div>
+    </sc-if>
+
+    <sc-if value="{{ hardIsStep2 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 14px;">
+        <div class="hard-field"><input class="hard-input" value="{{ hardSquat.val }}" onInput="{{ hardSquat.set }}" placeholder="{{ hardSquat.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardDeadlift.val }}" onInput="{{ hardDeadlift.set }}" placeholder="{{ hardDeadlift.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardBench.val }}" onInput="{{ hardBench.set }}" placeholder="{{ hardBench.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardOhp.val }}" onInput="{{ hardOhp.set }}" placeholder="{{ hardOhp.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardPullups.val }}" onInput="{{ hardPullups.set }}" placeholder="{{ hardPullups.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardPushups.val }}" onInput="{{ hardPushups.set }}" placeholder="{{ hardPushups.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardPlank.val }}" onInput="{{ hardPlank.set }}" placeholder="{{ hardPlank.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardFarmerCarryCap.val }}" onInput="{{ hardFarmerCarryCap.set }}" placeholder="{{ hardFarmerCarryCap.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardRunPerf.val }}" onInput="{{ hardRunPerf.set }}" placeholder="{{ hardRunPerf.ph }}"></div>
+        <div class="hard-field"><input class="hard-input" value="{{ hardSprintPerf.val }}" onInput="{{ hardSprintPerf.set }}" placeholder="{{ hardSprintPerf.ph }}"></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hardIsStep3 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+        <sc-for list="{{ hardLimitationChips }}" as="c" hint-placeholder-count="11">
+          <span onClick="{{ c.toggle }}" class="hard-chip" style="border:1px solid var(--hard-border-soft); background:{{ c.bg }}; color:{{ c.ink }};">{{ c.label }}</span>
+        </sc-for>
+      </div>
+      <div class="hard-field"><input class="hard-input" value="{{ hardMedicalNote.val }}" onInput="{{ hardMedicalNote.set }}" placeholder="{{ hardMedicalNote.ph }}"></div>
+    </sc-if>
+
+    <sc-if value="{{ hardIsStep4 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:10px;">
+        <sc-for list="{{ hardEquipmentModes }}" as="x" hint-placeholder-count="4">
+          <div onClick="{{ x.pick }}" class="hard-option" style="border:1px solid var(--hard-border-soft); background:{{ x.bg }}; color:{{ x.ink }};">
+            <div style="font-weight:700; font-size:14.5px;">{{ x.name }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ hardShowEquipmentPicker }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:11.5px; color:var(--hard-muted); margin:14px 0 8px;">Pick everything you have access to:</div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ hardEquipmentChips }}" as="c" hint-placeholder-count="20">
+            <span onClick="{{ c.toggle }}" class="hard-chip" style="border:1px solid var(--hard-border-soft); background:{{ c.bg }}; color:{{ c.ink }};">{{ c.label }}</span>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ hardIsStep5 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <sc-for list="{{ hardLevelOptions }}" as="l" hint-placeholder-count="5">
+          <div onClick="{{ l.pick }}" class="hard-option" style="border:1px solid var(--hard-border-soft); background:{{ l.bg }}; color:{{ l.ink }}; flex-direction:column; gap:4px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:1px; font-weight:700;">{{ l.name }}</div>
+            <div style="font-size:13px; opacity:.85;">{{ l.line }}</div>
+            <div style="font-size:11px; opacity:.65;">{{ l.focus }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hardIsStep6 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-wrap:wrap; gap:8px;">
+        <sc-for list="{{ hardGoalChips }}" as="c" hint-placeholder-count="14">
+          <span onClick="{{ c.toggle }}" class="hard-chip" style="border:1px solid var(--hard-border-soft); background:{{ c.bg }}; color:{{ c.ink }};">{{ c.label }}</span>
+        </sc-for>
+      </div>
+    </sc-if>
+    </div>
+
+    <span onClick="{{ hardNextGo }}" class="hard-welcome-enter">{{ hardNextLabel }}</span>
+    <span onClick="{{ hardBack }}" class="hard-welcome-back" style="opacity:{{ hardBackOpacity }}; cursor:{{ hardBackCursor }};">‹ BACK</span>
+
+    <div class="hard-welcome-dots">
+      <sc-for list="{{ hardOnboardDots }}" as="d" hint-placeholder-count="7">
+        <span title="{{ d.title }}" style="display:block; width:{{ d.w }}; height:8px; border-radius:4px; background:{{ d.bg }}; transition:width .2s,background .2s;"></span>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ---- MAIN APP (post-onboarding) ---- -->
+  <sc-if value="{{ hardOnboarded }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
+    <div style="flex:0 0 auto; width:54px; height:54px; border-radius:13px; border:1px solid var(--hard-border); display:flex; align-items:center; justify-content:center; background:var(--hard-card);">
+      <svg viewBox="0 0 18 18" width="27" height="27" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--hard-accent); display:block;"><path d="M9 16.2c-3.4 0-5.9-2.4-5.9-5.7 0-2.1 1-3.7 2.2-5.4.3 1.4 1 2.1 1.8 2.1-.2-2.9 1-5.5 3.5-7-.4 2.1.1 3.7 1.4 5 1.5 1.5 3 3.1 3 5.3 0 3.3-2.5 5.7-5.9 5.7z"/><path d="M9 13.6c-1.3 0-2.3-.9-2.3-2.2 0-.9.5-1.5 1-2.1.1.6.4.9.8.9-.1-1.1.4-2 1.3-2.6-.1.8 0 1.4.5 1.9.6.6 1.1 1.1 1.1 1.9 0 1.3-1 2.2-2.4 2.2z" opacity="0.4"/></svg>
+    </div>
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--hard-accent); margin-bottom:5px;">◆ THE HARDENING</div>
+      <h1 style="font-size:26px; font-weight:700; letter-spacing:-.5px; color:var(--hard-ink);">Build the body. Harden the mind.</h1>
+    </div>
+  </div>
+
+  <div class="hard-tabs">
+    <sc-for list="{{ hardTabs }}" as="t" hint-placeholder-count="7">
+      <span onClick="{{ t.go }}" class="hard-tab" style="color:{{ t.ink }}; background:{{ t.bg }};">{{ t.label }}</span>
+    </sc-for>
+  </div>
+
+  <!-- DASHBOARD -->
+  <sc-if value="{{ hardTabDashboard }}" hint-placeholder-val="{{ true }}">
+    <div class="hard-crest" style="background:var(--hard-card); border:1px solid var(--hard-border);">
+      <div style="font-size:10.5px; letter-spacing:3px; color:var(--hard-muted);">◆ {{ hardLevelName }}</div>
+      <div style="font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; font-size:24px; color:var(--hard-ink); margin:10px 0 8px;">{{ hardLevelLine }}</div>
+      <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin:14px auto 0;">
+        <div style="width:40px; height:1px; background:var(--hard-accent);"></div>
+        <span style="color:var(--hard-accent);">◆</span>
+        <div style="width:40px; height:1px; background:var(--hard-accent);"></div>
+      </div>
+    </div>
+    <div class="hard-frame">
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+      <div class="hard-row" style="border-top:none;"><span style="color:var(--hard-muted); font-size:12.5px;">TODAY'S SESSION</span><span onClick="{{ hardGoToProgram }}" style="cursor:pointer; font-weight:700; color:var(--hard-accent-strong);">{{ hardTodayDayName }} ›</span></div>
+      <div class="hard-row"><span style="color:var(--hard-muted); font-size:12.5px;">MENTAL DRILL</span><span onClick="{{ hardGoToMind }}" style="cursor:pointer; text-align:right;">{{ hardTodayDrillName }} ›</span></div>
+      <div class="hard-row"><span style="color:var(--hard-muted); font-size:12.5px;">HABITS TODAY</span><span>{{ hardHabitsDoneLabel }}</span></div>
+      <div class="hard-row"><span style="color:var(--hard-muted); font-size:12.5px;">STREAK</span><span style="color:var(--hard-accent-strong); font-weight:700;">{{ hardStreakLabel }}</span></div>
+      <div class="hard-row"><span style="color:var(--hard-muted); font-size:12.5px;">REFRAME YOURSELF</span><span onClick="{{ hardGoToReframe }}" style="cursor:pointer; color:var(--hard-accent-strong);">Begin today's confrontation ›</span></div>
+    </div>
+    </div>
+  </sc-if>
+
+  <!-- PROGRAM -->
+  <sc-if value="{{ hardTabProgram }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ hardProgramLoading }}" hint-placeholder-val="{{ false }}">
+      <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-muted); text-align:center; padding:40px;">Generating your program…</div>
+    </sc-if>
+    <sc-if value="{{ hardHasProgramErr }}" hint-placeholder-val="{{ false }}">
+      <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:#ff8a6a; margin-bottom:12px;">{{ hardProgramErr }}</div>
+    </sc-if>
+    <sc-if value="{{ hardNeedsProgramGen }}" hint-placeholder-val="{{ false }}">
+      <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); text-align:center; padding:40px 24px;">
+        <div style="font-size:14px; color:var(--hard-muted); margin-bottom:16px;">No program generated yet.</div>
+        <span onClick="{{ hardRegenerateProgram }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">GENERATE MY PROGRAM</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hardHasProgram }}" hint-placeholder-val="{{ true }}">
+      <div class="hard-tabs">
+        <sc-for list="{{ hardDayTabs }}" as="d" hint-placeholder-count="7">
+          <span onClick="{{ d.go }}" class="hard-tab" style="color:{{ d.ink }}; background:{{ d.bg }};">{{ d.label }}</span>
+        </sc-for>
+      </div>
+      <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+        <div class="hard-bhead">
+          <div>
+            <div style="font-weight:700; font-size:18px;">{{ hardOpenDayName }}</div>
+            <div style="font-size:12px; color:var(--hard-muted); margin-top:3px;">{{ hardOpenDayFocus }}</div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.5px; color:var(--hard-muted);">{{ hardProgramSource }}</span>
+        </div>
+        <sc-if value="{{ hardHasDayNote }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12.5px; color:var(--hard-accent-strong); background:var(--hard-border); border:1px solid var(--hard-border); border-radius:10px; padding:10px 12px; margin-bottom:14px;">{{ hardOpenDayNote }}</div>
+        </sc-if>
+
+        <sc-if value="{{ hardIsRestDay }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <sc-for list="{{ hardRestItems }}" as="it" hint-placeholder-count="8">
+              <div class="hard-row"><span>{{ it.text }}</span></div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ !hardIsRestDay }}" hint-placeholder-val="{{ true }}">
+          <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:var(--hard-muted); margin-bottom:8px;">WARM-UP · {{ hardWarmupMinutes }} MIN</div>
+          <div style="display:flex; flex-direction:column; gap:2px; margin-bottom:16px;">
+            <sc-for list="{{ hardWarmupItems }}" as="it" hint-placeholder-count="4">
+              <div class="hard-row" style="font-size:13px; padding:6px 0;"><span>{{ it.text }}</span></div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <sc-for list="{{ hardBlocks }}" as="b" hint-placeholder-count="8">
+              <div style="border:1px solid var(--hard-border-soft); border-radius:10px; padding:12px 14px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                  <input value="{{ b.exercise }}" onInput="{{ b.setEx }}" class="hard-input" style="flex:1; padding:8px 10px; font-size:13.5px; font-weight:700;">
+                  <span onClick="{{ b.remove }}" style="cursor:pointer; color:var(--hard-muted); font-size:12px;">✕</span>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <input value="{{ b.sets }}" onInput="{{ b.setSets }}" placeholder="sets" class="hard-input" style="width:64px; padding:8px 10px; font-size:12.5px; text-align:center;">
+                  <input value="{{ b.reps }}" onInput="{{ b.setReps }}" placeholder="reps" class="hard-input" style="width:80px; padding:8px 10px; font-size:12.5px; text-align:center;">
+                  <input value="{{ b.rest }}" onInput="{{ b.setRest }}" placeholder="rest" class="hard-input" style="width:90px; padding:8px 10px; font-size:12.5px; text-align:center;">
+                </div>
+                <div style="font-size:11.5px; color:var(--hard-muted); margin-top:8px; line-height:1.5;">{{ b.why }}</div>
+              </div>
+            </sc-for>
+            <sc-for list="{{ hardExtras }}" as="x" hint-placeholder-count="3">
+              <div style="border:1px dashed var(--hard-border-soft); border-radius:10px; padding:12px 14px;">
+                <input value="{{ x.exercise }}" onInput="{{ x.setEx }}" placeholder="Added exercise" class="hard-input" style="width:100%; padding:8px 10px; font-size:13.5px; font-weight:700; margin-bottom:8px; box-sizing:border-box;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <input value="{{ x.sets }}" onInput="{{ x.setSets }}" placeholder="sets" class="hard-input" style="width:64px; padding:8px 10px; font-size:12.5px; text-align:center;">
+                  <input value="{{ x.reps }}" onInput="{{ x.setReps }}" placeholder="reps" class="hard-input" style="width:80px; padding:8px 10px; font-size:12.5px; text-align:center;">
+                  <input value="{{ x.rest }}" onInput="{{ x.setRest }}" placeholder="rest" class="hard-input" style="width:90px; padding:8px 10px; font-size:12.5px; text-align:center;">
+                </div>
+              </div>
+            </sc-for>
+            <span onClick="{{ hardAddExercise }}" class="hard-pill-ghost" style="align-self:flex-start; color:var(--hard-accent-strong); border:1px solid var(--hard-border);">+ ADD EXERCISE</span>
+          </div>
+
+          <sc-if value="{{ hardHasFinisher }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:16px; border-top:1px solid var(--hard-border-soft); padding-top:14px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:var(--hard-accent-strong); margin-bottom:8px;">FINISHER</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <input value="{{ hardFinisher.exercise }}" onInput="{{ hardFinisher.setEx }}" class="hard-input" style="flex:1; min-width:160px; padding:8px 10px; font-size:13.5px; font-weight:700;">
+                <input value="{{ hardFinisher.reps }}" onInput="{{ hardFinisher.setReps }}" class="hard-input" style="width:110px; padding:8px 10px; font-size:12.5px; text-align:center;">
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="display:flex; gap:10px; margin-top:18px;">
+            <span onClick="{{ hardMakeHarder }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink); flex:1; justify-content:center; opacity:{{ hardAdjustOpacity }}; cursor:{{ hardAdjustCursor }};">{{ hardMakeHarderLabel }}</span>
+            <span onClick="{{ hardTooMuch }}" class="hard-pill-ghost" style="border:1px solid var(--hard-border-soft); color:var(--hard-muted); flex:1; justify-content:center; opacity:{{ hardAdjustOpacity }}; cursor:{{ hardAdjustCursor }};">{{ hardTooMuchLabel }}</span>
+          </div>
+
+          <div style="margin-top:18px; border-top:1px solid var(--hard-border-soft); padding-top:16px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:var(--hard-muted); margin-bottom:10px;">LOG THIS SESSION</div>
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+              <span style="font-size:12px; color:var(--hard-muted);">RPE</span>
+              <input value="{{ hardSessionRpe }}" onInput="{{ setHardSessionRpe }}" type="number" min="1" max="10" class="hard-input" style="width:60px; padding:8px 10px; text-align:center;">
+            </div>
+            <textarea value="{{ hardSessionNotes }}" onInput="{{ setHardSessionNotes }}" placeholder="Notes on today's session…" class="hard-input" style="width:100%; min-height:60px; box-sizing:border-box; resize:vertical; margin-bottom:10px;"></textarea>
+            <span onClick="{{ hardLogThisSession }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">LOG SESSION</span>
+          </div>
+
+          <sc-if value="{{ hardHasRecentLogs }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:16px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:1.5px; color:var(--hard-muted); margin-bottom:8px;">RECENT SESSIONS</div>
+              <sc-for list="{{ hardRecentLogs }}" as="lg" hint-placeholder-count="8">
+                <div class="hard-row" style="font-size:12.5px;"><span>{{ lg.day }} · {{ lg.date }}</span><span style="color:var(--hard-muted);">RPE {{ lg.rpe }}</span></div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+      <div style="text-align:center; margin-top:14px;">
+        <span onClick="{{ hardRegenerateProgram }}" style="cursor:pointer; font-size:11.5px; color:var(--hard-muted); text-decoration:underline;">Regenerate program</span>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <!-- HABITS -->
+  <sc-if value="{{ hardTabHabits }}" hint-placeholder-val="{{ false }}">
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); margin-bottom:14px;">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">MORNING</span></div>
+      <div style="display:flex; flex-direction:column;">
+        <sc-for list="{{ hardMorningHabits }}" as="m" hint-placeholder-count="4">
+          <div onClick="{{ m.toggle }}" class="hard-row" style="cursor:pointer;">
+            <div><div style="font-weight:600; font-size:13.5px;">{{ m.label }}</div><div style="font-size:11.5px; color:var(--hard-muted); margin-top:2px;">{{ m.desc }}</div></div>
+            <span style="color:var(--hard-accent-strong); font-size:16px;">{{ m.mark }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--hard-muted); margin:14px 0 8px;">MOVEMENT SEQUENCE</div>
+      <sc-for list="{{ hardMoveSequence }}" as="it" hint-placeholder-count="6">
+        <div class="hard-row" style="font-size:12.5px; padding:8px 0;"><span>{{ it.text }}</span></div>
+      </sc-for>
+    </div>
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); margin-bottom:14px;">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">NUTRITION STANDARDS</span></div>
+      <sc-for list="{{ hardNutritionStandards }}" as="it" hint-placeholder-count="7">
+        <div class="hard-row" style="font-size:13px;"><span>{{ it.text }}</span></div>
+      </sc-for>
+    </div>
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">EVENING</span></div>
+      <div onClick="{{ hardTogglePhoneCurfew }}" class="hard-row" style="cursor:pointer;">
+        <span style="font-size:13.5px;">Phone curfew held</span>
+        <span style="color:var(--hard-accent-strong); font-size:16px;">{{ hardPhoneCurfew }}</span>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:1.5px; color:var(--hard-muted); margin:14px 0 8px;">EVENING AUDIT</div>
+      <sc-for list="{{ hardAuditQuestions }}" as="q" hint-placeholder-count="5">
+        <div onClick="{{ q.toggle }}" class="hard-row" style="cursor:pointer;">
+          <span style="font-size:13px; flex:1;">{{ q.q }}</span>
+          <span style="color:var(--hard-accent-strong); font-size:16px;">{{ q.on }}</span>
+        </div>
+      </sc-for>
+      <textarea value="{{ hardAuditFix }}" onInput="{{ setHardAuditFix }}" placeholder="What will you fix tomorrow?" class="hard-input" style="width:100%; min-height:60px; box-sizing:border-box; resize:vertical; margin-top:12px;"></textarea>
+    </div>
+  </sc-if>
+
+  <!-- MIND -->
+  <sc-if value="{{ hardTabMind }}" hint-placeholder-val="{{ false }}">
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); margin-bottom:14px;">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">TODAY'S DRILL</span></div>
+      <div style="font-size:16px; font-weight:700; color:var(--hard-accent-strong); margin-bottom:6px;">{{ hardDrillName }}</div>
+      <div style="font-size:13.5px; color:var(--hard-muted); line-height:1.6;">{{ hardDrillDesc }}</div>
+      <textarea value="{{ hardMentalNote }}" onInput="{{ setHardMentalNote }}" placeholder="Notes on today's drill…" class="hard-input" style="width:100%; min-height:60px; box-sizing:border-box; resize:vertical; margin-top:14px;"></textarea>
+    </div>
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">LIFESTYLE FUNDAMENTALS</span></div>
+      <sc-for list="{{ hardLifestyleFundamentals }}" as="f" hint-placeholder-count="7">
+        <div class="hard-row" style="flex-direction:column; align-items:flex-start; gap:3px;">
+          <span style="font-weight:600; font-size:13.5px;">{{ f.name }}</span>
+          <span style="font-size:11.5px; color:var(--hard-muted);">{{ f.desc }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- REFRAME YOURSELF -->
+  <sc-if value="{{ hardTabReframe }}" hint-placeholder-val="{{ false }}">
+    <sc-if value="{{ !hardReframeStarted }}" hint-placeholder-val="{{ true }}">
+      <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); text-align:center; padding:40px 24px;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:var(--hard-muted); margin-bottom:12px;">REFRAME YOURSELF</div>
+        <div style="font-size:20px; font-weight:700; margin-bottom:10px;">Confront the truth. Take responsibility.</div>
+        <div style="font-size:13px; color:var(--hard-muted); max-width:400px; margin:0 auto 20px; line-height:1.6;">Ten questions, generated for you today. No shame, no theatrics — just an honest look at where you're actually lying to yourself.</div>
+        <sc-if value="{{ hardHasReframeErr }}" hint-placeholder-val="{{ false }}"><div style="color:#ff8a6a; font-size:12.5px; margin-bottom:12px;">{{ hardReframeErr }}</div></sc-if>
+        <span onClick="{{ hardBeginReframe }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink);">{{ hardBeginLabel }}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ hardReframeStarted }}" hint-placeholder-val="{{ false }}">
+      <sc-if value="{{ !hardReframeDone }}" hint-placeholder-val="{{ true }}">
+        <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); min-height:280px;">
+          <div class="hard-bhead"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2px; color:var(--hard-muted);">QUESTION {{ hardReframeQNum }} / {{ hardReframeQTotal }}</span></div>
+          <div style="font-size:18px; line-height:1.55; font-weight:600; margin-bottom:18px;">{{ hardReframeQ }}</div>
+          <textarea value="{{ hardReframeAnswer }}" onInput="{{ setHardReframeAnswer }}" placeholder="Answer honestly…" class="hard-input" style="width:100%; min-height:100px; box-sizing:border-box; resize:vertical;"></textarea>
+          <div class="hard-nav">
+            <span onClick="{{ hardReframeBack }}" class="hard-pill-ghost" style="opacity:{{ hardReframeBackOpacity }}; cursor:{{ hardReframeBackCursor }}; color:var(--hard-muted); border:1px solid var(--hard-border-soft);">‹ BACK</span>
+            <div class="hard-dots">
+              <sc-for list="{{ hardReframeDots }}" as="d" hint-placeholder-count="10">
+                <span title="{{ d.title }}" style="display:block; width:{{ d.w }}; height:8px; border-radius:4px; background:{{ d.bg }};"></span>
+              </sc-for>
+            </div>
+            <div class="hard-prog"><span style="width:{{ hardReframeProgPct }};"></span></div>
+            <span onClick="{{ hardReframeNext }}" class="hard-pill" style="background:var(--hard-cta-bg); color:var(--hard-cta-ink); opacity:{{ hardReframeNextOpacity }};">{{ hardReframeNextLabel }}</span>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hardReframeDone }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ hardReframeSummaryLoading }}" hint-placeholder-val="{{ false }}">
+          <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-muted); text-align:center; padding:40px;">Weighing what you told me…</div>
+        </sc-if>
+        <sc-if value="{{ hardHasReframeSummaryErr }}" hint-placeholder-val="{{ false }}">
+          <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:#ff8a6a;">{{ hardReframeSummaryErr }}</div>
+        </sc-if>
+        <sc-if value="{{ hardHasReframeSummary }}" hint-placeholder-val="{{ false }}">
+          <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+            <div class="hard-bhead"><span style="font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:2.5px; color:var(--hard-accent-strong);">COACH'S SUMMARY</span></div>
+            <div class="hard-row" style="flex-direction:column; align-items:flex-start; gap:4px;"><span style="font-size:11px; letter-spacing:1px; color:var(--hard-muted);">THE PATTERN</span><span style="font-size:14.5px; line-height:1.55;">{{ hardReframeSummary.pattern }}</span></div>
+            <div class="hard-row" style="flex-direction:column; align-items:flex-start; gap:4px;"><span style="font-size:11px; letter-spacing:1px; color:var(--hard-muted);">THE TRUTH</span><span style="font-size:14.5px; line-height:1.55;">{{ hardReframeSummary.truth }}</span></div>
+            <div class="hard-row" style="flex-direction:column; align-items:flex-start; gap:4px;"><span style="font-size:11px; letter-spacing:1px; color:var(--hard-muted);">THE ACTION</span><span style="font-size:14.5px; line-height:1.55;">{{ hardReframeSummary.action }}</span></div>
+            <div class="hard-row" style="flex-direction:column; align-items:flex-start; gap:4px;"><span style="font-size:11px; letter-spacing:1px; color:var(--hard-muted);">THE STANDARD</span><span style="font-size:14.5px; line-height:1.55; color:var(--hard-accent-strong); font-weight:700;">{{ hardReframeSummary.standard }}</span></div>
+          </div>
+        </sc-if>
+      </sc-if>
+    </sc-if>
+  </sc-if>
+
+  <!-- SCOREBOARD -->
+  <sc-if value="{{ hardTabScoreboard }}" hint-placeholder-val="{{ false }}">
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); margin-bottom:14px;">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">CAPABILITY</span></div>
+      <div class="hard-stats">
+        <div class="hard-stat"><div style="font-size:11px; color:var(--hard-muted);">SQUAT</div><div style="font-size:16px; font-weight:700;">{{ hardScoreSquat }}</div></div>
+        <div class="hard-stat"><div style="font-size:11px; color:var(--hard-muted);">DEADLIFT</div><div style="font-size:16px; font-weight:700;">{{ hardScoreDeadlift }}</div></div>
+        <div class="hard-stat"><div style="font-size:11px; color:var(--hard-muted);">BENCH</div><div style="font-size:16px; font-weight:700;">{{ hardScoreBench }}</div></div>
+        <div class="hard-stat"><div style="font-size:11px; color:var(--hard-muted);">OVERHEAD PRESS</div><div style="font-size:16px; font-weight:700;">{{ hardScoreOhp }}</div></div>
+        <div class="hard-stat"><div style="font-size:11px; color:var(--hard-muted);">PULL-UPS</div><div style="font-size:16px; font-weight:700;">{{ hardScorePullups }}</div></div>
+        <div class="hard-stat"><div style="font-size:11px; color:var(--hard-muted);">FARMER CARRY</div><div style="font-size:16px; font-weight:700;">{{ hardScoreFarmerCarry }}</div></div>
+      </div>
+    </div>
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink); margin-bottom:14px;">
+      <div class="hard-row" style="border-top:none;"><span style="color:var(--hard-muted); font-size:12.5px;">HABITS TODAY</span><span>{{ hardHabitCompletionLabel }}</span></div>
+      <div class="hard-row"><span style="color:var(--hard-muted); font-size:12.5px;">STREAK</span><span style="color:var(--hard-accent-strong); font-weight:700;">{{ hardStreakScoreLabel }}</span></div>
+    </div>
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">WEEKLY REVIEW</span><span style="font-size:11px; color:var(--hard-muted);">{{ hardWeekKeyLabel }}</span></div>
+      <textarea value="{{ hardReviewPhysical }}" onInput="{{ setHardReviewPhysical }}" placeholder="Physical — how did the body hold up this week?" class="hard-input" style="width:100%; min-height:56px; box-sizing:border-box; resize:vertical; margin-bottom:10px;"></textarea>
+      <textarea value="{{ hardReviewMental }}" onInput="{{ setHardReviewMental }}" placeholder="Mental — where did discipline hold, where did it slip?" class="hard-input" style="width:100%; min-height:56px; box-sizing:border-box; resize:vertical; margin-bottom:10px;"></textarea>
+      <textarea value="{{ hardReviewLifestyle }}" onInput="{{ setHardReviewLifestyle }}" placeholder="Lifestyle — sleep, food, habits." class="hard-input" style="width:100%; min-height:56px; box-sizing:border-box; resize:vertical; margin-bottom:12px;"></textarea>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <sc-for list="{{ hardReviewVerdictOptions }}" as="v" hint-placeholder-count="4">
+          <span onClick="{{ v.pick }}" class="hard-chip" style="border:1px solid var(--hard-border-soft); background:{{ v.bg }}; color:{{ v.ink }};">{{ v.label }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- PROFILE -->
+  <sc-if value="{{ hardTabProfile }}" hint-placeholder-val="{{ false }}">
+    <div class="hard-block" style="background:var(--hard-card); border:1px solid var(--hard-border); color:var(--hard-ink);">
+      <div class="hard-bhead"><span style="font-weight:700; font-size:15px;">YOUR PROFILE</span></div>
+      <sc-for list="{{ hardProfileSummary }}" as="r" hint-placeholder-count="9">
+        <div class="hard-row"><span style="color:var(--hard-muted); font-size:12.5px;">{{ r.k }}</span><span style="font-size:13px; text-align:right; max-width:60%;">{{ r.v }}</span></div>
+      </sc-for>
+      <span onClick="{{ hardEditProfile }}" class="hard-pill-ghost" style="margin-top:16px; align-self:flex-start; color:var(--hard-accent-strong); border:1px solid var(--hard-border);">RE-RUN ONBOARDING</span>
+    </div>
+  </sc-if>
+
+  </sc-if>
+</div>
+</x-dc>
+<script data-dc-script>
+/* THE HARDENING, split out of the monolithic app shell into its own isolated component
+   (v11.469) — the first use of this runtime's dc-import mechanism in this app, done as a
+   pilot for the pattern described as the real fix for renderVals() recomputing every
+   scene's data on every keystroke anywhere in the app. This component owns its own state,
+   its own renderVals(), and its own persistence (a dedicated localStorage key plus its own
+   Supabase sync) entirely independently of the parent shell — so typing here no longer
+   touches the parent's ~3,300-line renderVals() at all, and typing anywhere else in the
+   app no longer touches this component's renderVals() either. See index.html's <dc-import
+   name="hardening"> for the mount point, and CHANGELOG v11.469 for the measured impact. */
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = this._load();
+    this._authUserId = null;
+  }
+
+  // ---- persistence: fully self-contained, no dependency on the parent shell ----
+  _defaultHardening(){ return {
+    onboarded:false, step:0, tab:'dashboard',
+    profile:{ age:'', sex:'', height:'', weight:'', occupation:'', activity:'', steps:'', days:'', sessionTime:'',
+      experience:'', years:'', prevSports:'', prevStrength:'', conditioning:'', running:'', carrying:'', bodyweight:'',
+      squat:'', deadlift:'', bench:'', ohp:'', pullups:'', pushups:'', plank:'', farmerCarry:'', runPerf:'', sprintPerf:'',
+      limitations:[], medicalNote:'', equipmentMode:'', equipment:[], level:2, goals:[] },
+    program:null, programLoading:false, programErr:'', adjustLoading:{}, adjustErr:'',
+    edits:{}, logs:[], habits:{}, mentalLog:{}, reframe:{}, weeklyReview:{}
+  }; }
+  // One-time migration from the pre-split shared cc_v2.hardening blob, for anyone who used
+  // Hardening before this split (v11.461-v11.468) — after this, this component never reads
+  // or writes cc_v2 again, only its own dedicated key.
+  _load(){
+    try{ const raw=localStorage.getItem('nvx_hardening_v1'); if(raw) return {...this._defaultHardening(), ...JSON.parse(raw)}; }catch(e){}
+    try{ const old=JSON.parse(localStorage.getItem('cc_v2')||'{}'); if(old && old.hardening) return {...this._defaultHardening(), ...old.hardening}; }catch(e){}
+    return this._defaultHardening();
+  }
+  _save(){ try{ localStorage.setItem('nvx_hardening_v1', JSON.stringify(this.state)); }catch(e){} }
+  // setState(u) is synchronous (React's own state merge) so a typed character still shows
+  // immediately; the disk write + Supabase push are debounced the same way the parent
+  // shell's own mut() now defers save() — see index.html's mut() and its v11.468 comment.
+  mut(u){ this.setState(u); this._debounce('save', ()=>{ this._save(); this._sbPush(); }, 300); }
+  _debounce(key, fn, ms){ this._dbTimers=this._dbTimers||{}; this._dbPending=this._dbPending||{}; clearTimeout(this._dbTimers[key]); this._dbPending[key]=fn; this._dbTimers[key]=setTimeout(()=>{ delete this._dbPending[key]; fn(); }, ms||300); }
+  _flushDebounced(){ if(!this._dbPending) return; Object.keys(this._dbPending).forEach(k=>{ clearTimeout(this._dbTimers[k]); const fn=this._dbPending[k]; delete this._dbPending[k]; try{ fn(); }catch(e){} }); }
+
+  async _sbUserId(){
+    if(this._authUserId) return this._authUserId;
+    if(!(window.SB && window.SB.ready())) return null;
+    try{ const sess=await window.SB.getSession(); return (sess && sess.user && sess.user.id) || null; }catch(e){ return null; }
+  }
+  async _sbPull(){
+    const uid=await this._sbUserId(); if(!uid) return;
+    try{
+      const res=await window.SB.list('hardening_progress', {match:{user_id:uid}});
+      if(res && res.data && res.data[0] && res.data[0].data) this.setState(s=>({...this._defaultHardening(), ...s, ...res.data[0].data}));
+    }catch(e){}
+  }
+  _sbPush(){
+    if(!window.SB || !window.SB.ready()) return;
+    this._sbUserId().then(uid=>{ if(!uid) return;
+      window.SB.upsert('hardening_progress', {user_id:uid, data:this.state}, 'user_id').catch(()=>{}); });
+  }
+
+  componentDidMount(){
+    this._sbPull();
+    this._authSub = (window.SB && window.SB.onAuthChange) ? window.SB.onAuthChange((event, session)=>{
+      const uid=(session && session.user && session.user.id) || null;
+      if(uid && uid!==this._authUserId){ this._authUserId=uid; this._sbPull(); } else if(!uid){ this._authUserId=null; }
+    }) : null;
+    this._visHandler=()=>{ if(document.hidden) this._flushDebounced(); };
+    document.addEventListener('visibilitychange', this._visHandler);
+    this._exitHandler=()=>this._flushDebounced();
+    window.addEventListener('pagehide', this._exitHandler);
+    window.addEventListener('beforeunload', this._exitHandler);
+  }
+  componentWillUnmount(){
+    document.removeEventListener('visibilitychange', this._visHandler);
+    window.removeEventListener('pagehide', this._exitHandler);
+    window.removeEventListener('beforeunload', this._exitHandler);
+    if(this._authSub && this._authSub.data && this._authSub.data.subscription){ try{ this._authSub.data.subscription.unsubscribe(); }catch(e){} }
+    this._flushDebounced();
+  }
+
+  // ---- small utilities copied from the parent shell (kept identical on purpose) ----
+  _extractJSON(t){ try{ const a=t.indexOf('{'), b=t.lastIndexOf('}'); if(a<0||b<0) return null; return JSON.parse(t.slice(a,b+1)); }catch(e){ return null; } }
+  _uuid(){ return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'id'+Date.now()+Math.random().toString(16).slice(2); }
+  _fbToday(){ return window.HealthKit ? window.HealthKit.today() : new Date().toLocaleDateString('en-CA'); }
+
+  _hard(){ return this.state; }
+  _hardSet(patch){ this.mut(typeof patch==='function' ? patch(this.state) : patch); }
+  _hardToday(){ return this._fbToday(); }
+
+  hardSetProfile(field, value){ this._hardSet(h=>({profile:{...h.profile, [field]:value}})); }
+  hardSetProfileEvt(field){ return (e)=>this.hardSetProfile(field, e.target.value); }
+  hardToggleProfileList(field, value){
+    this._hardSet(h=>{ const cur=h.profile[field]||[]; const has=cur.includes(value);
+      return {profile:{...h.profile, [field]:has?cur.filter(x=>x!==value):[...cur, value]}}; });
+  }
+  hardSetEquipmentMode(mode){
+    const preset=(window.HardeningEngine.EQUIPMENT_MODES.find(m=>m.key===mode)||{}).items||[];
+    this._hardSet(h=>({profile:{...h.profile, equipmentMode:mode, equipment: mode==='home_gym' ? (h.profile.equipment||[]) : preset}}));
+  }
+  hardSetLevel(level){ this._hardSet(h=>({profile:{...h.profile, level}})); }
+  hardStep(delta){ this._hardSet(h=>({step:Math.max(0, Math.min(6, (h.step||0)+delta))})); }
+  hardGotoStep(i){ this._hardSet({step:i}); }
+  hardFinishOnboarding(){ this._hardSet({onboarded:true, step:0}); this.generateHardeningProgram(); }
+
+  // The AI call. Builds the prompt from the stored profile (+ recent session performance on
+  // a regenerate, so the program can progress rather than restart from zero every time),
+  // parses the JSON the same way the parent shell's own AI-JSON calls do, and falls back to
+  // the static DEFAULT_PROGRAM if no provider is connected or the response doesn't parse,
+  // so the page is never a dead end just because AI isn't set up.
+  async generateHardeningProgram(){
+    const HE=window.HardeningEngine; if(!HE) return;
+    this._hardSet({programLoading:true, programErr:''});
+    const h=this._hard();
+    const recent=(h.logs||[]).slice(-6).map(l=>({day:l.day, rpe:l.rpe, completed:l.completed, notes:l.notes}));
+    const profile={...h.profile, recentPerformance:recent.length?JSON.stringify(recent):undefined};
+    if(!window.claude){
+      this._hardSet({programLoading:false, programErr:'AI unavailable in this environment — showing the standard template instead.',
+        program:{...HE.DEFAULT_PROGRAM, level:h.profile.level||2, generatedAt:Date.now(), source:'default'}});
+      return;
+    }
+    try{
+      const {system, prompt}=HE.buildProgramPrompt(profile);
+      const raw=await window.claude.complete({role:'workout', system, messages:[{role:'user', content:prompt}], max_tokens:4000});
+      const j=this._extractJSON(raw);
+      if(j && Array.isArray(j.days) && j.days.length){
+        this._hardSet({programLoading:false, program:{...j, generatedAt:Date.now(), source:'ai'}});
+      } else {
+        this._hardSet({programLoading:false, programErr:'Could not parse the AI response — showing the standard template instead.',
+          program:{...HE.DEFAULT_PROGRAM, level:h.profile.level||2, generatedAt:Date.now(), source:'default'}});
+      }
+    }catch(e){
+      this._hardSet({programLoading:false, programErr:((e&&e.message)||'Generation failed')+' — showing the standard template instead.',
+        program:{...HE.DEFAULT_PROGRAM, level:h.profile.level||2, generatedAt:Date.now(), source:'default'}});
+    }
+  }
+
+  // Exercise editing (spec §12) — per-day, per-index overrides layered onto whatever the
+  // program holds, rather than mutating the generated program in place, so "regenerate"
+  // always starts clean and a user's manual edits are never silently lost by it either.
+  hardEditExercise(dayKey, idx, field, value){
+    this._hardSet(h=>{ const edits={...h.edits}; const day={...(edits[dayKey]||{})}; const row={...(day[idx]||{}), [field]:value};
+      day[idx]=row; edits[dayKey]=day; return {edits}; });
+  }
+  hardRemoveExercise(dayKey, idx){
+    this._hardSet(h=>{ const edits={...h.edits}; const day={...(edits[dayKey]||{})}; day[idx]={...(day[idx]||{}), removed:true}; edits[dayKey]=day; return {edits}; });
+  }
+  hardAddExercise(dayKey){
+    this._hardSet(h=>{ const edits={...h.edits}; const day={...(edits[dayKey]||{})}; const extra=day.__extra||[];
+      day.__extra=[...extra, {exercise:'', sets:3, reps:'10', rest:''}]; edits[dayKey]=day; return {edits}; });
+  }
+  hardEditExtra(dayKey, i, field, value){
+    this._hardSet(h=>{ const edits={...h.edits}; const day={...(edits[dayKey]||{})}; const extra=[...(day.__extra||[])];
+      extra[i]={...extra[i], [field]:value}; day.__extra=extra; edits[dayKey]=day; return {edits}; });
+  }
+  _hardProgramDay(dayKey){ const p=this._hard().program; return p ? (p.days||[]).find(d=>d.key===dayKey) : null; }
+  _hardExerciseAt(dayKey, idx){ const day=this._hardProgramDay(dayKey)||{}; const base=(day.blocks||[])[idx]||{};
+    const override=((this._hard().edits[dayKey]||{})[idx])||{}; return {...base, ...override}; }
+  _hardFinisherFor(dayKey){ const day=this._hardProgramDay(dayKey)||{}; const base=day.finisher||{};
+    const override=((this._hard().edits[dayKey]||{}).finisher)||{}; return {...base, ...override}; }
+  // "MAKE IT HARDER" / "TOO MUCH" (spec §13-14) — a real AI call: the model sees the day's
+  // actual current blocks and picks whichever variable(s) make sense per exercise, rather
+  // than one hardcoded rule applied everywhere. Falls back to a deterministic, single-
+  // variable nudge (add/remove one set on the heaviest compound block, or scale the
+  // finisher ~15%) when no AI provider is connected or the response doesn't parse cleanly.
+  async hardAdjustDay(dayKey, harder){
+    const day=(this._hardProgramDay(dayKey)||{});
+    const blocks=(day.blocks||[]).map((b,i)=>this._hardExerciseAt(dayKey, i));
+    if(!blocks.length && !day.finisher) return; // rest day — nothing to adjust
+    const HE=window.HardeningEngine;
+    this._hardSet(h=>({adjustLoading:{...(h.adjustLoading||{}), [dayKey]:true}, adjustErr:''}));
+    if(!HE || !window.claude){ this._hardAdjustDayFallback(dayKey, harder); this._hardSet(h=>({adjustLoading:{...(h.adjustLoading||{}), [dayKey]:false}})); return; }
+    try{
+      const finisher=day.finisher?this._hardFinisherFor(dayKey):null;
+      const {system, prompt}=HE.buildAdjustDayPrompt({name:day.name, focus:day.focus, blocks, finisher}, harder, this._hard().profile);
+      const raw=await window.claude.complete({role:'workout', system, messages:[{role:'user', content:prompt}], max_tokens:700});
+      const j=this._extractJSON(raw);
+      if(j && Array.isArray(j.blocks) && j.blocks.length===blocks.length){
+        j.blocks.forEach((nb,i)=>{
+          if(nb.sets!=null) this.hardEditExercise(dayKey, i, 'sets', nb.sets);
+          if(nb.reps!=null) this.hardEditExercise(dayKey, i, 'reps', nb.reps);
+          if(nb.rest!=null) this.hardEditExercise(dayKey, i, 'rest', nb.rest);
+        });
+        if(finisher && j.finisher && j.finisher.reps!=null) this.hardEditExercise(dayKey, 'finisher', 'reps', j.finisher.reps);
+      } else {
+        this._hardAdjustDayFallback(dayKey, harder);
+      }
+    }catch(e){
+      this._hardAdjustDayFallback(dayKey, harder);
+    }
+    this._hardSet(h=>({adjustLoading:{...(h.adjustLoading||{}), [dayKey]:false}}));
+  }
+  _hardAdjustDayFallback(dayKey, harder){
+    const day=(this._hardProgramDay(dayKey)||{});
+    const blocks=day.blocks||[];
+    if(blocks.length){
+      const idx=0; // the day's first block is always its heaviest compound lift in this program
+      const cur=this._hardExerciseAt(dayKey, idx);
+      const sets=Math.max(1, (+cur.sets||3) + (harder?1:-1));
+      this.hardEditExercise(dayKey, idx, 'sets', sets);
+      return;
+    }
+    if(day.finisher){
+      const f=this._hardFinisherFor(dayKey);
+      const num=parseFloat(f.reps);
+      if(!isNaN(num)){ const scaled=Math.max(1, Math.round(num*(harder?1.15:0.85))); this.hardEditExercise(dayKey, 'finisher', 'reps', String(scaled)+(String(f.reps).replace(/[\d.]/g,''))); }
+    }
+  }
+
+  // Session logging (spec §15) — one record per completed day, RPE-tagged. Feeds
+  // "recentPerformance" back into the next generateHardeningProgram() call.
+  hardLogSession(dayKey, rpe, notes){
+    this._hardSet(h=>({logs:[...(h.logs||[]), {id:this._uuid(), day:dayKey, date:this._hardToday(), rpe, notes:notes||'', completed:true, ts:Date.now()}]}));
+  }
+
+  // Daily readiness (spec §16) and habits (spec §18-19), both keyed by date so history is
+  // naturally kept without a separate log array.
+  hardSetReadiness(field, value){ const d=this._hardToday();
+    this._hardSet(h=>{ const habits={...h.habits}; const rec={...(habits[d]||{})}; rec.readiness={...(rec.readiness||{}), [field]:value}; habits[d]=rec; return {habits}; }); }
+  hardToggleHabit(phase, key){ const d=this._hardToday();
+    this._hardSet(h=>{ const habits={...h.habits}; const rec={...(habits[d]||{})}; const ph={...(rec[phase]||{})}; ph[key]=!ph[key]; rec[phase]=ph; habits[d]=rec; return {habits}; }); }
+  hardSetEveningAudit(field, value){ const d=this._hardToday();
+    this._hardSet(h=>{ const habits={...h.habits}; const rec={...(habits[d]||{})}; rec.audit={...(rec.audit||{}), [field]:value}; habits[d]=rec; return {habits}; }); }
+
+  // Mental drill (spec §23) — one rotates in per day (deterministic by day-of-year), logged per date.
+  hardMentalDrillForDate(d){ const HE=window.HardeningEngine; if(!HE) return null;
+    const day=new Date(d+'T00:00:00'); const start=new Date(day.getFullYear(),0,0);
+    const doy=Math.floor((day-start)/86400000);
+    return HE.MENTAL_DRILLS[doy % HE.MENTAL_DRILLS.length]; }
+  hardSetMentalNote(value){ const d=this._hardToday();
+    this._hardSet(h=>({mentalLog:{...h.mentalLog, [d]:{...(h.mentalLog[d]||{}), note:value}}})); }
+
+  // Weekly review (spec §27) — one free-text record per ISO week.
+  _hardWeekKey(){ const d=new Date(); const onejan=new Date(d.getFullYear(),0,1);
+    const week=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7); return d.getFullYear()+'-W'+week; }
+  hardSetWeeklyReview(field, value){ const wk=this._hardWeekKey();
+    this._hardSet(h=>({weeklyReview:{...h.weeklyReview, [wk]:{...(h.weeklyReview[wk]||{}), [field]:value}}})); }
+
+  // REFRAME YOURSELF (spec §32) — ten AI-generated questions per day, one answered at a
+  // time (forward-locked: can't advance past an unanswered question), then one AI call over
+  // the finished Q&A pairs for the coach's summary. Falls back to a fixed question bank
+  // (hardening-engine.js) with a locally-built fallback summary when no AI provider is
+  // connected.
+  async hardGenerateReframe(){
+    const HE=window.HardeningEngine; if(!HE) return;
+    const d=this._hardToday(); const h=this._hard();
+    if(h.reframe[d] && h.reframe[d].questions) return; // already generated today
+    this._hardSet(r=>({reframe:{...r.reframe, [d]:{questions:[], answers:[], idx:0, summary:null, loading:true, err:''}}}));
+    if(!window.claude){
+      this._hardSet(r=>({reframe:{...r.reframe, [d]:{questions:HE.FALLBACK_REFRAME_QUESTIONS, answers:new Array(10).fill(''), idx:0, summary:null, loading:false, err:'AI unavailable in this environment — using the standard question set.'}}}));
+      return;
+    }
+    try{
+      const logs=(h.logs||[]).slice(-10);
+      const habitDays=Object.keys(h.habits||{}).slice(-10);
+      const habitCompletion=habitDays.length ? habitDays.map(k=>{ const r=h.habits[k]; const m=r.morning||{}, ev=r.evening||{};
+        const done=Object.values(m).filter(Boolean).length+Object.values(ev).filter(Boolean).length; return k+': '+done+' habits'; }).join('; ') : 'none recorded yet';
+      const pastSummaries=Object.keys(h.reframe||{}).slice(-5).map(k=>h.reframe[k] && h.reframe[k].summary ? (k+': '+JSON.stringify(h.reframe[k].summary)) : null).filter(Boolean).join('\n') || 'none yet — this is the first day';
+      const context={
+        trainingConsistency: logs.length ? (logs.length+' sessions logged recently, avg RPE '+(logs.reduce((a,l)=>a+(+l.rpe||0),0)/logs.length).toFixed(1)) : 'no sessions logged yet',
+        habitCompletion, pastSummaries, patterns:'' };
+      const {system, prompt}=HE.buildReframeQuestionsPrompt(context);
+      const raw=await window.claude.complete({role:'writing', system, messages:[{role:'user', content:prompt}], max_tokens:1200});
+      const j=this._extractJSON(raw);
+      if(j && Array.isArray(j.questions) && j.questions.length){
+        this._hardSet(r=>({reframe:{...r.reframe, [d]:{questions:j.questions.slice(0,10), answers:new Array(j.questions.length).fill(''), idx:0, summary:null, loading:false, err:''}}}));
+      } else {
+        this._hardSet(r=>({reframe:{...r.reframe, [d]:{questions:HE.FALLBACK_REFRAME_QUESTIONS, answers:new Array(10).fill(''), idx:0, summary:null, loading:false, err:'Could not parse the AI response — using the standard question set.'}}}));
+      }
+    }catch(e){
+      this._hardSet(r=>({reframe:{...r.reframe, [d]:{questions:HE.FALLBACK_REFRAME_QUESTIONS, answers:new Array(10).fill(''), idx:0, summary:null, loading:false, err:((e&&e.message)||'Generation failed')+' — using the standard question set.'}}}));
+    }
+  }
+  hardSetReframeAnswer(value){ const d=this._hardToday();
+    this._hardSet(r=>{ const rec={...(r.reframe[d]||{})}; const answers=[...(rec.answers||[])]; answers[rec.idx||0]=value; return {reframe:{...r.reframe, [d]:{...rec, answers}}}; }); }
+  hardReframeNext(){ const d=this._hardToday(); const rec=this._hard().reframe[d]; if(!rec) return;
+    if(!(rec.answers[rec.idx]||'').trim()) return; // forward-locked, same as Gentlemen's Daily Test
+    const at=rec.idx||0;
+    if(at+1>=rec.questions.length){ this.hardGenerateReframeSummary(); return; }
+    this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:at+1}}}));
+  }
+  hardReframeBack(){ const d=this._hardToday(); const rec=this._hard().reframe[d]; if(!rec) return;
+    this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:Math.max(0,(rec.idx||0)-1)}}})); }
+  async hardGenerateReframeSummary(){
+    const HE=window.HardeningEngine; if(!HE) return;
+    const d=this._hardToday(); const rec=this._hard().reframe[d]; if(!rec) return;
+    this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:rec.questions.length, summaryLoading:true}}}));
+    if(!window.claude){
+      const fb=HE.buildFallbackReframeSummary(rec.questions, rec.answers);
+      this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec, idx:rec.questions.length, summaryLoading:false, summary:fb, summaryErr:'AI unavailable in this environment — showing a standard summary drawn from your own answers instead.'}}}));
+      return;
+    }
+    try{
+      const {system, prompt}=HE.buildReframeSummaryPrompt(rec.questions, rec.answers);
+      const raw=await window.claude.complete({role:'writing', system, messages:[{role:'user', content:prompt}], max_tokens:400});
+      const j=this._extractJSON(raw);
+      const rec2=this._hard().reframe[d]||rec;
+      if(j && j.pattern){ this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summary:j, summaryErr:''}}})); }
+      else { const fb=HE.buildFallbackReframeSummary(rec.questions, rec.answers);
+        this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summary:fb, summaryErr:'Could not parse the AI summary — showing a standard summary drawn from your own answers instead.'}}})); }
+    }catch(e){
+      const rec2=this._hard().reframe[d]||rec;
+      const fb=HE.buildFallbackReframeSummary(rec.questions, rec.answers);
+      this._hardSet(r=>({reframe:{...r.reframe, [d]:{...rec2, summaryLoading:false, summary:fb, summaryErr:((e&&e.message)||'Summary generation failed')+' — showing a standard summary drawn from your own answers instead.'}}}));
+    }
+  }
+
+  renderVals(){
+    const HE=window.HardeningEngine; if(!HE) return {};
+    const h=this._hard(); const p=h.profile||{};
+    const today=this._hardToday();
+    const ONBOARD_STEPS=['BASIC','EXPERIENCE','CAPABILITY','LIMITATIONS','EQUIPMENT','LEVEL','GOALS'];
+    const step=Math.max(0, Math.min(ONBOARD_STEPS.length-1, h.step||0));
+    const ONBOARD_TITLES=['The Basics','Your Experience','Capability','Limitations','Equipment','How Hard Do You Want To Push?','Your Goals'];
+    const ONBOARD_DESCS=[
+      "Who you are and what your week actually looks like.",
+      "Where you're starting from.",
+      'What you can do right now. "Don’t know" is a fine answer.',
+      'Anything the program must never aggravate.',
+      "What you're training with.",
+      "Choose your level — this sets the whole program's intensity.",
+      'What are you actually after?'
+    ];
+
+    const hardTextField=(field, ph)=>({ val:p[field]||'', ph:ph||'', set:this.hardSetProfileEvt(field) });
+    const hardChipList=(list, field)=>list.map(v=>({ label:v, on:(p[field]||[]).includes(v),
+      bg:(p[field]||[]).includes(v)?'var(--hard-cta-bg)':'transparent', ink:(p[field]||[]).includes(v)?'var(--hard-cta-ink)':'var(--hard-ink)',
+      toggle:()=>this.hardToggleProfileList(field, v) }));
+
+    const onboardDots=ONBOARD_STEPS.map((n,i)=>({ title:n, w:i===step?'22px':'8px', bg:i===step?'var(--hard-accent)':(i<step?'var(--hard-muted)':'var(--hard-border)') }));
+    const onboardProgPct=Math.round(((step+1)/ONBOARD_STEPS.length)*100)+'%';
+
+    // Program day tabs — always the fixed seven, regardless of source (AI or default).
+    const program=h.program;
+    const dayMeta=(program?program.days:HE.DEFAULT_PROGRAM.days)||[];
+    const openDayKey=(h.openDay && dayMeta.some(d=>d.key===h.openDay)) ? h.openDay : (dayMeta[0]||{}).key;
+    const hardDayTabs=dayMeta.map(d=>({ key:d.key, label:d.name, on:d.key===openDayKey,
+      bg:d.key===openDayKey?'var(--hard-cta-bg)':'transparent', ink:d.key===openDayKey?'var(--hard-cta-ink)':'var(--hard-ink)',
+      go:()=>this._hardSet({openDay:d.key}) }));
+    const openDay=dayMeta.find(d=>d.key===openDayKey)||{};
+    const dayEdits=h.edits[openDayKey]||{};
+    const hardBlocks=(openDay.blocks||[]).map((b,i)=>{ if((dayEdits[i]||{}).removed) return null;
+      const ex=this._hardExerciseAt(openDayKey, i);
+      return { i, exercise:ex.exercise, sets:ex.sets, reps:ex.reps, rest:ex.rest||'',
+        why:HE.EXERCISE_WHY[ex.exercise]||ex.why||'',
+        setEx:(e)=>this.hardEditExercise(openDayKey,i,'exercise',e.target.value),
+        setSets:(e)=>this.hardEditExercise(openDayKey,i,'sets',e.target.value),
+        setReps:(e)=>this.hardEditExercise(openDayKey,i,'reps',e.target.value),
+        setRest:(e)=>this.hardEditExercise(openDayKey,i,'rest',e.target.value),
+        remove:()=>this.hardRemoveExercise(openDayKey,i) }; }).filter(Boolean);
+    const hardExtras=((dayEdits.__extra)||[]).map((x,i)=>({ i, exercise:x.exercise, sets:x.sets, reps:x.reps, rest:x.rest||'',
+      setEx:(e)=>this.hardEditExtra(openDayKey,i,'exercise',e.target.value),
+      setSets:(e)=>this.hardEditExtra(openDayKey,i,'sets',e.target.value),
+      setReps:(e)=>this.hardEditExtra(openDayKey,i,'reps',e.target.value),
+      setRest:(e)=>this.hardEditExtra(openDayKey,i,'rest',e.target.value) }));
+    const hardFinisher=openDay.finisher ? (()=>{ const f=this._hardFinisherFor(openDayKey);
+      return { exercise:f.exercise, sets:f.sets, reps:f.reps, rest:f.rest||'',
+        setEx:(e)=>this.hardEditExercise(openDayKey,'finisher','exercise',e.target.value),
+        setReps:(e)=>this.hardEditExercise(openDayKey,'finisher','reps',e.target.value) }; })() : null;
+    const hardIsRestDay=!!openDay.rest;
+    const sessionRpe=h.sessionRpe||'7'; const sessionNotes=h.sessionNotes||'';
+
+    // Dashboard summary (spec §25)
+    const habitRec=h.habits[today]||{}; const morning=habitRec.morning||{}, evening=habitRec.evening||{};
+    const habitsDone=Object.values(morning).filter(Boolean).length+Object.values(evening).filter(Boolean).length;
+    const habitsTotal=HE.MORNING_HABITS.length+1; // +1 for phone curfew ack
+    const streak=(()=>{ let n=0; const d=new Date(); for(;;){ const k=d.toLocaleDateString('en-CA'); const rec=h.habits[k];
+      if(rec && (Object.values(rec.morning||{}).some(Boolean)||Object.values(rec.evening||{}).some(Boolean))){ n++; d.setDate(d.getDate()-1); } else break; } return n; })();
+    const levelInfo=HE.HARDENING_LEVELS.find(l=>l.key===(p.level||2))||HE.HARDENING_LEVELS[1];
+    const todayDrill=this.hardMentalDrillForDate(today);
+
+    // Reframe deck
+    const reframeRec=h.reframe[today]||null;
+    const rIdx=reframeRec?(reframeRec.idx||0):0;
+    const rDone=!!(reframeRec && rIdx>=(reframeRec.questions||[]).length);
+    const reframeDots=(reframeRec?reframeRec.questions:[]||[]).map((q,i)=>({ title:'Q'+(i+1), w:i===rIdx?'22px':'8px', bg:i===rIdx?'var(--hard-accent)':(i<rIdx?'var(--hard-muted)':'var(--hard-border)') }));
+
+    return {
+      hardOnboarded:!!h.onboarded, hardTab:h.tab||'dashboard',
+      setHardTab:(t)=>this._hardSet({tab:t}),
+      hardTabs:['dashboard','program','habits','mind','reframe','scoreboard','profile'].map(t=>({
+        key:t, label:t==='mind'?'MIND':t.toUpperCase(), on:(h.tab||'dashboard')===t,
+        bg:(h.tab||'dashboard')===t?'var(--hard-cta-bg)':'transparent', ink:(h.tab||'dashboard')===t?'var(--hard-cta-ink)':'var(--hard-ink)',
+        go:()=>this._hardSet({tab:t}) })),
+      hardTabDashboard:(h.tab||'dashboard')==='dashboard', hardTabProgram:h.tab==='program',
+      hardTabHabits:h.tab==='habits', hardTabMind:h.tab==='mind', hardTabReframe:h.tab==='reframe',
+      hardTabScoreboard:h.tab==='scoreboard', hardTabProfile:h.tab==='profile',
+
+      // Onboarding
+      hardStepIdx:step, hardStepName:ONBOARD_STEPS[step], hardStepCount:ONBOARD_STEPS.length,
+      hardStepTitle:ONBOARD_TITLES[step], hardStepDesc:ONBOARD_DESCS[step],
+      hardOnboardDots:onboardDots, hardOnboardProgPct:onboardProgPct,
+      hardIsStep0:step===0, hardIsStep1:step===1, hardIsStep2:step===2, hardIsStep3:step===3, hardIsStep4:step===4, hardIsStep5:step===5, hardIsStep6:step===6,
+      hardBack:()=>this.hardStep(-1), hardNext:()=>this.hardStep(1),
+      hardBackOpacity:step===0?'0.3':'1', hardBackCursor:step===0?'default':'pointer',
+      hardNextLabel:step===ONBOARD_STEPS.length-1?'GENERATE MY PROGRAM':'NEXT ›',
+      hardNextGo:step===ONBOARD_STEPS.length-1?(()=>this.hardFinishOnboarding()):(()=>this.hardStep(1)),
+
+      hardAge:hardTextField('age','Age'), hardSex:hardTextField('sex','Sex'), hardHeight:hardTextField('height','Height'),
+      hardWeight:hardTextField('weight','Weight'), hardOccupation:hardTextField('occupation','Occupation'),
+      hardActivity:hardTextField('activity','General daily activity'), hardSteps:hardTextField('steps','Approx. daily steps (or "don\'t know")'),
+      hardDays:hardTextField('days','Training days available per week'), hardSessionTime:hardTextField('sessionTime','Minutes available per session'),
+
+      hardExperienceOptions:HE.EXPERIENCE_LEVELS.map(l=>({ key:l.key, name:l.name, desc:l.desc, on:p.experience===l.key,
+        bg:p.experience===l.key?'var(--hard-cta-bg)':'transparent', ink:p.experience===l.key?'var(--hard-cta-ink)':'var(--hard-ink)',
+        pick:()=>this.hardSetProfile('experience', l.key) })),
+      hardYears:hardTextField('years','How long have you trained consistently? (e.g. "18 months")'),
+      hardPrevSports:hardTextField('prevSports','Sports you’ve played, if any (e.g. "rugby, boxing" or "none")'),
+      hardPrevStrength:hardTextField('prevStrength','Your strength training background (e.g. "3 years general gym work", "just started")'),
+      hardConditioning:hardTextField('conditioning','How’s your cardio right now? (e.g. "can do 20 min steady", "gets winded on stairs")'),
+      hardRunning:hardTextField('running','Best recent run, or "don’t run" (e.g. "5k in 28 min")'),
+      hardCarrying:hardTextField('carrying','Heaviest you can carry ~20m, or "not sure" (e.g. "2x24kg kettlebells")'),
+      hardBodyweight:hardTextField('bodyweight','Max push-ups and pull-ups right now (e.g. "20 push-ups, 5 pull-ups")'),
+
+      hardSquat:hardTextField('squat','Squat (or "don\'t know")'), hardDeadlift:hardTextField('deadlift','Deadlift'),
+      hardBench:hardTextField('bench','Bench press'), hardOhp:hardTextField('ohp','Overhead press'),
+      hardPullups:hardTextField('pullups','Pull-ups (max reps)'), hardPushups:hardTextField('pushups','Push-ups (max reps)'),
+      hardPlank:hardTextField('plank','Plank hold'), hardFarmerCarryCap:hardTextField('farmerCarry','Farmer carry'),
+      hardRunPerf:hardTextField('runPerf','Running performance'), hardSprintPerf:hardTextField('sprintPerf','Sprint performance'),
+
+      hardLimitationChips:hardChipList(HE.LIMITATION_AREAS,'limitations'),
+      hardMedicalNote:hardTextField('medicalNote','Any movements a medical professional has told you to avoid?'),
+
+      hardEquipmentModes:HE.EQUIPMENT_MODES.map(m=>({ key:m.key, name:m.name, on:p.equipmentMode===m.key,
+        bg:p.equipmentMode===m.key?'var(--hard-cta-bg)':'transparent', ink:p.equipmentMode===m.key?'var(--hard-cta-ink)':'var(--hard-ink)',
+        pick:()=>this.hardSetEquipmentMode(m.key) })),
+      hardShowEquipmentPicker:p.equipmentMode==='home_gym',
+      hardEquipmentChips:hardChipList(HE.ALL_EQUIPMENT,'equipment'),
+
+      hardLevelOptions:HE.HARDENING_LEVELS.map(l=>({ key:l.key, name:'LEVEL '+l.key+' — '+l.name, line:l.line,
+        focus:l.focus.join(' · '), note:l.note||'', on:(p.level||2)===l.key,
+        bg:(p.level||2)===l.key?'var(--hard-cta-bg)':'transparent', ink:(p.level||2)===l.key?'var(--hard-cta-ink)':'var(--hard-ink)',
+        pick:()=>this.hardSetLevel(l.key) })),
+
+      hardGoalChips:hardChipList(HE.GOALS,'goals'),
+
+      // Dashboard
+      hardLevelName:levelInfo.name, hardLevelLine:levelInfo.line,
+      hardTodayDayName:hardIsRestDay?'THE RESET':(openDay.name||''),
+      hardTodayDrillName:todayDrill?todayDrill.name:'', hardTodayDrillDesc:todayDrill?todayDrill.desc:'',
+      hardHabitsDoneLabel:habitsDone+' / '+habitsTotal, hardStreakLabel:streak+(streak===1?' day':' days'),
+      hardGoToProgram:()=>this._hardSet({tab:'program'}), hardGoToMind:()=>this._hardSet({tab:'mind'}), hardGoToReframe:()=>this._hardSet({tab:'reframe'}),
+
+      // Program
+      hardProgramLoading:!!h.programLoading, hardProgramErr:h.programErr||'', hardHasProgramErr:!!h.programErr,
+      hardHasProgram:!!program, hardProgramSource:program?program.source:'', hardIsAiProgram:program&&program.source==='ai',
+      hardRegenerateProgram:()=>this.generateHardeningProgram(),
+      hardNeedsProgramGen:!h.programLoading && !program && !h.programErr,
+      hardDayTabs, hardOpenDayName:openDay.name||'', hardOpenDayFocus:openDay.focus||'',
+      hardOpenDayNote:openDay.personalizationNote||'', hardHasDayNote:!!openDay.personalizationNote,
+      hardIsRestDay, hardRestItems:(openDay.items||[]).map(x=>({text:x})),
+      hardWarmupMinutes:(openDay.warmup||{}).minutes||0, hardWarmupItems:((openDay.warmup||{}).items||[]).map(x=>({text:x})),
+      hardBlocks, hardExtras, hardHasFinisher:!!hardFinisher, hardFinisher,
+      hardAddExercise:()=>this.hardAddExercise(openDayKey),
+      hardMakeHarder:()=>this.hardAdjustDay(openDayKey, true), hardTooMuch:()=>this.hardAdjustDay(openDayKey, false),
+      hardAdjustLoading:!!(h.adjustLoading||{})[openDayKey],
+      hardMakeHarderLabel:(h.adjustLoading||{})[openDayKey]?'ADJUSTING…':'MAKE IT HARDER',
+      hardTooMuchLabel:(h.adjustLoading||{})[openDayKey]?'ADJUSTING…':'TOO MUCH',
+      hardAdjustOpacity:(h.adjustLoading||{})[openDayKey]?'0.6':'1', hardAdjustCursor:(h.adjustLoading||{})[openDayKey]?'default':'pointer',
+      hardSessionRpe:sessionRpe, setHardSessionRpe:(e)=>this._hardSet({sessionRpe:e.target.value}),
+      hardSessionNotes:sessionNotes, setHardSessionNotes:(e)=>this._hardSet({sessionNotes:e.target.value}),
+      hardLogThisSession:()=>{ this.hardLogSession(openDayKey, sessionRpe, sessionNotes); this._hardSet({sessionNotes:''}); },
+      hardRecentLogs:(h.logs||[]).slice(-8).reverse().map(l=>({ day:(dayMeta.find(d=>d.key===l.day)||{}).name||l.day, date:l.date, rpe:l.rpe, notes:l.notes })),
+      hardHasRecentLogs:(h.logs||[]).length>0,
+
+      // Habits
+      hardMorningHabits:HE.MORNING_HABITS.map(m=>({ key:m.key, label:m.label, desc:m.desc, on:!!morning[m.key],
+        mark:morning[m.key]?'✓':'', toggle:()=>this.hardToggleHabit('morning', m.key) })),
+      hardMoveSequence:HE.MORNING_MOVE_SEQUENCE.map(x=>({text:x})),
+      hardNutritionStandards:['Adequate protein','Fruit','Vegetables','Whole-food carbohydrate sources','Adequate dietary fats','Adequate calories','Sufficient hydration'].map(x=>({text:x})),
+      hardPhoneCurfew:evening.phoneCurfew?'✓':'', hardTogglePhoneCurfew:()=>this.hardToggleHabit('evening','phoneCurfew'),
+      hardAuditQuestions:HE.EVENING_AUDIT_QUESTIONS.map((q,i)=>({ q, i, on:(evening.audit&&evening.audit['q'+i])?'✓':'',
+        toggle:()=>this.hardToggleHabit('evening','audit_'+i) })),
+      hardAuditFix:(habitRec.audit||{}).fix||'', setHardAuditFix:(e)=>this.hardSetEveningAudit('fix', e.target.value),
+
+      // Mind
+      hardDrillName:todayDrill?todayDrill.name:'', hardDrillDesc:todayDrill?todayDrill.desc:'',
+      hardMentalNote:(h.mentalLog[today]||{}).note||'', setHardMentalNote:(e)=>this.hardSetMentalNote(e.target.value),
+      hardLifestyleFundamentals:HE.LIFESTYLE_FUNDAMENTALS.map(f=>({name:f.name, desc:f.desc})),
+
+      // Reframe
+      hardReframeStarted:!!reframeRec, hardReframeLoading:!!(reframeRec&&reframeRec.loading),
+      hardReframeErr:reframeRec?(reframeRec.err||''):'', hardHasReframeErr:!!(reframeRec&&reframeRec.err),
+      hardBeginReframe:()=>this.hardGenerateReframe(),
+      hardBeginLabel:(reframeRec&&reframeRec.loading)?'GENERATING…':'BEGIN',
+      hardReframeDone:rDone, hardReframeQ:reframeRec?((reframeRec.questions||[])[rIdx]||''):'',
+      hardReframeQNum:rIdx+1, hardReframeQTotal:reframeRec?(reframeRec.questions||[]).length:10,
+      hardReframeAnswer:reframeRec?((reframeRec.answers||[])[rIdx]||''):'', setHardReframeAnswer:(e)=>this.hardSetReframeAnswer(e.target.value),
+      hardReframeDots:reframeDots, hardReframeProgPct:reframeRec?Math.round(((rIdx+1)/Math.max(1,(reframeRec.questions||[]).length))*100)+'%':'0%',
+      hardReframeBack:()=>this.hardReframeBack(), hardReframeNext:()=>this.hardReframeNext(),
+      hardReframeBackOpacity:rIdx===0?'0.3':'1', hardReframeBackCursor:rIdx===0?'default':'pointer',
+      hardReframeNextLabel:rDone?'':((rIdx+1>=(reframeRec?(reframeRec.questions||[]).length:10))?'FINISH':'NEXT ›'),
+      hardReframeNextOpacity:(reframeRec&&(reframeRec.answers||[])[rIdx]||'').trim()?'1':'0.35',
+      hardReframeSummaryLoading:!!(reframeRec&&reframeRec.summaryLoading),
+      hardReframeSummary:reframeRec?reframeRec.summary:null, hardHasReframeSummary:!!(reframeRec&&reframeRec.summary),
+      hardReframeSummaryErr:reframeRec?(reframeRec.summaryErr||''):'', hardHasReframeSummaryErr:!!(reframeRec&&reframeRec.summaryErr),
+
+      // Scoreboard
+      hardScoreSquat:p.squat||'—', hardScoreDeadlift:p.deadlift||'—', hardScoreBench:p.bench||'—',
+      hardScoreOhp:p.ohp||'—', hardScorePullups:p.pullups||'—', hardScoreFarmerCarry:p.farmerCarry||'—',
+      hardHabitCompletionLabel:habitsDone+'/'+habitsTotal+' today', hardStreakScoreLabel:streak+(streak===1?' day':' days'),
+      hardWeekKeyLabel:this._hardWeekKey(),
+      hardReviewPhysical:(h.weeklyReview[this._hardWeekKey()]||{}).physical||'',
+      setHardReviewPhysical:(e)=>this.hardSetWeeklyReview('physical', e.target.value),
+      hardReviewMental:(h.weeklyReview[this._hardWeekKey()]||{}).mental||'',
+      setHardReviewMental:(e)=>this.hardSetWeeklyReview('mental', e.target.value),
+      hardReviewLifestyle:(h.weeklyReview[this._hardWeekKey()]||{}).lifestyle||'',
+      setHardReviewLifestyle:(e)=>this.hardSetWeeklyReview('lifestyle', e.target.value),
+      hardReviewVerdictOptions:['PROGRESS','MAINTAIN','MODIFY','DELOAD'].map(v=>({ label:v,
+        on:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v,
+        bg:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v?'var(--hard-cta-bg)':'transparent',
+        ink:(h.weeklyReview[this._hardWeekKey()]||{}).verdict===v?'var(--hard-cta-ink)':'var(--hard-ink)',
+        pick:()=>this.hardSetWeeklyReview('verdict', v) })),
+
+      // Profile (read-back + edit re-entry)
+      hardEditProfile:()=>this._hardSet({onboarded:false, step:0}),
+      hardProfileSummary:[
+        {k:'Age / Sex', v:[p.age,p.sex].filter(Boolean).join(' · ')||'—'},
+        {k:'Height / Weight', v:[p.height,p.weight].filter(Boolean).join(' · ')||'—'},
+        {k:'Occupation', v:p.occupation||'—'},
+        {k:'Training days/week', v:p.days||'—'},
+        {k:'Experience', v:(HE.EXPERIENCE_LEVELS.find(l=>l.key===p.experience)||{}).name||'—'},
+        {k:'Equipment', v:p.equipmentMode?(HE.EQUIPMENT_MODES.find(m=>m.key===p.equipmentMode)||{}).name:'—'},
+        {k:'Hardening Level', v:levelInfo.key+' — '+levelInfo.name},
+        {k:'Limitations', v:(p.limitations||[]).join(', ')||'None stated'},
+        {k:'Goals', v:(p.goals||[]).join(', ')||'—'},
+      ],
+    };
+  }
+}
+</script>

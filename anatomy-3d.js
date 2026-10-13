@@ -14,6 +14,9 @@
 // from 29MB to 2.1MB. three.js + GLTFLoader + the meshopt decoder are bundled locally rather
 // than pulled from a CDN so the PWA keeps working offline.
 (function () {
+  // Runs once: the <helmet> relocation re-executes every script. See engine-guards.test.mjs.
+  if (window.NervexusAnatomy3D) return;
+
   'use strict';
 
   var BUNDLE_URL = 'anatomy-three.js';
@@ -200,8 +203,13 @@
     });
   }
 
+  /* Paused means no frames at all, not a still frame: the loop used to keep running whether
+     or not the canvas was on screen, and with the model spinning that is a WebGL render every
+     frame for something nobody is looking at. Measured at 6fps against 21 with the scene
+     absent, on the same page. */
   function frame() {
     if (S.disposed) return;
+    if (S.paused) { S.raf = null; return; }
     S.raf = requestAnimationFrame(frame);
     if (S.spin && !S.dragging && Date.now() >= S.spinResumeAt) {
       // Continuous, never-ending rotation. Kept slow enough to read the muscles as they pass.
@@ -226,6 +234,13 @@
 
   function fit() {
     if (!S.el || !S.renderer || !S.camera) return;
+    /* A container that is still display:none measures 0, and sizing off that locked the
+       canvas at the 120px floor — setSize writes an inline width, so the model stayed a
+       thumbnail hugging the left of a full-width card until something else forced a resize.
+       reattach() hit this on every page re-render. Wait for a real width instead; the
+       observer below re-fits the moment there is one. */
+    if (!S.el.clientWidth) { S.pendingFit = true; return; }
+    S.pendingFit = false;
     var w = Math.max(120, S.el.clientWidth);
     var h = Math.max(220, Math.round(w * S.aspect));
     // Cap height so the model never dominates a tall phone viewport.
@@ -321,6 +336,7 @@
         fit();
         wireDrag(renderer.domElement);
         if (!S._resize) { S._resize = function () { fit(); }; window.addEventListener('resize', S._resize); }
+        watch(el);
         S.dirty = true;
         frame();
         return true;
@@ -345,6 +361,7 @@
     S.raf = 0;
     if (S._off) { S._off(); S._off = null; }
     if (S._resize) { window.removeEventListener('resize', S._resize); S._resize = null; }
+    if (S._ro) { try { S._ro.disconnect(); } catch (e) { } S._ro = null; }
     try {
       S.meshes.forEach(function (m) { m.geometry.dispose(); if (m.material) m.material.dispose(); });
       if (S.renderer) { S.renderer.dispose(); if (S.renderer.domElement && S.renderer.domElement.parentNode) S.renderer.domElement.parentNode.removeChild(S.renderer.domElement); }
@@ -384,11 +401,21 @@
   function attached() {
     return !!(S.renderer && S.renderer.domElement && S.renderer.domElement.isConnected);
   }
+  /* window resize is not enough: the container changes size when it is revealed, when the
+     theme swaps its card padding, or when the page re-renders around it, and none of those
+     fire a window resize. */
+  function watch(el) {
+    if (typeof ResizeObserver === 'undefined' || !el) return;
+    if (S._ro) { try { S._ro.disconnect(); } catch (e) { } }
+    S._ro = new ResizeObserver(function () { fit(); });
+    try { S._ro.observe(el); } catch (e) { S._ro = null; }
+  }
   function reattach(el) {
     if (!S.mounted || !S.renderer || !el) return false;
     var c = S.renderer.domElement;
     if (c.parentNode !== el) { el.innerHTML = ''; el.appendChild(c); }
     S.el = el;
+    watch(el);
     fit();
     S.dirty = true;
     return true;
@@ -399,8 +426,18 @@
     supported: supported, isMounted: function () { return S.mounted && attached(); },
     hasScene: function () { return !!(S.mounted && S.renderer); },
     setAutoSpin: function (on) { S.spin = !!on; S.dirty = true; },
+    setPaused: function (on) {
+      var was = !!S.paused;
+      S.paused = !!on;
+      if (was && !S.paused && !S.raf && !S.disposed && S.renderer) {
+        S.dirty = true;
+        S.raf = requestAnimationFrame(frame);
+      }
+    },
+    isPaused: function () { return !!S.paused; },
+    isSpinning: function () { return !!S.spin; },
     setAspect: function (r) { S.aspect = r || 1.5; fit(); },
     debugZones: debugZones,
-    CREDIT: 'Model: “man muscle human body” by Rena — CC Attribution',
+    CREDIT: 'Model: “man muscle human body” by Rena: CC Attribution',
   };
 })();

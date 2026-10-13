@@ -24,40 +24,6 @@
 })();
 
 (function(){
-  var introMask = document.getElementById('introMask');
-  if (introMask){
-    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-    var introHeader = document.querySelector('header');
-    if (introHeader){ introHeader.style.opacity = '0'; introHeader.style.pointerEvents = 'none'; introHeader.style.transition = 'opacity .25s ease'; }
-    var maskReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var maskDist = Math.max(320, window.innerHeight * 0.75);
-    var introScroll = introMask.querySelector('.intro-scroll');
-    var maskCurrent = 0, maskTarget = 0, maskRafId = null;
-    var maskTick = function(){
-      maskCurrent += (maskTarget - maskCurrent) * (maskReduced ? 1 : 0.09);
-      if (Math.abs(maskTarget - maskCurrent) < 0.001) maskCurrent = maskTarget;
-      introMask.style.opacity = String(1 - maskCurrent);
-      if (introScroll) introScroll.style.opacity = String(Math.max(0, 1 - maskCurrent * 2.2));
-      if (introHeader){
-        introHeader.style.opacity = String(maskCurrent);
-        introHeader.style.pointerEvents = maskCurrent > 0.5 ? 'auto' : 'none';
-      }
-      if (maskCurrent !== maskTarget){
-        maskRafId = requestAnimationFrame(maskTick);
-      } else {
-        maskRafId = null;
-      }
-    };
-    var updateMask = function(){
-      var y = window.scrollY || 0;
-      maskTarget = Math.min(1, y / maskDist);
-      if (maskRafId === null) maskRafId = requestAnimationFrame(maskTick);
-    };
-    updateMask();
-    window.addEventListener('scroll', updateMask, { passive: true });
-  }
-
   var glow = document.querySelector('.hero-glow');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!reduced && glow){
