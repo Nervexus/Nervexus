@@ -151,7 +151,12 @@ nav.solid{
 }
 .ov-left{top:50%;left:0;transform:translateY(-50%);text-align:left;}
 .ov-right{top:50%;right:0;left:auto;transform:translateY(-50%);text-align:left;}
-.ov-hero{top:48%;max-width:600px;}
+.ov-hero{
+  top:48%;max-width:600px;
+  background:none;backdrop-filter:none;-webkit-backdrop-filter:none;
+  box-shadow:none;border-radius:0;
+  padding:0 7vw;margin:0;
+}
 
 .eyebrow{
   font-size:12px;letter-spacing:0.14em;font-weight:600;
@@ -351,7 +356,7 @@ footer{
   .ov{max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;}
   .ov-right{right:3vw;left:3vw;text-align:left;}
   .reveal{font-size:clamp(24px,7vw,36px);}
-  .ov-hero{padding:20px 24px;}
+  .ov-hero{padding:0 7vw;}
   .ov-hero h1.reveal{font-size:clamp(26px,8vw,38px);}
   .ov-hero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
   .ov-hero .heroactions{margin-top:12px;gap:8px;}
