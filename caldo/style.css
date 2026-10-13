@@ -9,6 +9,7 @@
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
+html{scroll-behavior:smooth;scroll-padding-top:var(--nav-h);}
 body{
   background:var(--paper);
   color:var(--ink);
@@ -32,6 +33,7 @@ img{display:block;max-width:100%;}
 
 #bg{
   position:fixed;inset:0;z-index:0;
+  pointer-events:none;
   background:
     radial-gradient(circle at 18% 12%, rgba(169,103,47,0.07), transparent 55%),
     radial-gradient(circle at 82% 88%, rgba(22,23,26,0.05), transparent 55%),
@@ -41,6 +43,7 @@ img{display:block;max-width:100%;}
 #photos{
   position:fixed;inset:0;z-index:2;
   width:100%;height:100%;overflow:hidden;
+  pointer-events:none;
   transition:opacity .3s linear;
   background:var(--ink);
 }
@@ -145,7 +148,6 @@ nav.solid{
 .ov-left{top:50%;left:0;transform:translateY(-50%);text-align:left;}
 .ov-right{top:50%;right:0;left:auto;transform:translateY(-50%);text-align:left;}
 .ov-hero{top:48%;max-width:600px;}
-.ov-compact{top:39%;}
 
 .eyebrow{
   font-size:12px;letter-spacing:0.14em;font-weight:600;
@@ -196,22 +198,43 @@ nav.solid{
 .swatch{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--ink-2);}
 .swatch span{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08);}
 
-/* ---------- testimonials ---------- */
+/* ---------- static page (below the intro) ---------- */
 
-.testi{max-width:360px;}
-.tcardviewport{
-  position:absolute;top:50%;left:46%;right:0;
-  transform:translateY(-50%);
-  overflow:hidden;pointer-events:auto;
-  transition:opacity .35s ease;
+#page{position:relative;z-index:6;background:var(--paper);}
+.page-section{max-width:1120px;margin:0 auto;padding:110px 28px;}
+.page-head{max-width:640px;margin-bottom:48px;}
+.page-head h2{font-size:clamp(28px,3.4vw,40px);line-height:1.12;}
+.page-head .body{max-width:560px;}
+
+.featuregrid{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:24px;
 }
-.tcardrow{
-  display:flex;gap:22px;
-  transition:transform .4s cubic-bezier(.22,1,.36,1);
-  padding-right:10vw;
+.feature{
+  background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:0 10px 30px rgba(22,23,26,0.05);
+}
+.featureimg{width:100%;aspect-ratio:4/3;object-fit:cover;max-width:none;}
+.featurebody{padding:24px;}
+.featurebody h3{font-size:19px;margin-top:4px;}
+.featurebody .body{margin-top:10px;font-size:14.5px;}
+
+.finishes{margin-top:64px;padding-top:48px;border-top:1px solid var(--line);}
+.finishes h3{font-size:22px;}
+.finishes .body{margin-top:10px;max-width:520px;}
+
+.anatomy-section{background:rgba(22,23,26,0.02);}
+.anatomygrid{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:28px;
+}
+.anatomyitem img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;max-width:none;}
+.anatomyitem .eyebrow{margin-top:18px;margin-bottom:6px;}
+.anatomyitem h4{font-size:17px;}
+.anatomyitem .body{margin-top:8px;font-size:14px;}
+
+.tgrid{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:22px;
 }
 .tcard{
-  flex:0 0 280px;
   background:#fff;border:1px solid var(--line);border-radius:18px;
   padding:26px;
   box-shadow:0 10px 30px rgba(0,0,0,0.05);
@@ -221,10 +244,8 @@ nav.solid{
 .tname{margin-top:16px;font-size:13px;font-weight:600;}
 .trole{font-size:12px;color:var(--ink-2);}
 
-/* ---------- FAQ ---------- */
-
-.faqwrap{max-width:440px;pointer-events:auto;}
-.qalist{margin-top:26px;border-top:1px solid var(--line);}
+.faqwrap-static{max-width:640px;}
+.qalist{margin-top:0;border-top:1px solid var(--line);}
 .qa{border-bottom:1px solid var(--line);}
 .qbtn{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
@@ -325,16 +346,15 @@ footer{
   .buybarinner{padding-right:84px;}
   .ov{max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;}
   .ov-right{right:3vw;left:3vw;text-align:left;}
-  .tcardviewport{left:7vw;right:7vw;top:auto;bottom:14vh;transform:none;}
-  .testi{top:16vh;transform:none;}
   .reveal{font-size:clamp(24px,7vw,36px);}
   .ov-hero h1.reveal{font-size:clamp(30px,9vw,42px);}
-  .faqwrap{max-width:94vw;}
+  .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
 }
 
 @media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
   .w i, .reveal.in .w i{transition:none;}
   .bob{animation:none;}
   #photos img{animation:none;}

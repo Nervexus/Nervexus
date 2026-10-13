@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { SECTIONS, TESTIMONIALS, FAQS, SWATCHES } from './data.js';
+import { SECTIONS, FEATURES, ANATOMY, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
@@ -64,7 +64,7 @@ function Nav() {
       <div class="navinner">
         <a class="logo" href="#hero">STRATA</a>
         <div class="navlinks">
-          <a href="#product">Services</a>
+          <a href="#services">Services</a>
           <a href="#reviews">Reviews</a>
           <a href="#faq">FAQ</a>
           <a href="#contact" onClick=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>Contact</a>
@@ -143,59 +143,87 @@ function HeroPanel({ idx }) {
 
 function TextPanel({ idx }) {
   const data = SECTIONS[idx];
-  const extra = data.kind === 'swatches' ? 'ov-compact' : '';
   return html`
-    <${Panel} idx=${idx} side=${idx % 2 === 0 ? 'left' : 'right'} extraClass=${extra}>
+    <${Panel} idx=${idx} side=${idx % 2 === 0 ? 'left' : 'right'}>
       <${Eyebrow}>${data.eyebrow}<//>
       <${Reveal} text=${data.h} />
       ${data.body ? html`<p class="body">${data.body}</p>` : null}
-      ${data.kind === 'swatches' ? html`
-        <div class="swatches">
-          ${SWATCHES.map((sw) => html`<div class="swatch" key=${sw.name} title=${sw.name}><span style=${{ background: sw.hex }}></span>${sw.name}</div>`)}
-        </div>
-      ` : null}
     <//>
   `;
 }
 
-function ExplodedPanel({ idx }) {
-  const data = SECTIONS[idx];
-  return html`
-    <${Panel} idx=${idx} side="left">
-      <${Eyebrow}>${data.eyebrow}<//>
-      <${Reveal} text=${data.h} />
-      <p class="body">${data.body}</p>
-    <//>
-  `;
-}
+// --- Static page sections (normal document flow, below the intro) -------
 
-function PartPanel({ idx }) {
-  const data = SECTIONS[idx];
+function FeatureCard({ f }) {
   return html`
-    <${Panel} idx=${idx} side="right">
-      <${Eyebrow}>${data.eyebrow}<//>
-      <${Reveal} text=${data.h} />
-      <p class="body">${data.body}</p>
-    <//>
-  `;
-}
-
-// --- Testimonials --------------------------------------------------------
-
-function TestimonialsPanel({ idx }) {
-  const s = useStore();
-  const w = weightFor(s.section, idx);
-  const data = SECTIONS[idx];
-  if (w <= 0.001) return null;
-  const local = s.sectionIdx === idx ? s.sectionLocal : (s.section > idx ? 1 : 0);
-  const travel = Math.max(0, Math.min(1, local)) * -62;
-  return html`
-    <div class="ov ov-left testi" style=${{ opacity: w }}>
-      <${Eyebrow}>${data.eyebrow}<//>
-      <${Reveal} text=${data.h} />
+    <div class="feature">
+      <img class="featureimg" src=${PHOTO_SRC[f.photo]} alt="" />
+      <div class="featurebody">
+        <${Eyebrow}>${f.eyebrow}<//>
+        <h3>${f.h}</h3>
+        <p class="body">${f.body}</p>
+      </div>
     </div>
-    <div class="tcardviewport" style=${{ opacity: w }}>
-      <div class="tcardrow" style=${{ transform: `translateX(${travel}%)` }}>
+  `;
+}
+
+function FinishesStrip() {
+  return html`
+    <div class="finishes">
+      <h3>Five finishes. One standard.</h3>
+      <p class="body">Finished in small batches: Charcoal, Zinc Gray, Copper Patina, Bone White and Graphite. Every finish weathers the same way — beautifully.</p>
+      <div class="swatches">
+        ${SWATCHES.map((sw) => html`<div class="swatch" key=${sw.name} title=${sw.name}><span style=${{ background: sw.hex }}></span>${sw.name}</div>`)}
+      </div>
+    </div>
+  `;
+}
+
+function ServicesSection() {
+  return html`
+    <section id="services" class="page-section">
+      <div class="page-head">
+        <${Eyebrow}>WHAT'S INCLUDED<//>
+        <h2>Every layer, engineered on purpose.</h2>
+      </div>
+      <div class="featuregrid">
+        ${FEATURES.map((f) => html`<${FeatureCard} key=${f.h} f=${f} />`)}
+      </div>
+      <${FinishesStrip} />
+    </section>
+  `;
+}
+
+function AnatomySection() {
+  return html`
+    <section class="page-section anatomy-section">
+      <div class="page-head">
+        <${Eyebrow}>ANATOMY<//>
+        <h2>Four layers, no shortcuts.</h2>
+        <p class="body">Deck, membrane, panel, ridge. Every layer is inspected on its own — nothing here is hidden once it is covered.</p>
+      </div>
+      <div class="anatomygrid">
+        ${ANATOMY.map((a) => html`
+          <div class="anatomyitem" key=${a.h}>
+            <img src=${PHOTO_SRC[a.photo]} alt="" />
+            <div class="eyebrow">${a.label}</div>
+            <h4>${a.h}</h4>
+            <p class="body">${a.body}</p>
+          </div>
+        `)}
+      </div>
+    </section>
+  `;
+}
+
+function TestimonialsSection() {
+  return html`
+    <section id="reviews" class="page-section">
+      <div class="page-head">
+        <${Eyebrow}>REVIEWS<//>
+        <h2>Trusted by homeowners who do not like surprises.</h2>
+      </div>
+      <div class="tgrid">
         ${TESTIMONIALS.map((t) => html`
           <div class="tcard" key=${t.name}>
             <img src=${t.avatar} alt=${t.name} width="56" height="56" />
@@ -205,21 +233,18 @@ function TestimonialsPanel({ idx }) {
           </div>
         `)}
       </div>
-    </div>
+    </section>
   `;
 }
 
-// --- FAQ -------------------------------------------------------------
-
-function FaqPanel({ idx }) {
+function FaqSection() {
   const s = useStore();
-  const w = weightFor(s.section, idx);
-  const data = SECTIONS[idx];
-  if (w <= 0.001) return null;
   return html`
-    <div class="ov ov-right faqwrap" style=${{ opacity: w, pointerEvents: w > 0.6 ? 'auto' : 'none' }}>
-      <${Eyebrow}>${data.eyebrow}<//>
-      <${Reveal} text=${data.h} />
+    <section id="faq" class="page-section faqwrap-static">
+      <div class="page-head">
+        <${Eyebrow}>QUESTIONS<//>
+        <h2>Everything you are wondering</h2>
+      </div>
       <div class="qalist">
         ${FAQS.map((f, i) => html`
           <div class="qa ${s.faqOpen === i ? 'open' : ''}" key=${i}>
@@ -233,7 +258,18 @@ function FaqPanel({ idx }) {
           </div>
         `)}
       </div>
-    </div>
+    </section>
+  `;
+}
+
+function PageContent() {
+  return html`
+    <${React.Fragment}>
+      <${ServicesSection} />
+      <${AnatomySection} />
+      <${TestimonialsSection} />
+      <${FaqSection} />
+    <//>
   `;
 }
 
@@ -290,18 +326,6 @@ function Overlays() {
       <${TextPanel} idx=${1} />
       <${TextPanel} idx=${2} />
       <${TextPanel} idx=${3} />
-      <${TextPanel} idx=${4} />
-      <${TextPanel} idx=${5} />
-      <${TextPanel} idx=${6} />
-      <${TextPanel} idx=${7} />
-      <${TextPanel} idx=${8} />
-      <${TextPanel} idx=${9} />
-      <${ExplodedPanel} idx=${10} />
-      <${PartPanel} idx=${11} />
-      <${PartPanel} idx=${12} />
-      <${PartPanel} idx=${13} />
-      <${TestimonialsPanel} idx=${14} />
-      <${FaqPanel} idx=${15} />
     </div>
     <${BuyBar} />
     <${SupportChat} />
@@ -316,8 +340,8 @@ function Footer() {
         <div class="footercols">
           <div>
             <h4>Services</h4>
-            <a href="#product">Standing-Seam Roofing</a>
-            <a href="#product">Roof Repair & Leak Detection</a>
+            <a href="#services">Standing-Seam Roofing</a>
+            <a href="#services">Roof Repair & Leak Detection</a>
             <a href="#faq">Insurance Claims</a>
           </div>
           <div>
@@ -343,7 +367,9 @@ function Footer() {
 
 export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
+  const pageRoot = document.getElementById('page-root');
   const footerRoot = document.getElementById('footer-root');
   createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${Overlays} /><//>`);
+  createRoot(pageRoot).render(html`<${PageContent} />`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }

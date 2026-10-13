@@ -5,6 +5,7 @@ import { mountApp } from './app.js';
 
 const scroller = document.getElementById('scroller');
 const footer = document.getElementById('footer');
+const grain = document.getElementById('grain');
 
 const backdrop = createBackdrop();
 
@@ -58,22 +59,26 @@ function onScroll() {
   const t = local <= 1 - EDGE ? 0 : (local - (1 - EDGE)) / EDGE;
   backdrop.setSection(a.photo, b.photo, t);
 
-  // Footer fade: compute how far the footer has risen past the viewport
-  // bottom once the scroller is fully exhausted.
-  // Fade fully out exactly once the footer has entirely scrolled into view,
-  // rather than scaling against viewport height (a footer shorter than the
-  // viewport would then never finish fading).
+  // The pinned intro is only the first few sections' worth of scroll — once
+  // the user scrolls past it, dissolve the fixed backdrop/overlays away so
+  // the normal static page underneath takes over. The dissolve happens in
+  // the last stretch of the intro's own scroll range, not a fixed pixel
+  // amount, so it still works at any viewport height.
+  const OUTRO_EDGE = 0.2;
+  const introOpacity = f < 1 - OUTRO_EDGE ? 1 : 1 - (f - (1 - OUTRO_EDGE)) / OUTRO_EDGE;
+  backdrop.setOpacity(introOpacity);
+  grain.style.opacity = String(0.07 * introOpacity);
+  const overlaysEl = document.getElementById('overlays');
+  if (overlaysEl) {
+    overlaysEl.style.opacity = String(introOpacity);
+    overlaysEl.style.pointerEvents = introOpacity < 0.5 ? 'none' : '';
+  }
+
+  // Separately, the sticky "Get Estimate" bar (part of the persistent
+  // chrome, not the intro) hides once the real footer scrolls into view.
   const footerRect = footer.getBoundingClientRect();
   const footerSpan = Math.max(footerRect.height, 1);
   const footerT = Math.max(0, Math.min(1, (window.innerHeight - footerRect.top) / footerSpan));
-  backdrop.setOpacity(1 - footerT);
-  // Only the scroll-synced panels fade with the backdrop — nav and the
-  // support bubble are persistent chrome and stay put near the footer.
-  const overlaysEl = document.getElementById('overlays');
-  if (overlaysEl) {
-    overlaysEl.style.opacity = String(1 - footerT);
-    overlaysEl.style.pointerEvents = footerT > 0.5 ? 'none' : '';
-  }
 
   setState({
     progress: f,

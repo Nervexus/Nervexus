@@ -1,9 +1,15 @@
 // STRATA — scroll pacing, copy and content data.
-// `photo` keys into the fixed photo backdrop (see index.html's #photos and
-// backdrop.js) — consecutive sections sharing a key hold the same image;
-// a change of key crossfades across the section boundary.
+//
+// The site is now two layers: a short, cinematic scroll-pinned INTRO
+// (4 sections, driven by the fixed photo backdrop in backdrop.js) that
+// dissolves into a normal, statically-flowing page underneath holding
+// everything else — services, finishes, anatomy, testimonials, FAQ.
+//
+// `photo` keys into the fixed photo backdrop (see index.html's #photos) —
+// consecutive intro sections sharing a key hold the same image; a change
+// of key crossfades across the section boundary.
 
-export const SECTION_VH = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 170, 120];
+export const SECTION_VH = [100, 100, 100, 100];
 
 export const SECTIONS = [
   // 0 — Hero
@@ -35,87 +41,67 @@ export const SECTIONS = [
     h: '140mph wind rated. Lifetime warranty.',
     body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once — outlive the mortgage.',
   },
-  // 4 — Material
+];
+
+// --- Static page content (normal document flow, below the intro) ---------
+
+export const FEATURES = [
   {
     photo: 'tiles',
-    eyebrow: 'MATERIAL', kind: 'text',
+    eyebrow: 'MATERIAL',
     h: 'Copper face. Aerospace steel.',
     body: 'A cold-rolled steel core with a hand-finished copper face, the same alloy family used in architectural façades — sealed against salt air, UV and corrosion for life.',
   },
-  // 5 — Seal / seam
   {
     photo: 'metal',
-    eyebrow: 'THE SEAL', kind: 'text',
+    eyebrow: 'THE SEAL',
     h: 'A seam that actually seals.',
     body: 'Mechanically double-locked panels form one continuous, watertight shell rated for full submersion testing. No exposed fasteners — nothing for water to find.',
   },
-  // 6 — Install / flashing
   {
     photo: 'drill',
-    eyebrow: 'INSTALLATION', kind: 'text',
+    eyebrow: 'INSTALLATION',
     h: 'One pass. No shortcuts.',
     body: 'Every panel is laser-measured and hand-fitted on site by a certified five-person crew. Most homes are fully dried-in within a single day.',
   },
-  // 7 — Capacity / scale
   {
     photo: 'aerial',
-    eyebrow: 'SCALE', kind: 'text',
+    eyebrow: 'SCALE',
     h: '4,200 sq ft. Installed in three days.',
     body: 'From a single roofline to a full estate, our crews move fast without skipping a layer — fully licensed, bonded and insured in every state we serve.',
   },
-  // 8 — Finishes
-  {
-    photo: 'tiles',
-    eyebrow: 'FINISH', kind: 'swatches',
-    h: 'Five finishes. One standard.',
-    body: 'Finished in small batches: Charcoal, Zinc Gray, Copper Patina, Bone White and Graphite. Every finish weathers the same way — beautifully.',
-  },
-  // 9 — Craft
   {
     photo: 'crew',
-    eyebrow: 'CRAFT', kind: 'text',
+    eyebrow: 'CRAFT',
     h: 'Built by people who will still be here in 20 years.',
     body: 'Every crew is factory-certified and every install is inspected twice before we leave the site. We would rather do fewer roofs, better.',
   },
-  // 10 — Anatomy overview
+];
+
+export const ANATOMY = [
   {
-    photo: 'carrying',
-    eyebrow: 'ANATOMY', kind: 'exploded',
-    h: 'Four layers, no shortcuts.',
-    body: 'Deck, membrane, panel, ridge. Every layer is inspected on its own — nothing here is hidden once it is covered.',
+    photo: 'tiles',
+    label: 'Layer 01',
+    h: 'The deck',
+    body: 'An insulated steel deck — the structural base every other layer builds on.',
   },
-  // 11 — Layer: Ridge cap
-  {
-    photo: 'working',
-    eyebrow: 'LAYER 01', kind: 'part',
-    h: 'The ridge cap',
-    body: 'Hand-formed copper trim seals the ridge line and vents the attic — the final, most visible layer of the system.',
-  },
-  // 12 — Layer: Standing-seam panel
-  {
-    photo: 'drill',
-    eyebrow: 'LAYER 02', kind: 'part',
-    h: 'The standing seam panel',
-    body: '24-gauge steel with a copper face, mechanically seamed on site to aerospace tolerances — rated for a 50-year service life.',
-  },
-  // 13 — Layer: Membrane & deck
   {
     photo: 'removing',
-    eyebrow: 'LAYER 03–04', kind: 'part',
-    h: 'The membrane & deck',
-    body: 'A fully adhered ice-and-water membrane over an insulated steel deck — the quiet layer underneath doing most of the work.',
+    label: 'Layer 02',
+    h: 'The membrane',
+    body: 'A fully adhered ice-and-water membrane, the quiet layer doing most of the waterproofing work.',
   },
-  // 14 — Testimonials
   {
-    photo: 'crew',
-    eyebrow: 'REVIEWS', kind: 'testimonials',
-    h: 'Trusted by homeowners who do not like surprises.',
+    photo: 'drill',
+    label: 'Layer 03',
+    h: 'The standing seam panel',
+    body: '24-gauge steel with a copper face, mechanically seamed on site to aerospace tolerances.',
   },
-  // 15 — FAQ
   {
-    photo: 'aerial',
-    eyebrow: 'QUESTIONS', kind: 'faq',
-    h: 'Everything you are wondering',
+    photo: 'working',
+    label: 'Layer 04',
+    h: 'The ridge cap',
+    body: 'Hand-formed copper trim seals the ridge line and vents the attic.',
   },
 ];
 
@@ -176,3 +162,16 @@ export const SWATCHES = [
   { name: 'Bone White', hex: '#e7e2d6' },
   { name: 'Graphite', hex: '#1f2126' },
 ];
+
+// Maps backdrop photo keys to a static <img> src for use in the normal
+// page content below the intro (same photos, reused inline).
+export const PHOTO_SRC = {
+  aerial: 'https://images.unsplash.com/photo-1506092309076-af15fb0051e3?w=1200&q=80&auto=format&fit=crop',
+  removing: 'https://images.unsplash.com/photo-1633759593085-1eaeb724fc88?w=1200&q=80&auto=format&fit=crop',
+  metal: 'https://images.unsplash.com/photo-1673645652350-6a4c31c1c78f?w=1200&q=80&auto=format&fit=crop',
+  drill: 'https://images.unsplash.com/photo-1635424824849-1b09bdcc55b1?w=1200&q=80&auto=format&fit=crop',
+  crew: 'https://images.unsplash.com/photo-1635424709961-f3a150459ad4?w=1200&q=80&auto=format&fit=crop',
+  tiles: 'https://images.unsplash.com/photo-1518736346281-76873166a64a?w=1200&q=80&auto=format&fit=crop',
+  carrying: 'https://images.unsplash.com/photo-1643225523483-e2c434191bba?w=1200&q=80&auto=format&fit=crop',
+  working: 'https://images.unsplash.com/photo-1726589004565-bedfba94d3a2?w=1200&q=80&auto=format&fit=crop',
+};
