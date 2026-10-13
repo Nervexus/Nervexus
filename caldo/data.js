@@ -34,7 +34,8 @@ export const SECTIONS = [
   },
   // 2 — Engineering
   {
-    photo: 'metal',
+    photo: 'engineering-layers',
+    voidRender: true,
     eyebrow: 'ENGINEERING', kind: 'text',
     h: 'Four layers. Zero gaps.',
     body: 'A fully adhered ice-and-water membrane sits beneath an insulated steel deck and a continuous standing-seam shell — stopping water, wind and ice at every seam.',
@@ -173,6 +174,7 @@ export const SWATCHES = [
 export const PHOTO_SRC = {
   'hero-house': './photos/hero-house.webp',
   'house-angle2': './photos/house-angle2.webp',
+  'engineering-layers': './photos/engineering-layers.webp',
   aerial: 'https://images.unsplash.com/photo-1506092309076-af15fb0051e3?w=1200&q=80&auto=format&fit=crop',
   removing: 'https://images.unsplash.com/photo-1633759593085-1eaeb724fc88?w=1200&q=80&auto=format&fit=crop',
   metal: 'https://images.unsplash.com/photo-1673645652350-6a4c31c1c78f?w=1200&q=80&auto=format&fit=crop',
