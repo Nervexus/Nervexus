@@ -80,7 +80,7 @@ function Nav() {
 // — tied to horizontal travel / accordion interaction — ever reaches 1.
 function weightFor(section, idx) {
   const d = section - idx;
-  const EDGE = 0.22;
+  const EDGE = 0.08;
   if (d <= -EDGE || d >= 1 + EDGE) return 0;
   if (d < 0) return 1 - (-d) / EDGE;
   if (d > 1) return 1 - (d - 1) / EDGE;
