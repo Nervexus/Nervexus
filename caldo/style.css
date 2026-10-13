@@ -56,6 +56,10 @@ img{display:block;max-width:100%;}
   animation:kenburns 26s ease-in-out infinite alternate;
 }
 #photos img:nth-child(even){animation-duration:32s;}
+/* The house sits left-of-center in this wide render; centering on the
+   image's own midpoint instead crops toward the empty right-hand side
+   on tall/narrow viewports where cover crops horizontally. */
+#photos img[data-photo="hero-house"]{object-position:36% center;}
 @keyframes kenburns{
   0%{transform:scale(1.0);}
   100%{transform:scale(1.08);}
