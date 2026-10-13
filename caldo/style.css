@@ -351,7 +351,11 @@ footer{
   .ov{max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;}
   .ov-right{right:3vw;left:3vw;text-align:left;}
   .reveal{font-size:clamp(24px,7vw,36px);}
-  .ov-hero h1.reveal{font-size:clamp(30px,9vw,42px);}
+  .ov-hero{padding:20px 24px;}
+  .ov-hero h1.reveal{font-size:clamp(26px,8vw,38px);}
+  .ov-hero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
+  .ov-hero .heroactions{margin-top:12px;gap:8px;}
+  .ov-hero .btn{padding:10px 16px;font-size:13px;}
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
