@@ -104,4 +104,13 @@ window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', onScroll);
 onScroll();
 
+// Continuous per-frame easing (see backdrop.js) rather than snapping
+// straight to scroll position — this is what gives the backdrop its
+// inertia instead of a flat, scroll-locked swipe.
+function renderLoop() {
+  backdrop.tick();
+  requestAnimationFrame(renderLoop);
+}
+requestAnimationFrame(renderLoop);
+
 mountApp();
