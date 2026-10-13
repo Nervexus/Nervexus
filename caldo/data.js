@@ -1,25 +1,15 @@
-// STRATA — scroll pacing, copy and content data.
+// STRATA — copy and content data.
 //
-// The site is now two layers: a short, cinematic scroll-pinned INTRO
-// (4 sections, driven by the fixed photo backdrop in backdrop.js) that
-// dissolves into a normal, statically-flowing page underneath holding
-// everything else — services, finishes, anatomy, testimonials, FAQ.
-//
-// `photo` keys into the fixed photo backdrop (see index.html's #photos) —
-// consecutive intro sections sharing a key hold the same image; a change
-// of key crossfades across the section boundary. `voidRender: true` marks
-// a section whose photo is one of the floating-studio-void renders
-// (object-fit:contain, no Ken Burns, text sits below it on mobile) rather
-// than a full-bleed environmental photo — see style.css's .ov-void and
-// the #photos img[data-photo=...] overrides.
+// The whole site is one continuously-scrolling page — no pinned/fixed
+// backdrop, no scroll-jacking. INTRO holds the four opening beats (Hero,
+// Problem, Engineering, Performance); everything after it (FEATURES,
+// ANATOMY, TESTIMONIALS, FAQS) was already laid out the same way. `photo`
+// keys into PHOTO_SRC below for each section's inline image.
 
-export const SECTION_VH = [100, 100, 100, 100];
-
-export const SECTIONS = [
+export const INTRO = [
   // 0 — Hero
   {
     photo: 'hero-house',
-    voidRender: true,
     kind: 'hero',
     h: 'The last roof you will ever need.',
     lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen — built for coastal storms and backed by a lifetime transferable warranty.',
@@ -27,7 +17,6 @@ export const SECTIONS = [
   // 1 — Problem
   {
     photo: 'house-angle2',
-    voidRender: true,
     eyebrow: 'THE PROBLEM', kind: 'text',
     h: 'Most roofs fail by year eight.',
     body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
@@ -168,8 +157,7 @@ export const SWATCHES = [
   { name: 'Graphite', hex: '#1f2126' },
 ];
 
-// Maps backdrop photo keys to a static <img> src for use in the normal
-// page content below the intro (same photos, reused inline).
+// Maps a photo key to its <img> src, used inline throughout the page.
 export const PHOTO_SRC = {
   'hero-house': './photos/hero-house.webp',
   'house-angle2': './photos/house-angle2.webp',

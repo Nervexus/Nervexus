@@ -1,11 +1,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { SECTIONS, FEATURES, ANATOMY, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
+import { INTRO, FEATURES, ANATOMY, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
-const { useState, useEffect, useRef, useSyncExternalStore } = React;
+const { useEffect, useRef, useSyncExternalStore } = React;
 
 function useStore() {
   return useSyncExternalStore(subscribe, getSnapshot);
@@ -22,15 +22,23 @@ const AccountIcon = () => html`
 
 // --- Headline letter/word reveal --------------------------------------
 
-function Reveal({ text, tag = 'h2', className = '', active = true }) {
+// Triggers its own reveal animation once the headline scrolls into view,
+// rather than depending on a parent scroll-position gate — the page is
+// normal document flow now, nothing pins sections to the viewport.
+function Reveal({ text, tag = 'h2', className = '' }) {
   const ref = useRef(null);
   useEffect(() => {
-    if (!active) return;
     const el = ref.current;
     if (!el) return;
-    const id = requestAnimationFrame(() => el.classList.add('in'));
-    return () => cancelAnimationFrame(id);
-  }, [active, text]);
+    const io = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        el.classList.add('in');
+        io.disconnect();
+      }
+    }, { threshold: 0.3, rootMargin: '0px 0px -10% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [text]);
 
   let i = 0;
   const words = text.split(' ').map((word, wi) => {
@@ -71,80 +79,43 @@ function Nav() {
   `;
 }
 
-// --- Generic section panel ---------------------------------------------
-
-// Full opacity for the section's entire local 0..1 dwell (however long that
-// section's scroll range is), with a short crossfade only right at the
-// boundary into the previous/next section. A flat radius around `idx` would
-// fade long sections (testimonials, FAQ) out before their local progress
-// — tied to horizontal travel / accordion interaction — ever reaches 1.
-function weightFor(section, idx) {
-  const d = section - idx;
-  const EDGE = 0.08;
-  if (d <= -EDGE || d >= 1 + EDGE) return 0;
-  if (d < 0) return 1 - (-d) / EDGE;
-  if (d > 1) return 1 - (d - 1) / EDGE;
-  return 1;
-}
-
-function Panel({ idx, children, side = 'left', extraClass = '' }) {
-  const s = useStore();
-  const w = weightFor(s.section, idx);
-  const activeRef = useRef(false);
-  const [bump, setBump] = useState(0);
-  const isActive = w > 0.5;
-  useEffect(() => {
-    if (isActive && !activeRef.current) {
-      activeRef.current = true;
-      setBump((b) => b + 1);
-    } else if (!isActive && activeRef.current) {
-      activeRef.current = false;
-    }
-  }, [isActive]);
-
-  if (w <= 0.001) return null;
-  return html`
-    <div
-      class=${`ov ov-${side} ${extraClass}`}
-      style=${{ opacity: w, transform: `translateY(${(1 - w) * 18}px)`, pointerEvents: w > 0.6 ? 'auto' : 'none' }}
-      key=${bump}
-    >
-      ${children}
-    </div>
-  `;
-}
-
 function Eyebrow({ children }) {
   return html`<div class="eyebrow">${children}</div>`;
 }
 
-function HeroPanel({ idx }) {
-  const data = SECTIONS[idx];
+// --- Intro sections (normal document flow, no pinning) ------------------
+
+function HeroSection() {
+  const data = INTRO[0];
   return html`
-    <${Panel} idx=${idx} side="left" extraClass="ov-hero">
-      <${Reveal} tag="h1" text=${data.h} />
-      <p class="lede">${data.lede}</p>
-      <div class="heroactions">
-        <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
-        <button class="btn btnghost" onClick=${() => window.scrollTo({ top: window.innerHeight * 1.1, behavior: 'smooth' })}>See the install</button>
+    <section class="page-section hero-section">
+      <div class="hero-visual"><img src=${PHOTO_SRC[data.photo]} alt="" /></div>
+      <div class="hero-copy">
+        <${Reveal} tag="h1" text=${data.h} />
+        <p class="lede">${data.lede}</p>
+        <div class="heroactions">
+          <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
+          <button class="btn btnghost" onClick=${() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })}>See the install</button>
+        </div>
       </div>
-      <div class="scrollhint"><span class="beamline"></span></div>
-    <//>
+    </section>
   `;
 }
 
-function TextPanel({ idx }) {
-  const data = SECTIONS[idx];
+function IntroTextSection({ data }) {
   return html`
-    <${Panel} idx=${idx} side=${idx % 2 === 0 ? 'left' : 'right'} extraClass=${data.voidRender ? 'ov-void' : ''}>
-      <${Eyebrow}>${data.eyebrow}<//>
-      <${Reveal} text=${data.h} />
-      ${data.body ? html`<p class="body">${data.body}</p>` : null}
-    <//>
+    <section class="page-section intro-text-section">
+      <img src=${PHOTO_SRC[data.photo]} alt="" />
+      <div class="intro-copy">
+        <${Eyebrow}>${data.eyebrow}<//>
+        <${Reveal} text=${data.h} />
+        <p class="body">${data.body}</p>
+      </div>
+    </section>
   `;
 }
 
-// --- Static page sections (normal document flow, below the intro) -------
+// --- Static page sections (normal document flow) -------------------------
 
 function FeatureCard({ f }) {
   return html`
@@ -257,6 +228,8 @@ function FaqSection() {
 function PageContent() {
   return html`
     <${React.Fragment}>
+      <${HeroSection} />
+      ${INTRO.slice(1).map((d) => html`<${IntroTextSection} key=${d.h} data=${d} />`)}
       <${ServicesSection} />
       <${AnatomySection} />
       <${TestimonialsSection} />
@@ -311,19 +284,6 @@ function SupportChat() {
 
 // --- Root app --------------------------------------------------------
 
-function Overlays() {
-  return html`
-    <div id="overlays">
-      <${HeroPanel} idx=${0} />
-      <${TextPanel} idx=${1} />
-      <${TextPanel} idx=${2} />
-      <${TextPanel} idx=${3} />
-    </div>
-    <${BuyBar} />
-    <${SupportChat} />
-  `;
-}
-
 function Footer() {
   return html`
     <div class="footerinner">
@@ -361,7 +321,7 @@ export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
   const pageRoot = document.getElementById('page-root');
   const footerRoot = document.getElementById('footer-root');
-  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${Overlays} /><//>`);
+  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${BuyBar} /><${SupportChat} /><//>`);
   createRoot(pageRoot).render(html`<${PageContent} />`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }
