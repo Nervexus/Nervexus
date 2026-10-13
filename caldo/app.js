@@ -20,12 +20,6 @@ const AccountIcon = () => html`
   </svg>
 `;
 
-const ArrowIcon = ({ className }) => html`
-  <svg class=${className} viewBox="0 0 12 8" width="12" height="8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M1 1l5 5 5-5" />
-  </svg>
-`;
-
 // --- Headline letter/word reveal --------------------------------------
 
 function Reveal({ text, tag = 'h2', className = '', active = true }) {
@@ -134,7 +128,7 @@ function HeroPanel({ idx }) {
         <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
         <button class="btn btnghost" onClick=${() => window.scrollTo({ top: window.innerHeight * 1.1, behavior: 'smooth' })}>See the install</button>
       </div>
-      <div class="scrollhint"><${ArrowIcon} className="bob" /><span>Scroll</span></div>
+      <div class="scrollhint"><span class="beamline"></span></div>
     <//>
   `;
 }

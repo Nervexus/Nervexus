@@ -193,15 +193,29 @@ nav.solid{
 .btnghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
 .btnghost:hover{border-color:var(--ink);}
 
-.scrollhint{
-  display:flex;align-items:center;gap:8px;margin-top:30px;
-  color:var(--ink-2);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;
-}
+.scrollhint{margin-top:30px;}
 @media (max-height:760px){
   .scrollhint{display:none;}
 }
-.bob{animation:bob 1.6s ease-in-out infinite;}
-@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(4px);}}
+.beamline{
+  position:relative;
+  display:block;
+  width:1px;height:46px;
+  background:var(--line);
+  overflow:hidden;
+}
+.beamline::after{
+  content:'';
+  position:absolute;
+  left:0;top:-40%;
+  width:100%;height:40%;
+  background:linear-gradient(180deg, transparent, var(--accent) 50%, transparent);
+  animation:beam 1.9s ease-in-out infinite;
+}
+@keyframes beam{
+  0%{top:-40%;}
+  100%{top:100%;}
+}
 
 .swatches{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
 .swatch{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--ink-2);}
@@ -369,6 +383,6 @@ footer{
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
   .w i, .reveal.in .w i{transition:none;}
-  .bob{animation:none;}
+  .beamline::after{animation:none;top:30%;}
   #photos img{animation:none;}
 }
