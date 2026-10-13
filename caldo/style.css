@@ -132,6 +132,7 @@ nav.solid{
 #overlays{
   position:fixed;inset:var(--nav-h) 0 0 0;z-index:10;
   pointer-events:none;
+  transition:opacity .3s linear;
 }
 
 /* ---------- content panels ---------- */

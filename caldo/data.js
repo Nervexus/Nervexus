@@ -13,7 +13,7 @@
 // than a full-bleed environmental photo — see style.css's .ov-void and
 // the #photos img[data-photo=...] overrides.
 
-export const SECTION_VH = [100, 100, 100, 100];
+export const SECTION_VH = [150, 150, 150, 150];
 
 export const SECTIONS = [
   // 0 — Hero

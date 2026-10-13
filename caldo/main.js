@@ -71,17 +71,25 @@ function onScroll() {
 
   // The pinned intro is only the first few sections' worth of scroll — once
   // the user scrolls past it, dissolve the fixed backdrop/overlays away so
-  // the normal static page underneath takes over. The dissolve happens in
-  // the last stretch of the intro's own scroll range, not a fixed pixel
-  // amount, so it still works at any viewport height.
+  // the normal static page underneath takes over.
   //
-  // Scaled to match the same 15%-of-section crossfade window every other
-  // section boundary uses (0.15 * last section's 0.25 share of the total
-  // scroll = 0.0375) — the last section used to get only a fifth of its
-  // own dwell before dissolving away, far less settled time than every
-  // other section got before its own crossfade.
-  const OUTRO_EDGE = 0.0375;
-  const introOpacity = f < 1 - OUTRO_EDGE ? 1 : 1 - (f - (1 - OUTRO_EDGE)) / OUTRO_EDGE;
+  // f reaches 1 a full viewport-height *before* the scroller spacer
+  // actually ends (that's what keeps the fixed backdrop pinned covering
+  // the viewport right up until the spacer runs out). #page, the next
+  // sibling in the document, only starts entering the viewport during
+  // that final viewport-height — fixed elements can't be scrolled past,
+  // so #page physically cannot appear any sooner. Fading introOpacity by
+  // *f* (which is already pegged at 1 throughout that whole stretch) was
+  // fading to reveal nothing there yet — a full viewport-height of blank
+  // dead scroll. Driving the fade off the same scroll window #page
+  // actually enters in — rather than off f — makes the backdrop dissolve
+  // in lockstep with the page sliding up underneath it instead of fading
+  // to blank first and revealing the page only afterward.
+  const releaseStart = scrollerTop + scroller.offsetHeight - window.innerHeight;
+  const release = window.innerHeight > 0
+    ? Math.max(0, Math.min(1, (window.scrollY - releaseStart) / window.innerHeight))
+    : 0;
+  const introOpacity = 1 - release;
   backdrop.setOpacity(introOpacity);
   grain.style.opacity = String(0.07 * introOpacity);
   const overlaysEl = document.getElementById('overlays');
