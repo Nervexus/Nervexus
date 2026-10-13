@@ -33,9 +33,21 @@ const bounds = [];
   bounds.push(1);
 }
 
+// Extra scroll distance reserved purely for the handoff into #page, on
+// top of the content-pacing budget below. #page can't start entering the
+// viewport until the scroller spacer itself runs out, so this margin is
+// literally how long that "page sliding up from the bottom, revealing
+// more of itself" transition takes — a full viewport-height here reads
+// as a large blank gap before any page content fills the top of the
+// screen, so it's kept to a fraction of that instead.
+const RELEASE_FRACTION = 0.45;
+
+function contentSpanPx() {
+  return (totalVh / 100) * window.innerHeight;
+}
+
 function setScrollerHeight() {
-  const vh = window.innerHeight;
-  scroller.style.height = `${(totalVh / 100) * vh}px`;
+  scroller.style.height = `${contentSpanPx() + RELEASE_FRACTION * window.innerHeight}px`;
 }
 setScrollerHeight();
 window.addEventListener('resize', setScrollerHeight);
@@ -55,8 +67,8 @@ function sectionFromFraction(f) {
 function onScroll() {
   const scrollerRect = scroller.getBoundingClientRect();
   const scrollerTop = window.scrollY + scrollerRect.top;
-  const scrollerHeight = scroller.offsetHeight - window.innerHeight;
-  const f = scrollerHeight > 0 ? Math.max(0, Math.min(1, (window.scrollY - scrollerTop) / scrollerHeight)) : 0;
+  const contentSpan = contentSpanPx();
+  const f = contentSpan > 0 ? Math.max(0, Math.min(1, (window.scrollY - scrollerTop) / contentSpan)) : 0;
 
   const { idx, local } = sectionFromFraction(f);
   const a = SECTIONS[idx];
@@ -73,21 +85,19 @@ function onScroll() {
   // the user scrolls past it, dissolve the fixed backdrop/overlays away so
   // the normal static page underneath takes over.
   //
-  // f reaches 1 a full viewport-height *before* the scroller spacer
-  // actually ends (that's what keeps the fixed backdrop pinned covering
-  // the viewport right up until the spacer runs out). #page, the next
-  // sibling in the document, only starts entering the viewport during
-  // that final viewport-height — fixed elements can't be scrolled past,
-  // so #page physically cannot appear any sooner. Fading introOpacity by
-  // *f* (which is already pegged at 1 throughout that whole stretch) was
-  // fading to reveal nothing there yet — a full viewport-height of blank
-  // dead scroll. Driving the fade off the same scroll window #page
-  // actually enters in — rather than off f — makes the backdrop dissolve
-  // in lockstep with the page sliding up underneath it instead of fading
-  // to blank first and revealing the page only afterward.
-  const releaseStart = scrollerTop + scroller.offsetHeight - window.innerHeight;
-  const release = window.innerHeight > 0
-    ? Math.max(0, Math.min(1, (window.scrollY - releaseStart) / window.innerHeight))
+  // f reaches 1 at the end of contentSpan, RELEASE_FRACTION*vh *before*
+  // the scroller spacer actually ends (that's what keeps the fixed
+  // backdrop pinned covering the viewport right up until the spacer runs
+  // out). #page, the next sibling in the document, only starts entering
+  // the viewport during that final stretch — fixed elements can't be
+  // scrolled past, so #page physically cannot appear any sooner. Driving
+  // the fade off this same scroll window — rather than off f — makes the
+  // backdrop dissolve in lockstep with the page sliding up underneath it
+  // instead of fading to blank first and revealing the page only after.
+  const releaseStart = scrollerTop + contentSpan;
+  const releaseSpan = RELEASE_FRACTION * window.innerHeight;
+  const release = releaseSpan > 0
+    ? Math.max(0, Math.min(1, (window.scrollY - releaseStart) / releaseSpan))
     : 0;
   // The fixed backdrop/overlays (position:fixed, painted above #page) stay
   // on top of whatever of #page has scrolled into view underneath for as
