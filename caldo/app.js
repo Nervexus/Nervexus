@@ -133,10 +133,22 @@ function HeroPanel({ idx }) {
   `;
 }
 
+// Per-section text placement overrides (see style.css's .pos-top and
+// .sec-N rules). Problem (1) and Performance (3) sit near the top of
+// their frame instead of vertically centered; Performance also moved
+// from its default alternating right side to the left.
+const TEXT_LAYOUT = {
+  1: { side: 'right', top: true },
+  2: { side: 'left', top: false },
+  3: { side: 'left', top: true },
+};
+
 function TextPanel({ idx }) {
   const data = SECTIONS[idx];
+  const layout = TEXT_LAYOUT[idx] || { side: idx % 2 === 0 ? 'left' : 'right', top: false };
+  const extraClass = `ov-hero sec-${idx}${layout.top ? ' pos-top' : ''}`;
   return html`
-    <${Panel} idx=${idx} side=${idx % 2 === 0 ? 'left' : 'right'} extraClass="ov-hero">
+    <${Panel} idx=${idx} side=${layout.side} extraClass=${extraClass}>
       <${Eyebrow}>${data.eyebrow}<//>
       <${Reveal} text=${data.h} />
       ${data.body ? html`<p class="body">${data.body}</p>` : null}

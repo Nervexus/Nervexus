@@ -59,6 +59,16 @@ img{display:block;max-width:100%;}
    "cover" was zooming in tight enough to crop the house on narrow
    viewports no matter how object-position was tuned. */
 #photos img[data-void="true"]{object-fit:contain;animation:none;}
+/* Desktop-only per-photo vertical nudges — mobile has its own
+   object-position override further down regardless of these. Shifting
+   `top` (width/height stay 100%, overflow is clipped by #photos) rather
+   than object-position: at typical desktop aspect ratios the contain-fit
+   image already fills nearly the whole frame, leaving no letterboxing
+   for object-position to shift within. */
+@media (min-width:861px){
+  #photos img[data-photo="engineering-layers"]{top:7%;}
+  #photos img[data-photo="performance-house"]{top:3%;}
+}
 @keyframes kenburns{
   0%{transform:scale(1.0);}
   100%{transform:scale(1.08);}
@@ -156,6 +166,12 @@ nav.solid{
   background:none;backdrop-filter:none;-webkit-backdrop-filter:none;
   box-shadow:none;border-radius:0;
   padding:0 7vw;margin:0;
+}
+/* Desktop-only per-section text placement (see app.js's TEXT_LAYOUT) —
+   mobile keeps its own top:220px rule further down regardless. */
+@media (min-width:861px){
+  .ov-hero.pos-top{top:16%;transform:none;}
+  .sec-2 .body{color:var(--ink);}
 }
 
 .eyebrow{
