@@ -8,17 +8,16 @@
 // requestAnimationFrame), not by snapping straight to the scroll position
 // or leaning on a CSS transition. That's what gives it inertia — motion
 // keeps settling smoothly for a few frames even after the scroll event
-// stops — instead of reading as two flat cards swiping past each other.
+// stops.
 //
-// The crossfade itself is a "downward spiral": the outgoing photo spins
-// clockwise, shrinks and drops away while the incoming photo spins in
-// from a counter-offset above and settles into place — both turning and
-// falling the same direction, purely vertical (no sideways drift, which
-// read as a left/right swipe rather than a spiral).
+// The crossfade itself is a plain dissolve: no rotation, no sideways or
+// vertical drift (nothing that reads as a card swiping or flipping past
+// another). The outgoing photo just fades out while drifting very
+// slightly closer (a gentle push-in), and the incoming photo fades in
+// while settling down from that same slight zoom — a soft depth cue
+// without any directional motion.
 
-const SPIRAL_DEG = 26;
-const SPIRAL_SCALE = 0.28;
-const SPIRAL_DROP = 100;
+const DISSOLVE_SCALE = 0.045;
 const SMOOTH = 0.09;
 
 export function createBackdrop() {
@@ -29,10 +28,7 @@ export function createBackdrop() {
   stack.querySelectorAll('img').forEach((img) => {
     const key = img.dataset.photo;
     images[key] = img;
-    state[key] = {
-      opacity: 0, rot: 0, scale: 1, y: 0,
-      tOpacity: 0, tRot: 0, tScale: 1, tY: 0,
-    };
+    state[key] = { opacity: 0, scale: 1, tOpacity: 0, tScale: 1 };
   });
 
   function setSection(keyA, keyB, t) {
@@ -40,21 +36,17 @@ export function createBackdrop() {
       const s = state[key];
       if (keyA === keyB) {
         s.tOpacity = key === keyA ? 1 : 0;
-        s.tRot = 0; s.tScale = 1; s.tY = 0;
+        s.tScale = 1;
       } else if (key === keyA) {
         s.tOpacity = 1 - t;
-        s.tRot = t * SPIRAL_DEG;
-        s.tScale = 1 - t * SPIRAL_SCALE;
-        s.tY = t * SPIRAL_DROP;
+        s.tScale = 1 + t * DISSOLVE_SCALE;
       } else if (key === keyB) {
         const u = 1 - t;
         s.tOpacity = t;
-        s.tRot = -u * SPIRAL_DEG;
-        s.tScale = 1 - u * SPIRAL_SCALE;
-        s.tY = -u * SPIRAL_DROP;
+        s.tScale = 1 + u * DISSOLVE_SCALE;
       } else {
         s.tOpacity = 0;
-        s.tRot = 0; s.tScale = 1; s.tY = 0;
+        s.tScale = 1;
       }
     }
   }
@@ -63,15 +55,13 @@ export function createBackdrop() {
     for (const key in state) {
       const s = state[key];
       s.opacity += (s.tOpacity - s.opacity) * SMOOTH;
-      s.rot += (s.tRot - s.rot) * SMOOTH;
       s.scale += (s.tScale - s.scale) * SMOOTH;
-      s.y += (s.tY - s.y) * SMOOTH;
 
       const img = images[key];
       img.style.opacity = String(s.opacity);
-      const settled = s.opacity > 0.995 && Math.abs(s.rot) < 0.05 && Math.abs(s.scale - 1) < 0.001;
+      const settled = s.opacity > 0.995 && Math.abs(s.scale - 1) < 0.001;
       img.style.animationPlayState = settled ? '' : 'paused';
-      img.style.transform = settled ? '' : `translateY(${s.y}px) rotate(${s.rot}deg) scale(${s.scale})`;
+      img.style.transform = settled ? '' : `scale(${s.scale})`;
     }
   }
 
