@@ -7,7 +7,11 @@
 //
 // `photo` keys into the fixed photo backdrop (see index.html's #photos) —
 // consecutive intro sections sharing a key hold the same image; a change
-// of key crossfades across the section boundary.
+// of key crossfades across the section boundary. `voidRender: true` marks
+// a section whose photo is one of the floating-studio-void renders
+// (object-fit:contain, no Ken Burns, text sits below it on mobile) rather
+// than a full-bleed environmental photo — see style.css's .ov-void and
+// the #photos img[data-photo=...] overrides.
 
 export const SECTION_VH = [100, 100, 100, 100];
 
@@ -15,6 +19,7 @@ export const SECTIONS = [
   // 0 — Hero
   {
     photo: 'hero-house',
+    voidRender: true,
     kind: 'hero',
     h: 'The last roof you will ever need.',
     lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen — built for coastal storms and backed by a lifetime transferable warranty.',
@@ -22,6 +27,7 @@ export const SECTIONS = [
   // 1 — Problem
   {
     photo: 'house-angle2',
+    voidRender: true,
     eyebrow: 'THE PROBLEM', kind: 'text',
     h: 'Most roofs fail by year eight.',
     body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',

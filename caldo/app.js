@@ -136,7 +136,7 @@ function HeroPanel({ idx }) {
 function TextPanel({ idx }) {
   const data = SECTIONS[idx];
   return html`
-    <${Panel} idx=${idx} side=${idx % 2 === 0 ? 'left' : 'right'}>
+    <${Panel} idx=${idx} side=${idx % 2 === 0 ? 'left' : 'right'} extraClass=${data.voidRender ? 'ov-void' : ''}>
       <${Eyebrow}>${data.eyebrow}<//>
       <${Reveal} text=${data.h} />
       ${data.body ? html`<p class="body">${data.body}</p>` : null}

@@ -9,6 +9,16 @@ const grain = document.getElementById('grain');
 
 const backdrop = createBackdrop();
 
+// Flag each <img> backing a "void render" section (see data.js) so
+// style.css can give that whole class of photo consistent treatment
+// (object-fit:contain, no Ken Burns, mobile positioning) without a
+// hardcoded selector per photo key.
+for (const s of SECTIONS) {
+  if (!s.voidRender) continue;
+  const img = document.querySelector(`#photos img[data-photo="${s.photo}"]`);
+  if (img) img.dataset.void = 'true';
+}
+
 // Cumulative vh weights -> fraction of total scroller height at which each
 // section boundary falls. SECTION_VH lets later sections (testimonials,
 // FAQ) claim extra scroll room without disturbing earlier pacing.

@@ -59,7 +59,7 @@ img{display:block;max-width:100%;}
 /* Show the whole render uncropped rather than filling the frame —
    "cover" was zooming in tight enough to crop the house on narrow
    viewports no matter how object-position was tuned. */
-#photos img[data-photo="hero-house"]{object-fit:contain;animation:none;}
+#photos img[data-void="true"]{object-fit:contain;animation:none;}
 @keyframes kenburns{
   0%{transform:scale(1.0);}
   100%{transform:scale(1.08);}
@@ -370,8 +370,8 @@ footer{
   .ov{max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;}
   .ov-right{right:3vw;left:3vw;text-align:left;}
   .reveal{font-size:clamp(24px,7vw,36px);}
-  #photos img[data-photo="hero-house"]{object-position:center 14%;}
-  .ov-hero{top:220px;transform:none;padding:0 7vw;}
+  #photos img[data-void="true"]{object-position:center 14%;}
+  .ov-hero,.ov-void{top:220px;right:auto;left:0;transform:none;padding:0 7vw;}
   .ov-hero h1.reveal{font-size:clamp(26px,8vw,38px);}
   .ov-hero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
   .ov-hero .heroactions{display:none;}
