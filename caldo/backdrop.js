@@ -18,7 +18,14 @@
 // without any directional motion.
 
 const DISSOLVE_SCALE = 0.045;
-const SMOOTH = 0.09;
+// How fast each frame's opacity/scale catches up to its scroll-derived
+// target. High enough that a photo the user has long since scrolled past
+// (its target opacity 0 for a while) finishes disappearing within a few
+// hundred ms of the scroll stopping, rather than visibly lingering as a
+// faint ghost — but still soft enough to keep the crossfade's inertia
+// over the short window where two adjacent photos are actually dissolving
+// into each other.
+const SMOOTH = 0.16;
 
 export function createBackdrop() {
   const stack = document.getElementById('photos');
@@ -51,11 +58,23 @@ export function createBackdrop() {
     }
   }
 
+  // An exponential-decay lerp never mathematically reaches its target —
+  // it just gets arbitrarily close. That's invisible after a short,
+  // adjacent-section crossfade, but after a big jump (scrolling fast
+  // across several sections at once) a photo whose target has been 0 for
+  // a while can still be sitting at a faint, very-much-visible opacity —
+  // a ghost of a section the user already scrolled past. Snapping to the
+  // exact target once within a hair of it guarantees it actually reaches
+  // precisely 0 (or 1) instead of approaching it forever.
+  const EPSILON = 0.0015;
+
   function tick() {
     for (const key in state) {
       const s = state[key];
       s.opacity += (s.tOpacity - s.opacity) * SMOOTH;
       s.scale += (s.tScale - s.scale) * SMOOTH;
+      if (Math.abs(s.tOpacity - s.opacity) < EPSILON) s.opacity = s.tOpacity;
+      if (Math.abs(s.tScale - s.scale) < EPSILON) s.scale = s.tScale;
 
       const img = images[key];
       img.style.opacity = String(s.opacity);
