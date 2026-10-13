@@ -67,7 +67,7 @@ img{display:block;max-width:100%;}
    for object-position to shift within. */
 @media (min-width:861px){
   #photos img[data-photo="engineering-layers"]{top:7%;}
-  #photos img[data-photo="performance-house"]{top:3%;transform:scale(1.1);}
+  #photos img[data-photo="performance-house"]{top:3%;transform:scale(1.04);}
 }
 @keyframes kenburns{
   0%{transform:scale(1.0);}
