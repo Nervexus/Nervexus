@@ -89,7 +89,15 @@ function onScroll() {
   const release = window.innerHeight > 0
     ? Math.max(0, Math.min(1, (window.scrollY - releaseStart) / window.innerHeight))
     : 0;
-  const introOpacity = 1 - release;
+  // The fixed backdrop/overlays (position:fixed, painted above #page) stay
+  // on top of whatever of #page has scrolled into view underneath for as
+  // long as their opacity is non-zero — so fading out over the *entire*
+  // release window left faded-but-still-legible intro text overlapping
+  // the services section once it was mostly revealed. Finishing the fade
+  // within the first 40% of the window — well before the page content
+  // becomes prominent — clears it out of the way first instead.
+  const FADE_FRACTION = 0.4;
+  const introOpacity = Math.max(0, 1 - release / FADE_FRACTION);
   backdrop.setOpacity(introOpacity);
   grain.style.opacity = String(0.07 * introOpacity);
   const overlaysEl = document.getElementById('overlays');
