@@ -81,33 +81,6 @@ export const STEPS = [
   },
 ];
 
-export const ANATOMY = [
-  {
-    photo: 'tiles',
-    label: 'Layer 01',
-    h: 'The deck',
-    body: 'An insulated steel deck — the structural base every other layer builds on.',
-  },
-  {
-    photo: 'removing',
-    label: 'Layer 02',
-    h: 'The membrane',
-    body: 'A fully adhered ice-and-water membrane, the quiet layer doing most of the waterproofing work.',
-  },
-  {
-    photo: 'drill',
-    label: 'Layer 03',
-    h: 'The standing seam panel',
-    body: '24-gauge steel with a copper face, mechanically seamed on site to aerospace tolerances.',
-  },
-  {
-    photo: 'working',
-    label: 'Layer 04',
-    h: 'The ridge cap',
-    body: 'Hand-formed copper trim seals the ridge line and vents the attic.',
-  },
-];
-
 export const TESTIMONIALS = [
   {
     name: 'Marisol Reyes', role: 'Homeowner, Lakeview',

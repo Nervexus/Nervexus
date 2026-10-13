@@ -262,15 +262,6 @@ nav.solid{
 .finishes h3{font-size:22px;}
 .finishes .body{margin-top:10px;max-width:520px;}
 
-.anatomy-section{background:rgba(22,23,26,0.02);}
-.anatomygrid{
-  display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:28px;
-}
-.anatomyitem img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;max-width:none;}
-.anatomyitem .eyebrow{margin-top:18px;margin-bottom:6px;}
-.anatomyitem h4{font-size:17px;}
-.anatomyitem .body{margin-top:8px;font-size:14px;}
-
 .tgrid{
   display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:22px;
 }

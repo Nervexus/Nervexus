@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { SECTIONS, STEPS, ANATOMY, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
+import { SECTIONS, STEPS, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
@@ -198,28 +198,6 @@ function ServicesSection() {
   `;
 }
 
-function AnatomySection() {
-  return html`
-    <section class="page-section anatomy-section">
-      <div class="page-head">
-        <${Eyebrow}>ANATOMY<//>
-        <h2>Four layers, no shortcuts.</h2>
-        <p class="body">Deck, membrane, panel, ridge. Every layer is inspected on its own — nothing here is hidden once it is covered.</p>
-      </div>
-      <div class="anatomygrid">
-        ${ANATOMY.map((a) => html`
-          <div class="anatomyitem" key=${a.h}>
-            <img src=${PHOTO_SRC[a.photo]} alt="" />
-            <div class="eyebrow">${a.label}</div>
-            <h4>${a.h}</h4>
-            <p class="body">${a.body}</p>
-          </div>
-        `)}
-      </div>
-    </section>
-  `;
-}
-
 function TestimonialsSection() {
   return html`
     <section id="reviews" class="page-section">
@@ -270,7 +248,6 @@ function PageContent() {
   return html`
     <${React.Fragment}>
       <${ServicesSection} />
-      <${AnatomySection} />
       <${TestimonialsSection} />
       <${FaqSection} />
     <//>
