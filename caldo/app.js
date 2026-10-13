@@ -83,20 +83,99 @@ function Eyebrow({ children }) {
   return html`<div class="eyebrow">${children}</div>`;
 }
 
-// --- Intro sections (normal document flow, no pinning) ------------------
+// --- Intro: Hero header, then a pinned 3D-tilt gallery bridging image
+// one (Hero) and image two (Problem), then Problem's narrative text. ----
 
-function HeroSection() {
+function HeroHeader() {
   const data = INTRO[0];
   return html`
-    <section class="page-section hero-section">
-      <div class="hero-visual"><img src=${PHOTO_SRC[data.photo]} alt="" /></div>
-      <div class="hero-copy">
-        <${Reveal} tag="h1" text=${data.h} />
-        <p class="lede">${data.lede}</p>
-        <div class="heroactions">
-          <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
-          <button class="btn btnghost" onClick=${() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })}>See the install</button>
+    <section class="page-section hero-header">
+      <${Reveal} tag="h1" text=${data.h} />
+      <p class="lede">${data.lede}</p>
+      <div class="heroactions">
+        <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
+        <button class="btn btnghost" onClick=${() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })}>See the install</button>
+      </div>
+    </section>
+  `;
+}
+
+// A pinned, scroll-driven 3D gallery reveal: the two-column grid tilts up
+// from a steep perspective to flat as the user scrolls through a tall
+// runway, then each column drifts vertically at a slightly different rate
+// (parallax) before releasing into the next section. Values are read
+// directly off scroll position every frame — no eased/lerped "inertia" —
+// matching how the reference component drives its transforms straight off
+// scrollYProgress.
+function GallerySection() {
+  const scrollRef = useRef(null);
+  const gridRef = useRef(null);
+  const col1Ref = useRef(null);
+  const col2Ref = useRef(null);
+
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+    function mapRange(t, inMin, inMax, outMin, outMax) {
+      const p = clamp01((t - inMin) / (inMax - inMin));
+      return outMin + (outMax - outMin) * p;
+    }
+
+    let ticking = false;
+    function update() {
+      ticking = false;
+      const el = scrollRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const total = rect.height - vh;
+      const progress = total > 0 ? clamp01(-rect.top / total) : 0;
+
+      const rotateX = mapRange(progress, 0, 0.5, 60, 0);
+      const scale = mapRange(progress, 0.5, 0.9, 1.15, 1);
+      if (gridRef.current) gridRef.current.style.transform = `rotateX(${rotateX}deg) scale(${scale})`;
+
+      const y1 = mapRange(progress, 0.5, 1, -6, 2);
+      const y2 = mapRange(progress, 0.5, 1, 6, -2);
+      if (col1Ref.current) col1Ref.current.style.transform = `translateY(${y1}%)`;
+      if (col2Ref.current) col2Ref.current.style.transform = `translateY(${y2}%)`;
+    }
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  return html`
+    <div class="gallery-scroll" ref=${scrollRef}>
+      <div class="gallery-sticky">
+        <div class="gallery-grid" ref=${gridRef}>
+          <div class="gallery-col" ref=${col1Ref}><img src=${PHOTO_SRC['hero-house']} alt="" /></div>
+          <div class="gallery-col" ref=${col2Ref}><img src=${PHOTO_SRC['house-angle2']} alt="" /></div>
         </div>
+      </div>
+    </div>
+  `;
+}
+
+function ProblemSection() {
+  const data = INTRO[1];
+  return html`
+    <section class="page-section intro-text-section">
+      <div class="intro-copy">
+        <${Eyebrow}>${data.eyebrow}<//>
+        <${Reveal} text=${data.h} />
+        <p class="body">${data.body}</p>
       </div>
     </section>
   `;
@@ -228,8 +307,10 @@ function FaqSection() {
 function PageContent() {
   return html`
     <${React.Fragment}>
-      <${HeroSection} />
-      ${INTRO.slice(1).map((d) => html`<${IntroTextSection} key=${d.h} data=${d} />`)}
+      <${HeroHeader} />
+      <${GallerySection} />
+      <${ProblemSection} />
+      ${INTRO.slice(2).map((d) => html`<${IntroTextSection} key=${d.h} data=${d} />`)}
       <${ServicesSection} />
       <${AnatomySection} />
       <${TestimonialsSection} />
