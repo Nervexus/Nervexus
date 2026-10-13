@@ -21,7 +21,7 @@ export const SECTIONS = [
   },
   // 1 — Problem
   {
-    photo: 'removing',
+    photo: 'house-angle2',
     eyebrow: 'THE PROBLEM', kind: 'text',
     h: 'Most roofs fail by year eight.',
     body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
@@ -166,6 +166,7 @@ export const SWATCHES = [
 // page content below the intro (same photos, reused inline).
 export const PHOTO_SRC = {
   'hero-house': './photos/hero-house.webp',
+  'house-angle2': './photos/house-angle2.webp',
   aerial: 'https://images.unsplash.com/photo-1506092309076-af15fb0051e3?w=1200&q=80&auto=format&fit=crop',
   removing: 'https://images.unsplash.com/photo-1633759593085-1eaeb724fc88?w=1200&q=80&auto=format&fit=crop',
   metal: 'https://images.unsplash.com/photo-1673645652350-6a4c31c1c78f?w=1200&q=80&auto=format&fit=crop',
