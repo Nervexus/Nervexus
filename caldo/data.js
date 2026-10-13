@@ -15,7 +15,6 @@ export const SECTIONS = [
   // 0 — Hero
   {
     photo: 'hero-house',
-    eyebrow: 'STRATA',
     kind: 'hero',
     h: 'The last roof you will ever need.',
     lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen — built for coastal storms and backed by a lifetime transferable warranty.',

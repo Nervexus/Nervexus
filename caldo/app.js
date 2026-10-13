@@ -62,7 +62,6 @@ function Nav() {
   return html`
     <nav class=${s.navSolid ? 'solid' : ''}>
       <div class="navinner">
-        <a class="logo" href="#hero">STRATA</a>
         <div class="navlinks">
           <a href="#services">Services</a>
           <a href="#reviews">Reviews</a>
@@ -129,7 +128,6 @@ function HeroPanel({ idx }) {
   const data = SECTIONS[idx];
   return html`
     <${Panel} idx=${idx} side="left" extraClass="ov-hero">
-      <${Eyebrow}>${data.eyebrow}<//>
       <${Reveal} tag="h1" text=${data.h} />
       <p class="lede">${data.lede}</p>
       <div class="heroactions">
