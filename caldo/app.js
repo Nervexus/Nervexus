@@ -279,26 +279,53 @@ function StepsCarousel() {
       if (flicked || dragged) go(dragX < 0 ? 1 : -1);
     }
 
-    // Pointer Events (not separate touch/mouse listeners) — one code path
-    // for touch, mouse and pen, with no risk of a touch gesture's
-    // synthetic compatibility mouse events double-firing the handlers.
-    // Capturing the pointer keeps move/up events coming even if the
-    // finger drifts outside the card stage mid-drag.
+    // Native touch events for touch, Pointer Events for everything else
+    // (mouse/pen) — not Pointer Events for touch too. Safari's pointer
+    // event delivery for touch has had real, device-visible timing quirks
+    // (a quick flick sometimes not registering at all unless the finger
+    // pauses on first contact); touch events are the one path every mobile
+    // browser has had reliable for years. A touchscreen fires both a
+    // 'touchstart' and a same-gesture 'pointerdown', so the pointer
+    // handlers below explicitly ignore pointerType 'touch' to avoid
+    // double-driving begin/move/end from the same gesture.
+    function onTouchStart(e) {
+      const t = e.touches[0];
+      begin(t.clientX, t.clientY);
+    }
+    function onTouchMove(e) {
+      const t = e.touches[0];
+      move(t.clientX, t.clientY, e);
+    }
+    function onTouchEnd() { end(); }
+
     function onPointerDown(e) {
+      if (e.pointerType === 'touch') return;
       begin(e.clientX, e.clientY);
       try { el.setPointerCapture(e.pointerId); } catch { /* pointer session already gone */ }
     }
     function onPointerMove(e) {
-      if (e.buttons === 0 && e.pointerType === 'mouse') return;
+      if (e.pointerType === 'touch') return;
+      if (e.buttons === 0) return;
       move(e.clientX, e.clientY, e);
     }
-    function onPointerUp() { end(); }
+    function onPointerUp(e) {
+      if (e.pointerType === 'touch') return;
+      end();
+    }
 
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    el.addEventListener('touchcancel', onTouchEnd);
     el.addEventListener('pointerdown', onPointerDown);
     el.addEventListener('pointermove', onPointerMove, { passive: false });
     el.addEventListener('pointerup', onPointerUp);
     el.addEventListener('pointercancel', onPointerUp);
     return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchEnd);
       el.removeEventListener('pointerdown', onPointerDown);
       el.removeEventListener('pointermove', onPointerMove);
       el.removeEventListener('pointerup', onPointerUp);
