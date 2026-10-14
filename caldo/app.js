@@ -173,23 +173,33 @@ const ChevronIcon = ({ flip }) => html`
   </svg>
 `;
 
-// A fanned 3D card stack, each card rotated/scaled in from the sides by
-// its distance from the focused step — click a side card or the arrows
-// to spin to it. Pure CSS 3D transforms (no Three.js/GSAP dependency),
-// kept to the site's own palette rather than borrowing anyone else's.
-function StepCard({ step, n, offset }) {
+// Shared fanned-3D-stack placement for a card at `offset` steps from the
+// focused one — used by both the steps and reviews carousels below. Pure
+// CSS 3D transforms (no Three.js/GSAP dependency), kept to the site's own
+// palette rather than borrowing anyone else's.
+function fanStyle(offset) {
   const abs = Math.abs(offset);
-  const hidden = abs > 2;
-  const style = hidden
-    ? { opacity: 0, pointerEvents: 'none', transform: `translate(-50%, 0) translateX(${offset > 0 ? 640 : -640}px) scale(0.5)` }
-    : {
-        transform: `translate(-50%, 0) translateX(${offset * 72}%) translateZ(${-abs * 90}px) rotateY(${offset * -26}deg) scale(${1 - abs * 0.12})`,
-        opacity: abs === 0 ? 1 : abs === 1 ? 0.55 : 0.22,
-        zIndex: String(10 - abs),
-        pointerEvents: abs === 0 ? 'auto' : 'none',
-      };
+  if (abs > 2) {
+    return { opacity: 0, pointerEvents: 'none', transform: `translate(-50%, 0) translateX(${offset > 0 ? 640 : -640}px) scale(0.5)` };
+  }
+  return {
+    transform: `translate(-50%, 0) translateX(${offset * 72}%) translateZ(${-abs * 90}px) rotateY(${offset * -26}deg) scale(${1 - abs * 0.12})`,
+    opacity: abs === 0 ? 1 : abs === 1 ? 0.55 : 0.22,
+    zIndex: String(10 - abs),
+    pointerEvents: abs === 0 ? 'auto' : 'none',
+  };
+}
+
+function cyclicOffset(i, idx, n) {
+  let offset = i - idx;
+  if (offset > n / 2) offset -= n;
+  if (offset < -n / 2) offset += n;
+  return offset;
+}
+
+function StepCard({ step, n, offset }) {
   return html`
-    <div class="stepcard" style=${style}>
+    <div class="stepcard" style=${fanStyle(offset)}>
       <span class="stepnum">${String(n).padStart(2, '0')}</span>
       <h3>${step.h}</h3>
       <p class="body">${step.body}</p>
@@ -197,9 +207,26 @@ function StepCard({ step, n, offset }) {
   `;
 }
 
-function StepsCarousel() {
+function TestimonialCard({ t, offset }) {
+  return html`
+    <div class="tcard" style=${fanStyle(offset)}>
+      <${QuoteIcon} />
+      <img class="tphoto" src=${t.avatar} alt=${t.name} />
+      <div class="tcontent">
+        <p class="tquote">"${t.quote}"</p>
+        <div class="tname">${t.name}</div>
+        <div class="trole">${t.role}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Drives a swipeable fanned-card-stack carousel: current index, keyboard
+// left/right nav (only while the carousel is in view), and the drag
+// gesture itself. Shared by the steps and reviews carousels — same cards,
+// same gesture handling, just different card content.
+function useSwipeCarousel(n) {
   const [idx, setIdx] = useState(0);
-  const n = STEPS.length;
   const ref = useRef(null);
   const stageRef = useRef(null);
   const go = (d) => setIdx((i) => (i + d + n) % n);
@@ -216,7 +243,7 @@ function StepsCarousel() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [n]);
 
   // Swipe the card stage itself, not the page — a horizontal drag spins
   // to the next/previous card; a vertical drag is left alone so the page
@@ -331,22 +358,40 @@ function StepsCarousel() {
       el.removeEventListener('pointerup', onPointerUp);
       el.removeEventListener('pointercancel', onPointerUp);
     };
-  }, []);
+  }, [n]);
 
+  return { idx, go, ref, stageRef };
+}
+
+function StepsCarousel() {
+  const n = STEPS.length;
+  const { idx, go, ref, stageRef } = useSwipeCarousel(n);
   return html`
     <div class="stepscarousel" ref=${ref}>
       <div class="cardstage" ref=${stageRef}>
-        ${STEPS.map((s, i) => {
-          let offset = i - idx;
-          if (offset > n / 2) offset -= n;
-          if (offset < -n / 2) offset += n;
-          return html`<${StepCard} key=${s.h} step=${s} n=${i + 1} offset=${offset} />`;
-        })}
+        ${STEPS.map((s, i) => html`<${StepCard} key=${s.h} step=${s} n=${i + 1} offset=${cyclicOffset(i, idx, n)} />`)}
       </div>
       <div class="cardnav">
         <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous step"><${ChevronIcon} flip /></button>
         <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
         <button class="cardarrow" onClick=${() => go(1)} aria-label="Next step"><${ChevronIcon} /></button>
+      </div>
+    </div>
+  `;
+}
+
+function ReviewsCarousel() {
+  const n = TESTIMONIALS.length;
+  const { idx, go, ref, stageRef } = useSwipeCarousel(n);
+  return html`
+    <div class="stepscarousel" ref=${ref}>
+      <div class="cardstage revstage" ref=${stageRef}>
+        ${TESTIMONIALS.map((t, i) => html`<${TestimonialCard} key=${t.name} t=${t} offset=${cyclicOffset(i, idx, n)} />`)}
+      </div>
+      <div class="cardnav">
+        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous review"><${ChevronIcon} flip /></button>
+        <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next review"><${ChevronIcon} /></button>
       </div>
     </div>
   `;
@@ -392,17 +437,7 @@ function TestimonialsSection() {
           <${Eyebrow}>REVIEWS<//>
           <h2>Trusted by homeowners who do not like surprises.</h2>
         </div>
-        <div class="tgrid">
-          ${TESTIMONIALS.map((t) => html`
-            <div class="tcard" key=${t.name}>
-              <${QuoteIcon} />
-              <img src=${t.avatar} alt=${t.name} width="44" height="44" />
-              <p class="tquote">"${t.quote}"</p>
-              <div class="tname">${t.name}</div>
-              <div class="trole">${t.role}</div>
-            </div>
-          `)}
-        </div>
+        <${ReviewsCarousel} />
       </div>
     </section>
   `;
