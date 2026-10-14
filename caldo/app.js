@@ -192,6 +192,7 @@ function StepsCarousel() {
   const [idx, setIdx] = useState(0);
   const n = STEPS.length;
   const ref = useRef(null);
+  const stageRef = useRef(null);
   const go = (d) => setIdx((i) => (i + d + n) % n);
 
   useEffect(() => {
@@ -208,9 +209,60 @@ function StepsCarousel() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  // Swipe the card stage itself, not the page — a horizontal drag spins
+  // to the next/previous card; a vertical drag is left alone so the page
+  // still scrolls normally. Only locks (preventDefault) once a gesture
+  // has clearly declared itself horizontal, so a straight-down scroll
+  // starting on the cards is never swallowed.
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    let active = false, decided = false, horizontal = false, startX = 0, startY = 0;
+
+    function begin(x, y) {
+      active = true; decided = false; horizontal = false; startX = x; startY = y;
+    }
+    function move(x, y, evt) {
+      if (!active) return;
+      const dx = x - startX, dy = y - startY;
+      if (!decided && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+        decided = true;
+        horizontal = Math.abs(dx) > Math.abs(dy);
+      }
+      if (horizontal && evt && evt.cancelable) evt.preventDefault();
+    }
+    function end(x) {
+      if (!active) return;
+      active = false;
+      if (horizontal && Math.abs(x - startX) > 40) go(x - startX < 0 ? 1 : -1);
+    }
+
+    function onTouchStart(e) { const t = e.touches[0]; begin(t.clientX, t.clientY); }
+    function onTouchMove(e) { const t = e.touches[0]; move(t.clientX, t.clientY, e); }
+    function onTouchEnd(e) { const t = e.changedTouches[0]; end(t.clientX); }
+    function onMouseDown(e) { begin(e.clientX, e.clientY); }
+    function onMouseMove(e) { move(e.clientX, e.clientY, e); }
+    function onMouseUp(e) { end(e.clientX); }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    el.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
   return html`
     <div class="stepscarousel" ref=${ref}>
-      <div class="cardstage">
+      <div class="cardstage" ref=${stageRef}>
         ${STEPS.map((s, i) => {
           let offset = i - idx;
           if (offset > n / 2) offset -= n;

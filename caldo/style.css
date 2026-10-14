@@ -251,6 +251,8 @@ nav.solid{
   height:380px;
   margin:0 auto;
   perspective:1400px;
+  touch-action:pan-y;
+  cursor:grab;
 }
 .stepcard{
   position:absolute;
@@ -415,9 +417,11 @@ footer{
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
-  .cardstage{height:420px;}
-  .stepcard{padding:28px 24px;}
-  .stepcard h3{font-size:19px;}
+  .cardstage{height:300px;}
+  .stepcard{width:250px;max-width:70vw;padding:22px 18px;}
+  .stepcard .stepnum{font-size:12px;}
+  .stepcard h3{font-size:16px;margin-top:10px;}
+  .stepcard .body{font-size:13px;margin-top:10px;line-height:1.5;}
 }
 
 @media (prefers-reduced-motion: reduce){
