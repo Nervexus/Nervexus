@@ -3,6 +3,7 @@
   --ink:#16171a;
   --ink-2:#6b6f76;
   --accent:#a9672f;
+  --accent-deep:#452811;
   --line:rgba(22,23,26,0.1);
   --nav-h:60px;
 }
@@ -306,20 +307,34 @@ nav.solid{
 .finishes h3{font-size:22px;}
 .finishes .body{margin-top:10px;max-width:520px;}
 
+/* A full-bleed color band (the page's other sections sit on --paper, the
+   footer on --ink) — same elevated-card layout as before, carried over to
+   a third, distinct tone so the page reads light -> warm -> dark instead
+   of just light -> dark. --accent-deep rather than --accent itself: flat
+   accent is closer to a mid-tone and didn't leave quite enough contrast
+   for white type at this size. */
+.reviewsband{background:var(--accent-deep);color:#fff;}
+.reviewsinner .eyebrow{color:#e3a874;}
+
 /* minmax floor raised to 420px (not 280px) so 4 cards settle into an even
    2x2 grid instead of 3-then-a-lone-orphan-card on its own row. */
 .tgrid{
   display:grid;grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));gap:22px;
 }
 .tcard{
-  background:#fff;border:1px solid var(--line);border-radius:18px;
-  padding:26px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.05);
+  position:relative;overflow:hidden;
+  background:var(--paper);border-radius:18px;
+  padding:28px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.25);
 }
-.tcard img{width:44px;height:44px;border-radius:50%;margin-bottom:16px;object-fit:cover;}
-.tquote{font-size:14.5px;line-height:1.55;color:var(--ink);min-height:84px;}
-.tname{margin-top:16px;font-size:13px;font-weight:600;}
-.trole{font-size:12px;color:var(--ink-2);}
+.tquoteicon{
+  position:absolute;top:-10px;right:-6px;color:var(--accent);opacity:0.12;
+  transform:rotate(8deg);
+}
+.tcard img{width:44px;height:44px;border-radius:50%;margin-bottom:16px;object-fit:cover;position:relative;}
+.tquote{position:relative;font-size:14.5px;line-height:1.55;color:var(--ink);min-height:84px;}
+.tname{position:relative;margin-top:16px;font-size:13px;font-weight:600;color:var(--ink);}
+.trole{position:relative;font-size:12px;color:var(--ink-2);}
 
 .faqwrap-static{max-width:640px;}
 .qalist{margin-top:0;border-top:1px solid var(--line);}
@@ -494,6 +509,10 @@ footer{
   .stepcard .stepnum{font-size:12px;}
   .stepcard h3{font-size:16px;margin-top:10px;}
   .stepcard .body{font-size:13px;margin-top:10px;line-height:1.5;}
+  /* The 420px column floor that keeps reviews in a clean 2x2 on desktop
+     is wider than a phone screen — it was forcing cards wider than the
+     viewport, clipping their text at the right edge instead of wrapping. */
+  .tgrid{grid-template-columns:1fr;}
 }
 
 @media (prefers-reduced-motion: reduce){

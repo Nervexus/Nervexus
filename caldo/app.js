@@ -378,22 +378,31 @@ function ServicesSection() {
   `;
 }
 
+const QuoteIcon = () => html`
+  <svg class="tquoteicon" viewBox="0 0 24 24" width="56" height="56" fill="currentColor">
+    <path d="M9.5 7C6.5 8.6 5 11 5 13.8c0 2.4 1.4 3.9 3.3 3.9 1.7 0 2.9-1.3 2.9-3 0-1.6-1.1-2.7-2.5-2.7-.3 0-.5 0-.7.1.3-1.6 1.6-3.2 3.4-4.2L9.5 7Zm9 0C15.5 8.6 14 11 14 13.8c0 2.4 1.4 3.9 3.3 3.9 1.7 0 2.9-1.3 2.9-3 0-1.6-1.1-2.7-2.5-2.7-.3 0-.5 0-.7.1.3-1.6 1.6-3.2 3.4-4.2L18.5 7Z"/>
+  </svg>
+`;
+
 function TestimonialsSection() {
   return html`
-    <section id="reviews" class="page-section">
-      <div class="page-head">
-        <${Eyebrow}>REVIEWS<//>
-        <h2>Trusted by homeowners who do not like surprises.</h2>
-      </div>
-      <div class="tgrid">
-        ${TESTIMONIALS.map((t) => html`
-          <div class="tcard" key=${t.name}>
-            <img src=${t.avatar} alt=${t.name} width="56" height="56" />
-            <p class="tquote">"${t.quote}"</p>
-            <div class="tname">${t.name}</div>
-            <div class="trole">${t.role}</div>
-          </div>
-        `)}
+    <section id="reviews" class="reviewsband">
+      <div class="page-section reviewsinner">
+        <div class="page-head">
+          <${Eyebrow}>REVIEWS<//>
+          <h2>Trusted by homeowners who do not like surprises.</h2>
+        </div>
+        <div class="tgrid">
+          ${TESTIMONIALS.map((t) => html`
+            <div class="tcard" key=${t.name}>
+              <${QuoteIcon} />
+              <img src=${t.avatar} alt=${t.name} width="44" height="44" />
+              <p class="tquote">"${t.quote}"</p>
+              <div class="tname">${t.name}</div>
+              <div class="trole">${t.role}</div>
+            </div>
+          `)}
+        </div>
       </div>
     </section>
   `;
