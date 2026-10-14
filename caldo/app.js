@@ -233,11 +233,11 @@ function StepsCarousel() {
     const el = stageRef.current;
     if (!el) return;
     let active = false, decided = false, horizontal = false, startX = 0, startY = 0, dragX = 0;
-    let lastX = 0, lastT = 0, velocity = 0;
+    let lastX = 0, lastY = 0, lastT = 0, velocity = 0;
 
     function begin(x, y) {
       active = true; decided = false; horizontal = false; startX = x; startY = y; dragX = 0;
-      lastX = x; lastT = performance.now(); velocity = 0;
+      lastX = x; lastY = y; lastT = performance.now(); velocity = 0;
       el.style.transition = 'none';
     }
     function move(x, y, evt) {
@@ -246,9 +246,20 @@ function StepsCarousel() {
       if (!decided && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
         decided = true;
         horizontal = Math.abs(dx) > Math.abs(dy);
-        if (!horizontal) { active = false; el.style.transition = ''; return; }
+        if (!horizontal) el.style.transition = '';
       }
-      if (!horizontal) return;
+      if (!decided) return;
+      if (!horizontal) {
+        // touch-action is 'none' here (see style.css) so the browser never
+        // starts its own scroll on this element — that's what stopped a
+        // vertical swipe from racing the JS decision above and winning as
+        // a native scroll before we could tell it was vertical. Replicate
+        // the scroll by hand instead, so starting a drag on the card still
+        // scrolls the page exactly like it would anywhere else.
+        window.scrollBy(0, lastY - y);
+        lastY = y;
+        return;
+      }
       if (evt && evt.cancelable) evt.preventDefault();
       dragX = dx;
       el.style.transform = `translateX(${dx}px)`;

@@ -251,7 +251,14 @@ nav.solid{
   height:380px;
   margin:0 auto;
   perspective:1400px;
-  touch-action:pan-y;
+  /* 'none', not 'pan-y': with pan-y the browser is free to start its own
+     vertical scroll the moment it sees any vertical motion, racing (and
+     usually beating) the JS direction check in app.js's StepsCarousel —
+     that's what made a real swipe register as a page scroll instead of a
+     card swipe. 'none' hands the gesture to JS from the first touch; a
+     vertical drag is then replicated by hand via window.scrollBy so the
+     page still scrolls normally from on top of the card. */
+  touch-action:none;
   cursor:grab;
   transition:transform .4s cubic-bezier(.22,1,.36,1);
 }
@@ -266,11 +273,9 @@ nav.solid{
   transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .4s ease;
   will-change:transform, opacity;
   /* The active card (pointer-events:auto) is the actual touch target the
-     finger lands on — touch-action has to be set here, not just on the
-     .cardstage ancestor, or some browsers resolve the gesture as a native
-     vertical scroll before the JS swipe handler's preventDefault ever
-     gets a say. */
-  touch-action:pan-y;
+     finger lands on — touch-action has to be set here too, not just on
+     the .cardstage ancestor, and matches it at 'none' (see .cardstage). */
+  touch-action:none;
   -webkit-user-select:none;user-select:none;
 }
 .stepcard .stepnum{
