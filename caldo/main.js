@@ -99,19 +99,20 @@ function onScroll() {
   // the user scrolls past it, dissolve the fixed backdrop/overlays away so
   // the normal static page underneath takes over.
   //
-  // f reaches 1 at the end of contentSpan, RELEASE_FRACTION*vh *before*
-  // the scroller spacer actually ends (that's what keeps the fixed
-  // backdrop pinned covering the viewport right up until the spacer runs
-  // out). #page, the next sibling in the document, only starts entering
-  // the viewport during that final stretch — fixed elements can't be
-  // scrolled past, so #page physically cannot appear any sooner. Driving
-  // the fade off this same scroll window — rather than off f — makes the
-  // backdrop dissolve in lockstep with the page sliding up underneath it
-  // instead of fading to blank first and revealing the page only after.
-  const releaseStart = scrollerTop + contentSpan;
-  const releaseSpan = RELEASE_FRACTION * vh;
+  // Driven directly off scrollerRect.bottom — the live, current distance
+  // from the viewport's top edge to #scroller's bottom edge (where #page,
+  // the next sibling in the document, begins) — rather than off computed
+  // scrollY/vh arithmetic. That math relies on scroller.style.height and
+  // window.innerHeight staying in lockstep, which mobile Safari can break
+  // mid-scroll (its URL bar collapses, changing innerHeight, not always
+  // with a resize event first); getBoundingClientRect() always reflects
+  // the actual current layout, so there's nothing for it to desync from.
+  // At scrollerRect.bottom === innerHeight, #page hasn't entered the
+  // viewport at all (release 0); by RELEASE_FRACTION*innerHeight further,
+  // #page has slid up that much further into view (release 1).
+  const releaseSpan = RELEASE_FRACTION * window.innerHeight;
   const release = releaseSpan > 0
-    ? Math.max(0, Math.min(1, (window.scrollY - releaseStart) / releaseSpan))
+    ? Math.max(0, Math.min(1, (window.innerHeight - scrollerRect.bottom) / releaseSpan))
     : 0;
   // The fixed backdrop/overlays (position:fixed, painted above #page) stay
   // on top of whatever of #page has scrolled into view underneath for as
