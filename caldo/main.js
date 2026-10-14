@@ -42,12 +42,26 @@ const bounds = [];
 // screen, so it's kept to a fraction of that instead.
 const RELEASE_FRACTION = 0.45;
 
+// Cached rather than read live from window.innerHeight on every scroll —
+// mobile Safari changes innerHeight mid-scroll as its URL bar collapses,
+// without always firing a resize event first. If the content/release
+// span math in onScroll used that live, drifting value while
+// scroller.style.height stayed fixed at whatever innerHeight was when it
+// was last set, the two desync: f and release stop corresponding to the
+// actual pixel height of #scroller, and the fixed intro can end up still
+// fully opaque well after #page has already scrolled into view — the
+// "140mph" heading stuck overlapping "What's Included". Freezing vh and
+// only updating it on an actual resize keeps every calculation anchored
+// to the same number #scroller's real height was built from.
+let vh = window.innerHeight;
+
 function contentSpanPx() {
-  return (totalVh / 100) * window.innerHeight;
+  return (totalVh / 100) * vh;
 }
 
 function setScrollerHeight() {
-  scroller.style.height = `${contentSpanPx() + RELEASE_FRACTION * window.innerHeight}px`;
+  vh = window.innerHeight;
+  scroller.style.height = `${contentSpanPx() + RELEASE_FRACTION * vh}px`;
 }
 setScrollerHeight();
 window.addEventListener('resize', setScrollerHeight);
@@ -95,7 +109,7 @@ function onScroll() {
   // backdrop dissolve in lockstep with the page sliding up underneath it
   // instead of fading to blank first and revealing the page only after.
   const releaseStart = scrollerTop + contentSpan;
-  const releaseSpan = RELEASE_FRACTION * window.innerHeight;
+  const releaseSpan = RELEASE_FRACTION * vh;
   const release = releaseSpan > 0
     ? Math.max(0, Math.min(1, (window.scrollY - releaseStart) / releaseSpan))
     : 0;
