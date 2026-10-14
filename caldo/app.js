@@ -214,35 +214,57 @@ function StepsCarousel() {
   // still scrolls normally. Only locks (preventDefault) once a gesture
   // has clearly declared itself horizontal, so a straight-down scroll
   // starting on the cards is never swallowed.
+  //
+  // The stack follows the finger in real time (direct DOM style, no React
+  // re-render per move — that's what made it feel laggy) instead of only
+  // reacting on release, and a fast short flick advances the card even if
+  // it didn't cross the distance threshold, matching how a native swiper
+  // actually feels.
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
-    let active = false, decided = false, horizontal = false, startX = 0, startY = 0;
+    let active = false, decided = false, horizontal = false, startX = 0, startY = 0, dragX = 0;
+    let lastX = 0, lastT = 0, velocity = 0;
 
     function begin(x, y) {
-      active = true; decided = false; horizontal = false; startX = x; startY = y;
+      active = true; decided = false; horizontal = false; startX = x; startY = y; dragX = 0;
+      lastX = x; lastT = performance.now(); velocity = 0;
+      el.style.transition = 'none';
     }
     function move(x, y, evt) {
       if (!active) return;
       const dx = x - startX, dy = y - startY;
-      if (!decided && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      if (!decided && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
         decided = true;
         horizontal = Math.abs(dx) > Math.abs(dy);
+        if (!horizontal) { active = false; el.style.transition = ''; return; }
       }
-      if (horizontal && evt && evt.cancelable) evt.preventDefault();
+      if (!horizontal) return;
+      if (evt && evt.cancelable) evt.preventDefault();
+      dragX = dx;
+      el.style.transform = `translateX(${dx}px)`;
+      const now = performance.now();
+      const dt = now - lastT;
+      if (dt > 0) velocity = (x - lastX) / dt;
+      lastX = x; lastT = now;
     }
-    function end(x) {
+    function end() {
       if (!active) return;
       active = false;
-      if (horizontal && Math.abs(x - startX) > 40) go(x - startX < 0 ? 1 : -1);
+      el.style.transition = '';
+      el.style.transform = '';
+      if (!horizontal) return;
+      const flicked = Math.abs(velocity) > 0.45 && Math.abs(dragX) > 12;
+      const dragged = Math.abs(dragX) > 36;
+      if (flicked || dragged) go(dragX < 0 ? 1 : -1);
     }
 
     function onTouchStart(e) { const t = e.touches[0]; begin(t.clientX, t.clientY); }
     function onTouchMove(e) { const t = e.touches[0]; move(t.clientX, t.clientY, e); }
-    function onTouchEnd(e) { const t = e.changedTouches[0]; end(t.clientX); }
+    function onTouchEnd() { end(); }
     function onMouseDown(e) { begin(e.clientX, e.clientY); }
     function onMouseMove(e) { move(e.clientX, e.clientY, e); }
-    function onMouseUp(e) { end(e.clientX); }
+    function onMouseUp() { end(); }
 
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchmove', onTouchMove, { passive: false });

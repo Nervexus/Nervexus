@@ -253,6 +253,7 @@ nav.solid{
   perspective:1400px;
   touch-action:pan-y;
   cursor:grab;
+  transition:transform .4s cubic-bezier(.22,1,.36,1);
 }
 .stepcard{
   position:absolute;
@@ -262,7 +263,7 @@ nav.solid{
   background:#fff;border:1px solid var(--line);border-radius:22px;
   padding:34px 32px;
   box-shadow:0 24px 60px rgba(22,23,26,0.1);
-  transition:transform .6s cubic-bezier(.22,1,.36,1), opacity .6s ease;
+  transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .4s ease;
   will-change:transform, opacity;
 }
 .stepcard .stepnum{
