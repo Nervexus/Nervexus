@@ -9,7 +9,7 @@
 
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
-html{scroll-behavior:smooth;scroll-padding-top:var(--nav-h);}
+html{scroll-behavior:smooth;scroll-padding-top:var(--nav-h);overflow-x:hidden;}
 body{
   background:var(--paper);
   color:var(--ink);
