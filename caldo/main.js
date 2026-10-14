@@ -142,6 +142,7 @@ function onScroll() {
     section: idx + local,
     sectionIdx: idx,
     sectionLocal: local,
+    introOpacity,
     footerT,
     navSolid: window.scrollY > 4,
   });

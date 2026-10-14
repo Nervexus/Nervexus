@@ -265,6 +265,13 @@ nav.solid{
   box-shadow:0 24px 60px rgba(22,23,26,0.1);
   transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .4s ease;
   will-change:transform, opacity;
+  /* The active card (pointer-events:auto) is the actual touch target the
+     finger lands on — touch-action has to be set here, not just on the
+     .cardstage ancestor, or some browsers resolve the gesture as a native
+     vertical scroll before the JS swipe handler's preventDefault ever
+     gets a say. */
+  touch-action:pan-y;
+  -webkit-user-select:none;user-select:none;
 }
 .stepcard .stepnum{
   display:inline-block;

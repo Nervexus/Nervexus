@@ -103,10 +103,19 @@ function Panel({ idx, children, side = 'left', extraClass = '' }) {
   }, [isActive]);
 
   if (w <= 0.001) return null;
+  // Also gated on s.introOpacity, not just local weight: once scroll is
+  // clamped past the last intro section, that section's weight sits at the
+  // top of its own dwell range forever, which would otherwise leave this
+  // panel permanently pointer-events:auto — an invisible hit target sitting
+  // over the page content below, swallowing clicks/touches meant for it.
+  // introOpacity (driven off real scroll geometry in main.js) correctly
+  // reaches 0 once the intro has handed off, regardless of any single
+  // section's own stuck weight.
+  const clickable = w > 0.6 && s.introOpacity > 0.01;
   return html`
     <div
       class=${`ov ov-${side} ${extraClass}`}
-      style=${{ opacity: w, transform: `translateY(${(1 - w) * 18}px)`, pointerEvents: w > 0.6 ? 'auto' : 'none' }}
+      style=${{ opacity: w, transform: `translateY(${(1 - w) * 18}px)`, pointerEvents: clickable ? 'auto' : 'none' }}
       key=${bump}
     >
       ${children}
@@ -259,26 +268,30 @@ function StepsCarousel() {
       if (flicked || dragged) go(dragX < 0 ? 1 : -1);
     }
 
-    function onTouchStart(e) { const t = e.touches[0]; begin(t.clientX, t.clientY); }
-    function onTouchMove(e) { const t = e.touches[0]; move(t.clientX, t.clientY, e); }
-    function onTouchEnd() { end(); }
-    function onMouseDown(e) { begin(e.clientX, e.clientY); }
-    function onMouseMove(e) { move(e.clientX, e.clientY, e); }
-    function onMouseUp() { end(); }
+    // Pointer Events (not separate touch/mouse listeners) — one code path
+    // for touch, mouse and pen, with no risk of a touch gesture's
+    // synthetic compatibility mouse events double-firing the handlers.
+    // Capturing the pointer keeps move/up events coming even if the
+    // finger drifts outside the card stage mid-drag.
+    function onPointerDown(e) {
+      begin(e.clientX, e.clientY);
+      try { el.setPointerCapture(e.pointerId); } catch { /* pointer session already gone */ }
+    }
+    function onPointerMove(e) {
+      if (e.buttons === 0 && e.pointerType === 'mouse') return;
+      move(e.clientX, e.clientY, e);
+    }
+    function onPointerUp() { end(); }
 
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    el.addEventListener('touchend', onTouchEnd);
-    el.addEventListener('mousedown', onMouseDown);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('pointermove', onPointerMove, { passive: false });
+    el.addEventListener('pointerup', onPointerUp);
+    el.addEventListener('pointercancel', onPointerUp);
     return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-      el.removeEventListener('touchend', onTouchEnd);
-      el.removeEventListener('mousedown', onMouseDown);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      el.removeEventListener('pointerdown', onPointerDown);
+      el.removeEventListener('pointermove', onPointerMove);
+      el.removeEventListener('pointerup', onPointerUp);
+      el.removeEventListener('pointercancel', onPointerUp);
     };
   }, []);
 
