@@ -84,22 +84,22 @@ export const STEPS = [
 export const TESTIMONIALS = [
   {
     name: 'Marisol Reyes', role: 'Homeowner, Lakeview',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&h=160&fit=crop&crop=faces&q=80',
+    avatar: './photos/review-home-1.webp',
     quote: 'They found two rotted rafters mid-tear-off and fixed it the same day — no change order, no surprise invoice.',
   },
   {
     name: 'Dana Okafor', role: 'Property Manager',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160&h=160&fit=crop&crop=faces&q=80',
+    avatar: './photos/review-home-2.webp',
     quote: 'We have used STRATA on six rental properties. Zero callbacks in three years — that is unheard of in this business.',
   },
   {
     name: 'Theo Lindqvist', role: 'Homeowner, Coastal Ridge',
-    avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=160&h=160&fit=crop&crop=faces&q=80',
+    avatar: './photos/review-home-3.webp',
     quote: 'Rode out a category 2 without losing a single panel. The crew down the street was not so lucky.',
   },
   {
     name: 'Priya Natarajan', role: 'Homeowner',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=faces&q=80',
+    avatar: './photos/review-home-4.webp',
     quote: 'The estimate was the final price, down to the dollar. That alone made them worth the premium.',
   },
 ];

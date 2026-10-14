@@ -20,6 +20,16 @@ const AccountIcon = () => html`
   </svg>
 `;
 
+// A simple roofline/ridge mark — same motif as the browser-tab favicon,
+// drawn inline here instead of as an <img> so it inherits the nav's
+// current text color for free.
+const LogoMark = () => html`
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 13 12 5l9 8" />
+    <path d="M12 5v4" />
+  </svg>
+`;
+
 // --- Headline letter/word reveal --------------------------------------
 
 function Reveal({ text, tag = 'h2', className = '', active = true }) {
@@ -56,6 +66,10 @@ function Nav() {
   return html`
     <nav class=${s.navSolid ? 'solid' : ''}>
       <div class="navinner">
+        <a href="#top" class="navlogo" onClick=${(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} aria-label="STRATA home">
+          <${LogoMark} />
+          <span class="logo">STRATA</span>
+        </a>
         <div class="navlinks">
           <a href="#services">Services</a>
           <a href="#reviews">Reviews</a>

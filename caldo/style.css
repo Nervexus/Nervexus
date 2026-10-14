@@ -127,6 +127,7 @@ nav.solid{
   font-size:17px;
   letter-spacing:0.02em;
 }
+.navlogo{display:flex;align-items:center;gap:8px;color:var(--ink);}
 .navlinks{display:flex;gap:28px;}
 .navlinks a{font-size:13px;color:var(--ink-2);transition:color .2s;}
 .navlinks a:hover{color:var(--ink);}
