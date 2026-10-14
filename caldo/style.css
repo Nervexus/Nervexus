@@ -306,8 +306,10 @@ nav.solid{
 .finishes h3{font-size:22px;}
 .finishes .body{margin-top:10px;max-width:520px;}
 
+/* minmax floor raised to 420px (not 280px) so 4 cards settle into an even
+   2x2 grid instead of 3-then-a-lone-orphan-card on its own row. */
 .tgrid{
-  display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:22px;
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(420px, 1fr));gap:22px;
 }
 .tcard{
   background:#fff;border:1px solid var(--line);border-radius:18px;
@@ -401,17 +403,74 @@ nav.solid{
 footer{
   position:relative;z-index:30;background:var(--ink);color:rgba(255,255,255,0.85);
 }
-.footerinner{max-width:1280px;margin:0 auto;padding:72px 28px 32px;}
-.footertop{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;}
-.footerbrand{font-family:'Inter Tight',sans-serif;font-size:22px;font-weight:600;letter-spacing:0.02em;color:#fff;}
-.footercols{display:flex;gap:56px;flex-wrap:wrap;}
-.footercols h4{font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:14px;}
-.footercols div{display:flex;flex-direction:column;gap:9px;}
-.footercols a{font-size:13.5px;color:rgba(255,255,255,0.78);transition:color .2s;}
-.footercols a:hover{color:#fff;}
-.footerbottom{
-  margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.12);
-  font-size:12.5px;color:rgba(255,255,255,0.45);
+/* No overflow:hidden on the footer itself — the pill below deliberately
+   straddles the top edge (half over the lighter section above, half over
+   the dark footer) and would get clipped flat if the footer clipped its
+   own box. Only the watermark needs its own clip, further down. */
+.footerinner{max-width:1280px;margin:0 auto;padding:96px 28px 0;position:relative;}
+
+.footpillwrap{
+  position:absolute;top:0;left:28px;right:28px;
+  display:flex;justify-content:center;
+  transform:translateY(-50%);
+}
+.footpill{
+  display:flex;align-items:center;gap:12px;
+  width:100%;max-width:420px;
+  background:#0f1012;border:1px solid rgba(255,255,255,0.14);
+  border-radius:999px;padding:8px 8px 8px 22px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+}
+.footpill input{
+  flex:1;min-width:0;background:transparent;border:none;outline:none;
+  color:#fff;font-size:14px;font-family:inherit;
+}
+.footpill input::placeholder{color:rgba(255,255,255,0.4);}
+.footpill button{
+  width:36px;height:36px;border-radius:50%;flex-shrink:0;
+  background:#fff;color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s, color .2s;
+}
+.footpill button:hover{background:var(--accent);color:#fff;}
+
+.footbrand{
+  font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.45);
+}
+.footheadline{
+  margin-top:16px;
+  font-size:clamp(40px,7vw,92px);line-height:0.98;letter-spacing:-0.02em;
+  color:#fff;font-weight:600;
+}
+.footheadline span{color:rgba(255,255,255,0.3);}
+
+.foottrust{
+  display:flex;flex-wrap:wrap;gap:16px 32px;
+  margin-top:44px;padding-top:28px;padding-bottom:12px;border-top:1px solid rgba(255,255,255,0.1);
+}
+.foottrust span{
+  font-family:'Inter Tight',sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:0.07em;color:rgba(255,255,255,0.5);
+}
+
+.footwatermark{
+  position:relative;overflow:hidden;margin-top:56px;pointer-events:none;user-select:none;
+}
+.footwatermark h1{
+  font-size:16vw;line-height:0.8;font-weight:700;letter-spacing:-0.02em;
+  color:rgba(255,255,255,0.045);text-align:center;white-space:nowrap;margin:0;
+}
+.footfade{
+  position:absolute;left:0;right:0;bottom:0;height:100px;
+  background:linear-gradient(to top, var(--ink), transparent);
+}
+
+.footlegal{
+  position:relative;z-index:2;
+  text-align:center;padding:20px 0;
+  font-family:'Inter Tight',sans-serif;font-size:11px;letter-spacing:0.08em;
+  text-transform:uppercase;color:rgba(255,255,255,0.35);
 }
 
 /* ---------- responsive ---------- */

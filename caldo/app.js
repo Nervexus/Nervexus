@@ -496,32 +496,34 @@ function Overlays() {
 function Footer() {
   return html`
     <div class="footerinner">
-      <div class="footertop">
-        <div class="footerbrand">STRATA</div>
-        <div class="footercols">
-          <div>
-            <h4>Services</h4>
-            <a href="#services">Standing-Seam Roofing</a>
-            <a href="#services">Roof Repair & Leak Detection</a>
-            <a href="#faq">Insurance Claims</a>
-          </div>
-          <div>
-            <h4>Company</h4>
-            <a href="#reviews">Reviews</a>
-            <a href="#faq">FAQ</a>
-            <a href="#contact" onClick=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>Contact</a>
-          </div>
-          <div>
-            <h4>Legal</h4>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Warranty</a>
-          </div>
-        </div>
+      <div class="footpillwrap">
+        <form class="footpill" onSubmit=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>
+          <input type="text" placeholder="Get a free roof estimate…" />
+          <button type="submit" aria-label="Request an estimate">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </button>
+        </form>
       </div>
-      <div class="footerbottom">
-        <span>© ${new Date().getFullYear()} STRATA Roofing. Built to outlast the weather.</span>
+
+      <div class="footbrand">STRATA</div>
+      <h2 class="footheadline">Inspect.<br /><span>Install.</span><br />Guarantee.</h2>
+
+      <div class="foottrust">
+        <span>LIFETIME WARRANTY</span>
+        <span>140 MPH WIND RATED</span>
+        <span>FREE ON-SITE ESTIMATE</span>
+        <span>SAME-WEEK QUOTE</span>
       </div>
+
+      <div class="footwatermark">
+        <h1>STRATA</h1>
+        <div class="footfade"></div>
+      </div>
+
+      <div class="footlegal">© ${new Date().getFullYear()} STRATA Roofing. Built to outlast the weather.</div>
     </div>
   `;
 }
