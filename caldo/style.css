@@ -245,18 +245,47 @@ nav.solid{
 .page-head h2{font-size:clamp(28px,3.4vw,40px);line-height:1.12;}
 .page-head .body{max-width:560px;}
 
-.stepsgrid{
-  display:grid;grid-template-columns:repeat(2, 1fr);
-  gap:40px 64px;
+.stepscarousel{margin-top:16px;}
+.cardstage{
+  position:relative;
+  height:380px;
+  margin:0 auto;
+  perspective:1400px;
 }
-.step{display:flex;gap:20px;align-items:flex-start;}
-.stepnum{
-  flex:0 0 auto;padding-top:2px;
+.stepcard{
+  position:absolute;
+  top:0;left:50%;
+  width:360px;max-width:88vw;
+  height:100%;
+  background:#fff;border:1px solid var(--line);border-radius:22px;
+  padding:34px 32px;
+  box-shadow:0 24px 60px rgba(22,23,26,0.1);
+  transition:transform .6s cubic-bezier(.22,1,.36,1), opacity .6s ease;
+  will-change:transform, opacity;
+}
+.stepcard .stepnum{
+  display:inline-block;
   font-family:'Inter Tight',sans-serif;font-weight:600;
   font-size:14px;letter-spacing:0.03em;color:var(--accent);
 }
-.stepbody h3{font-size:18px;}
-.stepbody .body{margin-top:8px;font-size:14.5px;}
+.stepcard h3{font-size:21px;margin-top:16px;}
+.stepcard .body{margin-top:14px;font-size:15px;line-height:1.6;}
+
+.cardnav{
+  display:flex;align-items:center;justify-content:center;gap:22px;
+  margin-top:32px;
+}
+.cardarrow{
+  display:flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid var(--line);color:var(--ink);
+  transition:border-color .2s, background .2s;
+}
+.cardarrow:hover{border-color:var(--ink);background:rgba(22,23,26,0.03);}
+.cardcount{
+  font-family:'Inter Tight',sans-serif;font-size:13px;letter-spacing:0.05em;
+  color:var(--ink-2);min-width:64px;text-align:center;
+}
 
 .finishes{margin-top:64px;padding-top:48px;border-top:1px solid var(--line);}
 .finishes h3{font-size:22px;}
@@ -386,7 +415,9 @@ footer{
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
-  .stepsgrid{grid-template-columns:1fr;gap:28px;}
+  .cardstage{height:420px;}
+  .stepcard{padding:28px 24px;}
+  .stepcard h3{font-size:19px;}
 }
 
 @media (prefers-reduced-motion: reduce){

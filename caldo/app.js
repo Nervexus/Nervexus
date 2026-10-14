@@ -158,13 +158,70 @@ function TextPanel({ idx }) {
 
 // --- Static page sections (normal document flow, below the intro) -------
 
-function Step({ n, step }) {
+const ChevronIcon = ({ flip }) => html`
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style=${{ transform: flip ? 'scaleX(-1)' : 'none' }}>
+    <path d="M9 5l7 7-7 7" />
+  </svg>
+`;
+
+// A fanned 3D card stack, each card rotated/scaled in from the sides by
+// its distance from the focused step — click a side card or the arrows
+// to spin to it. Pure CSS 3D transforms (no Three.js/GSAP dependency),
+// kept to the site's own palette rather than borrowing anyone else's.
+function StepCard({ step, n, offset }) {
+  const abs = Math.abs(offset);
+  const hidden = abs > 2;
+  const style = hidden
+    ? { opacity: 0, pointerEvents: 'none', transform: `translate(-50%, 0) translateX(${offset > 0 ? 640 : -640}px) scale(0.5)` }
+    : {
+        transform: `translate(-50%, 0) translateX(${offset * 72}%) translateZ(${-abs * 90}px) rotateY(${offset * -26}deg) scale(${1 - abs * 0.12})`,
+        opacity: abs === 0 ? 1 : abs === 1 ? 0.55 : 0.22,
+        zIndex: String(10 - abs),
+        pointerEvents: abs === 0 ? 'auto' : 'none',
+      };
   return html`
-    <div class="step">
+    <div class="stepcard" style=${style}>
       <span class="stepnum">${String(n).padStart(2, '0')}</span>
-      <div class="stepbody">
-        <h3>${step.h}</h3>
-        <p class="body">${step.body}</p>
+      <h3>${step.h}</h3>
+      <p class="body">${step.body}</p>
+    </div>
+  `;
+}
+
+function StepsCarousel() {
+  const [idx, setIdx] = useState(0);
+  const n = STEPS.length;
+  const ref = useRef(null);
+  const go = (d) => setIdx((i) => (i + d + n) % n);
+
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const inView = r.top < window.innerHeight * 0.8 && r.bottom > window.innerHeight * 0.2;
+      if (!inView) return;
+      go(e.key === 'ArrowLeft' ? -1 : 1);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  return html`
+    <div class="stepscarousel" ref=${ref}>
+      <div class="cardstage">
+        ${STEPS.map((s, i) => {
+          let offset = i - idx;
+          if (offset > n / 2) offset -= n;
+          if (offset < -n / 2) offset += n;
+          return html`<${StepCard} key=${s.h} step=${s} n=${i + 1} offset=${offset} />`;
+        })}
+      </div>
+      <div class="cardnav">
+        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous step"><${ChevronIcon} flip /></button>
+        <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next step"><${ChevronIcon} /></button>
       </div>
     </div>
   `;
@@ -190,9 +247,7 @@ function ServicesSection() {
         <h2>Every layer, engineered on purpose.</h2>
         <p class="body">Six steps, start to finish. No surprises in between.</p>
       </div>
-      <div class="stepsgrid">
-        ${STEPS.map((s, i) => html`<${Step} key=${s.h} n=${i + 1} step=${s} />`)}
-      </div>
+      <${StepsCarousel} />
       <${FinishesStrip} />
     </section>
   `;
