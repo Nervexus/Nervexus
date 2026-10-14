@@ -6,6 +6,11 @@ import { mountApp } from './app.js';
 const scroller = document.getElementById('scroller');
 const footer = document.getElementById('footer');
 const grain = document.getElementById('grain');
+// Not cached alongside the above: #overlays is the one element here that
+// React itself creates (mountApp() runs at the bottom of this file) rather
+// than something already sitting in index.html, so grabbing it this early
+// — before React has mounted — would silently cache null forever and the
+// opacity/pointer-events writes below would never apply to anything.
 
 const backdrop = createBackdrop();
 
@@ -78,7 +83,7 @@ function sectionFromFraction(f) {
   return { idx: n - 1, local: 1 };
 }
 
-function onScroll() {
+function computeScrollState() {
   const scrollerRect = scroller.getBoundingClientRect();
   const scrollerTop = window.scrollY + scrollerRect.top;
   const contentSpan = contentSpanPx();
@@ -148,14 +153,31 @@ function onScroll() {
   });
 }
 
+// computeScrollState() does two getBoundingClientRect() layout reads,
+// several style writes and a React setState — cheap once, but a raw
+// native 'scroll' event can fire far more often than the screen actually
+// repaints, especially mid-fling on mobile (a fast flick back up to the
+// top fires a lot more of them, in a shorter burst, than a slow scroll
+// down ever does). Running the real work there every time compounds into
+// exactly the "scrolling up lags badly" jank. The listener itself now
+// only flags that a scroll happened; the render loop below — already
+// running every frame for the backdrop's own easing — does the actual
+// (expensive) recompute at most once per rendered frame.
+let scrollDirty = true;
+function onScroll() {
+  scrollDirty = true;
+}
 window.addEventListener('scroll', onScroll, { passive: true });
-window.addEventListener('resize', onScroll);
-onScroll();
+window.addEventListener('resize', () => { scrollDirty = true; });
 
 // Continuous per-frame easing (see backdrop.js) rather than snapping
 // straight to scroll position — this is what gives the backdrop its
 // inertia instead of a flat, scroll-locked swipe.
 function renderLoop() {
+  if (scrollDirty) {
+    scrollDirty = false;
+    computeScrollState();
+  }
   backdrop.tick();
   requestAnimationFrame(renderLoop);
 }

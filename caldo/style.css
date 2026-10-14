@@ -519,17 +519,22 @@ footer{
   .stepcard .stepnum{font-size:12px;}
   .stepcard h3{font-size:16px;margin-top:10px;}
   .stepcard .body{font-size:13px;margin-top:10px;line-height:1.5;}
-  /* Side-by-side photo+quote doesn't fit a phone width — stack the photo
-     above the text instead, and give the stage the extra height that
-     needs. */
-  .revstage{height:380px;}
+  /* A compact landscape rectangle (photo and quote still side by side,
+     same as desktop) rather than a tall stacked portrait card — smaller
+     photo and a line-clamped quote so the longer reviews don't need a
+     taller card to fit. */
+  .revstage{height:190px;}
   .tcard{
-    width:260px;max-width:76vw;
-    flex-direction:column;align-items:flex-start;
-    padding:26px 22px;gap:16px;
+    width:86vw;max-width:360px;
+    padding:20px;gap:16px;border-radius:18px;
   }
-  .tphoto{width:64px;height:64px;}
-  .tquote{font-size:13.5px;}
+  .tphoto{width:68px;height:68px;border-radius:12px;}
+  .tquote{
+    font-size:12.5px;line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .tname{margin-top:10px;font-size:12.5px;}
+  .trole{font-size:11px;}
 }
 
 @media (prefers-reduced-motion: reduce){

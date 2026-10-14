@@ -35,7 +35,7 @@ export function createBackdrop() {
   stack.querySelectorAll('img').forEach((img) => {
     const key = img.dataset.photo;
     images[key] = img;
-    state[key] = { opacity: 0, scale: 1, tOpacity: 0, tScale: 1 };
+    state[key] = { opacity: 0, scale: 1, tOpacity: 0, tScale: 1, wroteRest: false };
   });
 
   function setSection(keyA, keyB, t) {
@@ -71,6 +71,17 @@ export function createBackdrop() {
   function tick() {
     for (const key in state) {
       const s = state[key];
+      // Most photos sit at rest (fully hidden, or the one fully shown)
+      // on most frames — only the 1-2 actually mid-crossfade ever need
+      // work. Once a photo has reached its target and that resting state
+      // has been written once, skip it entirely on later idle frames
+      // instead of rewriting the same opacity/transform ~60 times a
+      // second forever: with up to a dozen photos in the stack, that
+      // was extra main-thread work on every single frame, competing with
+      // scroll handling right when a fast fling needs the headroom most.
+      const atRest = s.opacity === s.tOpacity && s.scale === s.tScale;
+      if (atRest && s.wroteRest) continue;
+
       s.opacity += (s.tOpacity - s.opacity) * SMOOTH;
       s.scale += (s.tScale - s.scale) * SMOOTH;
       if (Math.abs(s.tOpacity - s.opacity) < EPSILON) s.opacity = s.tOpacity;
@@ -81,6 +92,8 @@ export function createBackdrop() {
       const settled = s.opacity > 0.995 && Math.abs(s.scale - 1) < 0.001;
       img.style.animationPlayState = settled ? '' : 'paused';
       img.style.transform = settled ? '' : `scale(${s.scale})`;
+
+      s.wroteRest = s.opacity === s.tOpacity && s.scale === s.tScale;
     }
   }
 
