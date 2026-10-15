@@ -385,16 +385,10 @@ nav.solid{
 
 /* ---------- support chat ---------- */
 
-.supportwrap{position:fixed;right:24px;bottom:24px;z-index:25;pointer-events:auto;}
-.chatbubble{
-  width:52px;height:52px;border-radius:50%;background:var(--ink);color:#fff;
-  font-size:20px;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.18);
-  transition:background .2s, transform .2s;
-}
-.chatbubble:hover{background:var(--accent);}
+.supportwrap{position:fixed;right:24px;bottom:24px;z-index:25;pointer-events:none;}
 .chatpanel{
-  position:absolute;right:0;bottom:66px;width:300px;
+  position:absolute;right:0;bottom:0;width:300px;
+  pointer-events:auto;
   background:#fff;border:1px solid var(--line);border-radius:18px;
   box-shadow:0 20px 50px rgba(0,0,0,0.14);
   transform-origin:100% 100%;
@@ -440,24 +434,22 @@ footer{
   transform:translateY(-50%);
 }
 .footpill{
-  display:flex;align-items:center;gap:12px;
-  width:100%;max-width:420px;
+  display:flex;align-items:center;gap:14px;
+  width:auto;max-width:420px;
   background:#0f1012;border:1px solid rgba(255,255,255,0.14);
-  border-radius:999px;padding:8px 8px 8px 22px;
+  border-radius:999px;padding:8px 8px 8px 26px;
   box-shadow:0 20px 50px rgba(0,0,0,0.35);
+  color:#fff;font-size:14px;font-weight:500;font-family:inherit;
+  transition:border-color .2s;
 }
-.footpill input{
-  flex:1;min-width:0;background:transparent;border:none;outline:none;
-  color:#fff;font-size:14px;font-family:inherit;
-}
-.footpill input::placeholder{color:rgba(255,255,255,0.4);}
-.footpill button{
+.footpill:hover{border-color:rgba(255,255,255,0.4);}
+.footpillicon{
   width:36px;height:36px;border-radius:50%;flex-shrink:0;
   background:#fff;color:var(--ink);
   display:flex;align-items:center;justify-content:center;
   transition:background .2s, color .2s;
 }
-.footpill button:hover{background:var(--accent);color:#fff;}
+.footpill:hover .footpillicon{background:var(--accent);color:#fff;}
 
 .footbrand{
   font-family:'Inter Tight',sans-serif;font-size:13px;font-weight:600;
@@ -510,7 +502,10 @@ footer{
   .ov-hero,.ov-void{top:220px;right:auto;left:0;transform:none;padding:0 7vw;}
   .ov-hero h1.reveal{font-size:clamp(26px,8vw,38px);}
   .ov-hero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
-  .ov-hero .heroactions{display:none;}
+  /* Was display:none — mobile had no estimate CTA at all above the fold
+     until the user scrolled far enough to trigger the sticky bar. */
+  .ov-hero .heroactions{margin-top:16px;}
+  .ov-hero .heroactions .btn{padding:11px 20px;font-size:13.5px;}
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}

@@ -149,7 +149,6 @@ function HeroPanel({ idx }) {
       <p class="lede">${data.lede}</p>
       <div class="heroactions">
         <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
-        <button class="btn btnghost" onClick=${() => window.scrollTo({ top: window.innerHeight * 1.1, behavior: 'smooth' })}>See the install</button>
       </div>
       <div class="scrollhint"><span class="beamline"></span></div>
     <//>
@@ -512,6 +511,10 @@ function BuyBar() {
 
 // --- Support chat --------------------------------------------------------
 
+// No separate floating toggle button here — every CTA on the page
+// (nav, hero, sticky bar, footer) already opens this same panel, and a
+// persistent extra bubble on top of those was one competing CTA too many.
+// The panel's own header close button is enough to dismiss it.
 function SupportChat() {
   const s = useStore();
   return html`
@@ -529,9 +532,6 @@ function SupportChat() {
           <button class="btn btnprimary chatsend">Send</button>
         </div>
       </div>
-      <button class="chatbubble" onClick=${() => setState({ chatOpen: !state.chatOpen })} aria-label="Toggle support chat">
-        ${s.chatOpen ? '×' : '💬'}
-      </button>
     </div>
   `;
 }
@@ -555,15 +555,15 @@ function Footer() {
   return html`
     <div class="footerinner">
       <div class="footpillwrap">
-        <form class="footpill" onSubmit=${(e) => { e.preventDefault(); setState({ chatOpen: true }); }}>
-          <input type="text" placeholder="Get a free roof estimate…" />
-          <button type="submit" aria-label="Request an estimate">
+        <button class="footpill" onClick=${() => setState({ chatOpen: true })}>
+          <span>Get a Free Estimate</span>
+          <span class="footpillicon">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
             </svg>
-          </button>
-        </form>
+          </span>
+        </button>
       </div>
 
       <div class="footbrand">STRATA</div>
