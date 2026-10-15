@@ -456,6 +456,29 @@ function TestimonialsSection() {
   `;
 }
 
+// Measures its own answer's real height (scrollHeight) rather than
+// expanding to a shared fixed cap — a hardcoded max-height clips any
+// answer longer than whatever that number assumed, which a genuinely
+// detailed, multi-sentence answer easily exceeds.
+function QaItem({ f, isOpen, onToggle }) {
+  const ref = useRef(null);
+  const [h, setH] = useState(0);
+  useEffect(() => {
+    if (ref.current) setH(ref.current.scrollHeight);
+  }, [f.a, isOpen]);
+  return html`
+    <div class="qa ${isOpen ? 'open' : ''}">
+      <button class="qbtn" onClick=${onToggle}>
+        <span>${f.q}</span>
+        <span class="plus">+</span>
+      </button>
+      <div class="a" ref=${ref} style=${{ maxHeight: isOpen ? `${h}px` : '0px' }}>
+        <p>${f.a}</p>
+      </div>
+    </div>
+  `;
+}
+
 function FaqSection() {
   const s = useStore();
   return html`
@@ -465,17 +488,7 @@ function FaqSection() {
         <h2>Everything you are wondering</h2>
       </div>
       <div class="qalist">
-        ${FAQS.map((f, i) => html`
-          <div class="qa ${s.faqOpen === i ? 'open' : ''}" key=${i}>
-            <button class="qbtn" onClick=${() => setState({ faqOpen: s.faqOpen === i ? -1 : i })}>
-              <span>${f.q}</span>
-              <span class="plus">+</span>
-            </button>
-            <div class="a" style=${{ maxHeight: s.faqOpen === i ? '160px' : '0px' }}>
-              <p>${f.a}</p>
-            </div>
-          </div>
-        `)}
+        ${FAQS.map((f, i) => html`<${QaItem} key=${i} f=${f} isOpen=${s.faqOpen === i} onToggle=${() => setState({ faqOpen: s.faqOpen === i ? -1 : i })} />`)}
       </div>
     </section>
   `;
