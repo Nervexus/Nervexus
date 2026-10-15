@@ -22,7 +22,7 @@ export const SECTIONS = [
     voidRender: true,
     kind: 'hero',
     h: 'The last roof you will ever need.',
-    lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen — built for coastal storms and backed by a lifetime transferable warranty.',
+    lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
   },
   // 1 — Problem
   {
@@ -38,7 +38,7 @@ export const SECTIONS = [
     voidRender: true,
     eyebrow: 'ENGINEERING', kind: 'text',
     h: 'Four layers. Zero gaps.',
-    body: 'A fully adhered ice-and-water membrane sits beneath an insulated steel deck and a continuous standing-seam shell — stopping water, wind and ice at every seam.',
+    body: 'A fully adhered ice-and-water membrane sits beneath an insulated steel deck and a continuous standing-seam shell, stopping water, wind and ice at every seam.',
   },
   // 3 — Performance stat
   {
@@ -46,7 +46,7 @@ export const SECTIONS = [
     voidRender: true,
     eyebrow: 'PERFORMANCE', kind: 'stat',
     h: '140mph wind rated. Lifetime warranty.',
-    body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once — outlive the mortgage.',
+    body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once. Outlive the mortgage.',
   },
 ];
 
@@ -57,7 +57,7 @@ export const SECTIONS = [
 export const STEPS = [
   {
     h: 'Free on-site inspection',
-    body: 'A certified estimator walks your roof in person, documents every vulnerability and gives you a same-week quote — no obligation.',
+    body: 'A certified estimator walks your roof in person, documents every vulnerability and gives you a same-week quote, no obligation.',
   },
   {
     h: 'Material & finish selection',
@@ -65,15 +65,15 @@ export const STEPS = [
   },
   {
     h: 'Tear-off & deck prep',
-    body: 'Old roofing comes off down to the deck. Any rot or damage underneath is repaired first — nothing new goes down over a compromised base.',
+    body: 'Old roofing comes off down to the deck. Any rot or damage underneath is repaired first. Nothing new goes down over a compromised base.',
   },
   {
     h: 'Ice & water membrane',
-    body: 'A fully adhered ice-and-water membrane seals the deck — the quiet layer that does most of the actual waterproofing work.',
+    body: 'A fully adhered ice-and-water membrane seals the deck, the quiet layer that does most of the actual waterproofing work.',
   },
   {
     h: 'Standing-seam install',
-    body: 'Panels are mechanically double-locked on site to aerospace tolerances. No exposed fasteners — nothing for water to find.',
+    body: 'Panels are mechanically double-locked on site to aerospace tolerances. No exposed fasteners, nothing for water to find.',
   },
   {
     h: 'Final walkthrough & warranty',
@@ -84,22 +84,22 @@ export const STEPS = [
 export const TESTIMONIALS = [
   {
     name: 'Marisol Reyes', role: 'Homeowner, Lakeview',
-    avatar: './photos/review-home-1.webp',
-    quote: 'They found two rotted rafters mid-tear-off and fixed it the same day — no change order, no surprise invoice.',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=faces&q=80',
+    quote: 'They found two rotted rafters mid-tear-off and fixed it the same day, no change order, no surprise invoice.',
   },
   {
     name: 'Dana Okafor', role: 'Property Manager',
-    avatar: './photos/review-home-2.webp',
-    quote: 'We have used STRATA on six rental properties. Zero callbacks in three years — that is unheard of in this business.',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces&q=80',
+    quote: 'We have used STRATA on six rental properties. Zero callbacks in three years. That is unheard of in this business.',
   },
   {
     name: 'Theo Lindqvist', role: 'Homeowner, Coastal Ridge',
-    avatar: './photos/review-home-3.webp',
+    avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop&crop=faces&q=80',
     quote: 'Rode out a category 2 without losing a single panel. The crew down the street was not so lucky.',
   },
   {
     name: 'Priya Natarajan', role: 'Homeowner',
-    avatar: './photos/review-home-4.webp',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&q=80',
     quote: 'The estimate was the final price, down to the dollar. That alone made them worth the premium.',
   },
 ];
@@ -107,7 +107,7 @@ export const TESTIMONIALS = [
 export const FAQS = [
   {
     q: 'How long does a STRATA roof actually last?',
-    a: 'Our standing-seam systems carry a lifetime, transferable material warranty and a 25-year workmanship guarantee — most installs last 50+ years with no maintenance.',
+    a: 'Our standing-seam systems carry a lifetime, transferable material warranty and a 25-year workmanship guarantee. Most installs last 50+ years with no maintenance.',
   },
   {
     q: 'Is a metal roof noisy in the rain?',
@@ -117,17 +117,17 @@ export const FAQS = [
     q: 'How long does installation take?',
     a: 'It mostly comes down to roof size and complexity:',
     bullets: [
-      'Single-story, 2,000–2,500 sq ft, simple gable or hip roof, one tear-off layer — 2–3 days',
-      '3,000+ sq ft, steep pitches, multiple valleys or dormers — 4–6 days',
-      'Multi-structure properties (house plus garage or guest house) — scoped and quoted as separate timelines',
-      'More than one existing roofing layer to tear off — adds time',
-      'Wet or high-wind days — built into the schedule as weather holds, never rushed through',
+      'Single-story, 2,000–2,500 sq ft, simple gable or hip roof, one tear-off layer: 2–3 days',
+      '3,000+ sq ft, steep pitches, multiple valleys or dormers: 4–6 days',
+      'Multi-structure properties (house plus garage or guest house): scoped and quoted as separate timelines',
+      'More than one existing roofing layer to tear off: adds time',
+      'Wet or high-wind days: built into the schedule as weather holds, never rushed through',
     ],
-    note: 'Whatever the estimate comes out to, it is written into your contract as a firm completion date before work begins — not a moving target.',
+    note: 'Whatever the estimate comes out to, it is written into your contract as a firm completion date before work begins, not a moving target.',
   },
   {
     q: 'Do you work with insurance claims?',
-    a: 'Yes — we manage storm and insurance claims directly with your adjuster, from inspection through final sign-off.',
+    a: 'Yes, we manage storm and insurance claims directly with your adjuster, from inspection through final sign-off.',
   },
   {
     q: 'What is the warranty?',
@@ -135,7 +135,7 @@ export const FAQS = [
   },
   {
     q: 'Do you offer financing?',
-    a: 'Yes — 0% financing is available for qualified homeowners, with same-as-cash terms up to 18 months.',
+    a: 'Yes, 0% financing is available for qualified homeowners, with same-as-cash terms up to 18 months.',
   },
 ];
 

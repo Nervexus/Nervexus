@@ -186,6 +186,56 @@ const ChevronIcon = ({ flip }) => html`
   </svg>
 `;
 
+// One small glyph per step card below, in the same stroke-based style as
+// the rest of the site's icons — a plain text/number card for each of the
+// six steps read as too empty.
+const STEP_ICONS = [
+  // Free on-site inspection
+  () => html`
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  `,
+  // Material & finish selection
+  () => html`
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </svg>
+  `,
+  // Tear-off & deck prep
+  () => html`
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m12 2 9 5-9 5-9-5 9-5Z" />
+      <path d="m3 12 9 5 9-5" />
+    </svg>
+  `,
+  // Ice & water membrane
+  () => html`
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2.5s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z" />
+    </svg>
+  `,
+  // Standing-seam install
+  () => html`
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12 12 4l9 8" />
+      <path d="M5 11v9h14v-9" />
+      <path d="M9.5 20v-5M14.5 20v-5" />
+    </svg>
+  `,
+  // Final walkthrough & warranty
+  () => html`
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  `,
+];
+
 // Shared fanned-3D-stack placement for a card at `offset` steps from the
 // focused one — used by both the steps and reviews carousels below. Pure
 // CSS 3D transforms (no Three.js/GSAP dependency), kept to the site's own
@@ -211,8 +261,10 @@ function cyclicOffset(i, idx, n) {
 }
 
 function StepCard({ step, n, offset }) {
+  const Icon = STEP_ICONS[(n - 1) % STEP_ICONS.length];
   return html`
     <div class="stepcard" style=${fanStyle(offset)}>
+      <div class="stepicon"><${Icon} /></div>
       <span class="stepnum">${String(n).padStart(2, '0')}</span>
       <h3>${step.h}</h3>
       <p class="body">${step.body}</p>
@@ -414,7 +466,7 @@ function FinishesStrip() {
   return html`
     <div class="finishes">
       <h3>Five finishes. One standard.</h3>
-      <p class="body">Finished in small batches: Charcoal, Zinc Gray, Copper Patina, Bone White and Graphite. Every finish weathers the same way — beautifully.</p>
+      <p class="body">Finished in small batches: Charcoal, Zinc Gray, Copper Patina, Bone White and Graphite. Every finish weathers the same way, beautifully.</p>
       <div class="swatches">
         ${SWATCHES.map((sw) => html`<div class="swatch" key=${sw.name} title=${sw.name}><span style=${{ background: sw.hex }}></span>${sw.name}</div>`)}
       </div>
@@ -546,7 +598,7 @@ function SupportChat() {
           <button class="chatclose" onClick=${() => setState({ chatOpen: false })} aria-label="Close">×</button>
         </div>
         <div class="chatbody">
-          <div class="chatmsg">Hi — tell us about your roof and we'll schedule a free on-site estimate, usually within one business day.</div>
+          <div class="chatmsg">Hi, tell us about your roof and we'll schedule a free on-site estimate, usually within one business day.</div>
         </div>
         <div class="chatinput">
           <input type="text" placeholder="Type a message…" />
