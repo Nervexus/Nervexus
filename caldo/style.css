@@ -363,7 +363,17 @@ nav.solid{
   overflow:hidden;max-height:0;
   transition:max-height .35s cubic-bezier(.22,1,.36,1);
 }
-.a p{padding:0 0 18px;font-size:14px;line-height:1.6;color:var(--ink-2);max-width:380px;}
+.apad{padding:0 0 18px;max-width:380px;}
+.apad>*+*{margin-top:10px;}
+.a p{font-size:14px;line-height:1.6;color:var(--ink-2);}
+.qbullets{list-style:none;margin:0;padding:0;}
+.qbullets li{position:relative;padding-left:16px;font-size:14px;line-height:1.55;color:var(--ink-2);}
+.qbullets li+li{margin-top:7px;}
+.qbullets li::before{
+  content:'';position:absolute;left:0;top:8px;
+  width:4px;height:4px;border-radius:50%;background:var(--accent);
+}
+.qnote{font-size:12.5px;line-height:1.5;color:var(--ink-2);opacity:0.8;}
 
 /* ---------- buy bar ---------- */
 

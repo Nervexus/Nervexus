@@ -465,7 +465,7 @@ function QaItem({ f, isOpen, onToggle }) {
   const [h, setH] = useState(0);
   useEffect(() => {
     if (ref.current) setH(ref.current.scrollHeight);
-  }, [f.a, isOpen]);
+  }, [f, isOpen]);
   return html`
     <div class="qa ${isOpen ? 'open' : ''}">
       <button class="qbtn" onClick=${onToggle}>
@@ -473,7 +473,15 @@ function QaItem({ f, isOpen, onToggle }) {
         <span class="plus">+</span>
       </button>
       <div class="a" ref=${ref} style=${{ maxHeight: isOpen ? `${h}px` : '0px' }}>
-        <p>${f.a}</p>
+        <div class="apad">
+          <p>${f.a}</p>
+          ${f.bullets ? html`
+            <ul class="qbullets">
+              ${f.bullets.map((b) => html`<li key=${b}>${b}</li>`)}
+            </ul>
+          ` : null}
+          ${f.note ? html`<p class="qnote">${f.note}</p>` : null}
+        </div>
       </div>
     </div>
   `;

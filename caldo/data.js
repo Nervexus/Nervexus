@@ -115,7 +115,15 @@ export const FAQS = [
   },
   {
     q: 'How long does installation take?',
-    a: 'It mostly comes down to roof size and complexity. A straightforward single-story home, roughly 2,000–2,500 sq ft with a simple gable or hip roof and one layer to tear off, is usually done in 2–3 days. Larger homes — 3,000+ sq ft, steep pitches, multiple valleys or dormers — run 4–6 days. Multi-structure properties (main house plus a garage or guest house) are scoped and quoted as separate timelines. Two things add time on any job: tearing off more than one existing layer instead of one, and weather holds on wet or high-wind days, which we build into the schedule rather than push through. Whatever the estimate comes out to, it is written into your contract as a firm completion date before work begins — not a moving target.',
+    a: 'It mostly comes down to roof size and complexity:',
+    bullets: [
+      'Single-story, 2,000–2,500 sq ft, simple gable or hip roof, one tear-off layer — 2–3 days',
+      '3,000+ sq ft, steep pitches, multiple valleys or dormers — 4–6 days',
+      'Multi-structure properties (house plus garage or guest house) — scoped and quoted as separate timelines',
+      'More than one existing roofing layer to tear off — adds time',
+      'Wet or high-wind days — built into the schedule as weather holds, never rushed through',
+    ],
+    note: 'Whatever the estimate comes out to, it is written into your contract as a firm completion date before work begins — not a moving target.',
   },
   {
     q: 'Do you work with insurance claims?',
