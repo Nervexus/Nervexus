@@ -9,12 +9,8 @@ const listeners = new Set();
 // reference whenever something changes — useSyncExternalStore bails out on
 // Object.is equality, so mutating one object in place would never re-render.
 export const state = {
-  progress: 0,        // 0..1 across the whole #scroller
-  section: 0,          // continuous section index, 0..SECTIONS.length-1
-  sectionIdx: 0,        // floored section index
-  sectionLocal: 0,      // 0..1 progress within the current section
-  footerT: 0,           // 0..1 how far the footer has risen into view
-  introOpacity: 1,       // 0..1 fixed intro/overlays visibility (see main.js)
+  footerT: 0,       // 0..1 how far the footer has risen into view
+  heroPast: false,   // scrolled far enough past the hero to show the buy bar
   chatOpen: false,
   faqOpen: -1,
   navSolid: false,

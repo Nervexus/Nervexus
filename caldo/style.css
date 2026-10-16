@@ -11,12 +11,14 @@
 html,body{margin:0;padding:0;}
 html{scroll-behavior:smooth;scroll-padding-top:var(--nav-h);overflow-x:hidden;}
 body{
-  background:var(--paper);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(169,103,47,0.07), transparent 55%),
+    radial-gradient(circle at 82% 88%, rgba(22,23,26,0.05), transparent 55%),
+    var(--paper);
   color:var(--ink);
   font-family:'Inter',system-ui,-apple-system,sans-serif;
   font-weight:400;
   -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
 }
 h1,h2,h3,h4{
   font-family:'Inter Tight',system-ui,sans-serif;
@@ -28,71 +30,6 @@ p{margin:0;}
 a{color:inherit;text-decoration:none;}
 button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
 img{display:block;max-width:100%;}
-
-/* ---------- layer stack ---------- */
-
-#bg{
-  position:fixed;inset:0;z-index:0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(169,103,47,0.07), transparent 55%),
-    radial-gradient(circle at 82% 88%, rgba(22,23,26,0.05), transparent 55%),
-    var(--paper);
-}
-
-#photos{
-  position:fixed;inset:0;z-index:2;
-  width:100%;height:100%;overflow:hidden;
-  pointer-events:none;
-  transition:opacity .3s linear;
-  background:var(--paper);
-}
-#photos img{
-  position:absolute;inset:0;
-  width:100%;height:100%;max-width:none;
-  object-fit:cover;object-position:center;
-  opacity:0;
-  animation:kenburns 26s ease-in-out infinite alternate;
-}
-#photos img:nth-child(even){animation-duration:32s;}
-/* Show the whole render uncropped rather than filling the frame —
-   "cover" was zooming in tight enough to crop the house on narrow
-   viewports no matter how object-position was tuned. */
-#photos img[data-void="true"]{object-fit:contain;animation:none;}
-/* Desktop-only per-photo vertical nudges — mobile has its own
-   object-position override further down regardless of these. Shifting
-   `top` (width/height stay 100%, overflow is clipped by #photos) rather
-   than object-position: at typical desktop aspect ratios the contain-fit
-   image already fills nearly the whole frame, leaving no letterboxing
-   for object-position to shift within. */
-@media (min-width:861px){
-  #photos img[data-photo="engineering-layers"]{top:7%;}
-  #photos img[data-photo="performance-house"]{top:0;}
-}
-@keyframes kenburns{
-  0%{transform:scale(1.0);}
-  100%{transform:scale(1.08);}
-}
-
-#scrim{
-  position:fixed;inset:0;z-index:3;
-  pointer-events:none;
-  transition:opacity .3s linear;
-  background:
-    linear-gradient(180deg, rgba(22,23,26,0.1), rgba(22,23,26,0.2) 60%, rgba(22,23,26,0.3)),
-    linear-gradient(90deg, rgba(22,23,26,0.28), transparent 45%);
-}
-
-#grain{
-  position:fixed;inset:0;z-index:5;
-  pointer-events:none;
-  mix-blend-mode:overlay;
-  opacity:0.07;
-  background:
-    radial-gradient(circle at 20% 30%, #fff 0%, transparent 1.2%),
-    radial-gradient(circle at 70% 65%, #000 0%, transparent 1.2%);
-  background-size:3px 3px, 5px 5px;
-}
 
 #app-fixed-root{
   position:fixed;inset:0;z-index:10;
@@ -140,45 +77,9 @@ nav.solid{
 .iconbtn:hover{background:rgba(22,23,26,0.06);}
 .navcta{padding:9px 18px;font-size:12.5px;}
 
-#overlays{
-  position:fixed;inset:var(--nav-h) 0 0 0;z-index:10;
-  pointer-events:none;
-  transition:opacity .3s linear;
-}
-
-/* ---------- content panels ---------- */
-
-.ov{
-  position:absolute;
-  max-width:460px;
-  padding:26px 34px;
-  margin:0 7vw;
-  border-radius:20px;
-  background:rgba(247,246,243,0.84);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  box-shadow:0 20px 50px rgba(22,23,26,0.1);
-  transition:opacity .35s ease, transform .35s ease;
-  will-change:opacity, transform;
-}
-.ov-left{top:50%;left:0;transform:translateY(-50%);text-align:left;}
-.ov-right{top:50%;right:0;left:auto;transform:translateY(-50%);text-align:left;}
-/* Used by the hero panel AND every intro text panel (see app.js's
-   TEXT_LAYOUT) — all of them sit directly over a photo whose brightness
-   varies by crop and scroll position. It used to strip out .ov's own
-   frosted-card background entirely (background:none etc.), leaving bare
-   text with only the page-wide #scrim vignette for contrast — fine over
-   a dark patch of photo, close to unreadable over a light one. Keeping
-   .ov's card backing here instead makes every subheading legible
-   regardless of what's behind it. */
-.ov-hero{
-  top:48%;max-width:600px;
-}
-/* Desktop-only per-section text placement (see app.js's TEXT_LAYOUT) —
-   mobile keeps its own top:220px rule further down regardless. */
-@media (min-width:861px){
-  .ov-hero.pos-top{top:16%;transform:none;}
-  .sec-2 .body{color:var(--ink);}
-}
+/* ---------- intro sections (plain static content, no more
+   scroll-pinned cinematic crossfade — a photo and some text, in normal
+   document flow) ---------- */
 
 .eyebrow{
   font-size:12px;letter-spacing:0.14em;font-weight:600;
@@ -186,7 +87,7 @@ nav.solid{
 }
 
 .reveal{font-size:clamp(28px,4.2vw,48px);line-height:1.08;}
-.ov-hero h1.reveal{font-size:clamp(32px,4.6vw,54px);}
+.introh1{font-size:clamp(32px,4.8vw,56px);}
 .w{display:inline-block;overflow:hidden;vertical-align:top;white-space:nowrap;}
 .w i{
   display:inline-block;font-style:normal;
@@ -215,28 +116,87 @@ nav.solid{
 .btnghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
 .btnghost:hover{border-color:var(--ink);}
 
-.scrollhint{margin-top:30px;}
-@media (max-height:760px){
-  .scrollhint{display:none;}
+.introsection{
+  display:flex;align-items:center;gap:64px;
+  max-width:1200px;margin:0 auto;padding:100px 28px;
 }
-.beamline{
-  position:relative;
-  display:block;
-  width:1px;height:46px;
-  background:var(--line);
-  overflow:hidden;
+.introsection.introreverse{flex-direction:row-reverse;}
+.introsection .introphoto{flex:1 1 50%;min-width:0;}
+.introsection .introtext{flex:1 1 50%;min-width:0;max-width:460px;}
+.introphoto img{
+  width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:24px;
 }
-.beamline::after{
-  content:'';
-  position:absolute;
-  left:0;top:-40%;
-  width:100%;height:40%;
-  background:linear-gradient(180deg, transparent, var(--accent) 50%, transparent);
-  animation:beam 1.9s ease-in-out infinite;
+.introhero{padding-top:calc(var(--nav-h) + 56px);}
+
+/* ---------- interactive 3D roof build-up ---------- */
+
+.scrolly{position:relative;height:520vh;}
+.pin{
+  position:sticky;top:0;height:100dvh;overflow:hidden;
+  background:
+    radial-gradient(circle at 25% 15%, rgba(169,103,47,0.08), transparent 55%),
+    radial-gradient(circle at 80% 85%, rgba(22,23,26,0.06), transparent 55%),
+    var(--paper);
 }
-@keyframes beam{
-  0%{top:-40%;}
-  100%{top:100%;}
+.mark{
+  position:absolute;inset:0;z-index:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Inter Tight',sans-serif;font-weight:700;letter-spacing:-0.02em;
+  font-size:19vw;white-space:nowrap;
+  color:rgba(22,23,26,0.035);
+  pointer-events:none;user-select:none;
+}
+.stage{position:absolute;inset:0;z-index:1;}
+#gl{width:100%;height:100%;display:block;}
+.fallback{
+  position:absolute;inset:0;z-index:1;
+  align-items:center;justify-content:center;
+  padding:0 10vw;text-align:center;
+  font-size:14px;color:var(--ink-2);background:var(--paper);
+}
+.fallback:not([hidden]){display:flex;}
+.copy{
+  position:absolute;z-index:2;
+  left:7vw;top:50%;transform:translateY(-50%);
+  max-width:400px;width:100%;
+  padding:28px 30px;border-radius:20px;
+  background:rgba(247,246,243,0.88);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:0 20px 50px rgba(22,23,26,0.1);
+}
+.copy .title{font-size:clamp(21px,2.4vw,28px);line-height:1.15;margin-bottom:18px;}
+.steps{list-style:none;margin:0;padding:0;}
+.steps li{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:11px 0;border-top:1px solid var(--line);
+  opacity:0.4;transition:opacity .3s ease;
+}
+.steps li:first-child{border-top:none;}
+.steps li.on{opacity:1;}
+.steps li .n{
+  flex:0 0 auto;padding-top:2px;
+  font-family:'Inter Tight',sans-serif;font-weight:600;font-size:12px;
+  color:var(--accent);
+}
+.steps li h3{font-size:14px;}
+.steps li p{
+  margin-top:4px;font-size:12.5px;line-height:1.5;color:var(--ink-2);
+  max-height:0;overflow:hidden;transition:max-height .3s ease;
+}
+.steps li.on p{max-height:120px;}
+.hint{margin-top:18px;font-size:12px;color:var(--ink-2);}
+.bar{margin-top:8px;height:2px;border-radius:2px;background:var(--line);overflow:hidden;}
+.bar i{display:block;height:100%;width:0;background:var(--accent);}
+
+@media (max-width:860px){
+  .mark{font-size:28vw;}
+  .copy{
+    left:12px;right:12px;top:auto;bottom:108px;transform:none;
+    max-width:none;padding:20px 22px;
+  }
+  .copy .title{font-size:19px;margin-bottom:12px;}
+  .steps li:not(.on){display:none;}
+  .steps li.on p{max-height:none;}
 }
 
 .swatches{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
@@ -436,9 +396,7 @@ nav.solid{
 .chatinput input:focus{outline:none;border-color:var(--accent);}
 .chatsend{padding:9px 16px;font-size:13px;}
 
-/* ---------- scroller / footer ---------- */
-
-#scroller{position:relative;z-index:1;}
+/* ---------- footer ---------- */
 
 footer{
   position:relative;z-index:30;background:var(--ink);color:rgba(255,255,255,0.85);
@@ -516,21 +474,18 @@ footer{
 @media (max-width:860px){
   .navlinks{display:none;}
   .buybarinner{padding-right:84px;}
-  .ov{max-width:92vw;padding:22px 7vw;margin:0 3vw;border-radius:22px;}
-  .ov-right{right:3vw;left:3vw;text-align:left;}
   .reveal{font-size:clamp(24px,7vw,36px);}
-  #photos img[data-void="true"]{object-position:center 14%;}
-  /* padding restored to match .ov's own 22px 7vw above (it used to zero
-     out the vertical padding here too, which is fine with no card
-     background but crams the text right up against the card's edges now
-     that .ov-hero keeps that background for contrast). */
-  .ov-hero,.ov-void{top:220px;right:auto;left:0;transform:none;}
-  .ov-hero h1.reveal{font-size:clamp(26px,8vw,38px);}
-  .ov-hero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
-  /* Was display:none — mobile had no estimate CTA at all above the fold
-     until the user scrolled far enough to trigger the sticky bar. */
-  .ov-hero .heroactions{margin-top:16px;}
-  .ov-hero .heroactions .btn{padding:11px 20px;font-size:13.5px;}
+  .introsection{
+    flex-direction:column;align-items:stretch;gap:28px;padding:64px 24px;
+  }
+  .introsection.introreverse{flex-direction:column;}
+  .introsection .introtext{order:1;max-width:none;}
+  .introsection .introphoto{order:2;}
+  .introhero{padding-top:calc(var(--nav-h) + 36px);}
+  .introh1{font-size:clamp(26px,8vw,38px);}
+  .introhero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
+  .introhero .heroactions{margin-top:16px;}
+  .introhero .heroactions .btn{padding:11px 20px;font-size:13.5px;}
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
@@ -562,6 +517,4 @@ footer{
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
   .w i, .reveal.in .w i{transition:none;}
-  .beamline::after{animation:none;top:30%;}
-  #photos img{animation:none;}
 }

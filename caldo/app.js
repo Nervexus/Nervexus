@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { SECTIONS, STEPS, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
+import { HERO, PROBLEM, PERFORMANCE, STEPS, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
@@ -85,102 +85,81 @@ function Nav() {
   `;
 }
 
-// --- Generic section panel ---------------------------------------------
-
-// Full opacity for the section's entire local 0..1 dwell (however long that
-// section's scroll range is), with a short crossfade only right at the
-// boundary into the previous/next section. A flat radius around `idx` would
-// fade long sections (testimonials, FAQ) out before their local progress
-// — tied to horizontal travel / accordion interaction — ever reaches 1.
-function weightFor(section, idx) {
-  const d = section - idx;
-  const EDGE = 0.08;
-  if (d <= -EDGE || d >= 1 + EDGE) return 0;
-  if (d < 0) return 1 - (-d) / EDGE;
-  if (d > 1) return 1 - (d - 1) / EDGE;
-  return 1;
-}
-
-function Panel({ idx, children, side = 'left', extraClass = '' }) {
-  const s = useStore();
-  const w = weightFor(s.section, idx);
-  const playedRef = useRef(false);
-  const isActive = w > 0.5;
-  useEffect(() => {
-    if (isActive) playedRef.current = true;
-  }, [isActive]);
-
-  // Not mounted at all until it first approaches, to avoid paying render
-  // cost for every intro panel for the whole page lifetime — but once it
-  // has played its one-time letter-reveal entrance, it stays mounted
-  // (just faded to opacity 0 / pointer-events none below) instead of
-  // unmounting again at w<=0.001. Unmounting destroyed the Reveal
-  // animation's state, so scrolling back into range remounted it and
-  // replayed the full staggered reveal from scratch every time — invisible
-  // on a fast flick, but on a slow scroll back up the user sits right
-  // through that remount-and-replay, which read as scroll lag.
-  if (w <= 0.001 && !playedRef.current) return null;
-  // Also gated on s.introOpacity, not just local weight: once scroll is
-  // clamped past the last intro section, that section's weight sits at the
-  // top of its own dwell range forever, which would otherwise leave this
-  // panel permanently pointer-events:auto — an invisible hit target sitting
-  // over the page content below, swallowing clicks/touches meant for it.
-  // introOpacity (driven off real scroll geometry in main.js) correctly
-  // reaches 0 once the intro has handed off, regardless of any single
-  // section's own stuck weight.
-  const clickable = w > 0.6 && s.introOpacity > 0.01;
-  return html`
-    <div
-      class=${`ov ov-${side} ${extraClass}`}
-      style=${{ opacity: w, transform: `translateY(${(1 - w) * 18}px)`, pointerEvents: clickable ? 'auto' : 'none' }}
-    >
-      ${children}
-    </div>
-  `;
-}
-
 function Eyebrow({ children }) {
   return html`<div class="eyebrow">${children}</div>`;
 }
 
-function HeroPanel({ idx }) {
-  const data = SECTIONS[idx];
+// Plays its child Reveal once, the first time the section scrolls into
+// view, then leaves it alone — no replay on repeat visits (scrolling
+// back up past a section you've already seen), the same lesson the old
+// pinned intro had to learn the hard way.
+function useInView(threshold = 0.25) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setInView(true);
+        obs.disconnect();
+      }
+    }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, inView];
+}
+
+// --- Intro sections (normal document flow — no more scroll-pinned
+// cinematic crossfade; each photo is just a plain image in its own
+// section now) -----------------------------------------------------------
+
+function HeroSection() {
+  const [ref, inView] = useInView(0.15);
   return html`
-    <${Panel} idx=${idx} side="left" extraClass="ov-hero">
-      <${Reveal} tag="h1" text=${data.h} />
-      <p class="lede">${data.lede}</p>
-      <div class="heroactions">
-        <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
+    <section class="introsection introhero" ref=${ref}>
+      <div class="introphoto"><img src=${PHOTO_SRC[HERO.photo]} alt="" /></div>
+      <div class="introtext">
+        <${Reveal} tag="h1" className="introh1" text=${HERO.h} active=${inView} />
+        <p class="lede">${HERO.lede}</p>
+        <div class="heroactions">
+          <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
+        </div>
       </div>
-      <div class="scrollhint"><span class="beamline"></span></div>
-    <//>
+    </section>
   `;
 }
 
-// Per-section text placement overrides (see style.css's .pos-top and
-// .sec-N rules). Problem (1) and Performance (3) sit near the top of
-// their frame instead of vertically centered; Performance also moved
-// from its default alternating right side to the left.
-const TEXT_LAYOUT = {
-  1: { side: 'right', top: true },
-  2: { side: 'left', top: false },
-  3: { side: 'left', top: true },
-};
-
-function TextPanel({ idx }) {
-  const data = SECTIONS[idx];
-  const layout = TEXT_LAYOUT[idx] || { side: idx % 2 === 0 ? 'left' : 'right', top: false };
-  const extraClass = `ov-hero sec-${idx}${layout.top ? ' pos-top' : ''}`;
+function ProblemSection() {
+  const [ref, inView] = useInView(0.25);
   return html`
-    <${Panel} idx=${idx} side=${layout.side} extraClass=${extraClass}>
-      <${Eyebrow}>${data.eyebrow}<//>
-      <${Reveal} text=${data.h} />
-      ${data.body ? html`<p class="body">${data.body}</p>` : null}
-    <//>
+    <section class="introsection" ref=${ref}>
+      <div class="introphoto"><img src=${PHOTO_SRC[PROBLEM.photo]} alt="" /></div>
+      <div class="introtext">
+        <${Eyebrow}>${PROBLEM.eyebrow}<//>
+        <${Reveal} text=${PROBLEM.h} active=${inView} />
+        <p class="body">${PROBLEM.body}</p>
+      </div>
+    </section>
   `;
 }
 
-// --- Static page sections (normal document flow, below the intro) -------
+function PerformanceSection() {
+  const [ref, inView] = useInView(0.25);
+  return html`
+    <section class="introsection introreverse" ref=${ref}>
+      <div class="introphoto"><img src=${PHOTO_SRC[PERFORMANCE.photo]} alt="" /></div>
+      <div class="introtext">
+        <${Eyebrow}>${PERFORMANCE.eyebrow}<//>
+        <${Reveal} text=${PERFORMANCE.h} active=${inView} />
+        <p class="body">${PERFORMANCE.body}</p>
+      </div>
+    </section>
+  `;
+}
+
+// --- Static page sections (normal document flow) -------------------------
 
 const ChevronIcon = ({ flip }) => html`
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style=${{ transform: flip ? 'scaleX(-1)' : 'none' }}>
@@ -556,9 +535,23 @@ function FaqSection() {
   `;
 }
 
-function PageContent() {
+// Split in two rather than one PageContent: the interactive 3D roof
+// build-up (roofbuild.js) sits between PageTop and PageBottom in the
+// document, as a plain static section React doesn't render or control —
+// see index.html's #page-top-root / #roofbuild / #page-bottom-root.
+function PageTop() {
   return html`
     <${React.Fragment}>
+      <${HeroSection} />
+      <${ProblemSection} />
+    <//>
+  `;
+}
+
+function PageBottom() {
+  return html`
+    <${React.Fragment}>
+      <${PerformanceSection} />
       <${ServicesSection} />
       <${TestimonialsSection} />
       <${FaqSection} />
@@ -570,7 +563,7 @@ function PageContent() {
 
 function BuyBar() {
   const s = useStore();
-  const show = s.progress > 0.3 && s.footerT < 0.5;
+  const show = s.heroPast && s.footerT < 0.5;
   return html`
     <div class="buybar ${show ? 'show' : ''}">
       <div class="buybarinner">
@@ -613,19 +606,6 @@ function SupportChat() {
 
 // --- Root app --------------------------------------------------------
 
-function Overlays() {
-  return html`
-    <div id="overlays">
-      <${HeroPanel} idx=${0} />
-      <${TextPanel} idx=${1} />
-      <${TextPanel} idx=${2} />
-      <${TextPanel} idx=${3} />
-    </div>
-    <${BuyBar} />
-    <${SupportChat} />
-  `;
-}
-
 function Footer() {
   return html`
     <div class="footerinner">
@@ -663,9 +643,11 @@ function Footer() {
 
 export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
-  const pageRoot = document.getElementById('page-root');
+  const pageTopRoot = document.getElementById('page-top-root');
+  const pageBottomRoot = document.getElementById('page-bottom-root');
   const footerRoot = document.getElementById('footer-root');
-  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${Overlays} /><//>`);
-  createRoot(pageRoot).render(html`<${PageContent} />`);
+  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${BuyBar} /><${SupportChat} /><//>`);
+  createRoot(pageTopRoot).render(html`<${PageTop} />`);
+  createRoot(pageBottomRoot).render(html`<${PageBottom} />`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }

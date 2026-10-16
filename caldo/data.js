@@ -1,56 +1,50 @@
-// STRATA — scroll pacing, copy and content data.
+// STRATA — copy and content data.
 //
-// The site is now two layers: a short, cinematic scroll-pinned INTRO
-// (4 sections, driven by the fixed photo backdrop in backdrop.js) that
-// dissolves into a normal, statically-flowing page underneath holding
-// everything else — services, finishes, anatomy, testimonials, FAQ.
-//
-// `photo` keys into the fixed photo backdrop (see index.html's #photos) —
-// consecutive intro sections sharing a key hold the same image; a change
-// of key crossfades across the section boundary. `voidRender: true` marks
-// a section whose photo is one of the floating-studio-void renders
-// (object-fit:contain, no Ken Burns, text sits below it on mobile) rather
-// than a full-bleed environmental photo — see style.css's .ov-void and
-// the #photos img[data-photo=...] overrides.
+// The old scroll-pinned cinematic intro (a fixed photo backdrop
+// crossfading behind 4 sections) is gone, replaced by plain static
+// sections in normal document flow — see app.js's HeroSection,
+// ProblemSection, PerformanceSection, and the interactive 3D roof
+// build-up in roofbuild.js for what used to be the "Engineering" beat.
 
-export const SECTION_VH = [150, 150, 150, 150];
+export const HERO = {
+  photo: 'hero-house',
+  h: 'The last roof you will ever need.',
+  lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
+};
 
-export const SECTIONS = [
-  // 0 — Hero
-  {
-    photo: 'hero-house',
-    voidRender: true,
-    kind: 'hero',
-    h: 'The last roof you will ever need.',
-    lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
-  },
-  // 1 — Problem
-  {
-    photo: 'house-angle2',
-    voidRender: true,
-    eyebrow: 'THE PROBLEM', kind: 'text',
-    h: 'Most roofs fail by year eight.',
-    body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
-  },
-  // 2 — Engineering
-  {
-    photo: 'engineering-layers',
-    voidRender: true,
-    eyebrow: 'ENGINEERING', kind: 'text',
-    h: 'Four layers. Zero gaps.',
-    body: 'A fully adhered ice-and-water membrane sits beneath an insulated steel deck and a continuous standing-seam shell, stopping water, wind and ice at every seam.',
-  },
-  // 3 — Performance stat
-  {
-    photo: 'performance-house',
-    voidRender: true,
-    eyebrow: 'PERFORMANCE', kind: 'stat',
-    h: '140mph wind rated. Lifetime warranty.',
-    body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once. Outlive the mortgage.',
-  },
+export const PROBLEM = {
+  photo: 'house-angle2',
+  eyebrow: 'THE PROBLEM',
+  h: 'Most roofs fail by year eight.',
+  body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
+};
+
+export const PERFORMANCE = {
+  photo: 'performance-house',
+  eyebrow: 'PERFORMANCE',
+  h: '140mph wind rated. Lifetime warranty.',
+  body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once. Outlive the mortgage.',
+};
+
+// Feeds the interactive 3D roof build-up (roofbuild.js). `key` is wired
+// directly into that scene's geometry groups — rafter/insul/membrane/
+// counter/batten/slate — so it has to stay exactly as is; name/note are
+// just the display copy and are safe to edit freely. Reworded from the
+// original generic slate-roof labels to STRATA's actual standing-seam
+// construction (reusing phrasing already established elsewhere on the
+// site — the ice-and-water membrane, the mechanically double-locked,
+// no-exposed-fastener panel system) so this doesn't contradict what the
+// rest of the page says STRATA actually builds.
+export const ROOF_LAYERS = [
+  { key: 'rafter', name: 'Rafters', note: 'The structural timber frame underneath. We check for rot, sag and damage before anything new goes back on.' },
+  { key: 'insul', name: 'Insulated deck', note: 'Insulated steel decking across the rafters. Most of your heating and cooling bill is decided right here.' },
+  { key: 'membrane', name: 'Ice & water membrane', note: 'A fully adhered membrane that seals every seam, the layer that does most of the actual waterproofing work.' },
+  { key: 'counter', name: 'Counter battens', note: 'Treated timber furring that lifts the panel system clear of the deck, giving any trapped moisture a clear path to the gutter.' },
+  { key: 'batten', name: 'Clip rail', note: 'Concealed fastening rail the panels lock onto. No exposed screws through the roof, anywhere.' },
+  { key: 'slate', name: 'Standing-seam shell', note: 'Mechanically double-locked steel panels, finished in your choice of five colors. The only layer you ever see.' },
 ];
 
-// --- Static page content (normal document flow, below the intro) ---------
+// --- Static page content (normal document flow) ---------------------
 
 // The six-step walkthrough replacing the old photo-card grid — a plain,
 // text-only process list (no images) covering estimate through warranty.
@@ -147,19 +141,9 @@ export const SWATCHES = [
   { name: 'Graphite', hex: '#1f2126' },
 ];
 
-// Maps backdrop photo keys to a static <img> src for use in the normal
-// page content below the intro (same photos, reused inline).
+// The static <img> src for each of the 3 plain intro sections above.
 export const PHOTO_SRC = {
   'hero-house': './photos/hero-house.webp',
   'house-angle2': './photos/house-angle2.webp',
-  'engineering-layers': './photos/engineering-layers.webp',
   'performance-house': './photos/performance-house.webp',
-  aerial: 'https://images.unsplash.com/photo-1506092309076-af15fb0051e3?w=1200&q=80&auto=format&fit=crop',
-  removing: 'https://images.unsplash.com/photo-1633759593085-1eaeb724fc88?w=1200&q=80&auto=format&fit=crop',
-  metal: 'https://images.unsplash.com/photo-1673645652350-6a4c31c1c78f?w=1200&q=80&auto=format&fit=crop',
-  drill: 'https://images.unsplash.com/photo-1635424824849-1b09bdcc55b1?w=1200&q=80&auto=format&fit=crop',
-  crew: 'https://images.unsplash.com/photo-1635424709961-f3a150459ad4?w=1200&q=80&auto=format&fit=crop',
-  tiles: 'https://images.unsplash.com/photo-1518736346281-76873166a64a?w=1200&q=80&auto=format&fit=crop',
-  carrying: 'https://images.unsplash.com/photo-1643225523483-e2c434191bba?w=1200&q=80&auto=format&fit=crop',
-  working: 'https://images.unsplash.com/photo-1726589004565-bedfba94d3a2?w=1200&q=80&auto=format&fit=crop',
 };
