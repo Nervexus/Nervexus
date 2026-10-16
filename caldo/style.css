@@ -162,11 +162,16 @@ nav.solid{
 }
 .ov-left{top:50%;left:0;transform:translateY(-50%);text-align:left;}
 .ov-right{top:50%;right:0;left:auto;transform:translateY(-50%);text-align:left;}
+/* Used by the hero panel AND every intro text panel (see app.js's
+   TEXT_LAYOUT) — all of them sit directly over a photo whose brightness
+   varies by crop and scroll position. It used to strip out .ov's own
+   frosted-card background entirely (background:none etc.), leaving bare
+   text with only the page-wide #scrim vignette for contrast — fine over
+   a dark patch of photo, close to unreadable over a light one. Keeping
+   .ov's card backing here instead makes every subheading legible
+   regardless of what's behind it. */
 .ov-hero{
   top:48%;max-width:600px;
-  background:none;backdrop-filter:none;-webkit-backdrop-filter:none;
-  box-shadow:none;border-radius:0;
-  padding:0 7vw;margin:0;
 }
 /* Desktop-only per-section text placement (see app.js's TEXT_LAYOUT) —
    mobile keeps its own top:220px rule further down regardless. */
@@ -515,7 +520,11 @@ footer{
   .ov-right{right:3vw;left:3vw;text-align:left;}
   .reveal{font-size:clamp(24px,7vw,36px);}
   #photos img[data-void="true"]{object-position:center 14%;}
-  .ov-hero,.ov-void{top:220px;right:auto;left:0;transform:none;padding:0 7vw;}
+  /* padding restored to match .ov's own 22px 7vw above (it used to zero
+     out the vertical padding here too, which is fine with no card
+     background but crams the text right up against the card's edges now
+     that .ov-hero keeps that background for contrast). */
+  .ov-hero,.ov-void{top:220px;right:auto;left:0;transform:none;}
   .ov-hero h1.reveal{font-size:clamp(26px,8vw,38px);}
   .ov-hero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
   /* Was display:none — mobile had no estimate CTA at all above the fold
