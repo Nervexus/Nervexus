@@ -117,8 +117,8 @@ export const FAQS = [
     q: 'How long does installation take?',
     a: 'It mostly comes down to roof size and complexity:',
     bullets: [
-      'Single-story, 2,000–2,500 sq ft, simple gable or hip roof, one tear-off layer: 2–3 days',
-      '3,000+ sq ft, steep pitches, multiple valleys or dormers: 4–6 days',
+      'Single-story, 2,000 to 2,500 sq ft, simple gable or hip roof, one tear-off layer: 2 to 3 days',
+      '3,000+ sq ft, steep pitches, multiple valleys or dormers: 4 to 6 days',
       'Multi-structure properties (house plus garage or guest house): scoped and quoted as separate timelines',
       'More than one existing roofing layer to tear off: adds time',
       'Wet or high-wind days: built into the schedule as weather holds, never rushed through',

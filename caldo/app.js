@@ -104,19 +104,22 @@ function weightFor(section, idx) {
 function Panel({ idx, children, side = 'left', extraClass = '' }) {
   const s = useStore();
   const w = weightFor(s.section, idx);
-  const activeRef = useRef(false);
-  const [bump, setBump] = useState(0);
+  const playedRef = useRef(false);
   const isActive = w > 0.5;
   useEffect(() => {
-    if (isActive && !activeRef.current) {
-      activeRef.current = true;
-      setBump((b) => b + 1);
-    } else if (!isActive && activeRef.current) {
-      activeRef.current = false;
-    }
+    if (isActive) playedRef.current = true;
   }, [isActive]);
 
-  if (w <= 0.001) return null;
+  // Not mounted at all until it first approaches, to avoid paying render
+  // cost for every intro panel for the whole page lifetime — but once it
+  // has played its one-time letter-reveal entrance, it stays mounted
+  // (just faded to opacity 0 / pointer-events none below) instead of
+  // unmounting again at w<=0.001. Unmounting destroyed the Reveal
+  // animation's state, so scrolling back into range remounted it and
+  // replayed the full staggered reveal from scratch every time — invisible
+  // on a fast flick, but on a slow scroll back up the user sits right
+  // through that remount-and-replay, which read as scroll lag.
+  if (w <= 0.001 && !playedRef.current) return null;
   // Also gated on s.introOpacity, not just local weight: once scroll is
   // clamped past the last intro section, that section's weight sits at the
   // top of its own dwell range forever, which would otherwise leave this
@@ -130,7 +133,6 @@ function Panel({ idx, children, side = 'left', extraClass = '' }) {
     <div
       class=${`ov ov-${side} ${extraClass}`}
       style=${{ opacity: w, transform: `translateY(${(1 - w) * 18}px)`, pointerEvents: clickable ? 'auto' : 'none' }}
-      key=${bump}
     >
       ${children}
     </div>
