@@ -11,32 +11,33 @@ export const HERO = {
 
 // --- Static page content (normal document flow) ---------------------
 
-// The six-step walkthrough replacing the old photo-card grid — a plain,
-// text-only process list (no images) covering estimate through warranty.
-export const STEPS = [
+// Four standing-seam panel profiles — real distinctions within STRATA's
+// one product line (not different roofing materials), shown as a
+// cinematic image gallery under "What's Included".
+export const ROOF_TYPES = [
   {
-    h: 'Free on-site inspection',
-    body: 'A certified estimator walks your roof in person, documents every vulnerability and gives you a same-week quote, no obligation.',
+    name: 'Snap-Lock',
+    tagline: 'The standard choice',
+    body: 'Panels click together by hand, no seaming tool required. Concealed clips, clean lines, the profile on most of the roofs we build.',
+    photo: './photos/hero-house.webp',
   },
   {
-    h: 'Material & finish selection',
-    body: 'Pick your finish from five standard colors. Every panel is then laser-measured and cut to your roof’s exact geometry before the crew ever arrives.',
+    name: 'Mechanical-Lock',
+    tagline: 'Built for the coast',
+    body: 'Field-seamed into a fully interlocked panel for the highest wind and water rating we offer. The call for steep pitches and storm-line homes.',
+    photo: './photos/house-angle2.webp',
   },
   {
-    h: 'Tear-off & deck prep',
-    body: 'Old roofing comes off down to the deck. Any rot or damage underneath is repaired first. Nothing new goes down over a compromised base.',
+    name: 'Nail-Strip',
+    tagline: 'The value entry point',
+    body: 'A nail flange hidden beneath the overlapping panel — still zero exposed fasteners, at a lower installed cost than our locking profiles.',
+    photo: './photos/performance-house.webp',
   },
   {
-    h: 'Ice & water membrane',
-    body: 'A fully adhered ice-and-water membrane seals the deck, the quiet layer that does most of the actual waterproofing work.',
-  },
-  {
-    h: 'Standing-seam install',
-    body: 'Panels are mechanically double-locked on site to aerospace tolerances. No exposed fasteners, nothing for water to find.',
-  },
-  {
-    h: 'Final walkthrough & warranty',
-    body: 'Every install is inspected twice before we leave the site, then backed by a lifetime transferable warranty.',
+    name: 'Flush Panel',
+    tagline: 'Architectural flat-seam',
+    body: 'A flat pan with soldered or mechanically-formed seams for an almost seamless plane. Built for modern, low-slope architectural work.',
+    photo: './photos/engineering-layers.webp',
   },
 ];
 
