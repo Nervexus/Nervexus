@@ -42,14 +42,18 @@ nav{
   z-index:20;
   display:flex;align-items:center;
   pointer-events:auto;
-  background:rgba(247,246,243,0.5);
+  /* Opaque enough to stay legible over any hero photo, light or dark,
+     without waiting for the scroll-triggered .solid state — a plain
+     translucent 0.5 read fine over the old light hero photo but washed
+     out the nav text over a dark one. */
+  background:rgba(247,246,243,0.82);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid transparent;
   transition:border-color .3s, background .3s;
 }
 nav.solid{
-  background:rgba(247,246,243,0.78);
+  background:rgba(247,246,243,0.92);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
   border-bottom:1px solid var(--line);
