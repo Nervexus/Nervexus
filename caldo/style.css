@@ -417,6 +417,10 @@ footer{
      not overlaid on top. */
   .herofull{
     height:auto;min-height:0;overflow:visible;
+    /* Unlike desktop, the photo should not run behind the nav here —
+       push it down to start cleanly below the bar instead of letting
+       the fixed nav float over its top edge. */
+    padding-top:var(--nav-h);
   }
   .herofull img{
     position:static;
