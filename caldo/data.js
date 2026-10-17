@@ -4,7 +4,7 @@
 // frosted card — no scroll-pinned sequence, no crossfade, just a plain
 // static section at the top of the page.
 export const HERO = {
-  photo: './photos/hero-sunset.webp',
+  photo: './photos/hero-dark-clean.webp',
   h: 'The last roof you will ever need.',
   lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
 };

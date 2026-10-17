@@ -63,11 +63,12 @@ function Eyebrow({ children }) {
 // A single full-bleed hero photo with the headline/CTA overlaid in a
 // frosted card for contrast — no pin, no crossfade, no scroll-triggered
 // animation, just a plain static section at the very top of the page.
+// The photo itself already has the STRATA wordmark baked in (no CSS
+// watermark overlay needed on top of it).
 function HeroSection() {
   return html`
     <section class="herofull">
       <img src=${HERO.photo} alt="" />
-      <div class="heromark" aria-hidden="true">STRATA</div>
       <div class="herocard">
         <h1>${HERO.h}</h1>
         <p class="lede">${HERO.lede}</p>
