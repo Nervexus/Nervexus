@@ -491,24 +491,6 @@ function PageContent() {
   `;
 }
 
-// --- Sticky estimate bar ---------------------------------------------
-
-function BuyBar() {
-  const s = useStore();
-  const show = s.scrolledDown && s.footerT < 0.5;
-  return html`
-    <div class="buybar ${show ? 'show' : ''}">
-      <div class="buybarinner">
-        <div class="buybarinfo">
-          <strong>STRATA Roof System</strong>
-          <span>Free on-site estimate · Response within 1 business day</span>
-        </div>
-        <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get Estimate</button>
-      </div>
-    </div>
-  `;
-}
-
 // --- Support chat --------------------------------------------------------
 
 // No separate floating toggle button here — every CTA on the page
@@ -577,7 +559,7 @@ export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
   const pageRoot = document.getElementById('page-root');
   const footerRoot = document.getElementById('footer-root');
-  createRoot(fixedRoot).render(html`<${React.Fragment}><${AnnounceBar} /><${Nav} /><${BuyBar} /><${SupportChat} /><//>`);
+  createRoot(fixedRoot).render(html`<${React.Fragment}><${AnnounceBar} /><${Nav} /><${SupportChat} /><//>`);
   createRoot(pageRoot).render(html`<${PageContent} />`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }

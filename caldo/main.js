@@ -1,16 +1,8 @@
 import { setState } from './store.js';
 import { mountApp } from './app.js';
 
-const footer = document.getElementById('footer');
-
 function computeScrollState() {
-  const footerRect = footer.getBoundingClientRect();
-  const footerSpan = Math.max(footerRect.height, 1);
-  const footerT = Math.max(0, Math.min(1, (window.innerHeight - footerRect.top) / footerSpan));
-
   setState({
-    footerT,
-    scrolledDown: window.scrollY > window.innerHeight * 0.6,
     navSolid: window.scrollY > 4,
   });
 }
