@@ -48,7 +48,6 @@ function Nav() {
         </div>
         <div class="navicons">
           <button class="iconbtn" aria-label="Client login"><${AccountIcon} /></button>
-          <button class="btn btnprimary navcta" onClick=${() => setState({ chatOpen: true })}>Get Estimate</button>
         </div>
       </div>
     </nav>
