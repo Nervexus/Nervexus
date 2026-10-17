@@ -479,18 +479,25 @@ footer{
      A fade on the clip edges (rather than a hard cut) keeps the
      neighboring peeking cards from looking chopped off — a gradient
      overlay rather than mask-image, which triggered a compositing
-     glitch (a stray solid bar) on real Safari. */
-  .cardstage{height:300px;overflow:hidden;}
-  .cardstage::before,
-  .cardstage::after{
+     glitch on real Safari.
+     The clip itself sits on .stepscarousel (the wrapper around the
+     stage + its nav arrows), not .cardstage directly — clipping
+     tight to the card's own height cut its drop shadow off with a
+     hard edge; the wrapper's extra vertical room (the gap down to
+     the nav arrows) gives the shadow space to fade out naturally
+     instead. */
+  .stepscarousel{position:relative;overflow:hidden;}
+  .stepscarousel::before,
+  .stepscarousel::after{
     content:'';
     position:absolute;top:0;bottom:0;z-index:5;
     width:32px;pointer-events:none;
   }
-  .cardstage::before{left:0;background:linear-gradient(to right, var(--paper), transparent);}
-  .cardstage::after{right:0;background:linear-gradient(to left, var(--paper), transparent);}
-  .revstage::before{background:linear-gradient(to right, var(--ink), transparent);}
-  .revstage::after{background:linear-gradient(to left, var(--ink), transparent);}
+  .stepscarousel::before{left:0;background:linear-gradient(to right, var(--paper), transparent);}
+  .stepscarousel::after{right:0;background:linear-gradient(to left, var(--paper), transparent);}
+  .reviewsinner .stepscarousel::before{background:linear-gradient(to right, var(--ink), transparent);}
+  .reviewsinner .stepscarousel::after{background:linear-gradient(to left, var(--ink), transparent);}
+  .cardstage{height:300px;}
   .stepcard{width:250px;max-width:70vw;padding:22px 18px;}
   .stepicon{width:36px;height:36px;border-radius:10px;margin-bottom:12px;}
   .stepicon svg{width:18px;height:18px;}
