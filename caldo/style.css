@@ -117,9 +117,10 @@ nav.solid{
 }
 .herocard{
   position:absolute;z-index:2;
-  top:50%;left:7vw;
-  transform:translateY(-50%);
-  max-width:520px;
+  bottom:9vh;left:50%;
+  transform:translateX(-50%);
+  max-width:560px;
+  text-align:center;
   padding:30px 34px;border-radius:20px;
   background:rgba(247,246,243,0.86);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
@@ -127,7 +128,7 @@ nav.solid{
 }
 .herocard h1{font-size:clamp(32px,4.6vw,54px);line-height:1.08;}
 .lede{
-  margin-top:16px;max-width:420px;
+  margin:16px auto 0;max-width:420px;
   font-size:15.5px;line-height:1.5;color:var(--ink-2);
 }
 .heroactions{margin-top:22px;}
@@ -425,6 +426,7 @@ footer{
   .herocard{
     position:static;
     transform:none;
+    text-align:left;
     max-width:none;width:auto;
     margin:0;
     padding:28px 7vw 32px;border-radius:0;
@@ -433,7 +435,7 @@ footer{
     box-shadow:none;
   }
   .herocard h1{font-size:clamp(26px,8vw,38px);}
-  .herocard .lede{margin-top:10px;font-size:14px;line-height:1.5;}
+  .herocard .lede{margin:10px 0 0;font-size:14px;line-height:1.5;}
   .herocard .heroactions{margin-top:18px;}
   .herocard .heroactions .btn{width:100%;text-align:center;padding:13px 20px;font-size:14.5px;}
   .page-section{padding:72px 24px;}
