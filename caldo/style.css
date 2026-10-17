@@ -409,19 +409,19 @@ footer{
   .navlinks{display:none;}
   .buybarinner{padding-right:84px;}
   /* The desktop treatment (card floated mid-photo over a tall 86vh
-     banner) doesn't translate to a narrow, much-shorter viewport — a
-     wide landscape photo squeezed that tall either crops hard or, at
-     its natural aspect ratio, shrinks to a tiny strip with an awkward
-     floating card. Mobile instead gets a plain stacked layout: a
-     shorter full-bleed photo banner, then the headline/CTA as a
-     regular content block directly below it, not overlaid on top. */
+     banner) doesn't translate to a narrow, much-shorter viewport.
+     Mobile gets a plain stacked layout instead: the photo at its own
+     natural aspect ratio (nothing cropped off — the whole house and
+     the STRATA wordmark behind it stay visible, just smaller), then
+     the headline/CTA as a regular content block directly below it,
+     not overlaid on top. */
   .herofull{
     height:auto;min-height:0;overflow:visible;
   }
   .herofull img{
     position:static;
-    width:100%;height:40vh;min-height:280px;
-    object-position:center 38%;
+    width:100%;height:auto;
+    object-fit:contain;
   }
   .herocard{
     position:static;
