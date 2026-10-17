@@ -421,6 +421,12 @@ footer{
   .herofull img{
     position:static;
     width:100%;height:auto;
+    /* Pin the box to the photo's own ratio up front rather than
+       waiting on the browser to read the file's intrinsic size —
+       real Safari was computing the box height late (or wrong),
+       cropping the top of the image (and the STRATA wordmark on it)
+       before that resolved. */
+    aspect-ratio:1685/934;
     object-fit:contain;
   }
   .herocard{
