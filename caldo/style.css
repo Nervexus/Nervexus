@@ -50,7 +50,7 @@ img{display:block;max-width:100%;}
 }
 .announcetrack{
   display:flex;width:max-content;
-  animation:announce-scroll 28s linear infinite;
+  animation:announce-scroll 55s linear infinite;
 }
 .announceseq{display:flex;}
 .announceseq span{
