@@ -30,6 +30,32 @@ const LogoMark = () => html`
   </svg>
 `;
 
+// --- Announcement bar ---------------------------------------------------
+
+// A seamless, endless horizontal ticker: two identical copies of the
+// message placed back to back, animated from translateX(0) to
+// translateX(-50%) — since both copies are the same width, the moment
+// the first scrolls fully offscreen the second is sitting exactly
+// where the first started, so the loop point is invisible.
+const ANNOUNCE_MSG = '10% OFF YOUR WINTER ROOF — LIMITED TIME';
+
+function AnnounceBar() {
+  const repeated = Array.from({ length: 8 }, () => ANNOUNCE_MSG);
+  const Sequence = ({ hidden }) => html`
+    <div class="announceseq" aria-hidden=${hidden ? 'true' : undefined}>
+      ${repeated.map((msg, i) => html`<span key=${i}>${msg}</span>`)}
+    </div>
+  `;
+  return html`
+    <div class="announcebar">
+      <div class="announcetrack">
+        <${Sequence} hidden=${false} />
+        <${Sequence} hidden=${true} />
+      </div>
+    </div>
+  `;
+}
+
 // --- Nav ---------------------------------------------------------------
 
 function Nav() {
@@ -551,7 +577,7 @@ export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
   const pageRoot = document.getElementById('page-root');
   const footerRoot = document.getElementById('footer-root');
-  createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${BuyBar} /><${SupportChat} /><//>`);
+  createRoot(fixedRoot).render(html`<${React.Fragment}><${AnnounceBar} /><${Nav} /><${BuyBar} /><${SupportChat} /><//>`);
   createRoot(pageRoot).render(html`<${PageContent} />`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }
