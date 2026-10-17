@@ -441,7 +441,15 @@ footer{
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
-  .cardstage{height:300px;}
+  /* Off-screen fan cards (offset beyond ±2) sit at a fixed ±640px
+     translateX — invisible (opacity:0) but still laid out there, which
+     on iOS Safari can leak into the page's real horizontal scrollable
+     area despite html's overflow-x:hidden (a known WebKit quirk: that
+     root-level rule doesn't reliably contain a descendant's transformed
+     overflow). Clipping the stage itself removes the leak at the
+     source, which is also what was making the visible card look
+     oversized/cut off — the viewport had silently panned sideways. */
+  .cardstage{height:300px;overflow:hidden;}
   .stepcard{width:250px;max-width:70vw;padding:22px 18px;}
   .stepicon{width:36px;height:36px;border-radius:10px;margin-bottom:12px;}
   .stepicon svg{width:18px;height:18px;}
