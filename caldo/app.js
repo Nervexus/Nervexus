@@ -39,7 +39,6 @@ function Nav() {
       <div class="navinner">
         <a href="#top" class="navlogo" onClick=${(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} aria-label="STRATA home">
           <${LogoMark} />
-          <span class="logo">STRATA</span>
         </a>
         <div class="navlinks">
           <a href="#services">Services</a>
