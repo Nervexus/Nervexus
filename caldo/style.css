@@ -77,35 +77,16 @@ nav.solid{
 .iconbtn:hover{background:rgba(22,23,26,0.06);}
 .navcta{padding:9px 18px;font-size:12.5px;}
 
-/* ---------- intro sections (plain static content, no more
-   scroll-pinned cinematic crossfade — a photo and some text, in normal
-   document flow) ---------- */
-
 .eyebrow{
   font-size:12px;letter-spacing:0.14em;font-weight:600;
   color:var(--accent);text-transform:uppercase;margin-bottom:14px;
 }
 
-.reveal{font-size:clamp(28px,4.2vw,48px);line-height:1.08;}
-.introh1{font-size:clamp(32px,4.8vw,56px);}
-.w{display:inline-block;overflow:hidden;vertical-align:top;white-space:nowrap;}
-.w i{
-  display:inline-block;font-style:normal;
-  transform:translateY(0.9em);filter:blur(6px);opacity:0;
-  transition:transform .62s cubic-bezier(.16,1,.3,1), filter .62s cubic-bezier(.16,1,.3,1), opacity .5s linear;
-}
-.reveal.in .w i{transform:translateY(0);filter:blur(0);opacity:1;}
-
-.lede{
-  margin-top:16px;max-width:420px;
-  font-size:15.5px;line-height:1.5;color:var(--ink-2);
-}
 .body{
   margin-top:18px;max-width:380px;
   font-size:16px;line-height:1.6;color:var(--ink-2);
 }
 
-.heroactions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;}
 .btn{
   padding:13px 22px;border-radius:999px;font-size:14px;font-weight:500;
   transition:transform .2s, background .2s, color .2s, border-color .2s;
@@ -116,17 +97,35 @@ nav.solid{
 .btnghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
 .btnghost:hover{border-color:var(--ink);}
 
-.introsection{
-  display:flex;align-items:center;gap:64px;
-  max-width:1200px;margin:0 auto;padding:100px 28px;
+/* ---------- hero (single full-bleed photo, text overlaid) ---------- */
+
+.herofull{
+  position:relative;
+  width:100%;
+  height:86vh;min-height:560px;
+  overflow:hidden;
 }
-.introsection.introreverse{flex-direction:row-reverse;}
-.introsection .introphoto{flex:1 1 50%;min-width:0;}
-.introsection .introtext{flex:1 1 50%;min-width:0;max-width:460px;}
-.introphoto img{
-  width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:24px;
+.herofull img{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  object-fit:cover;object-position:center;
 }
-.introhero{padding-top:calc(var(--nav-h) + 56px);}
+.herocard{
+  position:absolute;
+  top:50%;left:7vw;
+  transform:translateY(-50%);
+  max-width:520px;
+  padding:30px 34px;border-radius:20px;
+  background:rgba(247,246,243,0.86);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  box-shadow:0 20px 50px rgba(22,23,26,0.12);
+}
+.herocard h1{font-size:clamp(32px,4.6vw,54px);line-height:1.08;}
+.lede{
+  margin-top:16px;max-width:420px;
+  font-size:15.5px;line-height:1.5;color:var(--ink-2);
+}
+.heroactions{margin-top:22px;}
 
 .swatches{display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;}
 .swatch{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:11px;color:var(--ink-2);}
@@ -403,18 +402,15 @@ footer{
 @media (max-width:860px){
   .navlinks{display:none;}
   .buybarinner{padding-right:84px;}
-  .reveal{font-size:clamp(24px,7vw,36px);}
-  .introsection{
-    flex-direction:column;align-items:stretch;gap:28px;padding:64px 24px;
+  .herofull{height:72vh;min-height:460px;}
+  .herocard{
+    left:3vw;right:3vw;top:auto;bottom:24px;transform:none;
+    max-width:none;padding:22px 7vw;border-radius:22px;
   }
-  .introsection.introreverse{flex-direction:column;}
-  .introsection .introtext{order:1;max-width:none;}
-  .introsection .introphoto{order:2;}
-  .introhero{padding-top:calc(var(--nav-h) + 36px);}
-  .introh1{font-size:clamp(26px,8vw,38px);}
-  .introhero .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
-  .introhero .heroactions{margin-top:16px;}
-  .introhero .heroactions .btn{padding:11px 20px;font-size:13.5px;}
+  .herocard h1{font-size:clamp(26px,8vw,38px);}
+  .herocard .lede{margin-top:8px;font-size:13.5px;line-height:1.4;}
+  .herocard .heroactions{margin-top:16px;}
+  .herocard .heroactions .btn{padding:11px 20px;font-size:13.5px;}
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
@@ -445,5 +441,4 @@ footer{
 
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
-  .w i, .reveal.in .w i{transition:none;}
 }

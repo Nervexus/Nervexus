@@ -1,28 +1,12 @@
 // STRATA — copy and content data.
-//
-// The old scroll-pinned cinematic intro (a fixed photo backdrop
-// crossfading behind 4 sections) is gone, replaced by plain static
-// sections in normal document flow — see app.js's HeroSection,
-// ProblemSection, PerformanceSection.
 
+// A single full-bleed hero photo with the headline/CTA overlaid in a
+// frosted card — no scroll-pinned sequence, no crossfade, just a plain
+// static section at the top of the page.
 export const HERO = {
-  photo: 'hero-house',
+  photo: './photos/hero-house.webp',
   h: 'The last roof you will ever need.',
   lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
-};
-
-export const PROBLEM = {
-  photo: 'house-angle2',
-  eyebrow: 'THE PROBLEM',
-  h: 'Most roofs fail by year eight.',
-  body: 'Rushed crews, cut-rate underlayment and big-box materials turn a thirty-year roof into an eight-year liability. STRATA is built around one idea: your roof should never be the weakest part of your home.',
-};
-
-export const PERFORMANCE = {
-  photo: 'performance-house',
-  eyebrow: 'PERFORMANCE',
-  h: '140mph wind rated. Lifetime warranty.',
-  body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once. Outlive the mortgage.',
 };
 
 // --- Static page content (normal document flow) ---------------------
@@ -121,10 +105,3 @@ export const SWATCHES = [
   { name: 'Bone White', hex: '#e7e2d6' },
   { name: 'Graphite', hex: '#1f2126' },
 ];
-
-// The static <img> src for each of the 3 plain intro sections above.
-export const PHOTO_SRC = {
-  'hero-house': './photos/hero-house.webp',
-  'house-angle2': './photos/house-angle2.webp',
-  'performance-house': './photos/performance-house.webp',
-};

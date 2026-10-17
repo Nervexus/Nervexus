@@ -10,7 +10,7 @@ function computeScrollState() {
 
   setState({
     footerT,
-    heroPast: window.scrollY > window.innerHeight * 0.6,
+    scrolledDown: window.scrollY > window.innerHeight * 0.6,
     navSolid: window.scrollY > 4,
   });
 }

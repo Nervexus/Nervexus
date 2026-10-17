@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import htm from 'htm';
-import { HERO, PROBLEM, PERFORMANCE, STEPS, TESTIMONIALS, FAQS, SWATCHES, PHOTO_SRC } from './data.js';
+import { HERO, STEPS, TESTIMONIALS, FAQS, SWATCHES } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
@@ -29,35 +29,6 @@ const LogoMark = () => html`
     <path d="M12 5v4" />
   </svg>
 `;
-
-// --- Headline letter/word reveal --------------------------------------
-
-function Reveal({ text, tag = 'h2', className = '', active = true }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    if (!active) return;
-    const el = ref.current;
-    if (!el) return;
-    const id = requestAnimationFrame(() => el.classList.add('in'));
-    return () => cancelAnimationFrame(id);
-  }, [active, text]);
-
-  let i = 0;
-  const words = text.split(' ').map((word, wi) => {
-    const letters = [...word].map((ch) => {
-      const delay = i++ * 42;
-      return html`<i style=${{ transitionDelay: `${delay}ms` }}>${ch}</i>`;
-    });
-    i++; // account for the space between words in the stagger count
-    return html`<span class="w" key=${wi}>${letters}</span>`;
-  });
-
-  return React.createElement(tag, { className: `reveal ${className}`, ref }, words.reduce((acc, w, idx) => {
-    acc.push(w);
-    if (idx < words.length - 1) acc.push(' ');
-    return acc;
-  }, []));
-}
 
 // --- Nav ---------------------------------------------------------------
 
@@ -89,71 +60,19 @@ function Eyebrow({ children }) {
   return html`<div class="eyebrow">${children}</div>`;
 }
 
-// Plays its child Reveal once, the first time the section scrolls into
-// view, then leaves it alone — no replay on repeat visits (scrolling
-// back up past a section you've already seen), the same lesson the old
-// pinned intro had to learn the hard way.
-function useInView(threshold = 0.25) {
-  const ref = useRef(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setInView(true);
-        obs.disconnect();
-      }
-    }, { threshold });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, inView];
-}
-
-// --- Intro sections (normal document flow — no more scroll-pinned
-// cinematic crossfade; each photo is just a plain image in its own
-// section now) -----------------------------------------------------------
-
+// A single full-bleed hero photo with the headline/CTA overlaid in a
+// frosted card for contrast — no pin, no crossfade, no scroll-triggered
+// animation, just a plain static section at the very top of the page.
 function HeroSection() {
-  const [ref, inView] = useInView(0.15);
   return html`
-    <section class="introsection introhero" ref=${ref}>
-      <div class="introphoto"><img src=${PHOTO_SRC[HERO.photo]} alt="" /></div>
-      <div class="introtext">
-        <${Reveal} tag="h1" className="introh1" text=${HERO.h} active=${inView} />
+    <section class="herofull">
+      <img src=${HERO.photo} alt="" />
+      <div class="herocard">
+        <h1>${HERO.h}</h1>
         <p class="lede">${HERO.lede}</p>
         <div class="heroactions">
           <button class="btn btnprimary" onClick=${() => setState({ chatOpen: true })}>Get a Free Estimate</button>
         </div>
-      </div>
-    </section>
-  `;
-}
-
-function ProblemSection() {
-  const [ref, inView] = useInView(0.25);
-  return html`
-    <section class="introsection" ref=${ref}>
-      <div class="introphoto"><img src=${PHOTO_SRC[PROBLEM.photo]} alt="" /></div>
-      <div class="introtext">
-        <${Eyebrow}>${PROBLEM.eyebrow}<//>
-        <${Reveal} text=${PROBLEM.h} active=${inView} />
-        <p class="body">${PROBLEM.body}</p>
-      </div>
-    </section>
-  `;
-}
-
-function PerformanceSection() {
-  const [ref, inView] = useInView(0.25);
-  return html`
-    <section class="introsection introreverse" ref=${ref}>
-      <div class="introphoto"><img src=${PHOTO_SRC[PERFORMANCE.photo]} alt="" /></div>
-      <div class="introtext">
-        <${Eyebrow}>${PERFORMANCE.eyebrow}<//>
-        <${Reveal} text=${PERFORMANCE.h} active=${inView} />
-        <p class="body">${PERFORMANCE.body}</p>
       </div>
     </section>
   `;
@@ -539,8 +458,6 @@ function PageContent() {
   return html`
     <${React.Fragment}>
       <${HeroSection} />
-      <${ProblemSection} />
-      <${PerformanceSection} />
       <${ServicesSection} />
       <${TestimonialsSection} />
       <${FaqSection} />
@@ -552,7 +469,7 @@ function PageContent() {
 
 function BuyBar() {
   const s = useStore();
-  const show = s.heroPast && s.footerT < 0.5;
+  const show = s.scrolledDown && s.footerT < 0.5;
   return html`
     <div class="buybar ${show ? 'show' : ''}">
       <div class="buybarinner">
