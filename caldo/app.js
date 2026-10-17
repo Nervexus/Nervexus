@@ -535,22 +535,11 @@ function FaqSection() {
   `;
 }
 
-// Split in two rather than one PageContent: the interactive 3D roof
-// build-up (roofbuild.js) sits between PageTop and PageBottom in the
-// document, as a plain static section React doesn't render or control —
-// see index.html's #page-top-root / #roofbuild / #page-bottom-root.
-function PageTop() {
+function PageContent() {
   return html`
     <${React.Fragment}>
       <${HeroSection} />
       <${ProblemSection} />
-    <//>
-  `;
-}
-
-function PageBottom() {
-  return html`
-    <${React.Fragment}>
       <${PerformanceSection} />
       <${ServicesSection} />
       <${TestimonialsSection} />
@@ -643,11 +632,9 @@ function Footer() {
 
 export function mountApp() {
   const fixedRoot = document.getElementById('app-fixed-root');
-  const pageTopRoot = document.getElementById('page-top-root');
-  const pageBottomRoot = document.getElementById('page-bottom-root');
+  const pageRoot = document.getElementById('page-root');
   const footerRoot = document.getElementById('footer-root');
   createRoot(fixedRoot).render(html`<${React.Fragment}><${Nav} /><${BuyBar} /><${SupportChat} /><//>`);
-  createRoot(pageTopRoot).render(html`<${PageTop} />`);
-  createRoot(pageBottomRoot).render(html`<${PageBottom} />`);
+  createRoot(pageRoot).render(html`<${PageContent} />`);
   createRoot(footerRoot).render(html`<${Footer} />`);
 }

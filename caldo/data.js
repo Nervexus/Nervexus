@@ -3,8 +3,7 @@
 // The old scroll-pinned cinematic intro (a fixed photo backdrop
 // crossfading behind 4 sections) is gone, replaced by plain static
 // sections in normal document flow — see app.js's HeroSection,
-// ProblemSection, PerformanceSection, and the interactive 3D roof
-// build-up in roofbuild.js for what used to be the "Engineering" beat.
+// ProblemSection, PerformanceSection.
 
 export const HERO = {
   photo: 'hero-house',
@@ -25,24 +24,6 @@ export const PERFORMANCE = {
   h: '140mph wind rated. Lifetime warranty.',
   body: 'Independently tested to coastal commercial code and installed to the same tolerance. Put it on once. Outlive the mortgage.',
 };
-
-// Feeds the interactive 3D roof build-up (roofbuild.js). `key` is wired
-// directly into that scene's geometry groups — rafter/insul/membrane/
-// counter/batten/slate — so it has to stay exactly as is; name/note are
-// just the display copy and are safe to edit freely. Reworded from the
-// original generic slate-roof labels to STRATA's actual standing-seam
-// construction (reusing phrasing already established elsewhere on the
-// site — the ice-and-water membrane, the mechanically double-locked,
-// no-exposed-fastener panel system) so this doesn't contradict what the
-// rest of the page says STRATA actually builds.
-export const ROOF_LAYERS = [
-  { key: 'rafter', name: 'Rafters', note: 'The structural timber frame underneath. We check for rot, sag and damage before anything new goes back on.' },
-  { key: 'insul', name: 'Insulated deck', note: 'Insulated steel decking across the rafters. Most of your heating and cooling bill is decided right here.' },
-  { key: 'membrane', name: 'Ice & water membrane', note: 'A fully adhered membrane that seals every seam, the layer that does most of the actual waterproofing work.' },
-  { key: 'counter', name: 'Counter battens', note: 'Treated timber furring that lifts the panel system clear of the deck, giving any trapped moisture a clear path to the gutter.' },
-  { key: 'batten', name: 'Clip rail', note: 'Concealed fastening rail the panels lock onto. No exposed screws through the roof, anywhere.' },
-  { key: 'slate', name: 'Standing-seam shell', note: 'Mechanically double-locked steel panels, finished in your choice of five colors. The only layer you ever see.' },
-];
 
 // --- Static page content (normal document flow) ---------------------
 

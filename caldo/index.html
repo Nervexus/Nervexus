@@ -35,31 +35,10 @@
 <body>
   <div id="app-fixed-root"></div>
   <main id="page">
-    <div id="page-top-root"></div>
-
-    <section class="scrolly" id="roofbuild">
-      <div class="pin">
-        <div class="mark" aria-hidden="true">STRATA</div>
-        <div class="stage">
-          <canvas id="gl" aria-label="3D standing-seam roof separating into its layers"></canvas>
-          <div class="fallback" id="roofbuild-fallback" hidden>3D view isn't available in this browser.</div>
-        </div>
-        <div class="copy">
-          <div class="eyebrow">Inside a STRATA roof</div>
-          <h2 class="title">Six layers between you and the weather.</h2>
-          <ol class="steps" id="roofbuild-steps"></ol>
-          <div class="hint" id="roofbuild-hint">Scroll to take the roof apart</div>
-          <div class="bar"><i id="roofbuild-bar"></i></div>
-        </div>
-      </div>
-    </section>
-
-    <div id="page-bottom-root"></div>
+    <div id="page-root"></div>
   </main>
   <footer id="footer"><div id="footer-root"></div></footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script type="module" src="./roofbuild.js"></script>
   <script type="module" src="./main.js"></script>
 </body>
 </html>
