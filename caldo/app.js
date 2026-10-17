@@ -67,6 +67,7 @@ function HeroSection() {
   return html`
     <section class="herofull">
       <img src=${HERO.photo} alt="" />
+      <div class="heromark" aria-hidden="true">STRATA</div>
       <div class="herocard">
         <h1>${HERO.h}</h1>
         <p class="lede">${HERO.lede}</p>
