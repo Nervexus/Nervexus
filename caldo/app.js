@@ -308,11 +308,15 @@ function useSwipeCarousel(n) {
 
 const RING_CARD_H = 0.62; // card height, of the stage
 const RING_CARD_RATIO = 0.74; // card width / height — portrait, room for real copy
-const RING_SPACING = 1.22; // radius multiplier over the minimum non-overlap distance
-const RING_LENS = 2.3; // perspective distance, in card heights
-const RING_WHEEL_DEG = 0.22; // ring degrees per px of horizontal wheel delta
-const RING_DRAG_DEG = 0.3; // ...and per px dragged horizontally
-const RING_AUTO_SPEED = 0.045; // idle auto-rotate, degrees per frame
+const RING_SPACING = 1.8; // radius multiplier over the minimum non-overlap distance — generous gaps between cards
+// A bigger radius alone would also blow the front card up under perspective
+// (it sits closer to the viewer than the others by exactly `radius`) —
+// pulling the perspective distance out further keeps that magnification
+// modest instead of overflowing its own container.
+const RING_LENS = 5.5; // perspective distance, in card heights
+const RING_WHEEL_DEG = 0.1; // ring degrees per px of horizontal wheel delta — slower, more deliberate
+const RING_DRAG_DEG = 0.15; // ...and per px dragged horizontally
+const RING_AUTO_SPEED = 0.03; // idle auto-rotate, degrees per frame
 const RING_IDLE_MS = 1100; // quiet time after interaction before auto-rotate resumes
 const RING_SETTLE = 160; // quiet time before the ring settles on an item
 const RING_EASE = 0.14; // fraction of remaining distance closed per frame
