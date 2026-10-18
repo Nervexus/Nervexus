@@ -113,9 +113,9 @@ const ChevronIcon = ({ flip }) => html`
 `;
 
 // Fanned-3D-stack placement for a card at `offset` steps from the
-// focused one — used by the reviews carousel below. Pure CSS 3D
-// transforms (no Three.js/GSAP dependency), kept to the site's own
-// palette rather than borrowing anyone else's.
+// focused one — used by the roof types and reviews carousels below.
+// Pure CSS 3D transforms (no Three.js/GSAP dependency), kept to the
+// site's own palette rather than borrowing anyone else's.
 function fanStyle(offset) {
   const abs = Math.abs(offset);
   if (abs > 2) {
@@ -152,7 +152,7 @@ function TestimonialCard({ t, offset }) {
 
 // Drives a swipeable fanned-card-stack carousel: current index, keyboard
 // left/right nav (only while the carousel is in view), and the drag
-// gesture itself. Used by the reviews carousel.
+// gesture itself. Shared by the roof types and reviews carousels.
 function useSwipeCarousel(n) {
   const [idx, setIdx] = useState(0);
   const ref = useRef(null);
@@ -291,16 +291,16 @@ function useSwipeCarousel(n) {
   return { idx, go, ref, stageRef };
 }
 
-// A plain native-scroll gallery rather than another fanned-card
-// carousel — no swipe-gesture JS, no stage/clip-fade machinery, just a
-// horizontally scrollable, scroll-snapped row of full-bleed photo
-// cards. Each one carries its own caption in a bottom gradient scrim
-// instead of a separate text block, for a cinematic, image-led read.
-function RoofTypeCard({ t }) {
+// A smaller fanned-stack card, one in view at a time — same swipe/arrow
+// carousel as reviews below, rather than the wider multi-visible photo
+// strip this replaced. A compact image strip up top (one consistent
+// roof shot showing the full layer stack, not a different house per
+// card) with the profile's name/tagline/body underneath.
+function RoofTypeCard({ t, offset }) {
   return html`
-    <div class="rooftype">
-      <img src=${t.photo} alt=${t.name} />
-      <div class="rooftypescrim">
+    <div class="rooftypecard" style=${fanStyle(offset)}>
+      <div class="rooftypeimg"><img src=${t.photo} alt="" /></div>
+      <div class="rooftypetext">
         <div class="rooftypetag">${t.tagline}</div>
         <h3>${t.name}</h3>
         <p class="body">${t.body}</p>
@@ -309,10 +309,19 @@ function RoofTypeCard({ t }) {
   `;
 }
 
-function RoofTypesGallery() {
+function RoofTypesCarousel() {
+  const n = ROOF_TYPES.length;
+  const { idx, go, ref, stageRef } = useSwipeCarousel(n);
   return html`
-    <div class="rooftypes">
-      ${ROOF_TYPES.map((t) => html`<${RoofTypeCard} key=${t.name} t=${t} />`)}
+    <div class="stepscarousel" ref=${ref}>
+      <div class="cardstage" ref=${stageRef}>
+        ${ROOF_TYPES.map((t, i) => html`<${RoofTypeCard} key=${t.name} t=${t} offset=${cyclicOffset(i, idx, n)} />`)}
+      </div>
+      <div class="cardnav">
+        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous profile"><${ChevronIcon} flip /></button>
+        <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next profile"><${ChevronIcon} /></button>
+      </div>
     </div>
   `;
 }
@@ -354,7 +363,7 @@ function ServicesSection() {
         <h2>Four profiles. One standard of build.</h2>
         <p class="body">Every STRATA roof is standing-seam metal — the profile changes with your roof's pitch, budget and exposure.</p>
       </div>
-      <${RoofTypesGallery} />
+      <${RoofTypesCarousel} />
       <${FinishesStrip} />
     </section>
   `;

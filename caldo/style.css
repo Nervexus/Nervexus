@@ -145,6 +145,10 @@ nav.solid{
   height:86vh;min-height:560px;
   overflow:hidden;
   background:#0d0e10;
+  /* Start cleanly below the fixed announcement bar + nav instead of
+     letting them float over the photo's top edge — same fix as mobile
+     below, just applied here too. */
+  margin-top:var(--header-h);
 }
 .herofull img{
   position:absolute;inset:0;
@@ -181,50 +185,35 @@ nav.solid{
 .page-head h2{font-size:clamp(28px,3.4vw,40px);line-height:1.12;}
 .page-head .body{max-width:560px;}
 
-/* ---------- roof types (cinematic photo gallery) ---------- */
+/* ---------- roof types (one-at-a-time swipe carousel) ---------- */
 
-/* Plain native horizontal scroll with scroll-snap — no swipe-gesture
-   JS, no fanned 3D stack. Each card is self-contained (photo + caption
-   in its own bottom scrim), so the whole thing reads as one calm,
-   image-led strip rather than another interactive carousel widget. */
-.rooftypes{
-  display:flex;gap:20px;
-  margin-top:28px;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  padding-bottom:2px;
-}
-.rooftypes::-webkit-scrollbar{display:none;}
-.rooftype{
-  position:relative;
-  flex:0 0 auto;
-  width:340px;aspect-ratio:3/4;
-  border-radius:24px;
+/* Same fanned-card-stack carousel as reviews below (.cardstage) — a
+   smaller card, one in view at a time, swipe or arrow to the next.
+   A compact image strip up top (one consistent roof shot, the same
+   photo across every card) rather than a different house per card. */
+.rooftypecard{
+  position:absolute;
+  top:0;left:50%;
+  width:300px;max-width:82vw;
+  height:100%;
+  display:flex;flex-direction:column;
+  background:#fff;border:1px solid var(--line);border-radius:22px;
   overflow:hidden;
-  scroll-snap-align:start;
-  background:#0d0e10;
+  box-shadow:0 24px 60px rgba(22,23,26,0.1);
+  transition:transform .45s cubic-bezier(.22,1,.36,1), opacity .4s ease;
+  will-change:transform, opacity;
+  touch-action:none;
+  -webkit-user-select:none;user-select:none;
 }
-.rooftype img{
-  position:absolute;inset:0;
-  width:100%;height:100%;object-fit:cover;
-}
-.rooftypescrim{
-  position:absolute;left:0;right:0;bottom:0;
-  padding:28px 24px;
-  background:linear-gradient(to top, rgba(13,14,16,0.92), rgba(13,14,16,0.5) 60%, transparent);
-  color:#fff;
-}
+.rooftypeimg{flex:0 0 auto;width:100%;height:130px;}
+.rooftypeimg img{width:100%;height:100%;object-fit:cover;}
+.rooftypetext{padding:20px 22px 24px;flex:1 1 auto;min-height:0;}
 .rooftypetag{
-  font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
-  color:var(--accent);margin-bottom:6px;
+  font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--accent);
 }
-.rooftypescrim h3{font-size:22px;color:#fff;}
-.rooftypescrim .body{
-  margin-top:8px;max-width:none;
-  font-size:13.5px;line-height:1.5;color:rgba(255,255,255,0.75);
-}
+.rooftypetext h3{font-size:19px;margin-top:8px;}
+.rooftypetext .body{margin-top:10px;font-size:13.5px;line-height:1.55;}
 
 .stepscarousel{margin-top:16px;}
 .cardstage{
@@ -449,9 +438,9 @@ footer{
      not overlaid on top. */
   .herofull{
     height:auto;min-height:0;overflow:visible;
-    /* Unlike desktop, the photo should not run behind the header here —
-       push it down to start cleanly below the announcement bar + nav
-       instead of letting them float over its top edge. */
+    /* Same push-below-header fix as desktop, but via padding (not
+       margin) here since the layout below stacks instead of overlays. */
+    margin-top:0;
     padding-top:var(--header-h);
   }
   .herofull img{
@@ -483,11 +472,11 @@ footer{
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
-  .rooftypes{gap:14px;margin:0 -24px;padding:0 24px 2px;scroll-padding-left:24px;}
-  .rooftype{width:78vw;max-width:320px;border-radius:20px;}
-  .rooftypescrim{padding:20px 18px;}
-  .rooftypescrim h3{font-size:19px;}
-  .rooftypescrim .body{font-size:12.5px;}
+  .rooftypecard{width:250px;max-width:70vw;}
+  .rooftypeimg{height:110px;}
+  .rooftypetext{padding:16px 16px 18px;}
+  .rooftypetext h3{font-size:16px;margin-top:6px;}
+  .rooftypetext .body{font-size:12.5px;margin-top:8px;line-height:1.5;}
   /* Off-screen fan cards (offset beyond ±2) sit at a fixed ±640px
      translateX — invisible (opacity:0) but still laid out there, which
      on iOS Safari can leak into the page's real horizontal scrollable
