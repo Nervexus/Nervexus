@@ -410,14 +410,17 @@ function LayersRing({ items, onApi }) {
     const el = stageRef.current;
     if (!el) return;
     const onWheel = (event) => {
-      // Only a horizontal-dominant gesture (trackpad left/right swipe)
-      // turns the fan — a plain vertical mouse-wheel scroll passes
-      // straight through to the page, untouched. Dragging/scrolling the
-      // content right moves to the previous card, matching the usual
-      // horizontal-swipe-carousel convention.
-      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
-      event.preventDefault();
-      to(target.current - event.deltaX * RING_WHEEL_DEG);
+      // A plain mouse wheel only ever reports deltaY — gating this on
+      // deltaX (an actual horizontal trackpad swipe) left it dead for
+      // most input devices. Use whichever axis the device actually
+      // reports, same as before for a trackpad's left/right swipe, but
+      // a normal scroll wheel now drives it too.
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      const next = target.current + delta * RING_WHEEL_DEG;
+      // Only take over the gesture while it would actually move the fan —
+      // at either end (first/last card) the page keeps scrolling normally.
+      if (next > 0 && next < last) event.preventDefault();
+      to(next);
       window.clearTimeout(settling.current);
       settling.current = window.setTimeout(() => to(Math.round(target.current)), RING_SETTLE);
     };
@@ -426,9 +429,69 @@ function LayersRing({ items, onApi }) {
       el.removeEventListener('wheel', onWheel);
       window.clearTimeout(settling.current);
     };
-  }, [to]);
+  }, [to, last]);
 
+  // Native touch events for touch, Pointer Events for everything else
+  // (mouse/pen) — not Pointer Events for touch too. Safari's pointer event
+  // delivery for touch has had real, device-visible timing quirks (same
+  // reasoning as the reviews/roof-layers carousel above). A touchscreen
+  // fires both a 'touchstart' and a same-gesture 'pointerdown', so the
+  // pointer handlers below explicitly ignore pointerType 'touch' to avoid
+  // double-driving the drag from the same gesture.
   const drag = useRef(null);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+
+    function begin(x) { drag.current = x; }
+    function move(x) {
+      if (drag.current === null) return;
+      to(target.current - (x - drag.current) / RING_DRAG_UNITS);
+      drag.current = x;
+    }
+    function end() {
+      drag.current = null;
+      to(Math.round(target.current));
+    }
+
+    function onTouchStart(e) { begin(e.touches[0].clientX); }
+    function onTouchMove(e) { move(e.touches[0].clientX); }
+    function onTouchEnd() { end(); }
+
+    function onPointerDown(e) {
+      if (e.pointerType === 'touch') return;
+      begin(e.clientX);
+      try { el.setPointerCapture(e.pointerId); } catch { /* pointer session already gone */ }
+    }
+    function onPointerMove(e) {
+      if (e.pointerType === 'touch') return;
+      if (e.buttons === 0) return;
+      move(e.clientX);
+    }
+    function onPointerUp(e) {
+      if (e.pointerType === 'touch') return;
+      end();
+    }
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd);
+    el.addEventListener('touchcancel', onTouchEnd);
+    el.addEventListener('pointerdown', onPointerDown);
+    el.addEventListener('pointermove', onPointerMove, { passive: false });
+    el.addEventListener('pointerup', onPointerUp);
+    el.addEventListener('pointercancel', onPointerUp);
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchEnd);
+      el.removeEventListener('pointerdown', onPointerDown);
+      el.removeEventListener('pointermove', onPointerMove);
+      el.removeEventListener('pointerup', onPointerUp);
+      el.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [to]);
 
   return html`
     <section class="layersring">
@@ -439,19 +502,6 @@ function LayersRing({ items, onApi }) {
         aria-activedescendant=${`layersring-${active}`}
         class="layersringstage"
         style=${{ perspective: `${metrics.depth}px` }}
-        onPointerDown=${(event) => {
-          drag.current = event.clientX;
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }}
-        onPointerMove=${(event) => {
-          if (drag.current === null) return;
-          to(target.current - (event.clientX - drag.current) / RING_DRAG_UNITS);
-          drag.current = event.clientX;
-        }}
-        onPointerUp=${() => {
-          drag.current = null;
-          to(Math.round(target.current));
-        }}
         onKeyDown=${(event) => {
           if (event.key === 'ArrowRight') to(Math.round(target.current) + 1);
           else if (event.key === 'ArrowLeft') to(Math.round(target.current) - 1);
