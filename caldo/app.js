@@ -292,10 +292,8 @@ function useSwipeCarousel(n) {
 }
 
 // A smaller fanned-stack card, one in view at a time — same swipe/arrow
-// carousel as reviews below, rather than the wider multi-visible photo
-// strip this replaced. A compact image strip up top (one consistent
-// roof shot showing the full layer stack, not a different house per
-// card) with the profile's name/tagline/body underneath.
+// carousel as reviews below. A real photo of that construction stage up
+// top, with the layer's name/tagline/body underneath.
 function RoofTypeCard({ t, offset }) {
   return html`
     <div class="rooftypecard" style=${fanStyle(offset)}>
@@ -318,9 +316,9 @@ function RoofTypesCarousel() {
         ${ROOF_TYPES.map((t, i) => html`<${RoofTypeCard} key=${t.name} t=${t} offset=${cyclicOffset(i, idx, n)} />`)}
       </div>
       <div class="cardnav">
-        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous profile"><${ChevronIcon} flip /></button>
+        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous layer"><${ChevronIcon} flip /></button>
         <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
-        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next profile"><${ChevronIcon} /></button>
+        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next layer"><${ChevronIcon} /></button>
       </div>
     </div>
   `;
@@ -360,8 +358,8 @@ function ServicesSection() {
     <section id="services" class="page-section">
       <div class="page-head">
         <${Eyebrow}>WHAT'S INCLUDED<//>
-        <h2>Four profiles. One standard of build.</h2>
-        <p class="body">Every STRATA roof is standing-seam metal — the profile changes with your roof's pitch, budget and exposure.</p>
+        <h2>Built in layers. Every one engineered.</h2>
+        <p class="body">From the framing up, every STRATA roof is built the same deliberate way — here's what's actually underneath the metal.</p>
       </div>
       <${RoofTypesCarousel} />
       <${FinishesStrip} />
