@@ -11,10 +11,10 @@ export const HERO = {
 
 // --- Static page content (normal document flow) ---------------------
 
-// The actual build-up of a STRATA roof, bottom to top. Five of the six
-// stages have a photo now; Underlayment stays text-only because nothing
-// found for it was even a reasonable stand-in (wrong material, foil-shiny,
-// or a featureless black rectangle) rather than just imperfect.
+// The actual build-up of a STRATA roof, bottom to top, all six with a photo.
+// Underlayment's isn't a literal on-the-roof shot (nothing like that turned
+// up usable) — it's a dark woven synthetic texture standing in for the
+// membrane itself.
 export const ROOF_TYPES = [
   {
     name: 'Framing',
@@ -38,6 +38,7 @@ export const ROOF_TYPES = [
     name: 'Underlayment',
     tagline: 'The second line of defense',
     body: 'A synthetic, fully adhered membrane over the entire deck — waterproof backup in case wind or ice ever gets under a panel.',
+    photo: './photos/layer-underlayment.webp',
   },
   {
     name: 'Standing-Seam Panels',
