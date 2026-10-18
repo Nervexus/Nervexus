@@ -295,36 +295,34 @@ function useSwipeCarousel(n) {
 
 // --- Layers ring --------------------------------------------------------
 //
-// Ported from a supplied "CircularGallery" component (plain React + inline
-// styles, no Tailwind/shadcn/TypeScript dependency to translate this time)
-// into this project's htm setup. Cards stand edge-to-edge in a ring facing
-// outward; the ring spins on its vertical axis around a fixed centre. The
-// original drove rotation off the whole page's vertical scroll position
-// (window.scrollY) plus an idle auto-rotate — here rotation is driven by
-// horizontal wheel/drag on the component's own stage instead (left/right,
-// not up/down), so it sits inside a normal page section rather than
-// hijacking a 500vh scroll-jacked block. Auto-rotate still fills the quiet
-// time between interactions.
+// Started as a straight port of a supplied "CircularGallery" component — a
+// full 360° ring (card spacing = 360/count), rotation driven off page
+// scroll. Two things about that didn't fit here: with only 6 items the
+// per-card angle (60°) is nearly double the reference's own 10-item demo
+// (36°), so an even ring either left huge gaps between neighbours or
+// crowded them into a messy overlap; and a full loop doesn't suit six
+// roofing stages that happen in a fixed 1-2-3 order anyway, no wraparound
+// needed. So this is now a bounded fan instead of a closed ring: a fixed
+// angle between cards (tuned to match the reference's spacing regardless
+// of item count) and a hard stop at the first and last card — same `d =
+// i - pos` shape as the roof-layers drum that came before this, just
+// spun on the vertical axis with the circular gallery's card styling
+// instead of the drum's up/down one. Horizontal wheel/drag on the
+// component's own stage drives it (left/right, not up/down), so normal
+// page scrolling passes straight through untouched.
 
-// Sized and spaced to read as a deck of cards receding round a circle —
-// the front one clearly closer and bigger, neighbours overlapping in
-// behind it at a visible depth falloff — rather than separate cards
-// floating apart with gaps. That's what the stretched-out spacing/lens
-// from the previous pass traded away; pulled back in here to match the
-// reference's layered look.
-const RING_CARD_H = 0.46; // card height, of the stage — smaller base card leaves room to grow under perspective
+const RING_CARD_H = 0.55; // card height, of the stage
 const RING_CARD_RATIO = 0.72; // card width / height — portrait, room for real copy
-const RING_SPACING = 0.82; // radius multiplier over the minimum non-overlap distance — only 6 items means a wide angular step per card, so cards need to deliberately overlap (not just touch) to read as a deck rather than spokes
-const RING_LENS = 3.2; // perspective distance, in card heights — closer than before, for visible depth falloff
-const RING_WHEEL_DEG = 0.1; // ring degrees per px of horizontal wheel delta — slower, more deliberate
-const RING_DRAG_DEG = 0.15; // ...and per px dragged horizontally
-const RING_AUTO_SPEED = 0.03; // idle auto-rotate, degrees per frame
-const RING_IDLE_MS = 1100; // quiet time after interaction before auto-rotate resumes
-const RING_SETTLE = 160; // quiet time before the ring settles on an item
-const RING_EASE = 0.14; // fraction of remaining distance closed per frame
+const RING_STEP = 34; // degrees between adjacent cards — close to the reference's own spacing
+const RING_RADIUS = 1.5; // ring radius, in card heights
+const RING_LENS = 5; // perspective distance, in card heights — flat, like the reference
+const RING_WHEEL_DEG = 0.012; // position change per px of horizontal wheel delta — slow, deliberate
+const RING_DRAG_UNITS = 300; // px dragged horizontally per one card's worth of position
+const RING_SETTLE = 160; // quiet time before the fan settles on a card
+const RING_EASE = 0.16; // fraction of remaining distance closed per frame
+const RING_CULL = 3.2; // cards further than this many steps from centre stop drawing
 
 const ringClamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-const ringNorm = (deg) => ((deg % 360) + 360) % 360;
 
 function LayersRing({ items, onApi }) {
   const stageRef = useRef(null);
@@ -333,12 +331,11 @@ function LayersRing({ items, onApi }) {
 
   const turn = useRef(0);
   const target = useRef(0);
-  const lastInteraction = useRef(0);
   const [active, setActive] = useState(0);
   const [stage, setStage] = useState({ w: 0, h: 0 });
 
   const count = items.length;
-  const anglePerItem = 360 / count;
+  const last = Math.max(count - 1, 0);
 
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -362,63 +359,51 @@ function LayersRing({ items, onApi }) {
   const metrics = useMemo(() => {
     const { h } = stage;
     const cardH = h * RING_CARD_H;
-    const cardW = cardH * RING_CARD_RATIO;
-    const minRadius = (cardW / 2) / Math.sin(Math.PI / Math.max(count, 2));
     return {
-      cardW,
+      cardW: cardH * RING_CARD_RATIO,
       cardH,
-      radius: minRadius * RING_SPACING,
+      radius: cardH * RING_RADIUS,
       depth: cardH * RING_LENS,
     };
-  }, [stage, count]);
+  }, [stage]);
 
   useEffect(() => {
     if (!stage.h) return;
     let frame = 0;
+    const { radius } = metrics;
 
     const draw = () => {
       frame = requestAnimationFrame(draw);
-
-      if (!reduced && Date.now() - lastInteraction.current > RING_IDLE_MS) {
-        target.current += RING_AUTO_SPEED;
-      }
-
       const gap = target.current - turn.current;
       if (Math.abs(gap) < 0.0005) turn.current = target.current;
       else turn.current += gap * (reduced ? 1 : RING_EASE);
 
-      const rotation = turn.current;
-      if (ringRef.current) ringRef.current.style.transform = `rotateY(${rotation}deg)`;
-
-      let bestI = 0;
-      let bestD = Infinity;
+      const pos = turn.current;
       for (let i = 0; i < count; i++) {
-        const faceAngle = ringNorm(i * anglePerItem + rotation);
-        const d = faceAngle > 180 ? 360 - faceAngle : faceAngle;
-        if (d < bestD) { bestD = d; bestI = i; }
+        const d = i - pos;
         const card = cardRefs.current[i];
         if (card) {
-          card.style.transform = `rotateY(${i * anglePerItem}deg) translateZ(${metrics.radius}px)`;
-          card.style.opacity = String(Math.max(0.25, 1 - d / 150));
+          card.style.transform = `rotateY(${d * RING_STEP}deg) translateZ(${radius}px)`;
+          card.style.opacity = Math.abs(d) > RING_CULL ? '0' : String(Math.max(0.35, 1 - Math.abs(d) * 0.16));
         }
       }
-      setActive((prev) => (prev === bestI ? prev : bestI));
+      const near = ringClamp(Math.round(pos), 0, last);
+      setActive((prev) => (prev === near ? prev : near));
     };
 
     frame = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(frame);
-  }, [metrics, stage.h, count, anglePerItem, reduced]);
+  }, [metrics, stage.h, count, last, reduced]);
 
   const to = useCallback((next) => {
-    target.current = next;
-    lastInteraction.current = Date.now();
-  }, []);
+    target.current = ringClamp(next, 0, last);
+  }, [last]);
 
-  // Lets a parent (e.g. a "Next" button) drive the ring the same way
+  // Lets a parent (e.g. a "Next" button) drive the fan the same way
   // dragging or the arrow keys do, without lifting all of this state up.
   useEffect(() => {
-    if (onApi) onApi({ next: () => to(target.current - anglePerItem), prev: () => to(target.current + anglePerItem) });
-  }, [onApi, to, anglePerItem]);
+    if (onApi) onApi({ next: () => to(Math.round(target.current) + 1), prev: () => to(Math.round(target.current) - 1) });
+  }, [onApi, to]);
 
   const settling = useRef(0);
   useEffect(() => {
@@ -426,22 +411,22 @@ function LayersRing({ items, onApi }) {
     if (!el) return;
     const onWheel = (event) => {
       // Only a horizontal-dominant gesture (trackpad left/right swipe)
-      // spins the ring — a plain vertical mouse-wheel scroll passes
-      // straight through to the page, untouched.
+      // turns the fan — a plain vertical mouse-wheel scroll passes
+      // straight through to the page, untouched. Dragging/scrolling the
+      // content right moves to the previous card, matching the usual
+      // horizontal-swipe-carousel convention.
       if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
       event.preventDefault();
-      to(target.current + event.deltaX * RING_WHEEL_DEG);
+      to(target.current - event.deltaX * RING_WHEEL_DEG);
       window.clearTimeout(settling.current);
-      settling.current = window.setTimeout(() => {
-        to(Math.round(target.current / anglePerItem) * anglePerItem);
-      }, RING_SETTLE);
+      settling.current = window.setTimeout(() => to(Math.round(target.current)), RING_SETTLE);
     };
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => {
       el.removeEventListener('wheel', onWheel);
       window.clearTimeout(settling.current);
     };
-  }, [to, anglePerItem]);
+  }, [to]);
 
   const drag = useRef(null);
 
@@ -460,16 +445,16 @@ function LayersRing({ items, onApi }) {
         }}
         onPointerMove=${(event) => {
           if (drag.current === null) return;
-          to(target.current + (event.clientX - drag.current) * RING_DRAG_DEG);
+          to(target.current - (event.clientX - drag.current) / RING_DRAG_UNITS);
           drag.current = event.clientX;
         }}
         onPointerUp=${() => {
           drag.current = null;
-          to(Math.round(target.current / anglePerItem) * anglePerItem);
+          to(Math.round(target.current));
         }}
         onKeyDown=${(event) => {
-          if (event.key === 'ArrowRight') to(target.current - anglePerItem);
-          else if (event.key === 'ArrowLeft') to(target.current + anglePerItem);
+          if (event.key === 'ArrowRight') to(Math.round(target.current) + 1);
+          else if (event.key === 'ArrowLeft') to(Math.round(target.current) - 1);
           else return;
           event.preventDefault();
         }}
@@ -508,7 +493,7 @@ function LayersRing({ items, onApi }) {
       <ol class="layersringindex">
         ${items.map((item, i) => html`
           <li key=${item.title}>
-            <button type="button" onClick=${() => to(-i * anglePerItem)} class=${cx(i === active && 'active')}>
+            <button type="button" onClick=${() => to(i)} class=${cx(i === active && 'active')}>
               ${item.title}
             </button>
           </li>

@@ -194,12 +194,18 @@ nav.solid{
    page's vertical scroll, so it stays contained to its own section. */
 .layersringwrap{
   position:relative;
-  width:100%;
+  /* Full-bleed, breaking out of .page-section's max-width — the reference
+     shows five-plus cards across a full-width stage; confined to the
+     section's ~1064px content width there isn't room for more than three
+     before the rest get clipped off-stage by the overflow:hidden below. */
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
   /* Taller than the card itself needs, on purpose: the front card sits
      closer to the viewer than the rest under perspective, which magnifies
      it beyond its own CSS height — too little headroom here and
      overflow:hidden below slices a hard flat line straight through it. */
-  height:640px;
+  height:680px;
   margin-top:8px;
 }
 .layersring{
