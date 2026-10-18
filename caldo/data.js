@@ -11,14 +11,31 @@ export const HERO = {
 
 // --- Static page content (normal document flow) ---------------------
 
-// The actual build-up of a STRATA roof, bottom to top — real construction
-// photos of each stage rather than one reused illustration.
+// The actual build-up of a STRATA roof, bottom to top. The three stages we
+// have a real, accurate, good-quality photo for carry one; the rest are
+// text-only cards rather than reaching for a stock photo that misrepresents
+// the material or looks low-rent next to the real ones.
 export const ROOF_TYPES = [
   {
     name: 'Framing',
     tagline: 'The structural skeleton',
     body: 'Engineered rafters or trusses set the pitch and carry every load above — wind, snow, the roof itself. Everything else is built on top of this.',
     photo: './photos/layer-1-framing.webp',
+  },
+  {
+    name: 'Insulation',
+    tagline: 'Where comfort starts',
+    body: 'Fitted tight between the rafters, this is what keeps conditioned air in and the attic from becoming a heat trap — long before the metal goes on.',
+  },
+  {
+    name: 'Roof Decking',
+    tagline: 'The solid base',
+    body: 'Plywood or OSB sheathing, nailed across every rafter into one continuous, structurally rated deck for everything above it to lock onto.',
+  },
+  {
+    name: 'Underlayment',
+    tagline: 'The second line of defense',
+    body: 'A synthetic, fully adhered membrane over the entire deck — waterproof backup in case wind or ice ever gets under a panel.',
   },
   {
     name: 'Standing-Seam Panels',
