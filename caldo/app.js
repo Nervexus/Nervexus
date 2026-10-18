@@ -5,7 +5,9 @@ import { HERO, ROOF_TYPES, TESTIMONIALS, FAQS, SWATCHES } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
-const { useState, useEffect, useRef, useSyncExternalStore } = React;
+const { useState, useEffect, useRef, useMemo, useCallback, useSyncExternalStore } = React;
+
+const cx = (...parts) => parts.filter(Boolean).join(' ');
 
 function useStore() {
   return useSyncExternalStore(subscribe, getSnapshot);
@@ -291,35 +293,265 @@ function useSwipeCarousel(n) {
   return { idx, go, ref, stageRef };
 }
 
-// A smaller fanned-stack card, one in view at a time — same swipe/arrow
-// carousel as reviews below. A real photo of that construction stage up
-// top, with the layer's name/tagline/body underneath.
-function RoofTypeCard({ t, offset }) {
+// --- Layers wheel -----------------------------------------------------
+//
+// A portfolio-wheel pattern adapted to the roof-layers index: at rest the
+// layers sit in a ring around a title; the first notch of scroll/drag blows
+// the ring open into a vertical drum, the front layer flat and full size
+// with its neighbours rotating away into perspective. One number — `turn`
+// — read by a single rAF pass that writes transforms straight to the DOM:
+// 0 is the ring, 1 is the drum with item 0 at the front, and every whole
+// number after that is one more layer turned past.
+
+const WHEEL_CARD_H = 0.38; // front card height, of the stage
+const WHEEL_CARD_MAX_W = 0.34; // ...but never wider than this much of the stage
+const WHEEL_CARD_RATIO = 1.45; // card width / height
+const WHEEL_STEP = 40; // degrees between cards on the drum
+const WHEEL_DRUM = 2.22; // drum radius, in card heights — tuned against STEP
+const WHEEL_LENS = 2.7; // perspective distance
+const WHEEL_RING_R = 1.14; // ring radius
+// The drum hangs on an arc whose centre sits off to the left, so the card at
+// the front is at the arc's near point and its neighbours have already
+// swung back left as well as up and down. This is that arc's radius.
+const WHEEL_BOW = 1.82;
+const WHEEL_TITLE = 0.124; // ring label and front-card title, of card height
+const WHEEL_INDEX = 0.04; // the index down the right-hand side
+const WHEEL_CULL = 1.6; // items further than this off-centre stop drawing
+const WHEEL_UNITS = 900; // how much of a wheel-notch counts as one item
+const WHEEL_DRAG_UNITS = 420; // ...and how much of a dragged pixel does
+const WHEEL_SETTLE = 140; // quiet time before the wheel settles on an item
+const WHEEL_EASE = 0.12; // fraction of remaining distance closed per frame
+
+const wheelClamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const wheelLerp = (a, b, t) => a + (b - a) * t;
+const wheelRad = (deg) => (deg * Math.PI) / 180;
+
+// How far left the arc has carried something `drumDeg` off the front.
+function wheelBowAt(drumDeg, bow) {
+  return -bow * (1 - Math.cos(wheelRad(drumDeg)));
+}
+
+// Ring and drum placement in one chain: the ring terms fall away as `m`
+// reaches the drum, and the drum terms are still zero while the ring is up.
+function wheelPlace(ringDeg, drumDeg, ringR, drumR, bow, m) {
+  return (
+    `translateX(${m * wheelBowAt(drumDeg, bow)}px)` +
+    ` rotateZ(${(1 - m) * ringDeg}deg) translateY(${-(1 - m) * ringR}px)` +
+    ` rotateX(${m * drumDeg}deg) translateZ(${m * drumR}px)`
+  );
+}
+
+function LayersWheel({ items, label, action }) {
+  const stageRef = useRef(null);
+  const wheelRef = useRef(null);
+  const cardRefs = useRef([]);
+  const labelRef = useRef(null);
+  const titleRef = useRef(null);
+
+  const turn = useRef(0);
+  const target = useRef(0);
+  const [active, setActive] = useState(0);
+  const [stage, setStage] = useState({ w: 0, h: 0 });
+
+  const count = items.length;
+  const last = Math.max(count - 1, 0);
+
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const read = () => setReduced(query.matches);
+    read();
+    query.addEventListener('change', read);
+    return () => query.removeEventListener('change', read);
+  }, []);
+
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const read = () => setStage({ w: el.clientWidth, h: el.clientHeight });
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const metrics = useMemo(() => {
+    const { w, h } = stage;
+    const cardW = Math.min(h * WHEEL_CARD_H * WHEEL_CARD_RATIO, w * WHEEL_CARD_MAX_W);
+    const cardH = cardW / WHEEL_CARD_RATIO;
+    const drumR = cardH * WHEEL_DRUM;
+    const ringR = cardH * WHEEL_RING_R;
+    const ringScale = count
+      ? wheelClamp((((2 * Math.PI * ringR) / count) * 0.82) / (cardW || 1), 0.16, 1)
+      : 1;
+    return {
+      cardW,
+      cardH,
+      ringR,
+      ringScale,
+      drumR,
+      bow: cardH * WHEEL_BOW,
+      depth: cardH * WHEEL_LENS,
+      title: cardH * WHEEL_TITLE,
+      index: cardH * WHEEL_INDEX,
+    };
+  }, [stage, count]);
+
+  useEffect(() => {
+    if (!stage.h) return;
+    let frame = 0;
+    const { ringR, ringScale, drumR, bow } = metrics;
+
+    const draw = () => {
+      frame = requestAnimationFrame(draw);
+      const gap = target.current - turn.current;
+      if (Math.abs(gap) < 0.0005) turn.current = target.current;
+      else turn.current += gap * (reduced ? 1 : WHEEL_EASE);
+
+      const t = turn.current;
+      const m = wheelClamp(t, 0, 1);
+      const pos = Math.max(0, t - 1);
+
+      if (wheelRef.current) {
+        wheelRef.current.style.transform = `translateZ(${-m * drumR}px)`;
+      }
+
+      for (let i = 0; i < count; i++) {
+        const d = i - pos;
+        const drumDeg = d * WHEEL_STEP;
+        const card = cardRefs.current[i];
+        if (card) {
+          card.style.transform = wheelPlace(d * (360 / count), drumDeg, ringR, drumR, bow, m);
+          card.style.opacity = m > 0.5 && Math.abs(d) > WHEEL_CULL ? '0' : '1';
+          card.style.zIndex = String(Math.round(100 - Math.abs(d) * 2));
+        }
+        const face = card && card.firstElementChild;
+        if (face) face.style.transform = `scale(${wheelLerp(ringScale, 1, m)})`;
+      }
+
+      if (labelRef.current) labelRef.current.style.opacity = String(1 - m);
+      if (titleRef.current) titleRef.current.style.opacity = String(m);
+      const near = wheelClamp(Math.round(pos), 0, last);
+      setActive((prev) => (prev === near ? prev : near));
+    };
+
+    frame = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(frame);
+  }, [metrics, stage.h, count, last, reduced]);
+
+  const to = useCallback((next) => {
+    target.current = wheelClamp(next, 0, last + 1);
+  }, [last]);
+
+  const settling = useRef(0);
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    const onWheel = (event) => {
+      // Natural scroll-down (deltaY > 0, continuing on through the page)
+      // advances the wheel forward — scrolling up backs it out.
+      const next = target.current - event.deltaY / WHEEL_UNITS;
+      if (next > 0 && next < last + 1) event.preventDefault();
+      to(next);
+      window.clearTimeout(settling.current);
+      settling.current = window.setTimeout(() => to(Math.round(target.current)), WHEEL_SETTLE);
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+      window.clearTimeout(settling.current);
+    };
+  }, [to, last]);
+
+  const drag = useRef(null);
+
   return html`
-    <div class="rooftypecard" style=${fanStyle(offset)}>
-      <div class="rooftypeimg"><img src=${t.photo} alt="" /></div>
-      <div class="rooftypetext">
-        <div class="rooftypetag">${t.tagline}</div>
-        <h3>${t.name}</h3>
-        <p class="body">${t.body}</p>
+    <section aria-label=${label} class="layerswheel">
+      <div
+        ref=${stageRef}
+        tabIndex="0"
+        role="listbox"
+        aria-label=${label}
+        aria-activedescendant=${`layerswheel-${active}`}
+        class="layerswheelstage"
+        style=${{ perspective: `${metrics.depth}px` }}
+        onPointerDown=${(event) => {
+          drag.current = event.clientY;
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove=${(event) => {
+          if (drag.current === null) return;
+          to(target.current + (drag.current - event.clientY) / WHEEL_DRAG_UNITS);
+          drag.current = event.clientY;
+        }}
+        onPointerUp=${() => {
+          drag.current = null;
+          if (target.current > 1) to(Math.round(target.current));
+        }}
+        onKeyDown=${(event) => {
+          if (event.key === 'ArrowDown') to(Math.round(target.current) + 1);
+          else if (event.key === 'ArrowUp') to(Math.round(target.current) - 1);
+          else return;
+          event.preventDefault();
+        }}
+      >
+        <div ref=${wheelRef} class="layerswheelwheel">
+          ${items.map((item, i) => {
+            const Tag = item.href ? 'a' : 'div';
+            return html`
+              <${Tag}
+                key=${item.title}
+                id=${`layerswheel-${i}`}
+                role="option"
+                aria-selected=${i === active}
+                href=${item.href}
+                ref=${(node) => { cardRefs.current[i] = node; }}
+                class="layerswheelcard"
+                style=${{
+                  width: metrics.cardW,
+                  height: metrics.cardH,
+                  marginLeft: -metrics.cardW / 2,
+                  marginTop: -metrics.cardH / 2,
+                }}
+              >
+                <span class="layerswheelface">
+                  <img src=${item.image} alt=${item.title} draggable="false" />
+                  ${action && item.href ? html`
+                    <span class="layerswheelaction">
+                      <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
+                        <path d="M3 9 9 3M4 3h5v5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      ${action}
+                    </span>
+                  ` : null}
+                </span>
+              <//>
+            `;
+          })}
+        </div>
       </div>
-    </div>
+
+      <div ref=${labelRef} class="layerswheellabel" style=${{ fontSize: metrics.title }}>${label}</div>
+      <div ref=${titleRef} class="layerswheeltitle" style=${{ fontSize: metrics.title }}>${items[active] && items[active].title}</div>
+
+      <ol class="layerswheelindex" style=${{ fontSize: metrics.index }}>
+        ${items.map((item, i) => html`
+          <li key=${item.title}>
+            <button type="button" onClick=${() => to(i + 1)} class=${cx(i === active && 'active')}>
+              ${item.title}
+            </button>
+          </li>
+        `)}
+      </ol>
+    </section>
   `;
 }
 
-function RoofTypesCarousel() {
-  const n = ROOF_TYPES.length;
-  const { idx, go, ref, stageRef } = useSwipeCarousel(n);
+function LayersWheelSection() {
+  const wheelItems = ROOF_TYPES.map((t) => ({ title: t.name, image: t.photo }));
   return html`
-    <div class="stepscarousel" ref=${ref}>
-      <div class="cardstage" ref=${stageRef}>
-        ${ROOF_TYPES.map((t, i) => html`<${RoofTypeCard} key=${t.name} t=${t} offset=${cyclicOffset(i, idx, n)} />`)}
-      </div>
-      <div class="cardnav">
-        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous layer"><${ChevronIcon} flip /></button>
-        <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
-        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next layer"><${ChevronIcon} /></button>
-      </div>
+    <div class="layerswheelwrap">
+      <${LayersWheel} items=${wheelItems} label="The Build" />
     </div>
   `;
 }
@@ -361,7 +593,7 @@ function ServicesSection() {
         <h2>Built in layers. Every one engineered.</h2>
         <p class="body">From the framing up, every STRATA roof is built the same deliberate way — here's what's actually underneath the metal.</p>
       </div>
-      <${RoofTypesCarousel} />
+      <${LayersWheelSection} />
       <${FinishesStrip} />
     </section>
   `;
