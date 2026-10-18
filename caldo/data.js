@@ -11,10 +11,10 @@ export const HERO = {
 
 // --- Static page content (normal document flow) ---------------------
 
-// The actual build-up of a STRATA roof, bottom to top. The three stages we
-// have a real, accurate, good-quality photo for carry one; the rest are
-// text-only cards rather than reaching for a stock photo that misrepresents
-// the material or looks low-rent next to the real ones.
+// The actual build-up of a STRATA roof, bottom to top. Five of the six
+// stages have a photo now; Underlayment stays text-only because nothing
+// found for it was even a reasonable stand-in (wrong material, foil-shiny,
+// or a featureless black rectangle) rather than just imperfect.
 export const ROOF_TYPES = [
   {
     name: 'Framing',
@@ -26,11 +26,13 @@ export const ROOF_TYPES = [
     name: 'Insulation',
     tagline: 'Where comfort starts',
     body: 'Fitted tight between the rafters, this is what keeps conditioned air in and the attic from becoming a heat trap — long before the metal goes on.',
+    photo: './photos/layer-insulation.webp',
   },
   {
     name: 'Roof Decking',
     tagline: 'The solid base',
     body: 'Plywood or OSB sheathing, nailed across every rafter into one continuous, structurally rated deck for everything above it to lock onto.',
+    photo: './photos/layer-roof-decking.webp',
   },
   {
     name: 'Underlayment',
