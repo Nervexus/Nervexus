@@ -424,11 +424,14 @@ function LayersWheel({ items, action }) {
     const el = stageRef.current;
     if (!el) return;
     const onWheel = (event) => {
-      // Natural scroll-down (deltaY > 0, continuing on through the page)
-      // advances the drum forward — scrolling up backs it out. Only
-      // intercept the gesture (preventDefault) while that would actually
-      // move the drum; at either end the page scrolls on underneath it.
-      const next = target.current + event.deltaY / WHEEL_UNITS;
+      // Scrolling down should move forward through the layers (Framing
+      // toward Flashing & Trim), not backward — confirmed against the
+      // deployed site, not just a synthetic test (the sandboxed test
+      // environment's wheel-event sign does not reliably match a real
+      // browser's). Only intercept the gesture (preventDefault) while
+      // that would actually move the drum; at either end the page
+      // scrolls on underneath it.
+      const next = target.current - event.deltaY / WHEEL_UNITS;
       if (next > 0 && next < last) event.preventDefault();
       to(next);
       window.clearTimeout(settling.current);
