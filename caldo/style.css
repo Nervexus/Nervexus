@@ -13,6 +13,13 @@
 html,body{margin:0;padding:0;}
 html{scroll-behavior:smooth;scroll-padding-top:var(--header-h);overflow-x:hidden;}
 body{
+  /* Belt and suspenders alongside html's own overflow-x:hidden above — a
+     few components (the announcement ticker, the reviews/layers fan
+     carousels) intentionally lay out wider than the viewport and rely on
+     an ancestor clip; some browsers don't treat the html-level rule alone
+     as fully authoritative for a descendant's transformed/off-screen
+     content. */
+  overflow-x:hidden;
   background:
     radial-gradient(circle at 18% 12%, rgba(169,103,47,0.07), transparent 55%),
     radial-gradient(circle at 82% 88%, rgba(22,23,26,0.05), transparent 55%),
@@ -555,7 +562,18 @@ footer{
   .page-section{padding:72px 24px;}
   .supportwrap{right:16px;bottom:16px;}
   .chatpanel{width:min(300px, 88vw);}
-  .layersringwrap{height:400px;}
+  /* Taller than the 400px that first shipped — at that height the card's
+     text half was only ~105px tall, not enough room for the tagline, a
+     wrapping title and a 3-line body without the body getting clipped by
+     the overflow:hidden below. Also shrink the photo's share of the card
+     (and tighten the type a touch) so the text gets most of the growth. */
+  .layersringwrap{height:560px;}
+  .layersringmedia{height:38%;}
+  .layersringtag{font-size:10.5px;}
+  .layersringtext{padding:16px 18px;}
+  .layersringtext h3{font-size:17px;margin-top:6px;}
+  .layersringtext p{font-size:12.5px;margin-top:6px;line-height:1.48;}
+  .layersringcard.textonly .layersringtext{padding:22px 20px;}
   /* The side index list overlaps the front card at narrow widths (the
      card itself fills nearly the whole stage) — drop it, the in-card
      title and the Next button already identify what's showing. */
