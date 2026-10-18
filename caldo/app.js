@@ -306,14 +306,16 @@ function useSwipeCarousel(n) {
 // hijacking a 500vh scroll-jacked block. Auto-rotate still fills the quiet
 // time between interactions.
 
-const RING_CARD_H = 0.62; // card height, of the stage
-const RING_CARD_RATIO = 0.74; // card width / height — portrait, room for real copy
-const RING_SPACING = 1.8; // radius multiplier over the minimum non-overlap distance — generous gaps between cards
-// A bigger radius alone would also blow the front card up under perspective
-// (it sits closer to the viewer than the others by exactly `radius`) —
-// pulling the perspective distance out further keeps that magnification
-// modest instead of overflowing its own container.
-const RING_LENS = 5.5; // perspective distance, in card heights
+// Sized and spaced to read as a deck of cards receding round a circle —
+// the front one clearly closer and bigger, neighbours overlapping in
+// behind it at a visible depth falloff — rather than separate cards
+// floating apart with gaps. That's what the stretched-out spacing/lens
+// from the previous pass traded away; pulled back in here to match the
+// reference's layered look.
+const RING_CARD_H = 0.46; // card height, of the stage — smaller base card leaves room to grow under perspective
+const RING_CARD_RATIO = 0.72; // card width / height — portrait, room for real copy
+const RING_SPACING = 0.82; // radius multiplier over the minimum non-overlap distance — only 6 items means a wide angular step per card, so cards need to deliberately overlap (not just touch) to read as a deck rather than spokes
+const RING_LENS = 3.2; // perspective distance, in card heights — closer than before, for visible depth falloff
 const RING_WHEEL_DEG = 0.1; // ring degrees per px of horizontal wheel delta — slower, more deliberate
 const RING_DRAG_DEG = 0.15; // ...and per px dragged horizontally
 const RING_AUTO_SPEED = 0.03; // idle auto-rotate, degrees per frame
