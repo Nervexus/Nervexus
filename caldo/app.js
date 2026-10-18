@@ -334,7 +334,7 @@ function wheelPlace(drumDeg, drumR, bow) {
   );
 }
 
-function LayersWheel({ items, action }) {
+function LayersWheel({ items, action, onApi }) {
   const stageRef = useRef(null);
   const wheelRef = useRef(null);
   const cardRefs = useRef([]);
@@ -418,6 +418,12 @@ function LayersWheel({ items, action }) {
   const to = useCallback((next) => {
     target.current = wheelClamp(next, 0, last);
   }, [last]);
+
+  // Lets a parent (e.g. a "See More" button) drive the drum the same way
+  // scrolling or the arrow keys do, without lifting all of this state up.
+  useEffect(() => {
+    if (onApi) onApi({ next: () => to(Math.round(target.current) + 1) });
+  }, [onApi, to]);
 
   const settling = useRef(0);
   useEffect(() => {
@@ -533,10 +539,15 @@ function LayersWheel({ items, action }) {
 
 function LayersWheelSection() {
   const wheelItems = ROOF_TYPES.map((t) => ({ title: t.name, image: t.photo, tagline: t.tagline, body: t.body }));
+  const api = useRef(null);
   return html`
     <div class="layerswheelwrap">
-      <${LayersWheel} items=${wheelItems} />
+      <${LayersWheel} items=${wheelItems} onApi=${(a) => { api.current = a; }} />
     </div>
+    <button type="button" class="layerswheelmore" onClick=${() => api.current && api.current.next()}>
+      See more
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7" /></svg>
+    </button>
   `;
 }
 
