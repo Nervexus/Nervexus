@@ -21,22 +21,16 @@ export const ROOF_TYPES = [
     photo: './photos/layer-1-framing.webp',
   },
   {
-    name: 'Insulation',
-    tagline: 'Where comfort starts',
-    body: "Fitted tight between the rafters, this is what keeps conditioned air in and the attic from becoming a heat trap — long before the metal ever goes on.",
-    photo: './photos/layer-2-insulation.webp',
-  },
-  {
     name: 'Standing-Seam Panels',
     tagline: 'The weather shield',
     body: 'Concealed-clip metal panels, zero exposed fasteners, locked into a continuous weathertight plane built to outlast the house around it.',
-    photo: './photos/layer-3-standing-seam-panels.webp',
+    photo: './photos/layer-2-standing-seam-panels.webp',
   },
   {
     name: 'Flashing & Trim',
     tagline: 'Where the seams get sealed',
     body: 'Valleys, ridges and edges are the first place a roof fails. Custom-formed flashing seals every transition so water never finds a way in.',
-    photo: './photos/layer-4-flashing-trim.webp',
+    photo: './photos/layer-3-flashing-trim.webp',
   },
 ];
 
