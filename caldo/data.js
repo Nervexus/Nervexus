@@ -12,33 +12,36 @@ export const HERO = {
 // --- Static page content (normal document flow) ---------------------
 
 // Four standing-seam panel profiles — real distinctions within STRATA's
-// one product line (not different roofing materials). Four distinct shots
-// of the same house model (the one used elsewhere on the site), one of
-// them the exploded-layer construction view.
+// one product line (not different roofing materials). One consistent
+// photo across all four (the exploded-layer construction shot) — the
+// front card shows it, and the stacked cards behind follow suit as you
+// scroll through, rather than swapping to a different house each time.
+const ROOF_TYPE_PHOTO = './photos/engineering-layers.webp';
+
 export const ROOF_TYPES = [
   {
     name: 'Snap-Lock',
     tagline: 'The standard choice',
     body: 'Panels click together by hand, no seaming tool required. Concealed clips, clean lines, the profile on most of the roofs we build.',
-    photo: './photos/hero-house.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
     name: 'Mechanical-Lock',
     tagline: 'Built for the coast',
     body: 'Field-seamed into a fully interlocked panel for the highest wind and water rating we offer. The call for steep pitches and storm-line homes.',
-    photo: './photos/house-angle2.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
     name: 'Nail-Strip',
     tagline: 'The value entry point',
     body: 'A nail flange hidden beneath the overlapping panel — still zero exposed fasteners, at a lower installed cost than our locking profiles.',
-    photo: './photos/performance-house.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
     name: 'Flush Panel',
     tagline: 'Architectural flat-seam',
     body: 'A flat pan with soldered or mechanically-formed seams for an almost seamless plane. Built for modern, low-slope architectural work.',
-    photo: './photos/engineering-layers.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
 ];
 
