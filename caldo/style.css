@@ -184,10 +184,18 @@ nav.solid{
   box-shadow:0 20px 50px rgba(22,23,26,0.12);
 }
 .herocard h1{font-size:clamp(32px,4.6vw,54px);line-height:1.08;}
-/* The rest of HERO.photos, stacked directly underneath the hero as plain
-   full-bleed blocks — no overlay, no crossfade. Scrolling the page is what
-   carries you from one to the next. */
+/* HERO.follow, stacked directly underneath the hero as plain full-bleed
+   photo blocks — no overlay, no crossfade. Each one is followed by its own
+   caption on the plain paper background, which is what keeps one photo
+   from running straight into the next with a hard seam between them. */
 .herofollowphoto{display:block;width:100%;height:auto;}
+.herofollowcaption{
+  max-width:560px;margin:0 auto;
+  padding:40px 24px 56px;
+  text-align:center;
+}
+.herofollowcaption h3{font-size:clamp(22px,2.6vw,28px);line-height:1.2;}
+.herofollowcaption p{margin:10px 0 0;font-size:15px;line-height:1.55;color:var(--ink-2);}
 .lede{
   margin:16px auto 0;max-width:420px;
   font-size:15.5px;line-height:1.5;color:var(--ink-2);

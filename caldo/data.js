@@ -1,18 +1,32 @@
 // STRATA — copy and content data.
 
-// A full-bleed hero with the headline/CTA overlaid in a frosted card over
-// photos[0]. The rest of the photos aren't crossfaded in place — they sit
-// as plain full-bleed blocks directly underneath the hero, in normal
-// document flow, so scrolling the page carries you from one to the next.
+// A full-bleed hero with the headline/CTA overlaid in a frosted card. Below
+// it, `follow` renders as a sequence of plain full-bleed photo blocks, each
+// with its own short caption underneath — in normal document flow, so
+// scrolling the page carries you from one to the next, with the caption's
+// plain background giving each photo a clean break instead of running
+// straight into the next.
 export const HERO = {
-  photos: [
-    './photos/hero-house.webp',
-    './photos/house-angle2.webp',
-    './photos/engineering-layers.webp',
-    './photos/performance-house.webp',
-  ],
+  photo: './photos/hero-house.webp',
   h: 'The last roof you will ever need.',
   lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
+  follow: [
+    {
+      src: './photos/house-angle2.webp',
+      h: 'Engineered from every angle.',
+      body: 'Every panel, seam and fastener is planned before the crew ever sets foot on your roof.',
+    },
+    {
+      src: './photos/engineering-layers.webp',
+      h: 'Five layers between you and the weather.',
+      body: 'Decking, underlayment, flashing, panel and finish — each one doing its job so the others can do theirs.',
+    },
+    {
+      src: './photos/performance-house.webp',
+      h: 'Built to outlast the warranty.',
+      body: 'A lifetime material warranty and a 25-year workmanship guarantee, both fully transferable to the next owner.',
+    },
+  ],
 };
 
 // --- Static page content (normal document flow) ---------------------
