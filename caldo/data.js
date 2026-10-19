@@ -11,46 +11,37 @@ export const HERO = {
 
 // --- Static page content (normal document flow) ---------------------
 
-// The actual build-up of a STRATA roof, bottom to top, all six with a photo.
-// Underlayment's isn't a literal on-the-roof shot (nothing like that turned
-// up usable) — it's a dark woven synthetic texture standing in for the
-// membrane itself.
+// Four standing-seam panel profiles — real distinctions within STRATA's
+// one product line (not different roofing materials). One consistent
+// photo across all four (the same exploded-layer roof shot used
+// elsewhere on the site) — it's about one roof's construction, base
+// layer up through the rest, not four different houses.
+const ROOF_TYPE_PHOTO = './photos/engineering-layers.webp';
+
 export const ROOF_TYPES = [
   {
-    name: 'Framing',
-    tagline: 'The structural skeleton',
-    body: 'Engineered rafters or trusses set the pitch and carry every load above — wind, snow, the roof itself. Everything else is built on top of this.',
-    photo: './photos/layer-1-framing.webp',
+    name: 'Snap-Lock',
+    tagline: 'The standard choice',
+    body: 'Panels click together by hand, no seaming tool required. Concealed clips, clean lines, the profile on most of the roofs we build.',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
-    name: 'Insulation',
-    tagline: 'Where comfort starts',
-    body: 'Fitted tight between the rafters, this is what keeps conditioned air in and the attic from becoming a heat trap — long before the metal goes on.',
-    photo: './photos/layer-insulation.webp',
+    name: 'Mechanical-Lock',
+    tagline: 'Built for the coast',
+    body: 'Field-seamed into a fully interlocked panel for the highest wind and water rating we offer. The call for steep pitches and storm-line homes.',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
-    name: 'Roof Decking',
-    tagline: 'The solid base',
-    body: 'Plywood or OSB sheathing, nailed across every rafter into one continuous, structurally rated deck for everything above it to lock onto.',
-    photo: './photos/layer-roof-decking.webp',
+    name: 'Nail-Strip',
+    tagline: 'The value entry point',
+    body: 'A nail flange hidden beneath the overlapping panel — still zero exposed fasteners, at a lower installed cost than our locking profiles.',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
-    name: 'Underlayment',
-    tagline: 'The second line of defense',
-    body: 'A synthetic, fully adhered membrane over the entire deck — waterproof backup in case wind or ice ever gets under a panel.',
-    photo: './photos/layer-underlayment.webp',
-  },
-  {
-    name: 'Standing-Seam Panels',
-    tagline: 'The weather shield',
-    body: 'Concealed-clip metal panels, zero exposed fasteners, locked into a continuous weathertight plane built to outlast the house around it.',
-    photo: './photos/layer-2-standing-seam-panels.webp',
-  },
-  {
-    name: 'Flashing & Trim',
-    tagline: 'Where the seams get sealed',
-    body: 'Valleys, ridges and edges are the first place a roof fails. Custom-formed flashing seals every transition so water never finds a way in.',
-    photo: './photos/layer-3-flashing-trim.webp',
+    name: 'Flush Panel',
+    tagline: 'Architectural flat-seam',
+    body: 'A flat pan with soldered or mechanically-formed seams for an almost seamless plane. Built for modern, low-slope architectural work.',
+    photo: ROOF_TYPE_PHOTO,
   },
 ];
 

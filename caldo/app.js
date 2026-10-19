@@ -5,9 +5,7 @@ import { HERO, ROOF_TYPES, TESTIMONIALS, FAQS, SWATCHES } from './data.js';
 import { state, subscribe, setState, getSnapshot } from './store.js';
 
 const html = htm.bind(React.createElement);
-const { useState, useEffect, useRef, useMemo, useCallback, useSyncExternalStore } = React;
-
-const cx = (...parts) => parts.filter(Boolean).join(' ');
+const { useState, useEffect, useRef, useSyncExternalStore } = React;
 
 function useStore() {
   return useSyncExternalStore(subscribe, getSnapshot);
@@ -293,277 +291,38 @@ function useSwipeCarousel(n) {
   return { idx, go, ref, stageRef };
 }
 
-// --- Layers ring --------------------------------------------------------
-//
-// Started as a straight port of a supplied "CircularGallery" component — a
-// full 360° ring (card spacing = 360/count), rotation driven off page
-// scroll. Two things about that didn't fit here: with only 6 items the
-// per-card angle (60°) is nearly double the reference's own 10-item demo
-// (36°), so an even ring either left huge gaps between neighbours or
-// crowded them into a messy overlap; and a full loop doesn't suit six
-// roofing stages that happen in a fixed 1-2-3 order anyway, no wraparound
-// needed. So this is now a bounded fan instead of a closed ring: a fixed
-// angle between cards (tuned to match the reference's spacing regardless
-// of item count) and a hard stop at the first and last card — same `d =
-// i - pos` shape as the roof-layers drum that came before this, just
-// spun on the vertical axis with the circular gallery's card styling
-// instead of the drum's up/down one. Horizontal wheel/drag on the
-// component's own stage drives it (left/right, not up/down), so normal
-// page scrolling passes straight through untouched.
-
-const RING_CARD_H = 0.55; // card height, of the stage
-const RING_CARD_RATIO = 0.72; // card width / height — portrait, room for real copy
-const RING_STEP = 34; // degrees between adjacent cards — close to the reference's own spacing
-const RING_RADIUS = 1.5; // ring radius, in card heights
-const RING_LENS = 5; // perspective distance, in card heights — flat, like the reference
-const RING_WHEEL_DEG = 0.012; // position change per px of horizontal wheel delta — slow, deliberate
-const RING_DRAG_UNITS = 300; // px dragged horizontally per one card's worth of position
-const RING_SETTLE = 160; // quiet time before the fan settles on a card
-const RING_EASE = 0.16; // fraction of remaining distance closed per frame
-const RING_CULL = 3.2; // cards further than this many steps from centre stop drawing
-
-const ringClamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-
-function LayersRing({ items, onApi }) {
-  const stageRef = useRef(null);
-  const ringRef = useRef(null);
-  const cardRefs = useRef([]);
-
-  const turn = useRef(0);
-  const target = useRef(0);
-  const [active, setActive] = useState(0);
-  const [stage, setStage] = useState({ w: 0, h: 0 });
-
-  const count = items.length;
-  const last = Math.max(count - 1, 0);
-
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const read = () => setReduced(query.matches);
-    read();
-    query.addEventListener('change', read);
-    return () => query.removeEventListener('change', read);
-  }, []);
-
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    const read = () => setStage({ w: el.clientWidth, h: el.clientHeight });
-    read();
-    const ro = new ResizeObserver(read);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const metrics = useMemo(() => {
-    const { h } = stage;
-    const cardH = h * RING_CARD_H;
-    return {
-      cardW: cardH * RING_CARD_RATIO,
-      cardH,
-      radius: cardH * RING_RADIUS,
-      depth: cardH * RING_LENS,
-    };
-  }, [stage]);
-
-  useEffect(() => {
-    if (!stage.h) return;
-    let frame = 0;
-    const { radius } = metrics;
-
-    const draw = () => {
-      frame = requestAnimationFrame(draw);
-      const gap = target.current - turn.current;
-      if (Math.abs(gap) < 0.0005) turn.current = target.current;
-      else turn.current += gap * (reduced ? 1 : RING_EASE);
-
-      const pos = turn.current;
-      for (let i = 0; i < count; i++) {
-        const d = i - pos;
-        const card = cardRefs.current[i];
-        if (card) {
-          card.style.transform = `rotateY(${d * RING_STEP}deg) translateZ(${radius}px)`;
-          card.style.opacity = Math.abs(d) > RING_CULL ? '0' : String(Math.max(0.35, 1 - Math.abs(d) * 0.16));
-        }
-      }
-      const near = ringClamp(Math.round(pos), 0, last);
-      setActive((prev) => (prev === near ? prev : near));
-    };
-
-    frame = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(frame);
-  }, [metrics, stage.h, count, last, reduced]);
-
-  const to = useCallback((next) => {
-    target.current = ringClamp(next, 0, last);
-  }, [last]);
-
-  // Lets a parent (e.g. a "Next" button) drive the fan the same way
-  // dragging or the arrow keys do, without lifting all of this state up.
-  useEffect(() => {
-    if (onApi) onApi({ next: () => to(Math.round(target.current) + 1), prev: () => to(Math.round(target.current) - 1) });
-  }, [onApi, to]);
-
-  const settling = useRef(0);
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    const onWheel = (event) => {
-      // A plain mouse wheel only ever reports deltaY — gating this on
-      // deltaX (an actual horizontal trackpad swipe) left it dead for
-      // most input devices. Use whichever axis the device actually
-      // reports, same as before for a trackpad's left/right swipe, but
-      // a normal scroll wheel now drives it too.
-      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-      const next = target.current + delta * RING_WHEEL_DEG;
-      // Only take over the gesture while it would actually move the fan —
-      // at either end (first/last card) the page keeps scrolling normally.
-      if (next > 0 && next < last) event.preventDefault();
-      to(next);
-      window.clearTimeout(settling.current);
-      settling.current = window.setTimeout(() => to(Math.round(target.current)), RING_SETTLE);
-    };
-    el.addEventListener('wheel', onWheel, { passive: false });
-    return () => {
-      el.removeEventListener('wheel', onWheel);
-      window.clearTimeout(settling.current);
-    };
-  }, [to, last]);
-
-  // Native touch events for touch, Pointer Events for everything else
-  // (mouse/pen) — not Pointer Events for touch too. Safari's pointer event
-  // delivery for touch has had real, device-visible timing quirks (same
-  // reasoning as the reviews/roof-layers carousel above). A touchscreen
-  // fires both a 'touchstart' and a same-gesture 'pointerdown', so the
-  // pointer handlers below explicitly ignore pointerType 'touch' to avoid
-  // double-driving the drag from the same gesture.
-  const drag = useRef(null);
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-
-    function begin(x) { drag.current = x; }
-    function move(x) {
-      if (drag.current === null) return;
-      to(target.current - (x - drag.current) / RING_DRAG_UNITS);
-      drag.current = x;
-    }
-    function end() {
-      drag.current = null;
-      to(Math.round(target.current));
-    }
-
-    function onTouchStart(e) { begin(e.touches[0].clientX); }
-    function onTouchMove(e) { move(e.touches[0].clientX); }
-    function onTouchEnd() { end(); }
-
-    function onPointerDown(e) {
-      if (e.pointerType === 'touch') return;
-      begin(e.clientX);
-      try { el.setPointerCapture(e.pointerId); } catch { /* pointer session already gone */ }
-    }
-    function onPointerMove(e) {
-      if (e.pointerType === 'touch') return;
-      if (e.buttons === 0) return;
-      move(e.clientX);
-    }
-    function onPointerUp(e) {
-      if (e.pointerType === 'touch') return;
-      end();
-    }
-
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false });
-    el.addEventListener('touchend', onTouchEnd);
-    el.addEventListener('touchcancel', onTouchEnd);
-    el.addEventListener('pointerdown', onPointerDown);
-    el.addEventListener('pointermove', onPointerMove, { passive: false });
-    el.addEventListener('pointerup', onPointerUp);
-    el.addEventListener('pointercancel', onPointerUp);
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-      el.removeEventListener('touchend', onTouchEnd);
-      el.removeEventListener('touchcancel', onTouchEnd);
-      el.removeEventListener('pointerdown', onPointerDown);
-      el.removeEventListener('pointermove', onPointerMove);
-      el.removeEventListener('pointerup', onPointerUp);
-      el.removeEventListener('pointercancel', onPointerUp);
-    };
-  }, [to]);
-
+// A smaller fanned-stack card, one in view at a time — same swipe/arrow
+// carousel as reviews below, rather than the wider multi-visible photo
+// strip this replaced. A compact image strip up top (one consistent
+// roof shot showing the full layer stack, not a different house per
+// card) with the profile's name/tagline/body underneath.
+function RoofTypeCard({ t, offset }) {
   return html`
-    <section class="layersring">
-      <div
-        ref=${stageRef}
-        tabIndex="0"
-        role="listbox"
-        aria-activedescendant=${`layersring-${active}`}
-        class="layersringstage"
-        style=${{ perspective: `${metrics.depth}px` }}
-        onKeyDown=${(event) => {
-          if (event.key === 'ArrowRight') to(Math.round(target.current) + 1);
-          else if (event.key === 'ArrowLeft') to(Math.round(target.current) - 1);
-          else return;
-          event.preventDefault();
-        }}
-      >
-        <div ref=${ringRef} class="layersringwheel">
-          ${items.map((item, i) => html`
-            <div
-              key=${item.title}
-              id=${`layersring-${i}`}
-              role="option"
-              aria-selected=${i === active}
-              ref=${(node) => { cardRefs.current[i] = node; }}
-              class=${cx('layersringcard', !item.image && 'textonly')}
-              style=${{
-                width: metrics.cardW,
-                height: metrics.cardH,
-                marginLeft: -metrics.cardW / 2,
-                marginTop: -metrics.cardH / 2,
-              }}
-            >
-              <span class="layersringface">
-                ${item.image ? html`
-                  <span class="layersringmedia"><img src=${item.image} alt="" draggable="false" /></span>
-                ` : null}
-                <span class="layersringtext">
-                  <span class="layersringtag">${item.tagline}</span>
-                  <h3>${item.title}</h3>
-                  <p>${item.body}</p>
-                </span>
-              </span>
-            </div>
-          `)}
-        </div>
+    <div class="rooftypecard" style=${fanStyle(offset)}>
+      <div class="rooftypeimg"><img src=${t.photo} alt="" /></div>
+      <div class="rooftypetext">
+        <div class="rooftypetag">${t.tagline}</div>
+        <h3>${t.name}</h3>
+        <p class="body">${t.body}</p>
       </div>
-
-      <ol class="layersringindex">
-        ${items.map((item, i) => html`
-          <li key=${item.title}>
-            <button type="button" onClick=${() => to(i)} class=${cx(i === active && 'active')}>
-              ${item.title}
-            </button>
-          </li>
-        `)}
-      </ol>
-    </section>
+    </div>
   `;
 }
 
-function LayersWheelSection() {
-  const ringItems = ROOF_TYPES.map((t) => ({ title: t.name, image: t.photo, tagline: t.tagline, body: t.body }));
-  const api = useRef(null);
+function RoofTypesCarousel() {
+  const n = ROOF_TYPES.length;
+  const { idx, go, ref, stageRef } = useSwipeCarousel(n);
   return html`
-    <div class="layersringwrap">
-      <${LayersRing} items=${ringItems} onApi=${(a) => { api.current = a; }} />
+    <div class="stepscarousel" ref=${ref}>
+      <div class="cardstage" ref=${stageRef}>
+        ${ROOF_TYPES.map((t, i) => html`<${RoofTypeCard} key=${t.name} t=${t} offset=${cyclicOffset(i, idx, n)} />`)}
+      </div>
+      <div class="cardnav">
+        <button class="cardarrow" onClick=${() => go(-1)} aria-label="Previous profile"><${ChevronIcon} flip /></button>
+        <span class="cardcount">${String(idx + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+        <button class="cardarrow" onClick=${() => go(1)} aria-label="Next profile"><${ChevronIcon} /></button>
+      </div>
     </div>
-    <button type="button" class="layerswheelmore" onClick=${() => api.current && api.current.next()}>
-      Next
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
-    </button>
   `;
 }
 
@@ -601,10 +360,10 @@ function ServicesSection() {
     <section id="services" class="page-section">
       <div class="page-head">
         <${Eyebrow}>WHAT'S INCLUDED<//>
-        <h2>Built in layers. Every one engineered.</h2>
-        <p class="body">From the framing up, every STRATA roof is built the same deliberate way — here's what's actually underneath the metal.</p>
+        <h2>Four profiles. One standard of build.</h2>
+        <p class="body">Every STRATA roof is standing-seam metal — the profile changes with your roof's pitch, budget and exposure.</p>
       </div>
-      <${LayersWheelSection} />
+      <${RoofTypesCarousel} />
       <${FinishesStrip} />
     </section>
   `;
