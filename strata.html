@@ -125,19 +125,13 @@ tailwind.config = {
 <main class="relative z-10">
 
   <!-- SECTION 2: HERO -->
-  <section class="relative sm:min-h-screen flex flex-col sm:flex-row sm:items-center overflow-hidden pt-24 sm:pt-0">
-    <!-- Desktop/tablet full-bleed background image -->
+  <section class="relative min-h-screen flex items-center overflow-hidden">
     <img src="assets/strata/hero.webp"
          alt="STRATA modular roofing structure"
-         class="hidden sm:block absolute inset-0 w-full h-full object-cover object-[65%_center] z-0 opacity-50">
-    <div class="hidden sm:block absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent z-[1]"></div>
+         class="absolute inset-0 w-full h-full object-cover z-0 opacity-50">
+    <div class="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent z-[1]"></div>
 
-    <!-- Mobile inline image, fully visible right under the nav -->
-    <img src="assets/strata/hero.webp"
-         alt="STRATA modular roofing structure"
-         class="sm:hidden w-full h-auto object-contain px-6">
-
-    <div class="relative z-10 max-w-7xl mx-auto px-6 pt-8 sm:pt-32 pb-20">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20">
       <p class="hero-anim gsap-fade-up font-mono text-xs uppercase tracking-[0.3em] text-dark/60 mb-6">Modern Roofing Systems — Est. 2011</p>
       <h1 class="hero-anim gsap-fade-up font-serif text-6xl sm:text-7xl lg:text-9xl leading-[0.95] text-dark max-w-5xl">
         Engineered to<br><em class="italic">Withstand</em>
