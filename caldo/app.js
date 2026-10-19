@@ -106,10 +106,12 @@ function HeroSection() {
 function HeroFollowPhotos() {
   return html`
     <div class="herofollow">
-      ${HERO.follow.map((item) => html`
+      ${HERO.follow.map((item, i) => html`
         <div class="herofollowitem" key=${item.src}>
           <img src=${item.src} alt="" class="herofollowphoto" />
-          <div class="herofollowcaption">
+          <div class="herofollowscrim"></div>
+          <div class="herofollowtext">
+            <span class="herofollownum">${String(i + 2).padStart(2, '0')}</span>
             <h3>${item.h}</h3>
             <p>${item.body}</p>
           </div>
