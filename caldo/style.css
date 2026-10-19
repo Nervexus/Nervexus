@@ -452,13 +452,26 @@ footer{
      just scaled down to a shorter banner and a narrower, more compact
      card so it still fits a phone screen without feeling cramped. */
   .herofull{
-    height:78vh;min-height:460px;
+    height:auto;min-height:0;overflow:visible;
     margin-top:var(--header-h);
+    /* Reserves room below the photo for the card to overlap into —
+       see .herocard below. */
+    padding-bottom:170px;
+    background:var(--paper);
+  }
+  .herophotos{
+    position:relative;
+    width:100%;
+    /* Size the box to the photos' own ratio instead of cropping to
+       fill a tall banner — nothing of the house gets cut off, and
+       there's no wasted blank space around it either. */
+    aspect-ratio:1685/934;
+    overflow:hidden;
   }
   .herocard{
     width:88vw;max-width:420px;
     padding:22px 22px 26px;border-radius:18px;
-    bottom:5vh;
+    bottom:0;
   }
   .herocard h1{font-size:clamp(24px,7vw,34px);line-height:1.12;}
   .herocard .lede{margin:10px 0 0;font-size:13.5px;line-height:1.5;}
