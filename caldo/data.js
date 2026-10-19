@@ -1,9 +1,9 @@
 // STRATA — copy and content data.
 
-// A full-bleed hero with the headline/CTA overlaid in a frosted card. The
-// photo itself steps through a short sequence as the page scrolls past it
-// — not pinned/scroll-jacked, just a crossfade tied to scroll position,
-// so by the time the hero scrolls out of view all four have shown.
+// A full-bleed hero with the headline/CTA overlaid in a frosted card over
+// photos[0]. The rest of the photos aren't crossfaded in place — they sit
+// as plain full-bleed blocks directly underneath the hero, in normal
+// document flow, so scrolling the page carries you from one to the next.
 export const HERO = {
   photos: [
     './photos/hero-house.webp',

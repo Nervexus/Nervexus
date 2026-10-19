@@ -157,8 +157,7 @@ nav.solid{
      below, just applied here too. */
   margin-top:var(--header-h);
 }
-.herophotos{position:absolute;inset:0;}
-.herophotos::before{
+.herofull::before{
   /* The renders fade to a pale gray at the top edge, not pure white,
      which read as a hard seam against the paper-colored nav above —
      this fades the photo in from that same paper color instead of
@@ -172,7 +171,6 @@ nav.solid{
   position:absolute;inset:0;
   width:100%;height:100%;
   object-fit:cover;object-position:center;
-  transition:opacity .9s ease;
 }
 .herocard{
   position:absolute;z-index:2;
@@ -186,6 +184,10 @@ nav.solid{
   box-shadow:0 20px 50px rgba(22,23,26,0.12);
 }
 .herocard h1{font-size:clamp(32px,4.6vw,54px);line-height:1.08;}
+/* The rest of HERO.photos, stacked directly underneath the hero as plain
+   full-bleed blocks — no overlay, no crossfade. Scrolling the page is what
+   carries you from one to the next. */
+.herofollowphoto{display:block;width:100%;height:auto;}
 .lede{
   margin:16px auto 0;max-width:420px;
   font-size:15.5px;line-height:1.5;color:var(--ink-2);
@@ -459,14 +461,14 @@ footer{
     padding-bottom:130px;
     background:var(--paper);
   }
-  .herophotos{
-    position:relative;
-    width:100%;
-    /* Size the box to the photos' own ratio instead of cropping to
-       fill a tall banner — nothing of the house gets cut off, and
-       there's no wasted blank space around it either. */
+  .herophoto{
+    /* Size the photo to its own ratio instead of cropping to fill a
+       tall banner — nothing of the house gets cut off, and there's
+       no wasted blank space around it either. */
+    position:static;
+    width:100%;height:auto;
     aspect-ratio:1685/934;
-    overflow:hidden;
+    display:block;
   }
   .herocard{
     width:78vw;max-width:340px;

@@ -84,19 +84,16 @@ function Eyebrow({ children }) {
   return html`<div class="eyebrow">${children}</div>`;
 }
 
-// A full-bleed hero with the headline/CTA overlaid in a frosted card. The
-// section itself is not pinned — it scrolls away normally — but the photo
-// stack beneath the card crossfades through HERO.photos as heroPhotoIndex
-// advances with scroll position (see main.js).
+// A full-bleed hero with the headline/CTA overlaid in a frosted card over
+// the first photo. Not pinned/scroll-jacked — it just scrolls away like any
+// other section. The rest of HERO.photos aren't crossfaded in place; they
+// sit as plain full-bleed photo blocks directly underneath it, so scrolling
+// down the page is what moves you from one to the next (see
+// HeroFollowPhotos below).
 function HeroSection() {
-  const s = useStore();
   return html`
     <section class="herofull">
-      <div class="herophotos">
-        ${HERO.photos.map((photo, i) => html`
-          <img key=${photo} src=${photo} alt="" class="herophoto" style=${{ opacity: i === s.heroPhotoIndex ? 1 : 0 }} />
-        `)}
-      </div>
+      <img src=${HERO.photos[0]} alt="" class="herophoto" />
       <div class="herocard">
         <h1>${HERO.h}</h1>
         <p class="lede">${HERO.lede}</p>
@@ -105,6 +102,16 @@ function HeroSection() {
         </div>
       </div>
     </section>
+  `;
+}
+
+function HeroFollowPhotos() {
+  return html`
+    <div class="herofollow">
+      ${HERO.photos.slice(1).map((photo) => html`
+        <img key=${photo} src=${photo} alt="" class="herofollowphoto" />
+      `)}
+    </div>
   `;
 }
 
@@ -443,6 +450,7 @@ function PageContent() {
   return html`
     <${React.Fragment}>
       <${HeroSection} />
+      <${HeroFollowPhotos} />
       <${ServicesSection} />
       <${TestimonialsSection} />
       <${FaqSection} />

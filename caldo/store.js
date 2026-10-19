@@ -12,7 +12,6 @@ export const state = {
   chatOpen: false,
   faqOpen: -1,
   navSolid: false,
-  heroPhotoIndex: 0,
 };
 
 let snapshot = { ...state };
