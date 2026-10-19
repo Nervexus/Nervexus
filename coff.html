@@ -94,6 +94,9 @@ tailwind.config = {
   @media (max-width: 1023px) {
     .product-img-mobile-curve { border-top-right-radius: 80px; }
   }
+  @media (max-width: 639px) {
+    .product-img-mobile-curve { border-top-right-radius: 48px; }
+  }
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-dark">
@@ -125,7 +128,7 @@ tailwind.config = {
   <section class="relative min-h-screen flex items-center overflow-hidden">
     <img src="https://cdn.midjourney.com/e796b010-1fed-4709-bd1b-cc165351ee03/0_0.png"
          alt="Champ de café"
-         class="absolute inset-0 w-full h-full object-cover z-0 opacity-50">
+         class="absolute inset-0 w-full h-full object-cover object-[65%_center] sm:object-center z-0 opacity-50">
     <div class="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent z-[1]"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20">
@@ -176,10 +179,10 @@ tailwind.config = {
         </div>
       </div>
 
-      <div class="relative gsap-card-image-wrapper overflow-hidden rounded-[32px]">
+      <div class="relative gsap-card-image-wrapper overflow-hidden rounded-[24px] sm:rounded-[32px]">
         <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop"
              alt="Producteur de café"
-             class="gsap-scale-up w-full h-[520px] object-cover">
+             class="gsap-scale-up w-full h-[280px] sm:h-[380px] lg:h-[520px] object-cover">
       </div>
     </div>
   </section>
@@ -196,20 +199,20 @@ tailwind.config = {
 
         <!-- Left: image column -->
         <div class="relative w-full lg:w-[45%] shrink-0">
-          <div class="relative h-[340px] lg:h-full overflow-hidden custom-curve product-img-mobile-curve">
+          <div class="relative h-[220px] sm:h-[300px] lg:h-full overflow-hidden custom-curve product-img-mobile-curve">
             <img id="product-image" src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=2000&auto=format&fit=crop"
                  alt="Finca El Paraiso"
-                 class="w-full h-full object-cover scale-100">
+                 class="w-full h-full object-cover object-center scale-100">
           </div>
 
           <!-- Social proof avatars -->
-          <div class="absolute bottom-6 left-6 flex items-center gap-3 z-10">
+          <div class="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-2 sm:gap-3 z-10">
             <div class="flex -space-x-3">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200" class="w-10 h-10 rounded-full border-2 border-dark object-cover">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200" class="w-10 h-10 rounded-full border-2 border-dark object-cover">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" class="w-10 h-10 rounded-full border-2 border-dark object-cover">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
             </div>
-            <p class="font-mono text-xs text-surface/80">+240 amateurs</p>
+            <p class="font-mono text-[10px] sm:text-xs text-surface/80">+240 amateurs</p>
           </div>
         </div>
 
