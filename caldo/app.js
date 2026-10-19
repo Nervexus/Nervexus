@@ -84,15 +84,19 @@ function Eyebrow({ children }) {
   return html`<div class="eyebrow">${children}</div>`;
 }
 
-// A single full-bleed hero photo with the headline/CTA overlaid in a
-// frosted card for contrast — no pin, no crossfade, no scroll-triggered
-// animation, just a plain static section at the very top of the page.
-// The photo itself already has the STRATA wordmark baked in (no CSS
-// watermark overlay needed on top of it).
+// A full-bleed hero with the headline/CTA overlaid in a frosted card. The
+// section itself is not pinned — it scrolls away normally — but the photo
+// stack beneath the card crossfades through HERO.photos as heroPhotoIndex
+// advances with scroll position (see main.js).
 function HeroSection() {
+  const s = useStore();
   return html`
     <section class="herofull">
-      <img src=${HERO.photo} alt="" />
+      <div class="herophotos">
+        ${HERO.photos.map((photo, i) => html`
+          <img key=${photo} src=${photo} alt="" class="herophoto" style=${{ opacity: i === s.heroPhotoIndex ? 1 : 0 }} />
+        `)}
+      </div>
       <div class="herocard">
         <h1>${HERO.h}</h1>
         <p class="lede">${HERO.lede}</p>

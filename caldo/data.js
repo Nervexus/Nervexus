@@ -1,10 +1,16 @@
 // STRATA — copy and content data.
 
-// A single full-bleed hero photo with the headline/CTA overlaid in a
-// frosted card — no scroll-pinned sequence, no crossfade, just a plain
-// static section at the top of the page.
+// A full-bleed hero with the headline/CTA overlaid in a frosted card. The
+// photo itself steps through a short sequence as the page scrolls past it
+// — not pinned/scroll-jacked, just a crossfade tied to scroll position,
+// so by the time the hero scrolls out of view all four have shown.
 export const HERO = {
-  photo: './photos/hero-dark-wide.webp',
+  photos: [
+    './photos/hero-house.webp',
+    './photos/house-angle2.webp',
+    './photos/engineering-layers.webp',
+    './photos/performance-house.webp',
+  ],
   h: 'The last roof you will ever need.',
   lede: 'Engineered standing-seam systems, hand-fitted by master craftsmen, built for coastal storms and backed by a lifetime transferable warranty.',
 };
@@ -12,34 +18,34 @@ export const HERO = {
 // --- Static page content (normal document flow) ---------------------
 
 // Four standing-seam panel profiles — real distinctions within STRATA's
-// one product line (not different roofing materials). The main (front)
-// card carries the hero house shot; the ones that follow underneath it as
-// you scroll step through another angle, the exploded-layer construction
-// view, then the interior angle — in that order.
+// one product line (not different roofing materials). One consistent
+// photo across all four (the exploded-layer construction shot).
+const ROOF_TYPE_PHOTO = './photos/engineering-layers.webp';
+
 export const ROOF_TYPES = [
   {
     name: 'Snap-Lock',
     tagline: 'The standard choice',
     body: 'Panels click together by hand, no seaming tool required. Concealed clips, clean lines, the profile on most of the roofs we build.',
-    photo: './photos/hero-house.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
     name: 'Mechanical-Lock',
     tagline: 'Built for the coast',
     body: 'Field-seamed into a fully interlocked panel for the highest wind and water rating we offer. The call for steep pitches and storm-line homes.',
-    photo: './photos/house-angle2.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
     name: 'Nail-Strip',
     tagline: 'The value entry point',
     body: 'A nail flange hidden beneath the overlapping panel — still zero exposed fasteners, at a lower installed cost than our locking profiles.',
-    photo: './photos/engineering-layers.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
   {
     name: 'Flush Panel',
     tagline: 'Architectural flat-seam',
     body: 'A flat pan with soldered or mechanically-formed seams for an almost seamless plane. Built for modern, low-slope architectural work.',
-    photo: './photos/performance-house.webp',
+    photo: ROOF_TYPE_PHOTO,
   },
 ];
 
