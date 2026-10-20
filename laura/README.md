@@ -24,7 +24,7 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
-| `/`          | Home — a node-diagram-style view of the orb wired to its tools, + chat        |
+| `/`          | Home — a node-diagram-style view of the orb wired to its tools, + chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember                              |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
@@ -40,11 +40,12 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
 | `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
 | `components/DotGrid.tsx`          | dark dot-grid canvas background behind the home page's hero section   |
-| `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls |
-| `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive state) |
+| `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
+| `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
+| `components/ActivityFeed.tsx`     | home page's Activity tab: a timeline of what Laura's actually done     |
 | `components/HudCard.tsx`          | dark instrument-panel card + hex icon badge, used on Notes/Vault/Reminders |
-| `prisma/schema.prisma`            | `Note`, `VaultItem`, `ChatMessage`, `Reminder` models                 |
-| `app/api/{chat,notes,reminders,vault}/...` | API routes                                                  |
+| `prisma/schema.prisma`            | `Note`, `VaultItem`, `ChatMessage`, `Reminder`, `ActivityLog` models   |
+| `app/api/{chat,notes,reminders,vault,activity}/...` | API routes                                         |
 
 ## Running it
 
@@ -78,6 +79,16 @@ search effectively costs two model calls instead of one — fine for
 personal use, but worth knowing if replies feel slow or hit the free
 tier's rate limit (~5 requests/minute on the flash tier at the time of
 writing).
+
+## Activity feed
+
+Every time Laura saves a note, sets a reminder, or runs a web search, it's
+recorded to `ActivityLog` and shows up two places: the home page's
+"Activity" tab (a plain timeline), and a one-shot glow on the matching node
+in the flow diagram right as the reply lands (`/api/chat`'s response
+includes `toolsUsed`, which the frontend uses to trigger it). Read-only
+tools (`get_current_time`, `list_reminders`) aren't logged — they're not
+interesting as a history, just noise.
 
 ## Security notes
 

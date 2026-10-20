@@ -4,9 +4,10 @@ import { chat, type ChatMessage } from "@/lib/brain";
 
 export async function GET() {
   const rows = await prisma.chatMessage.findMany({ orderBy: { createdAt: "asc" } });
-  const messages: ChatMessage[] = rows.map((r) => ({
-    role: r.role === "user" ? "user" : "assistant",
+  const messages = rows.map((r) => ({
+    role: r.role === "user" ? ("user" as const) : ("assistant" as const),
     content: r.content,
+    createdAt: r.createdAt.toISOString(),
   }));
   return NextResponse.json({ messages });
 }
@@ -36,9 +37,9 @@ export async function POST(request: Request) {
   await prisma.chatMessage.create({ data: { role: "user", content: message } });
 
   try {
-    const reply = await chat(history);
+    const { reply, toolsUsed } = await chat(history);
     await prisma.chatMessage.create({ data: { role: "assistant", content: reply } });
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply, toolsUsed });
   } catch (error) {
     console.error("Laura chat error:", error);
     const errMessage = error instanceof Error ? error.message : "Something went wrong.";

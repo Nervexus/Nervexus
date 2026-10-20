@@ -49,3 +49,13 @@ model Reminder {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
+
+// A record of what Laura actually did, for the home page's Activity feed --
+// not every tool call (get_current_time/list_reminders are read-only noise),
+// just the ones with a real-world effect or worth showing you happened.
+model ActivityLog {
+  id        String   @id @default(cuid())
+  tool      String
+  summary   String
+  createdAt DateTime @default(now())
+}

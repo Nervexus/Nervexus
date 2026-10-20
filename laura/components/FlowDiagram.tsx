@@ -63,14 +63,38 @@ const nodeCenterX = (i: number) => ((i + 0.5) / NODE_COUNT) * STAGE_W;
 
 type Reminder = { title: string; dueAt: string; done: boolean };
 
+// Maps a tool name (as returned from /api/chat's toolsUsed) to the node it
+// should briefly light up.
+const TOOL_NODE: Record<string, string> = {
+  create_note: "Notes",
+  create_reminder: "Reminders",
+  web_search: "Web search",
+};
+
 export const FlowDiagram = forwardRef<
   VoiceOrbHandle,
-  { onTranscript: (text: string) => void }
->(function FlowDiagram({ onTranscript }, orbRef) {
+  { onTranscript: (text: string) => void; pulseTools?: string[]; pulseKey?: number }
+>(function FlowDiagram({ onTranscript, pulseTools, pulseKey }, orbRef) {
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [vaultCount, setVaultCount] = useState<number | null>(null);
   const [nextReminder, setNextReminder] = useState<Reminder | null>(null);
   const [reminderCount, setReminderCount] = useState<number | null>(null);
+  const [pulsingNodes, setPulsingNodes] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!pulseKey || !pulseTools || pulseTools.length === 0) return;
+    const nodeTitles = new Set(
+      pulseTools.map((t) => TOOL_NODE[t]).filter(Boolean) as string[]
+    );
+    if (nodeTitles.size === 0) return;
+    setPulsingNodes(nodeTitles);
+    const timer = setTimeout(() => setPulsingNodes(new Set()), 1800);
+    return () => clearTimeout(timer);
+    // Deliberately keyed only on pulseKey: pulseTools is captured from the
+    // same render that bumped pulseKey, so it's always in sync; including
+    // it in the deps array would also re-fire on unrelated parent renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pulseKey]);
 
   useEffect(() => {
     fetch("/api/notes")
@@ -152,12 +176,16 @@ export const FlowDiagram = forwardRef<
           preserveAspectRatio="none"
           fill="none"
         >
-          {nodes.map((_, i) => (
+          {nodes.map((node, i) => (
             <path
               key={i}
               d={`M ${STAGE_W / 2} 0 C ${STAGE_W / 2} 20, ${nodeCenterX(i)} 20, ${nodeCenterX(i)} 40`}
-              stroke="rgba(52,211,153,0.3)"
-              strokeWidth={1.5}
+              stroke={
+                pulsingNodes.has(node.title) ? "rgba(110,231,183,0.9)" : "rgba(52,211,153,0.3)"
+              }
+              strokeWidth={pulsingNodes.has(node.title) ? 2 : 1.5}
+              strokeDasharray="5 7"
+              className="animate-[flow-dash_1.1s_linear_infinite] transition-[stroke,stroke-width] duration-300"
               vectorEffect="non-scaling-stroke"
             />
           ))}
@@ -169,9 +197,13 @@ export const FlowDiagram = forwardRef<
         className="mx-auto grid w-full grid-cols-2 gap-2 sm:flex sm:gap-3.5"
         style={{ maxWidth: STAGE_W }}
       >
-        {nodes.map((node) => (
+        {nodes.map((node, i) => (
           <div key={node.title} className="sm:flex-1">
-            <FlowNode {...node} />
+            <FlowNode
+              {...node}
+              pulsing={pulsingNodes.has(node.title)}
+              style={{ animationDelay: `${i * 70}ms` }}
+            />
           </div>
         ))}
       </div>

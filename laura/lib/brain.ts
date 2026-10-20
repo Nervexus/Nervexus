@@ -139,6 +139,17 @@ async function webSearch(query: string): Promise<string> {
   return sources?.length ? `${answer}\n\nSources: ${sources.join(", ")}` : answer;
 }
 
+// Tools worth surfacing in the home page's Activity feed -- a real-world
+// effect, or an answer that came from outside the model's own memory.
+// get_current_time/list_reminders are read-only/self-referential noise.
+const LOGGED_TOOLS = new Set(["create_note", "create_reminder", "web_search"]);
+
+async function logActivity(tool: string, summary: string) {
+  await prisma.activityLog.create({ data: { tool, summary } }).catch((err) => {
+    console.error("activity log write failed:", err);
+  });
+}
+
 async function runTool(
   name: string,
   args: Record<string, unknown>
@@ -152,6 +163,7 @@ async function runTool(
       return { error: "a note needs both a title and a body" };
     }
     const note = await prisma.note.create({ data: { title, body } });
+    await logActivity("create_note", `Saved note "${note.title}"`);
     return { result: `Saved note "${note.title}".` };
   }
   if (name === "create_reminder") {
@@ -166,6 +178,7 @@ async function runTool(
     const reminder = await prisma.reminder.create({
       data: { title, dueAt: due, note: note ?? null },
     });
+    await logActivity("create_reminder", `Set reminder "${reminder.title}"`);
     return { result: `Set a reminder for "${reminder.title}" at ${due.toString()}.` };
   }
   if (name === "list_reminders") {
@@ -184,7 +197,9 @@ async function runTool(
     const { query } = args as { query?: string };
     if (!query) return { error: "web_search needs a query" };
     try {
-      return { result: await webSearch(query) };
+      const result = await webSearch(query);
+      await logActivity("web_search", `Searched: "${query}"`);
+      return { result };
     } catch (err) {
       console.error("web_search error:", err);
       return { error: err instanceof Error ? err.message : "web search failed" };
@@ -193,12 +208,15 @@ async function runTool(
   return { error: `Unknown tool: ${name}` };
 }
 
-export async function chat(history: ChatMessage[]): Promise<string> {
+export type ChatResult = { reply: string; toolsUsed: string[] };
+
+export async function chat(history: ChatMessage[]): Promise<ChatResult> {
   const ai = getClient();
   const contents: Content[] = history.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],
   }));
+  const toolsUsed = new Set<string>();
 
   for (let turn = 0; turn < 5; turn++) {
     const response = await ai.models.generateContent({
@@ -212,7 +230,7 @@ export async function chat(history: ChatMessage[]): Promise<string> {
 
     const functionCalls = response.functionCalls;
     if (!functionCalls || functionCalls.length === 0) {
-      return response.text ?? "";
+      return { reply: response.text ?? "", toolsUsed: [...toolsUsed] };
     }
 
     // Echo back the model's own content verbatim (not just the function
@@ -227,17 +245,24 @@ export async function chat(history: ChatMessage[]): Promise<string> {
     );
 
     const responses = await Promise.all(
-      functionCalls.map(async (call) => ({
-        functionResponse: {
-          name: call.name,
-          id: call.id,
-          response: await runTool(call.name ?? "", call.args ?? {}),
-        },
-      }))
+      functionCalls.map(async (call) => {
+        const name = call.name ?? "";
+        if (LOGGED_TOOLS.has(name)) toolsUsed.add(name);
+        return {
+          functionResponse: {
+            name: call.name,
+            id: call.id,
+            response: await runTool(name, call.args ?? {}),
+          },
+        };
+      })
     );
 
     contents.push({ role: "user", parts: responses });
   }
 
-  return "Sorry, I got stuck thinking about that -- try asking again.";
+  return {
+    reply: "Sorry, I got stuck thinking about that -- try asking again.",
+    toolsUsed: [...toolsUsed],
+  };
 }
