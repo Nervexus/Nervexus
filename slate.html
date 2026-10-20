@@ -435,8 +435,17 @@ tailwind.config = {
   </section>
 
   <!-- SECTION 6: FOOTER -->
-  <footer class="matte-noise relative bg-dark text-cream rounded-t-[44px] pt-24 pb-10 px-6">
-    <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20">
+  <footer class="matte-noise relative bg-dark text-cream rounded-t-[44px] pt-24 pb-10 overflow-hidden">
+
+    <!-- Giant brand wordmark -->
+    <div class="gsap-fade-up text-center w-full mb-16 px-4"
+      style="mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent);">
+      <h2 class="text-[18vw] leading-[0.7] select-none font-serif font-bold text-cream/5 tracking-tighter">
+        SLATE
+      </h2>
+    </div>
+
+    <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20 px-6 border-t border-cream/10 pt-16">
       <div>
         <p class="font-serif text-3xl mb-4">SLATE</p>
         <p class="text-cream/60 text-sm leading-relaxed max-w-xs">
@@ -477,7 +486,7 @@ tailwind.config = {
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto border-t border-cream/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-6 border-t border-cream/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
       <p class="font-mono text-xs text-cream/40">© 2026 SLATE. All rights reserved.</p>
       <div class="flex items-center gap-6 font-mono text-xs text-cream/40">
         <a href="#" class="hover:text-cream/70 transition-colors">Legal</a>
@@ -675,18 +684,18 @@ gsap.set(productCard, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100
 gsap.timeline({
   scrollTrigger: {
     trigger: productCard,
-    start: 'top 75%',
+    start: 'top 90%',
   },
 })
 .to(productCard, {
   clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)',
-  duration: 1.2,
-  ease: 'power4.inOut',
+  duration: 0.6,
+  ease: 'power3.out',
 })
 .from(productCard, {
-  y: 60,
-  duration: 1.2,
-  ease: 'power4.inOut',
+  y: 40,
+  duration: 0.6,
+  ease: 'power3.out',
 }, 0);
 
 gsap.to(productImage, {
