@@ -119,11 +119,34 @@ tailwind.config = {
     width: 100%;
     will-change: transform, opacity;
   }
-  .spiral-card {
-    background: rgba(224, 220, 209, 0.04);
-    border: 1px solid rgba(224, 220, 209, 0.12);
-    border-radius: 18px;
-    padding: 1.25rem 1.5rem;
+  .spiral-pole {
+    position: absolute;
+    top: 6%;
+    bottom: 6%;
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, transparent, rgba(206, 191, 169, 0.35) 15%, rgba(206, 191, 169, 0.35) 85%, transparent);
+  }
+  .spiral-tread {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 112px;
+    height: 10px;
+    margin-top: -5px;
+    margin-left: -56px;
+    border-radius: 4px;
+    background: linear-gradient(to right, rgba(206, 191, 169, 0.15), rgba(206, 191, 169, 0.85));
+    transform-origin: 50% 50%;
+  }
+  .spiral-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: 18px;
+    margin-top: -26px;
+    width: 140px;
   }
 </style>
 </head>
@@ -196,58 +219,60 @@ tailwind.config = {
           integrity and absolute traceability.
         </p>
 
-        <div id="spiralWrap" class="spiral-wrap gsap-fade-up max-w-md h-[360px] sm:h-[400px]">
-          <div id="spiralStage" class="spiral-stage">
-            <div class="spiral-item">
-              <div class="spiral-card">
-                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">01</p>
-                <p class="font-serif text-4xl text-sand leading-none">15+</p>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Partner Quarries</p>
-              </div>
+      </div>
+
+      <div id="spiralWrap" class="spiral-wrap gsap-fade-up w-full h-[360px] sm:h-[440px] lg:h-[560px]">
+        <div class="spiral-pole"></div>
+        <div id="spiralStage" class="spiral-stage">
+          <div class="spiral-item">
+            <div class="spiral-tread"></div>
+            <div class="spiral-label">
+              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">01</p>
+              <p class="font-serif text-3xl text-sand leading-none">15+</p>
+              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Partner Quarries</p>
             </div>
-            <div class="spiral-item">
-              <div class="spiral-card">
-                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">02</p>
-                <p class="font-serif text-4xl text-sand leading-none">25yr</p>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Workmanship Warranty</p>
-              </div>
+          </div>
+          <div class="spiral-item">
+            <div class="spiral-tread"></div>
+            <div class="spiral-label">
+              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">02</p>
+              <p class="font-serif text-3xl text-sand leading-none">25yr</p>
+              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Workmanship Warranty</p>
             </div>
-            <div class="spiral-item">
-              <div class="spiral-card">
-                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">03</p>
-                <p class="font-serif text-4xl text-sand leading-none">Wales</p>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Welsh Slate</p>
-              </div>
+          </div>
+          <div class="spiral-item">
+            <div class="spiral-tread"></div>
+            <div class="spiral-label">
+              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">03</p>
+              <p class="font-serif text-3xl text-sand leading-none">Wales</p>
+              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Welsh Slate</p>
             </div>
-            <div class="spiral-item">
-              <div class="spiral-card">
-                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">04</p>
-                <p class="font-serif text-4xl text-sand leading-none">Spain</p>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Northern Quarries</p>
-              </div>
+          </div>
+          <div class="spiral-item">
+            <div class="spiral-tread"></div>
+            <div class="spiral-label">
+              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">04</p>
+              <p class="font-serif text-3xl text-sand leading-none">Spain</p>
+              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Northern Quarries</p>
             </div>
-            <div class="spiral-item">
-              <div class="spiral-card">
-                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">05</p>
-                <p class="font-serif text-4xl text-sand leading-none">100%</p>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Full Traceability</p>
-              </div>
+          </div>
+          <div class="spiral-item">
+            <div class="spiral-tread"></div>
+            <div class="spiral-label">
+              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">05</p>
+              <p class="font-serif text-3xl text-sand leading-none">100%</p>
+              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Full Traceability</p>
             </div>
-            <div class="spiral-item">
-              <div class="spiral-card">
-                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">06</p>
-                <p class="font-serif text-4xl text-sand leading-none">In-House</p>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Master Craftsmen</p>
-              </div>
+          </div>
+          <div class="spiral-item">
+            <div class="spiral-tread"></div>
+            <div class="spiral-label">
+              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">06</p>
+              <p class="font-serif text-3xl text-sand leading-none">In-House</p>
+              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Master Craftsmen</p>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="relative gsap-card-image-wrapper overflow-hidden rounded-[24px] sm:rounded-[32px]">
-        <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop"
-             alt="Quarry supplier"
-             class="gsap-scale-up w-full h-[280px] sm:h-[380px] lg:h-[520px] object-cover">
       </div>
     </div>
   </section>
@@ -622,9 +647,9 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
   const items = stage.querySelectorAll('.spiral-item');
   const count = items.length;
 
-  const radiusX = 22;
-  const radiusZ = 46;
-  const cardHeight = 92;
+  const radiusX = 72;
+  const radiusZ = 90;
+  const cardHeight = 70;
 
   let autoProgress = 0;
 
@@ -642,14 +667,18 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
       const x = Math.sin(angle) * radiusX;
       const z = Math.cos(angle) * radiusZ;
       const depth01 = (Math.cos(angle) + 1) / 2;
-      const scale = 0.72 + 0.32 * depth01;
+      const scale = 0.78 + 0.28 * depth01;
+      const angleDeg = (angle * 180) / Math.PI;
 
       const edgeFade = Math.min(1, Math.min(pos, 1 - pos) * 6);
-      const opacity = Math.max(0, Math.min(1, edgeFade)) * (0.35 + 0.65 * depth01);
+      const opacity = Math.max(0, Math.min(1, edgeFade)) * (0.4 + 0.6 * depth01);
 
       item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
       item.style.opacity = opacity.toFixed(3);
       item.style.zIndex = Math.round(depth01 * 100);
+
+      const tread = item.querySelector('.spiral-tread');
+      if (tread) tread.style.transform = `rotate(${angleDeg}deg)`;
     });
   }
 
