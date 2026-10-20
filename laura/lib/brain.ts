@@ -1,7 +1,7 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI, Type, type Content, type FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/db";
 
-const MODEL = "claude-sonnet-5-5";
+const MODEL = "gemini-flash-latest";
 
 const SYSTEM_PROMPT = `You are Laura, a personal voice/text assistant. You are warm, direct, and
 efficient -- you sound like a sharp human assistant, not a generic chatbot.
@@ -27,17 +27,17 @@ You never have access to the Vault. If asked for a password or secret,
 say you can't see the Vault's contents and the user should look it up
 there themselves.`;
 
-let client: Anthropic | null = null;
+let client: GoogleGenAI | null = null;
 
 function getClient() {
   if (!client) {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error(
-        "ANTHROPIC_API_KEY is not set. Add it to .env.local to talk to Laura."
+        "GEMINI_API_KEY is not set. Add it to .env.local to talk to Laura."
       );
     }
-    client = new Anthropic({ apiKey });
+    client = new GoogleGenAI({ apiKey });
   }
   return client;
 }
@@ -50,77 +50,88 @@ export type ChatMessage = {
 // Deliberately not exposing Vault reads/writes as a tool: an LLM
 // conversation is the wrong place for secrets to flow through,
 // especially once this talks over SMS/voice in later phases.
-const tools: Anthropic.Tool[] = [
+const tools: FunctionDeclaration[] = [
   {
     name: "get_current_time",
     description: "Get the current date and time.",
-    input_schema: { type: "object", properties: {} },
+    parameters: { type: Type.OBJECT, properties: {} },
   },
   {
     name: "create_note",
     description: "Save a note for the user to see later in their Notes list.",
-    input_schema: {
-      type: "object",
+    parameters: {
+      type: Type.OBJECT,
       properties: {
-        title: { type: "string", description: "Short title for the note." },
-        body: { type: "string", description: "The note's content." },
+        title: { type: Type.STRING, description: "Short title for the note." },
+        body: { type: Type.STRING, description: "The note's content." },
       },
       required: ["title", "body"],
     },
   },
 ];
 
-async function runTool(name: string, input: unknown): Promise<string> {
+async function runTool(
+  name: string,
+  args: Record<string, unknown>
+): Promise<Record<string, unknown>> {
   if (name === "get_current_time") {
-    return new Date().toString();
+    return { result: new Date().toString() };
   }
   if (name === "create_note") {
-    const { title, body } = input as { title?: string; body?: string };
-    if (!title || !body) return "Error: a note needs both a title and a body.";
+    const { title, body } = args as { title?: string; body?: string };
+    if (!title || !body) {
+      return { error: "a note needs both a title and a body" };
+    }
     const note = await prisma.note.create({ data: { title, body } });
-    return `Saved note "${note.title}".`;
+    return { result: `Saved note "${note.title}".` };
   }
-  return `Unknown tool: ${name}`;
+  return { error: `Unknown tool: ${name}` };
 }
 
 export async function chat(history: ChatMessage[]): Promise<string> {
-  const anthropic = getClient();
-  const messages: Anthropic.MessageParam[] = history.map((m) => ({
-    role: m.role,
-    content: m.content,
+  const ai = getClient();
+  const contents: Content[] = history.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
   }));
 
   for (let turn = 0; turn < 5; turn++) {
-    const response = await anthropic.messages.create({
+    const response = await ai.models.generateContent({
       model: MODEL,
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      tools,
-      messages,
+      contents,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        tools: [{ functionDeclarations: tools }],
+      },
     });
 
-    const toolUses = response.content.filter(
-      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
-    );
-
-    if (toolUses.length === 0) {
-      const textBlock = response.content.find(
-        (block): block is Anthropic.TextBlock => block.type === "text"
-      );
-      return textBlock?.text ?? "";
+    const functionCalls = response.functionCalls;
+    if (!functionCalls || functionCalls.length === 0) {
+      return response.text ?? "";
     }
 
-    messages.push({ role: "assistant", content: response.content });
-    messages.push({
-      role: "user",
-      content: await Promise.all(
-        toolUses.map(async (toolUse) => ({
-          type: "tool_result" as const,
-          tool_use_id: toolUse.id,
-          content: await runTool(toolUse.name, toolUse.input),
-        }))
-      ),
-    });
+    // Echo back the model's own content verbatim (not just the function
+    // calls) -- it carries a thoughtSignature per part that Gemini
+    // requires on the next turn for multi-step tool use.
+    const modelContent = response.candidates?.[0]?.content;
+    contents.push(
+      modelContent ?? {
+        role: "model",
+        parts: functionCalls.map((call) => ({ functionCall: call })),
+      }
+    );
+
+    const responses = await Promise.all(
+      functionCalls.map(async (call) => ({
+        functionResponse: {
+          name: call.name,
+          id: call.id,
+          response: await runTool(call.name ?? "", call.args ?? {}),
+        },
+      }))
+    );
+
+    contents.push({ role: "user", parts: responses });
   }
 
   return "Sorry, I got stuck thinking about that -- try asking again.";

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { chat, type ChatMessage } from "@/lib/anthropic";
+import { chat, type ChatMessage } from "@/lib/brain";
 
 export async function GET() {
   const rows = await prisma.chatMessage.findMany({ orderBy: { createdAt: "asc" } });

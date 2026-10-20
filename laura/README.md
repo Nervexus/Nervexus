@@ -24,7 +24,7 @@ the next phases:
 
 | file                           | what it is                                                        |
 |----------------------------------|----------------------------------------------------------------------|
-| `lib/anthropic.ts`                | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`) |
+| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`), via Gemini |
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
@@ -36,7 +36,8 @@ the next phases:
 
 ```bash
 cp .env.example .env.local
-# add ANTHROPIC_API_KEY, TURSO_DATABASE_URL/TURSO_AUTH_TOKEN (turso.tech),
+# add GEMINI_API_KEY (aistudio.google.com/apikey, free tier),
+# TURSO_DATABASE_URL/TURSO_AUTH_TOKEN (turso.tech),
 # and TOKEN_ENCRYPTION_KEY (openssl rand -hex 32) to .env.local
 npm run dev
 ```
