@@ -24,7 +24,7 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
-| `/`          | Home — the voice orb + chat + an overview of Notes/Reminders/Vault           |
+| `/`          | Home — a node-diagram-style view of the orb wired to its tools, + chat        |
 | `/notes`     | notes you've written or asked Laura to remember                              |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
@@ -39,9 +39,10 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
 | `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
-| `components/DuneBackground.tsx`   | ambient speckled-horizon canvas behind the home page's hero section   |
-| `components/HudCard.tsx`          | dark instrument-panel card + hex icon badge, the shared card/block style |
-| `components/OverviewCards.tsx`    | home page's Notes/Reminders/Vault summary tiles                      |
+| `components/DotGrid.tsx`          | dark dot-grid canvas background behind the home page's hero section   |
+| `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls |
+| `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive state) |
+| `components/HudCard.tsx`          | dark instrument-panel card + hex icon badge, used on Notes/Vault/Reminders |
 | `prisma/schema.prisma`            | `Note`, `VaultItem`, `ChatMessage`, `Reminder` models                 |
 | `app/api/{chat,notes,reminders,vault}/...` | API routes                                                  |
 

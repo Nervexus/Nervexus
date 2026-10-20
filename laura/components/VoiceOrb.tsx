@@ -126,11 +126,11 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
     const label = STATUS_LABEL[status];
     const ringColorClass =
       status === "listening"
-        ? "border-amber-400/60 text-amber-300"
+        ? "border-emerald-400/60 text-emerald-300"
         : status === "thinking"
           ? "border-violet-400/60 text-violet-300"
           : status === "speaking"
-            ? "border-amber-300/60 text-amber-200"
+            ? "border-emerald-300/60 text-emerald-200"
             : status === "unsupported"
               ? "border-neutral-700 text-neutral-600"
               : "border-neutral-500/60 text-neutral-300";
@@ -152,9 +152,9 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
             <MicIcon className="h-6 w-6" />
           </span>
         </button>
-        <p className="flex flex-col items-center text-center font-serif text-sm tracking-wide text-neutral-500">
+        <p className="flex flex-col items-center text-center text-xs tracking-wide text-neutral-500">
           {label.line1 && <span>{label.line1}</span>}
-          <span className="italic text-neutral-300">{label.line2}</span>
+          <span className="font-medium text-neutral-300">{label.line2}</span>
         </p>
       </div>
     );

@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { VoiceOrb, type VoiceOrbHandle } from "@/components/VoiceOrb";
-import { DuneBackground } from "@/components/DuneBackground";
-import { OverviewCards } from "@/components/OverviewCards";
+import { type VoiceOrbHandle } from "@/components/VoiceOrb";
+import { DotGrid } from "@/components/DotGrid";
+import { FlowDiagram } from "@/components/FlowDiagram";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -78,26 +78,26 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col sm:h-auto sm:flex-1">
-      <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 pb-10 pt-8">
-        <DuneBackground />
+      <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 pb-10 pt-6">
+        <DotGrid />
         <div className="relative mx-auto flex max-w-3xl flex-col items-center">
-          <div className="flex w-full items-start justify-between gap-6">
-            <h1 className="font-serif text-3xl text-neutral-100 sm:text-4xl">
-              Hey, I&rsquo;m{" "}
-              <span className="border-b border-dotted border-neutral-500 pb-0.5">Laura</span>
-            </h1>
-            <p className="hidden max-w-[13rem] text-right font-serif text-xs italic leading-relaxed text-neutral-500 sm:block">
-              Your voice, your notes, your vault — all in one place.
-            </p>
+          <div className="mb-8 flex w-full items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl font-semibold text-neutral-100">Laura</h1>
+                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+                  Assistant
+                </span>
+              </div>
+              <p className="mt-0.5 text-xs text-neutral-600">/ personal</p>
+            </div>
+            <span className="flex items-center gap-1.5 text-[11px] text-neutral-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              online
+            </span>
           </div>
 
-          <div className="mt-8 sm:mt-10">
-            <VoiceOrb ref={orbRef} onTranscript={(text) => sendMessage(text, true)} />
-          </div>
-
-          <div className="mt-8 w-full max-w-xs">
-            <OverviewCards />
-          </div>
+          <FlowDiagram ref={orbRef} onTranscript={(text) => sendMessage(text, true)} />
         </div>
       </div>
 
