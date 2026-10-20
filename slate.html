@@ -124,11 +124,6 @@ tailwind.config = {
   .testimonial-nav-fill-right { transform: translateX(100%); }
   .testimonial-nav-btn:hover .testimonial-nav-fill { transform: translateX(0); }
 
-  /* Services scattered gallery */
-  .services-dot-grid {
-    background-image: radial-gradient(rgba(29, 29, 28, 0.14) 1px, transparent 1px);
-    background-size: 22px 22px;
-  }
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-dark">
@@ -302,55 +297,9 @@ tailwind.config = {
         <h2 class="font-serif text-4xl sm:text-5xl text-dark">What We Offer</h2>
       </div>
 
-      <!-- Scattered gallery (desktop/tablet) -->
-      <div id="servicesGallery" class="services-dot-grid relative hidden sm:block h-[560px] md:h-[640px] max-w-5xl mx-auto">
-        <div class="services-card absolute left-[2%] top-[4%] w-[38%] max-w-[260px]" data-rotate="-6">
-          <div class="rounded-2xl overflow-hidden shadow-xl border border-dark/10 bg-surface">
-            <img src="assets/strata/hero.webp" alt="Natural Slate" class="w-full h-40 md:h-48 object-cover">
-          </div>
-          <p class="mt-3 font-serif text-lg text-dark">Natural Slate</p>
-        </div>
-
-        <div class="services-card absolute left-[32%] top-[30%] w-[40%] max-w-[280px]" data-rotate="4">
-          <div class="rounded-2xl overflow-hidden shadow-xl border border-dark/10 bg-surface">
-            <img src="assets/strata/story.webp" alt="Standing Seam Metal" class="w-full h-40 md:h-48 object-cover">
-          </div>
-          <p class="mt-3 font-serif text-lg text-dark">Standing Seam Metal</p>
-        </div>
-
-        <div class="services-card absolute left-[58%] top-[6%] w-[32%] max-w-[230px]" data-rotate="7">
-          <div class="rounded-2xl overflow-hidden shadow-xl border border-dark/10 bg-surface">
-            <img src="assets/strata/product.webp" alt="Clay Tile" class="w-full h-36 md:h-44 object-cover">
-          </div>
-          <p class="mt-3 font-serif text-lg text-dark">Clay Tile</p>
-        </div>
-
-        <div class="services-card absolute left-[54%] top-[58%] w-[38%] max-w-[260px]" data-rotate="-4">
-          <div class="rounded-2xl overflow-hidden shadow-xl border border-dark/10 bg-surface">
-            <img src="assets/strata/interior.webp" alt="Cedar Shake" class="w-full h-40 md:h-48 object-cover">
-          </div>
-          <p class="mt-3 font-serif text-lg text-dark">Cedar Shake</p>
-        </div>
-      </div>
-
-      <!-- Simple stacked fallback (mobile) -->
-      <div class="sm:hidden grid grid-cols-2 gap-4">
-        <div class="gsap-fade-up">
-          <div class="rounded-xl overflow-hidden shadow-lg border border-dark/10"><img src="assets/strata/hero.webp" alt="Natural Slate" class="w-full h-28 object-cover"></div>
-          <p class="mt-2 font-serif text-sm text-dark text-center">Natural Slate</p>
-        </div>
-        <div class="gsap-fade-up">
-          <div class="rounded-xl overflow-hidden shadow-lg border border-dark/10"><img src="assets/strata/story.webp" alt="Standing Seam Metal" class="w-full h-28 object-cover"></div>
-          <p class="mt-2 font-serif text-sm text-dark text-center">Standing Seam Metal</p>
-        </div>
-        <div class="gsap-fade-up">
-          <div class="rounded-xl overflow-hidden shadow-lg border border-dark/10"><img src="assets/strata/product.webp" alt="Clay Tile" class="w-full h-28 object-cover"></div>
-          <p class="mt-2 font-serif text-sm text-dark text-center">Clay Tile</p>
-        </div>
-        <div class="gsap-fade-up">
-          <div class="rounded-xl overflow-hidden shadow-lg border border-dark/10"><img src="assets/strata/interior.webp" alt="Cedar Shake" class="w-full h-28 object-cover"></div>
-          <p class="mt-2 font-serif text-sm text-dark text-center">Cedar Shake</p>
-        </div>
+      <!-- Rotating cylindrical Three.js gallery -->
+      <div id="servicesGalleryHost" class="relative mx-auto max-w-5xl h-[420px] sm:h-[520px] md:h-[600px]" role="img" aria-label="Rotating gallery of roofing materials">
+        <canvas id="servicesGalleryCanvas" class="w-full h-full block"></canvas>
       </div>
     </div>
   </section>
@@ -638,36 +587,130 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 })();
 
 /* =========================================================
-   SERVICES SCATTERED GALLERY (scroll-driven reveal)
+   SERVICES GALLERY: rotating cylindrical Three.js gallery
+   (ported from a React/useEffect component to plain JS; this
+   page already loads THREE r134 for the hero background)
    ========================================================= */
-(function initServicesGallery() {
-  const gallery = document.getElementById('servicesGallery');
-  if (!gallery) return;
+(function initServicesGallery3D() {
+  const host = document.getElementById('servicesGalleryHost');
+  const canvas = document.getElementById('servicesGalleryCanvas');
+  if (!host || !canvas || typeof THREE === 'undefined') return;
 
-  const cards = gallery.querySelectorAll('.services-card');
+  const IMAGE_URLS = [
+    'assets/strata/hero.webp',
+    'assets/strata/story.webp',
+    'assets/strata/product.webp',
+    'assets/strata/interior.webp',
+  ];
 
-  cards.forEach((card, i) => {
-    const restRotate = parseFloat(card.dataset.rotate || '0');
-    const fromRotate = restRotate + (restRotate >= 0 ? 14 : -14);
+  const settings = { speed: 1, scale: 1 };
+  function clamp(value, min, max) { return Math.min(max, Math.max(min, value)); }
 
-    gsap.fromTo(
-      card,
-      { opacity: 0, scale: 0.85, y: 50, rotate: fromRotate },
-      {
-        opacity: 1,
-        scale: 1,
-        y: 0,
-        rotate: restRotate,
-        duration: 0.8,
-        delay: i * 0.1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: gallery,
-          start: 'top 80%',
-        },
-      }
-    );
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setClearColor(0x000000, 0);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+  camera.position.z = 18;
+
+  const galleryGroup = new THREE.Group();
+  scene.add(galleryGroup);
+
+  const geometry = new THREE.CylinderGeometry(5, 5, 1.8, 64, 1, true, 0, Math.PI * 0.4);
+  const loader = new THREE.TextureLoader();
+
+  let disposed = false;
+  let frame = 0;
+  let elapsed = 0;
+  let previousTime = 0;
+  let hostVisible = true;
+  let documentVisible = !document.hidden;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const textures = IMAGE_URLS.map((url) => {
+    const texture = loader.load(url, () => {
+      if (disposed) { texture.dispose(); return; }
+      renderer.render(scene, camera);
+    });
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    return texture;
   });
+
+  const materials = Array.from({ length: 16 }, (_, index) =>
+    new THREE.MeshBasicMaterial({
+      map: textures[index % textures.length],
+      opacity: 0.9,
+      side: THREE.DoubleSide,
+      toneMapped: false,
+      transparent: true,
+    })
+  );
+
+  materials.forEach((material, index) => {
+    const panel = new THREE.Mesh(geometry, material);
+    panel.position.y = (index - 8) * 2.4;
+    panel.rotation.y = (index / 16) * Math.PI * 4;
+    galleryGroup.add(panel);
+  });
+
+  function render(time) {
+    time = time || performance.now();
+    const safeSpeed = clamp(settings.speed, 0, 3);
+    const safeScale = clamp(settings.scale, 0.7, 1.35);
+    if (previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.05) * safeSpeed;
+    previousTime = time;
+    galleryGroup.rotation.y = elapsed * 0.18;
+    galleryGroup.position.y = Math.sin(elapsed) * 1.5;
+    galleryGroup.scale.setScalar(safeScale);
+    renderer.render(scene, camera);
+  }
+
+  function tick(time) {
+    if (disposed || !hostVisible || !documentVisible) { frame = 0; previousTime = 0; return; }
+    render(time);
+    frame = window.requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (reducedMotion) { render(0); return; }
+    if (!frame && hostVisible && documentVisible) frame = window.requestAnimationFrame(tick);
+  }
+
+  function stop() {
+    if (frame) window.cancelAnimationFrame(frame);
+    frame = 0;
+    previousTime = 0;
+  }
+
+  function resize() {
+    const bounds = host.getBoundingClientRect();
+    const width = Math.max(1, Math.round(bounds.width));
+    const height = Math.max(1, Math.round(bounds.height));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    render();
+  }
+
+  const resizeObserver = new ResizeObserver(resize);
+  const intersectionObserver = new IntersectionObserver(([entry]) => {
+    hostVisible = entry ? entry.isIntersecting : true;
+    if (hostVisible) start(); else stop();
+  });
+
+  function handleVisibility() {
+    documentVisible = !document.hidden;
+    if (documentVisible) start(); else stop();
+  }
+
+  resizeObserver.observe(host);
+  intersectionObserver.observe(host);
+  document.addEventListener('visibilitychange', handleVisibility);
+  resize();
+  start();
 })();
 
 /* =========================================================
