@@ -360,77 +360,93 @@ tailwind.config = {
   </section>
 
   <!-- SECTION 5: THE EXPERIENCE (cleared, ready for new content) -->
-  <section id="experience" class="relative bg-dark text-cream py-28 px-6 overflow-hidden">
-    <img src="assets/strata/hero.webp" alt="Finished roofing structure"
-         class="absolute inset-0 w-full h-full object-cover opacity-20">
-    <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/85 to-dark/50"></div>
-
-    <div class="relative z-10 max-w-4xl mx-auto text-center gsap-fade-up">
-      <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">The Experience</p>
-      <h2 class="font-serif text-3xl sm:text-5xl leading-tight mb-6">Ready for a roof built to last generations?</h2>
-      <p class="text-cream/70 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">
-        From the first site visit to the final inspection, every project is
-        handled by the same licensed crew, with full traceability and a
-        warranty that actually means something.
-      </p>
-
-      <div class="flex items-center justify-center mb-16">
-        <button class="magnetic-btn group relative inline-flex items-center gap-3 bg-surface text-dark px-8 py-4 rounded-full font-medium overflow-hidden">
-          Book a consultation
-          <iconify-icon icon="solar:arrow-right-linear" class="text-lg transition-transform group-hover:translate-x-1"></iconify-icon>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto border-t border-cream/10 pt-10">
-        <div>
-          <p class="font-serif text-3xl sm:text-4xl text-sand">500+</p>
-          <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Roofs completed</p>
-        </div>
-        <div>
-          <p class="font-serif text-3xl sm:text-4xl text-sand">15+</p>
-          <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Partner quarries</p>
-        </div>
-        <div>
-          <p class="font-serif text-3xl sm:text-4xl text-sand">25yr</p>
-          <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Workmanship warranty</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- SECTION 6: FOOTER -->
-  <footer class="matte-noise relative overflow-hidden text-cream bg-dark rounded-t-[44px] border-cream/10 border-t pt-24">
+  <footer id="experience" class="matte-noise relative overflow-hidden text-cream bg-dark rounded-t-[44px] border-cream/10 border-t">
 
-    <!-- Giant Brand Text -->
-    <div class="gsap-fade-up text-center w-full mb-20 px-4"
-      style="mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent);">
-      <h2 class="text-[26vw] leading-[0.7] select-none font-serif font-bold text-cream/5 tracking-tighter mix-blend-screen scale-y-110">
-        SLATE
-      </h2>
+    <!-- Experience CTA band -->
+    <div class="relative px-6 pt-24 pb-20 overflow-hidden">
+      <img src="assets/strata/hero.webp" alt="Finished roofing structure"
+           class="absolute inset-0 w-full h-full object-cover opacity-20">
+      <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/85 to-dark/50"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto text-center gsap-fade-up">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">The Experience</p>
+        <h2 class="font-serif text-3xl sm:text-5xl leading-tight mb-6">Ready for a roof built to last generations?</h2>
+        <p class="text-cream/70 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">
+          From the first site visit to the final inspection, every project is
+          handled by the same licensed crew, with full traceability and a
+          warranty that actually means something.
+        </p>
+
+        <div class="flex items-center justify-center mb-16">
+          <button class="magnetic-btn group relative inline-flex items-center gap-3 bg-surface text-dark px-8 py-4 rounded-full font-medium overflow-hidden">
+            Book a consultation
+            <iconify-icon icon="solar:arrow-right-linear" class="text-lg transition-transform group-hover:translate-x-1"></iconify-icon>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto border-t border-cream/10 pt-10">
+          <div>
+            <p class="font-serif text-3xl sm:text-4xl text-sand">500+</p>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Roofs completed</p>
+          </div>
+          <div>
+            <p class="font-serif text-3xl sm:text-4xl text-sand">15+</p>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Partner quarries</p>
+          </div>
+          <div>
+            <p class="font-serif text-3xl sm:text-4xl text-sand">25yr</p>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Workmanship warranty</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Links -->
-    <div class="gsap-fade-up p-8 md:p-16 grid grid-cols-2 gap-12 max-w-2xl mx-auto">
-      <div class="flex flex-col gap-6">
-        <a href="#heritage" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Our Process</a>
-        <a href="#services" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Services</a>
-        <a href="testimonials.html" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Testimonials</a>
+    <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20 px-6 border-t border-cream/10 pt-16">
+      <div>
+        <p class="font-serif text-3xl mb-4">SLATE</p>
+        <p class="text-cream/60 text-sm leading-relaxed max-w-xs">
+          Bespoke roofing, specified and installed to the standards of fine
+          craft. Every tile a material to be honored.
+        </p>
+        <div class="flex items-center gap-4 mt-6 text-xl text-cream/70">
+          <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+          <iconify-icon icon="solar:camera-linear"></iconify-icon>
+          <iconify-icon icon="solar:letter-linear"></iconify-icon>
+        </div>
       </div>
-      <div class="flex flex-col gap-6">
-        <a href="#experience" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Contact Us</a>
-        <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Instagram</a>
-        <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Twitter/X</a>
-        <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Facebook</a>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
+        <ul class="space-y-3 text-cream/70 text-sm">
+          <li><a href="#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
+          <li><a href="#services" class="hover:text-cream transition-colors">Services</a></li>
+          <li><a href="testimonials.html" class="hover:text-cream transition-colors">Testimonials</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">The Studio</p>
+        <p class="text-cream/70 text-sm leading-relaxed">
+          12 Artisan Row<br>Mayfair, London
+        </p>
+        <p class="text-cream/70 text-sm leading-relaxed mt-4">
+          Mon to Fri: 8am to 6pm<br>Sat to Sun: 9am to 5pm
+        </p>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Contact</p>
+        <p class="text-cream/70 text-sm leading-relaxed">hello@slate-roofing.co</p>
+        <p class="text-cream/70 text-sm leading-relaxed mt-2">+44 20 7946 0192</p>
       </div>
     </div>
 
-    <!-- Copyright Row -->
-    <div class="border-t border-cream/10 px-8 md:px-16 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-cream/40 font-medium tracking-wide">
-      <div>© 2026 SLATE. All rights reserved.</div>
-      <div class="flex gap-8">
-        <a href="#" class="hover:text-cream transition-colors">Privacy Policy</a>
-        <a href="#" class="hover:text-cream transition-colors">Terms of Use</a>
-        <a href="#" class="hover:text-cream transition-colors">Cookies</a>
+    <div class="max-w-7xl mx-auto px-6 border-t border-cream/10 pt-8 pb-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="font-mono text-xs text-cream/40">© 2026 SLATE. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-mono text-xs text-cream/40">
+        <a href="#" class="hover:text-cream/70 transition-colors">Legal</a>
+        <a href="#" class="hover:text-cream/70 transition-colors">Privacy</a>
       </div>
     </div>
   </footer>
