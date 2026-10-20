@@ -11,6 +11,11 @@ export async function GET() {
   return NextResponse.json({ messages });
 }
 
+export async function DELETE() {
+  await prisma.chatMessage.deleteMany({});
+  return NextResponse.json({ ok: true });
+}
+
 export async function POST(request: Request) {
   const data = await request.json().catch(() => null);
   const message = typeof data?.message === "string" ? data.message.trim() : "";

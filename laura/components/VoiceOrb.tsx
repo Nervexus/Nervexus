@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { canSpeak, getSpeechRecognitionCtor, type SpeechRecognitionLike } from "@/lib/speech";
+import { DustRing } from "@/components/DustRing";
 
 export type OrbStatus = "idle" | "listening" | "thinking" | "speaking" | "unsupported";
 
@@ -16,13 +17,40 @@ export type VoiceOrbHandle = {
   speak: (text: string) => Promise<void>;
 };
 
-const STATUS_LABEL: Record<OrbStatus, string> = {
+const ARIA_LABEL: Record<OrbStatus, string> = {
   idle: "Tap to talk to Laura",
   listening: "Listening…",
   thinking: "Thinking…",
   speaking: "Speaking…",
   unsupported: "Voice isn't supported in this browser — try Chrome or Edge",
 };
+
+const STATUS_LABEL: Record<OrbStatus, { line1?: string; line2: string }> = {
+  idle: { line1: "tap to", line2: "talk" },
+  listening: { line2: "listening…" },
+  thinking: { line2: "thinking…" },
+  speaking: { line2: "speaking…" },
+  unsupported: { line1: "voice isn't supported —", line2: "try chrome or edge" },
+};
+
+function MicIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="9" y="2.5" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+      <path d="M12 17.5V21" />
+      <path d="M8.5 21h7" />
+    </svg>
+  );
+}
 
 export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string) => void }>(
   function VoiceOrb({ onTranscript }, ref) {
@@ -92,42 +120,39 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
       }
     }
 
+    const label = STATUS_LABEL[status];
+    const ringColorClass =
+      status === "listening"
+        ? "border-amber-400/60 text-amber-300"
+        : status === "thinking"
+          ? "border-violet-400/60 text-violet-300"
+          : status === "speaking"
+            ? "border-amber-300/60 text-amber-200"
+            : status === "unsupported"
+              ? "border-neutral-700 text-neutral-600"
+              : "border-neutral-500/60 text-neutral-300";
+
     return (
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-5">
         <button
           onClick={handleClick}
-          aria-label={STATUS_LABEL[status]}
+          aria-label={ARIA_LABEL[status]}
           disabled={status === "unsupported"}
-          className="group relative flex h-44 w-44 items-center justify-center rounded-full outline-none disabled:cursor-not-allowed"
+          className="group relative flex h-56 w-56 items-center justify-center outline-none disabled:cursor-not-allowed"
         >
+          <DustRing status={status} size={224} />
           <span
-            className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
-              status === "idle"
-                ? "bg-amber-500/20"
-                : status === "listening"
-                  ? "scale-110 bg-amber-400/50"
-                  : status === "thinking"
-                    ? "bg-violet-400/40"
-                    : status === "speaking"
-                      ? "bg-amber-300/50"
-                      : "bg-neutral-700/20"
+            className={`relative flex h-16 w-16 items-center justify-center rounded-full border bg-neutral-950/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
+              status === "listening" ? "animate-[pulse_1.4s_ease-in-out_infinite]" : ""
             }`}
-          />
-          <span
-            className={`absolute inset-3 rounded-full bg-gradient-to-br from-amber-300 via-orange-400 to-violet-500 opacity-90 ${
-              status === "listening"
-                ? "animate-[pulse_1.1s_ease-in-out_infinite]"
-                : status === "thinking"
-                  ? "animate-[spin_2.2s_linear_infinite]"
-                  : status === "speaking"
-                    ? "animate-[pulse_0.6s_ease-in-out_infinite]"
-                    : "animate-[pulse_3.5s_ease-in-out_infinite]"
-            } ${status === "unsupported" ? "opacity-30 grayscale" : ""}`}
-          />
-          <span className="absolute inset-3 rounded-full bg-neutral-950/10 mix-blend-overlay" />
-          <span className="relative h-5 w-5 rounded-full bg-white/90 shadow-[0_0_20px_6px_rgba(255,255,255,0.5)]" />
+          >
+            <MicIcon className="h-6 w-6" />
+          </span>
         </button>
-        <p className="text-xs tracking-wide text-neutral-500">{STATUS_LABEL[status]}</p>
+        <p className="flex flex-col items-center text-center font-serif text-sm tracking-wide text-neutral-500">
+          {label.line1 && <span>{label.line1}</span>}
+          <span className="italic text-neutral-300">{label.line2}</span>
+        </p>
       </div>
     );
   }

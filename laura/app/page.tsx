@@ -1,7 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { VoiceOrb, type VoiceOrbHandle } from "@/components/VoiceOrb";
+import { DuneBackground } from "@/components/DuneBackground";
+
+function EyeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -76,13 +95,31 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col sm:h-auto sm:flex-1">
-      <header className="border-b border-neutral-800 px-6 py-4">
-        <h1 className="font-semibold tracking-tight">Home</h1>
-        <p className="text-xs text-neutral-500">talk to Laura, by voice or text</p>
-      </header>
+      <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 pb-10 pt-8">
+        <DuneBackground />
+        <div className="relative mx-auto flex max-w-3xl flex-col items-center">
+          <div className="flex w-full items-start justify-between gap-6">
+            <h1 className="font-serif text-3xl text-neutral-100 sm:text-4xl">
+              Hey, I&rsquo;m{" "}
+              <span className="border-b border-dotted border-neutral-500 pb-0.5">Laura</span>
+            </h1>
+            <p className="hidden max-w-[13rem] text-right font-serif text-xs italic leading-relaxed text-neutral-500 sm:block">
+              Your voice, your notes, your vault — all in one place.
+            </p>
+          </div>
 
-      <div className="flex justify-center border-b border-neutral-800 bg-neutral-950 py-8">
-        <VoiceOrb ref={orbRef} onTranscript={(text) => sendMessage(text, true)} />
+          <div className="mt-8 sm:mt-10">
+            <VoiceOrb ref={orbRef} onTranscript={(text) => sendMessage(text, true)} />
+          </div>
+
+          <Link
+            href="/notes"
+            className="mt-7 flex items-center gap-2 text-xs tracking-wide text-neutral-500 transition-colors hover:text-neutral-300"
+          >
+            <EyeIcon className="h-4 w-4" />
+            see your notes
+          </Link>
+        </div>
       </div>
 
       <div ref={listRef} className="flex-1 overflow-y-auto px-6 py-6">

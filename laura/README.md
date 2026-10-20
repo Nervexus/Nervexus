@@ -29,6 +29,8 @@ the next phases:
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
+| `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
+| `components/DuneBackground.tsx`   | ambient speckled-horizon canvas behind the home page's hero section   |
 | `prisma/schema.prisma`            | `Note`, `VaultItem`, `ChatMessage` models                             |
 | `app/api/{chat,notes,vault}/...`  | API routes                                                            |
 
