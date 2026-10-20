@@ -290,41 +290,77 @@ tailwind.config = {
         <h2 class="font-serif text-4xl sm:text-5xl text-dark">What We Offer</h2>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="max-w-3xl mx-auto gsap-fade-up border-t border-dark/10">
         <!-- Natural Slate -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col items-center text-center gap-2 sm:gap-4">
-          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
-            <iconify-icon icon="solar:layers-linear"></iconify-icon>
+        <div class="service-accordion-item border-b border-dark/10">
+          <button class="service-accordion-trigger w-full flex items-center justify-between gap-6 py-6 sm:py-8 text-left">
+            <span class="flex items-center gap-4 sm:gap-6">
+              <span class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-lg">
+                <iconify-icon icon="solar:layers-linear"></iconify-icon>
+              </span>
+              <span class="font-serif text-xl sm:text-3xl text-dark">Natural Slate</span>
+            </span>
+            <span class="service-accordion-icon shrink-0 w-8 h-8 rounded-full border border-dark/15 flex items-center justify-center text-dark text-lg transition-transform duration-300">
+              <iconify-icon icon="solar:add-linear"></iconify-icon>
+            </span>
+          </button>
+          <div class="service-accordion-panel overflow-hidden" style="height: 0;">
+            <p class="text-dark/50 text-sm sm:text-base leading-relaxed pb-6 sm:pb-8 pl-[52px] sm:pl-[68px] pr-10 max-w-md">Centuries-grade permanence with a deep graphite lustre. Our signature material.</p>
           </div>
-          <h3 class="font-serif text-base sm:text-2xl text-dark">Natural Slate</h3>
-          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Centuries-grade permanence with a deep graphite lustre. Our signature material.</p>
         </div>
 
         <!-- Standing Seam Metal -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col items-center text-center gap-2 sm:gap-4">
-          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
-            <iconify-icon icon="solar:home-2-linear"></iconify-icon>
+        <div class="service-accordion-item border-b border-dark/10">
+          <button class="service-accordion-trigger w-full flex items-center justify-between gap-6 py-6 sm:py-8 text-left">
+            <span class="flex items-center gap-4 sm:gap-6">
+              <span class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-lg">
+                <iconify-icon icon="solar:home-2-linear"></iconify-icon>
+              </span>
+              <span class="font-serif text-xl sm:text-3xl text-dark">Standing Seam Metal</span>
+            </span>
+            <span class="service-accordion-icon shrink-0 w-8 h-8 rounded-full border border-dark/15 flex items-center justify-center text-dark text-lg transition-transform duration-300">
+              <iconify-icon icon="solar:add-linear"></iconify-icon>
+            </span>
+          </button>
+          <div class="service-accordion-panel overflow-hidden" style="height: 0;">
+            <p class="text-dark/50 text-sm sm:text-base leading-relaxed pb-6 sm:pb-8 pl-[52px] sm:pl-[68px] pr-10 max-w-md">Precision-formed zinc and copper panels, built for clean architectural lines.</p>
           </div>
-          <h3 class="font-serif text-base sm:text-2xl text-dark">Standing Seam Metal</h3>
-          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Precision-formed zinc and copper panels, built for clean architectural lines.</p>
         </div>
 
         <!-- Clay Tile -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col items-center text-center gap-2 sm:gap-4">
-          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
-            <iconify-icon icon="solar:square-linear"></iconify-icon>
+        <div class="service-accordion-item border-b border-dark/10">
+          <button class="service-accordion-trigger w-full flex items-center justify-between gap-6 py-6 sm:py-8 text-left">
+            <span class="flex items-center gap-4 sm:gap-6">
+              <span class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-lg">
+                <iconify-icon icon="solar:square-linear"></iconify-icon>
+              </span>
+              <span class="font-serif text-xl sm:text-3xl text-dark">Clay Tile</span>
+            </span>
+            <span class="service-accordion-icon shrink-0 w-8 h-8 rounded-full border border-dark/15 flex items-center justify-center text-dark text-lg transition-transform duration-300">
+              <iconify-icon icon="solar:add-linear"></iconify-icon>
+            </span>
+          </button>
+          <div class="service-accordion-panel overflow-hidden" style="height: 0;">
+            <p class="text-dark/50 text-sm sm:text-base leading-relaxed pb-6 sm:pb-8 pl-[52px] sm:pl-[68px] pr-10 max-w-md">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</p>
           </div>
-          <h3 class="font-serif text-base sm:text-2xl text-dark">Clay Tile</h3>
-          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</p>
         </div>
 
         <!-- Cedar Shake -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col items-center text-center gap-2 sm:gap-4">
-          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
-            <iconify-icon icon="solar:leaf-linear"></iconify-icon>
+        <div class="service-accordion-item border-b border-dark/10">
+          <button class="service-accordion-trigger w-full flex items-center justify-between gap-6 py-6 sm:py-8 text-left">
+            <span class="flex items-center gap-4 sm:gap-6">
+              <span class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-lg">
+                <iconify-icon icon="solar:leaf-linear"></iconify-icon>
+              </span>
+              <span class="font-serif text-xl sm:text-3xl text-dark">Cedar Shake</span>
+            </span>
+            <span class="service-accordion-icon shrink-0 w-8 h-8 rounded-full border border-dark/15 flex items-center justify-center text-dark text-lg transition-transform duration-300">
+              <iconify-icon icon="solar:add-linear"></iconify-icon>
+            </span>
+          </button>
+          <div class="service-accordion-panel overflow-hidden" style="height: 0;">
+            <p class="text-dark/50 text-sm sm:text-base leading-relaxed pb-6 sm:pb-8 pl-[52px] sm:pl-[68px] pr-10 max-w-md">Hand-split cedar shingles that weather to a warm, silvered patina over time.</p>
           </div>
-          <h3 class="font-serif text-base sm:text-2xl text-dark">Cedar Shake</h3>
-          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Hand-split cedar shingles that weather to a warm, silvered patina over time.</p>
         </div>
       </div>
     </div>
@@ -626,6 +662,37 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 })();
 
 /* =========================================================
+   SERVICES ACCORDION
+   ========================================================= */
+(function initServicesAccordion() {
+  const items = document.querySelectorAll('.service-accordion-item');
+  if (!items.length) return;
+
+  items.forEach((item) => {
+    const trigger = item.querySelector('.service-accordion-trigger');
+    const panel = item.querySelector('.service-accordion-panel');
+    const icon = item.querySelector('.service-accordion-icon');
+    if (!trigger || !panel || !icon) return;
+
+    trigger.addEventListener('click', () => {
+      const isOpen = item.classList.contains('is-open');
+
+      if (isOpen) {
+        gsap.to(panel, { height: 0, duration: 0.4, ease: 'power3.inOut' });
+        gsap.to(icon, { rotate: 0, duration: 0.4, ease: 'power3.inOut' });
+        item.classList.remove('is-open');
+      } else {
+        gsap.set(panel, { height: 'auto' });
+        const target = panel.offsetHeight;
+        gsap.fromTo(panel, { height: 0 }, { height: target, duration: 0.4, ease: 'power3.inOut' });
+        gsap.to(icon, { rotate: 45, duration: 0.4, ease: 'power3.inOut' });
+        item.classList.add('is-open');
+      }
+    });
+  });
+})();
+
+/* =========================================================
    CLIENT TESTIMONIALS CAROUSEL
    ========================================================= */
 (function initTestimonials() {
@@ -650,6 +717,24 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
       author: 'James Okafor',
       role: 'Principal Architect',
       company: 'Studio Okafor',
+    },
+    {
+      quote: 'Four days, zero surprises, flawless finish.',
+      author: 'Priya Shah',
+      role: 'Homeowner, Full Re-roof',
+      company: 'Private Residence',
+    },
+    {
+      quote: 'They treat a roof like a piece of architecture.',
+      author: 'Marcus Webb',
+      role: 'General Contractor',
+      company: 'Webb & Sons Construction',
+    },
+    {
+      quote: 'Our listing sold within a week of the new roof.',
+      author: 'Elena Frost',
+      role: 'Estate Agent',
+      company: 'Frost & Partners',
     },
   ];
 
