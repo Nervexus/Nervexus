@@ -3,12 +3,20 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+// NOTE: `prisma migrate deploy`/`dev` don't actually work against this --
+// Prisma's CLI uses its native engine, which doesn't understand the
+// `libsql://` scheme (only the JS driver-adapter path in lib/db.ts does).
+// This is kept so `prisma format`/`validate`/Studio have *something* to
+// point at; real schema changes go through scripts/apply-turso-migration.mjs.
+const tursoUrl = process.env["TURSO_DATABASE_URL"];
+const tursoToken = process.env["TURSO_AUTH_TOKEN"];
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    url: tursoToken ? `${tursoUrl}?authToken=${tursoToken}` : tursoUrl,
   },
 });

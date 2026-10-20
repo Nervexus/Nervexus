@@ -36,10 +36,18 @@ the next phases:
 
 ```bash
 cp .env.example .env.local
-# add ANTHROPIC_API_KEY and TOKEN_ENCRYPTION_KEY (openssl rand -hex 32) to .env.local
-npx prisma migrate dev
+# add ANTHROPIC_API_KEY, TURSO_DATABASE_URL/TURSO_AUTH_TOKEN (turso.tech),
+# and TOKEN_ENCRYPTION_KEY (openssl rand -hex 32) to .env.local
 npm run dev
 ```
+
+Schema changes aren't applied via `prisma migrate deploy` — Prisma's CLI
+doesn't understand `libsql://` connection strings (only the JS driver
+adapter used by the running app does). Instead, write the new SQL into a
+`prisma/migrations/<timestamp>_name/migration.sql` file as usual, then run
+it directly against Turso via `@libsql/client` (see
+`scripts/apply-turso-migration.mjs` for the pattern) and record it with
+`scripts/record-migration-history.mjs`.
 
 Open [http://localhost:3000](http://localhost:3000). The voice orb needs
 Chrome or Edge (Web Speech API support); other browsers fall back to text
@@ -66,13 +74,11 @@ only, with a note saying so rather than a crash.
 
 ## Persistence note
 
-SQLite (via `@prisma/adapter-better-sqlite3`) is fine for local dev, but a
-serverless host's filesystem isn't durable across deploys/invocations.
-Before deploying this for real, swap the adapter in `lib/db.ts` for
-`@prisma/adapter-libsql` (Turso) — same SQLite-compatible schema, just a
-different adapter and a `DATABASE_URL`/auth token pointing at a hosted
-database instead of a local file. `googleapis` and `twilio` are already
-installed for phase 2 but not wired up yet.
+Storage is Turso (hosted libSQL, SQLite-wire-compatible) via
+`@prisma/adapter-libsql`, used for both local dev and production — a
+serverless host's filesystem isn't durable across deploys/invocations, so
+there's no local-SQLite-file mode anymore. `googleapis` and `twilio` are
+already installed for phase 2 but not wired up yet.
 
 ## Accounts you'll need before phase 2
 
