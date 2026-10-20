@@ -318,99 +318,11 @@ tailwind.config = {
   </section>
 
   <!-- SECTION 4: PRODUCT CARD -->
+  <!-- SECTION: CLIENT TESTIMONIALS (placeholder — ready for a component) -->
   <section id="boutique" class="relative py-28 px-6">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-16 gsap-fade-up">
-        <h2 class="font-serif text-4xl sm:text-5xl text-dark">Our Signature Collection</h2>
-      </div>
-
-      <div id="product-card" class="gradient-border-inset bg-dark rounded-[44px] shadow-2xl flex flex-col lg:flex-row overflow-hidden">
-
-        <!-- Left: image column -->
-        <div class="relative w-full lg:w-[45%] shrink-0">
-          <div class="relative h-[220px] sm:h-[300px] lg:h-full overflow-hidden custom-curve product-img-mobile-curve">
-            <div id="product-image" class="w-full h-full bg-gradient-to-br from-moss via-dark to-moss/60 scale-100"></div>
-          </div>
-
-          <!-- Social proof avatars -->
-          <div class="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-2 sm:gap-3 z-10">
-            <div class="flex -space-x-3">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
-            </div>
-            <p class="font-mono text-[10px] sm:text-xs text-surface/80">+240 homeowners</p>
-          </div>
-        </div>
-
-        <!-- Right: content column -->
-        <div class="flex-1 flex flex-col justify-between p-10 lg:p-14">
-          <div>
-            <div class="inline-flex items-center gap-2 bg-surface/10 text-sand px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider mb-6">
-              <iconify-icon icon="solar:bookmark-linear"></iconify-icon>
-              Signature Collection — Limited Series
-            </div>
-
-            <h3 class="font-serif text-4xl lg:text-5xl text-surface mb-4 italic">The Monarch Slate</h3>
-
-            <p class="text-surface/60 leading-relaxed mb-8 max-w-md">
-              A hand-finished natural slate, quarried at 1850m altitude in
-              Northern Spain, with a deep graphite lustre and flashes of
-              silver and charcoal. A roofline of rare character and permanence.
-            </p>
-
-            <!-- Olive specs panel -->
-            <div class="bg-moss rounded-2xl p-6 grid grid-cols-3 gap-6 mb-8">
-              <div>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mb-1">Origin</p>
-                <p class="text-cream text-sm font-medium flex items-center gap-1">
-                  <iconify-icon icon="solar:map-point-linear"></iconify-icon> Spain
-                </p>
-              </div>
-              <div>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mb-1">Altitude</p>
-                <p class="text-cream text-sm font-medium">1850 m</p>
-              </div>
-              <div>
-                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mb-1">Finish</p>
-                <p class="text-cream text-sm font-medium">Natural cleft</p>
-              </div>
-            </div>
-
-            <ul class="space-y-2 mb-10">
-              <li class="flex items-center gap-2 text-surface/70 text-sm">
-                <iconify-icon icon="solar:check-circle-bold" class="text-sand"></iconify-icon> Hand-selected and graded on site
-              </li>
-              <li class="flex items-center gap-2 text-surface/70 text-sm">
-                <iconify-icon icon="solar:check-circle-bold" class="text-sand"></iconify-icon> Full quarry-to-roofline traceability
-              </li>
-            </ul>
-          </div>
-
-          <!-- Beige action bar — negative margin overlap -->
-          <div class="price-bar-shadow bg-[#eae5d9] rounded-2xl px-8 py-6 flex items-center justify-between lg:ml-[-3rem] relative z-10">
-            <div class="flex items-center gap-4">
-              <div class="flex items-center border border-dark/15 rounded-full overflow-hidden">
-                <button class="w-9 h-9 flex items-center justify-center text-dark/60 hover:text-dark transition-colors">
-                  <iconify-icon icon="solar:minus-linear"></iconify-icon>
-                </button>
-                <span class="w-8 text-center text-sm font-medium text-dark">1</span>
-                <button class="w-9 h-9 flex items-center justify-center text-dark/60 hover:text-dark transition-colors">
-                  <iconify-icon icon="solar:add-linear"></iconify-icon>
-                </button>
-              </div>
-              <div>
-                <p class="font-serif text-2xl text-dark leading-none">$340</p>
-                <p class="font-mono text-[10px] text-dark/50 mt-1">/ square, installed</p>
-              </div>
-            </div>
-
-            <button class="magnetic-btn inline-flex items-center gap-2 bg-dark text-surface px-6 py-3.5 rounded-full text-sm font-medium">
-              <iconify-icon icon="solar:cart-large-minimalistic-linear" class="text-lg"></iconify-icon>
-              Request quote
-            </button>
-          </div>
-        </div>
+      <div class="text-center gsap-fade-up">
+        <h2 class="font-serif text-4xl sm:text-5xl text-dark">Client Testimonials</h2>
       </div>
     </div>
   </section>
@@ -650,37 +562,6 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
     },
   });
 })();
-
-// Product card: clip-path reveal + continuous image pulse
-const productCard = document.getElementById('product-card');
-const productImage = document.getElementById('product-image');
-
-gsap.set(productCard, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' });
-
-gsap.timeline({
-  scrollTrigger: {
-    trigger: productCard,
-    start: 'top 90%',
-  },
-})
-.to(productCard, {
-  clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)',
-  duration: 0.6,
-  ease: 'power3.out',
-})
-.from(productCard, {
-  y: 40,
-  duration: 0.6,
-  ease: 'power3.out',
-}, 0);
-
-gsap.to(productImage, {
-  scale: 1.03,
-  duration: 15,
-  ease: 'sine.inOut',
-  repeat: -1,
-  yoyo: true,
-});
 
 /* =========================================================
    NAV: fade out once scrolled past the top, fade back in at the top
