@@ -107,6 +107,20 @@ tailwind.config = {
     .timeline-sticky-label { top: 10rem; }
   }
 
+  /* Hero: a very gentle, edgeless blur behind the text for readability */
+  .hero-text-blur {
+    position: absolute;
+    top: -2rem;
+    left: -2rem;
+    right: -2rem;
+    bottom: -2rem;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    mask-image: radial-gradient(ellipse 85% 80% at 25% 40%, black 35%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 80% at 25% 40%, black 35%, transparent 75%);
+    pointer-events: none;
+  }
+
   /* Testimonials ticker */
   @keyframes testimonial-ticker {
     from { transform: translateX(0); }
@@ -162,6 +176,7 @@ tailwind.config = {
     <div class="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent z-[1]"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20">
+      <div class="hero-text-blur"></div>
       <p class="hero-anim gsap-fade-up font-mono text-xs uppercase tracking-[0.3em] text-dark/60 mb-6">Bespoke Roofing, Est. 2018</p>
       <h1 class="hero-anim gsap-fade-up font-serif text-4xl sm:text-6xl lg:text-7xl leading-[0.95] text-dark max-w-5xl sm:whitespace-nowrap">
         The Art of<br class="sm:hidden"> <em class="italic">Precision</em>
