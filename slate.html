@@ -103,7 +103,9 @@ tailwind.config = {
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
             mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   }
-  .timeline-sticky-label { top: 10rem; }
+  @media (min-width: 768px) {
+    .timeline-sticky-label { top: 10rem; }
+  }
 
   /* Testimonials ticker */
   @keyframes testimonial-ticker {
@@ -196,9 +198,9 @@ tailwind.config = {
         <div id="timelineEntries">
 
           <!-- Entry 01 -->
-          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-[#3A5A40] flex items-center justify-center">
+          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-moss flex items-center justify-center">
                 <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
               </div>
               <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif italic font-normal text-dark">01 — Consultation</h3>
@@ -216,9 +218,9 @@ tailwind.config = {
           </div>
 
           <!-- Entry 02 -->
-          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-[#3A5A40] flex items-center justify-center">
+          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-moss flex items-center justify-center">
                 <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
               </div>
               <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif italic font-normal text-dark">02 — Sourcing</h3>
@@ -236,9 +238,9 @@ tailwind.config = {
           </div>
 
           <!-- Entry 03 -->
-          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-[#3A5A40] flex items-center justify-center">
+          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-moss flex items-center justify-center">
                 <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
               </div>
               <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif italic font-normal text-dark">03 — Installation</h3>
@@ -256,9 +258,9 @@ tailwind.config = {
           </div>
 
           <!-- Entry 04 -->
-          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-[#3A5A40] flex items-center justify-center">
+          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-moss flex items-center justify-center">
                 <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
               </div>
               <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif italic font-normal text-dark">04 — Inspection</h3>
