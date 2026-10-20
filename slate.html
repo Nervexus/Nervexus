@@ -98,11 +98,12 @@ tailwind.config = {
     .product-img-mobile-curve { border-top-right-radius: 48px; }
   }
 
-  /* Heritage timeline */
-  #timelineTrack {
-    -webkit-mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
-            mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+  /* Process timeline */
+  .timeline-track-mask {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   }
+  .timeline-sticky-label { top: 10rem; }
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-dark">
@@ -176,61 +177,89 @@ tailwind.config = {
       </div>
 
       <div id="timelineWrap" class="relative">
-        <div id="timelineTrack" class="absolute left-5 top-0 bottom-0 w-1.5 bg-cream/10 rounded-full"></div>
-        <div id="timelineProgress" class="absolute left-5 top-0 w-1.5 h-0 opacity-0 bg-gradient-to-b from-sand via-sand to-transparent rounded-full"></div>
-
         <div id="timelineEntries">
-          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10 pb-16">
-            <div class="shrink-0 w-10 flex justify-center pt-1 md:sticky md:top-40 md:self-start">
-              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+
+          <!-- Entry 01 -->
+          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-dark flex items-center justify-center">
+                <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
+              </div>
+              <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif font-bold text-cream/25">01 — Consultation</h3>
             </div>
-            <div class="flex-1 md:flex md:gap-10">
-              <h3 class="font-mono text-xs text-sand/60 tracking-widest md:w-28 shrink-0 mb-2 md:mb-0 md:sticky md:top-40 md:self-start">01</h3>
-              <div>
-                <h4 class="font-serif text-xl text-sand mb-2">Consultation</h4>
-                <p class="text-cream/60 text-sm leading-relaxed max-w-md">We walk the site, discuss materials and scope, and provide a clear, itemized quote.</p>
+
+            <div class="relative pl-20 pr-4 md:pl-4 w-full">
+              <h3 class="md:hidden block text-2xl mb-4 text-left font-serif font-bold text-cream/25">01 — Consultation</h3>
+              <p class="text-cream/60 text-xs md:text-sm font-normal mb-8 max-w-md">We walk the site, discuss materials and scope, and provide a clear, itemized quote before anything is ordered.</p>
+              <div class="grid grid-cols-2 gap-4">
+                <img src="assets/strata/hero.webp" alt="Roofing structure" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
+                <img src="assets/strata/interior.webp" alt="Roof interior detail" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
               </div>
             </div>
           </div>
 
-          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10 pb-16">
-            <div class="shrink-0 w-10 flex justify-center pt-1 md:sticky md:top-40 md:self-start">
-              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+          <!-- Entry 02 -->
+          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-dark flex items-center justify-center">
+                <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
+              </div>
+              <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif font-bold text-cream/25">02 — Sourcing</h3>
             </div>
-            <div class="flex-1 md:flex md:gap-10">
-              <h3 class="font-mono text-xs text-sand/60 tracking-widest md:w-28 shrink-0 mb-2 md:mb-0 md:sticky md:top-40 md:self-start">02</h3>
-              <div>
-                <h4 class="font-serif text-xl text-sand mb-2">Material Sourcing</h4>
-                <p class="text-cream/60 text-sm leading-relaxed max-w-md">Slate and stone are hand-selected from our partner quarries and tracked to your address.</p>
+
+            <div class="relative pl-20 pr-4 md:pl-4 w-full">
+              <h3 class="md:hidden block text-2xl mb-4 text-left font-serif font-bold text-cream/25">02 — Sourcing</h3>
+              <p class="text-cream/60 text-xs md:text-sm font-normal mb-8 max-w-md">Slate and stone are hand-selected from our partner quarries and tracked all the way to your address.</p>
+              <div class="grid grid-cols-2 gap-4">
+                <img src="assets/strata/story.webp" alt="Material detail" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
+                <img src="assets/strata/product.webp" alt="Roofing layers" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
               </div>
             </div>
           </div>
 
-          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10 pb-16">
-            <div class="shrink-0 w-10 flex justify-center pt-1 md:sticky md:top-40 md:self-start">
-              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+          <!-- Entry 03 -->
+          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-dark flex items-center justify-center">
+                <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
+              </div>
+              <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif font-bold text-cream/25">03 — Installation</h3>
             </div>
-            <div class="flex-1 md:flex md:gap-10">
-              <h3 class="font-mono text-xs text-sand/60 tracking-widest md:w-28 shrink-0 mb-2 md:mb-0 md:sticky md:top-40 md:self-start">03</h3>
-              <div>
-                <h4 class="font-serif text-xl text-sand mb-2">Installation</h4>
-                <p class="text-cream/60 text-sm leading-relaxed max-w-md">A licensed, in-house crew installs to spec, with a site lead supervising every stage.</p>
+
+            <div class="relative pl-20 pr-4 md:pl-4 w-full">
+              <h3 class="md:hidden block text-2xl mb-4 text-left font-serif font-bold text-cream/25">03 — Installation</h3>
+              <p class="text-cream/60 text-xs md:text-sm font-normal mb-8 max-w-md">A licensed, in-house crew installs to spec, with a site lead supervising every stage of the build.</p>
+              <div class="grid grid-cols-2 gap-4">
+                <img src="assets/strata/product.webp" alt="Installation detail" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
+                <img src="assets/strata/hero.webp" alt="Finished structure" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
               </div>
             </div>
           </div>
 
-          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10">
-            <div class="shrink-0 w-10 flex justify-center pt-1 md:sticky md:top-40 md:self-start">
-              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+          <!-- Entry 04 -->
+          <div class="timeline-row flex justify-start pt-10 md:pt-40 md:gap-10">
+            <div class="timeline-sticky-label sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+              <div class="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-dark flex items-center justify-center">
+                <div class="h-4 w-4 rounded-full bg-cream/10 border border-sand/40"></div>
+              </div>
+              <h3 class="hidden md:block text-xl md:pl-20 md:text-5xl font-serif font-bold text-cream/25">04 — Inspection</h3>
             </div>
-            <div class="flex-1 md:flex md:gap-10">
-              <h3 class="font-mono text-xs text-sand/60 tracking-widest md:w-28 shrink-0 mb-2 md:mb-0 md:sticky md:top-40 md:self-start">04</h3>
-              <div>
-                <h4 class="font-serif text-xl text-sand mb-2">Final Inspection</h4>
-                <p class="text-cream/60 text-sm leading-relaxed max-w-md">A full walkthrough and sign-off, backed by a 25-year workmanship warranty.</p>
+
+            <div class="relative pl-20 pr-4 md:pl-4 w-full">
+              <h3 class="md:hidden block text-2xl mb-4 text-left font-serif font-bold text-cream/25">04 — Inspection</h3>
+              <p class="text-cream/60 text-xs md:text-sm font-normal mb-8 max-w-md">A full walkthrough and sign-off, backed by a 25-year workmanship warranty on every install.</p>
+              <div class="grid grid-cols-2 gap-4">
+                <img src="assets/strata/interior.webp" alt="Finished interior" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
+                <img src="assets/strata/story.webp" alt="Final detail" width="500" height="500" class="rounded-lg object-cover h-20 md:h-44 lg:h-60 w-full shadow-lg">
               </div>
             </div>
           </div>
+
+        </div>
+
+        <!-- Track line: thin, gradient-masked top/bottom, same as source -->
+        <div id="timelineTrack" class="absolute md:left-8 left-8 top-0 overflow-hidden w-[2px] bg-gradient-to-b from-transparent via-cream/15 to-transparent timeline-track-mask">
+          <div id="timelineProgress" class="absolute inset-x-0 top-0 w-[2px] h-0 opacity-0 bg-gradient-to-t from-sand via-sand/70 to-transparent rounded-full"></div>
         </div>
       </div>
     </div>
@@ -600,12 +629,16 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
    ========================================================= */
 (function initTimeline() {
   const wrap = document.getElementById('timelineWrap');
+  const entries = document.getElementById('timelineEntries');
   const track = document.getElementById('timelineTrack');
   const progress = document.getElementById('timelineProgress');
-  if (!wrap || !track || !progress) return;
+  if (!wrap || !entries || !track || !progress) return;
+
+  let entriesHeight = 0;
 
   function setHeight() {
-    track.style.height = wrap.offsetHeight + 'px';
+    entriesHeight = entries.offsetHeight;
+    track.style.height = entriesHeight + 'px';
   }
   setHeight();
   window.addEventListener('resize', setHeight);
@@ -617,7 +650,7 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
     scrub: true,
     onUpdate: (self) => {
       const p = self.progress;
-      progress.style.height = p * wrap.offsetHeight + 'px';
+      progress.style.height = p * entriesHeight + 'px';
       progress.style.opacity = Math.min(1, p * 10).toFixed(3);
     },
   });
