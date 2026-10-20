@@ -627,7 +627,6 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
   const cardHeight = 92;
 
   let autoProgress = 0;
-  let scrollProgress = 0;
 
   function render() {
     const wrapHeight = wrap.clientHeight;
@@ -635,7 +634,7 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 
     items.forEach((item, i) => {
       const base = i / count;
-      let pos = (base + autoProgress + scrollProgress) % 1;
+      let pos = (base + autoProgress) % 1;
       if (pos < 0) pos += 1;
 
       const y = pos * loopHeight - cardHeight;
@@ -655,20 +654,28 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
   }
 
   function tick() {
-    autoProgress = (autoProgress + 0.00035) % 1;
+    autoProgress = (autoProgress + 0.00014) % 1;
     render();
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
 
-  ScrollTrigger.create({
-    trigger: wrap,
-    start: 'top bottom',
-    end: 'bottom top',
-    onUpdate: (self) => {
-      scrollProgress = self.progress * 1.5;
-    },
-  });
+  // Simple scroll parallax: the whole spiral drifts up/down slightly as
+  // its section scrolls through the viewport, independent of the autoplay.
+  gsap.fromTo(
+    stage,
+    { y: -24 },
+    {
+      y: 24,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: wrap,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      },
+    }
+  );
 
   window.addEventListener('resize', render);
 })();
