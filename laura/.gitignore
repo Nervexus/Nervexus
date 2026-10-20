@@ -40,3 +40,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/lib/generated/prisma
+
+# local SQLite db -- will contain real notes/vault data once in use
+*.db
+*.db-journal
+
+# AI-agent reference docs bundled by `prisma init` -- useful locally,
+# not worth committing (71 files / ~500KB of vendor documentation)
+/.agents
+/.windsurf
+skills-lock.json

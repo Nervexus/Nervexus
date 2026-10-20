@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { prisma } from "@/lib/db";
 
 const MODEL = "claude-sonnet-5-5";
 
@@ -17,7 +18,14 @@ explain what's still missing (e.g. "I'm not connected to your email yet").
 When you do have a tool that takes a real-world, hard-to-undo action
 (sending an email, making a call, booking something), describe exactly
 what you're about to do and ask for a yes before calling it -- unless the
-user has already clearly confirmed earlier in this same conversation.`;
+user has already clearly confirmed earlier in this same conversation.
+Creating a note is low-stakes and reversible, so that one doesn't need
+confirmation -- just do it when asked, or when the user says something
+clearly worth remembering.
+
+You never have access to the Vault. If asked for a password or secret,
+say you can't see the Vault's contents and the user should look it up
+there themselves.`;
 
 let client: Anthropic | null = null;
 
@@ -39,20 +47,38 @@ export type ChatMessage = {
   content: string;
 };
 
-// A single demo tool for now, to prove the tool-calling loop works end to
-// end before the real tools (send_email, create_calendar_event, ...) get
-// wired up in the next phase.
+// Deliberately not exposing Vault reads/writes as a tool: an LLM
+// conversation is the wrong place for secrets to flow through,
+// especially once this talks over SMS/voice in later phases.
 const tools: Anthropic.Tool[] = [
   {
     name: "get_current_time",
     description: "Get the current date and time.",
     input_schema: { type: "object", properties: {} },
   },
+  {
+    name: "create_note",
+    description: "Save a note for the user to see later in their Notes list.",
+    input_schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Short title for the note." },
+        body: { type: "string", description: "The note's content." },
+      },
+      required: ["title", "body"],
+    },
+  },
 ];
 
-function runTool(name: string, _input: unknown): string {
+async function runTool(name: string, input: unknown): Promise<string> {
   if (name === "get_current_time") {
     return new Date().toString();
+  }
+  if (name === "create_note") {
+    const { title, body } = input as { title?: string; body?: string };
+    if (!title || !body) return "Error: a note needs both a title and a body.";
+    const note = await prisma.note.create({ data: { title, body } });
+    return `Saved note "${note.title}".`;
   }
   return `Unknown tool: ${name}`;
 }
@@ -87,11 +113,13 @@ export async function chat(history: ChatMessage[]): Promise<string> {
     messages.push({ role: "assistant", content: response.content });
     messages.push({
       role: "user",
-      content: toolUses.map((toolUse) => ({
-        type: "tool_result" as const,
-        tool_use_id: toolUse.id,
-        content: runTool(toolUse.name, toolUse.input),
-      })),
+      content: await Promise.all(
+        toolUses.map(async (toolUse) => ({
+          type: "tool_result" as const,
+          tool_use_id: toolUse.id,
+          content: await runTool(toolUse.name, toolUse.input),
+        }))
+      ),
     });
   }
 
