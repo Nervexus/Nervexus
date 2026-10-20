@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLATE | Bespoke Roofing</title>
+<meta name="description" content="SLATE — Bespoke roofing, crafted with precision. Rare materials, sourced from 15+ partner quarries.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream: '#e0dcd1',
+        surface: '#e2dcd0',
+        dark: '#1d1d1c',
+        moss: '#4f5343',
+        sand: '#cebfa9',
+      },
+      fontFamily: {
+        sans: ['Manrope', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+    },
+  },
+};
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body {
+    background: #e0dcd1;
+    font-family: 'Manrope', sans-serif;
+  }
+  ::selection { background: #4f5343; color: #e2dcd0; }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .gradient-border-inset {
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+
+  .custom-curve {
+    border-top-right-radius: 180px;
+  }
+
+  /* matte-noise overlay via inline SVG turbulence filter, applied as pseudo-element */
+  .matte-noise { position: relative; isolation: isolate; }
+  .matte-noise::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .magnetic-btn { will-change: transform; }
+
+  #webgl-bg { opacity: 0.6; }
+
+  .gsap-fade-up { opacity: 0; transform: translateY(40px); }
+  .gsap-scale-up { transform: scale(0.9); }
+
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0%; height: 1px;
+    background: currentColor;
+    transition: width 0.35s cubic-bezier(.16,1,.3,1);
+  }
+  .nav-link:hover::after { width: 100%; }
+
+  .price-bar-shadow {
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.35);
+  }
+
+  @media (max-width: 1023px) {
+    .product-img-mobile-curve { border-top-right-radius: 80px; }
+  }
+  @media (max-width: 639px) {
+    .product-img-mobile-curve { border-top-right-radius: 48px; }
+  }
+</style>
+</head>
+<body class="antialiased overflow-x-hidden text-dark">
+
+<!-- LAYER 0: WebGL ambient background -->
+<canvas id="webgl-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+<!-- LAYER 2: NAVIGATION -->
+<nav class="fixed top-0 left-0 w-full z-50 border-b border-white/10 py-4">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <a href="#" class="font-serif text-2xl tracking-tight text-dark">SLATE</a>
+
+    <div class="hidden md:flex items-center gap-10 text-sm font-medium text-dark/80">
+      <a href="#heritage" class="nav-link">Our Heritage</a>
+      <a href="#services" class="nav-link">Services</a>
+      <a href="#experience" class="nav-link">The Experience</a>
+      <a href="#boutique" class="nav-link">Boutique</a>
+    </div>
+
+    <button id="magnetic-burger" class="magnetic-btn w-11 h-11 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+      <iconify-icon icon="solar:hamburger-menu-linear"></iconify-icon>
+    </button>
+  </div>
+</nav>
+
+<!-- LAYER 1: MAIN CONTENT -->
+<main class="relative z-10">
+
+  <!-- SECTION 2: HERO -->
+  <section class="relative min-h-screen flex items-center overflow-hidden">
+    <img src="https://cdn.midjourney.com/e796b010-1fed-4709-bd1b-cc165351ee03/0_0.png"
+         alt="Natural stone landscape"
+         class="absolute inset-0 w-full h-full object-cover object-[65%_center] sm:object-center z-0 opacity-50">
+    <div class="absolute inset-0 bg-gradient-to-t from-cream via-cream/20 to-transparent z-[1]"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20">
+      <p class="hero-anim gsap-fade-up font-mono text-xs uppercase tracking-[0.3em] text-dark/60 mb-6">Bespoke Roofing — Est. 2018</p>
+      <h1 class="hero-anim gsap-fade-up font-serif text-6xl sm:text-7xl lg:text-9xl leading-[0.95] text-dark max-w-5xl">
+        The Art of<br><em class="italic">Precision</em>
+      </h1>
+      <p class="hero-anim gsap-fade-up mt-8 max-w-md text-dark/70 text-lg leading-relaxed">
+        Rare materials, specified with exacting care, installed with patience.
+        Every roof tells the story of a structure, a terrain, a craftsman's hand.
+      </p>
+
+      <div class="hero-anim gsap-fade-up mt-10 flex flex-wrap items-center gap-6">
+        <button class="magnetic-btn group relative inline-flex items-center gap-3 bg-surface text-dark px-8 py-4 rounded-full font-medium overflow-hidden">
+          Discover our materials
+          <iconify-icon icon="solar:arrow-right-linear" class="text-lg transition-transform group-hover:translate-x-1"></iconify-icon>
+        </button>
+        <a href="#experience" class="magnetic-btn inline-flex items-center gap-2 text-dark/80 font-medium border-b border-dark/30 pb-1">
+          Book a consultation
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: STORY -->
+  <section id="heritage" class="matte-noise relative bg-dark text-cream rounded-t-[80px] lg:rounded-t-[80px] py-28 px-6">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+      <div class="gsap-fade-up">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Our Heritage</p>
+        <h2 class="font-serif text-4xl sm:text-5xl leading-tight mb-8">
+          From quarry to roofline,<br>without compromise.
+        </h2>
+        <p class="text-cream/70 text-lg leading-relaxed mb-10 max-w-lg">
+          We work directly with exceptional stone and slate suppliers across
+          Wales and Northern Spain. Every batch is selected for its structural
+          integrity and absolute traceability.
+        </p>
+
+        <div class="grid grid-cols-2 gap-10 max-w-md">
+          <div>
+            <p class="font-serif text-5xl text-sand">15+</p>
+            <p class="font-mono text-xs uppercase tracking-wider text-cream/60 mt-2">Partner quarries</p>
+          </div>
+          <div>
+            <p class="font-serif text-5xl text-sand">25yr</p>
+            <p class="font-mono text-xs uppercase tracking-wider text-cream/60 mt-2">Workmanship warranty</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative gsap-card-image-wrapper overflow-hidden rounded-[24px] sm:rounded-[32px]">
+        <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2000&auto=format&fit=crop"
+             alt="Quarry supplier"
+             class="gsap-scale-up w-full h-[280px] sm:h-[380px] lg:h-[520px] object-cover">
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: SERVICES (placeholder — content to be filled in) -->
+  <section id="services" class="relative py-28 px-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 gsap-fade-up">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-dark/50 mb-4">Services</p>
+        <h2 class="font-serif text-4xl sm:text-5xl text-dark">What We Offer</h2>
+      </div>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Service card 1 -->
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
+          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+            <iconify-icon icon="solar:add-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-2xl text-dark">Service 01</h3>
+          <p class="text-dark/50 text-sm leading-relaxed">Placeholder description.</p>
+        </div>
+
+        <!-- Service card 2 -->
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
+          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+            <iconify-icon icon="solar:add-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-2xl text-dark">Service 02</h3>
+          <p class="text-dark/50 text-sm leading-relaxed">Placeholder description.</p>
+        </div>
+
+        <!-- Service card 3 -->
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
+          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+            <iconify-icon icon="solar:add-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-2xl text-dark">Service 03</h3>
+          <p class="text-dark/50 text-sm leading-relaxed">Placeholder description.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: PRODUCT CARD -->
+  <section id="boutique" class="relative py-28 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 gsap-fade-up">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-dark/50 mb-4">Boutique</p>
+        <h2 class="font-serif text-4xl sm:text-5xl text-dark">Our Signature Collection</h2>
+      </div>
+
+      <div id="product-card" class="gradient-border-inset bg-dark rounded-[44px] shadow-2xl flex flex-col lg:flex-row overflow-hidden">
+
+        <!-- Left: image column -->
+        <div class="relative w-full lg:w-[45%] shrink-0">
+          <div class="relative h-[220px] sm:h-[300px] lg:h-full overflow-hidden custom-curve product-img-mobile-curve">
+            <img id="product-image" src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=2000&auto=format&fit=crop"
+                 alt="The Monarch Slate"
+                 class="w-full h-full object-cover object-center scale-100">
+          </div>
+
+          <!-- Social proof avatars -->
+          <div class="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-2 sm:gap-3 z-10">
+            <div class="flex -space-x-3">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dark object-cover">
+            </div>
+            <p class="font-mono text-[10px] sm:text-xs text-surface/80">+240 homeowners</p>
+          </div>
+        </div>
+
+        <!-- Right: content column -->
+        <div class="flex-1 flex flex-col justify-between p-10 lg:p-14">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-surface/10 text-sand px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider mb-6">
+              <iconify-icon icon="solar:bookmark-linear"></iconify-icon>
+              Signature Collection — Limited Series
+            </div>
+
+            <h3 class="font-serif text-4xl lg:text-5xl text-surface mb-4 italic">The Monarch Slate</h3>
+
+            <p class="text-surface/60 leading-relaxed mb-8 max-w-md">
+              A hand-finished natural slate, quarried at 1850m altitude in
+              Northern Spain, with a deep graphite lustre and flashes of
+              silver and charcoal. A roofline of rare character and permanence.
+            </p>
+
+            <!-- Olive specs panel -->
+            <div class="bg-moss rounded-2xl p-6 grid grid-cols-3 gap-6 mb-8">
+              <div>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mb-1">Origin</p>
+                <p class="text-cream text-sm font-medium flex items-center gap-1">
+                  <iconify-icon icon="solar:map-point-linear"></iconify-icon> Spain
+                </p>
+              </div>
+              <div>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mb-1">Altitude</p>
+                <p class="text-cream text-sm font-medium">1850 m</p>
+              </div>
+              <div>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mb-1">Finish</p>
+                <p class="text-cream text-sm font-medium">Natural cleft</p>
+              </div>
+            </div>
+
+            <ul class="space-y-2 mb-10">
+              <li class="flex items-center gap-2 text-surface/70 text-sm">
+                <iconify-icon icon="solar:check-circle-bold" class="text-sand"></iconify-icon> Hand-selected and graded on site
+              </li>
+              <li class="flex items-center gap-2 text-surface/70 text-sm">
+                <iconify-icon icon="solar:check-circle-bold" class="text-sand"></iconify-icon> Full quarry-to-roofline traceability
+              </li>
+            </ul>
+          </div>
+
+          <!-- Beige action bar — negative margin overlap -->
+          <div class="price-bar-shadow bg-[#eae5d9] rounded-2xl px-8 py-6 flex items-center justify-between lg:ml-[-3rem] relative z-10">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center border border-dark/15 rounded-full overflow-hidden">
+                <button class="w-9 h-9 flex items-center justify-center text-dark/60 hover:text-dark transition-colors">
+                  <iconify-icon icon="solar:minus-linear"></iconify-icon>
+                </button>
+                <span class="w-8 text-center text-sm font-medium text-dark">1</span>
+                <button class="w-9 h-9 flex items-center justify-center text-dark/60 hover:text-dark transition-colors">
+                  <iconify-icon icon="solar:add-linear"></iconify-icon>
+                </button>
+              </div>
+              <div>
+                <p class="font-serif text-2xl text-dark leading-none">$340</p>
+                <p class="font-mono text-[10px] text-dark/50 mt-1">/ square, installed</p>
+              </div>
+            </div>
+
+            <button class="magnetic-btn inline-flex items-center gap-2 bg-dark text-surface px-6 py-3.5 rounded-full text-sm font-medium">
+              <iconify-icon icon="solar:cart-large-minimalistic-linear" class="text-lg"></iconify-icon>
+              Request quote
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: TESTIMONIALS -->
+  <section id="experience" class="relative bg-cream/80 backdrop-blur-sm border-y border-dark/10 py-28 px-6">
+    <div class="max-w-3xl mx-auto text-center gsap-fade-up">
+      <iconify-icon icon="solar:quote-left-linear" class="text-4xl text-sand mb-6"></iconify-icon>
+      <p class="font-serif text-2xl sm:text-3xl italic leading-relaxed text-dark/90 mb-8">
+        "SLATE transformed our home into a sanctuary. Watching the crew set
+        each tile with near-surgical precision — it is, without exaggeration,
+        the finest roof in the county."
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200" class="w-11 h-11 rounded-full object-cover">
+        <div class="text-left">
+          <p class="font-medium text-dark text-sm">Marcus L.</p>
+          <p class="font-mono text-xs text-dark/50">Client since 2019</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FOOTER -->
+  <footer class="matte-noise relative bg-dark text-cream rounded-t-[44px] pt-24 pb-10 px-6">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20">
+      <div>
+        <p class="font-serif text-3xl mb-4">SLATE</p>
+        <p class="text-cream/60 text-sm leading-relaxed max-w-xs">
+          Bespoke roofing, specified and installed to the standards of fine
+          craft. Every tile a material to be honored.
+        </p>
+        <div class="flex items-center gap-4 mt-6 text-xl text-cream/70">
+          <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+          <iconify-icon icon="solar:camera-linear"></iconify-icon>
+          <iconify-icon icon="solar:letter-linear"></iconify-icon>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
+        <ul class="space-y-3 text-cream/70 text-sm">
+          <li><a href="#heritage" class="hover:text-cream transition-colors">Our Heritage</a></li>
+          <li><a href="#services" class="hover:text-cream transition-colors">Services</a></li>
+          <li><a href="#experience" class="hover:text-cream transition-colors">The Experience</a></li>
+          <li><a href="#boutique" class="hover:text-cream transition-colors">Boutique</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">The Studio</p>
+        <p class="text-cream/70 text-sm leading-relaxed">
+          12 Artisan Row<br>Mayfair, London
+        </p>
+        <p class="text-cream/70 text-sm leading-relaxed mt-4">
+          Mon–Fri: 8am–6pm<br>Sat–Sun: 9am–5pm
+        </p>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Contact</p>
+        <p class="text-cream/70 text-sm leading-relaxed">hello@slate-roofing.co</p>
+        <p class="text-cream/70 text-sm leading-relaxed mt-2">+44 20 7946 0192</p>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto border-t border-cream/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="font-mono text-xs text-cream/40">© 2026 SLATE. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-mono text-xs text-cream/40">
+        <a href="#" class="hover:text-cream/70 transition-colors">Legal</a>
+        <a href="#" class="hover:text-cream/70 transition-colors">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+/* =========================================================
+   THREE.JS AMBIENT NOISE BACKGROUND
+   ========================================================= */
+(function initWebGL() {
+  const canvas = document.getElementById('webgl-bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform vec3 uColorA;
+    uniform vec3 uColorB;
+
+    float random(vec2 st) {
+      return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+
+    float noise(vec2 st) {
+      vec2 i = floor(st);
+      vec2 f = fract(st);
+      float a = random(i);
+      float b = random(i + vec2(1.0, 0.0));
+      float c = random(i + vec2(0.0, 1.0));
+      float d = random(i + vec2(1.0, 1.0));
+      vec2 u = f*f*(3.0-2.0*f);
+      return mix(a, b, u.x) + (c - a)*u.y*(1.0-u.x) + (d - b)*u.x*u.y;
+    }
+
+    float fbm(vec2 st) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      for (int i = 0; i < 5; i++) {
+        value += amplitude * noise(st);
+        st *= 2.0;
+        amplitude *= 0.5;
+      }
+      return value;
+    }
+
+    void main() {
+      vec2 uv = vUv;
+      uv.x *= uResolution.x / uResolution.y;
+
+      vec2 motion = vec2(uTime * 0.015, uTime * 0.01);
+      float n = fbm(uv * 3.0 + motion);
+      n += fbm(uv * 6.0 - motion * 1.5) * 0.5;
+
+      vec3 color = mix(uColorA, uColorB, n);
+      float alpha = smoothstep(0.2, 0.8, n) * 0.5;
+
+      gl_FragColor = vec4(color, alpha);
+    }
+  `;
+
+  const uniforms = {
+    uTime: { value: 0 },
+    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uColorA: { value: new THREE.Color('#cebfa9') },
+    uColorB: { value: new THREE.Color('#4f5343') },
+  };
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    uniforms,
+    transparent: true,
+  });
+
+  const geometry = new THREE.PlaneGeometry(2, 2);
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function resize() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', resize);
+
+  const clock = new THREE.Clock();
+  function animate() {
+    uniforms.uTime.value = clock.getElapsedTime();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* =========================================================
+   GSAP SCROLLTRIGGER ANIMATIONS
+   ========================================================= */
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero stagger fade-up (runs immediately, not scroll-triggered)
+gsap.to('.hero-anim', {
+  y: 0,
+  opacity: 1,
+  duration: 1.1,
+  ease: 'power3.out',
+  stagger: 0.12,
+  delay: 0.2,
+});
+
+// Generic fade-up on scroll
+document.querySelectorAll('.gsap-fade-up').forEach((el) => {
+  if (el.classList.contains('hero-anim')) return;
+  gsap.to(el, {
+    y: 0,
+    opacity: 1,
+    duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+    },
+  });
+});
+
+// Scale-up images on scroll
+document.querySelectorAll('.gsap-scale-up').forEach((el) => {
+  gsap.to(el, {
+    scale: 1,
+    duration: 1.4,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 80%',
+    },
+  });
+});
+
+// Product card: clip-path reveal + continuous image pulse
+const productCard = document.getElementById('product-card');
+const productImage = document.getElementById('product-image');
+
+gsap.set(productCard, { clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' });
+
+gsap.timeline({
+  scrollTrigger: {
+    trigger: productCard,
+    start: 'top 75%',
+  },
+})
+.to(productCard, {
+  clipPath: 'polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)',
+  duration: 1.2,
+  ease: 'power4.inOut',
+})
+.from(productCard, {
+  y: 60,
+  duration: 1.2,
+  ease: 'power4.inOut',
+}, 0);
+
+gsap.to(productImage, {
+  scale: 1.03,
+  duration: 15,
+  ease: 'sine.inOut',
+  repeat: -1,
+  yoyo: true,
+});
+
+/* =========================================================
+   MAGNETIC BUTTONS
+   ========================================================= */
+document.querySelectorAll('.magnetic-btn').forEach((btn) => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const relX = e.clientX - rect.left - rect.width / 2;
+    const relY = e.clientY - rect.top - rect.height / 2;
+    gsap.to(btn, {
+      x: relX * 0.4,
+      y: relY * 0.4,
+      duration: 0.4,
+      ease: 'power2.out',
+    });
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    gsap.to(btn, {
+      x: 0,
+      y: 0,
+      duration: 0.6,
+      ease: 'elastic.out(1, 0.4)',
+    });
+  });
+});
+</script>
+</body>
+</html>
