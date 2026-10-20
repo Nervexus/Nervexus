@@ -112,7 +112,7 @@ tailwind.config = {
 <canvas id="webgl-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-none"></canvas>
 
 <!-- LAYER 2: NAVIGATION -->
-<nav class="fixed top-0 left-0 w-full z-50 border-b border-white/10 py-4">
+<nav id="main-nav" class="fixed top-0 left-0 w-full z-50 bg-cream/75 backdrop-blur-md border-b border-white/10 py-4 transition-opacity duration-500 ease-out">
   <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
     <a href="#" class="font-serif text-2xl tracking-tight text-dark">SLATE</a>
 
@@ -699,6 +699,29 @@ gsap.to(productImage, {
   repeat: -1,
   yoyo: true,
 });
+
+/* =========================================================
+   NAV: fade out once scrolled past the top, fade back in at the top
+   ========================================================= */
+(function initNavFade() {
+  const nav = document.getElementById('main-nav');
+  if (!nav) return;
+
+  const threshold = 40;
+
+  function updateNav() {
+    if (window.scrollY > threshold) {
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+    } else {
+      nav.style.opacity = '1';
+      nav.style.pointerEvents = 'auto';
+    }
+  }
+
+  updateNav();
+  window.addEventListener('scroll', updateNav, { passive: true });
+})();
 
 /* =========================================================
    MAGNETIC BUTTONS
