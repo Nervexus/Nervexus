@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { HudCard, HexBadge } from "@/components/HudCard";
+import { LockIcon } from "@/components/icons";
 
 type VaultItem = { id: string; title: string; updatedAt: string };
 
@@ -113,29 +115,31 @@ export default function VaultPage() {
 
         <div className="flex flex-col gap-3">
           {items.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-900/50 p-4"
-            >
-              <div className="min-w-0">
-                <h3 className="text-sm font-medium">{item.title}</h3>
-                <p className="mt-1 truncate font-mono text-sm text-neutral-400">
-                  {revealed[item.id] ?? "••••••••••••"}
-                </p>
+            <HudCard key={item.id}>
+              <div className="flex items-center gap-3">
+                <HexBadge>
+                  <LockIcon className="h-4 w-4" />
+                </HexBadge>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-sm font-medium">{item.title}</h3>
+                  <p className="mt-1 truncate font-mono text-sm text-neutral-400">
+                    {revealed[item.id] ?? "••••••••••••"}
+                  </p>
+                </div>
+                <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
+                  <button
+                    onClick={() => reveal(item.id)}
+                    disabled={revealing === item.id}
+                    className="hover:text-neutral-200 disabled:opacity-50"
+                  >
+                    {revealing === item.id ? "…" : revealed[item.id] !== undefined ? "Hide" : "Reveal"}
+                  </button>
+                  <button onClick={() => remove(item.id)} className="hover:text-red-400">
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
-                <button
-                  onClick={() => reveal(item.id)}
-                  disabled={revealing === item.id}
-                  className="hover:text-neutral-200 disabled:opacity-50"
-                >
-                  {revealing === item.id ? "…" : revealed[item.id] !== undefined ? "Hide" : "Reveal"}
-                </button>
-                <button onClick={() => remove(item.id)} className="hover:text-red-400">
-                  Delete
-                </button>
-              </div>
-            </div>
+            </HudCard>
           ))}
         </div>
       </div>

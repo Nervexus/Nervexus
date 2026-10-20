@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { HudCard, HexBadge } from "@/components/HudCard";
+import { NoteIcon } from "@/components/icons";
 
 type Note = { id: string; title: string; body: string; updatedAt: string };
 
@@ -110,25 +112,29 @@ export default function NotesPage() {
 
         <div className="flex flex-col gap-3">
           {notes.map((note) => (
-            <div
-              key={note.id}
-              className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <h3 className="text-sm font-medium">{note.title}</h3>
-                <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
-                  <button onClick={() => startEdit(note)} className="hover:text-neutral-200">
-                    Edit
-                  </button>
-                  <button onClick={() => remove(note.id)} className="hover:text-red-400">
-                    Delete
-                  </button>
+            <HudCard key={note.id}>
+              <div className="flex items-start gap-3">
+                <HexBadge>
+                  <NoteIcon className="h-4 w-4" />
+                </HexBadge>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="text-sm font-medium">{note.title}</h3>
+                    <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
+                      <button onClick={() => startEdit(note)} className="hover:text-neutral-200">
+                        Edit
+                      </button>
+                      <button onClick={() => remove(note.id)} className="hover:text-red-400">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                  {note.body && (
+                    <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{note.body}</p>
+                  )}
                 </div>
               </div>
-              {note.body && (
-                <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{note.body}</p>
-              )}
-            </div>
+            </HudCard>
           ))}
         </div>
       </div>

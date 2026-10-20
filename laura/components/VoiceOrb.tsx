@@ -57,7 +57,10 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
     const [status, setStatus] = useState<OrbStatus>("idle");
     const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
     const onTranscriptRef = useRef(onTranscript);
-    onTranscriptRef.current = onTranscript;
+
+    useEffect(() => {
+      onTranscriptRef.current = onTranscript;
+    }, [onTranscript]);
 
     useEffect(() => {
       const Ctor = getSpeechRecognitionCtor();

@@ -12,7 +12,11 @@ const client = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-const migrationName = "20261020195039_init";
+const migrationName = process.argv[2];
+if (!migrationName) {
+  console.error("Usage: node scripts/record-migration-history.mjs <migration_folder_name>");
+  process.exit(1);
+}
 const sql = readFileSync(
   join(__dirname, `../prisma/migrations/${migrationName}/migration.sql`),
   "utf8"

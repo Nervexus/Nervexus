@@ -39,3 +39,13 @@ model ChatMessage {
   content   String
   createdAt DateTime @default(now())
 }
+
+model Reminder {
+  id        String    @id @default(cuid())
+  title     String
+  note      String?
+  dueAt     DateTime
+  done      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

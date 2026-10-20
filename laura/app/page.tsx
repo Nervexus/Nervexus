@@ -1,26 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { VoiceOrb, type VoiceOrbHandle } from "@/components/VoiceOrb";
 import { DuneBackground } from "@/components/DuneBackground";
-
-function EyeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
+import { OverviewCards } from "@/components/OverviewCards";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -112,13 +95,9 @@ export default function Home() {
             <VoiceOrb ref={orbRef} onTranscript={(text) => sendMessage(text, true)} />
           </div>
 
-          <Link
-            href="/notes"
-            className="mt-7 flex items-center gap-2 text-xs tracking-wide text-neutral-500 transition-colors hover:text-neutral-300"
-          >
-            <EyeIcon className="h-4 w-4" />
-            see your notes
-          </Link>
+          <div className="mt-8 w-full max-w-xs">
+            <OverviewCards />
+          </div>
         </div>
       </div>
 

@@ -24,7 +24,10 @@ export function DustRing({ status, size = 224 }: { status: OrbStatus; size?: num
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const statusRef = useRef(status);
-  statusRef.current = status;
+
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
   useEffect(() => {
     particlesRef.current = Array.from({ length: 200 }, () => ({
