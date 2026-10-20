@@ -277,41 +277,41 @@ tailwind.config = {
         <h2 class="font-serif text-4xl sm:text-5xl text-dark">What We Offer</h2>
       </div>
 
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <!-- Natural Slate -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
-          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col gap-2 sm:gap-4">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
             <iconify-icon icon="solar:layers-linear"></iconify-icon>
           </div>
-          <h3 class="font-serif text-2xl text-dark">Natural Slate</h3>
-          <p class="text-dark/50 text-sm leading-relaxed">Centuries-grade permanence with a deep graphite lustre. Our signature material.</p>
+          <h3 class="font-serif text-base sm:text-2xl text-dark">Natural Slate</h3>
+          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Centuries-grade permanence with a deep graphite lustre. Our signature material.</p>
         </div>
 
         <!-- Standing Seam Metal -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
-          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col gap-2 sm:gap-4">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
             <iconify-icon icon="solar:home-2-linear"></iconify-icon>
           </div>
-          <h3 class="font-serif text-2xl text-dark">Standing Seam Metal</h3>
-          <p class="text-dark/50 text-sm leading-relaxed">Precision-formed zinc and copper panels, built for clean architectural lines.</p>
+          <h3 class="font-serif text-base sm:text-2xl text-dark">Standing Seam Metal</h3>
+          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Precision-formed zinc and copper panels, built for clean architectural lines.</p>
         </div>
 
         <!-- Clay Tile -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
-          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col gap-2 sm:gap-4">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
             <iconify-icon icon="solar:square-linear"></iconify-icon>
           </div>
-          <h3 class="font-serif text-2xl text-dark">Clay Tile</h3>
-          <p class="text-dark/50 text-sm leading-relaxed">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</p>
+          <h3 class="font-serif text-base sm:text-2xl text-dark">Clay Tile</h3>
+          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</p>
         </div>
 
         <!-- Cedar Shake -->
-        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[24px] p-8 flex flex-col gap-4">
-          <div class="w-12 h-12 rounded-full bg-dark text-surface flex items-center justify-center text-xl">
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] sm:rounded-[24px] p-4 sm:p-8 flex flex-col gap-2 sm:gap-4">
+          <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-dark text-surface flex items-center justify-center text-sm sm:text-xl">
             <iconify-icon icon="solar:leaf-linear"></iconify-icon>
           </div>
-          <h3 class="font-serif text-2xl text-dark">Cedar Shake</h3>
-          <p class="text-dark/50 text-sm leading-relaxed">Hand-split cedar shingles that weather to a warm, silvered patina over time.</p>
+          <h3 class="font-serif text-base sm:text-2xl text-dark">Cedar Shake</h3>
+          <p class="text-dark/50 text-[11px] sm:text-sm leading-relaxed">Hand-split cedar shingles that weather to a warm, silvered patina over time.</p>
         </div>
       </div>
     </div>
@@ -321,7 +321,6 @@ tailwind.config = {
   <section id="boutique" class="relative py-28 px-6">
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-16 gsap-fade-up">
-        <p class="font-mono text-xs uppercase tracking-[0.3em] text-dark/50 mb-4">Boutique</p>
         <h2 class="font-serif text-4xl sm:text-5xl text-dark">Our Signature Collection</h2>
       </div>
 
@@ -330,9 +329,7 @@ tailwind.config = {
         <!-- Left: image column -->
         <div class="relative w-full lg:w-[45%] shrink-0">
           <div class="relative h-[220px] sm:h-[300px] lg:h-full overflow-hidden custom-curve product-img-mobile-curve">
-            <img id="product-image" src="https://images.unsplash.com/photo-1559525839-b184a4d698c7?q=80&w=2000&auto=format&fit=crop"
-                 alt="The Monarch Slate"
-                 class="w-full h-full object-cover object-center scale-100">
+            <div id="product-image" class="w-full h-full bg-gradient-to-br from-moss via-dark to-moss/60 scale-100"></div>
           </div>
 
           <!-- Social proof avatars -->
