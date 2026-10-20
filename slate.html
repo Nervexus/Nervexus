@@ -290,16 +290,51 @@ tailwind.config = {
   </section>
 
   <!-- SECTION: SERVICES (placeholder — content to be filled in) -->
-  <section id="services" class="relative py-28 px-6 overflow-hidden">
+  <section id="services" class="relative py-20 px-6 overflow-hidden">
     <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-16 gsap-fade-up">
+      <div class="text-center mb-10 gsap-fade-up">
         <p class="font-mono text-xs uppercase tracking-[0.3em] text-dark/50 mb-4">Services</p>
         <h2 class="font-serif text-4xl sm:text-5xl text-dark">What We Offer</h2>
       </div>
 
-      <!-- Rotating cylindrical Three.js gallery -->
-      <div id="servicesGalleryHost" class="relative mx-auto max-w-5xl h-[420px] sm:h-[520px] md:h-[600px]" role="img" aria-label="Rotating gallery of roofing materials">
+      <!-- Static cylindrical Three.js gallery -->
+      <div id="servicesGalleryHost" class="relative mx-auto max-w-5xl h-[320px] sm:h-[400px] md:h-[460px] mb-10" role="img" aria-label="Gallery of roofing materials">
         <canvas id="servicesGalleryCanvas" class="w-full h-full block"></canvas>
+      </div>
+
+      <!-- Feature cards -->
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] p-5 flex flex-col gap-2">
+          <div class="w-9 h-9 rounded-full bg-dark text-surface flex items-center justify-center text-sm">
+            <iconify-icon icon="solar:layers-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-lg text-dark">Natural Slate</h3>
+          <p class="text-dark/50 text-xs leading-relaxed">Centuries-grade permanence with a deep graphite lustre. Our signature material.</p>
+        </div>
+
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] p-5 flex flex-col gap-2">
+          <div class="w-9 h-9 rounded-full bg-dark text-surface flex items-center justify-center text-sm">
+            <iconify-icon icon="solar:home-2-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-lg text-dark">Standing Seam Metal</h3>
+          <p class="text-dark/50 text-xs leading-relaxed">Precision-formed zinc and copper panels, built for clean architectural lines.</p>
+        </div>
+
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] p-5 flex flex-col gap-2">
+          <div class="w-9 h-9 rounded-full bg-dark text-surface flex items-center justify-center text-sm">
+            <iconify-icon icon="solar:square-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-lg text-dark">Clay Tile</h3>
+          <p class="text-dark/50 text-xs leading-relaxed">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</p>
+        </div>
+
+        <div class="gsap-fade-up bg-surface/40 border border-dark/10 rounded-[16px] p-5 flex flex-col gap-2">
+          <div class="w-9 h-9 rounded-full bg-dark text-surface flex items-center justify-center text-sm">
+            <iconify-icon icon="solar:leaf-linear"></iconify-icon>
+          </div>
+          <h3 class="font-serif text-lg text-dark">Cedar Shake</h3>
+          <p class="text-dark/50 text-xs leading-relaxed">Hand-split cedar shingles that weather to a warm, silvered patina over time.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -621,12 +656,8 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
   const loader = new THREE.TextureLoader();
 
   let disposed = false;
-  let frame = 0;
-  let elapsed = 0;
-  let previousTime = 0;
   let hostVisible = true;
   let documentVisible = !document.hidden;
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const textures = IMAGE_URLS.map((url) => {
     const texture = loader.load(url, () => {
@@ -655,33 +686,13 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
     galleryGroup.add(panel);
   });
 
-  function render(time) {
-    time = time || performance.now();
-    const safeSpeed = clamp(settings.speed, 0, 3);
-    const safeScale = clamp(settings.scale, 0.7, 1.35);
-    if (previousTime) elapsed += Math.min((time - previousTime) / 1000, 0.05) * safeSpeed;
-    previousTime = time;
-    galleryGroup.rotation.y = elapsed * 0.18;
-    galleryGroup.position.y = Math.sin(elapsed) * 1.5;
-    galleryGroup.scale.setScalar(safeScale);
+  // Static pose -- no idle animation, just a fixed resting angle.
+  galleryGroup.rotation.y = 0.5;
+  galleryGroup.position.y = 0;
+  galleryGroup.scale.setScalar(clamp(settings.scale, 0.7, 1.35));
+
+  function render() {
     renderer.render(scene, camera);
-  }
-
-  function tick(time) {
-    if (disposed || !hostVisible || !documentVisible) { frame = 0; previousTime = 0; return; }
-    render(time);
-    frame = window.requestAnimationFrame(tick);
-  }
-
-  function start() {
-    if (reducedMotion) { render(0); return; }
-    if (!frame && hostVisible && documentVisible) frame = window.requestAnimationFrame(tick);
-  }
-
-  function stop() {
-    if (frame) window.cancelAnimationFrame(frame);
-    frame = 0;
-    previousTime = 0;
   }
 
   function resize() {
@@ -698,19 +709,18 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
   const resizeObserver = new ResizeObserver(resize);
   const intersectionObserver = new IntersectionObserver(([entry]) => {
     hostVisible = entry ? entry.isIntersecting : true;
-    if (hostVisible) start(); else stop();
+    if (hostVisible) render();
   });
 
   function handleVisibility() {
     documentVisible = !document.hidden;
-    if (documentVisible) start(); else stop();
+    if (documentVisible) render();
   }
 
   resizeObserver.observe(host);
   intersectionObserver.observe(host);
   document.addEventListener('visibilitychange', handleVisibility);
   resize();
-  start();
 })();
 
 /* =========================================================
