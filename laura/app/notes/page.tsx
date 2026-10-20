@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { HudCard, HexBadge } from "@/components/HudCard";
-import { NoteIcon } from "@/components/icons";
+import { DotGrid } from "@/components/DotGrid";
+import { NoteCard, PortDot } from "@/components/NoteCard";
 
 type Note = { id: string; title: string; body: string; updatedAt: string };
 
@@ -62,49 +62,72 @@ export default function NotesPage() {
     load();
   }
 
-  return (
-    <div className="flex-1">
-      <header className="border-b border-neutral-800 px-6 py-4">
-        <h1 className="font-semibold tracking-tight">Notes</h1>
-        <p className="text-xs text-neutral-500">
-          things you&apos;ve told Laura to remember, plus anything you jot down here
-        </p>
-      </header>
+  const lastUpdated = notes[0]?.updatedAt;
 
-      <div className="mx-auto max-w-3xl px-6 py-6">
-        <div className="mb-8 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-            className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-neutral-600"
-          />
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder="Write something…"
-            rows={3}
-            className="mt-2 w-full resize-none bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-          />
-          <div className="mt-2 flex justify-end gap-2">
-            {editingId && (
+  return (
+    <div className="relative flex-1">
+      <div className="relative overflow-hidden border-b border-neutral-800 px-6 pb-8 pt-6">
+        <DotGrid />
+        <div className="relative mx-auto max-w-3xl">
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-semibold text-neutral-100">Notes</h1>
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+              {notes.length} saved
+            </span>
+          </div>
+          <p className="mt-0.5 text-xs text-neutral-600">
+            things you&apos;ve told Laura to remember, plus anything you jot down here
+          </p>
+
+          {/* Compose "node": Title + Body feed a Save action, mirroring a
+              workflow editor's input-ports-into-an-action shape. */}
+          <div className="relative mt-6 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-4">
+            <div className="flex items-center gap-2">
+              <PortDot color={title.trim() ? "emerald" : "neutral"} />
+              <span className="text-[11px] tracking-wide text-neutral-500">Title</span>
+            </div>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Type what you want to remember…"
+              className="mt-1 w-full rounded-lg border border-neutral-800 bg-neutral-950/60 px-3 py-2 text-sm font-medium text-neutral-100 outline-none placeholder:font-normal placeholder:text-neutral-600 focus:border-emerald-500/40"
+            />
+
+            <div className="mt-3 flex items-center gap-2">
+              <PortDot color={body.trim() ? "emerald" : "neutral"} />
+              <span className="text-[11px] tracking-wide text-neutral-500">Body</span>
+            </div>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              placeholder="Write something…"
+              rows={3}
+              className="mt-1 w-full resize-none rounded-lg border border-neutral-800 bg-neutral-950/60 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-emerald-500/40"
+            />
+
+            <div className="mt-3 flex justify-end gap-2">
+              {editingId && (
+                <button
+                  onClick={resetForm}
+                  className="rounded-lg px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
+                >
+                  Cancel
+                </button>
+              )}
               <button
-                onClick={resetForm}
-                className="rounded-lg px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
+                onClick={save}
+                disabled={!title.trim()}
+                className="flex items-center gap-1.5 rounded-full bg-emerald-500 px-3.5 py-1.5 text-xs font-medium text-neutral-950 transition-opacity hover:bg-emerald-400 disabled:opacity-40"
               >
-                Cancel
+                <span className="text-sm leading-none">+</span>
+                {editingId ? "Save changes" : "Save note"}
               </button>
-            )}
-            <button
-              onClick={save}
-              disabled={!title.trim()}
-              className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-900 disabled:opacity-40"
-            >
-              {editingId ? "Save changes" : "Add note"}
-            </button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="relative mx-auto max-w-3xl px-6 py-6">
         {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
         {loaded && notes.length === 0 && (
           <p className="text-sm text-neutral-600">No notes yet.</p>
@@ -112,31 +135,21 @@ export default function NotesPage() {
 
         <div className="flex flex-col gap-3">
           {notes.map((note) => (
-            <HudCard key={note.id}>
-              <div className="flex items-start gap-3">
-                <HexBadge>
-                  <NoteIcon className="h-4 w-4" />
-                </HexBadge>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-sm font-medium">{note.title}</h3>
-                    <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
-                      <button onClick={() => startEdit(note)} className="hover:text-neutral-200">
-                        Edit
-                      </button>
-                      <button onClick={() => remove(note.id)} className="hover:text-red-400">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                  {note.body && (
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">{note.body}</p>
-                  )}
-                </div>
-              </div>
-            </HudCard>
+            <NoteCard
+              key={note.id}
+              title={note.title}
+              body={note.body}
+              updatedAt={note.updatedAt}
+              onEdit={() => startEdit(note)}
+              onDelete={() => remove(note.id)}
+            />
           ))}
         </div>
+      </div>
+
+      <div className="pointer-events-none absolute bottom-3 left-6 font-mono text-[11px] text-neutral-700">
+        N: {notes.length}
+        {lastUpdated && <> · last saved {new Date(lastUpdated).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</>}
       </div>
     </div>
   );

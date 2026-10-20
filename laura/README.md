@@ -39,11 +39,12 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
 | `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
-| `components/DotGrid.tsx`          | dark dot-grid canvas background behind the home page's hero section   |
+| `components/DotGrid.tsx`          | dark dot-grid canvas background, used on Home and Notes               |
+| `components/NoteCard.tsx`         | Notes page's node-editor-style card: port dot, title, nested content panel |
 | `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | home page's Activity tab: a timeline of what Laura's actually done     |
-| `components/HudCard.tsx`          | dark instrument-panel card + hex icon badge, used on Notes/Vault/Reminders |
+| `components/HudCard.tsx`          | dark instrument-panel card + hex icon badge, used on Vault/Reminders  |
 | `prisma/schema.prisma`            | `Note`, `VaultItem`, `ChatMessage`, `Reminder`, `ActivityLog` models   |
 | `app/api/{chat,notes,reminders,vault,activity}/...` | API routes                                         |
 
