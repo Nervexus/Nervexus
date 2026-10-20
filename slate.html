@@ -440,91 +440,33 @@ tailwind.config = {
     <!-- Giant Brand Text -->
     <div class="gsap-fade-up text-center w-full mb-20 px-4"
       style="mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent);">
-      <h2 class="text-[18vw] leading-[0.7] select-none font-serif font-bold text-cream/5 tracking-tighter mix-blend-screen scale-y-110">
+      <h2 class="text-[26vw] leading-[0.7] select-none font-serif font-bold text-cream/5 tracking-tighter mix-blend-screen scale-y-110">
         SLATE
       </h2>
     </div>
 
-    <!-- Links Grid -->
-    <div class="gsap-fade-up border-t border-cream/10 grid grid-cols-1 lg:grid-cols-2">
-
-      <!-- Left Side: Navigation Links -->
-      <div class="p-8 md:p-16 grid grid-cols-2 gap-12 border-r border-cream/10">
-        <div class="flex flex-col gap-6">
-          <a href="#heritage" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Our Process</a>
-          <a href="#services" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Services</a>
-          <a href="#boutique" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Boutique</a>
-        </div>
-        <div class="flex flex-col gap-6">
-          <a href="#experience" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Contact Us</a>
-          <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Instagram</a>
-          <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Twitter/X</a>
-          <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Facebook</a>
-        </div>
+    <!-- Links -->
+    <div class="gsap-fade-up p-8 md:p-16 grid grid-cols-2 gap-12 max-w-2xl mx-auto">
+      <div class="flex flex-col gap-6">
+        <a href="#heritage" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Our Process</a>
+        <a href="#services" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Services</a>
+        <a href="#boutique" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Boutique</a>
       </div>
-
-      <!-- Right Side: Roofline Wireframe Illustration -->
-      <div class="roofline-illustration lg:h-auto lg:border-t-0 flex overflow-hidden w-full h-48 border-cream/10 border-t relative items-center justify-center">
-        <svg viewBox="0 0 400 120" class="opacity-20 max-h-[160px] w-[756px] h-[160px]"
-          preserveAspectRatio="xMidYMid meet" stroke-width="2"
-          style="width: 756px; height: 160px; color: #e0dcd1;">
-
-          <!-- Gable roof 1 -->
-          <path d="M40 100 L70 30 L100 100" stroke="currentColor" stroke-width="1" fill="none"></path>
-          <rect x="55" y="25" width="30" height="7" stroke="currentColor" stroke-width="1" fill="none"></rect>
-
-          <!-- Gable roof 2 (taller) -->
-          <path d="M120 100 L150 10 L180 100" stroke="currentColor" stroke-width="1" fill="none"></path>
-          <rect x="135" y="5" width="30" height="6" stroke="currentColor" stroke-width="1" fill="none"></rect>
-
-          <!-- Chimney with glowing window -->
-          <g transform="translate(205, 10)" class="chimney">
-            <defs>
-              <clipPath id="chimney-clip">
-                <rect x="10" y="20" width="30" height="60" rx="2" />
-              </clipPath>
-            </defs>
-
-            <path d="M5 20 L45 20 L40 10 L10 10 Z" stroke="currentColor" stroke-width="1" fill="none"></path>
-            <rect x="10" y="20" width="30" height="60" stroke="currentColor" stroke-width="1" fill="none"></rect>
-
-            <g clip-path="url(#chimney-clip)">
-              <rect class="glow-fill" x="10" y="50" width="30" height="30" fill="#cebfa9" opacity="0.5"></rect>
-              <rect class="glow-pulse" x="10" y="40" width="30" height="40" fill="#cebfa9" opacity="0.25"></rect>
-            </g>
-          </g>
-
-          <!-- Gable roof 3 -->
-          <path d="M270 100 L300 20 L330 100" stroke="currentColor" stroke-width="1" fill="none"></path>
-          <rect x="285" y="10" width="30" height="10" stroke="currentColor" stroke-width="1" fill="none"></rect>
-
-          <!-- Small dormer -->
-          <g transform="translate(350, 20)">
-            <rect x="25" y="0" width="10" height="20" stroke="currentColor" stroke-width="1" fill="none"></rect>
-            <path d="M15 25 L30 5 L45 25 L45 70 L15 70 Z" stroke="currentColor" stroke-width="1" fill="none"></path>
-          </g>
-        </svg>
+      <div class="flex flex-col gap-6">
+        <a href="#experience" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Contact Us</a>
+        <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Instagram</a>
+        <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Twitter/X</a>
+        <a href="#" class="text-xs font-medium text-cream/50 uppercase tracking-widest hover:text-cream transition-colors">Facebook</a>
       </div>
+    </div>
 
-      <style>
-        .roofline-illustration svg:hover .glow-fill,
-        .roofline-illustration svg:hover .glow-pulse {
-          animation: slate-glow 1.8s ease-in-out infinite;
-        }
-        @keyframes slate-glow {
-          0%, 100% { opacity: 0.25; }
-          50% { opacity: 0.75; }
-        }
-      </style>
-
-      <!-- Copyright Row -->
-      <div class="border-t border-cream/10 px-8 md:px-16 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-cream/40 font-medium tracking-wide col-span-full">
-        <div>© 2026 SLATE. All rights reserved.</div>
-        <div class="flex gap-8">
-          <a href="#" class="hover:text-cream transition-colors">Privacy Policy</a>
-          <a href="#" class="hover:text-cream transition-colors">Terms of Use</a>
-          <a href="#" class="hover:text-cream transition-colors">Cookies</a>
-        </div>
+    <!-- Copyright Row -->
+    <div class="border-t border-cream/10 px-8 md:px-16 py-8 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] text-cream/40 font-medium tracking-wide">
+      <div>© 2026 SLATE. All rights reserved.</div>
+      <div class="flex gap-8">
+        <a href="#" class="hover:text-cream transition-colors">Privacy Policy</a>
+        <a href="#" class="hover:text-cream transition-colors">Terms of Use</a>
+        <a href="#" class="hover:text-cream transition-colors">Cookies</a>
       </div>
     </div>
   </footer>
