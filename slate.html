@@ -97,6 +97,34 @@ tailwind.config = {
   @media (max-width: 639px) {
     .product-img-mobile-curve { border-top-right-radius: 48px; }
   }
+
+  /* Downward-spiral carousel */
+  .spiral-wrap {
+    position: relative;
+    perspective: 1200px;
+    perspective-origin: 50% 20%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
+            mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
+  }
+  .spiral-stage {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+  .spiral-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    will-change: transform, opacity;
+  }
+  .spiral-card {
+    background: rgba(224, 220, 209, 0.04);
+    border: 1px solid rgba(224, 220, 209, 0.12);
+    border-radius: 18px;
+    padding: 1.25rem 1.5rem;
+  }
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-dark">
@@ -168,14 +196,50 @@ tailwind.config = {
           integrity and absolute traceability.
         </p>
 
-        <div class="grid grid-cols-2 gap-10 max-w-md">
-          <div>
-            <p class="font-serif text-5xl text-sand">15+</p>
-            <p class="font-mono text-xs uppercase tracking-wider text-cream/60 mt-2">Partner quarries</p>
-          </div>
-          <div>
-            <p class="font-serif text-5xl text-sand">25yr</p>
-            <p class="font-mono text-xs uppercase tracking-wider text-cream/60 mt-2">Workmanship warranty</p>
+        <div id="spiralWrap" class="spiral-wrap gsap-fade-up max-w-md h-[360px] sm:h-[400px]">
+          <div id="spiralStage" class="spiral-stage">
+            <div class="spiral-item">
+              <div class="spiral-card">
+                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">01</p>
+                <p class="font-serif text-4xl text-sand leading-none">15+</p>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Partner Quarries</p>
+              </div>
+            </div>
+            <div class="spiral-item">
+              <div class="spiral-card">
+                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">02</p>
+                <p class="font-serif text-4xl text-sand leading-none">25yr</p>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Workmanship Warranty</p>
+              </div>
+            </div>
+            <div class="spiral-item">
+              <div class="spiral-card">
+                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">03</p>
+                <p class="font-serif text-4xl text-sand leading-none">Wales</p>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Welsh Slate</p>
+              </div>
+            </div>
+            <div class="spiral-item">
+              <div class="spiral-card">
+                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">04</p>
+                <p class="font-serif text-4xl text-sand leading-none">Spain</p>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Northern Quarries</p>
+              </div>
+            </div>
+            <div class="spiral-item">
+              <div class="spiral-card">
+                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">05</p>
+                <p class="font-serif text-4xl text-sand leading-none">100%</p>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Full Traceability</p>
+              </div>
+            </div>
+            <div class="spiral-item">
+              <div class="spiral-card">
+                <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-2">06</p>
+                <p class="font-serif text-4xl text-sand leading-none">In-House</p>
+                <p class="font-mono text-[10px] uppercase tracking-wider text-cream/60 mt-2">Master Craftsmen</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -546,6 +610,68 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
     },
   });
 });
+
+/* =========================================================
+   DOWNWARD-SPIRAL CAROUSEL (Heritage menu)
+   ========================================================= */
+(function initSpiral() {
+  const wrap = document.getElementById('spiralWrap');
+  const stage = document.getElementById('spiralStage');
+  if (!wrap || !stage) return;
+
+  const items = stage.querySelectorAll('.spiral-item');
+  const count = items.length;
+
+  const radiusX = 22;
+  const radiusZ = 46;
+  const cardHeight = 92;
+
+  let autoProgress = 0;
+  let scrollProgress = 0;
+
+  function render() {
+    const wrapHeight = wrap.clientHeight;
+    const loopHeight = wrapHeight + cardHeight * 2;
+
+    items.forEach((item, i) => {
+      const base = i / count;
+      let pos = (base + autoProgress + scrollProgress) % 1;
+      if (pos < 0) pos += 1;
+
+      const y = pos * loopHeight - cardHeight;
+      const angle = pos * Math.PI * 2;
+      const x = Math.sin(angle) * radiusX;
+      const z = Math.cos(angle) * radiusZ;
+      const depth01 = (Math.cos(angle) + 1) / 2;
+      const scale = 0.72 + 0.32 * depth01;
+
+      const edgeFade = Math.min(1, Math.min(pos, 1 - pos) * 6);
+      const opacity = Math.max(0, Math.min(1, edgeFade)) * (0.35 + 0.65 * depth01);
+
+      item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
+      item.style.opacity = opacity.toFixed(3);
+      item.style.zIndex = Math.round(depth01 * 100);
+    });
+  }
+
+  function tick() {
+    autoProgress = (autoProgress + 0.00035) % 1;
+    render();
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  ScrollTrigger.create({
+    trigger: wrap,
+    start: 'top bottom',
+    end: 'bottom top',
+    onUpdate: (self) => {
+      scrollProgress = self.progress * 1.5;
+    },
+  });
+
+  window.addEventListener('resize', render);
+})();
 
 // Product card: clip-path reveal + continuous image pulse
 const productCard = document.getElementById('product-card');
