@@ -3,8 +3,18 @@
 import { useEffect, useState } from "react";
 import { DotGrid } from "@/components/DotGrid";
 import { NoteCard, PortDot } from "@/components/NoteCard";
+import { EmptyState } from "@/components/EmptyState";
+import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
+import { NoteIcon } from "@/components/icons";
 
 type Note = { id: string; title: string; body: string; updatedAt: string };
+
+const QUICK_START = ["Wifi password", "Grocery list", "Gift ideas", "Packing list", "Important dates"];
+
+function isThisWeek(iso: string): boolean {
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  return new Date(iso).getTime() >= weekAgo;
+}
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -63,6 +73,7 @@ export default function NotesPage() {
   }
 
   const lastUpdated = notes[0]?.updatedAt;
+  const thisWeek = notes.filter((n) => isThisWeek(n.updatedAt)).length;
 
   return (
     <div className="relative flex-1">
@@ -127,23 +138,59 @@ export default function NotesPage() {
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-3xl px-6 py-6">
-        {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
-        {loaded && notes.length === 0 && (
-          <p className="text-sm text-neutral-600">No notes yet.</p>
-        )}
+      <div className="relative mx-auto max-w-5xl px-6 py-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_260px]">
+          <div className="min-w-0">
+            {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
-        <div className="flex flex-col gap-3">
-          {notes.map((note) => (
-            <NoteCard
-              key={note.id}
-              title={note.title}
-              body={note.body}
-              updatedAt={note.updatedAt}
-              onEdit={() => startEdit(note)}
-              onDelete={() => remove(note.id)}
-            />
-          ))}
+            {loaded && notes.length === 0 ? (
+              <EmptyState
+                icon={<NoteIcon className="h-5 w-5" />}
+                title="No notes yet"
+                description="Ask Laura to remember something, jot one down above, or try a quick start."
+              >
+                <div className="mt-2 flex flex-wrap justify-center gap-2">
+                  {QUICK_START.map((suggestion) => (
+                    <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
+                      {suggestion}
+                    </Chip>
+                  ))}
+                </div>
+              </EmptyState>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {notes.map((note) => (
+                  <NoteCard
+                    key={note.id}
+                    title={note.title}
+                    body={note.body}
+                    updatedAt={note.updatedAt}
+                    onEdit={() => startEdit(note)}
+                    onDelete={() => remove(note.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <aside className="flex flex-col gap-4">
+            <SidebarCard title="Quick start">
+              <div className="flex flex-wrap gap-2">
+                {QUICK_START.map((suggestion) => (
+                  <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
+                    {suggestion}
+                  </Chip>
+                ))}
+              </div>
+            </SidebarCard>
+
+            <SidebarCard title="Stats">
+              <div className="flex flex-col gap-2">
+                <Stat label="Total notes" value={notes.length} />
+                <Stat label="Updated this week" value={thisWeek} />
+              </div>
+            </SidebarCard>
+          </aside>
         </div>
       </div>
 

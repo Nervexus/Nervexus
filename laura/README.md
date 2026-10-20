@@ -41,6 +41,8 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 | `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
 | `components/DotGrid.tsx`          | dark dot-grid canvas background, used on Home and Notes               |
 | `components/NoteCard.tsx`         | Notes page's node-editor-style card: port dot, title, nested content panel |
+| `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
+| `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
 | `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | home page's Activity tab: a timeline of what Laura's actually done     |
