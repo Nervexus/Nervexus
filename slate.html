@@ -98,55 +98,10 @@ tailwind.config = {
     .product-img-mobile-curve { border-top-right-radius: 48px; }
   }
 
-  /* Downward-spiral carousel */
-  .spiral-wrap {
-    position: relative;
-    perspective: 1200px;
-    perspective-origin: 50% 20%;
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
-            mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
-  }
-  .spiral-stage {
-    position: absolute;
-    inset: 0;
-    transform-style: preserve-3d;
-  }
-  .spiral-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    will-change: transform, opacity;
-  }
-  .spiral-pole {
-    position: absolute;
-    top: 6%;
-    bottom: 6%;
-    left: 50%;
-    width: 2px;
-    transform: translateX(-50%);
-    background: linear-gradient(to bottom, transparent, rgba(206, 191, 169, 0.35) 15%, rgba(206, 191, 169, 0.35) 85%, transparent);
-  }
-  .spiral-tread {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 112px;
-    height: 10px;
-    margin-top: -5px;
-    margin-left: -56px;
-    border-radius: 4px;
-    background: linear-gradient(to right, rgba(206, 191, 169, 0.15), rgba(206, 191, 169, 0.85));
-    transform-origin: 50% 50%;
-  }
-  .spiral-label {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left: 18px;
-    margin-top: -26px;
-    width: 140px;
+  /* Heritage timeline */
+  #timelineTrack {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+            mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
   }
 </style>
 </head>
@@ -205,71 +160,75 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- SECTION 3: STORY -->
+  <!-- SECTION 3: STORY / HERITAGE TIMELINE -->
   <section id="heritage" class="matte-noise relative bg-dark text-cream rounded-t-[80px] lg:rounded-t-[80px] py-28 px-6">
-    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-      <div class="gsap-fade-up">
+    <div class="max-w-5xl mx-auto">
+      <div class="gsap-fade-up mb-16 max-w-lg">
         <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Our Heritage</p>
         <h2 class="font-serif text-4xl sm:text-5xl leading-tight mb-8">
           From quarry to roofline,<br>without compromise.
         </h2>
-        <p class="text-cream/70 text-lg leading-relaxed mb-10 max-w-lg">
+        <p class="text-cream/70 text-lg leading-relaxed">
           We work directly with exceptional stone and slate suppliers across
           Wales and Northern Spain. Every batch is selected for its structural
           integrity and absolute traceability.
         </p>
-
       </div>
 
-      <div id="spiralWrap" class="spiral-wrap gsap-fade-up w-full h-[360px] sm:h-[440px] lg:h-[560px]">
-        <div class="spiral-pole"></div>
-        <div id="spiralStage" class="spiral-stage">
-          <div class="spiral-item">
-            <div class="spiral-tread"></div>
-            <div class="spiral-label">
-              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">01</p>
-              <p class="font-serif text-3xl text-sand leading-none">15+</p>
-              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Partner Quarries</p>
+      <div id="timelineWrap" class="relative">
+        <div id="timelineTrack" class="absolute left-5 top-0 bottom-0 w-[2px] bg-cream/10"></div>
+        <div id="timelineProgress" class="absolute left-5 top-0 w-[2px] h-0 opacity-0 bg-gradient-to-b from-sand via-sand to-transparent rounded-full"></div>
+
+        <div id="timelineEntries">
+          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10 pb-16">
+            <div class="shrink-0 w-10 flex justify-center pt-1">
+              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+            </div>
+            <div class="flex-1 md:flex md:gap-10">
+              <h3 class="font-serif text-2xl md:text-3xl text-cream/40 md:w-28 shrink-0 mb-2 md:mb-0">2003</h3>
+              <div>
+                <h4 class="font-serif text-xl text-sand mb-2">Founded in Wales</h4>
+                <p class="text-cream/60 text-sm leading-relaxed max-w-md">A small family slate supplier begins sourcing directly from Welsh quarries, grading every piece by hand.</p>
+              </div>
             </div>
           </div>
-          <div class="spiral-item">
-            <div class="spiral-tread"></div>
-            <div class="spiral-label">
-              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">02</p>
-              <p class="font-serif text-3xl text-sand leading-none">25yr</p>
-              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Workmanship Warranty</p>
+
+          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10 pb-16">
+            <div class="shrink-0 w-10 flex justify-center pt-1">
+              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+            </div>
+            <div class="flex-1 md:flex md:gap-10">
+              <h3 class="font-serif text-2xl md:text-3xl text-cream/40 md:w-28 shrink-0 mb-2 md:mb-0">2011</h3>
+              <div>
+                <h4 class="font-serif text-xl text-sand mb-2">Northern Spain Partnership</h4>
+                <p class="text-cream/60 text-sm leading-relaxed max-w-md">A second quarry partnership opens access to graphite-grade stone quarried at altitude.</p>
+              </div>
             </div>
           </div>
-          <div class="spiral-item">
-            <div class="spiral-tread"></div>
-            <div class="spiral-label">
-              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">03</p>
-              <p class="font-serif text-3xl text-sand leading-none">Wales</p>
-              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Welsh Slate</p>
+
+          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10 pb-16">
+            <div class="shrink-0 w-10 flex justify-center pt-1">
+              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
+            </div>
+            <div class="flex-1 md:flex md:gap-10">
+              <h3 class="font-serif text-2xl md:text-3xl text-cream/40 md:w-28 shrink-0 mb-2 md:mb-0">2018</h3>
+              <div>
+                <h4 class="font-serif text-xl text-sand mb-2">Full-Service Installation</h4>
+                <p class="text-cream/60 text-sm leading-relaxed max-w-md">We expand beyond sourcing into licensed, in-house installation crews across the region.</p>
+              </div>
             </div>
           </div>
-          <div class="spiral-item">
-            <div class="spiral-tread"></div>
-            <div class="spiral-label">
-              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">04</p>
-              <p class="font-serif text-3xl text-sand leading-none">Spain</p>
-              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Northern Quarries</p>
+
+          <div class="timeline-entry gsap-fade-up relative flex gap-6 md:gap-10">
+            <div class="shrink-0 w-10 flex justify-center pt-1">
+              <div class="w-4 h-4 rounded-full bg-dark border border-sand/60 relative z-10"></div>
             </div>
-          </div>
-          <div class="spiral-item">
-            <div class="spiral-tread"></div>
-            <div class="spiral-label">
-              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">05</p>
-              <p class="font-serif text-3xl text-sand leading-none">100%</p>
-              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Full Traceability</p>
-            </div>
-          </div>
-          <div class="spiral-item">
-            <div class="spiral-tread"></div>
-            <div class="spiral-label">
-              <p class="font-mono text-[10px] text-sand/50 tracking-widest mb-1">06</p>
-              <p class="font-serif text-3xl text-sand leading-none">In-House</p>
-              <p class="font-mono text-[9px] uppercase tracking-wider text-cream/60 mt-1">Master Craftsmen</p>
+            <div class="flex-1 md:flex md:gap-10">
+              <h3 class="font-serif text-2xl md:text-3xl text-cream/40 md:w-28 shrink-0 mb-2 md:mb-0">2024</h3>
+              <div>
+                <h4 class="font-serif text-xl text-sand mb-2">500+ Roofs, Full Traceability</h4>
+                <p class="text-cream/60 text-sm leading-relaxed max-w-md">Every batch is now tracked quarry to roofline, backed by a 25-year workmanship warranty.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -637,76 +596,31 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 });
 
 /* =========================================================
-   DOWNWARD-SPIRAL CAROUSEL (Heritage menu)
+   HERITAGE TIMELINE (scroll-filled progress line)
    ========================================================= */
-(function initSpiral() {
-  const wrap = document.getElementById('spiralWrap');
-  const stage = document.getElementById('spiralStage');
-  if (!wrap || !stage) return;
+(function initTimeline() {
+  const wrap = document.getElementById('timelineWrap');
+  const track = document.getElementById('timelineTrack');
+  const progress = document.getElementById('timelineProgress');
+  if (!wrap || !track || !progress) return;
 
-  const items = stage.querySelectorAll('.spiral-item');
-  const count = items.length;
-
-  const radiusX = 72;
-  const radiusZ = 90;
-  const cardHeight = 70;
-
-  let autoProgress = 0;
-
-  function render() {
-    const wrapHeight = wrap.clientHeight;
-    const loopHeight = wrapHeight + cardHeight * 2;
-
-    items.forEach((item, i) => {
-      const base = i / count;
-      let pos = (base + autoProgress) % 1;
-      if (pos < 0) pos += 1;
-
-      const y = pos * loopHeight - cardHeight;
-      const angle = pos * Math.PI * 2;
-      const x = Math.sin(angle) * radiusX;
-      const z = Math.cos(angle) * radiusZ;
-      const depth01 = (Math.cos(angle) + 1) / 2;
-      const scale = 0.78 + 0.28 * depth01;
-      const angleDeg = (angle * 180) / Math.PI;
-
-      const edgeFade = Math.min(1, Math.min(pos, 1 - pos) * 6);
-      const opacity = Math.max(0, Math.min(1, edgeFade)) * (0.4 + 0.6 * depth01);
-
-      item.style.transform = `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
-      item.style.opacity = opacity.toFixed(3);
-      item.style.zIndex = Math.round(depth01 * 100);
-
-      const tread = item.querySelector('.spiral-tread');
-      if (tread) tread.style.transform = `rotate(${angleDeg}deg)`;
-    });
+  function setHeight() {
+    track.style.height = wrap.offsetHeight + 'px';
   }
+  setHeight();
+  window.addEventListener('resize', setHeight);
 
-  function tick() {
-    autoProgress = (autoProgress + 0.00014) % 1;
-    render();
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-
-  // Simple scroll parallax: the whole spiral drifts up/down slightly as
-  // its section scrolls through the viewport, independent of the autoplay.
-  gsap.fromTo(
-    stage,
-    { y: -24 },
-    {
-      y: 24,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: wrap,
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: true,
-      },
-    }
-  );
-
-  window.addEventListener('resize', render);
+  ScrollTrigger.create({
+    trigger: wrap,
+    start: 'top 75%',
+    end: 'bottom 55%',
+    scrub: true,
+    onUpdate: (self) => {
+      const p = self.progress;
+      progress.style.height = p * wrap.offsetHeight + 'px';
+      progress.style.opacity = Math.min(1, p * 8).toFixed(3);
+    },
+  });
 })();
 
 // Product card: clip-path reveal + continuous image pulse
