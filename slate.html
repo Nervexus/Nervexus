@@ -360,7 +360,43 @@ tailwind.config = {
   </section>
 
   <!-- SECTION 5: THE EXPERIENCE (cleared, ready for new content) -->
-  <section id="experience" class="relative bg-cream py-28 px-6"></section>
+  <section id="experience" class="relative bg-dark text-cream py-28 px-6 overflow-hidden">
+    <img src="assets/strata/hero.webp" alt="Finished roofing structure"
+         class="absolute inset-0 w-full h-full object-cover opacity-20">
+    <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/85 to-dark/50"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto text-center gsap-fade-up">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">The Experience</p>
+      <h2 class="font-serif text-3xl sm:text-5xl leading-tight mb-6">Ready for a roof built to last generations?</h2>
+      <p class="text-cream/70 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">
+        From the first site visit to the final inspection, every project is
+        handled by the same licensed crew, with full traceability and a
+        warranty that actually means something.
+      </p>
+
+      <div class="flex items-center justify-center mb-16">
+        <button class="magnetic-btn group relative inline-flex items-center gap-3 bg-surface text-dark px-8 py-4 rounded-full font-medium overflow-hidden">
+          Book a consultation
+          <iconify-icon icon="solar:arrow-right-linear" class="text-lg transition-transform group-hover:translate-x-1"></iconify-icon>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto border-t border-cream/10 pt-10">
+        <div>
+          <p class="font-serif text-3xl sm:text-4xl text-sand">500+</p>
+          <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Roofs completed</p>
+        </div>
+        <div>
+          <p class="font-serif text-3xl sm:text-4xl text-sand">15+</p>
+          <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Partner quarries</p>
+        </div>
+        <div>
+          <p class="font-serif text-3xl sm:text-4xl text-sand">25yr</p>
+          <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Workmanship warranty</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- SECTION 6: FOOTER -->
   <footer class="matte-noise relative overflow-hidden text-cream bg-dark rounded-t-[44px] border-cream/10 border-t pt-24">
