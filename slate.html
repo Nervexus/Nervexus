@@ -104,6 +104,19 @@ tailwind.config = {
             mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
   }
   .timeline-sticky-label { top: 10rem; }
+
+  /* Testimonials ticker */
+  @keyframes testimonial-ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  #testimonialTicker {
+    animation: testimonial-ticker 20s linear infinite;
+  }
+  .testimonial-word {
+    display: inline-block;
+    margin-right: 0.3em;
+  }
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-dark">
@@ -317,12 +330,61 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- SECTION 4: PRODUCT CARD -->
-  <!-- SECTION: CLIENT TESTIMONIALS (placeholder — ready for a component) -->
-  <section id="boutique" class="relative py-28 px-6">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center gsap-fade-up">
-        <h2 class="font-serif text-4xl sm:text-5xl text-dark">Client Testimonials</h2>
+  <!-- SECTION 4: CLIENT TESTIMONIALS -->
+  <section id="boutique" class="relative py-28 px-6 overflow-hidden">
+    <div id="testimonialWrap" class="relative max-w-5xl mx-auto">
+
+      <!-- Oversized index number, bleeding off the left edge -->
+      <div class="absolute -left-4 sm:-left-8 top-1/2 -translate-y-1/2 text-[14rem] sm:text-[20rem] lg:text-[26rem] font-serif font-bold text-dark/[0.04] select-none pointer-events-none leading-none tracking-tighter">
+        <span id="testimonialNumber" class="block">01</span>
+      </div>
+
+      <div class="relative flex">
+        <!-- Left rail: vertical label + progress line -->
+        <div class="hidden sm:flex flex-col items-center justify-center pr-10 md:pr-16 border-r border-dark/10 shrink-0">
+          <span class="text-xs font-mono text-dark/40 tracking-widest uppercase" style="writing-mode: vertical-rl; text-orientation: mixed;">Testimonials</span>
+          <div class="relative h-28 w-px bg-dark/10 mt-8">
+            <div id="testimonialProgress" class="absolute top-0 left-0 w-full bg-sand origin-top" style="height:0%"></div>
+          </div>
+        </div>
+
+        <!-- Center content -->
+        <div class="flex-1 sm:pl-10 md:pl-16 py-8">
+          <div class="mb-8">
+            <span class="inline-flex items-center gap-2 text-xs font-mono text-dark/50 border border-dark/15 rounded-full px-3 py-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-sand"></span>
+              <span id="testimonialCompany"></span>
+            </span>
+          </div>
+
+          <div class="relative mb-10 min-h-[170px] sm:min-h-[140px]">
+            <blockquote id="testimonialQuote" class="text-3xl sm:text-4xl md:text-5xl font-light text-dark leading-[1.15] tracking-tight"></blockquote>
+          </div>
+
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-8">
+            <div class="flex items-center gap-4">
+              <div class="w-8 h-px bg-dark"></div>
+              <div>
+                <p id="testimonialName" class="text-base font-medium text-dark"></p>
+                <p id="testimonialRole" class="text-sm text-dark/50"></p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+              <button id="testimonialPrev" class="group w-12 h-12 rounded-full border border-dark/15 flex items-center justify-center hover:bg-dark transition-colors">
+                <iconify-icon icon="solar:arrow-left-linear" class="text-dark group-hover:text-cream transition-colors"></iconify-icon>
+              </button>
+              <button id="testimonialNext" class="group w-12 h-12 rounded-full border border-dark/15 flex items-center justify-center hover:bg-dark transition-colors">
+                <iconify-icon icon="solar:arrow-right-linear" class="text-dark group-hover:text-cream transition-colors"></iconify-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom ticker: faint repeating client names -->
+      <div class="mt-16 sm:mt-24 overflow-hidden opacity-[0.08] pointer-events-none">
+        <div id="testimonialTicker" class="flex whitespace-nowrap text-4xl sm:text-6xl font-bold tracking-tight"></div>
       </div>
     </div>
   </section>
@@ -561,6 +623,122 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
       progress.style.opacity = Math.min(1, p * 10).toFixed(3);
     },
   });
+})();
+
+/* =========================================================
+   CLIENT TESTIMONIALS CAROUSEL
+   ========================================================= */
+(function initTestimonials() {
+  const wrap = document.getElementById('testimonialWrap');
+  if (!wrap) return;
+
+  const testimonials = [
+    {
+      quote: 'Transformed our home into a sanctuary overnight.',
+      author: 'Daniel R.',
+      role: 'Homeowner, Re-roof Project',
+      company: 'Private Residence',
+    },
+    {
+      quote: 'The most elegant roofline we have ever specified.',
+      author: 'Sarah Bennett',
+      role: 'Project Manager',
+      company: 'Heritage Build Co.',
+    },
+    {
+      quote: 'Pure craftsmanship in every single detail.',
+      author: 'James Okafor',
+      role: 'Principal Architect',
+      company: 'Studio Okafor',
+    },
+  ];
+
+  const numberEl = document.getElementById('testimonialNumber');
+  const progressEl = document.getElementById('testimonialProgress');
+  const companyEl = document.getElementById('testimonialCompany');
+  const quoteEl = document.getElementById('testimonialQuote');
+  const nameEl = document.getElementById('testimonialName');
+  const roleEl = document.getElementById('testimonialRole');
+  const prevBtn = document.getElementById('testimonialPrev');
+  const nextBtn = document.getElementById('testimonialNext');
+  const tickerEl = document.getElementById('testimonialTicker');
+
+  if (tickerEl) {
+    const names = testimonials.map((t) => t.company).join(' • ');
+    tickerEl.innerHTML = `<span class="mx-8">${names} •</span>`.repeat(6);
+  }
+
+  let activeIndex = 0;
+  let autoplay;
+
+  function render() {
+    const t = testimonials[activeIndex];
+
+    if (numberEl) numberEl.textContent = String(activeIndex + 1).padStart(2, '0');
+    if (companyEl) companyEl.textContent = t.company;
+    if (nameEl) nameEl.textContent = t.author;
+    if (roleEl) roleEl.textContent = t.role;
+    if (progressEl) {
+      gsap.to(progressEl, {
+        height: `${((activeIndex + 1) / testimonials.length) * 100}%`,
+        duration: 0.5,
+        ease: 'power3.out',
+      });
+    }
+
+    if (quoteEl) {
+      quoteEl.innerHTML = '';
+      const words = t.quote.split(' ');
+      words.forEach((word) => {
+        const span = document.createElement('span');
+        span.className = 'testimonial-word';
+        span.textContent = word;
+        quoteEl.appendChild(span);
+      });
+      gsap.fromTo(
+        quoteEl.querySelectorAll('.testimonial-word'),
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }
+      );
+    }
+  }
+
+  function goNext() {
+    activeIndex = (activeIndex + 1) % testimonials.length;
+    render();
+  }
+  function goPrev() {
+    activeIndex = (activeIndex - 1 + testimonials.length) % testimonials.length;
+    render();
+  }
+  function resetAutoplay() {
+    clearInterval(autoplay);
+    autoplay = setInterval(goNext, 6000);
+  }
+
+  render();
+  resetAutoplay();
+
+  if (nextBtn) nextBtn.addEventListener('click', () => { goNext(); resetAutoplay(); });
+  if (prevBtn) prevBtn.addEventListener('click', () => { goPrev(); resetAutoplay(); });
+
+  // Subtle magnetic parallax on the oversized number
+  if (numberEl) {
+    wrap.addEventListener('mousemove', (e) => {
+      const rect = wrap.getBoundingClientRect();
+      const relX = (e.clientX - rect.left - rect.width / 2) / rect.width;
+      const relY = (e.clientY - rect.top - rect.height / 2) / rect.height;
+      gsap.to(numberEl, {
+        x: relX * 30,
+        y: relY * 16,
+        duration: 0.6,
+        ease: 'power2.out',
+      });
+    });
+    wrap.addEventListener('mouseleave', () => {
+      gsap.to(numberEl, { x: 0, y: 0, duration: 0.6, ease: 'power2.out' });
+    });
+  }
 })();
 
 /* =========================================================
