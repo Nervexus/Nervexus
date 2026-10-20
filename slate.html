@@ -117,6 +117,12 @@ tailwind.config = {
     display: inline-block;
     margin-right: 0.3em;
   }
+  .testimonial-nav-fill {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .testimonial-nav-fill-left { transform: translateX(-100%); }
+  .testimonial-nav-fill-right { transform: translateX(100%); }
+  .testimonial-nav-btn:hover .testimonial-nav-fill { transform: translateX(0); }
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-dark">
@@ -386,7 +392,7 @@ tailwind.config = {
 
         <!-- Center content -->
         <div class="flex-1 sm:pl-10 md:pl-16 py-8">
-          <div class="mb-8">
+          <div id="testimonialBadge" class="mb-8">
             <span class="inline-flex items-center gap-2 text-xs font-mono text-dark/50 border border-dark/15 rounded-full px-3 py-1">
               <span class="w-1.5 h-1.5 rounded-full bg-sand"></span>
               <span id="testimonialCompany"></span>
@@ -398,7 +404,7 @@ tailwind.config = {
           </div>
 
           <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-8">
-            <div class="flex items-center gap-4">
+            <div id="testimonialAuthor" class="flex items-center gap-4">
               <div class="w-8 h-px bg-dark"></div>
               <div>
                 <p id="testimonialName" class="text-base font-medium text-dark"></p>
@@ -407,11 +413,13 @@ tailwind.config = {
             </div>
 
             <div class="flex items-center gap-4">
-              <button id="testimonialPrev" class="group w-12 h-12 rounded-full border border-dark/15 flex items-center justify-center hover:bg-dark transition-colors">
-                <iconify-icon icon="solar:arrow-left-linear" class="text-dark group-hover:text-cream transition-colors"></iconify-icon>
+              <button id="testimonialPrev" class="testimonial-nav-btn group relative w-12 h-12 rounded-full border border-dark/15 flex items-center justify-center overflow-hidden">
+                <span class="testimonial-nav-fill testimonial-nav-fill-left absolute inset-0 bg-dark"></span>
+                <iconify-icon icon="solar:arrow-left-linear" class="relative z-10 text-dark group-hover:text-cream transition-colors duration-300"></iconify-icon>
               </button>
-              <button id="testimonialNext" class="group w-12 h-12 rounded-full border border-dark/15 flex items-center justify-center hover:bg-dark transition-colors">
-                <iconify-icon icon="solar:arrow-right-linear" class="text-dark group-hover:text-cream transition-colors"></iconify-icon>
+              <button id="testimonialNext" class="testimonial-nav-btn group relative w-12 h-12 rounded-full border border-dark/15 flex items-center justify-center overflow-hidden">
+                <span class="testimonial-nav-fill testimonial-nav-fill-right absolute inset-0 bg-dark"></span>
+                <iconify-icon icon="solar:arrow-right-linear" class="relative z-10 text-dark group-hover:text-cream transition-colors duration-300"></iconify-icon>
               </button>
             </div>
           </div>
@@ -725,8 +733,10 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 
   const numberEl = document.getElementById('testimonialNumber');
   const progressEl = document.getElementById('testimonialProgress');
+  const badgeEl = document.getElementById('testimonialBadge');
   const companyEl = document.getElementById('testimonialCompany');
   const quoteEl = document.getElementById('testimonialQuote');
+  const authorEl = document.getElementById('testimonialAuthor');
   const nameEl = document.getElementById('testimonialName');
   const roleEl = document.getElementById('testimonialRole');
   const prevBtn = document.getElementById('testimonialPrev');
@@ -740,53 +750,107 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 
   let activeIndex = 0;
   let autoplay;
+  let transitioning = false;
 
-  function render() {
-    const t = testimonials[activeIndex];
+  function fillQuote(text) {
+    if (!quoteEl) return;
+    quoteEl.innerHTML = '';
+    text.split(' ').forEach((word) => {
+      const span = document.createElement('span');
+      span.className = 'testimonial-word';
+      span.textContent = word;
+      quoteEl.appendChild(span);
+    });
+  }
 
-    if (numberEl) numberEl.textContent = String(activeIndex + 1).padStart(2, '0');
-    if (companyEl) companyEl.textContent = t.company;
-    if (nameEl) nameEl.textContent = t.author;
-    if (roleEl) roleEl.textContent = t.role;
-    if (progressEl) {
-      gsap.to(progressEl, {
-        height: `${((activeIndex + 1) / testimonials.length) * 100}%`,
-        duration: 0.5,
-        ease: 'power3.out',
-      });
-    }
+  function transitionTo(nextIndex, direction) {
+    if (transitioning) return;
+    transitioning = true;
 
+    const exitX = direction === 'next' ? -20 : 20;
+    const enterX = direction === 'next' ? 20 : -20;
+
+    const exitTl = gsap.timeline({
+      onComplete: () => {
+        activeIndex = nextIndex;
+        const t = testimonials[activeIndex];
+
+        if (numberEl) numberEl.textContent = String(activeIndex + 1).padStart(2, '0');
+        if (companyEl) companyEl.textContent = t.company;
+        if (nameEl) nameEl.textContent = t.author;
+        if (roleEl) roleEl.textContent = t.role;
+        fillQuote(t.quote);
+
+        if (progressEl) {
+          gsap.to(progressEl, {
+            height: `${((activeIndex + 1) / testimonials.length) * 100}%`,
+            duration: 0.5,
+            ease: 'power3.out',
+          });
+        }
+
+        const enterTl = gsap.timeline({
+          onComplete: () => { transitioning = false; },
+        });
+
+        if (numberEl) {
+          enterTl.fromTo(
+            numberEl,
+            { opacity: 0, scale: 0.8, filter: 'blur(10px)' },
+            { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.6, ease: 'power2.out' },
+            0
+          );
+        }
+        if (badgeEl) {
+          enterTl.fromTo(badgeEl, { opacity: 0, x: enterX }, { opacity: 1, x: 0, duration: 0.4, ease: 'power3.out' }, 0);
+        }
+        if (quoteEl) {
+          enterTl.fromTo(
+            quoteEl.querySelectorAll('.testimonial-word'),
+            { opacity: 0, y: 20, rotateX: 90 },
+            { opacity: 1, y: 0, rotateX: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' },
+            0
+          );
+        }
+        if (authorEl) {
+          enterTl.fromTo(authorEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, 0.1);
+        }
+      },
+    });
+
+    if (numberEl) exitTl.to(numberEl, { opacity: 0, scale: 1.1, filter: 'blur(10px)', duration: 0.2, ease: 'power2.in' }, 0);
+    if (badgeEl) exitTl.to(badgeEl, { opacity: 0, x: exitX, duration: 0.2, ease: 'power2.in' }, 0);
     if (quoteEl) {
-      quoteEl.innerHTML = '';
-      const words = t.quote.split(' ');
-      words.forEach((word) => {
-        const span = document.createElement('span');
-        span.className = 'testimonial-word';
-        span.textContent = word;
-        quoteEl.appendChild(span);
-      });
-      gsap.fromTo(
-        quoteEl.querySelectorAll('.testimonial-word'),
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }
-      );
+      exitTl.to(quoteEl.querySelectorAll('.testimonial-word'), { opacity: 0, y: -10, duration: 0.15, stagger: 0.01 }, 0);
     }
+    if (authorEl) exitTl.to(authorEl, { opacity: 0, y: -20, duration: 0.2, ease: 'power2.in' }, 0);
   }
 
   function goNext() {
-    activeIndex = (activeIndex + 1) % testimonials.length;
-    render();
+    transitionTo((activeIndex + 1) % testimonials.length, 'next');
   }
   function goPrev() {
-    activeIndex = (activeIndex - 1 + testimonials.length) % testimonials.length;
-    render();
+    transitionTo((activeIndex - 1 + testimonials.length) % testimonials.length, 'prev');
   }
   function resetAutoplay() {
     clearInterval(autoplay);
     autoplay = setInterval(goNext, 6000);
   }
 
-  render();
+  // Initial render (no transition)
+  const first = testimonials[0];
+  if (numberEl) numberEl.textContent = '01';
+  if (companyEl) companyEl.textContent = first.company;
+  if (nameEl) nameEl.textContent = first.author;
+  if (roleEl) roleEl.textContent = first.role;
+  fillQuote(first.quote);
+  if (progressEl) progressEl.style.height = `${(1 / testimonials.length) * 100}%`;
+  gsap.fromTo(
+    quoteEl.querySelectorAll('.testimonial-word'),
+    { opacity: 0, y: 20 },
+    { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }
+  );
+
   resetAutoplay();
 
   if (nextBtn) nextBtn.addEventListener('click', () => { goNext(); resetAutoplay(); });
