@@ -26,7 +26,7 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
-| `/`          | Home — an editorial-style landing page: headline, live Notes/Reminders/Vault counts, CTAs into `/laura` |
+| `/`          | Home — a minimal full-height hero: pill badge, serif headline, bracket CTA into `/laura`, ambient animated background |
 | `/laura`     | the assistant itself — node-diagram view of the orb wired to its tools, + chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember                              |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
@@ -49,7 +49,9 @@ settable by Laura from a conversation), and copy-without-revealing
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
 | `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
-| `components/DotGrid.tsx`          | dark dot-grid canvas background, used on Home and Notes               |
+| `components/DotGrid.tsx`          | dark dot-grid canvas background, used on `/laura` and Notes           |
+| `components/AmbientField.tsx`     | drifting amber bokeh-orb canvas behind the Home hero, brightens on CTA hover |
+| `components/Pill.tsx`             | small rounded badge used above the Home hero's headline                |
 | `components/NoteCard.tsx`         | Notes page's node-editor-style card: port dot, title, pin, nested content panel |
 | `components/ReminderCard.tsx`     | Reminders page's card: priority accent bar, overdue highlighting      |
 | `components/VaultCard.tsx`        | Vault page's card: Reveal and Copy-without-revealing actions          |
