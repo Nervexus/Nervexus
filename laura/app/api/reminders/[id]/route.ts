@@ -7,7 +7,13 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const { id } = await params;
   const data = await request.json().catch(() => null);
 
-  const update: { title?: string; note?: string | null; dueAt?: Date; done?: boolean } = {};
+  const update: {
+    title?: string;
+    note?: string | null;
+    dueAt?: Date;
+    done?: boolean;
+    priority?: string;
+  } = {};
   if (typeof data?.title === "string") update.title = data.title.trim();
   if (typeof data?.note === "string" || data?.note === null) update.note = data.note;
   if (typeof data?.dueAt === "string") {
@@ -18,6 +24,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     update.dueAt = dueAt;
   }
   if (typeof data?.done === "boolean") update.done = data.done;
+  if (["low", "normal", "high"].includes(data?.priority)) update.priority = data.priority;
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "Nothing to update." }, { status: 400 });

@@ -1,3 +1,5 @@
+import { PinIcon } from "@/components/icons";
+
 function PortDot({ color }: { color: "emerald" | "neutral" }) {
   return (
     <span
@@ -13,25 +15,40 @@ export function NoteCard({
   title,
   body,
   updatedAt,
+  pinned,
   onEdit,
   onDelete,
+  onTogglePin,
 }: {
   title: string;
   body: string;
   updatedAt: string;
+  pinned: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onTogglePin: () => void;
 }) {
   return (
-    <div className="group relative rounded-2xl border border-neutral-800 bg-neutral-900/60 p-4 transition-colors hover:border-emerald-500/40">
+    <div
+      className={`group relative flex h-full flex-col rounded-2xl border bg-neutral-900/60 p-5 transition-colors hover:border-emerald-500/40 ${
+        pinned ? "border-emerald-500/30" : "border-neutral-800"
+      }`}
+    >
       <span className="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-neutral-950 bg-emerald-400" />
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
           <PortDot color="emerald" />
-          <h3 className="truncate text-sm font-medium text-neutral-100">{title}</h3>
+          <h3 className="truncate text-base font-medium text-neutral-100">{title}</h3>
         </div>
-        <div className="flex shrink-0 gap-3 text-xs text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="flex shrink-0 items-center gap-3 text-xs text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100">
+          <button
+            onClick={onTogglePin}
+            className={pinned ? "text-emerald-300" : "hover:text-neutral-200"}
+            title={pinned ? "Unpin" : "Pin"}
+          >
+            <PinIcon className="h-3.5 w-3.5" />
+          </button>
           <button onClick={onEdit} className="hover:text-neutral-200">
             Edit
           </button>
@@ -42,13 +59,19 @@ export function NoteCard({
       </div>
 
       {body && (
-        <div className="mt-2.5 rounded-lg border border-neutral-800/80 bg-neutral-950/60 px-3 py-2">
-          <p className="whitespace-pre-wrap text-sm text-neutral-400">{body}</p>
+        <div className="mt-3 flex-1 rounded-lg border border-neutral-800/80 bg-neutral-950/60 px-3 py-2.5">
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-400">{body}</p>
         </div>
       )}
 
-      <p className="mt-2 text-[11px] text-neutral-600">
-        updated {new Date(updatedAt).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+      <p className="mt-3 text-[11px] text-neutral-600">
+        updated{" "}
+        {new Date(updatedAt).toLocaleString([], {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })}
       </p>
     </div>
   );

@@ -52,3 +52,34 @@ export function ClockIcon(props: IconProps) {
 export function CheckIcon(props: IconProps) {
   return base(<path d="M4 12.5 9.5 18 20 6" />, props);
 }
+
+export function PinIcon(props: IconProps) {
+  return base(
+    <>
+      <path d="M12 2v6" />
+      <path d="M7 9h10l-1.5 5H8.5L7 9Z" />
+      <path d="M12 14v8" />
+    </>,
+    props
+  );
+}
+
+export function SearchIcon(props: IconProps) {
+  return base(
+    <>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m20 20-4.3-4.3" />
+    </>,
+    props
+  );
+}
+
+export function CopyIcon(props: IconProps) {
+  return base(
+    <>
+      <rect x="9" y="9" width="11" height="11" rx="1.5" />
+      <path d="M5 15V5a1 1 0 0 1 1-1h10" />
+    </>,
+    props
+  );
+}

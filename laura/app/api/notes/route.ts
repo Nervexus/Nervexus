@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 
 export async function GET() {
-  const notes = await prisma.note.findMany({ orderBy: { updatedAt: "desc" } });
+  const notes = await prisma.note.findMany({
+    orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
+  });
   return NextResponse.json({ notes });
 }
 

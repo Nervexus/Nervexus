@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { HudCard, HexBadge } from "@/components/HudCard";
-import { ClockIcon, CheckIcon } from "@/components/icons";
+import { ClockIcon } from "@/components/icons";
 import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
+import { ReminderCard } from "@/components/ReminderCard";
+import { PriorityPicker } from "@/components/PriorityPicker";
 
 type Reminder = {
   id: string;
@@ -12,6 +13,7 @@ type Reminder = {
   note: string | null;
   dueAt: string;
   done: boolean;
+  priority: string;
 };
 
 function toLocalInputValue(date: Date): string {
@@ -55,12 +57,38 @@ const TIME_PRESETS: { label: string; get: () => Date }[] = [
   { label: "Next week", get: () => nextWeekday(1, 9) },
 ];
 
+function startOfDay(ms: number): number {
+  const d = new Date(ms);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function groupByWhen(upcoming: Reminder[], now: number) {
+  const todayEnd = startOfDay(now) + 24 * 60 * 60 * 1000;
+  const weekEnd = startOfDay(now) + 7 * 24 * 60 * 60 * 1000;
+
+  const overdue: Reminder[] = [];
+  const today: Reminder[] = [];
+  const thisWeek: Reminder[] = [];
+  const later: Reminder[] = [];
+
+  for (const r of upcoming) {
+    const t = new Date(r.dueAt).getTime();
+    if (t < now) overdue.push(r);
+    else if (t < todayEnd) today.push(r);
+    else if (t < weekEnd) thisWeek.push(r);
+    else later.push(r);
+  }
+  return { overdue, today, thisWeek, later };
+}
+
 export default function RemindersPage() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [title, setTitle] = useState("");
   const [note, setNote] = useState("");
   const [dueAt, setDueAt] = useState("");
+  const [priority, setPriority] = useState("normal");
   const [error, setError] = useState<string | null>(null);
   // Snapshotted once on mount rather than read via Date.now() during
   // render, which React's purity rules flag as an impure render.
@@ -81,6 +109,7 @@ export default function RemindersPage() {
     setTitle("");
     setNote("");
     setDueAt("");
+    setPriority("normal");
   }
 
   async function add() {
@@ -96,6 +125,7 @@ export default function RemindersPage() {
           title: trimmedTitle,
           note: note || undefined,
           dueAt: new Date(dueAt).toISOString(),
+          priority,
         }),
       });
       const data = await res.json();
@@ -123,33 +153,41 @@ export default function RemindersPage() {
 
   const upcoming = reminders.filter((r) => !r.done);
   const done = reminders.filter((r) => r.done);
-  const overdue = now === null ? 0 : upcoming.filter((r) => new Date(r.dueAt).getTime() < now).length;
+  const groups = now === null ? null : groupByWhen(upcoming, now);
+  const overdueCount = groups?.overdue.length ?? 0;
+
+  const SECTIONS: { key: keyof NonNullable<typeof groups>; label: string }[] = [
+    { key: "overdue", label: "Overdue" },
+    { key: "today", label: "Today" },
+    { key: "thisWeek", label: "This week" },
+    { key: "later", label: "Later" },
+  ];
 
   return (
     <div className="flex-1">
-      <header className="border-b border-neutral-800 px-6 py-4">
-        <h1 className="font-semibold tracking-tight">Reminders</h1>
-        <p className="text-xs text-neutral-500">
+      <header className="border-b border-neutral-800 px-8 py-6">
+        <h1 className="text-2xl font-semibold tracking-tight">Reminders</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           things to do, set by you or by Laura from a conversation
         </p>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-6">
-        <div className="mb-6 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
+      <div className="mx-auto max-w-7xl px-8 py-8">
+        <div className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Remind me to…"
-            className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-neutral-600"
+            className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
           />
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Extra detail (optional)"
-            className="mt-2 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="mt-2.5 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
 
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {TIME_PRESETS.map((preset) => (
               <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
                 {preset.label}
@@ -157,24 +195,27 @@ export default function RemindersPage() {
             ))}
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            <input
-              type="datetime-local"
-              value={dueAt}
-              onChange={(e) => setDueAt(e.target.value)}
-              className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
-            />
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                type="datetime-local"
+                value={dueAt}
+                onChange={(e) => setDueAt(e.target.value)}
+                className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
+              />
+              <PriorityPicker value={priority} onChange={setPriority} />
+            </div>
             <button
               onClick={add}
               disabled={!title.trim() || !dueAt}
-              className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-900 disabled:opacity-40"
+              className="rounded-lg bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
             >
               Set reminder
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_260px]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
           <div className="min-w-0">
             {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
@@ -185,85 +226,63 @@ export default function RemindersPage() {
                 description="Set one above, pick a quick time from the sidebar, or just ask Laura."
               />
             ) : (
-              <>
-                <div className="flex flex-col gap-3">
-                  {upcoming.map((reminder) => {
-                    const isOverdue = now !== null && new Date(reminder.dueAt).getTime() < now;
+              groups && (
+                <>
+                  {SECTIONS.map(({ key, label }) => {
+                    const items = groups[key];
+                    if (items.length === 0) return null;
                     return (
-                      <HudCard key={reminder.id}>
-                        <div className="flex items-start gap-3">
-                          <HexBadge>
-                            <ClockIcon className="h-4 w-4" />
-                          </HexBadge>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-start justify-between gap-3">
-                              <h3 className="text-sm font-medium">{reminder.title}</h3>
-                              <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
-                                <button
-                                  onClick={() => toggleDone(reminder)}
-                                  className="hover:text-neutral-200"
-                                >
-                                  Done
-                                </button>
-                                <button
-                                  onClick={() => remove(reminder.id)}
-                                  className="hover:text-red-400"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </div>
-                            <p
-                              className={`mt-1 text-xs tracking-wide ${
-                                isOverdue ? "text-amber-400" : "text-neutral-500"
-                              }`}
-                            >
-                              {isOverdue ? "overdue · " : ""}
-                              {new Date(reminder.dueAt).toLocaleString()}
-                            </p>
-                            {reminder.note && (
-                              <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-400">
-                                {reminder.note}
-                              </p>
-                            )}
-                          </div>
+                      <div key={key} className="mb-8">
+                        <h2
+                          className={`mb-3 text-xs font-medium uppercase tracking-wide ${
+                            key === "overdue" ? "text-amber-400" : "text-neutral-500"
+                          }`}
+                        >
+                          {label} · {items.length}
+                        </h2>
+                        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">
+                          {items.map((reminder) => (
+                            <ReminderCard
+                              key={reminder.id}
+                              title={reminder.title}
+                              note={reminder.note}
+                              dueAt={reminder.dueAt}
+                              priority={reminder.priority}
+                              done={false}
+                              overdue={key === "overdue"}
+                              onToggleDone={() => toggleDone(reminder)}
+                              onDelete={() => remove(reminder.id)}
+                            />
+                          ))}
                         </div>
-                      </HudCard>
+                      </div>
                     );
                   })}
-                </div>
 
-                {done.length > 0 && (
-                  <div className="mt-8">
-                    <h2 className="mb-3 text-xs tracking-wide text-neutral-600">Done</h2>
-                    <div className="flex flex-col gap-3">
-                      {done.map((reminder) => (
-                        <HudCard key={reminder.id} className="opacity-50">
-                          <div className="flex items-center gap-3">
-                            <HexBadge>
-                              <CheckIcon className="h-4 w-4" />
-                            </HexBadge>
-                            <div className="min-w-0 flex-1">
-                              <h3 className="text-sm font-medium line-through">{reminder.title}</h3>
-                            </div>
-                            <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
-                              <button
-                                onClick={() => toggleDone(reminder)}
-                                className="hover:text-neutral-200"
-                              >
-                                Undo
-                              </button>
-                              <button onClick={() => remove(reminder.id)} className="hover:text-red-400">
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        </HudCard>
-                      ))}
+                  {done.length > 0 && (
+                    <div>
+                      <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-600">
+                        Done · {done.length}
+                      </h2>
+                      <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">
+                        {done.map((reminder) => (
+                          <ReminderCard
+                            key={reminder.id}
+                            title={reminder.title}
+                            note={reminder.note}
+                            dueAt={reminder.dueAt}
+                            priority={reminder.priority}
+                            done
+                            overdue={false}
+                            onToggleDone={() => toggleDone(reminder)}
+                            onDelete={() => remove(reminder.id)}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </>
+                  )}
+                </>
+              )
             )}
           </div>
 
@@ -281,7 +300,7 @@ export default function RemindersPage() {
             <SidebarCard title="Stats">
               <div className="flex flex-col gap-2">
                 <Stat label="Upcoming" value={upcoming.length} />
-                <Stat label="Overdue" value={overdue} />
+                <Stat label="Overdue" value={overdueCount} />
                 <Stat label="Done" value={done.length} />
               </div>
             </SidebarCard>

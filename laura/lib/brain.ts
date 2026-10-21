@@ -92,6 +92,12 @@ const tools: FunctionDeclaration[] = [
           description: "Absolute ISO 8601 datetime the reminder is due, e.g. 2026-10-21T17:00:00Z.",
         },
         note: { type: Type.STRING, description: "Optional extra detail." },
+        priority: {
+          type: Type.STRING,
+          description:
+            "How urgent this is: 'low', 'normal', or 'high'. Use 'high' for things the " +
+            "user stresses the importance of or that have real consequences if missed.",
+        },
       },
       required: ["title", "dueAt"],
     },
@@ -167,7 +173,12 @@ async function runTool(
     return { result: `Saved note "${note.title}".` };
   }
   if (name === "create_reminder") {
-    const { title, dueAt, note } = args as { title?: string; dueAt?: string; note?: string };
+    const { title, dueAt, note, priority } = args as {
+      title?: string;
+      dueAt?: string;
+      note?: string;
+      priority?: string;
+    };
     if (!title || !dueAt) {
       return { error: "a reminder needs both a title and a dueAt datetime" };
     }
@@ -175,8 +186,9 @@ async function runTool(
     if (Number.isNaN(due.getTime())) {
       return { error: "dueAt must be a valid ISO 8601 datetime" };
     }
+    const safePriority = ["low", "normal", "high"].includes(priority ?? "") ? priority! : "normal";
     const reminder = await prisma.reminder.create({
-      data: { title, dueAt: due, note: note ?? null },
+      data: { title, dueAt: due, note: note ?? null, priority: safePriority },
     });
     await logActivity("create_reminder", `Set reminder "${reminder.title}"`);
     return { result: `Set a reminder for "${reminder.title}" at ${due.toString()}.` };

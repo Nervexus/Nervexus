@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { HudCard, HexBadge } from "@/components/HudCard";
 import { LockIcon } from "@/components/icons";
 import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
+import { VaultCard } from "@/components/VaultCard";
 
 type VaultItem = { id: string; title: string; updatedAt: string };
 
@@ -15,6 +15,7 @@ export default function VaultPage() {
   const [loaded, setLoaded] = useState(false);
   const [revealed, setRevealed] = useState<Record<string, string>>({});
   const [revealing, setRevealing] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [secret, setSecret] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +51,21 @@ export default function VaultPage() {
     }
   }
 
+  async function fetchSecret(id: string): Promise<string | null> {
+    setRevealing(id);
+    try {
+      const res = await fetch(`/api/vault/${id}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Couldn't decrypt this.");
+      return data.secret as string;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't decrypt this.");
+      return null;
+    } finally {
+      setRevealing(null);
+    }
+  }
+
   async function reveal(id: string) {
     if (revealed[id] !== undefined) {
       setRevealed((prev) => {
@@ -59,16 +75,19 @@ export default function VaultPage() {
       });
       return;
     }
-    setRevealing(id);
+    const secret = await fetchSecret(id);
+    if (secret !== null) setRevealed((prev) => ({ ...prev, [id]: secret }));
+  }
+
+  async function copy(id: string) {
+    const value = revealed[id] ?? (await fetchSecret(id));
+    if (value === null || value === undefined) return;
     try {
-      const res = await fetch(`/api/vault/${id}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Couldn't decrypt this.");
-      setRevealed((prev) => ({ ...prev, [id]: data.secret }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't decrypt this.");
-    } finally {
-      setRevealing(null);
+      await navigator.clipboard.writeText(value);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId((cur) => (cur === id ? null : cur)), 1500);
+    } catch {
+      setError("Couldn't copy to clipboard.");
     }
   }
 
@@ -79,40 +98,40 @@ export default function VaultPage() {
 
   return (
     <div className="flex-1">
-      <header className="border-b border-neutral-800 px-6 py-4">
-        <h1 className="font-semibold tracking-tight">Vault</h1>
-        <p className="text-xs text-neutral-500">
+      <header className="border-b border-neutral-800 px-8 py-6">
+        <h1 className="text-2xl font-semibold tracking-tight">Vault</h1>
+        <p className="mt-1 text-sm text-neutral-500">
           encrypted at rest — Laura herself can&apos;t read these, only this page can
         </p>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-6">
-        <div className="mb-6 rounded-xl border border-neutral-800 bg-neutral-900 p-4">
+      <div className="mx-auto max-w-7xl px-8 py-8">
+        <div className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="What is this? (e.g. Wi-Fi password)"
-            className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-neutral-600"
+            className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
           />
           <input
             value={secret}
             onChange={(e) => setSecret(e.target.value)}
             placeholder="Secret value"
             type="password"
-            className="mt-2 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
+            className="mt-2.5 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
           />
-          <div className="mt-2 flex justify-end">
+          <div className="mt-3 flex justify-end">
             <button
               onClick={add}
               disabled={!title.trim() || !secret}
-              className="rounded-lg bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-900 disabled:opacity-40"
+              className="rounded-lg bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
             >
               Add to vault
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_260px]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
           <div className="min-w-0">
             {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
 
@@ -131,37 +150,18 @@ export default function VaultPage() {
                 </div>
               </EmptyState>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4">
                 {items.map((item) => (
-                  <HudCard key={item.id}>
-                    <div className="flex items-center gap-3">
-                      <HexBadge>
-                        <LockIcon className="h-4 w-4" />
-                      </HexBadge>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-medium">{item.title}</h3>
-                        <p className="mt-1 truncate font-mono text-sm text-neutral-400">
-                          {revealed[item.id] ?? "••••••••••••"}
-                        </p>
-                      </div>
-                      <div className="flex shrink-0 gap-3 text-xs text-neutral-500">
-                        <button
-                          onClick={() => reveal(item.id)}
-                          disabled={revealing === item.id}
-                          className="hover:text-neutral-200 disabled:opacity-50"
-                        >
-                          {revealing === item.id
-                            ? "…"
-                            : revealed[item.id] !== undefined
-                              ? "Hide"
-                              : "Reveal"}
-                        </button>
-                        <button onClick={() => remove(item.id)} className="hover:text-red-400">
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </HudCard>
+                  <VaultCard
+                    key={item.id}
+                    title={item.title}
+                    revealedValue={revealed[item.id]}
+                    revealing={revealing === item.id}
+                    copied={copiedId === item.id}
+                    onReveal={() => reveal(item.id)}
+                    onCopy={() => copy(item.id)}
+                    onDelete={() => remove(item.id)}
+                  />
                 ))}
               </div>
             )}
@@ -186,7 +186,7 @@ export default function VaultPage() {
               <p className="text-xs leading-relaxed text-neutral-500">
                 Secrets are encrypted (AES-256-GCM) before they ever touch the database. Laura&apos;s
                 brain has no tool to read the Vault — only this page can decrypt an item, one at a
-                time, when you click Reveal.
+                time, when you click Reveal or Copy.
               </p>
             </SidebarCard>
           </aside>

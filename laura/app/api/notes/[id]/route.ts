@@ -7,9 +7,10 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const { id } = await params;
   const data = await request.json().catch(() => null);
 
-  const update: { title?: string; body?: string } = {};
+  const update: { title?: string; body?: string; pinned?: boolean } = {};
   if (typeof data?.title === "string") update.title = data.title.trim();
   if (typeof data?.body === "string") update.body = data.body;
+  if (typeof data?.pinned === "boolean") update.pinned = data.pinned;
 
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
