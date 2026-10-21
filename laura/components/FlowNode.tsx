@@ -24,7 +24,7 @@ export function FlowNode({
   const content = (
     <div
       style={style}
-      className={`relative flex animate-[rise-in_0.5s_ease-out_backwards] items-center gap-3 rounded-lg border px-3.5 py-2.5 transition-all duration-500 ${
+      className={`relative flex animate-[rise-in_0.5s_ease-out_backwards] items-center gap-3 rounded-xl border px-3.5 py-2.5 transition-all duration-500 ${
         pulsing
           ? "scale-[1.04] border-amber-400 bg-amber-500/10 shadow-[0_0_24px_4px_rgba(251,191,36,0.35)]"
           : active

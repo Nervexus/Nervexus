@@ -6,6 +6,8 @@ import { NoteCard, PortDot } from "@/components/NoteCard";
 import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
 import { NoteIcon, SearchIcon } from "@/components/icons";
+import { Pill } from "@/components/Pill";
+import { Button } from "@/components/Button";
 
 type Note = { id: string; title: string; body: string; pinned: boolean; updatedAt: string };
 
@@ -104,22 +106,20 @@ export default function NotesPage() {
       <div className="relative overflow-hidden border-b border-neutral-800 px-8 pb-10 pt-8">
         <DotGrid />
         <div className="relative mx-auto max-w-4xl">
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-semibold text-neutral-100">Notes</h1>
-            <span className="rounded-sm border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300">
-              {notes.length} saved
-            </span>
+          <div className="flex items-center gap-3">
+            <h1 className="font-serif text-3xl text-neutral-50">Notes</h1>
+            <Pill>{notes.length} saved</Pill>
           </div>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-2 text-sm text-neutral-500">
             things you&apos;ve told Laura to remember, plus anything you jot down here
           </p>
 
           {/* Compose "node": Title + Body feed a Save action, mirroring a
               workflow editor's input-ports-into-an-action shape. */}
-          <div className="relative mt-7 rounded-lg border border-neutral-800 bg-neutral-900/70 p-5">
+          <div className="relative mt-7 rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-6">
             <div className="flex items-center gap-2">
               <PortDot color={title.trim() ? "emerald" : "neutral"} />
-              <span className="text-xs tracking-wide text-neutral-500">Title</span>
+              <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">Title</span>
             </div>
             <input
               value={title}
@@ -130,7 +130,7 @@ export default function NotesPage() {
 
             <div className="mt-3.5 flex items-center gap-2">
               <PortDot color={body.trim() ? "emerald" : "neutral"} />
-              <span className="text-xs tracking-wide text-neutral-500">Body</span>
+              <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">Body</span>
             </div>
             <textarea
               value={body}
@@ -142,21 +142,14 @@ export default function NotesPage() {
 
             <div className="mt-3.5 flex justify-end gap-2">
               {editingId && (
-                <button
-                  onClick={resetForm}
-                  className="rounded-lg px-3 py-1.5 text-xs text-neutral-400 hover:text-neutral-200"
-                >
+                <Button variant="ghost" onClick={resetForm}>
                   Cancel
-                </button>
+                </Button>
               )}
-              <button
-                onClick={save}
-                disabled={!title.trim()}
-                className="flex items-center gap-1.5 rounded-sm bg-amber-500 px-4 py-2 text-xs font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
-              >
+              <Button onClick={save} disabled={!title.trim()}>
                 <span className="text-sm leading-none">+</span>
                 {editingId ? "Save changes" : "Save note"}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -174,7 +167,7 @@ export default function NotesPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search notes…"
-                  className="w-full rounded-lg border border-neutral-800 bg-neutral-900/60 py-2.5 pl-10 pr-4 text-sm text-neutral-200 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
+                  className="w-full rounded-xl border border-neutral-800 bg-neutral-900/60 py-2.5 pl-10 pr-4 text-sm text-neutral-200 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
                 />
               </div>
             )}

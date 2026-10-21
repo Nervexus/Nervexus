@@ -47,11 +47,14 @@ settable by Laura from a conversation), and copy-without-revealing
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
+| `lib/clip.ts`                      | the notched-corner clip-path shared by the primary button and icon tiles |
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
 | `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status |
-| `components/DotGrid.tsx`          | dark dot-grid canvas background, used on `/laura` and Notes           |
+| `components/DotGrid.tsx`          | dark dot-grid canvas background, used on each tool page's header      |
 | `components/DotWaveField.tsx`     | perspective dot-wave grid canvas behind the Home hero                 |
-| `components/Pill.tsx`             | small rounded badge used above the Home hero's headline                |
+| `components/Pill.tsx`             | filled dark badge with a leading amber dot, used for page headline counts/status |
+| `components/Button.tsx`           | the app's one primary (notched amber gradient) and ghost/danger button style |
+| `components/IconTile.tsx`         | small notched-corner icon tile, same brand motif as the primary button |
 | `components/NoteCard.tsx`         | Notes page's node-editor-style card: port dot, title, pin, nested content panel |
 | `components/ReminderCard.tsx`     | Reminders page's card: priority accent bar, overdue highlighting      |
 | `components/VaultCard.tsx`        | Vault page's card: Reveal and Copy-without-revealing actions          |
@@ -59,11 +62,9 @@ settable by Laura from a conversation), and copy-without-revealing
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
 | `components/StatusBar.tsx`        | live clock + "SYSTEMS NOMINAL" readout at the top of the sidebar      |
-| `components/CornerBrackets.tsx`   | angular targeting-reticle corners framing the home hero                |
 | `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | home page's Activity tab: a timeline of what Laura's actually done     |
-| `components/HudCard.tsx`          | dark instrument-panel card + hex icon badge, used on Reminders        |
 | `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog` models |
 | `app/api/{chat,notes,reminders,vault,activity}/...` | API routes                                         |
 

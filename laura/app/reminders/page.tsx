@@ -6,6 +6,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
 import { ReminderCard } from "@/components/ReminderCard";
 import { PriorityPicker } from "@/components/PriorityPicker";
+import { DotGrid } from "@/components/DotGrid";
+import { Pill } from "@/components/Pill";
+import { Button } from "@/components/Button";
 
 type Reminder = {
   id: string;
@@ -165,56 +168,58 @@ export default function RemindersPage() {
 
   return (
     <div className="flex-1">
-      <header className="border-b border-neutral-800 px-8 py-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Reminders</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          things to do, set by you or by Laura from a conversation
-        </p>
-      </header>
-
-      <div className="mx-auto max-w-7xl px-8 py-8">
-        <div className="mb-8 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Remind me to…"
-            className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
-          />
-          <input
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Extra detail (optional)"
-            className="mt-2.5 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-          />
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {TIME_PRESETS.map((preset) => (
-              <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
-                {preset.label}
-              </Chip>
-            ))}
+      <div className="relative overflow-hidden border-b border-neutral-800 px-8 pb-10 pt-8">
+        <DotGrid />
+        <div className="relative mx-auto max-w-4xl">
+          <div className="flex items-center gap-3">
+            <h1 className="font-serif text-3xl text-neutral-50">Reminders</h1>
+            <Pill>{upcoming.length} upcoming</Pill>
           </div>
+          <p className="mt-2 text-sm text-neutral-500">
+            things to do, set by you or by Laura from a conversation
+          </p>
 
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <input
-                type="datetime-local"
-                value={dueAt}
-                onChange={(e) => setDueAt(e.target.value)}
-                className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
-              />
-              <PriorityPicker value={priority} onChange={setPriority} />
+          <div className="relative mt-7 rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-6">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Remind me to…"
+              className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
+            />
+            <input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Extra detail (optional)"
+              className="mt-2.5 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            />
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {TIME_PRESETS.map((preset) => (
+                <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
+                  {preset.label}
+                </Chip>
+              ))}
             </div>
-            <button
-              onClick={add}
-              disabled={!title.trim() || !dueAt}
-              className="rounded-sm bg-amber-500 px-4 py-2 text-sm font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
-            >
-              Set reminder
-            </button>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  type="datetime-local"
+                  value={dueAt}
+                  onChange={(e) => setDueAt(e.target.value)}
+                  className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
+                />
+                <PriorityPicker value={priority} onChange={setPriority} />
+              </div>
+              <Button onClick={add} disabled={!title.trim() || !dueAt}>
+                Set reminder
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="mx-auto max-w-7xl px-8 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
           <div className="min-w-0">
             {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
@@ -234,7 +239,7 @@ export default function RemindersPage() {
                     return (
                       <div key={key} className="mb-8">
                         <h2
-                          className={`mb-3 text-xs font-medium uppercase tracking-wide ${
+                          className={`mb-3 font-mono text-[11px] uppercase tracking-widest ${
                             key === "overdue" ? "text-amber-400" : "text-neutral-500"
                           }`}
                         >
@@ -261,7 +266,7 @@ export default function RemindersPage() {
 
                   {done.length > 0 && (
                     <div>
-                      <h2 className="mb-3 text-xs font-medium uppercase tracking-wide text-neutral-600">
+                      <h2 className="mb-3 font-mono text-[11px] uppercase tracking-widest text-neutral-600">
                         Done · {done.length}
                       </h2>
                       <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">

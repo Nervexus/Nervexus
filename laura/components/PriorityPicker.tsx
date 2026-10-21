@@ -17,7 +17,7 @@ export function PriorityPicker({
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`rounded-sm border px-3 py-1 text-xs font-medium uppercase tracking-wide transition-colors ${
+          className={`rounded-full border px-3.5 py-1 font-mono text-[11px] font-medium uppercase tracking-wide transition-colors ${
             value === opt.value ? opt.active : "border-neutral-800 text-neutral-500 hover:text-neutral-300"
           }`}
         >

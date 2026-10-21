@@ -5,6 +5,9 @@ import { LockIcon } from "@/components/icons";
 import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
 import { VaultCard } from "@/components/VaultCard";
+import { DotGrid } from "@/components/DotGrid";
+import { Pill } from "@/components/Pill";
+import { Button } from "@/components/Button";
 
 type VaultItem = { id: string; title: string; updatedAt: string };
 
@@ -98,39 +101,41 @@ export default function VaultPage() {
 
   return (
     <div className="flex-1">
-      <header className="border-b border-neutral-800 px-8 py-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Vault</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          encrypted at rest — Laura herself can&apos;t read these, only this page can
-        </p>
-      </header>
+      <div className="relative overflow-hidden border-b border-neutral-800 px-8 pb-10 pt-8">
+        <DotGrid />
+        <div className="relative mx-auto max-w-4xl">
+          <div className="flex items-center gap-3">
+            <h1 className="font-serif text-3xl text-neutral-50">Vault</h1>
+            <Pill>{items.length} items</Pill>
+          </div>
+          <p className="mt-2 text-sm text-neutral-500">
+            encrypted at rest — Laura herself can&apos;t read these, only this page can
+          </p>
 
-      <div className="mx-auto max-w-7xl px-8 py-8">
-        <div className="mb-8 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="What is this? (e.g. Wi-Fi password)"
-            className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
-          />
-          <input
-            value={secret}
-            onChange={(e) => setSecret(e.target.value)}
-            placeholder="Secret value"
-            type="password"
-            className="mt-2.5 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
-          />
-          <div className="mt-3 flex justify-end">
-            <button
-              onClick={add}
-              disabled={!title.trim() || !secret}
-              className="rounded-sm bg-amber-500 px-4 py-2 text-sm font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
-            >
-              Add to vault
-            </button>
+          <div className="relative mt-7 rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-6">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="What is this? (e.g. Wi-Fi password)"
+              className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
+            />
+            <input
+              value={secret}
+              onChange={(e) => setSecret(e.target.value)}
+              placeholder="Secret value"
+              type="password"
+              className="mt-2.5 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
+            />
+            <div className="mt-3 flex justify-end">
+              <Button onClick={add} disabled={!title.trim() || !secret}>
+                Add to vault
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div className="mx-auto max-w-7xl px-8 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
           <div className="min-w-0">
             {error && <p className="mb-4 text-sm text-red-400">{error}</p>}

@@ -30,7 +30,7 @@ export function NoteCard({
 }) {
   return (
     <div
-      className={`group relative flex h-full flex-col rounded-lg border bg-neutral-900/60 p-5 transition-colors hover:border-amber-500/40 ${
+      className={`group relative flex h-full flex-col rounded-xl border bg-neutral-900/40 p-5 transition-colors hover:border-neutral-700 ${
         pinned ? "border-amber-500/30" : "border-neutral-800"
       }`}
     >

@@ -158,7 +158,7 @@ export const FlowDiagram = forwardRef<
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs text-neutral-300">
+      <div className="flex items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/80 px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-widest text-neutral-300">
         <ChatBubbleIcon className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
         You
       </div>

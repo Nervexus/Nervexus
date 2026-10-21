@@ -1,4 +1,4 @@
-import { HexBadge } from "@/components/HudCard";
+import { IconTile } from "@/components/IconTile";
 import { LockIcon, CopyIcon } from "@/components/icons";
 
 export function VaultCard({
@@ -19,11 +19,11 @@ export function VaultCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="group relative flex h-full flex-col rounded-lg border border-neutral-800 bg-neutral-900/60 p-5 transition-colors hover:border-amber-500/40">
+    <div className="group relative flex h-full flex-col rounded-xl border border-neutral-800 bg-neutral-900/40 p-5 transition-colors hover:border-neutral-700">
       <div className="flex items-start gap-3">
-        <HexBadge>
+        <IconTile>
           <LockIcon className="h-4 w-4" />
-        </HexBadge>
+        </IconTile>
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-base font-medium text-neutral-100">{title}</h3>
           <p className="mt-1.5 truncate rounded-lg border border-neutral-800/80 bg-neutral-950/60 px-3 py-2 font-mono text-sm text-neutral-400">
