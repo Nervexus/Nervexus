@@ -1,6 +1,8 @@
 # Laura
 
-A personal assistant with an HQ: a voice orb, a chat log, Notes,
+A dark, Batcomputer-styled HQ: amber-on-black, angular panels, corner-
+bracket HUD framing, a live status/clock readout, and a radar sweep on
+the orb itself. A voice orb, a chat log, Notes,
 Reminders, and a Vault. Laura can also search the live web (place hours,
 directions/travel comparisons, current info) via Gemini's Google Search
 grounding. She cannot yet send email/texts, make calls, or book/pay for
@@ -53,6 +55,8 @@ settable by Laura from a conversation), and copy-without-revealing
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
+| `components/StatusBar.tsx`        | live clock + "SYSTEMS NOMINAL" readout at the top of the sidebar      |
+| `components/CornerBrackets.tsx`   | angular targeting-reticle corners framing the home hero                |
 | `components/FlowDiagram.tsx`      | home page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | home page's Activity tab: a timeline of what Laura's actually done     |

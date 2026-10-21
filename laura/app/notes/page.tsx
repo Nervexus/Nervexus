@@ -106,7 +106,7 @@ export default function NotesPage() {
         <div className="relative mx-auto max-w-4xl">
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-semibold text-neutral-100">Notes</h1>
-            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-300">
+            <span className="rounded-sm border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-300">
               {notes.length} saved
             </span>
           </div>
@@ -116,7 +116,7 @@ export default function NotesPage() {
 
           {/* Compose "node": Title + Body feed a Save action, mirroring a
               workflow editor's input-ports-into-an-action shape. */}
-          <div className="relative mt-7 rounded-2xl border border-neutral-800 bg-neutral-900/70 p-5">
+          <div className="relative mt-7 rounded-lg border border-neutral-800 bg-neutral-900/70 p-5">
             <div className="flex items-center gap-2">
               <PortDot color={title.trim() ? "emerald" : "neutral"} />
               <span className="text-xs tracking-wide text-neutral-500">Title</span>
@@ -125,7 +125,7 @@ export default function NotesPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Type what you want to remember…"
-              className="mt-1.5 w-full rounded-lg border border-neutral-800 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-medium text-neutral-100 outline-none placeholder:font-normal placeholder:text-neutral-600 focus:border-emerald-500/40"
+              className="mt-1.5 w-full rounded-lg border border-neutral-800 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-medium text-neutral-100 outline-none placeholder:font-normal placeholder:text-neutral-600 focus:border-amber-500/40"
             />
 
             <div className="mt-3.5 flex items-center gap-2">
@@ -137,7 +137,7 @@ export default function NotesPage() {
               onChange={(e) => setBody(e.target.value)}
               placeholder="Write something…"
               rows={4}
-              className="mt-1.5 w-full resize-none rounded-lg border border-neutral-800 bg-neutral-950/60 px-3.5 py-2.5 text-sm text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-emerald-500/40"
+              className="mt-1.5 w-full resize-none rounded-lg border border-neutral-800 bg-neutral-950/60 px-3.5 py-2.5 text-sm text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
             />
 
             <div className="mt-3.5 flex justify-end gap-2">
@@ -152,7 +152,7 @@ export default function NotesPage() {
               <button
                 onClick={save}
                 disabled={!title.trim()}
-                className="flex items-center gap-1.5 rounded-full bg-emerald-500 px-4 py-2 text-xs font-medium text-neutral-950 transition-opacity hover:bg-emerald-400 disabled:opacity-40"
+                className="flex items-center gap-1.5 rounded-sm bg-amber-500 px-4 py-2 text-xs font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
               >
                 <span className="text-sm leading-none">+</span>
                 {editingId ? "Save changes" : "Save note"}
@@ -174,7 +174,7 @@ export default function NotesPage() {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search notes…"
-                  className="w-full rounded-xl border border-neutral-800 bg-neutral-900/60 py-2.5 pl-10 pr-4 text-sm text-neutral-200 outline-none placeholder:text-neutral-600 focus:border-emerald-500/40"
+                  className="w-full rounded-lg border border-neutral-800 bg-neutral-900/60 py-2.5 pl-10 pr-4 text-sm text-neutral-200 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
                 />
               </div>
             )}

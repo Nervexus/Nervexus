@@ -173,7 +173,7 @@ export default function RemindersPage() {
       </header>
 
       <div className="mx-auto max-w-7xl px-8 py-8">
-        <div className="mb-8 rounded-2xl border border-neutral-800 bg-neutral-900 p-5">
+        <div className="mb-8 rounded-lg border border-neutral-800 bg-neutral-900 p-5">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -208,7 +208,7 @@ export default function RemindersPage() {
             <button
               onClick={add}
               disabled={!title.trim() || !dueAt}
-              className="rounded-lg bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-900 disabled:opacity-40"
+              className="rounded-sm bg-amber-500 px-4 py-2 text-sm font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
             >
               Set reminder
             </button>

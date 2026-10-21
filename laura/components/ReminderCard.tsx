@@ -3,7 +3,7 @@ import { ClockIcon, CheckIcon } from "@/components/icons";
 
 const PRIORITY_STYLE: Record<string, { bar: string; label: string; text: string }> = {
   high: { bar: "bg-red-400", label: "high", text: "text-red-400" },
-  normal: { bar: "bg-emerald-500/50", label: "normal", text: "text-neutral-600" },
+  normal: { bar: "bg-amber-500/50", label: "normal", text: "text-neutral-600" },
   low: { bar: "bg-neutral-700", label: "low", text: "text-neutral-600" },
 };
 
@@ -30,8 +30,8 @@ export function ReminderCard({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border bg-neutral-900/50 p-4 pl-5 transition-colors ${
-        done ? "border-neutral-800 opacity-50" : "border-neutral-800 hover:border-emerald-500/30"
+      className={`relative overflow-hidden rounded-lg border bg-neutral-900/50 p-4 pl-5 transition-colors ${
+        done ? "border-neutral-800 opacity-50" : "border-neutral-800 hover:border-amber-500/30"
       }`}
     >
       <span className={`absolute inset-y-0 left-0 w-1 ${style.bar}`} />

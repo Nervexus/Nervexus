@@ -158,12 +158,12 @@ export const FlowDiagram = forwardRef<
 
   return (
     <div className="flex w-full flex-col items-center">
-      <div className="flex items-center gap-2 rounded-xl border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs text-neutral-300">
+      <div className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs text-neutral-300">
         <ChatBubbleIcon className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
         You
       </div>
 
-      <div className="h-6 w-px bg-emerald-500/30 sm:h-8" />
+      <div className="h-6 w-px bg-amber-500/30 sm:h-8" />
 
       <VoiceOrb ref={orbRef} onTranscript={onTranscript} />
 
@@ -181,7 +181,7 @@ export const FlowDiagram = forwardRef<
               key={i}
               d={`M ${STAGE_W / 2} 0 C ${STAGE_W / 2} 20, ${nodeCenterX(i)} 20, ${nodeCenterX(i)} 40`}
               stroke={
-                pulsingNodes.has(node.title) ? "rgba(110,231,183,0.9)" : "rgba(52,211,153,0.3)"
+                pulsingNodes.has(node.title) ? "rgba(252,211,77,0.9)" : "rgba(251,191,36,0.3)"
               }
               strokeWidth={pulsingNodes.has(node.title) ? 2 : 1.5}
               strokeDasharray="5 7"
@@ -191,7 +191,7 @@ export const FlowDiagram = forwardRef<
           ))}
         </svg>
       </div>
-      <div className="h-6 w-px bg-emerald-500/30 sm:hidden" />
+      <div className="h-6 w-px bg-amber-500/30 sm:hidden" />
 
       <div
         className="mx-auto grid w-full grid-cols-2 gap-2 sm:flex sm:gap-3.5"

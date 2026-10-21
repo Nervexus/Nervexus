@@ -14,7 +14,7 @@ export function HudCard({
 }) {
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] transition-colors hover:border-neutral-700 ${className}`}
+      className={`group relative overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/50 p-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] transition-colors hover:border-neutral-700 ${className}`}
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.04),transparent_60%)]" />
       {["left-2 top-2", "right-2 top-2", "left-2 bottom-2", "right-2 bottom-2"].map((pos) => (

@@ -24,25 +24,25 @@ export function FlowNode({
   const content = (
     <div
       style={style}
-      className={`relative flex animate-[rise-in_0.5s_ease-out_backwards] items-center gap-3 rounded-2xl border px-3.5 py-2.5 transition-all duration-500 ${
+      className={`relative flex animate-[rise-in_0.5s_ease-out_backwards] items-center gap-3 rounded-lg border px-3.5 py-2.5 transition-all duration-500 ${
         pulsing
-          ? "scale-[1.04] border-emerald-400 bg-emerald-500/10 shadow-[0_0_24px_4px_rgba(52,211,153,0.35)]"
+          ? "scale-[1.04] border-amber-400 bg-amber-500/10 shadow-[0_0_24px_4px_rgba(251,191,36,0.35)]"
           : active
-            ? "border-emerald-500/30 bg-neutral-900/80 hover:border-emerald-500/60 hover:bg-neutral-900"
+            ? "border-amber-500/30 bg-neutral-900/80 hover:border-amber-500/60 hover:bg-neutral-900"
             : "border-neutral-800 bg-neutral-900/40 opacity-60"
       }`}
     >
       {active && (
-        <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-neutral-950">
+        <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-neutral-950">
           <CheckIcon className="h-2.5 w-2.5" />
         </span>
       )}
       <div
         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-500 ${
           pulsing
-            ? "bg-emerald-500/20 text-emerald-200"
+            ? "bg-amber-500/20 text-amber-200"
             : active
-              ? "bg-neutral-800 text-emerald-300"
+              ? "bg-neutral-800 text-amber-300"
               : "bg-neutral-800/60 text-neutral-500"
         }`}
       >

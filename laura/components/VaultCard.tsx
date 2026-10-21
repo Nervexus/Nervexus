@@ -19,7 +19,7 @@ export function VaultCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="group relative flex h-full flex-col rounded-2xl border border-neutral-800 bg-neutral-900/60 p-5 transition-colors hover:border-emerald-500/40">
+    <div className="group relative flex h-full flex-col rounded-lg border border-neutral-800 bg-neutral-900/60 p-5 transition-colors hover:border-amber-500/40">
       <div className="flex items-start gap-3">
         <HexBadge>
           <LockIcon className="h-4 w-4" />

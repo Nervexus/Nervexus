@@ -5,9 +5,9 @@ import type { OrbStatus } from "@/components/VoiceOrb";
 
 const STATUS_COLOR: Record<OrbStatus, [number, number, number]> = {
   idle: [212, 212, 216], // neutral-300 -- a quiet, mostly-still dust ring
-  listening: [52, 211, 153], // emerald-400
-  thinking: [167, 139, 250], // violet-400 -- kept distinct from the active/green states
-  speaking: [110, 231, 183], // emerald-300
+  listening: [251, 191, 36], // amber-400 -- the signal, lit
+  thinking: [34, 211, 238], // cyan-400 -- cool processing glow, distinct from the amber states
+  speaking: [252, 211, 77], // amber-300
   unsupported: [82, 82, 82], // neutral-600
 };
 

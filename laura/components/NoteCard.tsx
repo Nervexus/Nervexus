@@ -4,7 +4,7 @@ function PortDot({ color }: { color: "emerald" | "neutral" }) {
   return (
     <span
       className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-        color === "emerald" ? "bg-emerald-400" : "bg-neutral-600"
+        color === "emerald" ? "bg-amber-400" : "bg-neutral-600"
       }`}
     />
   );
@@ -30,11 +30,11 @@ export function NoteCard({
 }) {
   return (
     <div
-      className={`group relative flex h-full flex-col rounded-2xl border bg-neutral-900/60 p-5 transition-colors hover:border-emerald-500/40 ${
-        pinned ? "border-emerald-500/30" : "border-neutral-800"
+      className={`group relative flex h-full flex-col rounded-lg border bg-neutral-900/60 p-5 transition-colors hover:border-amber-500/40 ${
+        pinned ? "border-amber-500/30" : "border-neutral-800"
       }`}
     >
-      <span className="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-neutral-950 bg-emerald-400" />
+      <span className="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full border-2 border-neutral-950 bg-amber-400" />
 
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -44,7 +44,7 @@ export function NoteCard({
         <div className="flex shrink-0 items-center gap-3 text-xs text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={onTogglePin}
-            className={pinned ? "text-emerald-300" : "hover:text-neutral-200"}
+            className={pinned ? "text-amber-300" : "hover:text-neutral-200"}
             title={pinned ? "Unpin" : "Pin"}
           >
             <PinIcon className="h-3.5 w-3.5" />

@@ -126,11 +126,11 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
     const label = STATUS_LABEL[status];
     const ringColorClass =
       status === "listening"
-        ? "border-emerald-400/60 text-emerald-300"
+        ? "border-amber-400/60 text-amber-300"
         : status === "thinking"
-          ? "border-violet-400/60 text-violet-300"
+          ? "border-cyan-400/60 text-cyan-300"
           : status === "speaking"
-            ? "border-emerald-300/60 text-emerald-200"
+            ? "border-amber-300/60 text-amber-200"
             : status === "unsupported"
               ? "border-neutral-700 text-neutral-600"
               : "border-neutral-500/60 text-neutral-300";
@@ -144,6 +144,18 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
           className="group relative flex h-56 w-56 items-center justify-center outline-none disabled:cursor-not-allowed"
         >
           <DustRing status={status} size={224} />
+          <span
+            className="pointer-events-none absolute inset-2 rounded-full opacity-40 [animation:radar-sweep_6s_linear_infinite]"
+            style={{
+              background:
+                "conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(251,191,36,0.35) 345deg, transparent 360deg)",
+            }}
+            aria-hidden="true"
+          />
+          <span
+            className="pointer-events-none absolute inset-2 rounded-full border border-amber-500/10"
+            aria-hidden="true"
+          />
           <span
             className={`relative flex h-16 w-16 items-center justify-center rounded-full border bg-neutral-950/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
               status === "listening" ? "animate-[pulse_1.4s_ease-in-out_infinite]" : ""

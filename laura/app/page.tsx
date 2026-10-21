@@ -5,6 +5,7 @@ import { type VoiceOrbHandle } from "@/components/VoiceOrb";
 import { DotGrid } from "@/components/DotGrid";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { ActivityFeed } from "@/components/ActivityFeed";
+import { CornerBrackets } from "@/components/CornerBrackets";
 
 type Message = { role: "user" | "assistant"; content: string; createdAt?: string };
 
@@ -17,7 +18,7 @@ function Avatar({ role }: { role: "user" | "assistant" }) {
   return (
     <div
       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-        role === "user" ? "bg-neutral-200 text-neutral-900" : "bg-emerald-500/20 text-emerald-300"
+        role === "user" ? "bg-neutral-200 text-neutral-900" : "bg-amber-500/20 text-amber-300"
       }`}
     >
       {role === "user" ? "Y" : "L"}
@@ -113,19 +114,20 @@ export default function Home() {
     <div className="flex h-screen flex-col sm:h-auto sm:flex-1">
       <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 pb-10 pt-6">
         <DotGrid />
+        <CornerBrackets />
         <div className="relative mx-auto flex max-w-3xl flex-col items-center">
           <div className="mb-8 flex w-full items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2.5">
                 <h1 className="text-xl font-semibold text-neutral-100">Laura</h1>
-                <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+                <span className="rounded-sm border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300">
                   Assistant
                 </span>
               </div>
               <p className="mt-0.5 text-xs text-neutral-600">/ personal</p>
             </div>
             <span className="flex items-center gap-1.5 text-[11px] text-neutral-500">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
               online
             </span>
           </div>
@@ -146,7 +148,7 @@ export default function Home() {
             onClick={() => setTab(t)}
             className={`rounded-t-lg px-3 py-2 text-xs font-medium capitalize transition-colors ${
               tab === t
-                ? "border-b-2 border-emerald-400 text-neutral-100"
+                ? "border-b-2 border-amber-400 text-neutral-100"
                 : "text-neutral-500 hover:text-neutral-300"
             }`}
           >
@@ -169,7 +171,7 @@ export default function Home() {
                 <Avatar role={m.role} />
                 <div className="flex max-w-[75%] flex-col gap-1">
                   <div
-                    className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                    className={`rounded-lg px-4 py-2.5 text-sm leading-relaxed ${
                       m.role === "user"
                         ? "bg-neutral-100 text-neutral-900"
                         : "bg-neutral-900 text-neutral-100"
@@ -190,13 +192,13 @@ export default function Home() {
             {sending && (
               <div className="flex items-end gap-2 self-start">
                 <Avatar role="assistant" />
-                <div className="rounded-2xl bg-neutral-900 px-4 py-2.5 text-sm text-neutral-500">
+                <div className="rounded-lg bg-neutral-900 px-4 py-2.5 text-sm text-neutral-500">
                   …
                 </div>
               </div>
             )}
             {error && (
-              <div className="self-start rounded-2xl bg-red-950 px-4 py-2.5 text-sm text-red-300">
+              <div className="self-start rounded-lg bg-red-950 px-4 py-2.5 text-sm text-red-300">
                 {error}
               </div>
             )}
@@ -216,12 +218,12 @@ export default function Home() {
             onKeyDown={handleKeyDown}
             placeholder="Message Laura…"
             rows={1}
-            className="flex-1 resize-none rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-2.5 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+            className="flex-1 resize-none rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-2.5 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
           />
           <button
             onClick={() => sendMessage(input.trim(), false)}
             disabled={sending || !input.trim()}
-            className="rounded-xl bg-neutral-100 px-4 py-2.5 text-sm font-medium text-neutral-900 transition-opacity disabled:opacity-40"
+            className="rounded-sm bg-amber-500 px-4 py-2.5 text-sm font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
           >
             Send
           </button>
