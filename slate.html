@@ -385,22 +385,29 @@ tailwind.config = {
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-20 px-6 border-t border-cream/10 pt-16">
+    <div class="relative z-10 max-w-7xl mx-auto grid md:grid-cols-[1.3fr_1fr_1fr_1fr] gap-x-10 gap-y-14 mb-16 px-6 border-t border-cream/10 pt-16">
       <div>
-        <p class="text-cream/60 text-sm leading-relaxed max-w-xs">
+        <p class="font-serif text-xl tracking-tight text-cream mb-4">SLATE</p>
+        <p class="text-cream/55 text-sm leading-relaxed max-w-xs">
           Bespoke roofing, specified and installed to the standards of fine
           craft. Every tile a material to be honored.
         </p>
-        <div class="flex items-center gap-4 mt-6 text-xl text-cream/70">
-          <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
-          <iconify-icon icon="solar:camera-linear"></iconify-icon>
-          <iconify-icon icon="solar:letter-linear"></iconify-icon>
+        <div class="flex items-center gap-3 mt-7">
+          <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:camera-linear"></iconify-icon>
+          </a>
+          <a href="#" aria-label="More" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+          </a>
+          <a href="#" aria-label="Email" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:letter-linear"></iconify-icon>
+          </a>
         </div>
       </div>
 
       <div>
         <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
-        <ul class="space-y-3 text-cream/70 text-sm">
+        <ul class="space-y-3 text-cream/55 text-sm">
           <li><a href="#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
           <li><a href="#services" class="hover:text-cream transition-colors">Services</a></li>
           <li><a href="testimonials.html" class="hover:text-cream transition-colors">Testimonials</a></li>
@@ -409,24 +416,24 @@ tailwind.config = {
 
       <div>
         <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">The Studio</p>
-        <p class="text-cream/70 text-sm leading-relaxed">
+        <p class="text-cream/55 text-sm leading-relaxed">
           12 Artisan Row<br>Mayfair, London
         </p>
-        <p class="text-cream/70 text-sm leading-relaxed mt-4">
+        <p class="text-cream/55 text-sm leading-relaxed mt-4">
           Mon to Fri: 8am to 6pm<br>Sat to Sun: 9am to 5pm
         </p>
       </div>
 
       <div>
         <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Contact</p>
-        <p class="text-cream/70 text-sm leading-relaxed">hello@slate-roofing.co</p>
-        <p class="text-cream/70 text-sm leading-relaxed mt-2">+44 20 7946 0192</p>
+        <p class="text-cream/55 text-sm leading-relaxed"><a href="mailto:hello@slate-roofing.co" class="hover:text-cream transition-colors">hello@slate-roofing.co</a></p>
+        <p class="text-cream/55 text-sm leading-relaxed mt-2"><a href="tel:+442079460192" class="hover:text-cream transition-colors">+44 20 7946 0192</a></p>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-6 border-t border-cream/10 pt-8 pb-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <p class="font-mono text-xs text-cream/40">© 2026 SLATE. All rights reserved.</p>
-      <div class="flex items-center gap-6 font-mono text-xs text-cream/40">
+    <div class="relative z-10 max-w-7xl mx-auto px-6 border-t border-cream/10 pt-7 pb-10 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+      <p class="font-mono text-xs text-cream/35">© 2026 SLATE. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-mono text-xs text-cream/35">
         <a href="#" class="hover:text-cream/70 transition-colors">Legal</a>
         <a href="#" class="hover:text-cream/70 transition-colors">Privacy</a>
       </div>
