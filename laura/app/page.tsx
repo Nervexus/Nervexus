@@ -1,233 +1,147 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { type VoiceOrbHandle } from "@/components/VoiceOrb";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { DotGrid } from "@/components/DotGrid";
-import { FlowDiagram } from "@/components/FlowDiagram";
-import { ActivityFeed } from "@/components/ActivityFeed";
-import { CornerBrackets } from "@/components/CornerBrackets";
+import { NoteIcon, ClockIcon, LockIcon, SearchIcon, PlayIcon } from "@/components/icons";
 
-type Message = { role: "user" | "assistant"; content: string; createdAt?: string };
+type Counts = { notes: number | null; reminders: number | null; vault: number | null };
 
-function formatTime(iso?: string): string {
-  if (!iso) return "now";
-  return new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
-
-function Avatar({ role }: { role: "user" | "assistant" }) {
-  return (
-    <div
-      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-        role === "user" ? "bg-neutral-200 text-neutral-900" : "bg-amber-500/20 text-amber-300"
-      }`}
-    >
-      {role === "user" ? "Y" : "L"}
-    </div>
-  );
-}
+const FEATURES = [
+  { n: "01", label: "Notes", icon: NoteIcon },
+  { n: "02", label: "Reminders", icon: ClockIcon },
+  { n: "03", label: "Vault", icon: LockIcon },
+  { n: "04", label: "Search", icon: SearchIcon },
+];
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"chat" | "activity">("chat");
-  const [pulseTools, setPulseTools] = useState<string[]>([]);
-  const [pulseKey, setPulseKey] = useState(0);
-  const [activityKey, setActivityKey] = useState(0);
-  const listRef = useRef<HTMLDivElement>(null);
-  const orbRef = useRef<VoiceOrbHandle>(null);
+  const [counts, setCounts] = useState<Counts>({ notes: null, reminders: null, vault: null });
 
   useEffect(() => {
-    fetch("/api/chat")
+    fetch("/api/notes")
       .then((res) => res.json())
-      .then((body) => {
-        setMessages(
-          body.messages?.length
-            ? body.messages
-            : [
-                {
-                  role: "assistant",
-                  content:
-                    "Hey, I'm Laura. Type below or tap the orb to talk — I can take notes for you, but email, calendar, and calls aren't wired up yet.",
-                },
-              ]
-        );
-      })
-      .catch(() => setError("Couldn't load chat history."))
-      .finally(() => setLoaded(true));
+      .then((data) => setCounts((c) => ({ ...c, notes: data.notes?.length ?? 0 })))
+      .catch(() => setCounts((c) => ({ ...c, notes: 0 })));
+
+    fetch("/api/reminders")
+      .then((res) => res.json())
+      .then((data) =>
+        setCounts((c) => ({
+          ...c,
+          reminders: data.reminders?.filter((r: { done: boolean }) => !r.done).length ?? 0,
+        }))
+      )
+      .catch(() => setCounts((c) => ({ ...c, reminders: 0 })));
+
+    fetch("/api/vault")
+      .then((res) => res.json())
+      .then((data) => setCounts((c) => ({ ...c, vault: data.items?.length ?? 0 })))
+      .catch(() => setCounts((c) => ({ ...c, vault: 0 })));
   }, []);
 
-  function scrollToBottom() {
-    requestAnimationFrame(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    });
-  }
-
-  async function sendMessage(text: string, speakReply: boolean) {
-    if (!text || sending) return;
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: text, createdAt: new Date().toISOString() },
-    ]);
-    setInput("");
-    setSending(true);
-    setError(null);
-    scrollToBottom();
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error ?? "Something went wrong.");
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: body.reply, createdAt: new Date().toISOString() },
-      ]);
-      if (body.toolsUsed?.length) {
-        setPulseTools(body.toolsUsed);
-        setPulseKey((k) => k + 1);
-        setActivityKey((k) => k + 1);
-      }
-      if (speakReply) await orbRef.current?.speak(body.reply);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
-    } finally {
-      setSending(false);
-      scrollToBottom();
-    }
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage(input.trim(), false);
-    }
-  }
-
   return (
-    <div className="flex h-screen flex-col sm:h-auto sm:flex-1">
-      <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 pb-10 pt-6">
-        <DotGrid />
-        <CornerBrackets />
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center">
-          <div className="mb-8 flex w-full items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-semibold text-neutral-100">Laura</h1>
-                <span className="rounded-sm border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-300">
-                  Assistant
+    <div className="relative flex-1 overflow-hidden bg-neutral-950">
+      <DotGrid />
+      <div
+        className="pointer-events-none absolute right-[-10%] top-[-10%] h-[60%] w-[55%] rounded-full opacity-60 blur-[100px]"
+        style={{ background: "radial-gradient(circle, rgba(251,191,36,0.16), transparent 70%)" }}
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ boxShadow: "inset 0 0 180px 40px rgba(0,0,0,0.75)" }}
+        aria-hidden="true"
+      />
+
+      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-6 sm:px-10 sm:py-8">
+        {/* Top micro-bar */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-500">
+            Laura<span className="text-amber-500">.</span>
+          </span>
+          <span className="flex items-center gap-1.5 text-[11px] text-neutral-500">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
+            online
+          </span>
+        </div>
+
+        {/* Hero */}
+        <div className="flex flex-1 flex-col justify-center gap-10 py-16 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+          <div className="max-w-xl">
+            <h1 className="text-5xl font-bold uppercase leading-[0.95] tracking-tight text-neutral-50 sm:text-7xl">
+              Endless
+              <br />
+              <span className="text-amber-400">Memory</span>
+            </h1>
+
+            <div className="mt-9 flex flex-wrap items-center gap-6">
+              <Link href="/laura" className="group flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-700 text-neutral-200 transition-colors group-hover:border-amber-400 group-hover:text-amber-300">
+                  <PlayIcon className="ml-0.5 h-4 w-4" />
                 </span>
-              </div>
-              <p className="mt-0.5 text-xs text-neutral-600">/ personal</p>
-            </div>
-            <span className="flex items-center gap-1.5 text-[11px] text-neutral-500">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
-              online
-            </span>
-          </div>
+                <span className="text-xs font-medium uppercase tracking-widest text-neutral-300 group-hover:text-amber-300">
+                  Talk to Laura
+                </span>
+              </Link>
 
-          <FlowDiagram
-            ref={orbRef}
-            onTranscript={(text) => sendMessage(text, true)}
-            pulseTools={pulseTools}
-            pulseKey={pulseKey}
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-1 border-b border-neutral-800 px-6 pt-3">
-        {(["chat", "activity"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`rounded-t-lg px-3 py-2 text-xs font-medium capitalize transition-colors ${
-              tab === t
-                ? "border-b-2 border-amber-400 text-neutral-100"
-                : "text-neutral-500 hover:text-neutral-300"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      {tab === "chat" ? (
-        <div ref={listRef} className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="mx-auto flex max-w-2xl flex-col gap-4">
-            {!loaded && <p className="text-sm text-neutral-600">Loading…</p>}
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`group flex items-end gap-2 ${
-                  m.role === "user" ? "flex-row-reverse self-end" : "self-start"
-                }`}
+              <Link
+                href="/laura"
+                className="rounded-sm bg-amber-500 px-5 py-2.5 text-xs font-medium uppercase tracking-widest text-neutral-950 transition-colors hover:bg-amber-400"
               >
-                <Avatar role={m.role} />
-                <div className="flex max-w-[75%] flex-col gap-1">
-                  <div
-                    className={`rounded-lg px-4 py-2.5 text-sm leading-relaxed ${
-                      m.role === "user"
-                        ? "bg-neutral-100 text-neutral-900"
-                        : "bg-neutral-900 text-neutral-100"
-                    }`}
-                  >
-                    {m.content}
-                  </div>
-                  <span
-                    className={`text-[10px] text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 ${
-                      m.role === "user" ? "self-end" : "self-start"
-                    }`}
-                  >
-                    {formatTime(m.createdAt)}
-                  </span>
-                </div>
-              </div>
-            ))}
-            {sending && (
-              <div className="flex items-end gap-2 self-start">
-                <Avatar role="assistant" />
-                <div className="rounded-lg bg-neutral-900 px-4 py-2.5 text-sm text-neutral-500">
-                  …
-                </div>
-              </div>
-            )}
-            {error && (
-              <div className="self-start rounded-lg bg-red-950 px-4 py-2.5 text-sm text-red-300">
-                {error}
-              </div>
-            )}
+                Get started
+              </Link>
+            </div>
+          </div>
+
+          <div className="max-w-xs rounded-lg border border-neutral-800 bg-neutral-950/70 p-5 backdrop-blur-sm lg:mt-24">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">Laura</h2>
+            <p className="mt-2 text-sm leading-relaxed text-neutral-400">
+              A personal assistant that remembers everything you tell her — notes, reminders, an
+              encrypted vault, and a voice that&apos;s always ready to listen.
+            </p>
           </div>
         </div>
-      ) : (
-        <div className="flex-1 overflow-y-auto">
-          <ActivityFeed refreshKey={activityKey} />
-        </div>
-      )}
 
-      <div className="border-t border-neutral-800 px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-end gap-3">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Message Laura…"
-            rows={1}
-            className="flex-1 resize-none rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-2.5 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
-          />
-          <button
-            onClick={() => sendMessage(input.trim(), false)}
-            disabled={sending || !input.trim()}
-            className="rounded-sm bg-amber-500 px-4 py-2.5 text-sm font-medium tracking-wide text-neutral-950 transition-colors hover:bg-amber-400 disabled:opacity-40"
-          >
-            Send
-          </button>
+        {/* Bottom row: stats + quick links */}
+        <div className="flex flex-col gap-6 border-t border-neutral-800 pt-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex gap-3 text-xs text-neutral-500">
+            <Link href="/notes" className="hover:text-amber-300">
+              Notes
+            </Link>
+            <Link href="/reminders" className="hover:text-amber-300">
+              Reminders
+            </Link>
+            <Link href="/vault" className="hover:text-amber-300">
+              Vault
+            </Link>
+          </div>
+
+          <div className="flex gap-10">
+            <div>
+              <div className="text-3xl font-bold text-neutral-100">{counts.notes ?? "–"}</div>
+              <div className="text-[11px] uppercase tracking-wide text-neutral-600">Notes</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-neutral-100">{counts.reminders ?? "–"}</div>
+              <div className="text-[11px] uppercase tracking-wide text-neutral-600">Reminders</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-neutral-100">{counts.vault ?? "–"}</div>
+              <div className="text-[11px] uppercase tracking-wide text-neutral-600">Vault items</div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Vertical feature index, right edge */}
+      <div className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-5 lg:flex">
+        {FEATURES.map((f) => (
+          <div key={f.n} className="flex flex-col items-center gap-1 text-neutral-700">
+            <span className="font-mono text-[10px] tracking-widest">{f.n}</span>
+            <f.icon className="h-3.5 w-3.5" />
+          </div>
+        ))}
+        <span className="mt-1 h-10 w-px bg-neutral-800" />
       </div>
     </div>
   );

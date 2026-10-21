@@ -26,7 +26,8 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
-| `/`          | Home — a node-diagram-style view of the orb wired to its tools, + chat/Activity tabs |
+| `/`          | Home — an editorial-style landing page: headline, live Notes/Reminders/Vault counts, CTAs into `/laura` |
+| `/laura`     | the assistant itself — node-diagram view of the orb wired to its tools, + chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember                              |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |

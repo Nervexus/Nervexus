@@ -6,6 +6,7 @@ import { StatusBar } from "@/components/StatusBar";
 
 const LINKS = [
   { href: "/", label: "Home" },
+  { href: "/laura", label: "Laura" },
   { href: "/notes", label: "Notes" },
   { href: "/reminders", label: "Reminders" },
   { href: "/vault", label: "Vault" },
