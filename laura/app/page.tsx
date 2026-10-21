@@ -1,21 +1,11 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { AmbientField } from "@/components/AmbientField";
+import { DotWaveField } from "@/components/DotWaveField";
 import { Pill } from "@/components/Pill";
 
 export default function Home() {
-  const [hovering, setHovering] = useState(false);
-
   return (
     <div className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-neutral-950">
-      <AmbientField hovering={hovering} />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ boxShadow: "inset 0 0 160px 30px rgba(0,0,0,0.7)" }}
-        aria-hidden="true"
-      />
+      <DotWaveField />
 
       <div className="relative mt-auto px-6 pb-16 pt-24 text-center">
         <Pill className="mb-6">Personal Assistant</Pill>
@@ -31,14 +21,15 @@ export default function Home() {
           forgets.
         </p>
 
-        <Link href="/laura">
-          <button
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
-            className="mt-14 rounded-sm border border-amber-500/40 px-6 py-3 font-mono text-xs uppercase tracking-widest text-amber-300 transition-colors hover:border-amber-400 hover:bg-amber-500/10"
-          >
-            [ Talk to Laura ]
-          </button>
+        <Link
+          href="/laura"
+          className="mt-14 inline-block bg-gradient-to-br from-amber-300 to-amber-500 px-7 py-3.5 font-mono text-sm font-medium tracking-wide text-neutral-950 transition-opacity hover:opacity-90"
+          style={{
+            clipPath:
+              "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
+          }}
+        >
+          [Talk to Laura]
         </Link>
       </div>
     </div>
