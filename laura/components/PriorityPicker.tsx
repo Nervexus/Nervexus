@@ -1,6 +1,6 @@
 const OPTIONS: { value: string; label: string; active: string }[] = [
   { value: "low", label: "Low", active: "border-neutral-500 bg-neutral-500/10 text-neutral-300" },
-  { value: "normal", label: "Normal", active: "border-amber-500 bg-amber-500/10 text-amber-300" },
+  { value: "normal", label: "Normal", active: "border-neutral-300 bg-neutral-300/10 text-neutral-100" },
   { value: "high", label: "High", active: "border-red-400 bg-red-400/10 text-red-300" },
 ];
 

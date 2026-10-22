@@ -1,34 +1,53 @@
 import type { ButtonHTMLAttributes } from "react";
-import { notch } from "@/lib/clip";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "ghost" | "danger";
+  /** Shows the arrow-right-linear icon after the label, matching the
+   * reference's primary-CTA asset. */
+  withArrow?: boolean;
 };
 
-/** The app's one primary-action style (notched amber gradient) plus two
- * text-only variants, so every page's main CTA stays visually identical. */
-export function Button({ variant = "primary", className = "", ...props }: ButtonProps) {
+/** The app's one primary-action style (solid neutral-100, max contrast)
+ * plus two text-only variants, so every page's main CTA stays identical. */
+export function Button({
+  variant = "primary",
+  withArrow = false,
+  className = "",
+  children,
+  ...props
+}: ButtonProps) {
   if (variant === "primary") {
     return (
       <button
         {...props}
-        style={{ clipPath: notch(8) }}
-        className={`inline-flex shrink-0 items-center gap-1.5 bg-gradient-to-br from-amber-300 to-amber-500 px-4 py-2.5 text-xs font-medium tracking-wide text-neutral-950 transition-opacity hover:opacity-90 disabled:opacity-40 ${className}`}
-      />
+        className={`group inline-flex shrink-0 items-center gap-2 rounded-full bg-neutral-100 px-5 py-2.5 font-mono text-xs tracking-tight text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-40 ${className}`}
+      >
+        {children}
+        {withArrow && (
+          <iconify-icon
+            icon="solar:arrow-right-linear"
+            className="text-sm transition-transform group-hover:translate-x-0.5"
+          />
+        )}
+      </button>
     );
   }
   if (variant === "danger") {
     return (
       <button
         {...props}
-        className={`text-xs text-neutral-500 transition-colors hover:text-red-400 ${className}`}
-      />
+        className={`font-mono text-xs text-neutral-500 transition-colors hover:text-red-400 ${className}`}
+      >
+        {children}
+      </button>
     );
   }
   return (
     <button
       {...props}
-      className={`text-xs text-neutral-400 transition-colors hover:text-neutral-200 ${className}`}
-    />
+      className={`font-mono text-xs text-neutral-500 transition-colors hover:text-neutral-200 ${className}`}
+    >
+      {children}
+    </button>
   );
 }

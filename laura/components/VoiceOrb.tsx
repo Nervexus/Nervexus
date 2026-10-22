@@ -126,11 +126,11 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
     const label = STATUS_LABEL[status];
     const ringColorClass =
       status === "listening"
-        ? "border-amber-400/60 text-amber-300"
+        ? "border-neutral-100/60 text-neutral-50"
         : status === "thinking"
-          ? "border-cyan-400/60 text-cyan-300"
+          ? "border-neutral-300/60 text-neutral-200"
           : status === "speaking"
-            ? "border-amber-300/60 text-amber-200"
+            ? "border-neutral-200/60 text-neutral-100"
             : status === "unsupported"
               ? "border-neutral-700 text-neutral-600"
               : "border-neutral-500/60 text-neutral-300";
@@ -148,12 +148,12 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
             className="pointer-events-none absolute inset-2 rounded-full opacity-40 [animation:radar-sweep_6s_linear_infinite]"
             style={{
               background:
-                "conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(251,191,36,0.35) 345deg, transparent 360deg)",
+                "conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(245,245,245,0.3) 345deg, transparent 360deg)",
             }}
             aria-hidden="true"
           />
           <span
-            className="pointer-events-none absolute inset-2 rounded-full border border-amber-500/10"
+            className="pointer-events-none absolute inset-2 rounded-full border border-neutral-700/40"
             aria-hidden="true"
           />
           <span

@@ -163,7 +163,7 @@ export const FlowDiagram = forwardRef<
         You
       </div>
 
-      <div className="h-6 w-px bg-amber-500/30 sm:h-8" />
+      <div className="h-6 w-px bg-neutral-700 sm:h-8" />
 
       <VoiceOrb ref={orbRef} onTranscript={onTranscript} />
 
@@ -181,7 +181,7 @@ export const FlowDiagram = forwardRef<
               key={i}
               d={`M ${STAGE_W / 2} 0 C ${STAGE_W / 2} 20, ${nodeCenterX(i)} 20, ${nodeCenterX(i)} 40`}
               stroke={
-                pulsingNodes.has(node.title) ? "rgba(252,211,77,0.9)" : "rgba(251,191,36,0.3)"
+                pulsingNodes.has(node.title) ? "rgba(245,245,245,0.9)" : "rgba(115,115,115,0.3)"
               }
               strokeWidth={pulsingNodes.has(node.title) ? 2 : 1.5}
               strokeDasharray="5 7"
@@ -191,7 +191,7 @@ export const FlowDiagram = forwardRef<
           ))}
         </svg>
       </div>
-      <div className="h-6 w-px bg-amber-500/30 sm:hidden" />
+      <div className="h-6 w-px bg-neutral-700 sm:hidden" />
 
       <div
         className="mx-auto grid w-full grid-cols-2 gap-2 sm:flex sm:gap-3.5"

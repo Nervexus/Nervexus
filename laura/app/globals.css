@@ -5,19 +5,12 @@
    prefers-color-scheme variables the starter template shipped with. */
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-serif);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  background-color: #060606;
-  /* A faint carbon-fiber weave -- almost subliminal, just enough texture
-     that the dark isn't a flat void. */
-  background-image:
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 7px),
-    repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 7px);
 }
 
 /* Slow continuous sweep for the orb's radar ring. */
@@ -34,7 +27,9 @@ body {
   }
 }
 
-/* Staggered entrance for flow-diagram nodes and activity feed rows. */
+/* Staggered entrance for flow-diagram nodes and activity feed rows (the
+   GSAP-driven .gsap-entrance reveal is used for page-level sections; this
+   lighter CSS-only version covers small dynamic lists). */
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -44,4 +39,51 @@ body {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* Pre-hidden so GSAP's .from() reveal has no flash-of-unstyled-content
+   before the entrance script runs. */
+.gsap-entrance {
+  opacity: 0;
+}
+
+/* Procedural film-grain noise, used by the fixed full-viewport overlay. */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* A hairline border whose gradient fades per-edge rather than being a flat
+   color -- a mask-composite trick: paint the gradient over the whole box,
+   then subtract everything but a 1px ring. */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 60%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Infinite drift for the metrics' gradient-filled numerals. */
+@keyframes gradient-shift {
+  to {
+    background-position: 200% center;
+  }
+}
+.metric-gradient-text {
+  background: linear-gradient(90deg, #f5f5f5, #737373, #f5f5f5);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 4s linear infinite;
 }

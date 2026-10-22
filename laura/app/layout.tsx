@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Spectral } from "next/font/google";
-import { Sidebar } from "@/components/Sidebar";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import { AmbientCanvas } from "@/components/background/AmbientCanvas";
+import { Vignette } from "@/components/background/Vignette";
+import { NoiseOverlay } from "@/components/background/NoiseOverlay";
+import { TopNav } from "@/components/TopNav";
+import { SiteFooter } from "@/components/SiteFooter";
+import { IconifyRegister } from "@/components/IconifyRegister";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["100", "200", "300", "400"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-});
-
-const spectral = Spectral({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  style: ["normal", "italic"],
+  weight: ["300", "400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -27,13 +27,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${spectral.variable} h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col bg-neutral-950 text-neutral-100 sm:flex-row">
-        <Sidebar />
-        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+      <body className="min-h-full overflow-x-hidden bg-[#080808] text-[#FFFFFF] selection:bg-neutral-800">
+        <IconifyRegister />
+        <AmbientCanvas />
+        <Vignette />
+        <TopNav />
+        <main className="relative z-10 min-h-screen pt-24 pb-20 sm:pt-28">{children}</main>
+        <SiteFooter />
+        <NoiseOverlay />
       </body>
     </html>
   );

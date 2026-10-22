@@ -67,10 +67,10 @@ export function ActivityFeed({ refreshKey }: { refreshKey?: number }) {
         <div
           key={entry.id}
           style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
-          className="flex animate-[rise-in_0.4s_ease-out_backwards] items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-900/40 px-3.5 py-2.5"
+          className="flex animate-[rise-in_0.4s_ease-out_backwards] items-center gap-3 rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-3.5 py-2.5 backdrop-blur-sm"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-amber-300">
-            {TOOL_ICON[entry.tool]?.("h-4 w-4") ?? <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-neutral-300">
+            {TOOL_ICON[entry.tool]?.("h-4 w-4") ?? <span className="h-1.5 w-1.5 rounded-full bg-neutral-300" />}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm text-neutral-200">{entry.summary}</p>

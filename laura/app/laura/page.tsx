@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { type VoiceOrbHandle } from "@/components/VoiceOrb";
-import { DotGrid } from "@/components/DotGrid";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
+import { GsapEntrance } from "@/components/GsapEntrance";
 
 type Message = { role: "user" | "assistant"; content: string; createdAt?: string };
 
@@ -18,8 +18,8 @@ function formatTime(iso?: string): string {
 function Avatar({ role }: { role: "user" | "assistant" }) {
   return (
     <div
-      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-        role === "user" ? "bg-neutral-200 text-neutral-900" : "bg-amber-500/20 text-amber-300"
+      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-medium ${
+        role === "user" ? "bg-neutral-200 text-neutral-900" : "bg-neutral-800 text-neutral-300"
       }`}
     >
       {role === "user" ? "Y" : "L"}
@@ -37,7 +37,6 @@ export default function LauraPage() {
   const [pulseTools, setPulseTools] = useState<string[]>([]);
   const [pulseKey, setPulseKey] = useState(0);
   const [activityKey, setActivityKey] = useState(0);
-  const listRef = useRef<HTMLDivElement>(null);
   const orbRef = useRef<VoiceOrbHandle>(null);
 
   useEffect(() => {
@@ -60,12 +59,6 @@ export default function LauraPage() {
       .finally(() => setLoaded(true));
   }, []);
 
-  function scrollToBottom() {
-    requestAnimationFrame(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
-    });
-  }
-
   async function sendMessage(text: string, speakReply: boolean) {
     if (!text || sending) return;
 
@@ -76,7 +69,6 @@ export default function LauraPage() {
     setInput("");
     setSending(true);
     setError(null);
-    scrollToBottom();
 
     try {
       const res = await fetch("/api/chat", {
@@ -100,7 +92,6 @@ export default function LauraPage() {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSending(false);
-      scrollToBottom();
     }
   }
 
@@ -112,37 +103,34 @@ export default function LauraPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col sm:h-auto sm:flex-1">
-      <div className="relative overflow-hidden border-b border-neutral-800 bg-neutral-950 px-6 pb-10 pt-8">
-        <DotGrid />
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center">
-          <div className="mb-8 flex w-full items-center justify-between gap-3">
-            <div>
-              <h1 className="font-serif text-2xl italic text-neutral-50">Laura</h1>
-              <p className="mt-0.5 text-xs text-neutral-600">/ personal assistant</p>
-            </div>
-            <Pill>
-              <span className="normal-case tracking-normal">online</span>
-            </Pill>
-          </div>
-
-          <FlowDiagram
-            ref={orbRef}
-            onTranscript={(text) => sendMessage(text, true)}
-            pulseTools={pulseTools}
-            pulseKey={pulseKey}
-          />
+    <GsapEntrance className="relative mx-auto max-w-3xl px-6 pb-20">
+      <div className="gsap-entrance mb-8 flex w-full items-center justify-between gap-3">
+        <div>
+          <h1 className="font-thin text-2xl tracking-tight text-neutral-100">Laura</h1>
+          <p className="mt-0.5 text-xs text-neutral-600">/ personal assistant</p>
         </div>
+        <Pill>
+          <span className="normal-case tracking-normal">online</span>
+        </Pill>
       </div>
 
-      <div className="flex gap-1 border-b border-neutral-800 px-6 pt-3">
+      <div className="gsap-entrance flex flex-col items-center">
+        <FlowDiagram
+          ref={orbRef}
+          onTranscript={(text) => sendMessage(text, true)}
+          pulseTools={pulseTools}
+          pulseKey={pulseKey}
+        />
+      </div>
+
+      <div className="gsap-entrance mt-10 flex gap-1 border-b border-neutral-800/60">
         {(["chat", "activity"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`rounded-t-lg px-3 py-2 text-xs font-medium capitalize transition-colors ${
+            className={`rounded-t-lg px-3 py-2 font-mono text-xs capitalize transition-colors ${
               tab === t
-                ? "border-b-2 border-amber-400 text-neutral-100"
+                ? "border-b-2 border-neutral-100 text-neutral-100"
                 : "text-neutral-500 hover:text-neutral-300"
             }`}
           >
@@ -152,77 +140,69 @@ export default function LauraPage() {
       </div>
 
       {tab === "chat" ? (
-        <div ref={listRef} className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="mx-auto flex max-w-2xl flex-col gap-4">
-            {!loaded && <p className="text-sm text-neutral-600">Loading…</p>}
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`group flex items-end gap-2 ${
-                  m.role === "user" ? "flex-row-reverse self-end" : "self-start"
-                }`}
-              >
-                <Avatar role={m.role} />
-                <div className="flex max-w-[75%] flex-col gap-1">
-                  <div
-                    className={`rounded-lg px-4 py-2.5 text-sm leading-relaxed ${
-                      m.role === "user"
-                        ? "bg-neutral-100 text-neutral-900"
-                        : "bg-neutral-900 text-neutral-100"
-                    }`}
-                  >
-                    {m.content}
-                  </div>
-                  <span
-                    className={`text-[10px] text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 ${
-                      m.role === "user" ? "self-end" : "self-start"
-                    }`}
-                  >
-                    {formatTime(m.createdAt)}
-                  </span>
+        <div className="gsap-entrance flex flex-col gap-4 py-6">
+          {!loaded && <p className="text-sm text-neutral-600">Loading…</p>}
+          {messages.map((m, i) => (
+            <div
+              key={i}
+              className={`group flex items-end gap-2 ${
+                m.role === "user" ? "flex-row-reverse self-end" : "self-start"
+              }`}
+            >
+              <Avatar role={m.role} />
+              <div className="flex max-w-[75%] flex-col gap-1">
+                <div
+                  className={`rounded-xl px-4 py-2.5 text-sm font-light leading-relaxed ${
+                    m.role === "user"
+                      ? "bg-neutral-100 text-neutral-900"
+                      : "border border-neutral-800/60 bg-neutral-900/40 text-neutral-100 backdrop-blur-sm"
+                  }`}
+                >
+                  {m.content}
                 </div>
+                <span
+                  className={`text-[10px] text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 ${
+                    m.role === "user" ? "self-end" : "self-start"
+                  }`}
+                >
+                  {formatTime(m.createdAt)}
+                </span>
               </div>
-            ))}
-            {sending && (
-              <div className="flex items-end gap-2 self-start">
-                <Avatar role="assistant" />
-                <div className="rounded-lg bg-neutral-900 px-4 py-2.5 text-sm text-neutral-500">
-                  …
-                </div>
+            </div>
+          ))}
+          {sending && (
+            <div className="flex items-end gap-2 self-start">
+              <Avatar role="assistant" />
+              <div className="rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-2.5 text-sm text-neutral-500">
+                …
               </div>
-            )}
-            {error && (
-              <div className="self-start rounded-lg bg-red-950 px-4 py-2.5 text-sm text-red-300">
-                {error}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
+          {error && (
+            <div className="self-start rounded-xl bg-red-950/60 px-4 py-2.5 text-sm text-red-300">
+              {error}
+            </div>
+          )}
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto">
+        <div className="gsap-entrance py-6">
           <ActivityFeed refreshKey={activityKey} />
         </div>
       )}
 
-      <div className="border-t border-neutral-800 px-6 py-4">
-        <div className="mx-auto flex max-w-2xl items-end gap-3">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Message Laura…"
-            rows={1}
-            className="flex-1 resize-none rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-2.5 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-amber-500/40"
-          />
-          <Button
-            onClick={() => sendMessage(input.trim(), false)}
-            disabled={sending || !input.trim()}
-            className="py-2.5"
-          >
-            Send
-          </Button>
-        </div>
+      <div className="gsap-entrance gradient-border flex items-end gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-3 backdrop-blur-md">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Message Laura…"
+          rows={1}
+          className="flex-1 resize-none bg-transparent px-2 py-2 text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600"
+        />
+        <Button onClick={() => sendMessage(input.trim(), false)} disabled={sending || !input.trim()}>
+          Send
+        </Button>
       </div>
-    </div>
+    </GsapEntrance>
   );
 }

@@ -1,13 +1,11 @@
 import type { ReactNode } from "react";
-import { notch } from "@/lib/clip";
 
-/** A small notched-corner icon tile — the same brand motif as the primary
- * button, scaled down for use inside Reminder/Vault cards. */
+/** A small glass icon tile -- the same bg-neutral-900/40 + backdrop-blur
+ * + hairline-border treatment as the portfolio cards, scaled down. */
 export function IconTile({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      style={{ clipPath: notch(7) }}
-      className={`flex h-10 w-10 shrink-0 items-center justify-center bg-neutral-800 text-amber-300/90 ${className}`}
+      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-neutral-800/60 bg-neutral-900/40 text-neutral-300 backdrop-blur-sm ${className}`}
     >
       {children}
     </div>

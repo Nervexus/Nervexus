@@ -6,9 +6,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
 import { ReminderCard } from "@/components/ReminderCard";
 import { PriorityPicker } from "@/components/PriorityPicker";
-import { DotGrid } from "@/components/DotGrid";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
+import { GsapEntrance } from "@/components/GsapEntrance";
 
 type Reminder = {
   id: string;
@@ -167,62 +167,56 @@ export default function RemindersPage() {
   ];
 
   return (
-    <div className="flex-1">
-      <div className="relative overflow-hidden border-b border-neutral-800 px-8 pb-10 pt-8">
-        <DotGrid />
-        <div className="relative mx-auto max-w-4xl">
-          <div className="flex items-center gap-3">
-            <h1 className="font-serif text-3xl text-neutral-50">Reminders</h1>
-            <Pill>{upcoming.length} upcoming</Pill>
-          </div>
-          <p className="mt-2 text-sm text-neutral-500">
-            things to do, set by you or by Laura from a conversation
-          </p>
+    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+      <div className="gsap-entrance flex items-center gap-3">
+        <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Reminders</h1>
+        <Pill>{upcoming.length} upcoming</Pill>
+      </div>
+      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
+        things to do, set by you or by Laura from a conversation
+      </p>
 
-          <div className="relative mt-7 rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-6">
+      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Remind me to…"
+          className="w-full bg-transparent text-base font-light outline-none placeholder:text-neutral-600"
+        />
+        <input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Extra detail (optional)"
+          className="mt-2.5 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+        />
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {TIME_PRESETS.map((preset) => (
+            <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
+              {preset.label}
+            </Chip>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Remind me to…"
-              className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
+              type="datetime-local"
+              value={dueAt}
+              onChange={(e) => setDueAt(e.target.value)}
+              className="rounded-lg border border-neutral-800/60 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
             />
-            <input
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="Extra detail (optional)"
-              className="mt-2.5 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-            />
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              {TIME_PRESETS.map((preset) => (
-                <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
-                  {preset.label}
-                </Chip>
-              ))}
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-3">
-                <input
-                  type="datetime-local"
-                  value={dueAt}
-                  onChange={(e) => setDueAt(e.target.value)}
-                  className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
-                />
-                <PriorityPicker value={priority} onChange={setPriority} />
-              </div>
-              <Button onClick={add} disabled={!title.trim() || !dueAt}>
-                Set reminder
-              </Button>
-            </div>
+            <PriorityPicker value={priority} onChange={setPriority} />
           </div>
+          <Button onClick={add} disabled={!title.trim() || !dueAt}>
+            Set reminder
+          </Button>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-8 py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
-          <div className="min-w-0">
-            {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
+        <div className="min-w-0">
+          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
 
             {loaded && reminders.length === 0 ? (
               <EmptyState
@@ -240,7 +234,7 @@ export default function RemindersPage() {
                       <div key={key} className="mb-8">
                         <h2
                           className={`mb-3 font-mono text-[11px] uppercase tracking-widest ${
-                            key === "overdue" ? "text-amber-400" : "text-neutral-500"
+                            key === "overdue" ? "text-neutral-200" : "text-neutral-500"
                           }`}
                         >
                           {label} · {items.length}
@@ -311,7 +305,6 @@ export default function RemindersPage() {
             </SidebarCard>
           </aside>
         </div>
-      </div>
-    </div>
+      </GsapEntrance>
   );
 }

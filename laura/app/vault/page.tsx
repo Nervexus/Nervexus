@@ -5,9 +5,9 @@ import { LockIcon } from "@/components/icons";
 import { EmptyState } from "@/components/EmptyState";
 import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
 import { VaultCard } from "@/components/VaultCard";
-import { DotGrid } from "@/components/DotGrid";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
+import { GsapEntrance } from "@/components/GsapEntrance";
 
 type VaultItem = { id: string; title: string; updatedAt: string };
 
@@ -100,65 +100,59 @@ export default function VaultPage() {
   }
 
   return (
-    <div className="flex-1">
-      <div className="relative overflow-hidden border-b border-neutral-800 px-8 pb-10 pt-8">
-        <DotGrid />
-        <div className="relative mx-auto max-w-4xl">
-          <div className="flex items-center gap-3">
-            <h1 className="font-serif text-3xl text-neutral-50">Vault</h1>
-            <Pill>{items.length} items</Pill>
-          </div>
-          <p className="mt-2 text-sm text-neutral-500">
-            encrypted at rest — Laura herself can&apos;t read these, only this page can
-          </p>
+    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+      <div className="gsap-entrance flex items-center gap-3">
+        <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Vault</h1>
+        <Pill>{items.length} items</Pill>
+      </div>
+      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
+        encrypted at rest — Laura herself can&apos;t read these, only this page can
+      </p>
 
-          <div className="relative mt-7 rounded-xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-6">
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="What is this? (e.g. Wi-Fi password)"
-              className="w-full bg-transparent text-base font-medium outline-none placeholder:text-neutral-600"
-            />
-            <input
-              value={secret}
-              onChange={(e) => setSecret(e.target.value)}
-              placeholder="Secret value"
-              type="password"
-              className="mt-2.5 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
-            />
-            <div className="mt-3 flex justify-end">
-              <Button onClick={add} disabled={!title.trim() || !secret}>
-                Add to vault
-              </Button>
-            </div>
-          </div>
+      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="What is this? (e.g. Wi-Fi password)"
+          className="w-full bg-transparent text-base font-light outline-none placeholder:text-neutral-600"
+        />
+        <input
+          value={secret}
+          onChange={(e) => setSecret(e.target.value)}
+          placeholder="Secret value"
+          type="password"
+          className="mt-2.5 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
+        />
+        <div className="mt-3 flex justify-end">
+          <Button onClick={add} disabled={!title.trim() || !secret}>
+            Add to vault
+          </Button>
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-8 py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
-          <div className="min-w-0">
-            {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
+      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
+        <div className="min-w-0">
+          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
 
-            {loaded && items.length === 0 ? (
-              <EmptyState
-                icon={<LockIcon className="h-5 w-5" />}
-                title="The vault is empty"
-                description="Save a password or code above — only this page can ever decrypt it."
-              >
-                <div className="mt-2 flex flex-wrap justify-center gap-2">
-                  {QUICK_START.map((suggestion) => (
-                    <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
-                      {suggestion}
-                    </Chip>
-                  ))}
-                </div>
-              </EmptyState>
-            ) : (
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4">
-                {items.map((item) => (
+          {loaded && items.length === 0 ? (
+            <EmptyState
+              icon={<LockIcon className="h-5 w-5" />}
+              title="The vault is empty"
+              description="Save a password or code above — only this page can ever decrypt it."
+            >
+              <div className="mt-2 flex flex-wrap justify-center gap-2">
+                {QUICK_START.map((suggestion) => (
+                  <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
+                    {suggestion}
+                  </Chip>
+                ))}
+              </div>
+            </EmptyState>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
+              {items.map((item) => (
+                <div key={item.id} className="gsap-entrance">
                   <VaultCard
-                    key={item.id}
                     title={item.title}
                     revealedValue={revealed[item.id]}
                     revealing={revealing === item.id}
@@ -167,36 +161,36 @@ export default function VaultPage() {
                     onCopy={() => copy(item.id)}
                     onDelete={() => remove(item.id)}
                   />
-                ))}
-              </div>
-            )}
-          </div>
-
-          <aside className="flex flex-col gap-4">
-            <SidebarCard title="Quick start">
-              <div className="flex flex-wrap gap-2">
-                {QUICK_START.map((suggestion) => (
-                  <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
-                    {suggestion}
-                  </Chip>
-                ))}
-              </div>
-            </SidebarCard>
-
-            <SidebarCard title="Stats">
-              <Stat label="Items stored" value={items.length} />
-            </SidebarCard>
-
-            <SidebarCard title="How this works">
-              <p className="text-xs leading-relaxed text-neutral-500">
-                Secrets are encrypted (AES-256-GCM) before they ever touch the database. Laura&apos;s
-                brain has no tool to read the Vault — only this page can decrypt an item, one at a
-                time, when you click Reveal or Copy.
-              </p>
-            </SidebarCard>
-          </aside>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+
+        <aside className="gsap-entrance flex flex-col gap-4">
+          <SidebarCard title="Quick start">
+            <div className="flex flex-wrap gap-2">
+              {QUICK_START.map((suggestion) => (
+                <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
+                  {suggestion}
+                </Chip>
+              ))}
+            </div>
+          </SidebarCard>
+
+          <SidebarCard title="Stats">
+            <Stat label="Items stored" value={items.length} />
+          </SidebarCard>
+
+          <SidebarCard title="How this works">
+            <p className="text-xs leading-relaxed text-neutral-500">
+              Secrets are encrypted (AES-256-GCM) before they ever touch the database. Laura&apos;s
+              brain has no tool to read the Vault — only this page can decrypt an item, one at a
+              time, when you click Reveal or Copy.
+            </p>
+          </SidebarCard>
+        </aside>
       </div>
-    </div>
+    </GsapEntrance>
   );
 }

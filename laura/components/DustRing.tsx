@@ -3,11 +3,13 @@
 import { useEffect, useRef } from "react";
 import type { OrbStatus } from "@/components/VoiceOrb";
 
+// Monochrome throughout -- states read by brightness and motion (spin
+// speed, pulse) rather than hue, matching the app's grayscale palette.
 const STATUS_COLOR: Record<OrbStatus, [number, number, number]> = {
-  idle: [212, 212, 216], // neutral-300 -- a quiet, mostly-still dust ring
-  listening: [251, 191, 36], // amber-400 -- the signal, lit
-  thinking: [34, 211, 238], // cyan-400 -- cool processing glow, distinct from the amber states
-  speaking: [252, 211, 77], // amber-300
+  idle: [163, 163, 163], // neutral-400 -- a quiet, mostly-still dust ring
+  listening: [245, 245, 245], // neutral-100 -- the signal, lit
+  thinking: [212, 212, 216], // neutral-300 -- distinguished by its fast spin, not color
+  speaking: [229, 229, 229], // neutral-200
   unsupported: [82, 82, 82], // neutral-600
 };
 
