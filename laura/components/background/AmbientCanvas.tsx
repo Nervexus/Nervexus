@@ -14,11 +14,10 @@ void main() {
 // A raymarched, SDF-based morphing sphere: monochrome, lit by a single
 // fixed key light plus fresnel rim, with its surface displaced by 3D value
 // noise driven by u_time so it slowly breathes/warps rather than sitting
-// static. u_mouse nudges the ray origin, giving a subtle parallax.
+// static.
 const FRAG = `
 precision highp float;
 uniform vec2 u_resolution;
-uniform vec2 u_mouse;
 uniform float u_time;
 
 float hash(vec3 p) {
@@ -57,9 +56,8 @@ vec3 getNormal(vec3 p) {
 
 void main() {
   vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / u_resolution.y;
-  vec2 mouse = (u_mouse - 0.5 * u_resolution.xy) / u_resolution.y;
 
-  vec3 ro = vec3(mouse * 0.35, 6.0);
+  vec3 ro = vec3(0.0, 0.0, 6.0);
   vec3 rd = normalize(vec3(uv, -1.5));
 
   float t = 0.0;
@@ -105,12 +103,12 @@ function compile(gl: WebGLRenderingContext, type: number, source: string): WebGL
 }
 
 /** Layer 0: a raw-WebGL ambient mesh -- a monochrome morphing sphere,
+ * static regardless of pointer position (deliberately not mouse-reactive),
  * masked by a radial gradient that stays fixed to the viewport while
  * #canvas-wrapper drifts and rotates with scroll (via ScrollTrigger). */
 export function AmbientCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const mouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -141,7 +139,6 @@ export function AmbientCanvas() {
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
     const uResolution = gl.getUniformLocation(program, "u_resolution");
-    const uMouse = gl.getUniformLocation(program, "u_mouse");
     const uTime = gl.getUniformLocation(program, "u_time");
 
     function resize() {
@@ -154,12 +151,6 @@ export function AmbientCanvas() {
     resize();
     window.addEventListener("resize", resize);
 
-    function handlePointerMove(e: PointerEvent) {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      mouseRef.current = { x: e.clientX * dpr, y: (window.innerHeight - e.clientY) * dpr };
-    }
-    window.addEventListener("pointermove", handlePointerMove);
-
     let raf = 0;
     const start = performance.now();
     function frame(now: number) {
@@ -167,7 +158,6 @@ export function AmbientCanvas() {
       gl!.clearColor(0, 0, 0, 0);
       gl!.clear(gl!.COLOR_BUFFER_BIT);
       gl!.uniform2f(uResolution, canvas!.width, canvas!.height);
-      gl!.uniform2f(uMouse, mouseRef.current.x, mouseRef.current.y);
       gl!.uniform1f(uTime, t);
       gl!.drawArrays(gl!.TRIANGLES, 0, 3);
       raf = requestAnimationFrame(frame);
@@ -177,7 +167,6 @@ export function AmbientCanvas() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("pointermove", handlePointerMove);
     };
   }, []);
 
