@@ -41,6 +41,13 @@ High priority with Overdue/Today/This week/Later grouping (Reminders, also
 settable by Laura from a conversation), and copy-without-revealing
 (Vault, via the clipboard, no on-screen display needed).
 
+`/laura`, `/notes`, `/reminders`, and `/vault` live under the `(app)`
+route group and share `AppSidebar` — a sticky left column on desktop, a
+horizontal bar on mobile, with live Notes/Reminders/Vault counts, active-
+route highlighting, and a status card. `/` lives under `(marketing)` and
+uses the fixed `TopNav`/`SiteFooter` instead — the two route groups don't
+affect the URLs, just which chrome wraps each page.
+
 ## Key files
 
 | file                           | what it is                                                        |
@@ -52,8 +59,9 @@ settable by Laura from a conversation), and copy-without-revealing
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
-| `components/TopNav.tsx`           | layer 3: fixed top nav, `mix-blend-difference`, brand + route links   |
-| `components/SiteFooter.tsx`       | layer 3: fixed footer, `mix-blend-difference`, pointer-events-none wrapper around a literal `document.write` year |
+| `components/TopNav.tsx`           | `(marketing)` layer 3: fixed top nav, `mix-blend-difference`, brand + route links |
+| `components/SiteFooter.tsx`       | `(marketing)` layer 3: fixed footer, `mix-blend-difference`, pointer-events-none wrapper around a literal `document.write` year |
+| `components/AppSidebar.tsx`       | `(app)` nav: sticky left column (desktop) / top bar (mobile), live tool counts, its own GSAP entrance (since it persists across page navigation instead of remounting) |
 | `components/GsapEntrance.tsx`     | per-page wrapper: runs the `.gsap-entrance` stagger reveal and the `.pulse-dot` pulse once on mount |
 | `components/IconifyRegister.tsx`  | client-only side-effect import that registers the `<iconify-icon>` custom element |
 | `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
