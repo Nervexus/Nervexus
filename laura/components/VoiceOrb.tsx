@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 import { canSpeak, getSpeechRecognitionCtor, type SpeechRecognitionLike } from "@/lib/speech";
-import { DustRing } from "@/components/DustRing";
 
 export type OrbStatus = "idle" | "listening" | "thinking" | "speaking" | "unsupported";
 
@@ -141,27 +140,16 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
           onClick={handleClick}
           aria-label={ARIA_LABEL[status]}
           disabled={status === "unsupported"}
-          className="group relative flex h-56 w-56 items-center justify-center outline-none disabled:cursor-not-allowed"
+          className="group relative flex h-32 w-32 items-center justify-center outline-none disabled:cursor-not-allowed"
         >
-          <DustRing status={status} size={224} />
+          {/* The ambient WebGL mesh behind the page is the orb now -- this
+              button is just the tap target, not a second decorative ring. */}
           <span
-            className="pointer-events-none absolute inset-2 rounded-full opacity-40 [animation:radar-sweep_6s_linear_infinite]"
-            style={{
-              background:
-                "conic-gradient(from 0deg, transparent 0deg, transparent 300deg, rgba(245,245,245,0.3) 345deg, transparent 360deg)",
-            }}
-            aria-hidden="true"
-          />
-          <span
-            className="pointer-events-none absolute inset-2 rounded-full border border-neutral-700/40"
-            aria-hidden="true"
-          />
-          <span
-            className={`relative flex h-16 w-16 items-center justify-center rounded-full border bg-neutral-950/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
+            className={`relative flex h-20 w-20 items-center justify-center rounded-full border bg-neutral-950/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
               status === "listening" ? "animate-[pulse_1.4s_ease-in-out_infinite]" : ""
             }`}
           >
-            <MicIcon className="h-6 w-6" />
+            <MicIcon className="h-7 w-7" />
           </span>
         </button>
         <p className="flex flex-col items-center text-center text-xs tracking-wide text-neutral-500">

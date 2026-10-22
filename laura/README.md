@@ -64,8 +64,7 @@ affect the URLs, just which chrome wraps each page.
 | `components/AppSidebar.tsx`       | `(app)` nav: sticky left column (desktop) / top bar (mobile), live tool counts, its own GSAP entrance (since it persists across page navigation instead of remounting) |
 | `components/GsapEntrance.tsx`     | per-page wrapper: runs the `.gsap-entrance` stagger reveal and the `.pulse-dot` pulse once on mount |
 | `components/IconifyRegister.tsx`  | client-only side-effect import that registers the `<iconify-icon>` custom element |
-| `components/VoiceOrb.tsx`         | the orb: mic input via SpeechRecognition, speaks replies via SpeechSynthesis |
-| `components/DustRing.tsx`         | canvas particle ring drawn behind the orb's button, colored per status (grayscale; states read by brightness/motion, not hue) |
+| `components/VoiceOrb.tsx`         | just the mic tap-target + status ring now (mic input via SpeechRecognition, speaks replies via SpeechSynthesis) -- the ambient WebGL mesh behind the page is the orb, so there's no second decorative ring here |
 | `components/Pill.tsx`             | filled dark badge with a leading pulsing dot, used for page headline counts/status |
 | `components/Button.tsx`           | the app's one primary (solid neutral-100) and ghost/danger button style |
 | `components/IconTile.tsx`         | small glass icon tile, same `bg-neutral-900/40` + blur treatment as the portfolio cards |
