@@ -104,15 +104,23 @@ export default function LauraPage() {
   }
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-3xl px-6 pb-20">
-      <div className="gsap-entrance mb-8 flex w-full items-center justify-between gap-3">
-        <div>
-          <h1 className="font-thin text-2xl tracking-tight text-neutral-100">Laura</h1>
-          <p className="mt-0.5 text-xs text-neutral-600">/ personal assistant</p>
+    // Wider than the prose/chat column below -- eight flow-diagram nodes
+    // need more room than max-w-3xl gives them without squeezing each
+    // node below its min-content width (which overflows the row rather
+    // than truncating, since a flex item's default min-width is its own
+    // content size, not 0). The header/tabs/chat stay at max-w-3xl inside
+    // their own centered wrapper for readability.
+    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+      <div className="mx-auto w-full max-w-3xl">
+        <div className="gsap-entrance mb-8 flex w-full items-center justify-between gap-3">
+          <div>
+            <h1 className="font-thin text-2xl tracking-tight text-neutral-100">Laura</h1>
+            <p className="mt-0.5 text-xs text-neutral-600">/ personal assistant</p>
+          </div>
+          <Pill>
+            <span className="normal-case tracking-normal">online</span>
+          </Pill>
         </div>
-        <Pill>
-          <span className="normal-case tracking-normal">online</span>
-        </Pill>
       </div>
 
       <div className="gsap-entrance flex flex-col items-center">
@@ -125,85 +133,87 @@ export default function LauraPage() {
         <TomorrowBriefing />
       </div>
 
-      <div className="gsap-entrance mt-10 flex gap-1 border-b border-neutral-800/60">
-        {(["chat", "activity"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`rounded-t-lg px-3 py-2 font-mono text-xs capitalize transition-colors ${
-              tab === t
-                ? "border-b-2 border-neutral-100 text-neutral-100"
-                : "text-neutral-500 hover:text-neutral-300"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-
-      {tab === "chat" ? (
-        <div className="gsap-entrance flex flex-col gap-4 py-6">
-          {!loaded && <p className="text-sm text-neutral-600">Loading…</p>}
-          {messages.map((m, i) => (
-            <div
-              key={i}
-              className={`group flex items-end gap-2 ${
-                m.role === "user" ? "flex-row-reverse self-end" : "self-start"
+      <div className="mx-auto w-full max-w-3xl">
+        <div className="gsap-entrance mt-10 flex gap-1 border-b border-neutral-800/60">
+          {(["chat", "activity"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`rounded-t-lg px-3 py-2 font-mono text-xs capitalize transition-colors ${
+                tab === t
+                  ? "border-b-2 border-neutral-100 text-neutral-100"
+                  : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
-              <Avatar role={m.role} />
-              <div className="flex max-w-[75%] flex-col gap-1">
-                <div
-                  className={`rounded-xl px-4 py-2.5 text-sm font-light leading-relaxed ${
-                    m.role === "user"
-                      ? "bg-neutral-100 text-neutral-900"
-                      : "border border-neutral-800/60 bg-neutral-900/40 text-neutral-100 backdrop-blur-sm"
-                  }`}
-                >
-                  {m.content}
-                </div>
-                <span
-                  className={`text-[10px] text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 ${
-                    m.role === "user" ? "self-end" : "self-start"
-                  }`}
-                >
-                  {formatTime(m.createdAt)}
-                </span>
-              </div>
-            </div>
+              {t}
+            </button>
           ))}
-          {sending && (
-            <div className="flex items-end gap-2 self-start">
-              <Avatar role="assistant" />
-              <div className="rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-2.5 text-sm text-neutral-500">
-                …
-              </div>
-            </div>
-          )}
-          {error && (
-            <div className="self-start rounded-xl bg-red-950/60 px-4 py-2.5 text-sm text-red-300">
-              {error}
-            </div>
-          )}
         </div>
-      ) : (
-        <div className="gsap-entrance py-6">
-          <ActivityFeed refreshKey={activityKey} />
-        </div>
-      )}
 
-      <div className="gsap-entrance gradient-border flex items-end gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-3 backdrop-blur-md">
-        <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Message Laura…"
-          rows={1}
-          className="flex-1 resize-none bg-transparent px-2 py-2 text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600"
-        />
-        <Button onClick={() => sendMessage(input.trim(), false)} disabled={sending || !input.trim()}>
-          Send
-        </Button>
+        {tab === "chat" ? (
+          <div className="gsap-entrance flex flex-col gap-4 py-6">
+            {!loaded && <p className="text-sm text-neutral-600">Loading…</p>}
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                className={`group flex items-end gap-2 ${
+                  m.role === "user" ? "flex-row-reverse self-end" : "self-start"
+                }`}
+              >
+                <Avatar role={m.role} />
+                <div className="flex max-w-[75%] flex-col gap-1">
+                  <div
+                    className={`rounded-xl px-4 py-2.5 text-sm font-light leading-relaxed ${
+                      m.role === "user"
+                        ? "bg-neutral-100 text-neutral-900"
+                        : "border border-neutral-800/60 bg-neutral-900/40 text-neutral-100 backdrop-blur-sm"
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                  <span
+                    className={`text-[10px] text-neutral-600 opacity-0 transition-opacity group-hover:opacity-100 ${
+                      m.role === "user" ? "self-end" : "self-start"
+                    }`}
+                  >
+                    {formatTime(m.createdAt)}
+                  </span>
+                </div>
+              </div>
+            ))}
+            {sending && (
+              <div className="flex items-end gap-2 self-start">
+                <Avatar role="assistant" />
+                <div className="rounded-xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-2.5 text-sm text-neutral-500">
+                  …
+                </div>
+              </div>
+            )}
+            {error && (
+              <div className="self-start rounded-xl bg-red-950/60 px-4 py-2.5 text-sm text-red-300">
+                {error}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="gsap-entrance py-6">
+            <ActivityFeed refreshKey={activityKey} />
+          </div>
+        )}
+
+        <div className="gsap-entrance gradient-border flex items-end gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-3 backdrop-blur-md">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Message Laura…"
+            rows={1}
+            className="flex-1 resize-none bg-transparent px-2 py-2 text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600"
+          />
+          <Button onClick={() => sendMessage(input.trim(), false)} disabled={sending || !input.trim()}>
+            Send
+          </Button>
+        </div>
       </div>
     </GsapEntrance>
   );

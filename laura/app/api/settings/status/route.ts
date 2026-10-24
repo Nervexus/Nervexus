@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, connection } from "next/server";
 
 type Status = "connected" | "expiring" | "missing";
 
@@ -16,6 +16,12 @@ function tursoTokenExpiry(token: string | undefined): string | null {
 // Reads presence/shape only -- never the actual secret values -- so this
 // route is safe to expose to the Settings page without leaking anything.
 export async function GET() {
+  // Opts into per-request rendering under Cache Components: without this,
+  // Next statically evaluates the route at build time, freezing the
+  // Date.now()-based "expires soon" check forever instead of recomputing
+  // it on every request.
+  await connection();
+
   const tursoExpiresAt = tursoTokenExpiry(process.env.TURSO_AUTH_TOKEN);
   const tursoExpiringSoon = tursoExpiresAt
     ? new Date(tursoExpiresAt).getTime() - Date.now() < 48 * 60 * 60 * 1000

@@ -319,7 +319,7 @@ export const FlowDiagram = forwardRef<
         style={{ maxWidth: STAGE_W }}
       >
         {nodes.map((node, i) => (
-          <div key={node.title} className="sm:flex-1">
+          <div key={node.title} className="sm:min-w-0 sm:flex-1">
             <FlowNode
               {...node}
               pulsing={pulsingNodes.has(node.title)}

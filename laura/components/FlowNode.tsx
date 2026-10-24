@@ -2,7 +2,14 @@ import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { CheckIcon } from "@/components/icons";
 
-/** A node card in the workflow-style diagram, e.g. "Notes" or "Vault". */
+/** A node card in the workflow-style diagram, e.g. "Notes" or "Vault".
+ * Icon-above-text (not icon-beside-text) on purpose: a side-by-side
+ * layout's minimum content width is icon + gap + the widest text line,
+ * which stopped fitting once there were 8 of these in one row (each
+ * squeezed to ~100px forced severe truncation or overflowed the row
+ * entirely, since a flex item's default min-width is its own content
+ * size). Stacking the text under the icon needs only as much width as
+ * the text itself, which scales to far more nodes per row. */
 export function FlowNode({
   icon,
   title,
@@ -24,7 +31,7 @@ export function FlowNode({
   const content = (
     <div
       style={style}
-      className={`relative flex animate-[rise-in_0.5s_ease-out_backwards] items-center gap-3 rounded-xl border px-3.5 py-2.5 backdrop-blur-sm transition-all duration-500 ${
+      className={`relative flex animate-[rise-in_0.5s_ease-out_backwards] flex-col items-center gap-2 rounded-xl border px-2 py-3 text-center backdrop-blur-sm transition-all duration-500 ${
         pulsing
           ? "scale-[1.04] border-neutral-100 bg-neutral-100/10 shadow-[0_0_24px_4px_rgba(245,245,245,0.25)]"
           : active
@@ -48,9 +55,9 @@ export function FlowNode({
       >
         {icon}
       </div>
-      <div className="min-w-0">
+      <div className="w-full min-w-0">
         <div className="truncate text-xs font-medium text-neutral-100">{title}</div>
-        {subtitle && <div className="truncate text-[11px] text-neutral-500">{subtitle}</div>}
+        {subtitle && <div className="truncate text-[10px] text-neutral-500">{subtitle}</div>}
       </div>
     </div>
   );
