@@ -94,9 +94,12 @@ export async function sendText(message: string): Promise<CallResult> {
   return send("sms", message);
 }
 
-/** The owner's chat id, for checking that an incoming update is from you. */
+/** The owner's chat id, for checking that an incoming update is from you.
+ * Normalized because the stored env value can carry whitespace or quotes
+ * from however it was pasted in -- harmless when sending (Telegram trims
+ * it), but it breaks an exact string comparison against an update. */
 export function ownerChatId(): string {
-  return getChatId();
+  return getChatId().trim().replace(/^["']|["']$/g, "");
 }
 
 /** A conversational reply inside the Telegram chat. Not logged to CallLog

@@ -18,6 +18,11 @@ export async function POST(request: Request) {
   const msg = update?.message;
   const text: string | undefined = typeof msg?.text === "string" ? msg.text.trim() : undefined;
   if (!msg || String(msg.chat?.id) !== ownerChatId() || !text) {
+    console.warn("Telegram update ignored:", {
+      hasMessage: Boolean(msg),
+      fromOwner: String(msg?.chat?.id) === ownerChatId(),
+      hasText: Boolean(text),
+    });
     return NextResponse.json({ ok: true });
   }
 
