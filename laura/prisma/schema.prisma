@@ -74,3 +74,31 @@ model CallLog {
   providerId String? // Telegram's own message_id, if sent
   createdAt  DateTime @default(now())
 }
+
+// One work shift, entered by hand or extracted from a photographed rota
+// (see lib/rota.ts) -- confidence/source let the Rota page flag
+// AI-extracted shifts for review before they're trusted the same as a
+// hand-entered one.
+model Shift {
+  id          String   @id @default(cuid())
+  startAt     DateTime
+  endAt       DateTime
+  location    String?
+  colleagues  String? // comma-separated names, as given
+  note        String?
+  source      String   @default("manual") // "manual" | "photo"
+  commutePlan String? // Laura's generated "when to leave" text, if asked for
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Singleton (id is always "me") -- the home/work addresses and arrival
+// buffer that commute planning needs. Deliberately not per-user since
+// this whole app is single-user.
+model Profile {
+  id                   String   @id @default("me")
+  homeAddress          String?
+  workAddress          String?
+  arrivalBufferMinutes Int      @default(15)
+  updatedAt            DateTime @updatedAt
+}

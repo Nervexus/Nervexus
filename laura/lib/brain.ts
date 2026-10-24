@@ -1,11 +1,8 @@
-import { GoogleGenAI, Type, type Content, type FunctionDeclaration } from "@google/genai";
+import { Type, type Content, type FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/db";
 import { placeCall, sendText } from "@/lib/telegram";
-
-// The non-"lite" flash alias free tier is capped at a measly 20
-// requests/day -- flash-lite's free quota is far more usable for an
-// assistant meant to be asked things throughout the day.
-const MODEL = "gemini-flash-lite-latest";
+import { getGeminiClient, MODEL } from "@/lib/gemini";
+import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 
 const SYSTEM_PROMPT = `You are Laura, a personal voice/text assistant. You are warm, direct, and
 efficient -- you sound like a sharp human assistant, not a generic chatbot.
@@ -39,24 +36,14 @@ vs. walking), recent news, or any other real-world fact that can change --
 use web_search rather than guessing from memory. Summarize what you find
 plainly; don't dump raw search results.
 
+You have access to the user's work rota (get_shifts, who_am_i_working_with)
+-- use it for questions about shifts, days off, or who they're working
+with. If the rota has no shifts yet, say so and suggest they add one on
+the Rota page rather than guessing.
+
 You never have access to the Vault. If asked for a password or secret,
 say you can't see the Vault's contents and the user should look it up
 there themselves.`;
-
-let client: GoogleGenAI | null = null;
-
-function getClient() {
-  if (!client) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error(
-        "GEMINI_API_KEY is not set. Add it to .env.local to talk to Laura."
-      );
-    }
-    client = new GoogleGenAI({ apiKey });
-  }
-  return client;
-}
 
 export type ChatMessage = {
   role: "user" | "assistant";
@@ -156,6 +143,52 @@ const tools: FunctionDeclaration[] = [
       required: ["message"],
     },
   },
+  {
+    name: "get_shifts",
+    description: "List the user's upcoming work shifts, soonest first.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        days: {
+          type: Type.NUMBER,
+          description: "How many days ahead to look. Defaults to 14 if not given.",
+        },
+      },
+    },
+  },
+  {
+    name: "who_am_i_working_with",
+    description: "Find who the user is scheduled to work with on a given date.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        date: {
+          type: Type.STRING,
+          description: "Absolute ISO 8601 date (e.g. 2026-10-25), resolved from relative terms " +
+            "like 'tomorrow' or 'Friday' using get_current_time if needed.",
+        },
+      },
+      required: ["date"],
+    },
+  },
+  {
+    name: "plan_commute",
+    description:
+      "Work out when to leave home for the shift on a given date, searching live " +
+      "transit info. Needs home/work addresses set on the Rota page first -- if " +
+      "the tool says they're missing, tell the user to add them there.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        date: {
+          type: Type.STRING,
+          description: "Absolute ISO 8601 date of the shift to plan for, resolved from relative " +
+            "terms like 'tomorrow' using get_current_time if needed.",
+        },
+      },
+      required: ["date"],
+    },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -163,7 +196,7 @@ const tools: FunctionDeclaration[] = [
 // same request, so this runs as a separate, search-only call whose answer
 // comes back as plain text (like any other tool result).
 async function webSearch(query: string): Promise<string> {
-  const ai = getClient();
+  const ai = getGeminiClient();
   const response = await ai.models.generateContent({
     model: MODEL,
     contents: query,
@@ -182,7 +215,14 @@ async function webSearch(query: string): Promise<string> {
 // Tools worth surfacing in the home page's Activity feed -- a real-world
 // effect, or an answer that came from outside the model's own memory.
 // get_current_time/list_reminders are read-only/self-referential noise.
-const LOGGED_TOOLS = new Set(["create_note", "create_reminder", "web_search", "call_me", "text_me"]);
+const LOGGED_TOOLS = new Set([
+  "create_note",
+  "create_reminder",
+  "web_search",
+  "call_me",
+  "text_me",
+  "plan_commute",
+]);
 
 async function logActivity(tool: string, summary: string) {
   await prisma.activityLog.create({ data: { tool, summary } }).catch((err) => {
@@ -267,13 +307,60 @@ async function runTool(
     await logActivity("text_me", `Sent a message: "${message}"`);
     return { result: "Sent." };
   }
+  if (name === "get_shifts") {
+    const { days } = args as { days?: number };
+    const shifts = await getShifts(typeof days === "number" ? days : 14);
+    if (shifts.length === 0) return { result: "No upcoming shifts on the rota." };
+    return {
+      result: shifts
+        .map(
+          (s) =>
+            `- ${s.startAt.toString()} to ${s.endAt.toString()}` +
+            (s.location ? ` at ${s.location}` : "") +
+            (s.colleagues ? ` (with ${s.colleagues})` : "")
+        )
+        .join("\n"),
+    };
+  }
+  if (name === "who_am_i_working_with") {
+    const { date } = args as { date?: string };
+    if (!date) return { error: "who_am_i_working_with needs a date" };
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return { error: "date must be a valid ISO 8601 date" };
+    const answer = await whoAmIWorkingWith(parsed);
+    return { result: answer };
+  }
+  if (name === "plan_commute") {
+    const { date } = args as { date?: string };
+    if (!date) return { error: "plan_commute needs a date" };
+    const parsed = new Date(date);
+    if (Number.isNaN(parsed.getTime())) return { error: "date must be a valid ISO 8601 date" };
+
+    const dayStart = new Date(parsed);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    const shift = await prisma.shift.findFirst({
+      where: { startAt: { gte: dayStart, lt: dayEnd } },
+      orderBy: { startAt: "asc" },
+    });
+    if (!shift) return { error: `No shift on the rota for ${dayStart.toDateString()}.` };
+
+    try {
+      const plan = await planCommute(shift.id);
+      await logActivity("plan_commute", `Planned commute for ${dayStart.toDateString()}`);
+      return { result: plan };
+    } catch (err) {
+      console.error("plan_commute error:", err);
+      return { error: err instanceof Error ? err.message : "Couldn't plan the commute." };
+    }
+  }
   return { error: `Unknown tool: ${name}` };
 }
 
 export type ChatResult = { reply: string; toolsUsed: string[] };
 
 export async function chat(history: ChatMessage[]): Promise<ChatResult> {
-  const ai = getClient();
+  const ai = getGeminiClient();
   const contents: Content[] = history.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],

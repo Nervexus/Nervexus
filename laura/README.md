@@ -4,21 +4,29 @@ A dark, monochrome studio-site look: deep black (`#080808`), a raw-WebGL
 ambient mesh (a raymarched, SDF-based morphing sphere) on the Laura page,
 procedural film-grain noise, Inter thin/extralight headlines, JetBrains
 Mono labels, and GSAP-driven reveals and scroll scrubbing. A voice orb, a
-chat log, Notes, Reminders, a Vault, and real outbound Calls & texts (via
+chat log, Notes, Reminders, a Vault, real outbound Calls & texts (via
 a free Telegram bot -- "calling" sends an urgent-styled Telegram message
 rather than an actual ringing phone call, since no free provider can place
-one). Laura can also search the live web (place hours, directions/
-travel comparisons, current info) via Gemini's Google Search grounding.
-She cannot yet book/pay for anything (restaurants, rides, tickets), parse
-a work rota, plan a commute, or touch Instagram — those are later phases
-of the full vision (see the roadmap doc shared with this project):
+one), and a Rota — upload a photo of your work schedule (Gemini vision
+parses it, no OCR service needed) or add shifts by hand, then ask Laura
+"who am I working with Thursday" or have her plan when to leave for a
+shift against your saved home/work addresses. Laura can also search the
+live web (place hours, directions/travel comparisons, current info) via
+Gemini's Google Search grounding — commute planning reuses that same
+grounding tool as a stand-in for a dedicated transit API, upgradable later
+without changing the calling code's shape. She cannot yet book/pay for
+anything (restaurants, rides, tickets), send an automatic tomorrow
+briefing, or touch Instagram — those are the rest of the full vision (see
+the roadmap doc shared with this project):
 
 1. **Core assistant** (this) — Gemini + tool-calling loop, a voice orb
    (browser Speech Recognition/Synthesis), persistent chat, Notes,
    Reminders, an encrypted Vault, web search, and outbound calls/texts via
    a free Telegram bot.
-2. **Work rota & daily planning** — upload/parse a rota, commute/transit
-   planning, an automatic tomorrow briefing, colleague/shift awareness.
+2. **Work rota & daily planning** (this, partial) — upload/parse a rota,
+   commute/transit planning, and colleague/shift awareness are live; an
+   automatic tomorrow briefing combining shifts + commute + reminders into
+   one summary is not built yet.
 3. **Booking management** — natural-language restaurant/activity booking,
    availability search, payment links (never auto-paying), calendar sync.
 4. **Instagram intelligence** — analytics, profile/content strategy,
@@ -43,6 +51,7 @@ search), but a human always approves and completes any payment.
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
+| `/rota`      | your work schedule — upload a rota photo or add shifts by hand, per-shift commute planning, home/work address + arrival-buffer settings |
 
 Notes/Reminders/Vault all use a responsive auto-fit card grid (not a fixed
 column count) so a handful of items still fill the row instead of leaving
@@ -51,10 +60,10 @@ High priority with Overdue/Today/This week/Later grouping (Reminders, also
 settable by Laura from a conversation), and copy-without-revealing
 (Vault, via the clipboard, no on-screen display needed).
 
-`/laura`, `/notes`, `/reminders`, and `/vault` live under the `(app)`
-route group and share `AppSidebar` — a sticky left column on desktop, a
-horizontal bar on mobile, with live Notes/Reminders/Vault counts, active-
-route highlighting, and a status card. `/` lives under `(marketing)` and
+`/laura`, `/notes`, `/reminders`, `/rota`, `/vault`, and `/calls` live
+under the `(app)` route group and share `AppSidebar` — a sticky left
+column on desktop, a horizontal bar on mobile, with live per-page counts,
+active-route highlighting, and a status card. `/` lives under `(marketing)` and
 uses the fixed `TopNav`/`SiteFooter` instead — the two route groups don't
 affect the URLs, just which chrome wraps each page.
 
@@ -62,11 +71,13 @@ affect the URLs, just which chrome wraps each page.
 
 | file                           | what it is                                                        |
 |----------------------------------|----------------------------------------------------------------------|
-| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`), via Gemini |
+| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`), via Gemini |
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
+| `lib/gemini.ts`                   | shared Gemini client/model (`getGeminiClient()`, `MODEL`), used by `lib/brain.ts` and `lib/rota.ts` |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `lib/telegram.ts`                 | `placeCall`/`sendText` -- outbound-only, always to `TELEGRAM_CHAT_ID`, logs every attempt (success or failure) to `CallLog` |
+| `lib/rota.ts`                     | `parseRotaImage` (Gemini vision, structured JSON output), `getShifts`, `whoAmIWorkingWith`, `planCommute` (Gemini + Google Search grounding, saved to `Shift.commutePlan`) |
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
@@ -85,12 +96,13 @@ affect the URLs, just which chrome wraps each page.
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
-| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
+| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls/Rota, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
-| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog` models |
-| `app/api/{chat,notes,reminders,vault,activity,calls}/...` | API routes                                         |
+| `components/ShiftCard.tsx`        | `/rota` page's card: date/time range, location/colleagues, "from photo" badge, inline "Plan commute" + delete |
+| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile` models |
+| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile}/...` | API routes                                         |
 
 ## Design system
 
@@ -143,6 +155,25 @@ personal use, but worth knowing if replies feel slow or hit the free
 tier's rate limit (~5 requests/minute on the flash tier at the time of
 writing).
 
+## Rota & commute planning
+
+Upload a photo of a work rota (any format — a photo of a printed sheet, a
+screenshot, a handwritten table) and `parseRotaImage` sends it straight to
+Gemini as multimodal input with a structured JSON `responseSchema` — no
+separate OCR step, and no new API key, since it reuses `GEMINI_API_KEY`.
+Parsed shifts are shown for review/editing before anything is saved
+(`POST /api/rota/parse` only previews; saving is a separate explicit
+`POST /api/rota` per shift). Shifts can also be added by hand.
+
+Commute planning (`planCommute`, wired to `plan_commute` in `lib/brain.ts`
+and the "Plan commute" button on `ShiftCard`) needs `homeAddress` +
+`workAddress` set once on `/rota`'s sidebar (stored in the singleton
+`Profile` row) and otherwise returns a plain "I don't have your addresses
+yet" message instead of erroring. It currently answers via Gemini's
+Google Search grounding tool — the same mechanism `web_search` uses — as a
+stand-in for a dedicated transit API; the result is saved to
+`Shift.commutePlan` so it only has to be computed once per shift.
+
 ## Activity feed
 
 Every time Laura saves a note, sets a reminder, or runs a web search, it's
@@ -193,7 +224,10 @@ installed for a later phase but not wired up yet.
   termination. If you ever want an actual ringing call, that needs a paid
   telephony provider (Twilio, etc.) at a fraction of a cent per call.
 - **Later (commute planning):** a maps/transit API key (e.g. Google Maps
-  Platform) for real bus/train times and journey calculation.
+  Platform) for real bus/train times and journey calculation — commute
+  planning already works today via Gemini's Google Search grounding, but a
+  dedicated transit API would give exact timings instead of a search-based
+  estimate.
 - **Later (Instagram):** a Meta Business + Instagram Graph API app on top
   of a professional Instagram account — Meta's App Review process gates
   most of the DM/analytics scopes and can take time (and isn't guaranteed

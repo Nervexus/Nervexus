@@ -54,8 +54,25 @@ function PhoneIcon({ className }: { className?: string }) {
   );
 }
 
-const STAGE_W = 680;
-const NODE_COUNT = 5;
+function CalendarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="4" y="5" width="16" height="15" rx="2" />
+      <path d="M4 9.5h16M8 3v3.5M16 3v3.5" />
+    </svg>
+  );
+}
+
+const STAGE_W = 760;
+const NODE_COUNT = 6;
 // Evenly-spaced virtual centers in a 0..STAGE_W space -- the actual node
 // row below uses the same even distribution (flex-1 each), so these line
 // up with the real rendered centers regardless of viewport width.
@@ -71,6 +88,9 @@ const TOOL_NODE: Record<string, string> = {
   web_search: "Web search",
   call_me: "Calls & texts",
   text_me: "Calls & texts",
+  get_shifts: "Rota",
+  who_am_i_working_with: "Rota",
+  plan_commute: "Rota",
 };
 
 export const FlowDiagram = forwardRef<
@@ -82,6 +102,7 @@ export const FlowDiagram = forwardRef<
   const [nextReminder, setNextReminder] = useState<Reminder | null>(null);
   const [reminderCount, setReminderCount] = useState<number | null>(null);
   const [callCount, setCallCount] = useState<number | null>(null);
+  const [rotaCount, setRotaCount] = useState<number | null>(null);
   const [pulsingNodes, setPulsingNodes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -126,6 +147,16 @@ export const FlowDiagram = forwardRef<
       .then((res) => res.json())
       .then((data) => setCallCount(data.logs?.length ?? 0))
       .catch(() => setCallCount(0));
+
+    fetch("/api/rota")
+      .then((res) => res.json())
+      .then((data) => {
+        const upcoming = (data.shifts ?? []).filter(
+          (s: { endAt: string }) => new Date(s.endAt) >= new Date()
+        );
+        setRotaCount(upcoming.length);
+      })
+      .catch(() => setRotaCount(0));
   }, []);
 
   const nodes = [
@@ -161,6 +192,13 @@ export const FlowDiagram = forwardRef<
       title: "Calls & texts",
       subtitle: callCount === null ? "…" : callCount > 0 ? `${callCount} sent` : "via Telegram",
       href: "/calls",
+      active: true,
+    },
+    {
+      icon: <CalendarIcon className="h-4 w-4" />,
+      title: "Rota",
+      subtitle: rotaCount === null ? "…" : rotaCount > 0 ? `${rotaCount} upcoming` : "upload a photo",
+      href: "/rota",
       active: true,
     },
   ];

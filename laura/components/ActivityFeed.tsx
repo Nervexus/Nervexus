@@ -54,12 +54,33 @@ function MessageIcon({ className }: { className?: string }) {
   );
 }
 
+function BusIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="4" y="4" width="16" height="13" rx="2" />
+      <path d="M4 12h16" />
+      <path d="M8 20v-3M16 20v-3" />
+      <circle cx="8" cy="15" r="0.6" fill="currentColor" />
+      <circle cx="16" cy="15" r="0.6" fill="currentColor" />
+    </svg>
+  );
+}
+
 const TOOL_ICON: Record<string, (className: string) => ReactNode> = {
   create_note: (c) => <NoteIcon className={c} />,
   create_reminder: (c) => <ClockIcon className={c} />,
   web_search: (c) => <SearchIcon className={c} />,
   call_me: (c) => <PhoneIcon className={c} />,
   text_me: (c) => <MessageIcon className={c} />,
+  plan_commute: (c) => <BusIcon className={c} />,
 };
 
 function timeAgo(iso: string): string {
