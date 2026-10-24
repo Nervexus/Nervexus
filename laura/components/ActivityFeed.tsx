@@ -113,6 +113,7 @@ const TOOL_ICON: Record<string, (className: string) => ReactNode> = {
   create_reminder: (c) => <ClockIcon className={c} />,
   web_search: (c) => <SearchIcon className={c} />,
   call_me: (c) => <PhoneIcon className={c} />,
+  start_video_call: (c) => <PhoneIcon className={c} />,
   text_me: (c) => <MessageIcon className={c} />,
   plan_commute: (c) => <BusIcon className={c} />,
   search_booking_options: (c) => <BookmarkIcon className={c} />,

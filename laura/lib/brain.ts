@@ -315,6 +315,15 @@ const tools: FunctionDeclaration[] = [
     description: "List content ideas the user is currently tracking (not posted or discarded).",
     parameters: { type: Type.OBJECT, properties: {} },
   },
+  {
+    name: "start_video_call",
+    description:
+      "Send the user a link to an instant, free video/audio call (Jitsi Meet) -- for " +
+      "when a live conversation would help more than text. This does not place an " +
+      "actual ringing phone call and Laura does not join the call herself; it just " +
+      "gives the user a link to start one, e.g. to loop in someone else.",
+    parameters: { type: Type.OBJECT, properties: {} },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -353,6 +362,7 @@ const LOGGED_TOOLS = new Set([
   "create_booking",
   "research_instagram_account",
   "create_content_idea",
+  "start_video_call",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -617,6 +627,13 @@ async function runTool(
         )
         .join("\n"),
     };
+  }
+  if (name === "start_video_call") {
+    const link = `https://meet.jit.si/laura-${Math.random().toString(36).slice(2, 10)}`;
+    const result = await sendText(`📹 Video call: ${link}`);
+    if (!result.ok) return { error: result.error };
+    await logActivity("start_video_call", "Sent a video call link");
+    return { result: `Sent the call link: ${link}` };
   }
   return { error: `Unknown tool: ${name}` };
 }
