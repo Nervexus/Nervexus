@@ -114,7 +114,6 @@ affect the URLs, just which chrome wraps each page.
 | `components/Button.tsx`           | the app's one primary (solid neutral-100) and ghost/danger button style |
 | `components/IconTile.tsx`         | small glass icon tile, same `bg-neutral-900/40` + blur treatment as the portfolio cards |
 | `components/ui/glass-folder-cards.tsx` | drop-in third-party component (vendored as-is, not modified): a glass-and-canvas "folder" object -- notes are its files. Lives in `components/ui/` rather than flat in `components/` since it's a drop-in primitive, not a hand-rolled app component |
-| `components/ReminderCard.tsx`     | a reminder's card: priority accent bar, done/overdue state -- used in the selected day's panel on the Reminders calendar |
 | `components/VaultCard.tsx`        | Vault page's card: Reveal and Copy-without-revealing actions          |
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
@@ -209,13 +208,20 @@ when one's already set.
 ## Reminders
 
 `/reminders` is a month calendar (`buildMonthGrid` always returns 42 cells
--- 6 full weeks -- so the grid never reflows height between months) instead
-of the earlier Overdue/Today/This week/Later list. Each day with reminders
-due shows up to 3 as small tag pills (a priority-colored dot + truncated
-title, `+N more` beyond that); clicking a day lists that day's reminders as
-full `ReminderCard`s plus a quick-add row (title, time, priority) scoped to
-that date. Same data model and API routes as before -- this only changed
-how the existing reminders are browsed and added, not what a reminder is.
+-- 6 full weeks -- so the grid never reflows height between months); leading
+and trailing days from adjacent months get a diagonal hatch (`.day-hatch`
+in `app/globals.css`) instead of just dimming. Each day shows up to 4 small
+priority-colored dots for its reminders (no inline text -- the grid is for
+scanning a month at a glance); clicking any day opens it as a popup
+(backdrop click or Esc to dismiss) with that day's reminders as compact
+rows plus a quick-add form, rather than a panel below the grid. `Today`
+jumps the grid back to the current month; the `+` button opens today's
+popup directly. This is the app's other deliberate color accent
+(`--calendar-accent` in `app/globals.css`, a red used for today/selected,
+the add button, and the popup's primary action) -- everything else on the
+page, including the normal/low priority dots, stays neutral. Same data
+model and API routes as before -- this only changed how reminders are
+browsed and added, not what a reminder is.
 
 ## Web search
 
