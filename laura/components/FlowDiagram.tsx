@@ -159,7 +159,7 @@ export const FlowDiagram = forwardRef<
     {
       icon: <PhoneIcon className="h-4 w-4" />,
       title: "Calls & texts",
-      subtitle: callCount === null ? "…" : callCount > 0 ? `${callCount} sent` : "via Twilio",
+      subtitle: callCount === null ? "…" : callCount > 0 ? `${callCount} sent` : "via Telegram",
       href: "/calls",
       active: true,
     },

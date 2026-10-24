@@ -1,6 +1,6 @@
 import { GoogleGenAI, Type, type Content, type FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/db";
-import { placeCall, sendText } from "@/lib/twilio";
+import { placeCall, sendText } from "@/lib/telegram";
 
 // The non-"lite" flash alias free tier is capped at a measly 20
 // requests/day -- flash-lite's free quota is far more usable for an
@@ -14,20 +14,24 @@ speech: a sentence or two for most things, more only when the user actually
 asked for detail.
 
 You do not yet have real-world tools wired up beyond the ones listed for
-this conversation. You can call and text the user's own phone (call_me,
-text_me), but you cannot send email or book or pay for anything (rides,
-food, reservations) -- those aren't wired up yet. Don't claim to have done
-one of those unless a tool call in this conversation actually did it. If
-asked to do something you can't do yet, say so plainly and briefly explain
-what's still missing (e.g. "I can look that up, but I can't actually book
-it yet").
+this conversation. You can send the user an urgent notification or a
+plain message via Telegram (call_me, text_me) -- call_me does NOT place
+an actual ringing phone call, it just sends an urgent-styled message, so
+never claim to have "called" or "rung" the user, say you've "sent an
+urgent message" or similar instead. You cannot send email or book or pay
+for anything (rides, food, reservations) -- those aren't wired up yet.
+Don't claim to have done one of those unless a tool call in this
+conversation actually did it. If asked to do something you can't do yet,
+say so plainly and briefly explain what's still missing (e.g. "I can look
+that up, but I can't actually book it yet").
 
 When you do have a tool that takes a real-world, hard-to-undo action --
-including call_me and text_me, which place a real phone call or send a
-real text -- describe exactly what you're about to do and ask for a yes
-before calling it, unless the user has already clearly confirmed earlier
-in this same conversation. Creating a note or a reminder is low-stakes and
-reversible, so those don't need confirmation -- just do them when asked.
+including call_me and text_me, which send a real notification to the
+user's phone -- describe exactly what you're about to do and ask for a
+yes before calling it, unless the user has already clearly confirmed
+earlier in this same conversation. Creating a note or a reminder is
+low-stakes and reversible, so those don't need confirmation -- just do
+them when asked.
 
 For anything you don't know for certain -- whether a place is open right
 now, current prices, directions, which way to travel (train vs. rideshare
@@ -128,12 +132,13 @@ const tools: FunctionDeclaration[] = [
   {
     name: "call_me",
     description:
-      "Place a real phone call to the user's own phone and read a short message " +
-      "aloud. Confirm with the user first, per the hard-to-undo-action rule.",
+      "Send the user an urgent-styled Telegram notification -- the free stand-in " +
+      "for 'calling' them (it does not place an actual ringing phone call). " +
+      "Confirm with the user first, per the hard-to-undo-action rule.",
     parameters: {
       type: Type.OBJECT,
       properties: {
-        message: { type: Type.STRING, description: "What Laura should say on the call." },
+        message: { type: Type.STRING, description: "The urgent message to send." },
       },
       required: ["message"],
     },
@@ -141,12 +146,12 @@ const tools: FunctionDeclaration[] = [
   {
     name: "text_me",
     description:
-      "Send a real text message to the user's own phone. Confirm with the user " +
-      "first, per the hard-to-undo-action rule.",
+      "Send the user a plain Telegram message. Confirm with the user first, per " +
+      "the hard-to-undo-action rule.",
     parameters: {
       type: Type.OBJECT,
       properties: {
-        message: { type: Type.STRING, description: "The text message body." },
+        message: { type: Type.STRING, description: "The message body." },
       },
       required: ["message"],
     },
@@ -248,18 +253,18 @@ async function runTool(
   }
   if (name === "call_me") {
     const { message } = args as { message?: string };
-    if (!message) return { error: "call_me needs a message to say" };
+    if (!message) return { error: "call_me needs a message to send" };
     const result = await placeCall(message);
     if (!result.ok) return { error: result.error };
-    await logActivity("call_me", `Called you: "${message}"`);
-    return { result: "Calling you now." };
+    await logActivity("call_me", `Sent an urgent message: "${message}"`);
+    return { result: "Sent as an urgent notification." };
   }
   if (name === "text_me") {
     const { message } = args as { message?: string };
     if (!message) return { error: "text_me needs a message body" };
     const result = await sendText(message);
     if (!result.ok) return { error: result.error };
-    await logActivity("text_me", `Texted you: "${message}"`);
+    await logActivity("text_me", `Sent a message: "${message}"`);
     return { result: "Sent." };
   }
   return { error: `Unknown tool: ${name}` };

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { placeCall, sendText } from "@/lib/twilio";
+import { placeCall, sendText } from "@/lib/telegram";
 
 export async function GET() {
   const logs = await prisma.callLog.findMany({ orderBy: { createdAt: "desc" }, take: 50 });

@@ -5,7 +5,9 @@ ambient mesh (a raymarched, SDF-based morphing sphere) on the Laura page,
 procedural film-grain noise, Inter thin/extralight headlines, JetBrains
 Mono labels, and GSAP-driven reveals and scroll scrubbing. A voice orb, a
 chat log, Notes, Reminders, a Vault, and real outbound Calls & texts (via
-Twilio). Laura can also search the live web (place hours, directions/
+a free Telegram bot -- "calling" sends an urgent-styled Telegram message
+rather than an actual ringing phone call, since no free provider can place
+one). Laura can also search the live web (place hours, directions/
 travel comparisons, current info) via Gemini's Google Search grounding.
 She cannot yet book/pay for anything (restaurants, rides, tickets), parse
 a work rota, plan a commute, or touch Instagram — those are later phases
@@ -13,8 +15,8 @@ of the full vision (see the roadmap doc shared with this project):
 
 1. **Core assistant** (this) — Gemini + tool-calling loop, a voice orb
    (browser Speech Recognition/Synthesis), persistent chat, Notes,
-   Reminders, an encrypted Vault, web search, and outbound calls/texts to
-   your own phone via Twilio.
+   Reminders, an encrypted Vault, web search, and outbound calls/texts via
+   a free Telegram bot.
 2. **Work rota & daily planning** — upload/parse a rota, commute/transit
    planning, an automatic tomorrow briefing, colleague/shift awareness.
 3. **Booking management** — natural-language restaurant/activity booking,
@@ -40,7 +42,7 @@ search), but a human always approves and completes any payment.
 | `/notes`     | notes you've written or asked Laura to remember                              |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
-| `/calls`     | have Laura call or text your own phone (via Twilio), plus a history of past ones |
+| `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
 
 Notes/Reminders/Vault all use a responsive auto-fit card grid (not a fixed
 column count) so a handful of items still fill the row instead of leaving
@@ -64,7 +66,7 @@ affect the URLs, just which chrome wraps each page.
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
-| `lib/twilio.ts`                   | `placeCall`/`sendText` -- outbound-only, always to `OWNER_PHONE_NUMBER`, logs every attempt (success or failure) to `CallLog` |
+| `lib/telegram.ts`                 | `placeCall`/`sendText` -- outbound-only, always to `TELEGRAM_CHAT_ID`, logs every attempt (success or failure) to `CallLog` |
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
@@ -88,7 +90,7 @@ affect the URLs, just which chrome wraps each page.
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
 | `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog` models |
-| `app/api/{chat,notes,reminders,vault,activity,calls}/...` | API routes (`calls/twiml` is the webhook Twilio fetches mid-call for what to say) |
+| `app/api/{chat,notes,reminders,vault,activity,calls}/...` | API routes                                         |
 
 ## Design system
 
@@ -161,24 +163,17 @@ interesting as a history, just noise.
   (the list view never receives decrypted values).
 - **Confirm before acting**: the system prompt instructs Laura to describe
   and get a yes before calling any tool with a real-world, hard-to-undo
-  side effect (calling/texting you, sending an email, booking something) —
-  matters since a misheard voice command or an ambiguous text could
-  otherwise trigger a real call to your phone. Creating a note or a
-  reminder is treated as low-stakes/reversible and doesn't need
+  side effect (sending you an urgent message, sending an email, booking
+  something) — matters since a misheard voice command or an ambiguous
+  text could otherwise trigger an unwanted notification. Creating a note
+  or a reminder is treated as low-stakes/reversible and doesn't need
   confirmation.
-- **Calls/texts are outbound-only, to one fixed number.** `call_me`/
-  `text_me` always dial `OWNER_PHONE_NUMBER` — there's no inbound handling
-  yet, so there's nothing for a stranger to hijack by texting/calling the
-  Twilio number. The caller-ID-allowlist problem only shows up once Laura
-  can *receive* messages/calls (phase 5), at which point the webhook will
-  need to check the sender against `OWNER_PHONE_NUMBER` before acting on
-  anything.
-- **The `/api/calls/twiml` webhook isn't signature-verified yet.** It
-  trusts whatever `message` query param it's given rather than checking
-  Twilio's `X-Twilio-Signature` header — acceptable for now since the only
-  thing it can do is make the call say something, to a number only you
-  control, but worth hardening (via `twilio.validateRequest`) before this
-  app has anything more sensitive riding on that endpoint.
+- **Calls/texts are outbound-only, to one fixed chat.** `call_me`/
+  `text_me` always message `TELEGRAM_CHAT_ID` — there's no inbound
+  handling yet, so there's nothing for a stranger to hijack by messaging
+  the bot. The sender-allowlist problem only shows up once Laura can
+  *receive* messages (phase 5), at which point incoming updates will need
+  to be checked against `TELEGRAM_CHAT_ID` before acting on anything.
 
 ## Persistence note
 
@@ -190,12 +185,13 @@ installed for a later phase but not wired up yet.
 
 ## Accounts needed, by phase
 
-- **Now (calls/texts):** a Twilio account, phone number, and your own
-  verified number — see `.env.example` for the exact env vars
-  (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`,
-  `OWNER_PHONE_NUMBER`). A free trial account works fine for personal
-  volume; it just restricts calls/texts to numbers you've verified in the
-  console and adds a short spoken disclaimer before Laura's message.
+- **Now (calls/texts):** a Telegram bot, created via @BotFather — free,
+  no card, no trial limits. See `.env.example` for the exact steps and env
+  vars (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`). "Calling" you sends an
+  urgent-styled Telegram message, not an actual ringing phone call — no
+  free provider can do that, since real telephone carriers charge for
+  termination. If you ever want an actual ringing call, that needs a paid
+  telephony provider (Twilio, etc.) at a fraction of a cent per call.
 - **Later (commute planning):** a maps/transit API key (e.g. Google Maps
   Platform) for real bus/train times and journey calculation.
 - **Later (Instagram):** a Meta Business + Instagram Graph API app on top

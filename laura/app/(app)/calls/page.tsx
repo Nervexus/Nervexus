@@ -75,7 +75,8 @@ export default function CallsPage() {
         <Pill>{logs.length} sent</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
-        have Laura call or text your phone directly, via Twilio
+        have Laura send you an urgent notification or a plain message, via Telegram — free, but
+        not an actual ringing phone call
       </p>
 
       <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
@@ -98,7 +99,9 @@ export default function CallsPage() {
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder={kind === "call" ? "What should Laura say when she calls?" : "What should the text say?"}
+          placeholder={
+            kind === "call" ? "What should the urgent message say?" : "What should the message say?"
+          }
           rows={3}
           className="mt-3.5 w-full resize-none rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
         />
@@ -113,7 +116,7 @@ export default function CallsPage() {
 
         <div className="mt-3.5 flex justify-end">
           <Button onClick={send} disabled={!message.trim() || sending}>
-            {sending ? "Sending…" : kind === "call" ? "Call me now" : "Text me now"}
+            {sending ? "Sending…" : "Send now"}
           </Button>
         </div>
       </div>
@@ -125,8 +128,8 @@ export default function CallsPage() {
           {loaded && logs.length === 0 ? (
             <EmptyState
               icon={<iconify-icon icon="solar:phone-calling-linear" className="text-lg" />}
-              title="No calls or texts yet"
-              description="Ask Laura to call or text you, or try it above."
+              title="Nothing sent yet"
+              description="Ask Laura to send you a message, or try it above."
             />
           ) : (
             <div className="flex flex-col gap-3">
@@ -156,9 +159,9 @@ export default function CallsPage() {
 
           <SidebarCard title="How this works">
             <p className="text-xs leading-relaxed text-neutral-500">
-              Calls and texts go out through Twilio to your own phone number. On a free trial
-              account, Twilio can only reach numbers you&apos;ve verified in its console, and
-              plays a short trial disclaimer before Laura&apos;s message on calls.
+              Messages go out through a Telegram bot to your own chat with it — free, instant, no
+              trial limits. &quot;Call me&quot; sends an urgent-styled message rather than an
+              actual ringing phone call, since no free provider can place a real one.
             </p>
           </SidebarCard>
         </aside>

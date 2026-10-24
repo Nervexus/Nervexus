@@ -62,16 +62,15 @@ model ActivityLog {
   createdAt DateTime @default(now())
 }
 
-// A record of every real-world call/text Laura has placed via Twilio --
-// the Calls page's history, and a paper trail if a call fails or a trial
-// account's number restrictions block one.
+// A record of every real notification Laura has sent via Telegram -- the
+// Calls page's history, and a paper trail if one fails.
 model CallLog {
   id         String   @id @default(cuid())
-  kind       String // "call" | "sms"
-  toNumber   String
+  kind       String // "call" (urgent-styled) | "sms" (plain message)
+  target     String // the Telegram chat id this went to
   message    String
   status     String // "sent" | "failed"
   error      String?
-  twilioSid  String?
+  providerId String? // Telegram's own message_id, if sent
   createdAt  DateTime @default(now())
 }
