@@ -40,6 +40,13 @@ body {
   opacity: 0;
 }
 
+/* The one deliberate color accent in the whole app, used only inside the
+   Bookings card's holographic panel (components/HolographicShader.tsx,
+   components/BookingCard.tsx) -- everything else stays strictly neutral. */
+:root {
+  --booking-accent: #a9c0d6;
+}
+
 /* Procedural film-grain noise, used by the fixed full-viewport overlay. */
 .noise-overlay {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
