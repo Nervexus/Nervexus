@@ -17,10 +17,13 @@ grounding tool as a stand-in for a dedicated transit API, upgradable later
 without changing the calling code's shape. A daily job also pushes a
 "tomorrow" briefing (shift + commute + reminders, combined) to Telegram
 unprompted, and the same briefing shows as a card on the Laura page and
-answers "what does tomorrow look like" in chat. She cannot yet book/pay
-for anything (restaurants, rides, tickets) or touch Instagram — those are
-the rest of the full vision (see the roadmap doc shared with this
-project):
+answers "what does tomorrow look like" in chat. She can also research
+restaurants/activities/travel by searching the live web for real options
+and booking links, and track what you're interested in on a Bookings
+page -- but she can NEVER complete, confirm, or pay for a booking herself,
+no matter how clearly you ask; you always finish it yourself via the link
+she finds. She cannot yet touch Instagram or calendars — those are the
+rest of the full vision (see the roadmap doc shared with this project):
 
 1. **Core assistant** (this) — Gemini + tool-calling loop, a voice orb
    (browser Speech Recognition/Synthesis), persistent chat, Notes,
@@ -30,8 +33,11 @@ project):
    transit planning, colleague/shift awareness, and an automatic tomorrow
    briefing combining shift + commute + reminders into one summary, pushed
    to Telegram daily via a Vercel Cron job.
-3. **Booking management** — natural-language restaurant/activity booking,
-   availability search, payment links (never auto-paying), calendar sync.
+3. **Booking management** (this, partial) — natural-language restaurant/
+   activity/travel research and a Bookings tracker (idea → pending →
+   confirmed) are live; calendar sync isn't built yet. Laura never books or
+   pays for anything herself -- a human always completes it via the link
+   she finds.
 4. **Instagram intelligence** — analytics, profile/content strategy,
    location & outfit planning, public-account research.
 5. **Controlled messaging** — Instagram DMs and SMS with configurable
@@ -55,6 +61,7 @@ search), but a human always approves and completes any payment.
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
 | `/rota`      | your work schedule — upload a rota photo or add shifts by hand, per-shift commute planning, home/work address + arrival-buffer settings |
+| `/bookings`  | restaurants/activities/travel Laura's researched or you've added — search live options, track idea → pending → confirmed, open the booking link to finish it yourself |
 
 Notes/Reminders/Vault all use a responsive auto-fit card grid (not a fixed
 column count) so a handful of items still fill the row instead of leaving
@@ -74,7 +81,7 @@ affect the URLs, just which chrome wraps each page.
 
 | file                           | what it is                                                        |
 |----------------------------------|----------------------------------------------------------------------|
-| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`, `get_tomorrow_briefing`), via Gemini |
+| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`, `get_tomorrow_briefing`, `search_booking_options`, `create_booking`, `list_bookings`), via Gemini |
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/gemini.ts`                   | shared Gemini client/model (`getGeminiClient()`, `MODEL`), used by `lib/brain.ts` and `lib/rota.ts` |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
@@ -82,6 +89,7 @@ affect the URLs, just which chrome wraps each page.
 | `lib/telegram.ts`                 | `placeCall`/`sendText` -- outbound-only, always to `TELEGRAM_CHAT_ID`, logs every attempt (success or failure) to `CallLog` |
 | `lib/rota.ts`                     | `parseRotaImage` (Gemini vision, structured JSON output), `getShifts`, `whoAmIWorkingWith`, `planCommute` (Gemini + Google Search grounding, saved to `Shift.commutePlan`) |
 | `lib/briefing.ts`                 | `getTomorrowBriefing` -- tomorrow's shift + commute plan + reminders, combined into one plain-text summary |
+| `lib/booking.ts`                  | `searchBookingOptions` (Gemini + Google Search grounding, with source links), `listBookings` -- Laura never books/pays, only researches and tracks |
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
@@ -100,14 +108,15 @@ affect the URLs, just which chrome wraps each page.
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
-| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls/Rota, lights up whichever node Laura just used |
+| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls/Rota/Bookings, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
 | `components/ShiftCard.tsx`        | `/rota` page's card: date/time range, location/colleagues, "from photo" badge, inline "Plan commute" + delete |
-| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile` models |
+| `components/BookingCard.tsx`      | `/bookings` page's card: category icon, date/party/location, booking link, idea/pending/confirmed/cancel status buttons |
+| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile`, `Booking` models |
 | `components/TomorrowBriefing.tsx` | `/laura` page card: today's answer to "what does tomorrow look like" -- renders nothing while loading or if there's nothing to show |
-| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing}/...` | API routes                                         |
+| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing,bookings}/...` | API routes                                         |
 | `vercel.json`                     | Vercel Cron config: fires `/api/briefing/send` daily to push tomorrow's briefing to Telegram unprompted |
 
 ## Design system
@@ -201,6 +210,21 @@ combining logic lives:
   Vercel sends automatically as a Bearer token once the env var is set on
   the project — see `.env.example`.
 
+## Bookings
+
+`searchBookingOptions` (`lib/booking.ts`) reuses the same Gemini Google
+Search grounding pattern as `web_search` and commute planning, tuned to
+return real places/activities, current availability if findable, and a
+direct link to book or reserve. It's a research tool only: Laura's system
+prompt is explicit that she can NEVER complete, confirm, or pay for a
+booking herself, however clearly the user asks -- `create_booking` saves
+what she found (or what the user tells her) as a tracked record with a
+status (`idea` → `pending` → `confirmed`, or `cancelled`), and the
+`/bookings` page's booking link is always where the user finishes it
+themselves. The same search box, add-by-hand form, and status buttons are
+on the page directly, so tracking a booking doesn't require going through
+chat at all.
+
 ## Activity feed
 
 Every time Laura saves a note, sets a reminder, or runs a web search, it's
@@ -261,7 +285,9 @@ installed for a later phase but not wired up yet.
   to approve an automated-reply use case).
 - **Later (email/calendar):** a Google Cloud project with an OAuth consent
   screen + Gmail/Calendar API scopes enabled.
-- **Later (real bookings):** whatever partner API a specific restaurant/
-  booking platform offers — most don't have a public self-serve API, so
-  this will likely stay "search + hand you the booking link" rather than
-  a fully automated booking for most venues.
+- **Later (real-time booking availability):** whatever partner API a
+  specific restaurant/booking platform offers (OpenTable, Resy, etc.) —
+  most don't have a public self-serve API, so booking search already works
+  today via Gemini's Google Search grounding ("search + hand you the
+  booking link"), and will likely stay that way for most venues rather
+  than a fully automated booking.

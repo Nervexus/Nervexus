@@ -54,6 +54,22 @@ function MessageIcon({ className }: { className?: string }) {
   );
 }
 
+function BookmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M6 4h12v16l-6-4-6 4V4Z" />
+    </svg>
+  );
+}
+
 function BusIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -81,6 +97,8 @@ const TOOL_ICON: Record<string, (className: string) => ReactNode> = {
   call_me: (c) => <PhoneIcon className={c} />,
   text_me: (c) => <MessageIcon className={c} />,
   plan_commute: (c) => <BusIcon className={c} />,
+  search_booking_options: (c) => <BookmarkIcon className={c} />,
+  create_booking: (c) => <BookmarkIcon className={c} />,
 };
 
 function timeAgo(iso: string): string {

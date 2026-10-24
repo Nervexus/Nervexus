@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/notes", label: "Notes", icon: "solar:notebook-linear" },
   { href: "/reminders", label: "Reminders", icon: "solar:alarm-linear" },
   { href: "/rota", label: "Rota", icon: "solar:calendar-linear" },
+  { href: "/bookings", label: "Bookings", icon: "solar:bookmark-linear" },
   { href: "/vault", label: "Vault", icon: "solar:lock-keyhole-linear" },
   { href: "/calls", label: "Calls", icon: "solar:phone-calling-linear" },
 ];
@@ -21,6 +22,7 @@ type Counts = {
   vault: number | null;
   calls: number | null;
   rota: number | null;
+  bookings: number | null;
 };
 
 /** The app shell's nav: a sticky left column on desktop, a top bar on
@@ -38,6 +40,7 @@ export function AppSidebar() {
     vault: null,
     calls: null,
     rota: null,
+    bookings: null,
   });
 
   useEffect(() => {
@@ -93,6 +96,16 @@ export function AppSidebar() {
         }))
       )
       .catch(() => setCounts((c) => ({ ...c, rota: 0 })));
+    fetch("/api/bookings")
+      .then((res) => res.json())
+      .then((data) =>
+        setCounts((c) => ({
+          ...c,
+          bookings: (data.bookings ?? []).filter((b: { status: string }) => b.status !== "cancelled")
+            .length,
+        }))
+      )
+      .catch(() => setCounts((c) => ({ ...c, bookings: 0 })));
   }, []);
 
   return (
@@ -122,7 +135,9 @@ export function AppSidebar() {
                     ? counts.calls
                     : link.href === "/rota"
                       ? counts.rota
-                      : null;
+                      : link.href === "/bookings"
+                        ? counts.bookings
+                        : null;
           return (
             <li key={link.href} className="gsap-entrance shrink-0 sm:shrink">
               <Link

@@ -4,6 +4,7 @@ import { placeCall, sendText } from "@/lib/telegram";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
 import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 import { getTomorrowBriefing } from "@/lib/briefing";
+import { searchBookingOptions, listBookings } from "@/lib/booking";
 
 const SYSTEM_PROMPT = `You are Laura, a personal voice/text assistant. You are warm, direct, and
 efficient -- you sound like a sharp human assistant, not a generic chatbot.
@@ -16,12 +17,16 @@ this conversation. You can send the user an urgent notification or a
 plain message via Telegram (call_me, text_me) -- call_me does NOT place
 an actual ringing phone call, it just sends an urgent-styled message, so
 never claim to have "called" or "rung" the user, say you've "sent an
-urgent message" or similar instead. You cannot send email or book or pay
-for anything (rides, food, reservations) -- those aren't wired up yet.
-Don't claim to have done one of those unless a tool call in this
-conversation actually did it. If asked to do something you can't do yet,
-say so plainly and briefly explain what's still missing (e.g. "I can look
-that up, but I can't actually book it yet").
+urgent message" or similar instead. You cannot send email, and you can
+NEVER complete, confirm, or pay for a booking yourself -- no matter how
+clearly the user authorizes it. For restaurants/activities/travel, use
+search_booking_options to find real current options and links, then
+create_booking to save one you're tracking (status "idea" if just
+researched, "pending" once the user says they're going to book it
+themselves) -- always via that link, never by you. Don't claim to have
+booked, confirmed, or paid for anything unless the user tells you they did
+it and asks you to update the record. If asked to do something else you
+can't do yet, say so plainly and briefly explain what's still missing.
 
 When you do have a tool that takes a real-world, hard-to-undo action --
 including call_me and text_me, which send a real notification to the
@@ -44,6 +49,9 @@ the Rota page rather than guessing. For "what does tomorrow look like" or
 similar, use get_tomorrow_briefing rather than combining get_shifts and
 list_reminders yourself -- it already covers the shift, commute, and
 reminders together.
+
+Use list_bookings to check what the user is already tracking before
+suggesting something new (so you don't duplicate an existing idea).
 
 You never have access to the Vault. If asked for a password or secret,
 say you can't see the Vault's contents and the user should look it up
@@ -201,6 +209,60 @@ const tools: FunctionDeclaration[] = [
       "tomorrow look like', 'brief me on tomorrow', or similar.",
     parameters: { type: Type.OBJECT, properties: {} },
   },
+  {
+    name: "search_booking_options",
+    description:
+      "Search the live web for real restaurant/activity/travel options matching " +
+      "what the user wants, with current availability info and a direct booking " +
+      "link where possible. This only researches -- it never books anything.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        query: {
+          type: Type.STRING,
+          description: "What the user wants, e.g. 'Italian restaurant near Soho for 4 Friday 8pm'.",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "create_booking",
+    description:
+      "Save a booking the user is tracking -- something you researched, or one " +
+      "they're telling you about. This never books or pays for anything itself.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING, description: "Short title, e.g. 'Dinner at Lina's'." },
+        category: {
+          type: Type.STRING,
+          description: "'restaurant', 'activity', 'travel', or 'other'. Defaults to 'other'.",
+        },
+        dateTime: {
+          type: Type.STRING,
+          description: "Absolute ISO 8601 datetime, if known.",
+        },
+        partySize: { type: Type.NUMBER, description: "Number of people, if known." },
+        location: { type: Type.STRING, description: "Where it is, if known." },
+        link: { type: Type.STRING, description: "The booking link, if you found or were given one." },
+        status: {
+          type: Type.STRING,
+          description:
+            "'idea' (just researched, default), or 'pending' if the user said they're " +
+            "going to book it. Never set 'confirmed' unless the user tells you they " +
+            "already completed the booking themselves.",
+        },
+        note: { type: Type.STRING, description: "Anything else worth keeping." },
+      },
+      required: ["title"],
+    },
+  },
+  {
+    name: "list_bookings",
+    description: "List bookings the user is currently tracking (not cancelled).",
+    parameters: { type: Type.OBJECT, properties: {} },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -235,6 +297,8 @@ const LOGGED_TOOLS = new Set([
   "text_me",
   "plan_commute",
   "get_tomorrow_briefing",
+  "search_booking_options",
+  "create_booking",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -376,6 +440,70 @@ async function runTool(
       console.error("get_tomorrow_briefing error:", err);
       return { error: err instanceof Error ? err.message : "Couldn't build tomorrow's briefing." };
     }
+  }
+  if (name === "search_booking_options") {
+    const { query } = args as { query?: string };
+    if (!query) return { error: "search_booking_options needs a query" };
+    try {
+      const result = await searchBookingOptions(query);
+      await logActivity("search_booking_options", `Searched booking options: "${query}"`);
+      return { result };
+    } catch (err) {
+      console.error("search_booking_options error:", err);
+      return { error: err instanceof Error ? err.message : "Booking search failed." };
+    }
+  }
+  if (name === "create_booking") {
+    const { title, category, dateTime, partySize, location, link, status, note } = args as {
+      title?: string;
+      category?: string;
+      dateTime?: string;
+      partySize?: number;
+      location?: string;
+      link?: string;
+      status?: string;
+      note?: string;
+    };
+    if (!title) return { error: "create_booking needs a title" };
+    const safeCategory = ["restaurant", "activity", "travel", "other"].includes(category ?? "")
+      ? category!
+      : "other";
+    const safeStatus = ["idea", "pending", "confirmed", "cancelled"].includes(status ?? "")
+      ? status!
+      : "idea";
+    let parsedDate: Date | null = null;
+    if (dateTime) {
+      parsedDate = new Date(dateTime);
+      if (Number.isNaN(parsedDate.getTime())) return { error: "dateTime must be a valid ISO 8601 datetime" };
+    }
+    const booking = await prisma.booking.create({
+      data: {
+        title,
+        category: safeCategory,
+        status: safeStatus,
+        dateTime: parsedDate,
+        partySize: partySize ?? null,
+        location: location ?? null,
+        link: link ?? null,
+        note: note ?? null,
+      },
+    });
+    await logActivity("create_booking", `Saved booking "${booking.title}" (${booking.status})`);
+    return { result: `Saved "${booking.title}" as ${booking.status}.` };
+  }
+  if (name === "list_bookings") {
+    const bookings = await listBookings();
+    if (bookings.length === 0) return { result: "No bookings being tracked." };
+    return {
+      result: bookings
+        .map(
+          (b) =>
+            `- ${b.title} (${b.status}${b.category !== "other" ? `, ${b.category}` : ""})` +
+            (b.dateTime ? ` at ${b.dateTime.toString()}` : "") +
+            (b.location ? `, ${b.location}` : "")
+        )
+        .join("\n"),
+    };
   }
   return { error: `Unknown tool: ${name}` };
 }

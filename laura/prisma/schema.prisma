@@ -102,3 +102,22 @@ model Profile {
   arrivalBufferMinutes Int      @default(15)
   updatedAt            DateTime @updatedAt
 }
+
+// A restaurant/activity booking Laura is tracking -- never one she's paid
+// for or finalized herself (see lib/booking.ts): status moves from "idea"
+// (just researched) to "pending" (the user said they'd book it) to
+// "confirmed" (the user did, usually with a confirmation number in note)
+// or "cancelled". link points at wherever the user actually completes it.
+model Booking {
+  id        String   @id @default(cuid())
+  title     String
+  category  String   @default("other") // "restaurant" | "activity" | "travel" | "other"
+  dateTime  DateTime?
+  partySize Int?
+  location  String?
+  link      String?
+  status    String   @default("idea") // "idea" | "pending" | "confirmed" | "cancelled"
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

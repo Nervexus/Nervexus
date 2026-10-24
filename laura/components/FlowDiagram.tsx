@@ -71,8 +71,24 @@ function CalendarIcon({ className }: { className?: string }) {
   );
 }
 
-const STAGE_W = 760;
-const NODE_COUNT = 6;
+function BookmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M6 4h12v16l-6-4-6 4V4Z" />
+    </svg>
+  );
+}
+
+const STAGE_W = 840;
+const NODE_COUNT = 7;
 // Evenly-spaced virtual centers in a 0..STAGE_W space -- the actual node
 // row below uses the same even distribution (flex-1 each), so these line
 // up with the real rendered centers regardless of viewport width.
@@ -91,6 +107,8 @@ const TOOL_NODE: Record<string, string> = {
   get_shifts: "Rota",
   who_am_i_working_with: "Rota",
   plan_commute: "Rota",
+  search_booking_options: "Bookings",
+  create_booking: "Bookings",
 };
 
 export const FlowDiagram = forwardRef<
@@ -103,6 +121,7 @@ export const FlowDiagram = forwardRef<
   const [reminderCount, setReminderCount] = useState<number | null>(null);
   const [callCount, setCallCount] = useState<number | null>(null);
   const [rotaCount, setRotaCount] = useState<number | null>(null);
+  const [bookingCount, setBookingCount] = useState<number | null>(null);
   const [pulsingNodes, setPulsingNodes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -157,6 +176,16 @@ export const FlowDiagram = forwardRef<
         setRotaCount(upcoming.length);
       })
       .catch(() => setRotaCount(0));
+
+    fetch("/api/bookings")
+      .then((res) => res.json())
+      .then((data) => {
+        const active = (data.bookings ?? []).filter(
+          (b: { status: string }) => b.status !== "cancelled"
+        );
+        setBookingCount(active.length);
+      })
+      .catch(() => setBookingCount(0));
   }, []);
 
   const nodes = [
@@ -199,6 +228,13 @@ export const FlowDiagram = forwardRef<
       title: "Rota",
       subtitle: rotaCount === null ? "…" : rotaCount > 0 ? `${rotaCount} upcoming` : "upload a photo",
       href: "/rota",
+      active: true,
+    },
+    {
+      icon: <BookmarkIcon className="h-4 w-4" />,
+      title: "Bookings",
+      subtitle: bookingCount === null ? "…" : bookingCount > 0 ? `${bookingCount} tracked` : "search one",
+      href: "/bookings",
       active: true,
     },
   ];
