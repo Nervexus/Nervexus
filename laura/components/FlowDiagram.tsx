@@ -69,6 +69,8 @@ const TOOL_NODE: Record<string, string> = {
   create_note: "Notes",
   create_reminder: "Reminders",
   web_search: "Web search",
+  call_me: "Calls & texts",
+  text_me: "Calls & texts",
 };
 
 export const FlowDiagram = forwardRef<
@@ -79,6 +81,7 @@ export const FlowDiagram = forwardRef<
   const [vaultCount, setVaultCount] = useState<number | null>(null);
   const [nextReminder, setNextReminder] = useState<Reminder | null>(null);
   const [reminderCount, setReminderCount] = useState<number | null>(null);
+  const [callCount, setCallCount] = useState<number | null>(null);
   const [pulsingNodes, setPulsingNodes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -118,6 +121,11 @@ export const FlowDiagram = forwardRef<
         setReminderCount(0);
         setNextReminder(null);
       });
+
+    fetch("/api/calls")
+      .then((res) => res.json())
+      .then((data) => setCallCount(data.logs?.length ?? 0))
+      .catch(() => setCallCount(0));
   }, []);
 
   const nodes = [
@@ -151,8 +159,9 @@ export const FlowDiagram = forwardRef<
     {
       icon: <PhoneIcon className="h-4 w-4" />,
       title: "Calls & texts",
-      subtitle: "not wired up yet",
-      active: false,
+      subtitle: callCount === null ? "…" : callCount > 0 ? `${callCount} sent` : "via Twilio",
+      href: "/calls",
+      active: true,
     },
   ];
 

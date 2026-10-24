@@ -61,3 +61,17 @@ model ActivityLog {
   summary   String
   createdAt DateTime @default(now())
 }
+
+// A record of every real-world call/text Laura has placed via Twilio --
+// the Calls page's history, and a paper trail if a call fails or a trial
+// account's number restrictions block one.
+model CallLog {
+  id         String   @id @default(cuid())
+  kind       String // "call" | "sms"
+  toNumber   String
+  message    String
+  status     String // "sent" | "failed"
+  error      String?
+  twilioSid  String?
+  createdAt  DateTime @default(now())
+}

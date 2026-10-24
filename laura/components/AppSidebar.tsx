@@ -11,9 +11,15 @@ const LINKS = [
   { href: "/notes", label: "Notes", icon: "solar:notebook-linear" },
   { href: "/reminders", label: "Reminders", icon: "solar:alarm-linear" },
   { href: "/vault", label: "Vault", icon: "solar:lock-keyhole-linear" },
+  { href: "/calls", label: "Calls", icon: "solar:phone-calling-linear" },
 ];
 
-type Counts = { notes: number | null; reminders: number | null; vault: number | null };
+type Counts = {
+  notes: number | null;
+  reminders: number | null;
+  vault: number | null;
+  calls: number | null;
+};
 
 /** The app shell's nav: a sticky left column on desktop, a top bar on
  * mobile (same pattern the very first version of this app used, just
@@ -24,7 +30,12 @@ type Counts = { notes: number | null; reminders: number | null; vault: number | 
 export function AppSidebar() {
   const pathname = usePathname();
   const rootRef = useRef<HTMLElement>(null);
-  const [counts, setCounts] = useState<Counts>({ notes: null, reminders: null, vault: null });
+  const [counts, setCounts] = useState<Counts>({
+    notes: null,
+    reminders: null,
+    vault: null,
+    calls: null,
+  });
 
   useEffect(() => {
     const el = rootRef.current;
@@ -65,6 +76,10 @@ export function AppSidebar() {
       .then((res) => res.json())
       .then((data) => setCounts((c) => ({ ...c, vault: data.items?.length ?? 0 })))
       .catch(() => setCounts((c) => ({ ...c, vault: 0 })));
+    fetch("/api/calls")
+      .then((res) => res.json())
+      .then((data) => setCounts((c) => ({ ...c, calls: data.logs?.length ?? 0 })))
+      .catch(() => setCounts((c) => ({ ...c, calls: 0 })));
   }, []);
 
   return (
@@ -90,7 +105,9 @@ export function AppSidebar() {
                 ? counts.reminders
                 : link.href === "/vault"
                   ? counts.vault
-                  : null;
+                  : link.href === "/calls"
+                    ? counts.calls
+                    : null;
           return (
             <li key={link.href} className="gsap-entrance shrink-0 sm:shrink">
               <Link

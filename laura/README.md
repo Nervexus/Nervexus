@@ -1,28 +1,35 @@
 # Laura
 
 A dark, monochrome studio-site look: deep black (`#080808`), a raw-WebGL
-ambient mesh (a raymarched, SDF-based morphing sphere) behind every page,
+ambient mesh (a raymarched, SDF-based morphing sphere) on the Laura page,
 procedural film-grain noise, Inter thin/extralight headlines, JetBrains
 Mono labels, and GSAP-driven reveals and scroll scrubbing. A voice orb, a
-chat log, Notes, Reminders, and a Vault. Laura can also search the live
-web (place hours,
-directions/travel comparisons, current info) via Gemini's Google Search
-grounding. She cannot yet send email/texts, make calls, or book/pay for
-anything (rides, food, reservations) — those need real third-party
-accounts and are later phases:
+chat log, Notes, Reminders, a Vault, and real outbound Calls & texts (via
+Twilio). Laura can also search the live web (place hours, directions/
+travel comparisons, current info) via Gemini's Google Search grounding.
+She cannot yet book/pay for anything (restaurants, rides, tickets), parse
+a work rota, plan a commute, or touch Instagram — those are later phases
+of the full vision (see the roadmap doc shared with this project):
 
-1. **Core brain + HQ** (this) — Gemini + tool-calling loop, a voice orb
-   (browser Speech Recognition/Synthesis, no Twilio needed for this part),
-   persistent chat, Notes, Reminders, an encrypted Vault, and web search.
-2. **Text (SMS) + Gmail + Calendar** — text the Laura number, it sends email / books things.
-3. **Phone calls** — same brain, call the Laura number and talk to it.
-4. **Laura calls you** — proactive/scheduled calls (reminders read aloud, etc.).
-5. **"Hey Laura" wake-word app** — always-listening mobile/desktop app, same backend.
+1. **Core assistant** (this) — Gemini + tool-calling loop, a voice orb
+   (browser Speech Recognition/Synthesis), persistent chat, Notes,
+   Reminders, an encrypted Vault, web search, and outbound calls/texts to
+   your own phone via Twilio.
+2. **Work rota & daily planning** — upload/parse a rota, commute/transit
+   planning, an automatic tomorrow briefing, colleague/shift awareness.
+3. **Booking management** — natural-language restaurant/activity booking,
+   availability search, payment links (never auto-paying), calendar sync.
+4. **Instagram intelligence** — analytics, profile/content strategy,
+   location & outfit planning, public-account research.
+5. **Controlled messaging** — Instagram DMs and SMS with configurable
+   reply delays, contact rules, personalized tone, and approval gates.
+6. **Unified intelligence** — every feature above wired into one
+   proactive, cross-feature assistant.
 
 Booking/paying for things on your behalf (an Uber, a restaurant table, food
-delivery) isn't planned as a generic capability — those platforms mostly
-don't offer self-serve APIs for individual developers. Laura can look things
-up and recommend (via web_search), but won't execute a real-world purchase.
+delivery) isn't planned as something Laura ever completes unattended — Laura
+can look things up and recommend (via web_search, and later real booking
+search), but a human always approves and completes any payment.
 
 ## Pages
 
@@ -33,6 +40,7 @@ up and recommend (via web_search), but won't execute a real-world purchase.
 | `/notes`     | notes you've written or asked Laura to remember                              |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
+| `/calls`     | have Laura call or text your own phone (via Twilio), plus a history of past ones |
 
 Notes/Reminders/Vault all use a responsive auto-fit card grid (not a fixed
 column count) so a handful of items still fill the row instead of leaving
@@ -52,10 +60,11 @@ affect the URLs, just which chrome wraps each page.
 
 | file                           | what it is                                                        |
 |----------------------------------|----------------------------------------------------------------------|
-| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`), via Gemini |
+| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`), via Gemini |
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
+| `lib/twilio.ts`                   | `placeCall`/`sendText` -- outbound-only, always to `OWNER_PHONE_NUMBER`, logs every attempt (success or failure) to `CallLog` |
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
@@ -77,17 +86,20 @@ affect the URLs, just which chrome wraps each page.
 | `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
-| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog` models |
-| `app/api/{chat,notes,reminders,vault,activity}/...` | API routes                                         |
+| `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
+| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog` models |
+| `app/api/{chat,notes,reminders,vault,activity,calls}/...` | API routes (`calls/twiml` is the webhook Twilio fetches mid-call for what to say) |
 
 ## Design system
 
-Three fixed background layers sit behind every page (mounted once in
-`app/layout.tsx`, so they persist across client-side navigation): the
-WebGL ambient mesh (z-0), a radial vignette (z-1), and a near-invisible
-procedural noise overlay (z-100) on top of everything, including the fixed
-top nav and footer (z-50, both `mix-blend-difference`). Page content sits
-at z-10. Typography is Inter (weights 100/200/300/400) for headings and
+Three fixed background layers are mounted once in `app/layout.tsx` (so
+they persist across client-side navigation): a radial vignette (z-1) and a
+near-invisible procedural noise overlay (z-100) sit behind/above every
+page, while the WebGL ambient mesh (z-0) -- "the orb" -- is gated to
+`/laura` only (`AmbientCanvasGate`, a `usePathname()` check at the same
+DOM position, so it mounts/unmounts a real WebGL context per-route rather
+than running everywhere). The fixed top nav and footer sit at z-50 (both
+`mix-blend-difference`); page content sits at z-10. Typography is Inter (weights 100/200/300/400) for headings and
 body text, JetBrains Mono for labels/badges/mono numerals. There's no
 color accent anywhere — states (the voice orb's idle/listening/thinking/
 speaking, priority levels, etc.) read by brightness and motion rather than
@@ -149,25 +161,50 @@ interesting as a history, just noise.
   (the list view never receives decrypted values).
 - **Confirm before acting**: the system prompt instructs Laura to describe
   and get a yes before calling any tool with a real-world, hard-to-undo
-  side effect (sending an email, making a call, booking something) —
-  matters once real tools exist, since a misheard voice command or an
-  ambiguous text could otherwise trigger a real action. Creating a note or
-  a reminder is treated as low-stakes/reversible and doesn't need
+  side effect (calling/texting you, sending an email, booking something) —
+  matters since a misheard voice command or an ambiguous text could
+  otherwise trigger a real call to your phone. Creating a note or a
+  reminder is treated as low-stakes/reversible and doesn't need
   confirmation.
-- **Only respond to you**: once SMS/calls are wired up (phase 2+), the
-  webhook needs to check the caller/sender number against an allowlisted
-  `OWNER_PHONE_NUMBER` before doing anything — otherwise anyone who gets
-  the Laura number could ask it to send mail from your account.
+- **Calls/texts are outbound-only, to one fixed number.** `call_me`/
+  `text_me` always dial `OWNER_PHONE_NUMBER` — there's no inbound handling
+  yet, so there's nothing for a stranger to hijack by texting/calling the
+  Twilio number. The caller-ID-allowlist problem only shows up once Laura
+  can *receive* messages/calls (phase 5), at which point the webhook will
+  need to check the sender against `OWNER_PHONE_NUMBER` before acting on
+  anything.
+- **The `/api/calls/twiml` webhook isn't signature-verified yet.** It
+  trusts whatever `message` query param it's given rather than checking
+  Twilio's `X-Twilio-Signature` header — acceptable for now since the only
+  thing it can do is make the call say something, to a number only you
+  control, but worth hardening (via `twilio.validateRequest`) before this
+  app has anything more sensitive riding on that endpoint.
 
 ## Persistence note
 
 Storage is Turso (hosted libSQL, SQLite-wire-compatible) via
 `@prisma/adapter-libsql`, used for both local dev and production — a
 serverless host's filesystem isn't durable across deploys/invocations, so
-there's no local-SQLite-file mode anymore. `googleapis` and `twilio` are
-already installed for phase 2 but not wired up yet.
+there's no local-SQLite-file mode anymore. `googleapis` is already
+installed for a later phase but not wired up yet.
 
-## Accounts you'll need before phase 2
+## Accounts needed, by phase
 
-A Twilio account + phone number, and a Google Cloud project with an OAuth
-consent screen + Gmail/Calendar API scopes enabled. Neither is set up yet.
+- **Now (calls/texts):** a Twilio account, phone number, and your own
+  verified number — see `.env.example` for the exact env vars
+  (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`,
+  `OWNER_PHONE_NUMBER`). A free trial account works fine for personal
+  volume; it just restricts calls/texts to numbers you've verified in the
+  console and adds a short spoken disclaimer before Laura's message.
+- **Later (commute planning):** a maps/transit API key (e.g. Google Maps
+  Platform) for real bus/train times and journey calculation.
+- **Later (Instagram):** a Meta Business + Instagram Graph API app on top
+  of a professional Instagram account — Meta's App Review process gates
+  most of the DM/analytics scopes and can take time (and isn't guaranteed
+  to approve an automated-reply use case).
+- **Later (email/calendar):** a Google Cloud project with an OAuth consent
+  screen + Gmail/Calendar API scopes enabled.
+- **Later (real bookings):** whatever partner API a specific restaurant/
+  booking platform offers — most don't have a public self-serve API, so
+  this will likely stay "search + hand you the booking link" rather than
+  a fully automated booking for most venues.

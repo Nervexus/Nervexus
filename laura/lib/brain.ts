@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type, type Content, type FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/db";
+import { placeCall, sendText } from "@/lib/twilio";
 
 // The non-"lite" flash alias free tier is capped at a measly 20
 // requests/day -- flash-lite's free quota is far more usable for an
@@ -13,18 +14,20 @@ speech: a sentence or two for most things, more only when the user actually
 asked for detail.
 
 You do not yet have real-world tools wired up beyond the ones listed for
-this conversation. You cannot send email, make calls, send texts, or book
-or pay for anything (rides, food, reservations) -- those aren't wired up
-yet. Don't claim to have done one of those unless a tool call in this
-conversation actually did it. If asked to do something you can't do yet,
-say so plainly and briefly explain what's still missing (e.g. "I can look
-that up, but I can't actually book it yet").
+this conversation. You can call and text the user's own phone (call_me,
+text_me), but you cannot send email or book or pay for anything (rides,
+food, reservations) -- those aren't wired up yet. Don't claim to have done
+one of those unless a tool call in this conversation actually did it. If
+asked to do something you can't do yet, say so plainly and briefly explain
+what's still missing (e.g. "I can look that up, but I can't actually book
+it yet").
 
-When you do have a tool that takes a real-world, hard-to-undo action,
-describe exactly what you're about to do and ask for a yes before calling
-it -- unless the user has already clearly confirmed earlier in this same
-conversation. Creating a note or a reminder is low-stakes and reversible,
-so those don't need confirmation -- just do them when asked.
+When you do have a tool that takes a real-world, hard-to-undo action --
+including call_me and text_me, which place a real phone call or send a
+real text -- describe exactly what you're about to do and ask for a yes
+before calling it, unless the user has already clearly confirmed earlier
+in this same conversation. Creating a note or a reminder is low-stakes and
+reversible, so those don't need confirmation -- just do them when asked.
 
 For anything you don't know for certain -- whether a place is open right
 now, current prices, directions, which way to travel (train vs. rideshare
@@ -122,6 +125,32 @@ const tools: FunctionDeclaration[] = [
       required: ["query"],
     },
   },
+  {
+    name: "call_me",
+    description:
+      "Place a real phone call to the user's own phone and read a short message " +
+      "aloud. Confirm with the user first, per the hard-to-undo-action rule.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        message: { type: Type.STRING, description: "What Laura should say on the call." },
+      },
+      required: ["message"],
+    },
+  },
+  {
+    name: "text_me",
+    description:
+      "Send a real text message to the user's own phone. Confirm with the user " +
+      "first, per the hard-to-undo-action rule.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        message: { type: Type.STRING, description: "The text message body." },
+      },
+      required: ["message"],
+    },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -148,7 +177,7 @@ async function webSearch(query: string): Promise<string> {
 // Tools worth surfacing in the home page's Activity feed -- a real-world
 // effect, or an answer that came from outside the model's own memory.
 // get_current_time/list_reminders are read-only/self-referential noise.
-const LOGGED_TOOLS = new Set(["create_note", "create_reminder", "web_search"]);
+const LOGGED_TOOLS = new Set(["create_note", "create_reminder", "web_search", "call_me", "text_me"]);
 
 async function logActivity(tool: string, summary: string) {
   await prisma.activityLog.create({ data: { tool, summary } }).catch((err) => {
@@ -216,6 +245,22 @@ async function runTool(
       console.error("web_search error:", err);
       return { error: err instanceof Error ? err.message : "web search failed" };
     }
+  }
+  if (name === "call_me") {
+    const { message } = args as { message?: string };
+    if (!message) return { error: "call_me needs a message to say" };
+    const result = await placeCall(message);
+    if (!result.ok) return { error: result.error };
+    await logActivity("call_me", `Called you: "${message}"`);
+    return { result: "Calling you now." };
+  }
+  if (name === "text_me") {
+    const { message } = args as { message?: string };
+    if (!message) return { error: "text_me needs a message body" };
+    const result = await sendText(message);
+    if (!result.ok) return { error: result.error };
+    await logActivity("text_me", `Texted you: "${message}"`);
+    return { result: "Sent." };
   }
   return { error: `Unknown tool: ${name}` };
 }

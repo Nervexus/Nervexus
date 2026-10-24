@@ -22,10 +22,44 @@ function SearchIcon({ className }: { className?: string }) {
   );
 }
 
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+    </svg>
+  );
+}
+
+function MessageIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M4 5h16v11H9l-5 4V5Z" />
+    </svg>
+  );
+}
+
 const TOOL_ICON: Record<string, (className: string) => ReactNode> = {
   create_note: (c) => <NoteIcon className={c} />,
   create_reminder: (c) => <ClockIcon className={c} />,
   web_search: (c) => <SearchIcon className={c} />,
+  call_me: (c) => <PhoneIcon className={c} />,
+  text_me: (c) => <MessageIcon className={c} />,
 };
 
 function timeAgo(iso: string): string {
