@@ -124,8 +124,8 @@ affect the URLs, just which chrome wraps each page.
 | `components/SettingsCard.tsx`     | `/settings` page's card: connected/expires soon/not set status, read-only |
 | `app/api/settings/status/route.ts` | reads `process.env` presence/shape only (decodes the Turso token's `exp` claim to flag an expiring one) -- never returns an actual secret value |
 | `components/ShiftCard.tsx`        | `/rota` page's card: date/time range, location/colleagues, "from photo" badge, inline "Plan commute" + delete |
-| `components/BookingCard.tsx`      | `/bookings` page's card: holographic header (category, status, title, date/time/party), status/link/cancel/delete actions below it |
-| `components/HolographicShader.tsx` | the WebGL shimmer behind each booking card -- time-driven only, pauses off-screen via `IntersectionObserver` |
+| `components/BookingsWidget.tsx`   | `/bookings` page's card shell: big monospace count + label, a dotted texture swatch, rows below |
+| `components/BookingRow.tsx`       | one booking inside a widget: collapsed tick/icon/title/time, expands to location/party/note/actions |
 | `components/ContentCard.tsx`      | `/content` page's card: type icon, caption/hashtags, idea/scheduled/posted/discard status buttons |
 | `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile`, `Booking`, `ContentIdea` models |
 | `components/TomorrowBriefing.tsx` | `/laura` page card: today's answer to "what does tomorrow look like" -- renders nothing while loading or if there's nothing to show |
@@ -289,17 +289,20 @@ themselves. The same search box, add-by-hand form, and status buttons are
 on the page directly, so tracking a booking doesn't require going through
 chat at all.
 
-Each booking renders as a holographic card (`components/BookingCard.tsx`,
-`components/HolographicShader.tsx`) -- the app's one deliberate color
-accent (`--booking-accent` in `app/globals.css`), everywhere else stays
-strictly neutral. The shader is a time-driven ambient shimmer only: no
-pointer-tracked 3D tilt (a grid of many cards chasing the cursor didn't
-make sense), just a `glow` boost on hover and an `IntersectionObserver`
-that pauses the WebGL render loop for off-screen cards. The card is a CSS
-container (`container-type: inline-size`) with every internal size in
-`cqw` units, so it scales as one piece at any grid width, and the whole
-component caps at `max-w-[360px]` so a single card left alone in a grid
-row (nothing else in its status section) doesn't stretch to fill the row.
+Bookings are grouped into `BookingsWidget` cards (one per status --
+Confirmed/Pending/Ideas, plus Cancelled when shown) styled like a smart
+device's readout: a big monospace count, a small dotted texture swatch,
+then each booking as a collapsed `BookingRow` (a colored tick, category
+icon, title, and date/time) that expands in place to show location, party
+size, any note, and the status/link/cancel/delete actions. The sidebar
+reuses the same widget shell for a total-tracked summary with a
+Confirmed/Pending/Ideas breakdown. `--booking-accent` (`app/globals.css`,
+a muted amber) is the page's one deliberate color accent, used only for
+the tick on a confirmed or pending row and the big counts -- everything
+else stays strictly neutral. (This replaced an earlier holographic-WebGL
+card design -- the shader looked good alone but didn't fit a page with
+several bookings at once, so it was dropped in favor of this flatter,
+list-first layout.)
 
 ## Content & Instagram research
 

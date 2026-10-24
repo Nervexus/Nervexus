@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
-import { SidebarCard, Stat } from "@/components/SidebarCard";
-import { BookingCard } from "@/components/BookingCard";
+import { BookingsWidget } from "@/components/BookingsWidget";
+import { BookingRow } from "@/components/BookingRow";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
@@ -222,9 +222,9 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
-        <div className="min-w-0">
-          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
+      <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_260px]">
+        <div className="flex min-w-0 flex-col gap-5">
+          {error && <p className="gsap-entrance text-sm text-red-400">{error}</p>}
 
           {loaded && active.length === 0 ? (
             <EmptyState
@@ -236,21 +236,17 @@ export default function BookingsPage() {
             SECTIONS.map(
               ({ label, items }) =>
                 items.length > 0 && (
-                  <div key={label} className="mb-8">
-                    <h2 className="mb-3 font-mono text-[11px] uppercase tracking-widest text-neutral-500">
-                      {label} · {items.length}
-                    </h2>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
+                  <div key={label} className="gsap-entrance">
+                    <BookingsWidget count={items.length} label={label}>
                       {items.map((booking) => (
-                        <div key={booking.id} className="gsap-entrance">
-                          <BookingCard
-                            {...booking}
-                            onStatusChange={(status) => updateStatus(booking.id, status)}
-                            onDelete={() => remove(booking.id)}
-                          />
-                        </div>
+                        <BookingRow
+                          key={booking.id}
+                          {...booking}
+                          onStatusChange={(status) => updateStatus(booking.id, status)}
+                          onDelete={() => remove(booking.id)}
+                        />
                       ))}
-                    </div>
+                    </BookingsWidget>
                   </div>
                 )
             )
@@ -259,21 +255,26 @@ export default function BookingsPage() {
           {cancelled.length > 0 && (
             <button
               onClick={() => setShowCancelled((s) => !s)}
-              className="font-mono text-[11px] uppercase tracking-widest text-neutral-600 hover:text-neutral-300"
+              className="self-start font-mono text-[11px] uppercase tracking-widest text-neutral-600 hover:text-neutral-300"
             >
               {showCancelled ? "Hide" : "Show"} cancelled ({cancelled.length})
             </button>
           )}
         </div>
 
-        <aside className="gsap-entrance flex flex-col gap-4">
-          <SidebarCard title="Stats">
-            <div className="flex flex-col gap-2">
-              <Stat label="Confirmed" value={confirmed.length} />
-              <Stat label="Pending" value={pending.length} />
-              <Stat label="Ideas" value={ideas.length} />
-            </div>
-          </SidebarCard>
+        <aside className="gsap-entrance">
+          <BookingsWidget count={active.length} label="tracked">
+            {[
+              { label: "Confirmed", value: confirmed.length },
+              { label: "Pending", value: pending.length },
+              { label: "Ideas", value: ideas.length },
+            ].map((s) => (
+              <div key={s.label} className="flex items-center justify-between rounded-xl bg-neutral-900/60 px-3 py-2.5">
+                <span className="text-sm text-neutral-300">{s.label}</span>
+                <span className="font-mono text-xs tabular-nums text-neutral-500">{s.value}</span>
+              </div>
+            ))}
+          </BookingsWidget>
         </aside>
       </div>
     </GsapEntrance>

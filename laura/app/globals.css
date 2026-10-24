@@ -40,11 +40,19 @@ body {
   opacity: 0;
 }
 
-/* The one deliberate color accent in the whole app, used only inside the
-   Bookings card's holographic panel (components/HolographicShader.tsx,
-   components/BookingCard.tsx) -- everything else stays strictly neutral. */
+/* The one deliberate color accent on the Bookings page (components/
+   BookingsWidget.tsx, components/BookingRow.tsx) -- a muted amber used for
+   the active/needs-attention tick, the widget's big count, and nothing
+   else. Everywhere else on the page stays strictly neutral. */
 :root {
-  --booking-accent: #a9c0d6;
+  --booking-accent: #e2924f;
+}
+
+/* A faint dot grid -- a small decorative texture swatch in each Bookings
+   widget's header, echoing a physical device screen's pixel grid. */
+.widget-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  background-size: 5px 5px;
 }
 
 /* The Reminders calendar's one accent -- today/selected days, the add
