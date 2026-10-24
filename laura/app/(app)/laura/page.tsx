@@ -31,6 +31,7 @@ export default function LauraPage() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"chat" | "activity">("chat");
   const [activityKey, setActivityKey] = useState(0);
+  const [chatOpen, setChatOpen] = useState(false);
   const orbRef = useRef<VoiceOrbHandle>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -51,6 +52,8 @@ export default function LauraPage() {
     if (!text || sending) return;
     setMessages((prev) => [...prev, { role: "user", content: text, createdAt: new Date().toISOString() }]);
     setInput("");
+    setTab("chat");
+    setChatOpen(true);
     setSending(true);
     setError(null);
     try {
@@ -76,7 +79,10 @@ export default function LauraPage() {
     inputRef.current?.focus();
   }
 
-  const hasConversation = messages.length > 0;
+  // The hero (full-size orb, heading, chips) stays until the chat is
+  // opened -- by sending a message or tapping Chat/Activity -- even when
+  // there is history from earlier sessions.
+  const hasConversation = chatOpen;
 
   return (
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 pb-10">
@@ -91,9 +97,12 @@ export default function LauraPage() {
         {(["chat", "activity"] as const).map((t) => (
           <button
             key={t}
-            onClick={() => setTab(t)}
+            onClick={() => {
+              setChatOpen(tab === t ? !chatOpen : true);
+              setTab(t);
+            }}
             className={`rounded-full px-3 py-1 font-mono text-[11px] capitalize tracking-wide transition-colors ${
-              tab === t ? "bg-white/10 text-white" : "text-neutral-500 hover:text-neutral-300"
+              chatOpen && tab === t ? "bg-white/10 text-white" : "text-neutral-500 hover:text-neutral-300"
             }`}
           >
             {t}
@@ -117,7 +126,7 @@ export default function LauraPage() {
         )}
       </div>
 
-      {tab === "activity" ? (
+      {!chatOpen ? null : tab === "activity" ? (
         <div className="mt-2 max-h-[38vh] overflow-y-auto">
           <ActivityFeed refreshKey={activityKey} />
         </div>
