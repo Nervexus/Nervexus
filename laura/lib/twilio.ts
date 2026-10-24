@@ -47,6 +47,36 @@ function getBaseUrl(): string {
 
 export type CallResult = { ok: true; sid: string } | { ok: false; error: string };
 
+type LogAttempt = {
+  kind: "call" | "sms";
+  toNumber: string;
+  message: string;
+  status: "sent" | "failed";
+  error?: string;
+  twilioSid?: string;
+};
+
+// Best-effort and isolated on purpose: whether Twilio actually placed the
+// call/text is already decided by the time this runs, so a CallLog write
+// failure (e.g. the table/migration isn't there yet) must never flip a
+// real success into a reported failure, or vice versa.
+async function logAttempt(attempt: LogAttempt) {
+  try {
+    await prisma.callLog.create({
+      data: {
+        kind: attempt.kind,
+        toNumber: attempt.toNumber,
+        message: attempt.message,
+        status: attempt.status,
+        error: attempt.error ?? null,
+        twilioSid: attempt.twilioSid ?? null,
+      },
+    });
+  } catch (err) {
+    console.error("CallLog write failed:", err);
+  }
+}
+
 /** Has Laura call OWNER_PHONE_NUMBER and read `message` aloud via TwiML
  * <Say>, logging the attempt either way. */
 export async function placeCall(message: string): Promise<CallResult> {
@@ -56,15 +86,11 @@ export async function placeCall(message: string): Promise<CallResult> {
     const from = getFromNumber();
     const twimlUrl = `${getBaseUrl()}/api/calls/twiml?message=${encodeURIComponent(message)}`;
     const call = await client.calls.create({ to: toNumber, from, url: twimlUrl });
-    await prisma.callLog.create({
-      data: { kind: "call", toNumber, message, status: "sent", twilioSid: call.sid },
-    });
+    await logAttempt({ kind: "call", toNumber, message, status: "sent", twilioSid: call.sid });
     return { ok: true, sid: call.sid };
   } catch (err) {
     const error = err instanceof Error ? err.message : "Twilio call failed.";
-    await prisma.callLog.create({
-      data: { kind: "call", toNumber, message, status: "failed", error },
-    });
+    await logAttempt({ kind: "call", toNumber, message, status: "failed", error });
     return { ok: false, error };
   }
 }
@@ -76,15 +102,11 @@ export async function sendText(message: string): Promise<CallResult> {
     const client = getClient();
     const from = getFromNumber();
     const sms = await client.messages.create({ to: toNumber, from, body: message });
-    await prisma.callLog.create({
-      data: { kind: "sms", toNumber, message, status: "sent", twilioSid: sms.sid },
-    });
+    await logAttempt({ kind: "sms", toNumber, message, status: "sent", twilioSid: sms.sid });
     return { ok: true, sid: sms.sid };
   } catch (err) {
     const error = err instanceof Error ? err.message : "Twilio text failed.";
-    await prisma.callLog.create({
-      data: { kind: "sms", toNumber, message, status: "failed", error },
-    });
+    await logAttempt({ kind: "sms", toNumber, message, status: "failed", error });
     return { ok: false, error };
   }
 }
