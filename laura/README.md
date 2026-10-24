@@ -67,6 +67,7 @@ search), but a human always approves and completes any payment.
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
+| `/settings`  | every credential Laura uses or will use, and whether it's connected (status only, never the actual secret values) — links to the full setup guide |
 | `/rota`      | your work schedule — upload a rota photo or add shifts by hand, per-shift commute planning, home/work address + arrival-buffer settings |
 | `/bookings`  | restaurants/activities/travel Laura's researched or you've added — search live options, track idea → pending → confirmed, open the booking link to finish it yourself |
 | `/content`   | Instagram post ideas — research a public account, brainstorm/add captions, hashtags, location, and outfit, track idea → scheduled → posted |
@@ -121,12 +122,14 @@ affect the URLs, just which chrome wraps each page.
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
+| `components/SettingsCard.tsx`     | `/settings` page's card: connected/expires soon/not set status, read-only |
+| `app/api/settings/status/route.ts` | reads `process.env` presence/shape only (decodes the Turso token's `exp` claim to flag an expiring one) -- never returns an actual secret value |
 | `components/ShiftCard.tsx`        | `/rota` page's card: date/time range, location/colleagues, "from photo" badge, inline "Plan commute" + delete |
 | `components/BookingCard.tsx`      | `/bookings` page's card: category icon, date/party/location, booking link, idea/pending/confirmed/cancel status buttons |
 | `components/ContentCard.tsx`      | `/content` page's card: type icon, caption/hashtags, idea/scheduled/posted/discard status buttons |
 | `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile`, `Booking`, `ContentIdea` models |
 | `components/TomorrowBriefing.tsx` | `/laura` page card: today's answer to "what does tomorrow look like" -- renders nothing while loading or if there's nothing to show |
-| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing,bookings,content}/...` | API routes                                         |
+| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing,bookings,content,settings}/...` | API routes                                         |
 | `vercel.json`                     | Vercel Cron config: fires `/api/briefing/send` daily to push tomorrow's briefing to Telegram unprompted |
 
 ## Design system
@@ -259,6 +262,25 @@ in the flow diagram right as the reply lands (`/api/chat`'s response
 includes `toolsUsed`, which the frontend uses to trigger it). Read-only
 tools (`get_current_time`, `list_reminders`) aren't logged — they're not
 interesting as a history, just noise.
+
+## Settings
+
+`/settings` reads `process.env` presence (and, for Turso, the auth
+token's own `exp` JWT claim) server-side and returns status only --
+`connected`, `expires soon`, or `not set` -- never an actual secret value,
+so the page is safe to leave open. It links to a living credentials setup
+guide (a Claude-authored doc, not part of this repo) with exact steps for
+everything still missing.
+
+Building this page surfaced a real bug in `GsapEntrance`: its reveal
+animation only scanned for `.gsap-entrance` elements once, on mount, so
+anything rendered later from an async fetch (a Settings card, a Rota
+shift, a Booking, a Content idea) inherited the CSS's pre-set `opacity: 0`
+and then never got animated in -- permanently invisible. It just hadn't
+been noticed yet because those other pages' lists have always been empty
+in testing. Fixed with a `MutationObserver` inside `GsapEntrance` that
+re-scans for new `.gsap-entrance`/`.pulse-dot` elements as they're added,
+tracking what's already been animated in a `WeakSet` so nothing re-fires.
 
 ## Security notes
 

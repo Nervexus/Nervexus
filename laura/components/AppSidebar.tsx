@@ -15,6 +15,7 @@ const LINKS = [
   { href: "/content", label: "Content", icon: "solar:gallery-linear" },
   { href: "/vault", label: "Vault", icon: "solar:lock-keyhole-linear" },
   { href: "/calls", label: "Calls", icon: "solar:phone-calling-linear" },
+  { href: "/settings", label: "Settings", icon: "solar:settings-linear" },
 ];
 
 type Counts = {
@@ -25,6 +26,7 @@ type Counts = {
   rota: number | null;
   bookings: number | null;
   content: number | null;
+  settings: number | null;
 };
 
 /** The app shell's nav: a sticky left column on desktop, a top bar on
@@ -44,6 +46,7 @@ export function AppSidebar() {
     rota: null,
     bookings: null,
     content: null,
+    settings: null,
   });
 
   useEffect(() => {
@@ -119,6 +122,16 @@ export function AppSidebar() {
         }))
       )
       .catch(() => setCounts((c) => ({ ...c, content: 0 })));
+    fetch("/api/settings/status")
+      .then((res) => res.json())
+      .then((data) =>
+        setCounts((c) => ({
+          ...c,
+          settings: (data.items ?? []).filter((i: { status: string }) => i.status !== "connected")
+            .length,
+        }))
+      )
+      .catch(() => setCounts((c) => ({ ...c, settings: 0 })));
   }, []);
 
   return (
@@ -152,7 +165,9 @@ export function AppSidebar() {
                         ? counts.bookings
                         : link.href === "/content"
                           ? counts.content
-                          : null;
+                          : link.href === "/settings"
+                            ? counts.settings
+                            : null;
           return (
             <li key={link.href} className="gsap-entrance shrink-0 sm:shrink">
               <Link
