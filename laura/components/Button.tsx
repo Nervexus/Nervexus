@@ -36,9 +36,10 @@ export function Button({
     return (
       <button
         {...props}
-        className={`inline-flex shrink-0 items-center gap-2 rounded-2xl bg-[var(--booking-accent)] px-5 py-3 font-mono text-xs uppercase tracking-wide text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-30 ${className}`}
+        className={`group inline-flex shrink-0 items-center gap-3 py-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-300 transition-colors hover:text-neutral-50 disabled:opacity-30 ${className}`}
       >
         {children}
+        <span className="relative h-px w-10 bg-neutral-500 transition-all group-hover:w-14 group-hover:bg-[var(--calendar-accent)]" />
       </button>
     );
   }

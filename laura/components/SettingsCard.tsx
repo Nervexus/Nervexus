@@ -20,7 +20,7 @@ export function SettingsCard({
   status: "connected" | "expiring" | "missing";
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-[24px] border border-neutral-900 bg-neutral-950 p-4">
+    <div className="flex items-center gap-3 rounded-2xl bg-[#1b1b1d] p-4">
       <IconTile>
         <iconify-icon icon={icon} className="text-lg" />
       </IconTile>

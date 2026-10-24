@@ -53,7 +53,7 @@ export function BookingRow({
   const meta = [location, partySize ? `${partySize} people` : null].filter(Boolean).join(" · ");
 
   return (
-    <div className="rounded-2xl border border-neutral-900 bg-neutral-900/50 p-4">
+    <div className="rounded-2xl bg-[#1b1b1d] p-4">
       <div className="flex items-start gap-3">
         <span
           className={`mt-1 h-8 w-[3px] shrink-0 rounded-full ${
@@ -71,7 +71,6 @@ export function BookingRow({
                 {title}
               </h3>
             </div>
-            <div className="widget-dots h-5 w-5 shrink-0 rounded bg-neutral-900" />
           </div>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs tabular-nums text-neutral-500">
             <span>{formatWhen(dateTime)}</span>

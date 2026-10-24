@@ -45,7 +45,7 @@ body {
    the active/needs-attention tick, the widget's big count, and nothing
    else. Everywhere else on the page stays strictly neutral. */
 :root {
-  --booking-accent: #e2924f;
+  --booking-accent: #c9a063;
 }
 
 /* A faint dot grid -- a small decorative texture swatch in each Bookings

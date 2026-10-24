@@ -3,10 +3,9 @@ import type { ReactNode } from "react";
 /** A titled card used in each tool page's sidebar column. */
 export function SidebarCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
+    <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
       <div className="flex items-center justify-between px-1">
-        <h2 className="font-mono text-xs uppercase tracking-widest text-neutral-500">{title}</h2>
-        <div className="widget-dots h-6 w-6 shrink-0 rounded-md bg-neutral-900" />
+        <h2 className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">{title}</h2>
       </div>
       <div className="mt-4">{children}</div>
     </div>

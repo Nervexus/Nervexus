@@ -144,21 +144,21 @@ export default function BookingsPage() {
   return (
     <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Bookings</h1>
+        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Bookings</h1>
         <Pill>{active.length} tracked</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         restaurants, activities, and trips Laura&apos;s helped you look into — she researches and
         tracks, you always complete the booking yourself
       </p>
+      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
       <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
+        <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
           <div className="flex items-center justify-between px-1">
-            <span className="font-mono text-xs uppercase tracking-widest text-neutral-500">Search</span>
-            <div className="widget-dots h-7 w-7 rounded-md bg-neutral-900" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">Search</span>
           </div>
-          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-neutral-900/70 p-1.5 pl-4">
+          <div className="mt-4 flex items-center gap-3 border-b border-[var(--calendar-accent)]/40 pb-1">
             <iconify-icon icon="solar:magnifer-linear" className="shrink-0 text-neutral-500"></iconify-icon>
             <input
               value={query}
@@ -170,13 +170,14 @@ export default function BookingsPage() {
             <button
               onClick={search}
               disabled={searching || !query.trim()}
-              className="shrink-0 rounded-xl bg-[var(--booking-accent)] px-4 py-2 font-mono text-xs uppercase tracking-wide text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-30"
+              className="group shrink-0 inline-flex items-center gap-3 py-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-300 transition-colors hover:text-neutral-50 disabled:opacity-30"
             >
               {searching ? "…" : "Go"}
+              <span className="h-px w-8 bg-neutral-500 transition-all group-hover:w-12 group-hover:bg-[var(--calendar-accent)]" />
             </button>
           </div>
           {searchResult && (
-            <div className="mt-3 rounded-2xl bg-neutral-900/70 px-4 py-3">
+            <div className="mt-3 rounded-2xl bg-[#1b1b1d] px-4 py-3">
               <p className="whitespace-pre-wrap text-sm text-neutral-300">{searchResult}</p>
               <div className="mt-2 flex justify-end">
                 <Button variant="ghost" onClick={saveSearchAsIdea}>
@@ -187,17 +188,16 @@ export default function BookingsPage() {
           )}
         </div>
 
-        <div className="rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
+        <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
           <div className="flex items-center justify-between px-1">
-            <span className="font-mono text-xs uppercase tracking-widest text-neutral-500">Add by hand</span>
-            <div className="widget-dots h-7 w-7 rounded-md bg-neutral-900" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">Add by hand</span>
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Dinner at Lina's"
-              className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600 focus:bg-neutral-900"
+              className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-200 outline-none placeholder:text-neutral-600 "
             />
             <div className="grid grid-cols-4 gap-2">
               {CATEGORIES.map((c) => (
@@ -220,13 +220,13 @@ export default function BookingsPage() {
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => setDateTime(e.target.value)}
-                className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
+                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
               />
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Location"
-                className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -234,14 +234,15 @@ export default function BookingsPage() {
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
                 placeholder="Booking link"
-                className="min-w-0 flex-1 rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+                className="min-w-0 flex-1 border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
               />
               <button
                 onClick={addBooking}
                 disabled={!title.trim()}
-                className="shrink-0 rounded-2xl bg-[var(--booking-accent)] px-5 py-3 font-mono text-xs uppercase tracking-wide text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-30"
+                className="group shrink-0 inline-flex items-center gap-3 py-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-300 transition-colors hover:text-neutral-50 disabled:opacity-30"
               >
                 Add
+                <span className="h-px w-8 bg-neutral-500 transition-all group-hover:w-12 group-hover:bg-[var(--calendar-accent)]" />
               </button>
             </div>
           </div>

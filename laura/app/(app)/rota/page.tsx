@@ -216,15 +216,16 @@ export default function RotaPage() {
   return (
     <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Rota</h1>
+        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Rota</h1>
         <Pill>{upcoming.length} upcoming</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         your work schedule — upload a photo of it, or add shifts by hand
       </p>
+      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
-      <div className="gsap-entrance relative mt-8 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
-        <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">
+      <div className="gsap-entrance relative mt-8 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
           Upload a rota photo
         </span>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -286,8 +287,8 @@ export default function RotaPage() {
         )}
       </div>
 
-      <div className="gsap-entrance relative mt-4 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
-        <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">
+      <div className="gsap-entrance relative mt-4 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
+        <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
           Add a shift by hand
         </span>
         <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -295,25 +296,25 @@ export default function RotaPage() {
             type="datetime-local"
             value={startAt}
             onChange={(e) => setStartAt(e.target.value)}
-            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
           />
           <input
             type="datetime-local"
             value={endAt}
             onChange={(e) => setEndAt(e.target.value)}
-            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
           />
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location (optional)"
-            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
           <input
             value={colleagues}
             onChange={(e) => setColleagues(e.target.value)}
             placeholder="Colleagues (optional)"
-            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
         </div>
         <div className="mt-3.5 flex justify-end">
@@ -338,7 +339,7 @@ export default function RotaPage() {
               ({ label, items }) =>
                 items.length > 0 && (
                   <div key={label} className="mb-8">
-                    <h2 className="mb-3 font-mono text-[11px] uppercase tracking-widest text-neutral-500">
+                    <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
                       {label} · {items.length}
                     </h2>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
@@ -361,13 +362,13 @@ export default function RotaPage() {
                 value={profileDraft.homeAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, homeAddress: e.target.value }))}
                 placeholder="Home address"
-                className="rounded-xl bg-neutral-900/70 px-3 py-2.5 font-mono text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
               />
               <input
                 value={profileDraft.workAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, workAddress: e.target.value }))}
                 placeholder="Work address"
-                className="rounded-xl bg-neutral-900/70 px-3 py-2.5 font-mono text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
               />
               <div className="flex items-center gap-2">
                 <input
@@ -377,7 +378,7 @@ export default function RotaPage() {
                   onChange={(e) =>
                     setProfileDraft((p) => ({ ...p, arrivalBufferMinutes: Number(e.target.value) }))
                   }
-                  className="w-16 rounded-xl bg-neutral-900/70 px-3 py-2.5 font-mono text-xs text-neutral-300 outline-none"
+                  className="w-16 border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-xs text-neutral-300 outline-none"
                 />
                 <span className="text-xs text-neutral-500">min arrival buffer</span>
               </div>

@@ -19,7 +19,7 @@ export function VaultCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="group relative flex h-full flex-col rounded-[24px] border border-neutral-900 bg-neutral-950 p-5 transition-colors hover:border-neutral-700">
+    <div className="group relative flex h-full flex-col rounded-2xl bg-[#1b1b1d] p-5 transition-colors hover:border-neutral-700">
       <div className="flex items-start gap-3">
         <IconTile>
           <LockIcon className="h-4 w-4" />

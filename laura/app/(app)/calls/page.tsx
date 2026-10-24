@@ -71,15 +71,16 @@ export default function CallsPage() {
   return (
     <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Calls & texts</h1>
+        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Calls & texts</h1>
         <Pill>{logs.length} sent</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         have Laura send you an urgent notification or a plain message, via Telegram — free, but
         not an actual ringing phone call
       </p>
+      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
-      <div className="gsap-entrance relative mt-8 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
+      <div className="gsap-entrance relative mt-8 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
         <div className="flex gap-2">
           {(["call", "sms"] as const).map((k) => (
             <button
@@ -103,7 +104,7 @@ export default function CallsPage() {
             kind === "call" ? "What should the urgent message say?" : "What should the message say?"
           }
           rows={3}
-          className="mt-3.5 w-full resize-none rounded-xl bg-neutral-900/70 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+          className="mt-5 w-full resize-none border-b border-[var(--calendar-accent)]/40 bg-transparent pb-2 text-base font-light text-neutral-200 outline-none placeholder:text-neutral-600 focus:border-[var(--calendar-accent)]"
         />
 
         <div className="mt-3.5 flex flex-wrap gap-2">

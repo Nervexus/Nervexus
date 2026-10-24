@@ -54,7 +54,7 @@ export function ShiftCard({
   }
 
   return (
-    <div className="relative flex flex-col gap-3 rounded-[24px] border border-neutral-900 bg-neutral-950 p-4">
+    <div className="relative flex flex-col gap-3 rounded-2xl bg-[#1b1b1d] p-4">
       <div className="flex items-start gap-3">
         <IconTile>
           <iconify-icon icon="solar:calendar-linear" className="text-lg" />
