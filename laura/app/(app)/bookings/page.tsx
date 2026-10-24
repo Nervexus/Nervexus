@@ -21,6 +21,12 @@ type Booking = {
 };
 
 const CATEGORIES = ["restaurant", "activity", "travel", "other"] as const;
+const CATEGORY_ICON: Record<string, string> = {
+  restaurant: "solar:chef-hat-linear",
+  activity: "solar:ticket-linear",
+  travel: "solar:map-point-linear",
+  other: "solar:bookmark-linear",
+};
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -146,79 +152,99 @@ export default function BookingsPage() {
         tracks, you always complete the booking yourself
       </p>
 
-      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
-        <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">
-          Search for options
-        </span>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && search()}
-            placeholder="Italian restaurant near Soho for 4, Friday 8pm"
-            className="min-w-0 flex-1 rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-          />
-          <Button onClick={search} disabled={searching || !query.trim()}>
-            {searching ? "Searching…" : "Search"}
-          </Button>
+      <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
+          <div className="flex items-center justify-between px-1">
+            <span className="font-mono text-xs uppercase tracking-widest text-neutral-500">Search</span>
+            <div className="widget-dots h-7 w-7 rounded-md bg-neutral-900" />
+          </div>
+          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-neutral-900/70 p-1.5 pl-4">
+            <iconify-icon icon="solar:magnifer-linear" className="shrink-0 text-neutral-500"></iconify-icon>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && search()}
+              placeholder="Italian near Soho for 4, Friday 8pm"
+              className="min-w-0 flex-1 bg-transparent py-2 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+            />
+            <button
+              onClick={search}
+              disabled={searching || !query.trim()}
+              className="shrink-0 rounded-xl bg-[var(--booking-accent)] px-4 py-2 font-mono text-xs uppercase tracking-wide text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-30"
+            >
+              {searching ? "…" : "Go"}
+            </button>
+          </div>
+          {searchResult && (
+            <div className="mt-3 rounded-2xl bg-neutral-900/70 px-4 py-3">
+              <p className="whitespace-pre-wrap text-sm text-neutral-300">{searchResult}</p>
+              <div className="mt-2 flex justify-end">
+                <Button variant="ghost" onClick={saveSearchAsIdea}>
+                  Save as an idea
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-        {searchResult && (
-          <div className="mt-4 rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-2.5">
-            <p className="whitespace-pre-wrap text-sm text-neutral-300">{searchResult}</p>
-            <div className="mt-2 flex justify-end">
-              <Button variant="ghost" onClick={saveSearchAsIdea}>
-                Save as an idea
-              </Button>
+
+        <div className="rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
+          <div className="flex items-center justify-between px-1">
+            <span className="font-mono text-xs uppercase tracking-widest text-neutral-500">Add by hand</span>
+            <div className="widget-dots h-7 w-7 rounded-md bg-neutral-900" />
+          </div>
+          <div className="mt-4 flex flex-col gap-2">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Dinner at Lina's"
+              className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600 focus:bg-neutral-900"
+            />
+            <div className="grid grid-cols-4 gap-2">
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCategory(c)}
+                  aria-label={c}
+                  className={`flex flex-col items-center gap-1 rounded-2xl py-2.5 transition-colors ${
+                    category === c ? "bg-neutral-800 text-neutral-100" : "bg-neutral-900/70 text-neutral-500 hover:text-neutral-300"
+                  }`}
+                >
+                  <iconify-icon icon={CATEGORY_ICON[c]} className="text-lg"></iconify-icon>
+                  <span className="font-mono text-[9px] uppercase tracking-widest">{c}</span>
+                  <span className={`h-0.5 w-3 rounded-full ${category === c ? "bg-[var(--booking-accent)]" : "bg-transparent"}`} />
+                </button>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <input
+                type="datetime-local"
+                value={dateTime}
+                onChange={(e) => setDateTime(e.target.value)}
+                className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
+              />
+              <input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Location"
+                className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                placeholder="Booking link"
+                className="min-w-0 flex-1 rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+              />
+              <button
+                onClick={addBooking}
+                disabled={!title.trim()}
+                className="shrink-0 rounded-2xl bg-[var(--booking-accent)] px-5 py-3 font-mono text-xs uppercase tracking-wide text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-30"
+              >
+                Add
+              </button>
             </div>
           </div>
-        )}
-      </div>
-
-      <div className="gradient-border gsap-entrance relative mt-4 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
-        <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">
-          Add one by hand
-        </span>
-        <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title, e.g. Dinner at Lina's"
-            className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value as (typeof CATEGORIES)[number])}
-            className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none [color-scheme:dark]"
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-          <input
-            type="datetime-local"
-            value={dateTime}
-            onChange={(e) => setDateTime(e.target.value)}
-            className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none [color-scheme:dark]"
-          />
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Location (optional)"
-            className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-          />
-          <input
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            placeholder="Booking link (optional)"
-            className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
-          />
-        </div>
-        <div className="mt-3.5 flex justify-end">
-          <Button onClick={addBooking} disabled={!title.trim()}>
-            Add booking
-          </Button>
         </div>
       </div>
 
