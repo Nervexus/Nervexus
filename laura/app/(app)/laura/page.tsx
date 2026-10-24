@@ -6,6 +6,7 @@ import { ActivityFeed } from "@/components/ActivityFeed";
 import { TomorrowBriefing } from "@/components/TomorrowBriefing";
 import { GsapEntrance } from "@/components/GsapEntrance";
 import { ParticleOrb } from "@/components/ParticleOrb";
+import { TelegramButton } from "@/components/TelegramButton";
 
 type Message = { role: "user" | "assistant"; content: string; createdAt?: string };
 
@@ -215,6 +216,12 @@ export default function LauraPage() {
           </div>
         )}
       </div>
+
+      {!hasConversation && (
+        <div className="mt-12 flex justify-center">
+          <TelegramButton />
+        </div>
+      )}
 
       {!hasConversation && (
         <GsapEntrance className="mt-8 flex justify-center">
