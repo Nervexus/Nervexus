@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClockIcon } from "@/components/icons";
-import { EmptyState } from "@/components/EmptyState";
-import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
 import { ReminderCard } from "@/components/ReminderCard";
 import { PriorityPicker } from "@/components/PriorityPicker";
 import { Pill } from "@/components/Pill";
@@ -19,84 +16,54 @@ type Reminder = {
   priority: string;
 };
 
-function toLocalInputValue(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
-    date.getHours()
-  )}:${pad(date.getMinutes())}`;
-}
-
-function inHours(h: number): Date {
-  return new Date(Date.now() + h * 60 * 60 * 1000);
-}
-
-function todayOrTomorrowAt(hour: number): Date {
-  const d = new Date();
-  d.setHours(hour, 0, 0, 0);
-  if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
-  return d;
-}
-
-function tomorrowAt(hour: number): Date {
-  const d = new Date();
-  d.setDate(d.getDate() + 1);
-  d.setHours(hour, 0, 0, 0);
-  return d;
-}
-
-function nextWeekday(targetDay: number, hour: number): Date {
-  const d = new Date();
-  const diff = (targetDay - d.getDay() + 7) % 7 || 7;
-  d.setDate(d.getDate() + diff);
-  d.setHours(hour, 0, 0, 0);
-  return d;
-}
-
-const TIME_PRESETS: { label: string; get: () => Date }[] = [
-  { label: "In 1 hour", get: () => inHours(1) },
-  { label: "This evening", get: () => todayOrTomorrowAt(19) },
-  { label: "Tomorrow 9am", get: () => tomorrowAt(9) },
-  { label: "This weekend", get: () => nextWeekday(6, 10) },
-  { label: "Next week", get: () => nextWeekday(1, 9) },
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
 ];
+const PRIORITY_DOT: Record<string, string> = {
+  high: "bg-red-400",
+  normal: "bg-neutral-300",
+  low: "bg-neutral-600",
+};
+const MAX_TAGS_PER_DAY = 3;
 
-function startOfDay(ms: number): number {
-  const d = new Date(ms);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
+function dateKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function groupByWhen(upcoming: Reminder[], now: number) {
-  const todayEnd = startOfDay(now) + 24 * 60 * 60 * 1000;
-  const weekEnd = startOfDay(now) + 7 * 24 * 60 * 60 * 1000;
+function sameDay(a: Date, b: Date): boolean {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
 
-  const overdue: Reminder[] = [];
-  const today: Reminder[] = [];
-  const thisWeek: Reminder[] = [];
-  const later: Reminder[] = [];
-
-  for (const r of upcoming) {
-    const t = new Date(r.dueAt).getTime();
-    if (t < now) overdue.push(r);
-    else if (t < todayEnd) today.push(r);
-    else if (t < weekEnd) thisWeek.push(r);
-    else later.push(r);
-  }
-  return { overdue, today, thisWeek, later };
+/** Always 42 cells (6 full weeks) so the grid never reflows height between
+ * months -- leading/trailing days from adjacent months are included dimmed,
+ * same as a normal calendar app. */
+function buildMonthGrid(year: number, month: number): Date[] {
+  const firstOfMonth = new Date(year, month, 1);
+  const gridStart = new Date(year, month, 1 - firstOfMonth.getDay());
+  return Array.from({ length: 42 }, (_, i) => new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + i));
 }
 
 export default function RemindersPage() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
-  const [dueAt, setDueAt] = useState("");
-  const [priority, setPriority] = useState("normal");
   const [error, setError] = useState<string | null>(null);
-  // Snapshotted once on mount rather than read via Date.now() during
-  // render, which React's purity rules flag as an impure render.
-  const [now, setNow] = useState<number | null>(null);
-  useEffect(() => setNow(Date.now()), []);
+  const [cursor, setCursor] = useState<{ year: number; month: number } | null>(null);
+  const [selected, setSelected] = useState<Date | null>(null);
+  const [newTitle, setNewTitle] = useState("");
+  const [newTime, setNewTime] = useState("09:00");
+  const [newPriority, setNewPriority] = useState("normal");
+
+  // Snapshotted once on mount rather than read via `new Date()` during
+  // render -- a bare `new Date()` in a Client Component is flagged by
+  // Next's prerender as a non-deterministic value.
+  const [today, setToday] = useState<Date | null>(null);
+  useEffect(() => {
+    const now = new Date();
+    setCursor({ year: now.getFullYear(), month: now.getMonth() });
+    setToday(now);
+  }, []);
 
   function load() {
     fetch("/api/reminders")
@@ -108,32 +75,24 @@ export default function RemindersPage() {
 
   useEffect(load, []);
 
-  function resetForm() {
-    setTitle("");
-    setNote("");
-    setDueAt("");
-    setPriority("normal");
-  }
-
-  async function add() {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle || !dueAt) return;
+  async function addOnSelectedDay() {
+    if (!selected || !newTitle.trim()) return;
     setError(null);
+    const [hours, minutes] = newTime.split(":").map(Number);
+    const due = new Date(selected);
+    due.setHours(hours || 0, minutes || 0, 0, 0);
 
     try {
       const res = await fetch("/api/reminders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: trimmedTitle,
-          note: note || undefined,
-          dueAt: new Date(dueAt).toISOString(),
-          priority,
-        }),
+        body: JSON.stringify({ title: newTitle.trim(), dueAt: due.toISOString(), priority: newPriority }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't save reminder.");
-      resetForm();
+      setNewTitle("");
+      setNewTime("09:00");
+      setNewPriority("normal");
       load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't save reminder.");
@@ -154,157 +113,173 @@ export default function RemindersPage() {
     load();
   }
 
-  const upcoming = reminders.filter((r) => !r.done);
-  const done = reminders.filter((r) => r.done);
-  const groups = now === null ? null : groupByWhen(upcoming, now);
-  const overdueCount = groups?.overdue.length ?? 0;
+  const byDay = new Map<string, Reminder[]>();
+  for (const r of reminders) {
+    const key = dateKey(new Date(r.dueAt));
+    const list = byDay.get(key) ?? [];
+    list.push(r);
+    byDay.set(key, list);
+  }
 
-  const SECTIONS: { key: keyof NonNullable<typeof groups>; label: string }[] = [
-    { key: "overdue", label: "Overdue" },
-    { key: "today", label: "Today" },
-    { key: "thisWeek", label: "This week" },
-    { key: "later", label: "Later" },
-  ];
+  const grid = cursor ? buildMonthGrid(cursor.year, cursor.month) : [];
+  const selectedReminders = selected ? (byDay.get(dateKey(selected)) ?? []) : [];
+
+  function changeMonth(delta: number) {
+    setCursor((c) => {
+      if (!c) return c;
+      const d = new Date(c.year, c.month + delta, 1);
+      return { year: d.getFullYear(), month: d.getMonth() };
+    });
+    setSelected(null);
+  }
 
   return (
     <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
       <div className="gsap-entrance flex items-center gap-3">
         <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Reminders</h1>
-        <Pill>{upcoming.length} upcoming</Pill>
+        <Pill>{reminders.filter((r) => !r.done).length} upcoming</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         things to do, set by you or by Laura from a conversation
       </p>
 
-      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Remind me to…"
-          className="w-full bg-transparent text-base font-light outline-none placeholder:text-neutral-600"
-        />
-        <input
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Extra detail (optional)"
-          className="mt-2.5 w-full bg-transparent text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
-        />
+      {error && <p className="gsap-entrance mt-4 text-sm text-red-400">{error}</p>}
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {TIME_PRESETS.map((preset) => (
-            <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
-              {preset.label}
-            </Chip>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <input
-              type="datetime-local"
-              value={dueAt}
-              onChange={(e) => setDueAt(e.target.value)}
-              className="rounded-lg border border-neutral-800/60 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
-            />
-            <PriorityPicker value={priority} onChange={setPriority} />
+      {!loaded || !cursor ? (
+        <p className="gsap-entrance mt-10 py-10 text-center text-sm text-neutral-600">Loading…</p>
+      ) : (
+        <div className="gsap-entrance gradient-border relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+          <div className="flex items-center justify-between">
+            <h2 className="font-mono text-sm uppercase tracking-widest text-neutral-200">
+              {MONTH_NAMES[cursor.month]} {cursor.year}
+            </h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => changeMonth(-1)}
+                aria-label="Previous month"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-800 text-neutral-400 transition-colors hover:border-neutral-600 hover:text-neutral-100"
+              >
+                <iconify-icon icon="solar:alt-arrow-left-linear" />
+              </button>
+              <button
+                onClick={() => changeMonth(1)}
+                aria-label="Next month"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-800 text-neutral-400 transition-colors hover:border-neutral-600 hover:text-neutral-100"
+              >
+                <iconify-icon icon="solar:alt-arrow-right-linear" />
+              </button>
+            </div>
           </div>
-          <Button onClick={add} disabled={!title.trim() || !dueAt}>
-            Set reminder
-          </Button>
+
+          <div className="mt-5 grid grid-cols-7 gap-1.5 text-center font-mono text-[10px] uppercase tracking-widest text-neutral-600">
+            {WEEKDAYS.map((w) => (
+              <div key={w} className="hidden sm:block">
+                {w}
+              </div>
+            ))}
+            {WEEKDAYS.map((w) => (
+              <div key={w + "-short"} className="sm:hidden">
+                {w.slice(0, 1)}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-2 grid grid-cols-7 gap-1.5">
+            {grid.map((day, i) => {
+              const inMonth = day.getMonth() === cursor.month;
+              const isToday = today !== null && sameDay(day, today);
+              const isSelected = selected && sameDay(day, selected);
+              const tags = byDay.get(dateKey(day)) ?? [];
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelected(day)}
+                  className={`flex min-h-[72px] flex-col items-start gap-1 rounded-xl border p-2 text-left transition-colors sm:min-h-[92px] ${
+                    isSelected
+                      ? "border-neutral-100 bg-neutral-900/80"
+                      : isToday
+                        ? "border-neutral-700 bg-neutral-100 text-neutral-950"
+                        : inMonth
+                          ? "border-neutral-800/60 bg-neutral-950/40 hover:border-neutral-700"
+                          : "border-neutral-900/40 bg-transparent opacity-30"
+                  }`}
+                >
+                  <span className={`text-xs font-medium ${isToday && !isSelected ? "text-neutral-950" : "text-neutral-200"}`}>
+                    {day.getDate()}
+                  </span>
+                  <div className="flex w-full flex-col gap-0.5">
+                    {tags.slice(0, MAX_TAGS_PER_DAY).map((r) => (
+                      <span
+                        key={r.id}
+                        className={`flex items-center gap-1 truncate text-[10px] ${
+                          r.done
+                            ? "text-neutral-600 line-through"
+                            : isToday && !isSelected
+                              ? "text-neutral-800"
+                              : "text-neutral-500"
+                        }`}
+                      >
+                        <span className={`h-1 w-1 shrink-0 rounded-full ${PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal}`} />
+                        <span className="truncate">{r.title}</span>
+                      </span>
+                    ))}
+                    {tags.length > MAX_TAGS_PER_DAY && (
+                      <span className="text-[10px] text-neutral-600">+{tags.length - MAX_TAGS_PER_DAY} more</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
-        <div className="min-w-0">
-          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
+      {selected && (
+        <div className="gsap-entrance mt-8">
+          <h2 className="mb-3 font-mono text-[11px] uppercase tracking-widest text-neutral-500">
+            {selected.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" })}
+          </h2>
 
-            {loaded && reminders.length === 0 ? (
-              <EmptyState
-                icon={<ClockIcon className="h-5 w-5" />}
-                title="No reminders yet"
-                description="Set one above, pick a quick time from the sidebar, or just ask Laura."
+          {selectedReminders.length > 0 && (
+            <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-3">
+              {selectedReminders.map((r) => (
+                <ReminderCard
+                  key={r.id}
+                  title={r.title}
+                  note={r.note}
+                  dueAt={r.dueAt}
+                  priority={r.priority}
+                  done={r.done}
+                  overdue={false}
+                  onToggleDone={() => toggleDone(r)}
+                  onDelete={() => remove(r.id)}
+                />
+              ))}
+            </div>
+          )}
+
+          <div className="gradient-border relative rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-5 backdrop-blur-md">
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Remind me to…"
+                className="min-w-0 flex-1 bg-transparent text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600"
               />
-            ) : (
-              groups && (
-                <>
-                  {SECTIONS.map(({ key, label }) => {
-                    const items = groups[key];
-                    if (items.length === 0) return null;
-                    return (
-                      <div key={key} className="mb-8">
-                        <h2
-                          className={`mb-3 font-mono text-[11px] uppercase tracking-widest ${
-                            key === "overdue" ? "text-neutral-200" : "text-neutral-500"
-                          }`}
-                        >
-                          {label} · {items.length}
-                        </h2>
-                        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">
-                          {items.map((reminder) => (
-                            <ReminderCard
-                              key={reminder.id}
-                              title={reminder.title}
-                              note={reminder.note}
-                              dueAt={reminder.dueAt}
-                              priority={reminder.priority}
-                              done={false}
-                              overdue={key === "overdue"}
-                              onToggleDone={() => toggleDone(reminder)}
-                              onDelete={() => remove(reminder.id)}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                  {done.length > 0 && (
-                    <div>
-                      <h2 className="mb-3 font-mono text-[11px] uppercase tracking-widest text-neutral-600">
-                        Done · {done.length}
-                      </h2>
-                      <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-3">
-                        {done.map((reminder) => (
-                          <ReminderCard
-                            key={reminder.id}
-                            title={reminder.title}
-                            note={reminder.note}
-                            dueAt={reminder.dueAt}
-                            priority={reminder.priority}
-                            done
-                            overdue={false}
-                            onToggleDone={() => toggleDone(reminder)}
-                            onDelete={() => remove(reminder.id)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )
-            )}
+              <input
+                type="time"
+                value={newTime}
+                onChange={(e) => setNewTime(e.target.value)}
+                className="rounded-lg border border-neutral-800/60 bg-neutral-950 px-3 py-1.5 text-sm text-neutral-300 outline-none [color-scheme:dark]"
+              />
+              <PriorityPicker value={newPriority} onChange={setNewPriority} />
+              <Button onClick={addOnSelectedDay} disabled={!newTitle.trim()}>
+                Add
+              </Button>
+            </div>
           </div>
-
-          <aside className="flex flex-col gap-4">
-            <SidebarCard title="Quick add">
-              <div className="flex flex-wrap gap-2">
-                {TIME_PRESETS.map((preset) => (
-                  <Chip key={preset.label} onClick={() => setDueAt(toLocalInputValue(preset.get()))}>
-                    {preset.label}
-                  </Chip>
-                ))}
-              </div>
-            </SidebarCard>
-
-            <SidebarCard title="Stats">
-              <div className="flex flex-col gap-2">
-                <Stat label="Upcoming" value={upcoming.length} />
-                <Stat label="Overdue" value={overdueCount} />
-                <Stat label="Done" value={done.length} />
-              </div>
-            </SidebarCard>
-          </aside>
         </div>
-      </GsapEntrance>
+      )}
+    </GsapEntrance>
   );
 }

@@ -64,7 +64,7 @@ search), but a human always approves and completes any payment.
 | `/`          | Home — a studio-site landing page: hero (JS-injected word-reveal headline, metrics), a portfolio grid, a 3-step process section, CTA into `/laura` |
 | `/laura`     | the assistant itself — node-diagram view of the orb wired to its tools, + chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember — shown as files inside a Glass Folder (`components/ui/glass-folder-cards.tsx`), click one open to edit or delete it |
-| `/reminders` | things to do, set by you or by Laura from a conversation                     |
+| `/reminders` | a month calendar — click a day to see/add/edit reminders due then, set by you or by Laura from a conversation |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
 | `/settings`  | every credential Laura uses or will use, and whether it's connected (status only, never the actual secret values) — links to the full setup guide |
@@ -72,12 +72,12 @@ search), but a human always approves and completes any payment.
 | `/bookings`  | restaurants/activities/travel Laura's researched or you've added — search live options, track idea → pending → confirmed, open the booking link to finish it yourself |
 | `/content`   | Instagram post ideas — research a public account, brainstorm/add captions, hashtags, location, and outfit, track idea → scheduled → posted |
 
-Reminders/Vault use a responsive auto-fit card grid (not a fixed column
-count) so a handful of items still fill the row instead of leaving a lone
-narrow card — plus Low/Normal/High priority with Overdue/Today/This
-week/Later grouping (Reminders, also settable by Laura from a
-conversation), and copy-without-revealing (Vault, via the clipboard, no
-on-screen display needed).
+Vault uses a responsive auto-fit card grid (not a fixed column count) so
+a handful of items still fill the row instead of leaving a lone narrow
+card, plus copy-without-revealing via the clipboard (no on-screen display
+needed). Reminders carry Low/Normal/High priority (also settable by Laura
+from a conversation), shown as a small colored dot on each day's tag in
+the calendar.
 
 `/laura`, `/notes`, `/reminders`, `/rota`, `/vault`, and `/calls` live
 under the `(app)` route group and share `AppSidebar` — a sticky left
@@ -113,7 +113,7 @@ affect the URLs, just which chrome wraps each page.
 | `components/Button.tsx`           | the app's one primary (solid neutral-100) and ghost/danger button style |
 | `components/IconTile.tsx`         | small glass icon tile, same `bg-neutral-900/40` + blur treatment as the portfolio cards |
 | `components/ui/glass-folder-cards.tsx` | drop-in third-party component (vendored as-is, not modified): a glass-and-canvas "folder" object -- notes are its files. Lives in `components/ui/` rather than flat in `components/` since it's a drop-in primitive, not a hand-rolled app component |
-| `components/ReminderCard.tsx`     | Reminders page's card: priority accent bar, overdue highlighting      |
+| `components/ReminderCard.tsx`     | a reminder's card: priority accent bar, done/overdue state -- used in the selected day's panel on the Reminders calendar |
 | `components/VaultCard.tsx`        | Vault page's card: Reveal and Copy-without-revealing actions          |
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
@@ -189,6 +189,17 @@ effect) trip the newer React 19.2 hooks lint rules, same as four
 pre-existing instances elsewhere in this codebase; rewriting a third-party
 component's carefully-tuned identity/animation logic to satisfy a lint
 rule risks breaking it, so those are left alone.
+
+## Reminders
+
+`/reminders` is a month calendar (`buildMonthGrid` always returns 42 cells
+-- 6 full weeks -- so the grid never reflows height between months) instead
+of the earlier Overdue/Today/This week/Later list. Each day with reminders
+due shows up to 3 as small tag pills (a priority-colored dot + truncated
+title, `+N more` beyond that); clicking a day lists that day's reminders as
+full `ReminderCard`s plus a quick-add row (title, time, priority) scoped to
+that date. Same data model and API routes as before -- this only changed
+how the existing reminders are browsed and added, not what a reminder is.
 
 ## Web search
 
