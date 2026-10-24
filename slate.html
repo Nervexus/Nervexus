@@ -98,15 +98,6 @@ tailwind.config = {
     .product-img-mobile-curve { border-top-right-radius: 48px; }
   }
 
-  /* Process timeline */
-  .timeline-track-mask {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
-  }
-  @media (min-width: 768px) {
-    .timeline-sticky-label { top: 10rem; }
-  }
-
   /* Hero: a very gentle, edgeless blur behind the text for readability */
   .hero-text-blur {
     position: absolute;
@@ -192,95 +183,89 @@ tailwind.config = {
 
   <!-- SECTION 3: PROCESS TIMELINE -->
   <section id="heritage" class="relative bg-dark text-cream py-28 px-6">
-    <div class="max-w-5xl mx-auto">
-      <div class="gsap-fade-up mb-16 max-w-lg">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 gsap-fade-up">
         <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Our Process</p>
-        <h2 class="font-serif text-3xl sm:text-4xl leading-tight mb-8">
-          From quarry to roofline,<br>without compromise.
-        </h2>
-        <p class="text-cream/70 text-lg leading-relaxed">
-          A straightforward look at how a project runs from the first
-          conversation to the final inspection, covering direct sourcing,
-          licensed installation and full traceability throughout.
-        </p>
+        <h2 class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-tight mb-6">From Quarry to Roofline</h2>
+        <p class="max-w-2xl mx-auto text-lg sm:text-xl text-cream/60 leading-relaxed">A straightforward journey from the first conversation to the final inspection.</p>
       </div>
 
-      <div id="timelineWrap" class="relative">
-        <div id="timelineEntries">
-
-          <!-- Entry 01 -->
-          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <h3 class="hidden md:block text-xl md:pl-10 md:text-3xl font-serif italic font-normal text-cream">01. Consultation</h3>
-            </div>
-
-            <div class="relative pl-8 pr-4 md:pl-4 w-full">
-              <h3 class="md:hidden block text-2xl mb-4 text-center font-serif italic font-normal text-cream">01. Consultation</h3>
-              <div class="text-center max-w-md mx-auto">
-                <p class="text-cream/60 text-xs md:text-sm font-normal leading-relaxed mb-8">We walk the site, discuss materials and scope, and provide a clear, itemized quote before anything is ordered.</p>
-                <div class="max-w-sm mx-auto">
-                  <img src="assets/strata/facade.webp" alt="Timber-clad gable facade with cathedral glass window" width="500" height="500" class="rounded-2xl object-cover object-[center_58%] h-48 md:h-64 lg:h-72 w-full border border-cream/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Entry 02 -->
-          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <h3 class="hidden md:block text-xl md:pl-10 md:text-3xl font-serif italic font-normal text-cream">02. Sourcing</h3>
-            </div>
-
-            <div class="relative pl-8 pr-4 md:pl-4 w-full">
-              <h3 class="md:hidden block text-2xl mb-4 text-center font-serif italic font-normal text-cream">02. Sourcing</h3>
-              <div class="text-center max-w-md mx-auto">
-                <p class="text-cream/60 text-xs md:text-sm font-normal leading-relaxed mb-8">Slate and stone are hand-selected from our partner quarries and tracked all the way to your address.</p>
-                <div class="max-w-sm mx-auto">
-                  <img src="assets/strata/aerial-day.webp" alt="Aerial view of timber lodges along a rocky coastline" width="500" height="500" class="rounded-2xl object-cover object-[center_72%] h-48 md:h-64 lg:h-72 w-full border border-cream/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Entry 03 -->
-          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <h3 class="hidden md:block text-xl md:pl-10 md:text-3xl font-serif italic font-normal text-cream">03. Installation</h3>
-            </div>
-
-            <div class="relative pl-8 pr-4 md:pl-4 w-full">
-              <h3 class="md:hidden block text-2xl mb-4 text-center font-serif italic font-normal text-cream">03. Installation</h3>
-              <div class="text-center max-w-md mx-auto">
-                <p class="text-cream/60 text-xs md:text-sm font-normal leading-relaxed mb-8">A licensed, in-house crew installs to spec, with a site lead supervising every stage of the build.</p>
-                <div class="max-w-sm mx-auto">
-                  <img src="assets/strata/aerial-night.webp" alt="Finished roof lit at night" width="500" height="500" class="rounded-2xl object-cover object-[center_60%] h-48 md:h-64 lg:h-72 w-full border border-cream/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Entry 04 -->
-          <div class="timeline-row gsap-fade-up flex justify-start pt-10 md:pt-40 md:gap-10">
-            <div class="timeline-sticky-label md:sticky flex flex-col md:flex-row z-40 items-center md:top-40 self-start max-w-xs lg:max-w-sm md:w-full">
-              <h3 class="hidden md:block text-xl md:pl-10 md:text-3xl font-serif italic font-normal text-cream">04. Inspection</h3>
-            </div>
-
-            <div class="relative pl-8 pr-4 md:pl-4 w-full">
-              <h3 class="md:hidden block text-2xl mb-4 text-center font-serif italic font-normal text-cream">04. Inspection</h3>
-              <div class="text-center max-w-md mx-auto">
-                <p class="text-cream/60 text-xs md:text-sm font-normal leading-relaxed mb-8">A full walkthrough and sign-off, backed by a 25-year workmanship warranty on every install.</p>
-                <div class="max-w-sm mx-auto">
-                  <img src="assets/strata/exploded-cutaway.webp" alt="Exploded diagram of roof and facade construction layers" width="500" height="500" class="rounded-2xl object-cover object-[center_48%] h-48 md:h-64 lg:h-72 w-full border border-cream/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.5)]">
-                </div>
-              </div>
-            </div>
-          </div>
-
+      <div class="relative" id="timeline-container">
+        <!-- Progress line -->
+        <div class="absolute left-1/2 -translate-x-1/2 w-px h-full bg-cream/10 hidden lg:block rounded-full overflow-hidden">
+          <div id="progress-line" class="w-full rounded-full" style="height: 0%; background: linear-gradient(#cebfa9, #4f5343); transition: height 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 0 10px rgba(206,191,169,0.3);"></div>
         </div>
 
-        <!-- Track line: thin, gradient-masked top/bottom, same as source -->
-        <div id="timelineTrack" class="absolute md:left-2 left-2 top-0 overflow-hidden w-[2px] bg-gradient-to-b from-transparent via-cream/15 to-transparent timeline-track-mask">
-          <div id="timelineProgress" class="absolute inset-x-0 top-0 w-[2px] h-0 opacity-0 bg-gradient-to-t from-sand via-sand/70 to-transparent rounded-full"></div>
+        <div class="space-y-16" id="timeline-steps">
+
+          <!-- Step 1 -->
+          <div class="flex flex-col lg:flex-row gap-10 items-center timeline-step" data-step="1" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex-1 lg:text-right lg:pr-12">
+              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
+                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 01</span>
+                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Consultation</h3>
+                <p class="text-cream/60 leading-relaxed mb-6">We walk the site, discuss materials and scope, and provide a clear, itemized quote before anything is ordered.</p>
+                <div class="flex items-center gap-2 text-sm text-cream/40 lg:justify-end">
+                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
+                  <span>Duration: 60 to 90 minutes</span>
+                </div>
+              </div>
+            </div>
+            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="1" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
+            <div class="flex-1 lg:pl-12"></div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex flex-col lg:flex-row items-center gap-10 timeline-step" data-step="2" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex-1 lg:pr-12"></div>
+            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="2" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
+            <div class="flex-1 lg:pl-12">
+              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
+                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 02</span>
+                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Sourcing</h3>
+                <p class="text-cream/60 leading-relaxed mb-6">Slate and stone are hand-selected from our partner quarries and tracked all the way to your address.</p>
+                <div class="flex items-center gap-2 text-sm text-cream/40">
+                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
+                  <span>Duration: 3 to 5 days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex flex-col lg:flex-row items-center gap-10 timeline-step" data-step="3" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex-1 lg:text-right lg:pr-12">
+              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
+                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 03</span>
+                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Installation</h3>
+                <p class="text-cream/60 leading-relaxed mb-6">A licensed, in-house crew installs to spec, with a site lead supervising every stage of the build.</p>
+                <div class="flex items-center gap-2 text-sm text-cream/40 lg:justify-end">
+                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
+                  <span>Duration: 1 to 3 weeks</span>
+                </div>
+              </div>
+            </div>
+            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="3" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
+            <div class="flex-1 lg:pl-12"></div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="flex flex-col lg:flex-row items-center gap-10 timeline-step" data-step="4" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
+            <div class="flex-1 lg:pr-12"></div>
+            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="4" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
+            <div class="flex-1 lg:pl-12">
+              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
+                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 04</span>
+                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Inspection</h3>
+                <p class="text-cream/60 leading-relaxed mb-6">A full walkthrough and sign-off, backed by a 25-year workmanship warranty on every install.</p>
+                <div class="flex items-center gap-2 text-sm text-cream/40">
+                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
+                  <span>Duration: 45 to 60 minutes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -585,35 +570,74 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 });
 
 /* =========================================================
-   HERITAGE TIMELINE (scroll-filled progress line)
+   PROCESS TIMELINE (sequential reveal on scroll into view)
    ========================================================= */
-(function initTimeline() {
-  const wrap = document.getElementById('timelineWrap');
-  const entries = document.getElementById('timelineEntries');
-  const track = document.getElementById('timelineTrack');
-  const progress = document.getElementById('timelineProgress');
-  if (!wrap || !entries || !track || !progress) return;
+(function initSmoothTimeline() {
+  const progressLine = document.getElementById('progress-line');
+  const timelineSteps = document.querySelectorAll('.timeline-step');
+  const timelineDots = document.querySelectorAll('.timeline-dot');
+  const timelineContainer = document.getElementById('timeline-container');
 
-  let entriesHeight = 0;
+  if (!progressLine || !timelineSteps.length || !timelineDots.length || !timelineContainer) return;
 
-  function setHeight() {
-    entriesHeight = entries.offsetHeight;
-    track.style.height = entriesHeight + 'px';
+  let animationStarted = false;
+
+  function resetTimeline() {
+    progressLine.style.height = '0%';
+    timelineSteps.forEach((step) => {
+      step.style.opacity = '0';
+      step.style.transform = 'translateY(50px)';
+    });
+    timelineDots.forEach((dot) => {
+      dot.style.background = 'rgba(245,243,238,0.15)';
+      dot.style.transform = 'scale(0.8)';
+      dot.style.opacity = '0.5';
+      dot.style.boxShadow = 'none';
+    });
   }
-  setHeight();
-  window.addEventListener('resize', setHeight);
 
-  ScrollTrigger.create({
-    trigger: wrap,
-    start: 'top 10%',
-    end: 'bottom 50%',
-    scrub: true,
-    onUpdate: (self) => {
-      const p = self.progress;
-      progress.style.height = p * entriesHeight + 'px';
-      progress.style.opacity = Math.min(1, p * 10).toFixed(3);
+  function animateTimeline() {
+    if (animationStarted) return;
+    animationStarted = true;
+
+    setTimeout(() => {
+      progressLine.style.height = '100%';
+    }, 200);
+
+    timelineSteps.forEach((step, index) => {
+      const dot = timelineDots[index];
+      const delay = 400 + index * 600;
+
+      setTimeout(() => {
+        step.style.opacity = '1';
+        step.style.transform = 'translateY(0px)';
+
+        if (dot) {
+          dot.style.background = '#cebfa9';
+          dot.style.transform = 'scale(1)';
+          dot.style.opacity = '1';
+          dot.style.boxShadow = '0 0 20px rgba(206,191,169,0.4)';
+        }
+      }, delay);
+    });
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateTimeline();
+        } else if (!entry.isIntersecting && entry.boundingClientRect.top > 0) {
+          animationStarted = false;
+          resetTimeline();
+        }
+      });
     },
-  });
+    { threshold: 0.2, rootMargin: '-100px 0px -50px 0px' }
+  );
+
+  resetTimeline();
+  observer.observe(timelineContainer);
 })();
 
 
