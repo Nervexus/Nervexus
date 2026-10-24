@@ -33,7 +33,7 @@ export default function LauraPage() {
   const [activityKey, setActivityKey] = useState(0);
   const orbRef = useRef<VoiceOrbHandle>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const endRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/chat")
@@ -43,7 +43,8 @@ export default function LauraPage() {
   }, []);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    const el = chatRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages.length, sending]);
 
   async function sendMessage(text: string, speakReply: boolean) {
@@ -102,26 +103,29 @@ export default function LauraPage() {
 
       <div
         className={`flex flex-col items-center text-center transition-all duration-700 ${
-          hasConversation ? "pt-2" : "pt-[3vh]"
+          "pt-0"
         }`}
       >
         <ParticleOrb
           active={sending}
-          className={`transition-all duration-700 ${hasConversation ? "w-28" : "w-[300px] sm:w-[400px]"}`}
+          className={`transition-all duration-700 ${hasConversation ? "w-[240px] sm:w-[300px]" : "w-[340px] sm:w-[520px]"}`}
         />
         {!hasConversation && (
-          <h1 className="-mt-4 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
+          <h1 className="-mt-8 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
             How can I help you today?
           </h1>
         )}
       </div>
 
       {tab === "activity" ? (
-        <div className="mt-8 flex-1">
+        <div className="mt-2 max-h-[38vh] overflow-y-auto">
           <ActivityFeed refreshKey={activityKey} />
         </div>
       ) : (
-        <div className="mt-8 flex flex-1 flex-col gap-5">
+        <div
+          ref={chatRef}
+          className="mt-2 flex max-h-[38vh] flex-col gap-5 overflow-y-auto px-1 py-4 [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_92%,transparent)]"
+        >
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
@@ -149,11 +153,10 @@ export default function LauraPage() {
             </div>
           )}
           {error && <p className="text-center text-sm text-red-400">{error}</p>}
-          <div ref={endRef} />
         </div>
       )}
 
-      <div className={`sticky bottom-4 ${hasConversation ? "mt-6" : "mt-10"}`}>
+      <div className={hasConversation ? "mt-4" : "mt-6"}>
         <div className="relative rounded-[22px] border border-white/15 bg-white/[0.05] p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl">
           <textarea
             ref={inputRef}
