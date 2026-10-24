@@ -156,3 +156,15 @@ export async function resolveButtonTap(callbackId: string, messageId: number, ne
     body: JSON.stringify({ chat_id: getChatId(), message_id: messageId, text: newText.slice(0, 4096) }),
   }).catch(() => {});
 }
+
+/** Downloads a file someone sent the bot (voice note, photo) as base64.
+ * Telegram serves bot downloads up to 20MB. */
+export async function downloadTelegramFile(fileId: string): Promise<{ base64: string; path: string }> {
+  const token = getBotToken();
+  const meta = await fetch(`https://api.telegram.org/bot${token}/getFile?file_id=${encodeURIComponent(fileId)}`).then((r) => r.json());
+  if (!meta.ok) throw new Error(meta.description ?? "Couldn't look up that file.");
+  const path: string = meta.result.file_path;
+  const res = await fetch(`https://api.telegram.org/file/bot${token}/${path}`);
+  if (!res.ok) throw new Error(`Couldn't download that file (${res.status}).`);
+  return { base64: Buffer.from(await res.arrayBuffer()).toString("base64"), path };
+}

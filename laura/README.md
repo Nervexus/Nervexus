@@ -361,12 +361,34 @@ tracking what's already been animated in a `WeakSet` so nothing re-fires.
   text could otherwise trigger an unwanted notification. Creating a note
   or a reminder is treated as low-stakes/reversible and doesn't need
   confirmation.
-- **Calls/texts are outbound-only, to one fixed chat.** `call_me`/
-  `text_me` always message `TELEGRAM_CHAT_ID` — there's no inbound
-  handling yet, so there's nothing for a stranger to hijack by messaging
-  the bot. The sender-allowlist problem only shows up once Laura can
-  *receive* messages (phase 5), at which point incoming updates will need
-  to be checked against `TELEGRAM_CHAT_ID` before acting on anything.
+- **Password sign-in.** `proxy.ts` gates every page and API behind a
+  signed session cookie (`lib/session.ts`): sign in at `/login` with
+  `APP_PASSWORD`, get a 30-day HttpOnly cookie signed with
+  `TOKEN_ENCRYPTION_KEY`. Only the landing page, `/login`, the login API,
+  the Telegram webhook, and the cron briefing are reachable signed out --
+  the last two check their own secrets. With `APP_PASSWORD` unset the app
+  stays locked rather than open.
+- **Telegram is two-way, but only for you.** `/api/telegram/webhook`
+  requires the `TELEGRAM_WEBHOOK_SECRET` header Telegram echoes back, and
+  only acts on updates from `TELEGRAM_CHAT_ID` (messages, voice notes,
+  rota photos, booking-button taps); anything else is acknowledged and
+  ignored.
+
+## Telegram
+
+Message `@Laura1xbot` and she answers with the same brain, tools, and
+history as the web chat. Voice notes are transcribed by Gemini
+(`lib/transcribe.ts`) and answered, with the transcript quoted back so a
+mishearing is obvious. A photo is read as a work rota (`parseRotaImage`):
+shifts it finds are saved with `source: "photo"` and listed back. When
+you pick a place to book, `prepare_booking` sends ready-to-book link
+buttons (`lib/booking-links.ts`: the venue's own page, OpenTable
+prefilled with date/time/party size, the Google Maps listing) plus "I
+booked it" / "Skip"; "I booked it" confirms the booking and sets a
+reminder two hours before. Laura never books or pays herself. The webhook
+must be registered with `allowed_updates: ["message", "callback_query"]`
+for the buttons to work. Times in links are formatted in
+`USER_TIMEZONE` (default `Europe/London`), since the servers run on UTC.
 
 ## Persistence note
 
