@@ -87,8 +87,26 @@ function BookmarkIcon({ className }: { className?: string }) {
   );
 }
 
-const STAGE_W = 840;
-const NODE_COUNT = 7;
+function GalleryIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+      <circle cx="9" cy="10" r="1.6" />
+      <path d="m5 17 4.5-4.5 3 3L18 10l1.5 1.5" />
+    </svg>
+  );
+}
+
+const STAGE_W = 920;
+const NODE_COUNT = 8;
 // Evenly-spaced virtual centers in a 0..STAGE_W space -- the actual node
 // row below uses the same even distribution (flex-1 each), so these line
 // up with the real rendered centers regardless of viewport width.
@@ -109,6 +127,8 @@ const TOOL_NODE: Record<string, string> = {
   plan_commute: "Rota",
   search_booking_options: "Bookings",
   create_booking: "Bookings",
+  research_instagram_account: "Content",
+  create_content_idea: "Content",
 };
 
 export const FlowDiagram = forwardRef<
@@ -122,6 +142,7 @@ export const FlowDiagram = forwardRef<
   const [callCount, setCallCount] = useState<number | null>(null);
   const [rotaCount, setRotaCount] = useState<number | null>(null);
   const [bookingCount, setBookingCount] = useState<number | null>(null);
+  const [contentCount, setContentCount] = useState<number | null>(null);
   const [pulsingNodes, setPulsingNodes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -186,6 +207,16 @@ export const FlowDiagram = forwardRef<
         setBookingCount(active.length);
       })
       .catch(() => setBookingCount(0));
+
+    fetch("/api/content")
+      .then((res) => res.json())
+      .then((data) => {
+        const active = (data.ideas ?? []).filter(
+          (i: { status: string }) => i.status !== "discarded"
+        );
+        setContentCount(active.length);
+      })
+      .catch(() => setContentCount(0));
   }, []);
 
   const nodes = [
@@ -235,6 +266,13 @@ export const FlowDiagram = forwardRef<
       title: "Bookings",
       subtitle: bookingCount === null ? "…" : bookingCount > 0 ? `${bookingCount} tracked` : "search one",
       href: "/bookings",
+      active: true,
+    },
+    {
+      icon: <GalleryIcon className="h-4 w-4" />,
+      title: "Content",
+      subtitle: contentCount === null ? "…" : contentCount > 0 ? `${contentCount} tracked` : "brainstorm one",
+      href: "/content",
       active: true,
     },
   ];

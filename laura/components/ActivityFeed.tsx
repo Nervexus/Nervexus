@@ -70,6 +70,24 @@ function BookmarkIcon({ className }: { className?: string }) {
   );
 }
 
+function GalleryIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+      <circle cx="9" cy="10" r="1.6" />
+      <path d="m5 17 4.5-4.5 3 3L18 10l1.5 1.5" />
+    </svg>
+  );
+}
+
 function BusIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -99,6 +117,8 @@ const TOOL_ICON: Record<string, (className: string) => ReactNode> = {
   plan_commute: (c) => <BusIcon className={c} />,
   search_booking_options: (c) => <BookmarkIcon className={c} />,
   create_booking: (c) => <BookmarkIcon className={c} />,
+  research_instagram_account: (c) => <GalleryIcon className={c} />,
+  create_content_idea: (c) => <GalleryIcon className={c} />,
 };
 
 function timeAgo(iso: string): string {

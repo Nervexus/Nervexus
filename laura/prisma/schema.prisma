@@ -121,3 +121,23 @@ model Booking {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// A content idea Laura's helped brainstorm (caption, hashtags, location,
+// outfit) or the user's noted themselves -- no real Instagram account is
+// connected yet (see lib/instagram.ts), so this is planning/tracking only.
+// status moves "idea" -> "scheduled" (user picked a date) -> "posted"
+// (user tells Laura they posted it) or "discarded".
+model ContentIdea {
+  id          String    @id @default(cuid())
+  type        String    @default("post") // "post" | "reel" | "story" | "other"
+  title       String
+  caption     String?
+  hashtags    String? // comma-separated, no '#'
+  location    String?
+  outfit      String?
+  scheduledAt DateTime?
+  status      String    @default("idea") // "idea" | "scheduled" | "posted" | "discarded"
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}

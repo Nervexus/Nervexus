@@ -5,6 +5,7 @@ import { getGeminiClient, MODEL } from "@/lib/gemini";
 import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 import { getTomorrowBriefing } from "@/lib/briefing";
 import { searchBookingOptions, listBookings } from "@/lib/booking";
+import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
 
 const SYSTEM_PROMPT = `You are Laura, a personal voice/text assistant. You are warm, direct, and
 efficient -- you sound like a sharp human assistant, not a generic chatbot.
@@ -52,6 +53,16 @@ reminders together.
 
 Use list_bookings to check what the user is already tracking before
 suggesting something new (so you don't duplicate an existing idea).
+
+There is no Instagram account connected yet, so you have no real
+analytics (follower counts, engagement, insights) and cannot post, schedule,
+or message anyone on Instagram. research_instagram_account only searches
+the public web for what's findable about an account -- never invent
+follower/engagement numbers it didn't find. You CAN help brainstorm post
+ideas, captions, hashtags, locations, and outfits yourself (that's just
+creative writing, not a real tool), and save one with create_content_idea
+so it's tracked on the Content page -- but always as a draft the user
+reviews and posts themselves, never as something you did.
 
 You never have access to the Vault. If asked for a password or secret,
 say you can't see the Vault's contents and the user should look it up
@@ -263,6 +274,47 @@ const tools: FunctionDeclaration[] = [
     description: "List bookings the user is currently tracking (not cancelled).",
     parameters: { type: Type.OBJECT, properties: {} },
   },
+  {
+    name: "research_instagram_account",
+    description:
+      "Search the live web for what's publicly known about an Instagram account -- " +
+      "content style, niche, anything publicly reported. There's no connected " +
+      "Instagram account, so this never returns real follower counts or engagement " +
+      "unless a specific public source states them.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        handle: { type: Type.STRING, description: "The Instagram handle, with or without '@'." },
+      },
+      required: ["handle"],
+    },
+  },
+  {
+    name: "create_content_idea",
+    description:
+      "Save a content idea (post/reel/story) the user is planning -- your own " +
+      "brainstormed caption/hashtags/location/outfit, or what the user describes. " +
+      "This only tracks a draft; it never posts anything.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING, description: "Short title, e.g. 'Beach sunset reel'." },
+        type: { type: Type.STRING, description: "'post', 'reel', 'story', or 'other'. Defaults to 'post'." },
+        caption: { type: Type.STRING, description: "Draft caption, if you've written one." },
+        hashtags: { type: Type.STRING, description: "Comma-separated hashtags, no '#'." },
+        location: { type: Type.STRING, description: "Suggested location, if any." },
+        outfit: { type: Type.STRING, description: "Suggested outfit, if any." },
+        scheduledAt: { type: Type.STRING, description: "Absolute ISO 8601 datetime, if the user picked one." },
+        note: { type: Type.STRING, description: "Anything else worth keeping." },
+      },
+      required: ["title"],
+    },
+  },
+  {
+    name: "list_content_ideas",
+    description: "List content ideas the user is currently tracking (not posted or discarded).",
+    parameters: { type: Type.OBJECT, properties: {} },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -299,6 +351,8 @@ const LOGGED_TOOLS = new Set([
   "get_tomorrow_briefing",
   "search_booking_options",
   "create_booking",
+  "research_instagram_account",
+  "create_content_idea",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -501,6 +555,65 @@ async function runTool(
             `- ${b.title} (${b.status}${b.category !== "other" ? `, ${b.category}` : ""})` +
             (b.dateTime ? ` at ${b.dateTime.toString()}` : "") +
             (b.location ? `, ${b.location}` : "")
+        )
+        .join("\n"),
+    };
+  }
+  if (name === "research_instagram_account") {
+    const { handle } = args as { handle?: string };
+    if (!handle) return { error: "research_instagram_account needs a handle" };
+    try {
+      const result = await researchInstagramAccount(handle);
+      await logActivity("research_instagram_account", `Researched @${handle.replace(/^@/, "")}`);
+      return { result };
+    } catch (err) {
+      console.error("research_instagram_account error:", err);
+      return { error: err instanceof Error ? err.message : "Instagram research failed." };
+    }
+  }
+  if (name === "create_content_idea") {
+    const { title, type, caption, hashtags, location, outfit, scheduledAt, note } = args as {
+      title?: string;
+      type?: string;
+      caption?: string;
+      hashtags?: string;
+      location?: string;
+      outfit?: string;
+      scheduledAt?: string;
+      note?: string;
+    };
+    if (!title) return { error: "create_content_idea needs a title" };
+    const safeType = ["post", "reel", "story", "other"].includes(type ?? "") ? type! : "post";
+    let parsedDate: Date | null = null;
+    if (scheduledAt) {
+      parsedDate = new Date(scheduledAt);
+      if (Number.isNaN(parsedDate.getTime()))
+        return { error: "scheduledAt must be a valid ISO 8601 datetime" };
+    }
+    const idea = await prisma.contentIdea.create({
+      data: {
+        title,
+        type: safeType,
+        caption: caption ?? null,
+        hashtags: hashtags ?? null,
+        location: location ?? null,
+        outfit: outfit ?? null,
+        scheduledAt: parsedDate,
+        note: note ?? null,
+      },
+    });
+    await logActivity("create_content_idea", `Saved content idea "${idea.title}"`);
+    return { result: `Saved "${idea.title}" as a ${idea.type} idea.` };
+  }
+  if (name === "list_content_ideas") {
+    const ideas = await listContentIdeas();
+    if (ideas.length === 0) return { result: "No content ideas being tracked." };
+    return {
+      result: ideas
+        .map(
+          (i) =>
+            `- ${i.title} (${i.type}, ${i.status})` +
+            (i.scheduledAt ? ` for ${i.scheduledAt.toString()}` : "")
         )
         .join("\n"),
     };

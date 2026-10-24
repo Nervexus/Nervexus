@@ -22,8 +22,12 @@ restaurants/activities/travel by searching the live web for real options
 and booking links, and track what you're interested in on a Bookings
 page -- but she can NEVER complete, confirm, or pay for a booking herself,
 no matter how clearly you ask; you always finish it yourself via the link
-she finds. She cannot yet touch Instagram or calendars — those are the
-rest of the full vision (see the roadmap doc shared with this project):
+she finds. She can also research public Instagram accounts (content style,
+niche, anything publicly findable) and brainstorm/track post ideas --
+captions, hashtags, location, outfit -- on a Content page, but has no real
+analytics or posting ability until a real Instagram account is connected.
+She cannot yet touch calendars or send/receive Instagram DMs — those are
+the rest of the full vision (see the roadmap doc shared with this project):
 
 1. **Core assistant** (this) — Gemini + tool-calling loop, a voice orb
    (browser Speech Recognition/Synthesis), persistent chat, Notes,
@@ -38,8 +42,11 @@ rest of the full vision (see the roadmap doc shared with this project):
    confirmed) are live; calendar sync isn't built yet. Laura never books or
    pays for anything herself -- a human always completes it via the link
    she finds.
-4. **Instagram intelligence** — analytics, profile/content strategy,
-   location & outfit planning, public-account research.
+4. **Instagram intelligence** (this, partial) — public-account research and
+   a content-idea tracker (captions/hashtags/location/outfit brainstorming)
+   are live, both via web search rather than the Instagram Graph API;
+   real analytics, scheduling, and actual posting need a connected
+   professional Instagram account, not set up yet.
 5. **Controlled messaging** — Instagram DMs and SMS with configurable
    reply delays, contact rules, personalized tone, and approval gates.
 6. **Unified intelligence** — every feature above wired into one
@@ -62,6 +69,7 @@ search), but a human always approves and completes any payment.
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
 | `/rota`      | your work schedule — upload a rota photo or add shifts by hand, per-shift commute planning, home/work address + arrival-buffer settings |
 | `/bookings`  | restaurants/activities/travel Laura's researched or you've added — search live options, track idea → pending → confirmed, open the booking link to finish it yourself |
+| `/content`   | Instagram post ideas — research a public account, brainstorm/add captions, hashtags, location, and outfit, track idea → scheduled → posted |
 
 Notes/Reminders/Vault all use a responsive auto-fit card grid (not a fixed
 column count) so a handful of items still fill the row instead of leaving
@@ -81,7 +89,7 @@ affect the URLs, just which chrome wraps each page.
 
 | file                           | what it is                                                        |
 |----------------------------------|----------------------------------------------------------------------|
-| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`, `get_tomorrow_briefing`, `search_booking_options`, `create_booking`, `list_bookings`), via Gemini |
+| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`, `get_tomorrow_briefing`, `search_booking_options`, `create_booking`, `list_bookings`, `research_instagram_account`, `create_content_idea`, `list_content_ideas`), via Gemini |
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/gemini.ts`                   | shared Gemini client/model (`getGeminiClient()`, `MODEL`), used by `lib/brain.ts` and `lib/rota.ts` |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
@@ -90,6 +98,7 @@ affect the URLs, just which chrome wraps each page.
 | `lib/rota.ts`                     | `parseRotaImage` (Gemini vision, structured JSON output), `getShifts`, `whoAmIWorkingWith`, `planCommute` (Gemini + Google Search grounding, saved to `Shift.commutePlan`) |
 | `lib/briefing.ts`                 | `getTomorrowBriefing` -- tomorrow's shift + commute plan + reminders, combined into one plain-text summary |
 | `lib/booking.ts`                  | `searchBookingOptions` (Gemini + Google Search grounding, with source links), `listBookings` -- Laura never books/pays, only researches and tracks |
+| `lib/instagram.ts`                | `researchInstagramAccount` (Gemini + Google Search grounding, public info only -- never invents follower/engagement numbers), `listContentIdeas` |
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
@@ -108,15 +117,16 @@ affect the URLs, just which chrome wraps each page.
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
-| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls/Rota/Bookings, lights up whichever node Laura just used |
+| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls/Rota/Bookings/Content, lights up whichever node Laura just used |
 | `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
 | `components/ShiftCard.tsx`        | `/rota` page's card: date/time range, location/colleagues, "from photo" badge, inline "Plan commute" + delete |
 | `components/BookingCard.tsx`      | `/bookings` page's card: category icon, date/party/location, booking link, idea/pending/confirmed/cancel status buttons |
-| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile`, `Booking` models |
+| `components/ContentCard.tsx`      | `/content` page's card: type icon, caption/hashtags, idea/scheduled/posted/discard status buttons |
+| `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile`, `Booking`, `ContentIdea` models |
 | `components/TomorrowBriefing.tsx` | `/laura` page card: today's answer to "what does tomorrow look like" -- renders nothing while loading or if there's nothing to show |
-| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing,bookings}/...` | API routes                                         |
+| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing,bookings,content}/...` | API routes                                         |
 | `vercel.json`                     | Vercel Cron config: fires `/api/briefing/send` daily to push tomorrow's briefing to Telegram unprompted |
 
 ## Design system
@@ -225,6 +235,21 @@ themselves. The same search box, add-by-hand form, and status buttons are
 on the page directly, so tracking a booking doesn't require going through
 chat at all.
 
+## Content & Instagram research
+
+`researchInstagramAccount` (`lib/instagram.ts`) reuses the same Gemini
+Google Search grounding pattern again, tuned to surface what's publicly
+findable about an Instagram account -- content style, niche, anything a
+public source reports. There's no Instagram Graph API connected yet, so
+it's explicitly instructed to never invent follower counts or engagement
+numbers it didn't actually find; this is competitor/inspiration research,
+not real analytics. `create_content_idea` saves a post/reel/story draft
+(title, caption, hashtags, location, outfit) Laura brainstormed herself or
+the user described, tracked `idea` → `scheduled` → `posted` on the
+`/content` page -- same research-box/add-by-hand/status-button pattern as
+Bookings. Nothing here ever posts to Instagram; it's planning and tracking
+only, same as the booking tracker's "never books or pays" rule.
+
 ## Activity feed
 
 Every time Laura saves a note, sets a reminder, or runs a web search, it's
@@ -279,10 +304,13 @@ installed for a later phase but not wired up yet.
   planning already works today via Gemini's Google Search grounding, but a
   dedicated transit API would give exact timings instead of a search-based
   estimate.
-- **Later (Instagram):** a Meta Business + Instagram Graph API app on top
-  of a professional Instagram account — Meta's App Review process gates
-  most of the DM/analytics scopes and can take time (and isn't guaranteed
-  to approve an automated-reply use case).
+- **Later (Instagram analytics/posting/DMs):** a Meta Business + Instagram
+  Graph API app on top of a professional Instagram account — Meta's App
+  Review process gates most of the DM/analytics scopes and can take time
+  (and isn't guaranteed to approve an automated-reply use case). Public-
+  account research and content-idea brainstorming/tracking already work
+  today via Gemini's Google Search grounding, same as commute and booking
+  search.
 - **Later (email/calendar):** a Google Cloud project with an OAuth consent
   screen + Gmail/Calendar API scopes enabled.
 - **Later (real-time booking availability):** whatever partner API a
