@@ -35,8 +35,6 @@ export default function LauraPage() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<"chat" | "activity">("chat");
-  const [pulseTools, setPulseTools] = useState<string[]>([]);
-  const [pulseKey, setPulseKey] = useState(0);
   const [activityKey, setActivityKey] = useState(0);
   const orbRef = useRef<VoiceOrbHandle>(null);
 
@@ -84,8 +82,6 @@ export default function LauraPage() {
         { role: "assistant", content: body.reply, createdAt: new Date().toISOString() },
       ]);
       if (body.toolsUsed?.length) {
-        setPulseTools(body.toolsUsed);
-        setPulseKey((k) => k + 1);
         setActivityKey((k) => k + 1);
       }
       if (speakReply) await orbRef.current?.speak(body.reply);
@@ -104,36 +100,23 @@ export default function LauraPage() {
   }
 
   return (
-    // Wider than the prose/chat column below -- eight flow-diagram nodes
-    // need more room than max-w-3xl gives them without squeezing each
-    // node below its min-content width (which overflows the row rather
-    // than truncating, since a flex item's default min-width is its own
-    // content size, not 0). The header/tabs/chat stay at max-w-3xl inside
-    // their own centered wrapper for readability.
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
-      <div className="mx-auto w-full max-w-3xl">
-        <div className="gsap-entrance mb-8 flex w-full items-center justify-between gap-3">
-          <div>
-            <h1 className="font-thin text-2xl tracking-tight text-neutral-100">Laura</h1>
-            <p className="mt-0.5 text-xs text-neutral-600">/ personal assistant</p>
-          </div>
-          <Pill>
-            <span className="normal-case tracking-normal">online</span>
-          </Pill>
+    <GsapEntrance className="relative mx-auto max-w-3xl px-6 pb-20">
+      <div className="gsap-entrance mb-8 flex w-full items-center justify-between gap-3">
+        <div>
+          <h1 className="font-thin text-2xl tracking-tight text-neutral-100">Laura</h1>
+          <p className="mt-0.5 text-xs text-neutral-600">/ personal assistant</p>
         </div>
+        <Pill>
+          <span className="normal-case tracking-normal">online</span>
+        </Pill>
       </div>
 
       <div className="gsap-entrance flex flex-col items-center">
-        <FlowDiagram
-          ref={orbRef}
-          onTranscript={(text) => sendMessage(text, true)}
-          pulseTools={pulseTools}
-          pulseKey={pulseKey}
-        />
+        <FlowDiagram ref={orbRef} onTranscript={(text) => sendMessage(text, true)} />
         <TomorrowBriefing />
       </div>
 
-      <div className="mx-auto w-full max-w-3xl">
+      <div className="w-full">
         <div className="gsap-entrance mt-10 flex gap-1 border-b border-neutral-800/60">
           {(["chat", "activity"] as const).map((t) => (
             <button

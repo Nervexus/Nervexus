@@ -62,7 +62,7 @@ search), but a human always approves and completes any payment.
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
 | `/`          | Home — a studio-site landing page: hero (JS-injected word-reveal headline, metrics), a portfolio grid, a 3-step process section, CTA into `/laura` |
-| `/laura`     | the assistant itself — node-diagram view of the orb wired to its tools, + chat/Activity tabs |
+| `/laura`     | the assistant itself — voice orb, + chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember, grouped into one or more Glass Folders (`components/ui/glass-folder-cards.tsx`) you can add and PIN-lock — click a note to edit or delete it |
 | `/reminders` | a month calendar — click a day to see/add/edit reminders due then, set by you or by Laura from a conversation |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
@@ -119,8 +119,7 @@ affect the URLs, just which chrome wraps each page.
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
-| `components/FlowDiagram.tsx`      | `/laura` page's node graph: You → orb → Notes/Reminders/Vault/Web search/Calls/Rota/Bookings/Content, lights up whichever node Laura just used |
-| `components/FlowNode.tsx`         | a single node card in that diagram (icon, title, active/inactive/pulsing state) |
+| `components/FlowDiagram.tsx`      | `/laura` page's "You" pill + connector line + the voice orb             |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
 | `components/SettingsCard.tsx`     | `/settings` page's card: connected/expires soon/not set status, read-only |
