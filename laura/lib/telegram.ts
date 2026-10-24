@@ -125,3 +125,34 @@ export async function showTyping(): Promise<void> {
     body: JSON.stringify({ chat_id: getChatId(), action: "typing" }),
   }).catch(() => {});
 }
+
+type InlineButton = { text: string; url: string } | { text: string; callback_data: string };
+
+/** A message with tappable buttons under it -- link buttons open a URL,
+ * callback buttons come back to the webhook as a callback_query. */
+export async function sendWithButtons(text: string, rows: InlineButton[][]): Promise<boolean> {
+  const token = getBotToken();
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: getChatId(), text: text.slice(0, 4096), reply_markup: { inline_keyboard: rows } }),
+  });
+  if (!res.ok) console.error("Telegram send with buttons failed:", res.status, await res.text());
+  return res.ok;
+}
+
+/** Acknowledges a button tap (clears the spinner, optional toast) and
+ * replaces the message text so the buttons can't be tapped twice. */
+export async function resolveButtonTap(callbackId: string, messageId: number, newText: string, toast?: string) {
+  const token = getBotToken();
+  await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ callback_query_id: callbackId, text: toast }),
+  }).catch(() => {});
+  await fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: getChatId(), message_id: messageId, text: newText.slice(0, 4096) }),
+  }).catch(() => {});
+}

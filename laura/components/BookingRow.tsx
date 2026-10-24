@@ -1,5 +1,7 @@
 "use client";
 
+import { readyToBookLinks } from "@/lib/booking-links";
+
 const CATEGORY_ICON: Record<string, string> = {
   restaurant: "solar:chef-hat-linear",
   activity: "solar:ticket-linear",
@@ -96,16 +98,25 @@ export function BookingRow({
                   </button>
                 ))}
             </div>
-            {link && (
-              <a
-                href={link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="whitespace-nowrap font-mono text-[10px] uppercase tracking-wide text-neutral-400 hover:text-neutral-100"
-              >
-                Open link
-              </a>
-            )}
+            {status !== "cancelled" &&
+              readyToBookLinks({
+                title,
+                category,
+                location,
+                link,
+                partySize,
+                dateTime: dateTime ? new Date(dateTime) : null,
+              }).map((l) => (
+                <a
+                  key={l.label}
+                  href={l.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="whitespace-nowrap font-mono text-[10px] uppercase tracking-wide text-neutral-400 hover:text-neutral-100"
+                >
+                  {l.label} ↗
+                </a>
+              ))}
             <div className="ml-auto flex items-center gap-3">
               {status !== "cancelled" && (
                 <button

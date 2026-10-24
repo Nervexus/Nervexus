@@ -1,10 +1,10 @@
 import { Type, type Content, type FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/db";
-import { placeCall, sendText } from "@/lib/telegram";
+import { placeCall, sendText, sendWithButtons } from "@/lib/telegram";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
 import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 import { getTomorrowBriefing } from "@/lib/briefing";
-import { searchBookingOptions, listBookings } from "@/lib/booking";
+import { searchBookingOptions, listBookings, readyToBookLinks, friendlyDateTime } from "@/lib/booking";
 import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
 
 const SYSTEM_PROMPT = `You are Laura, a personal voice/text assistant. You are warm, direct, and
@@ -24,7 +24,13 @@ clearly the user authorizes it. For restaurants/activities/travel, use
 search_booking_options to find real current options and links, then
 create_booking to save one you're tracking (status "idea" if just
 researched, "pending" once the user says they're going to book it
-themselves) -- always via that link, never by you. Don't claim to have
+themselves) -- always via that link, never by you. When the user picks a
+place and wants to book it, use prepare_booking instead: it saves the
+booking as pending and sends them a Telegram message with ready-to-book
+links (prefilled with the date, time and party size where possible) and
+an "I booked it" button they tap once they've finished -- then tell them
+to check Telegram. Ask for the date, time and party size first if you
+don't have them. Don't claim to have
 booked, confirmed, or paid for anything unless the user tells you they did
 it and asks you to update the record. If asked to do something else you
 can't do yet, say so plainly and briefly explain what's still missing.
@@ -270,6 +276,26 @@ const tools: FunctionDeclaration[] = [
     },
   },
   {
+    name: "prepare_booking",
+    description:
+      "When the user wants to book a specific place: save it as pending and send them a " +
+      "Telegram message with ready-to-book links (prefilled where the site allows) plus " +
+      "'I booked it' / 'Skip' buttons. Tapping 'I booked it' confirms it and sets a " +
+      "reminder. This never books or pays for anything itself.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING, description: "Short title, e.g. 'Dinner at Lina's'." },
+        category: { type: Type.STRING, description: "'restaurant', 'activity', 'travel', or 'other'." },
+        dateTime: { type: Type.STRING, description: "Absolute ISO 8601 datetime with offset." },
+        partySize: { type: Type.NUMBER, description: "Number of people." },
+        location: { type: Type.STRING, description: "Area or address, e.g. 'Soho, London'." },
+        link: { type: Type.STRING, description: "The venue's own booking link, if research found one." },
+      },
+      required: ["title"],
+    },
+  },
+  {
     name: "list_bookings",
     description: "List bookings the user is currently tracking (not cancelled).",
     parameters: { type: Type.OBJECT, properties: {} },
@@ -360,6 +386,7 @@ const LOGGED_TOOLS = new Set([
   "get_tomorrow_briefing",
   "search_booking_options",
   "create_booking",
+  "prepare_booking",
   "research_instagram_account",
   "create_content_idea",
   "start_video_call",
@@ -554,6 +581,56 @@ async function runTool(
     });
     await logActivity("create_booking", `Saved booking "${booking.title}" (${booking.status})`);
     return { result: `Saved "${booking.title}" as ${booking.status}.` };
+  }
+  if (name === "prepare_booking") {
+    const { title, category, dateTime, partySize, location, link } = args as {
+      title?: string;
+      category?: string;
+      dateTime?: string;
+      partySize?: number;
+      location?: string;
+      link?: string;
+    };
+    if (!title) return { error: "prepare_booking needs a title" };
+    const safeCategory = ["restaurant", "activity", "travel", "other"].includes(category ?? "") ? category! : "other";
+    let parsedDate: Date | null = null;
+    if (dateTime) {
+      parsedDate = new Date(dateTime);
+      if (Number.isNaN(parsedDate.getTime())) return { error: "dateTime must be a valid ISO 8601 datetime" };
+    }
+    const booking = await prisma.booking.create({
+      data: {
+        title,
+        category: safeCategory,
+        status: "pending",
+        dateTime: parsedDate,
+        partySize: partySize ?? null,
+        location: location ?? null,
+        link: link ?? null,
+      },
+    });
+    const links = readyToBookLinks(booking);
+    const details = [
+      booking.dateTime ? friendlyDateTime(booking.dateTime) : null,
+      booking.partySize ? `${booking.partySize} people` : null,
+      booking.location,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const sent = await sendWithButtons(
+      `📍 ${booking.title}${details ? `\n${details}` : ""}\n\nBook it with one of these, then tap "I booked it".`,
+      [
+        links.map((l) => ({ text: l.label, url: l.url })),
+        [
+          { text: "✅ I booked it", callback_data: `bk:ok:${booking.id}` },
+          { text: "✖ Skip", callback_data: `bk:no:${booking.id}` },
+        ],
+      ]
+    );
+    await logActivity("prepare_booking", `Sent booking links for "${booking.title}"`);
+    return sent
+      ? { result: `Saved "${booking.title}" as pending and sent the booking links to Telegram.` }
+      : { result: `Saved "${booking.title}" as pending, but sending the Telegram message failed.` };
   }
   if (name === "list_bookings") {
     const bookings = await listBookings();

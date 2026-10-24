@@ -118,6 +118,7 @@ const TOOL_ICON: Record<string, (className: string) => ReactNode> = {
   plan_commute: (c) => <BusIcon className={c} />,
   search_booking_options: (c) => <BookmarkIcon className={c} />,
   create_booking: (c) => <BookmarkIcon className={c} />,
+  prepare_booking: (c) => <BookmarkIcon className={c} />,
   research_instagram_account: (c) => <GalleryIcon className={c} />,
   create_content_idea: (c) => <GalleryIcon className={c} />,
 };

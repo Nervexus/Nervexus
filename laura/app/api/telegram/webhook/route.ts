@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { chat, type ChatMessage } from "@/lib/brain";
-import { ownerChatId, replyInChat, showTyping } from "@/lib/telegram";
+import { ownerChatId, replyInChat, resolveButtonTap, showTyping } from "@/lib/telegram";
+import { friendlyDateTime } from "@/lib/booking";
 
 // Telegram calls this for every message sent to the bot (registered via
 // setWebhook with a secret_token). Only the owner's chat gets answers;
@@ -15,6 +16,11 @@ export async function POST(request: Request) {
   }
 
   const update = await request.json().catch(() => null);
+
+  if (update?.callback_query) {
+    await handleButtonTap(update.callback_query);
+    return NextResponse.json({ ok: true });
+  }
   const msg = update?.message;
   const text: string | undefined = typeof msg?.text === "string" ? msg.text.trim() : undefined;
   if (!msg || String(msg.chat?.id) !== ownerChatId() || !text) {
@@ -52,4 +58,45 @@ export async function POST(request: Request) {
     await replyInChat("Sorry, something went wrong on my end. Try that again in a moment.");
   }
   return NextResponse.json({ ok: true });
+}
+
+const REMINDER_LEAD_MS = 2 * 60 * 60 * 1000;
+
+type CallbackQuery = { id: string; data?: string; message?: { message_id: number; chat?: { id: number | string } } };
+
+// Buttons from prepare_booking: "bk:ok:<id>" confirms the booking (and sets
+// a reminder two hours before, when that's still in the future), "bk:no:<id>"
+// cancels it. The message text is replaced so a second tap does nothing.
+async function handleButtonTap(cq: CallbackQuery) {
+  if (!cq.message || String(cq.message.chat?.id) !== ownerChatId()) return;
+  const [kind, action, id] = (cq.data ?? "").split(":");
+  if (kind !== "bk" || !id) return;
+
+  const booking = await prisma.booking.findUnique({ where: { id } });
+  if (!booking) {
+    await resolveButtonTap(cq.id, cq.message.message_id, "That booking no longer exists.");
+    return;
+  }
+
+  if (action === "ok") {
+    await prisma.booking.update({ where: { id }, data: { status: "confirmed" } });
+    let reminderNote = "";
+    if (booking.dateTime && booking.dateTime.getTime() - REMINDER_LEAD_MS > Date.now()) {
+      await prisma.reminder.create({
+        data: {
+          title: booking.title,
+          dueAt: new Date(booking.dateTime.getTime() - REMINDER_LEAD_MS),
+          note: [booking.location, booking.partySize ? `${booking.partySize} people` : null].filter(Boolean).join(" · ") || null,
+          priority: "high",
+        },
+      });
+      reminderNote = "\nI'll remind you two hours before.";
+    }
+    await prisma.activityLog.create({ data: { tool: "create_booking", summary: `Confirmed "${booking.title}"` } }).catch(() => {});
+    const when = booking.dateTime ? ` for ${friendlyDateTime(booking.dateTime)}` : "";
+    await resolveButtonTap(cq.id, cq.message.message_id, `✅ ${booking.title} is booked${when}.${reminderNote}`, "Marked as booked");
+  } else if (action === "no") {
+    await prisma.booking.update({ where: { id }, data: { status: "cancelled" } });
+    await resolveButtonTap(cq.id, cq.message.message_id, `✖ Skipped ${booking.title}.`, "Skipped");
+  }
 }
