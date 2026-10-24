@@ -51,8 +51,8 @@ function MicIcon({ className }: { className?: string }) {
   );
 }
 
-export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string) => void }>(
-  function VoiceOrb({ onTranscript }, ref) {
+export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string) => void; compact?: boolean }>(
+  function VoiceOrb({ onTranscript, compact = false }, ref) {
     const [status, setStatus] = useState<OrbStatus>("idle");
     const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
     const onTranscriptRef = useRef(onTranscript);
@@ -120,6 +120,26 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
         recognitionRef.current?.stop();
         setStatus("idle");
       }
+    }
+
+    if (compact) {
+      return (
+        <button
+          onClick={handleClick}
+          aria-label={ARIA_LABEL[status]}
+          title={ARIA_LABEL[status]}
+          disabled={status === "unsupported"}
+          className={`flex h-9 w-9 items-center justify-center rounded-full transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+            status === "listening"
+              ? "animate-[pulse_1.4s_ease-in-out_infinite] bg-white/90 text-neutral-950 shadow-[0_0_24px_rgba(255,255,255,0.5)]"
+              : status === "speaking" || status === "thinking"
+                ? "bg-white/15 text-white"
+                : "text-neutral-400 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          <MicIcon className="h-[18px] w-[18px]" />
+        </button>
+      );
     }
 
     const label = STATUS_LABEL[status];

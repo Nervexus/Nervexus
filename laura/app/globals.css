@@ -115,3 +115,14 @@ body {
   color: transparent;
   animation: gradient-shift 4s linear infinite;
 }
+
+/* Sparse starfield behind the Laura page -- a few layered dot grids at
+   offset sizes so the pattern never reads as a regular grid. */
+.laura-stars {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 140px 90px, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.5px 1.5px at 260px 180px, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 330px 40px, rgba(255, 255, 255, 0.3), transparent);
+  background-size: 360px 240px, 420px 300px, 520px 380px, 300px 260px;
+}

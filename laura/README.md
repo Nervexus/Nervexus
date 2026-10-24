@@ -62,7 +62,7 @@ search), but a human always approves and completes any payment.
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
 | `/`          | Home — a studio-site landing page: hero (JS-injected word-reveal headline, metrics), a portfolio grid, a 3-step process section, CTA into `/laura` |
-| `/laura`     | the assistant itself — voice orb, + chat/Activity tabs |
+| `/laura`     | the assistant itself — a light-beam hero ("How can I help you today?"), a frosted-glass composer with mic + send, suggestion chips, and chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember, grouped into one or more Glass Folders (`components/ui/glass-folder-cards.tsx`) you can add and PIN-lock — click a note to edit or delete it |
 | `/reminders` | a month calendar — click a day to see/add/edit reminders due then, set by you or by Laura from a conversation |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
@@ -101,7 +101,6 @@ affect the URLs, just which chrome wraps each page.
 | `lib/briefing.ts`                 | `getTomorrowBriefing` -- tomorrow's shift + commute plan + reminders, combined into one plain-text summary |
 | `lib/booking.ts`                  | `searchBookingOptions` (Gemini + Google Search grounding, with source links), `listBookings` -- Laura never books/pays, only researches and tracks |
 | `lib/instagram.ts`                | `researchInstagramAccount` (Gemini + Google Search grounding, public info only -- never invents follower/engagement numbers), `listContentIdeas` |
-| `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
 | `components/TopNav.tsx`           | `(marketing)` layer 3: fixed top nav, `mix-blend-difference`, brand + route links |
@@ -118,7 +117,6 @@ affect the URLs, just which chrome wraps each page.
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
 | `components/EmptyState.tsx`       | shared empty-state block (icon, heading, description, optional chips) |
 | `components/SidebarCard.tsx`      | shared sidebar card/chip/stat-row used on Notes, Reminders, Vault     |
-| `components/FlowDiagram.tsx`      | `/laura` page's "You" pill + connector line + the voice orb             |
 | `components/ActivityFeed.tsx`     | `/laura` page's Activity tab: a timeline of what Laura's actually done |
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
 | `components/SettingsCard.tsx`     | `/settings` page's card: connected/expires soon/not set status, read-only |
@@ -134,13 +132,12 @@ affect the URLs, just which chrome wraps each page.
 
 ## Design system
 
-Three fixed background layers are mounted once in `app/layout.tsx` (so
+Two fixed background layers are mounted once in `app/layout.tsx` (so
 they persist across client-side navigation): a radial vignette (z-1) and a
-near-invisible procedural noise overlay (z-100) sit behind/above every
-page, while the WebGL ambient mesh (z-0) -- "the orb" -- is gated to
-`/laura` only (`AmbientCanvasGate`, a `usePathname()` check at the same
-DOM position, so it mounts/unmounts a real WebGL context per-route rather
-than running everywhere). The fixed top nav and footer sit at z-50 (both
+near-invisible procedural noise overlay (z-100). The `/laura` page draws
+its own light beam, halo, and sparse starfield (`.laura-stars` in
+`app/globals.css`) in plain CSS; the voice input is `VoiceOrb` in its
+`compact` mode, a mic button inside the composer. The fixed top nav and footer sit at z-50 (both
 `mix-blend-difference`); page content sits at z-10. Typography is Inter (weights 100/200/300/400) for headings and
 body text, JetBrains Mono for labels/badges/mono numerals. There's no
 color accent anywhere — states (the voice orb's idle/listening/thinking/
