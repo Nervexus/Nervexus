@@ -63,7 +63,7 @@ search), but a human always approves and completes any payment.
 |--------------|------------------------------------------------------------------------------|
 | `/`          | Home — a studio-site landing page: hero (JS-injected word-reveal headline, metrics), a portfolio grid, a 3-step process section, CTA into `/laura` |
 | `/laura`     | the assistant itself — node-diagram view of the orb wired to its tools, + chat/Activity tabs |
-| `/notes`     | notes you've written or asked Laura to remember — shown as files inside a Glass Folder (`components/ui/glass-folder-cards.tsx`), click one open to edit or delete it |
+| `/notes`     | notes you've written or asked Laura to remember, grouped into one or more Glass Folders (`components/ui/glass-folder-cards.tsx`) you can add and PIN-lock — click a note to edit or delete it |
 | `/reminders` | a month calendar — click a day to see/add/edit reminders due then, set by you or by Laura from a conversation |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
@@ -94,6 +94,7 @@ affect the URLs, just which chrome wraps each page.
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/gemini.ts`                   | shared Gemini client/model (`getGeminiClient()`, `MODEL`), used by `lib/brain.ts` and `lib/rota.ts` |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
+| `lib/pin.ts`                      | salted-hash/verify a note folder's lock PIN (scrypt + `timingSafeEqual`), never stores the PIN itself |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `lib/telegram.ts`                 | `placeCall`/`sendText` -- outbound-only, always to `TELEGRAM_CHAT_ID`, logs every attempt (success or failure) to `CallLog` |
 | `lib/rota.ts`                     | `parseRotaImage` (Gemini vision, structured JSON output), `getShifts`, `whoAmIWorkingWith`, `planCommute` (Gemini + Google Search grounding, saved to `Shift.commutePlan`) |
@@ -174,21 +175,36 @@ only, with a note saying so rather than a crash.
 
 ## Notes
 
-`/notes` is one `GlassFolder` (`components/ui/glass-folder-cards.tsx`) whose
-files are the user's notes, rendered with a monochrome `ArtRecipe` to match
-the app's no-color-accent rule instead of the component's colorful built-in
-presets. The component only reads its `files` prop once ("the folder owns
-the list" after that), so the page keys it on a `generation` counter and
-remounts it after every add/save/delete to sync real server data back in,
-rather than expecting a prop update to take effect. Clicking a file opens a
-plain title/body edit form below the folder; the "+" key both shows an
-optimistic file immediately and persists the real note behind it. The
-component is vendored as-is and not modified -- two of its internal
-patterns (reading `ids.current` during render, a `setState` inside an
-effect) trip the newer React 19.2 hooks lint rules, same as four
-pre-existing instances elsewhere in this codebase; rewriting a third-party
-component's carefully-tuned identity/animation logic to satisfy a lint
-rule risks breaking it, so those are left alone.
+`/notes` renders one `GlassFolder` (`components/ui/glass-folder-cards.tsx`)
+per `NoteFolder`, each scoped to its own notes and rendered with a
+monochrome `ArtRecipe` to match the app's no-color-accent rule instead of
+the component's colorful built-in presets. There's always at least the
+"default" folder (seeded by its migration); a dashed "+ New folder" tile
+creates more, optionally with a PIN. The component only reads its `files`
+prop once ("the folder owns the list" after that), so the page keys each
+folder on a `${folderId}-${generation}` counter and remounts it after every
+add/save/delete to sync real server data back in, rather than expecting a
+prop update to take effect. Clicking a file opens a plain title/body edit
+form below the folder; the "+" key both shows an optimistic file
+immediately and persists the real note behind it. The component is
+vendored as-is and not modified -- two of its internal patterns (reading
+`ids.current` during render, a `setState` inside an effect) trip the newer
+React 19.2 hooks lint rules, same as four pre-existing instances elsewhere
+in this codebase; rewriting a third-party component's carefully-tuned
+identity/animation logic to satisfy a lint rule risks breaking it, so those
+are left alone.
+
+A folder can be locked with a PIN (the small lock icon by its name): a
+locked folder stores a salted hash of the PIN (`lib/pin.ts`, scrypt +
+`timingSafeEqual`), never the PIN itself, and renders as a plain "Enter PIN
+to open" tile instead of a `GlassFolder` until the right one is typed.
+There's no server-side session for this -- the page just keeps unlocked
+folder ids in memory for as long as it's open, so a reload re-locks
+everything. The lock icon toggles straight back to locked with no PIN
+needed (nothing to re-verify, it's just hiding the folder again); setting
+a new PIN or removing one (`Remove lock`, under an unlocked locked folder)
+both go through `/api/notes/folders/[id]` and do require the current PIN
+when one's already set.
 
 ## Reminders
 

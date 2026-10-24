@@ -12,11 +12,12 @@ export async function POST(request: Request) {
   const data = await request.json().catch(() => null);
   const title = typeof data?.title === "string" ? data.title.trim() : "";
   const body = typeof data?.body === "string" ? data.body : "";
+  const folderId = typeof data?.folderId === "string" && data.folderId ? data.folderId : "default";
 
   if (!title) {
     return NextResponse.json({ error: "A title is required." }, { status: 400 });
   }
 
-  const note = await prisma.note.create({ data: { title, body } });
+  const note = await prisma.note.create({ data: { title, body, folderId } });
   return NextResponse.json({ note }, { status: 201 });
 }

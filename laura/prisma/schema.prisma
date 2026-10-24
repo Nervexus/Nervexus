@@ -12,13 +12,30 @@ datasource db {
   provider = "sqlite"
 }
 
-model Note {
+// A folder notes live in. There's always at least the "default" one
+// (seeded by the migration that added this table); the user can add more
+// from the Notes page. Locking stores a salted hash of a PIN, never the
+// PIN itself -- see lib/pin.ts.
+model NoteFolder {
   id        String   @id @default(cuid())
-  title     String
-  body      String
-  pinned    Boolean  @default(false)
+  name      String
+  locked    Boolean  @default(false)
+  pinHash   String?
+  pinSalt   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  notes     Note[]
+}
+
+model Note {
+  id        String     @id @default(cuid())
+  title     String
+  body      String
+  pinned    Boolean    @default(false)
+  folderId  String     @default("default")
+  folder    NoteFolder @relation(fields: [folderId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 // Secret values are encrypted (AES-256-GCM, see lib/crypto.ts) before they
