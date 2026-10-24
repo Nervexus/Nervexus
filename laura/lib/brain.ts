@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { placeCall, sendText } from "@/lib/telegram";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
 import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
+import { getTomorrowBriefing } from "@/lib/briefing";
 
 const SYSTEM_PROMPT = `You are Laura, a personal voice/text assistant. You are warm, direct, and
 efficient -- you sound like a sharp human assistant, not a generic chatbot.
@@ -39,7 +40,10 @@ plainly; don't dump raw search results.
 You have access to the user's work rota (get_shifts, who_am_i_working_with)
 -- use it for questions about shifts, days off, or who they're working
 with. If the rota has no shifts yet, say so and suggest they add one on
-the Rota page rather than guessing.
+the Rota page rather than guessing. For "what does tomorrow look like" or
+similar, use get_tomorrow_briefing rather than combining get_shifts and
+list_reminders yourself -- it already covers the shift, commute, and
+reminders together.
 
 You never have access to the Vault. If asked for a password or secret,
 say you can't see the Vault's contents and the user should look it up
@@ -189,6 +193,14 @@ const tools: FunctionDeclaration[] = [
       required: ["date"],
     },
   },
+  {
+    name: "get_tomorrow_briefing",
+    description:
+      "Get tomorrow's shift (with a commute plan, if addresses are set) and " +
+      "tomorrow's reminders, combined into one summary. Use this for 'what does " +
+      "tomorrow look like', 'brief me on tomorrow', or similar.",
+    parameters: { type: Type.OBJECT, properties: {} },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -222,6 +234,7 @@ const LOGGED_TOOLS = new Set([
   "call_me",
   "text_me",
   "plan_commute",
+  "get_tomorrow_briefing",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -352,6 +365,16 @@ async function runTool(
     } catch (err) {
       console.error("plan_commute error:", err);
       return { error: err instanceof Error ? err.message : "Couldn't plan the commute." };
+    }
+  }
+  if (name === "get_tomorrow_briefing") {
+    try {
+      const briefing = await getTomorrowBriefing();
+      await logActivity("get_tomorrow_briefing", "Pulled tomorrow's briefing");
+      return { result: briefing.summary };
+    } catch (err) {
+      console.error("get_tomorrow_briefing error:", err);
+      return { error: err instanceof Error ? err.message : "Couldn't build tomorrow's briefing." };
     }
   }
   return { error: `Unknown tool: ${name}` };

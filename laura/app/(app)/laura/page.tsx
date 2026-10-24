@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { type VoiceOrbHandle } from "@/components/VoiceOrb";
 import { FlowDiagram } from "@/components/FlowDiagram";
 import { ActivityFeed } from "@/components/ActivityFeed";
+import { TomorrowBriefing } from "@/components/TomorrowBriefing";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
@@ -121,6 +122,7 @@ export default function LauraPage() {
           pulseTools={pulseTools}
           pulseKey={pulseKey}
         />
+        <TomorrowBriefing />
       </div>
 
       <div className="gsap-entrance mt-10 flex gap-1 border-b border-neutral-800/60">

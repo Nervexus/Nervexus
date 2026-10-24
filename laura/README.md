@@ -14,19 +14,22 @@ shift against your saved home/work addresses. Laura can also search the
 live web (place hours, directions/travel comparisons, current info) via
 Gemini's Google Search grounding — commute planning reuses that same
 grounding tool as a stand-in for a dedicated transit API, upgradable later
-without changing the calling code's shape. She cannot yet book/pay for
-anything (restaurants, rides, tickets), send an automatic tomorrow
-briefing, or touch Instagram — those are the rest of the full vision (see
-the roadmap doc shared with this project):
+without changing the calling code's shape. A daily job also pushes a
+"tomorrow" briefing (shift + commute + reminders, combined) to Telegram
+unprompted, and the same briefing shows as a card on the Laura page and
+answers "what does tomorrow look like" in chat. She cannot yet book/pay
+for anything (restaurants, rides, tickets) or touch Instagram — those are
+the rest of the full vision (see the roadmap doc shared with this
+project):
 
 1. **Core assistant** (this) — Gemini + tool-calling loop, a voice orb
    (browser Speech Recognition/Synthesis), persistent chat, Notes,
    Reminders, an encrypted Vault, web search, and outbound calls/texts via
    a free Telegram bot.
-2. **Work rota & daily planning** (this, partial) — upload/parse a rota,
-   commute/transit planning, and colleague/shift awareness are live; an
-   automatic tomorrow briefing combining shifts + commute + reminders into
-   one summary is not built yet.
+2. **Work rota & daily planning** (this) — upload/parse a rota, commute/
+   transit planning, colleague/shift awareness, and an automatic tomorrow
+   briefing combining shift + commute + reminders into one summary, pushed
+   to Telegram daily via a Vercel Cron job.
 3. **Booking management** — natural-language restaurant/activity booking,
    availability search, payment links (never auto-paying), calendar sync.
 4. **Instagram intelligence** — analytics, profile/content strategy,
@@ -71,13 +74,14 @@ affect the URLs, just which chrome wraps each page.
 
 | file                           | what it is                                                        |
 |----------------------------------|----------------------------------------------------------------------|
-| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`), via Gemini |
+| `lib/brain.ts`                    | the brain: system prompt, tool-calling loop (`get_current_time`, `create_note`, `create_reminder`, `list_reminders`, `web_search`, `call_me`, `text_me`, `get_shifts`, `who_am_i_working_with`, `plan_commute`, `get_tomorrow_briefing`), via Gemini |
 | `lib/db.ts`                       | Prisma client (SQLite + driver adapter)                              |
 | `lib/gemini.ts`                   | shared Gemini client/model (`getGeminiClient()`, `MODEL`), used by `lib/brain.ts` and `lib/rota.ts` |
 | `lib/crypto.ts`                   | AES-256-GCM encrypt/decrypt for Vault entries                        |
 | `lib/speech.ts`                   | minimal types for the (unstandardized) Web Speech API                |
 | `lib/telegram.ts`                 | `placeCall`/`sendText` -- outbound-only, always to `TELEGRAM_CHAT_ID`, logs every attempt (success or failure) to `CallLog` |
 | `lib/rota.ts`                     | `parseRotaImage` (Gemini vision, structured JSON output), `getShifts`, `whoAmIWorkingWith`, `planCommute` (Gemini + Google Search grounding, saved to `Shift.commutePlan`) |
+| `lib/briefing.ts`                 | `getTomorrowBriefing` -- tomorrow's shift + commute plan + reminders, combined into one plain-text summary |
 | `components/background/AmbientCanvas.tsx` | layer 0: raw-WebGL raymarched SDF sphere, masked to a fixed radial glow, scroll-scrubbed via GSAP ScrollTrigger |
 | `components/background/Vignette.tsx` | layer 1: radial-gradient darkening the viewport's edges               |
 | `components/background/NoiseOverlay.tsx` | layer 4: fixed, near-invisible procedural film-grain (SVG `feTurbulence`) |
@@ -102,7 +106,9 @@ affect the URLs, just which chrome wraps each page.
 | `components/CallLogCard.tsx`      | `/calls` page's card: call vs. text, message, sent/failed status      |
 | `components/ShiftCard.tsx`        | `/rota` page's card: date/time range, location/colleagues, "from photo" badge, inline "Plan commute" + delete |
 | `prisma/schema.prisma`            | `Note` (+pinned), `VaultItem`, `ChatMessage`, `Reminder` (+priority), `ActivityLog`, `CallLog`, `Shift`, `Profile` models |
-| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile}/...` | API routes                                         |
+| `components/TomorrowBriefing.tsx` | `/laura` page card: today's answer to "what does tomorrow look like" -- renders nothing while loading or if there's nothing to show |
+| `app/api/{chat,notes,reminders,vault,activity,calls,rota,profile,briefing}/...` | API routes                                         |
+| `vercel.json`                     | Vercel Cron config: fires `/api/briefing/send` daily to push tomorrow's briefing to Telegram unprompted |
 
 ## Design system
 
@@ -173,6 +179,27 @@ yet" message instead of erroring. It currently answers via Gemini's
 Google Search grounding tool — the same mechanism `web_search` uses — as a
 stand-in for a dedicated transit API; the result is saved to
 `Shift.commutePlan` so it only has to be computed once per shift.
+
+## Tomorrow briefing
+
+`getTomorrowBriefing` (`lib/briefing.ts`) pulls tomorrow's shift, computes
+its commute plan if one isn't cached yet, and tomorrow's not-yet-done
+reminders, then joins them into one plain-text summary. It's surfaced
+three ways from the same function, so there's exactly one place the
+combining logic lives:
+
+- **On request** — `get_tomorrow_briefing` in `lib/brain.ts`, for "what
+  does tomorrow look like" in chat.
+- **On the page** — `TomorrowBriefing.tsx` fetches `GET /api/briefing` and
+  shows a card above the chat on `/laura`; it renders nothing while
+  loading or if tomorrow has neither a shift nor a reminder, rather than
+  showing an empty or error state.
+- **Unprompted** — `GET /api/briefing/send`, fired daily by the Vercel
+  Cron job in `vercel.json` (defaults to 19:00 UTC — edit the cron
+  expression for your own evening), texts the summary via the same
+  Telegram bot `call_me`/`text_me` use. Gated on `CRON_SECRET`, which
+  Vercel sends automatically as a Bearer token once the env var is set on
+  the project — see `.env.example`.
 
 ## Activity feed
 
