@@ -63,7 +63,7 @@ search), but a human always approves and completes any payment.
 |--------------|------------------------------------------------------------------------------|
 | `/`          | Home — a studio-site landing page: hero (JS-injected word-reveal headline, metrics), a portfolio grid, a 3-step process section, CTA into `/laura` |
 | `/laura`     | the assistant itself — node-diagram view of the orb wired to its tools, + chat/Activity tabs |
-| `/notes`     | notes you've written or asked Laura to remember                              |
+| `/notes`     | notes you've written or asked Laura to remember — shown as files inside a Glass Folder (`components/ui/glass-folder-cards.tsx`), click one open to edit or delete it |
 | `/reminders` | things to do, set by you or by Laura from a conversation                     |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
 | `/calls`     | have Laura send you an urgent or plain Telegram message, plus a history of past ones |
@@ -72,12 +72,12 @@ search), but a human always approves and completes any payment.
 | `/bookings`  | restaurants/activities/travel Laura's researched or you've added — search live options, track idea → pending → confirmed, open the booking link to finish it yourself |
 | `/content`   | Instagram post ideas — research a public account, brainstorm/add captions, hashtags, location, and outfit, track idea → scheduled → posted |
 
-Notes/Reminders/Vault all use a responsive auto-fit card grid (not a fixed
-column count) so a handful of items still fill the row instead of leaving
-a lone narrow card — plus search (Notes), pin-to-top (Notes), Low/Normal/
-High priority with Overdue/Today/This week/Later grouping (Reminders, also
-settable by Laura from a conversation), and copy-without-revealing
-(Vault, via the clipboard, no on-screen display needed).
+Reminders/Vault use a responsive auto-fit card grid (not a fixed column
+count) so a handful of items still fill the row instead of leaving a lone
+narrow card — plus Low/Normal/High priority with Overdue/Today/This
+week/Later grouping (Reminders, also settable by Laura from a
+conversation), and copy-without-revealing (Vault, via the clipboard, no
+on-screen display needed).
 
 `/laura`, `/notes`, `/reminders`, `/rota`, `/vault`, and `/calls` live
 under the `(app)` route group and share `AppSidebar` — a sticky left
@@ -112,7 +112,7 @@ affect the URLs, just which chrome wraps each page.
 | `components/Pill.tsx`             | filled dark badge with a leading pulsing dot, used for page headline counts/status |
 | `components/Button.tsx`           | the app's one primary (solid neutral-100) and ghost/danger button style |
 | `components/IconTile.tsx`         | small glass icon tile, same `bg-neutral-900/40` + blur treatment as the portfolio cards |
-| `components/NoteCard.tsx`         | Notes page's node-editor-style card: port dot, title, pin, nested content panel |
+| `components/ui/glass-folder-cards.tsx` | drop-in third-party component (vendored as-is, not modified): a glass-and-canvas "folder" object -- notes are its files. Lives in `components/ui/` rather than flat in `components/` since it's a drop-in primitive, not a hand-rolled app component |
 | `components/ReminderCard.tsx`     | Reminders page's card: priority accent bar, overdue highlighting      |
 | `components/VaultCard.tsx`        | Vault page's card: Reveal and Copy-without-revealing actions          |
 | `components/PriorityPicker.tsx`   | Low/Normal/High selector used in the Reminders compose form           |
@@ -171,6 +171,24 @@ it directly against Turso via `@libsql/client` (see
 Open [http://localhost:3000](http://localhost:3000). The voice orb needs
 Chrome or Edge (Web Speech API support); other browsers fall back to text
 only, with a note saying so rather than a crash.
+
+## Notes
+
+`/notes` is one `GlassFolder` (`components/ui/glass-folder-cards.tsx`) whose
+files are the user's notes, rendered with a monochrome `ArtRecipe` to match
+the app's no-color-accent rule instead of the component's colorful built-in
+presets. The component only reads its `files` prop once ("the folder owns
+the list" after that), so the page keys it on a `generation` counter and
+remounts it after every add/save/delete to sync real server data back in,
+rather than expecting a prop update to take effect. Clicking a file opens a
+plain title/body edit form below the folder; the "+" key both shows an
+optimistic file immediately and persists the real note behind it. The
+component is vendored as-is and not modified -- two of its internal
+patterns (reading `ids.current` during render, a `setState` inside an
+effect) trip the newer React 19.2 hooks lint rules, same as four
+pre-existing instances elsewhere in this codebase; rewriting a third-party
+component's carefully-tuned identity/animation logic to satisfy a lint
+rule risks breaking it, so those are left alone.
 
 ## Web search
 

@@ -1,31 +1,41 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { NoteCard, PortDot } from "@/components/NoteCard";
-import { EmptyState } from "@/components/EmptyState";
-import { SidebarCard, Chip, Stat } from "@/components/SidebarCard";
-import { NoteIcon, SearchIcon } from "@/components/icons";
-import { Pill } from "@/components/Pill";
+import { useEffect, useState } from "react";
+import GlassFolder, { type ArtRecipe, type FolderFile } from "@/components/ui/glass-folder-cards";
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
 
 type Note = { id: string; title: string; body: string; pinned: boolean; updatedAt: string };
 
-const QUICK_START = ["Wifi password", "Grocery list", "Gift ideas", "Packing list", "Important dates"];
+// Pure greys -- the app has no color accents anywhere, so the folder's
+// generated artwork uses the same neutral palette as everything else
+// instead of one of the component's colorful built-in presets.
+const MONO_ART: ArtRecipe = {
+  style: "marble",
+  colors: ["#050505", "#171717", "#404040", "#737373", "#a3a3a3", "#d4d4d4", "#f5f5f5"],
+  scale: 0.7,
+  warp: 3,
+  gloss: 0.35,
+  veins: 0.3,
+};
 
-function isThisWeek(iso: string): boolean {
-  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  return new Date(iso).getTime() >= weekAgo;
+function formatMeta(iso: string): string {
+  return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
 export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Note | null>(null);
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftBody, setDraftBody] = useState("");
+  const [saving, setSaving] = useState(false);
+  // Bumped after any change so <GlassFolder> remounts with the fresh list --
+  // it only reads its `files` prop once, by design ("the folder owns the
+  // list" after that), so syncing real server data back in means giving it
+  // a fresh instance rather than expecting a prop update to take effect.
+  const [generation, setGeneration] = useState(0);
 
   function load() {
     fetch("/api/notes")
@@ -37,192 +47,127 @@ export default function NotesPage() {
 
   useEffect(load, []);
 
-  function startEdit(note: Note) {
-    setEditingId(note.id);
-    setTitle(note.title);
-    setBody(note.body);
-  }
-
-  function resetForm() {
-    setEditingId(null);
-    setTitle("");
-    setBody("");
+  function selectNote(file: FolderFile, index: number) {
+    const note = oldestFirst[index];
+    if (!note) return;
+    setSelected(note);
+    setDraftTitle(note.title);
+    setDraftBody(note.body);
   }
 
   async function save() {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) return;
+    if (!selected || !draftTitle.trim()) return;
+    setSaving(true);
     setError(null);
-
     try {
-      const res = await fetch(editingId ? `/api/notes/${editingId}` : "/api/notes", {
-        method: editingId ? "PATCH" : "POST",
+      const res = await fetch(`/api/notes/${selected.id}`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: trimmedTitle, body }),
+        body: JSON.stringify({ title: draftTitle.trim(), body: draftBody }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Couldn't save note.");
-      resetForm();
+      if (!res.ok) throw new Error(data.error ?? "Couldn't save the note.");
+      setSelected(null);
+      setGeneration((g) => g + 1);
       load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't save note.");
+      setError(err instanceof Error ? err.message : "Couldn't save the note.");
+    } finally {
+      setSaving(false);
     }
   }
 
-  async function remove(id: string) {
-    await fetch(`/api/notes/${id}`, { method: "DELETE" });
-    if (editingId === id) resetForm();
+  async function remove() {
+    if (!selected) return;
+    await fetch(`/api/notes/${selected.id}`, { method: "DELETE" });
+    setSelected(null);
+    setGeneration((g) => g + 1);
     load();
   }
 
-  async function togglePin(note: Note) {
-    setNotes((prev) =>
-      prev
-        .map((n) => (n.id === note.id ? { ...n, pinned: !n.pinned } : n))
-        .sort((a, b) => Number(b.pinned) - Number(a.pinned))
-    );
-    await fetch(`/api/notes/${note.id}`, {
-      method: "PATCH",
+  async function addNote() {
+    // Fires once per "+" click: the folder shows "Untitled note" right
+    // away, and this persists the same thing behind it so a reload matches.
+    await fetch("/api/notes", {
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pinned: !note.pinned }),
+      body: JSON.stringify({ title: "Untitled note", body: "" }),
     });
+    setGeneration((g) => g + 1);
     load();
   }
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return notes;
-    return notes.filter(
-      (n) => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)
-    );
-  }, [notes, query]);
-
-  const thisWeek = notes.filter((n) => isThisWeek(n.updatedAt)).length;
-  const pinnedCount = notes.filter((n) => n.pinned).length;
+  // Oldest first, so the newest note ends up at the end of the array --
+  // GlassFolder stacks the LAST files frontmost, nearest the glass.
+  const oldestFirst = [...notes].sort(
+    (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+  );
+  const files: FolderFile[] = oldestFirst.map((n) => ({
+    name: n.title,
+    meta: formatMeta(n.updatedAt),
+  }));
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-3xl px-6 pb-20">
       <div className="gsap-entrance flex items-center gap-3">
         <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Notes</h1>
-        <Pill>{notes.length} saved</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         things you&apos;ve told Laura to remember, plus anything you jot down here
       </p>
 
-      {/* Compose "node": Title + Body feed a Save action, mirroring a
-          workflow editor's input-ports-into-an-action shape. */}
-      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <PortDot color={title.trim() ? "emerald" : "neutral"} />
-          <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">Title</span>
-        </div>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Type what you want to remember…"
-          className="mt-1.5 w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
-        />
+      {error && <p className="gsap-entrance mt-4 text-sm text-red-400">{error}</p>}
 
-        <div className="mt-3.5 flex items-center gap-2">
-          <PortDot color={body.trim() ? "emerald" : "neutral"} />
-          <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">Body</span>
-        </div>
-        <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Write something…"
-          rows={4}
-          className="mt-1.5 w-full resize-none rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
-        />
+      <div className="gsap-entrance mt-10 flex justify-center">
+        {!loaded ? (
+          <p className="py-10 text-sm text-neutral-600">Loading…</p>
+        ) : (
+          <GlassFolder
+            key={generation}
+            label="Notes"
+            meta={`${notes.length} saved`}
+            tone="dark"
+            art={MONO_ART}
+            seed={7}
+            files={files}
+            action="add"
+            onAdd={() => {
+              addNote();
+              return { name: "Untitled note", meta: "Just now" };
+            }}
+            onFileSelect={selectNote}
+          />
+        )}
+      </div>
 
-        <div className="mt-3.5 flex justify-end gap-3">
-          {editingId && (
-            <Button variant="ghost" onClick={resetForm}>
+      {selected && (
+        <div className="gradient-border relative mt-10 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+          <input
+            value={draftTitle}
+            onChange={(e) => setDraftTitle(e.target.value)}
+            placeholder="Title"
+            className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+          />
+          <textarea
+            value={draftBody}
+            onChange={(e) => setDraftBody(e.target.value)}
+            placeholder="Write something…"
+            rows={6}
+            className="mt-3 w-full resize-none rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+          />
+          <div className="mt-3.5 flex justify-end gap-3">
+            <Button variant="danger" onClick={remove}>
+              Delete
+            </Button>
+            <Button variant="ghost" onClick={() => setSelected(null)}>
               Cancel
             </Button>
-          )}
-          <Button onClick={save} disabled={!title.trim()}>
-            {editingId ? "Save changes" : "Save note"}
-          </Button>
+            <Button onClick={save} disabled={saving || !draftTitle.trim()}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+          </div>
         </div>
-      </div>
-
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
-        <div className="min-w-0">
-          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
-
-          {notes.length > 0 && (
-            <div className="gsap-entrance relative mb-5">
-              <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-600" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search notes…"
-                className="w-full rounded-xl border border-neutral-800/60 bg-neutral-900/40 py-2.5 pl-10 pr-4 text-sm text-neutral-200 outline-none backdrop-blur-sm placeholder:text-neutral-600 focus:border-neutral-600"
-              />
-            </div>
-          )}
-
-          {!loaded ? (
-            <p className="py-10 text-center text-sm text-neutral-600">Loading…</p>
-          ) : notes.length === 0 ? (
-            <EmptyState
-              icon={<NoteIcon className="h-5 w-5" />}
-              title="No notes yet"
-              description="Ask Laura to remember something, jot one down above, or try a quick start."
-            >
-              <div className="mt-2 flex flex-wrap justify-center gap-2">
-                {QUICK_START.map((suggestion) => (
-                  <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
-                    {suggestion}
-                  </Chip>
-                ))}
-              </div>
-            </EmptyState>
-          ) : filtered.length === 0 ? (
-            <p className="py-10 text-center text-sm text-neutral-600">
-              No notes match &quot;{query}&quot;.
-            </p>
-          ) : (
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-4">
-              {filtered.map((note) => (
-                <div key={note.id} className="gsap-entrance">
-                  <NoteCard
-                    title={note.title}
-                    body={note.body}
-                    updatedAt={note.updatedAt}
-                    pinned={note.pinned}
-                    onEdit={() => startEdit(note)}
-                    onDelete={() => remove(note.id)}
-                    onTogglePin={() => togglePin(note)}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <aside className="gsap-entrance flex flex-col gap-4">
-          <SidebarCard title="Quick start">
-            <div className="flex flex-wrap gap-2">
-              {QUICK_START.map((suggestion) => (
-                <Chip key={suggestion} onClick={() => setTitle(suggestion)}>
-                  {suggestion}
-                </Chip>
-              ))}
-            </div>
-          </SidebarCard>
-
-          <SidebarCard title="Stats">
-            <div className="flex flex-col gap-2">
-              <Stat label="Total notes" value={notes.length} />
-              <Stat label="Pinned" value={pinnedCount} />
-              <Stat label="Updated this week" value={thisWeek} />
-            </div>
-          </SidebarCard>
-        </aside>
-      </div>
+      )}
     </GsapEntrance>
   );
 }
