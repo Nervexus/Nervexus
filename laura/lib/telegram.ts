@@ -93,3 +93,32 @@ export async function placeCall(message: string): Promise<CallResult> {
 export async function sendText(message: string): Promise<CallResult> {
   return send("sms", message);
 }
+
+/** The owner's chat id, for checking that an incoming update is from you. */
+export function ownerChatId(): string {
+  return getChatId();
+}
+
+/** A conversational reply inside the Telegram chat. Not logged to CallLog
+ * (that history is for messages Laura sends you on purpose), sent as
+ * plain text so a stray `*` or `_` in a reply can't fail Markdown parsing,
+ * and capped at Telegram's 4096-character limit. */
+export async function replyInChat(text: string): Promise<void> {
+  const token = getBotToken();
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: getChatId(), text: text.slice(0, 4096) }),
+  });
+  if (!res.ok) console.error("Telegram reply failed:", res.status, await res.text());
+}
+
+/** Shows "typing…" in the chat while Laura works on a reply. */
+export async function showTyping(): Promise<void> {
+  const token = getBotToken();
+  await fetch(`https://api.telegram.org/bot${token}/sendChatAction`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: getChatId(), action: "typing" }),
+  }).catch(() => {});
+}

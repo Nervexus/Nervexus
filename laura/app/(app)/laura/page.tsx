@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VoiceOrb, type VoiceOrbHandle } from "@/components/VoiceOrb";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { TomorrowBriefing } from "@/components/TomorrowBriefing";
@@ -16,6 +16,12 @@ const SUGGESTIONS = [
   { icon: "solar:chef-hat-linear", label: "Find a dinner spot", prompt: "Find me a good dinner spot near " },
   { icon: "solar:chat-round-line-linear", label: "Text me", prompt: "Text me a reminder to " },
 ];
+
+const noopSubscribe = () => () => {};
+function greetingForNow(): string {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+}
 
 function SendIcon({ className }: { className?: string }) {
   return (
@@ -33,6 +39,9 @@ export default function LauraPage() {
   const [tab, setTab] = useState<"chat" | "activity">("chat");
   const [activityKey, setActivityKey] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
+  // Read from the browser clock only -- the prerender gets a neutral
+  // "Hello" instead of baking in whatever hour the build ran at.
+  const greeting = useSyncExternalStore(noopSubscribe, greetingForNow, () => "Hello");
   const orbRef = useRef<VoiceOrbHandle>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -116,7 +125,12 @@ export default function LauraPage() {
           className={`transition-all duration-700 ${hasConversation ? "w-[240px] sm:w-[300px]" : "w-[340px] sm:w-[520px]"}`}
         />
         {!hasConversation && (
-          <h1 className="-mt-8 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
+          <p className="-mt-8 font-mono text-[11px] uppercase tracking-[0.4em] text-neutral-500">
+            {greeting}, Madoxs Harvey
+          </p>
+        )}
+        {!hasConversation && (
+          <h1 className="mt-3 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
             How can I help you today?
           </h1>
         )}
