@@ -87,11 +87,6 @@ export default function LauraPage() {
 
   return (
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 pb-10">
-      {/* Soft blue/violet halo behind the orb. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex h-[680px] justify-center overflow-hidden" aria-hidden>
-        <div className="absolute top-[60px] h-[380px] w-[380px] rounded-full bg-sky-500/[0.10] blur-3xl" />
-        <div className="absolute top-[200px] h-[260px] w-[260px] rounded-full bg-violet-500/[0.10] blur-3xl" />
-      </div>
       <div className="laura-stars pointer-events-none fixed inset-0 -z-20 opacity-60" aria-hidden />
 
       <div className="flex items-center justify-end gap-1 pt-2">

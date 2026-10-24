@@ -56,10 +56,10 @@ body {
 }
 
 /* The Reminders calendar's accent -- today/selected days, the add button,
-   and the day-popup's primary action. Same amber as --booking-accent so the
-   device-panel pages share one accent. */
+   and the day-popup's primary action. A matte gold, echoing the thin gold rule
+   in the page header. */
 :root {
-  --calendar-accent: #e2924f;
+  --calendar-accent: #c9a063;
 }
 
 /* Diagonal hatch for a calendar's leading/trailing (out-of-month) days --
