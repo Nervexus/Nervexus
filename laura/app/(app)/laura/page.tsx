@@ -5,6 +5,7 @@ import { VoiceOrb, type VoiceOrbHandle } from "@/components/VoiceOrb";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { TomorrowBriefing } from "@/components/TomorrowBriefing";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { ParticleOrb } from "@/components/ParticleOrb";
 
 type Message = { role: "user" | "assistant"; content: string; createdAt?: string };
 
@@ -14,21 +15,6 @@ const SUGGESTIONS = [
   { icon: "solar:chef-hat-linear", label: "Find a dinner spot", prompt: "Find me a good dinner spot near " },
   { icon: "solar:chat-round-line-linear", label: "Text me", prompt: "Text me a reminder to " },
 ];
-
-/** Laura's mark: two triangles meeting at a twist, drawn as one stroke. */
-function LauraMark({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" className={className}>
-      <path
-        d="M20 10 L46 10 L20 54 L46 54 Z"
-        stroke="currentColor"
-        strokeWidth={5}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function SendIcon({ className }: { className?: string }) {
   return (
@@ -93,11 +79,10 @@ export default function LauraPage() {
 
   return (
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 pb-10">
-      {/* Light beam + soft halo, the one bold gesture on the page. */}
+      {/* Soft blue/violet halo behind the orb. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 flex h-[680px] justify-center overflow-hidden" aria-hidden>
-        <div className="h-[420px] w-[3px] bg-gradient-to-b from-transparent via-white/70 to-transparent blur-[2px]" />
-        <div className="absolute top-0 h-[460px] w-[140px] bg-gradient-to-b from-white/0 via-white/[0.12] to-white/0 blur-2xl" />
-        <div className="absolute top-[160px] h-[360px] w-[360px] rounded-full bg-white/[0.06] blur-3xl" />
+        <div className="absolute top-[60px] h-[380px] w-[380px] rounded-full bg-sky-500/[0.10] blur-3xl" />
+        <div className="absolute top-[200px] h-[260px] w-[260px] rounded-full bg-violet-500/[0.10] blur-3xl" />
       </div>
       <div className="laura-stars pointer-events-none fixed inset-0 -z-20 opacity-60" aria-hidden />
 
@@ -117,19 +102,15 @@ export default function LauraPage() {
 
       <div
         className={`flex flex-col items-center text-center transition-all duration-700 ${
-          hasConversation ? "pt-6" : "pt-[14vh]"
+          hasConversation ? "pt-2" : "pt-[3vh]"
         }`}
       >
-        <div className="relative">
-          <div className="absolute inset-0 -z-10 rounded-full bg-white/30 blur-2xl" />
-          <LauraMark
-            className={`text-white drop-shadow-[0_0_18px_rgba(255,255,255,0.7)] transition-all duration-700 ${
-              hasConversation ? "h-9 w-9" : "h-16 w-16"
-            }`}
-          />
-        </div>
+        <ParticleOrb
+          active={sending}
+          className={`transition-all duration-700 ${hasConversation ? "w-28" : "w-[300px] sm:w-[400px]"}`}
+        />
         {!hasConversation && (
-          <h1 className="mt-7 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
+          <h1 className="-mt-4 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
             How can I help you today?
           </h1>
         )}

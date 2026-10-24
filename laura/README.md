@@ -62,7 +62,7 @@ search), but a human always approves and completes any payment.
 | route        | what it is                                                                 |
 |--------------|------------------------------------------------------------------------------|
 | `/`          | Home — a studio-site landing page: hero (JS-injected word-reveal headline, metrics), a portfolio grid, a 3-step process section, CTA into `/laura` |
-| `/laura`     | the assistant itself — a light-beam hero ("How can I help you today?"), a frosted-glass composer with mic + send, suggestion chips, and chat/Activity tabs |
+| `/laura`     | the assistant itself — a particle-orb hero (`components/ParticleOrb.tsx`, "How can I help you today?"), a frosted-glass composer with mic + send, suggestion chips, and chat/Activity tabs |
 | `/notes`     | notes you've written or asked Laura to remember, grouped into one or more Glass Folders (`components/ui/glass-folder-cards.tsx`) you can add and PIN-lock — click a note to edit or delete it |
 | `/reminders` | a month calendar — click a day to see/add/edit reminders due then, set by you or by Laura from a conversation |
 | `/vault`     | encrypted secrets (passwords, etc.) — Laura's own brain has no access to this |
@@ -135,7 +135,8 @@ affect the URLs, just which chrome wraps each page.
 Two fixed background layers are mounted once in `app/layout.tsx` (so
 they persist across client-side navigation): a radial vignette (z-1) and a
 near-invisible procedural noise overlay (z-100). The `/laura` page draws
-its own light beam, halo, and sparse starfield (`.laura-stars` in
+its own particle orb (a canvas of ~3,400 dots on a wave-folded sphere,
+blue-to-violet, swelling while Laura thinks), a soft halo, and a sparse starfield (`.laura-stars` in
 `app/globals.css`) in plain CSS; the voice input is `VoiceOrb` in its
 `compact` mode, a mic button inside the composer. The fixed top nav and footer sit at z-50 (both
 `mix-blend-difference`); page content sits at z-10. Typography is Inter (weights 100/200/300/400) for headings and
