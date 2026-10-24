@@ -205,6 +205,15 @@ export function AppSidebar() {
           Laura&apos;s personal assistant HQ — notes, reminders, and a vault that only this page
           can decrypt.
         </p>
+        <button
+          onClick={async () => {
+            await fetch("/api/auth/logout", { method: "POST" });
+            window.location.replace("/login");
+          }}
+          className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 transition-colors hover:text-neutral-200"
+        >
+          Sign out
+        </button>
       </div>
     </nav>
   );
