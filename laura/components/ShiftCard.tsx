@@ -54,7 +54,7 @@ export function ShiftCard({
   }
 
   return (
-    <div className="gradient-border relative flex flex-col gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-4 backdrop-blur-sm">
+    <div className="relative flex flex-col gap-3 rounded-[24px] border border-neutral-900 bg-neutral-950 p-4">
       <div className="flex items-start gap-3">
         <IconTile>
           <iconify-icon icon="solar:calendar-linear" className="text-lg" />
@@ -80,7 +80,7 @@ export function ShiftCard({
       </div>
 
       {plan ? (
-        <div className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-2.5">
+        <div className="rounded-xl bg-neutral-900/70 px-3 py-2.5">
           <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-600">Commute plan</p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-300">{plan}</p>
         </div>

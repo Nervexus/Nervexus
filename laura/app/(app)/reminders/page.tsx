@@ -175,7 +175,7 @@ export default function RemindersPage() {
       {!loaded || !cursor ? (
         <p className="gsap-entrance mt-10 py-10 text-center text-sm text-neutral-600">Loading…</p>
       ) : (
-        <div className="gsap-entrance gradient-border relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/60 p-6 backdrop-blur-md">
+        <div className="gsap-entrance relative mt-8 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-mono text-sm uppercase tracking-widest text-neutral-200">
               {MONTH_NAMES[cursor.month]} {cursor.year}
@@ -343,14 +343,14 @@ export default function RemindersPage() {
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addOnSelectedDay()}
                 placeholder="Remind me to…"
-                className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                className="w-full rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
               />
               <div className="flex items-center gap-2">
                 <input
                   type="time"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
-                  className="rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-300 outline-none [color-scheme:dark]"
+                  className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
                 />
                 <PriorityPicker value={newPriority} onChange={setNewPriority} />
               </div>

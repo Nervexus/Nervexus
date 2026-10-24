@@ -223,7 +223,7 @@ export default function RotaPage() {
         your work schedule — upload a photo of it, or add shifts by hand
       </p>
 
-      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+      <div className="gsap-entrance relative mt-8 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
         <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">
           Upload a rota photo
         </span>
@@ -246,31 +246,31 @@ export default function RotaPage() {
             {parsed.map((s, i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 gap-2 rounded-lg border border-neutral-800/60 bg-neutral-950/60 p-3 sm:grid-cols-2"
+                className="grid grid-cols-1 gap-2 rounded-xl bg-neutral-900/70 p-3 sm:grid-cols-2"
               >
                 <input
                   type="datetime-local"
                   value={toLocalInputValue(s.startAt)}
                   onChange={(e) => updateParsed(i, { startAt: new Date(e.target.value).toISOString() })}
-                  className="rounded-lg border border-neutral-800 bg-neutral-950 px-2.5 py-1.5 text-xs text-neutral-300 outline-none [color-scheme:dark]"
+                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none [color-scheme:dark]"
                 />
                 <input
                   type="datetime-local"
                   value={toLocalInputValue(s.endAt)}
                   onChange={(e) => updateParsed(i, { endAt: new Date(e.target.value).toISOString() })}
-                  className="rounded-lg border border-neutral-800 bg-neutral-950 px-2.5 py-1.5 text-xs text-neutral-300 outline-none [color-scheme:dark]"
+                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none [color-scheme:dark]"
                 />
                 <input
                   value={s.location ?? ""}
                   onChange={(e) => updateParsed(i, { location: e.target.value || null })}
                   placeholder="Location"
-                  className="rounded-lg border border-neutral-800 bg-neutral-950 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
                 />
                 <input
                   value={s.colleagues ?? ""}
                   onChange={(e) => updateParsed(i, { colleagues: e.target.value || null })}
                   placeholder="Colleagues"
-                  className="rounded-lg border border-neutral-800 bg-neutral-950 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
                 />
               </div>
             ))}
@@ -278,7 +278,7 @@ export default function RotaPage() {
               <Button variant="ghost" onClick={() => setParsed(null)}>
                 Discard
               </Button>
-              <Button onClick={saveParsed} disabled={savingParsed}>
+              <Button variant="accent" onClick={saveParsed} disabled={savingParsed}>
                 {savingParsed ? "Saving…" : `Save ${parsed.length} shift${parsed.length === 1 ? "" : "s"}`}
               </Button>
             </div>
@@ -286,7 +286,7 @@ export default function RotaPage() {
         )}
       </div>
 
-      <div className="gradient-border gsap-entrance relative mt-4 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+      <div className="gsap-entrance relative mt-4 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
         <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500">
           Add a shift by hand
         </span>
@@ -295,29 +295,29 @@ export default function RotaPage() {
             type="datetime-local"
             value={startAt}
             onChange={(e) => setStartAt(e.target.value)}
-            className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
           />
           <input
             type="datetime-local"
             value={endAt}
             onChange={(e) => setEndAt(e.target.value)}
-            className="rounded-lg border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
           />
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location (optional)"
-            className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
           <input
             value={colleagues}
             onChange={(e) => setColleagues(e.target.value)}
             placeholder="Colleagues (optional)"
-            className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-2 text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="rounded-2xl bg-neutral-900/70 px-4 py-3 font-mono text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
         </div>
         <div className="mt-3.5 flex justify-end">
-          <Button onClick={addShift} disabled={!startAt || !endAt}>
+          <Button variant="accent" onClick={addShift} disabled={!startAt || !endAt}>
             Add shift
           </Button>
         </div>
@@ -361,13 +361,13 @@ export default function RotaPage() {
                 value={profileDraft.homeAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, homeAddress: e.target.value }))}
                 placeholder="Home address"
-                className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="rounded-xl bg-neutral-900/70 px-3 py-2.5 font-mono text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
               />
               <input
                 value={profileDraft.workAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, workAddress: e.target.value }))}
                 placeholder="Work address"
-                className="rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="rounded-xl bg-neutral-900/70 px-3 py-2.5 font-mono text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
               />
               <div className="flex items-center gap-2">
                 <input
@@ -377,11 +377,11 @@ export default function RotaPage() {
                   onChange={(e) =>
                     setProfileDraft((p) => ({ ...p, arrivalBufferMinutes: Number(e.target.value) }))
                   }
-                  className="w-16 rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-2.5 py-1.5 text-xs text-neutral-300 outline-none"
+                  className="w-16 rounded-xl bg-neutral-900/70 px-3 py-2.5 font-mono text-xs text-neutral-300 outline-none"
                 />
                 <span className="text-xs text-neutral-500">min arrival buffer</span>
               </div>
-              <Button onClick={saveProfile} disabled={savingProfile} className="mt-1 self-end">
+              <Button variant="accent" onClick={saveProfile} disabled={savingProfile} className="mt-1 self-end">
                 {savingProfile ? "Saving…" : "Save"}
               </Button>
             </div>

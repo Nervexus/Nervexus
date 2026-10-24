@@ -55,7 +55,7 @@ export default function SettingsPage() {
         href={CREDENTIALS_GUIDE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="gsap-entrance gradient-border mt-6 flex items-center gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-4 backdrop-blur-sm transition-colors hover:border-neutral-600"
+        className="gsap-entrance mt-6 flex items-center gap-3 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5 transition-colors hover:border-neutral-600"
       >
         <iconify-icon icon="solar:document-text-linear" className="shrink-0 text-xl text-neutral-400" />
         <div className="min-w-0 flex-1">

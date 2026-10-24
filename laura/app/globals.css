@@ -55,12 +55,11 @@ body {
   background-size: 5px 5px;
 }
 
-/* The Reminders calendar's one accent -- today/selected days, the add
-   button, and the day-popup's primary action all use this red instead of
-   the app's usual neutral-100. Everywhere else on that page (rows, text,
-   the priority legend) stays neutral. */
+/* The Reminders calendar's accent -- today/selected days, the add button,
+   and the day-popup's primary action. Same amber as --booking-accent so the
+   device-panel pages share one accent. */
 :root {
-  --calendar-accent: #ef4444;
+  --calendar-accent: #e2924f;
 }
 
 /* Diagonal hatch for a calendar's leading/trailing (out-of-month) days --

@@ -27,8 +27,8 @@ export function CallLogCard({
   const failed = status === "failed";
   return (
     <div
-      className={`gradient-border relative flex items-start gap-3 rounded-2xl border p-4 backdrop-blur-sm ${
-        failed ? "border-red-900/60 bg-red-950/20" : "border-neutral-800/60 bg-neutral-900/40"
+      className={`relative flex items-start gap-3 rounded-[24px] border p-4 ${
+        failed ? "border-red-900/60 bg-red-950/20" : "border-neutral-900 bg-neutral-950"
       }`}
     >
       <IconTile>

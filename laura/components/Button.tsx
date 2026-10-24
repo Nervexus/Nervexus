@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost" | "danger";
+  variant?: "primary" | "ghost" | "danger" | "accent";
   /** Shows the arrow-right-linear icon after the label, matching the
    * reference's primary-CTA asset. */
   withArrow?: boolean;
@@ -29,6 +29,16 @@ export function Button({
             className="text-sm transition-transform group-hover:translate-x-0.5"
           />
         )}
+      </button>
+    );
+  }
+  if (variant === "accent") {
+    return (
+      <button
+        {...props}
+        className={`inline-flex shrink-0 items-center gap-2 rounded-2xl bg-[var(--booking-accent)] px-5 py-3 font-mono text-xs uppercase tracking-wide text-neutral-950 transition-opacity hover:opacity-85 disabled:opacity-30 ${className}`}
+      >
+        {children}
       </button>
     );
   }

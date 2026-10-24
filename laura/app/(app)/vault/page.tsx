@@ -109,7 +109,7 @@ export default function VaultPage() {
         encrypted at rest — Laura herself can&apos;t read these, only this page can
       </p>
 
-      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+      <div className="gsap-entrance relative mt-8 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -124,7 +124,7 @@ export default function VaultPage() {
           className="mt-2.5 w-full bg-transparent font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
         />
         <div className="mt-3 flex justify-end">
-          <Button onClick={add} disabled={!title.trim() || !secret}>
+          <Button variant="accent" onClick={add} disabled={!title.trim() || !secret}>
             Add to vault
           </Button>
         </div>

@@ -79,7 +79,7 @@ export default function CallsPage() {
         not an actual ringing phone call
       </p>
 
-      <div className="gradient-border gsap-entrance relative mt-8 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+      <div className="gsap-entrance relative mt-8 rounded-[28px] border border-neutral-900 bg-neutral-950 p-5">
         <div className="flex gap-2">
           {(["call", "sms"] as const).map((k) => (
             <button
@@ -103,7 +103,7 @@ export default function CallsPage() {
             kind === "call" ? "What should the urgent message say?" : "What should the message say?"
           }
           rows={3}
-          className="mt-3.5 w-full resize-none rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+          className="mt-3.5 w-full resize-none rounded-xl bg-neutral-900/70 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
         />
 
         <div className="mt-3.5 flex flex-wrap gap-2">
@@ -115,7 +115,7 @@ export default function CallsPage() {
         </div>
 
         <div className="mt-3.5 flex justify-end">
-          <Button onClick={send} disabled={!message.trim() || sending}>
+          <Button variant="accent" onClick={send} disabled={!message.trim() || sending}>
             {sending ? "Sending…" : "Send now"}
           </Button>
         </div>
