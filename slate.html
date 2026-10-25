@@ -427,7 +427,7 @@ tailwind.config = {
   <section id="cinema" class="relative bg-dark" aria-label="Built to endure">
     <div id="cinema-pin" class="relative h-screen overflow-hidden flex items-center justify-center">
       <div id="cinema-frame" class="absolute inset-0">
-        <img id="cinema-img" src="assets/strata/aerial-night.webp" alt="Stone residence with a slate roof glowing at night beside a lake" class="w-full h-full object-cover">
+        <img id="cinema-img" src="assets/strata/grand-facade.webp" alt="Grand stone building with arched windows lit warmly at night" class="w-full h-full object-cover">
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(20,20,20,0.75)_100%)]"></div>
         <div id="cinema-shade" class="absolute inset-0 bg-dark" style="opacity: 0.35;"></div>
       </div>
@@ -808,10 +808,10 @@ if (!reduceMotion) {
   const pin = document.getElementById('cinema-pin');
   if (!pin || reduceMotion) return;
   const narrow = window.innerWidth < 768;
-  const startClip = narrow ? 'inset(14% 4% 14% 4% round 20px)' : 'inset(8% 10% 8% 10% round 28px)';
+  const startClip = narrow ? 'inset(28% 8% 28% 8% round 20px)' : 'inset(20% 28% 20% 28% round 28px)';
 
   gsap.set('#cinema-frame', { clipPath: startClip });
-  gsap.set('#cinema-img', { scale: 1.15 });
+  gsap.set('#cinema-img', { scale: 1.35 });
   gsap.set('#cinema-copy', { opacity: 0, y: 60 });
 
   gsap.timeline({
