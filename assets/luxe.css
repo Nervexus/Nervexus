@@ -95,6 +95,15 @@ html.luxe-loading::before {
   100% { transform: translate(0, 0); }
 }
 
+/* Vignette */
+#luxe-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 64;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.38) 100%);
+}
+
 /* Custom cursor (fine pointers only, toggled by JS) */
 html.has-luxe-cursor, html.has-luxe-cursor * { cursor: none !important; }
 #luxe-cursor-dot, #luxe-cursor-ring {

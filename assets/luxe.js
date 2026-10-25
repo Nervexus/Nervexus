@@ -129,6 +129,12 @@
   grain.setAttribute('aria-hidden', 'true');
   document.body.appendChild(grain);
 
+  /* Vignette */
+  const vignette = document.createElement('div');
+  vignette.id = 'luxe-vignette';
+  vignette.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(vignette);
+
   /* Custom cursor */
   if (hasGsap && finePointer) {
     root.classList.add('has-luxe-cursor');
@@ -160,10 +166,11 @@
     document.querySelectorAll('[data-reveal]').forEach((el) => {
       const words = splitWords(el);
       const onScreenAtLoad = el.getBoundingClientRect().top < window.innerHeight;
-      gsap.set(words, { yPercent: 110 });
+      gsap.set(words, { yPercent: 110, filter: 'blur(10px)' });
       gsap.to(words, {
         yPercent: 0,
-        duration: 1.1,
+        filter: 'blur(0px)',
+        duration: 1.3,
         ease: 'power4.out',
         stagger: 0.06,
         delay: onScreenAtLoad ? window.__introDelay : 0,
