@@ -107,6 +107,7 @@ export function ownerChatId(): string {
  * plain text so a stray `*` or `_` in a reply can't fail Markdown parsing,
  * and capped at Telegram's 4096-character limit. */
 export async function replyInChat(text: string): Promise<void> {
+  text = stripMarkdown(text);
   const token = getBotToken();
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: "POST",
@@ -167,4 +168,15 @@ export async function downloadTelegramFile(fileId: string): Promise<{ base64: st
   const res = await fetch(`https://api.telegram.org/file/bot${token}/${path}`);
   if (!res.ok) throw new Error(`Couldn't download that file (${res.status}).`);
   return { base64: Buffer.from(await res.arrayBuffer()).toString("base64"), path };
+}
+
+/** Backstop for replies sent as plain text: Telegram shows markdown
+ * markers literally, so drop bold/italic/heading/bullet syntax. */
+export function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/__(.+?)__/g, "$1")
+    .replace(/(^|[\s(])\*(\S[^*]*?)\*(?=[\s).,!?]|$)/g, "$1$2")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*•]\s+/gm, "");
 }
