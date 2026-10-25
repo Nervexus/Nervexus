@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LandingFooter } from "@/components/LandingFooter";
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
@@ -16,10 +17,7 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
         </Link>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="flex items-center justify-between px-6 py-6 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 sm:px-10">
-        <span>Laura</span>
-        <span>Personal assistant</span>
-      </footer>
+      <LandingFooter />
     </div>
   );
 }

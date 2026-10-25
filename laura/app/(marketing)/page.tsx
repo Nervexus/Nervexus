@@ -1,27 +1,19 @@
 import Link from "next/link";
 import { ParticleOrb } from "@/components/ParticleOrb";
 
-// The public front door. Shows what Laura does, never any of the user's
+// The public front door. Shows what Laura is, never any of the user's
 // data -- everything real sits behind the sign-in.
-const FEATURES = [
-  { label: "Telegram", title: "Text her anywhere", body: "Chat, voice notes, and rota photos straight from Telegram." },
-  { label: "Bookings", title: "Somewhere to go", body: "Asks what it's for, shows the place, sends a ready-to-book link." },
-  { label: "Reminders", title: "Never miss a thing", body: "A month at a glance, set by you or by Laura mid-conversation." },
-  { label: "Rota", title: "Your shifts, sorted", body: "Photograph the rota; she knows when you're working and with who." },
-  { label: "Vault", title: "Locked away", body: "Encrypted at rest. Laura herself can't read it." },
-  { label: "Notes", title: "Remember everything", body: "Folders you can PIN-lock, filled by you or by her." },
-];
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-5xl px-6 pb-16">
+    <div className="mx-auto max-w-5xl px-6 pb-24">
       <div className="laura-stars pointer-events-none fixed inset-0 -z-10 opacity-50" aria-hidden />
 
       <section className="flex flex-col items-center text-center">
         <ParticleOrb className="w-[300px] sm:w-[440px]" />
         <p className="-mt-6 font-mono text-[10px] uppercase tracking-[0.45em] text-neutral-500">Personal assistant</p>
-        <h1 className="mt-4 text-balance text-5xl font-thin tracking-tight text-neutral-50 sm:text-7xl">Laura</h1>
-        <p className="mt-5 max-w-md text-balance text-base font-light text-neutral-400">
+        <h1 className="sr-only">Laura</h1>
+        <p className="mt-6 max-w-md text-balance text-base font-light text-neutral-400">
           Reminders, bookings, your rota and a private vault. One assistant you can talk to on the
           site or text on Telegram.
         </p>
@@ -36,23 +28,6 @@ export default function Home() {
         </Link>
       </section>
 
-      <div className="mt-20 h-px w-full bg-gradient-to-r from-transparent via-[var(--calendar-accent)]/60 to-transparent" />
-
-      <section className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((f) => (
-          <div
-            key={f.label}
-            className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] p-6 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]"
-          >
-            <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
-              <span className="h-1 w-1 rounded-full bg-violet-400" />
-              {f.label}
-            </p>
-            <h2 className="mt-5 text-xl font-thin text-neutral-100">{f.title}</h2>
-            <p className="mt-2 text-sm font-light leading-relaxed text-neutral-500">{f.body}</p>
-          </div>
-        ))}
-      </section>
     </div>
   );
 }

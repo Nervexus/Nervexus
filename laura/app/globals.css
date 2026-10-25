@@ -112,3 +112,34 @@ body {
     radial-gradient(1px 1px at 330px 40px, rgba(255, 255, 255, 0.3), transparent);
   background-size: 360px 240px, 420px 300px, 520px 380px, 300px 260px;
 }
+
+/* Landing footer illustration: the phone's purple liquid ripples on hover. */
+.laura-wire .liquid-fill,
+.laura-wire .liquid-wave {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+.laura-wire svg:hover .liquid-wave {
+  animation: laura-wave 1.8s ease-in-out infinite;
+}
+.laura-wire svg:hover .liquid-fill {
+  animation: laura-fill 1.8s ease-in-out infinite;
+}
+@keyframes laura-wave {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, -2px); }
+  50% { transform: translate(3px, -1px); }
+  75% { transform: translate(-2px, -3px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes laura-fill {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .laura-wire svg:hover .liquid-wave,
+  .laura-wire svg:hover .liquid-fill {
+    animation: none;
+  }
+}
