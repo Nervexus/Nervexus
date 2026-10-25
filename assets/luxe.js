@@ -170,7 +170,7 @@
   const navInner = nav && nav.querySelector('.max-w-7xl');
 
   if (nav && navInner) {
-    const onHome = !/testimonials\.html$/.test(window.location.pathname);
+    const onHome = !!document.getElementById('heritage');
     const base = onHome ? '' : 'slate.html';
     const items = [
       ['#heritage', 'Our Process'],
@@ -241,7 +241,7 @@
 
   /* Booking shortcut: Call / Book bar on phones, floating Book button on desktop */
   if (nav) {
-    const onHome = !/testimonials\.html$/.test(window.location.pathname);
+    const onHome = !!document.getElementById('heritage');
     const bookHref = (onHome ? '' : 'slate.html') + '#book';
     const cta = document.createElement('div');
     cta.id = 'luxe-cta';

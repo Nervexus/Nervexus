@@ -11,16 +11,15 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <meta name="theme-color" content="#1c1c1c">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="assets/vendor/tailwind.js"></script>
+<script src="assets/vendor/icons.js"></script>
+<script src="assets/vendor/iconify-icon.min.js"></script>
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
 <link rel="stylesheet" href="assets/luxe.css">
 <script>
 (function () {
@@ -254,7 +253,7 @@ tailwind.config = {
   <!-- SECTION 2: HERO -->
   <section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
     <div id="hero-media" class="absolute inset-0 z-0">
-      <img id="hero-img" src="https://cdn.midjourney.com/e796b010-1fed-4709-bd1b-cc165351ee03/0_0.png"
+      <img id="hero-img" src="assets/strata/hero-landscape.webp"
            alt="Natural stone landscape"
            class="w-full h-full object-cover object-[65%_center] sm:object-center opacity-50">
     </div>
@@ -575,7 +574,7 @@ tailwind.config = {
         <!-- Clay Tile -->
         <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
           <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:square-linear"></iconify-icon>
+            <iconify-icon icon="solar:widget-linear"></iconify-icon>
           </span>
           <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Clay Tile</span>
           <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</span>
@@ -698,7 +697,7 @@ tailwind.config = {
             Request my consultation
             <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
           </button>
-          <p class="text-cream/50 text-xs text-center mt-4 leading-relaxed">No obligation. We only use your details to contact you about your enquiry.</p>
+          <p class="text-cream/50 text-xs text-center mt-4 leading-relaxed">No obligation. We only use your details to contact you about your enquiry. See our <a href="privacy.html" class="underline decoration-cream/30 underline-offset-4 hover:text-cream">Privacy Notice</a>.</p>
         </form>
 
         <div id="booking-success" class="hidden rounded-3xl border border-sand/30 bg-cream/[0.04] p-8 sm:p-12 text-center" role="status" aria-live="polite">
@@ -848,8 +847,8 @@ tailwind.config = {
     <div class="relative z-10 max-w-7xl mx-auto px-6 border-t border-cream/10 pt-7 pb-10 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
       <p class="font-mono text-xs text-cream/35">© 2026 SLATE. All rights reserved.</p>
       <div class="flex items-center gap-6 font-mono text-xs text-cream/35">
-        <a href="#" class="hover:text-cream/70 transition-colors">Legal</a>
-        <a href="#" class="hover:text-cream/70 transition-colors">Privacy</a>
+        <a href="privacy.html#company" class="hover:text-cream/70 transition-colors">Company info</a>
+        <a href="privacy.html" class="hover:text-cream/70 transition-colors">Privacy</a>
       </div>
     </div>
   </footer>

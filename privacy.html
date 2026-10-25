@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Notice | SLATE</title>
+<meta name="robots" content="noindex">
+<script>
+/* =====================================================================
+   BUSINESS DETAILS: the only part to edit for each client.
+   Leave a value as '' to hide that line from the page.
+   ===================================================================== */
+window.PRIVACY_CONFIG = {
+  businessName: 'SLATE',                      // trading name shown to customers
+  legalName: '',                              // e.g. 'Slate Roofing Ltd' (required if a limited company)
+  companyNumber: '',                          // Companies House number
+  registeredIn: 'England and Wales',
+  address: '12 Artisan Row, Mayfair, London', // registered office or trading address
+  email: 'hello@slate-roofing.co',
+  phone: '+44 20 7946 0192',
+  vatNumber: '',
+  icoNumber: '',                              // ICO data protection registration number
+  formProvider: '',                           // e.g. 'Formspree, Inc.' once the form is connected
+  emailProvider: 'our business email provider', // e.g. 'Google Workspace' or 'Microsoft 365'
+  hostingProvider: 'Vercel Inc.',
+  retention: '12 months',                     // how long enquiries are kept if no work goes ahead
+  jobRetention: '6 years',                    // how long customer records are kept after a job
+  lastUpdated: '25 October 2026',
+};
+</script>
+<meta name="description" content="How SLATE collects, uses and protects your personal information.">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#1c1c1c">
+
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+
+<script src="assets/vendor/tailwind.js"></script>
+<script src="assets/vendor/icons.js"></script>
+<script src="assets/vendor/iconify-icon.min.js"></script>
+<script src="assets/vendor/gsap.min.js"></script>
+<script src="assets/vendor/ScrollTrigger.min.js"></script>
+<script src="assets/vendor/three.min.js"></script>
+<script src="assets/vendor/lenis.min.js"></script>
+<link rel="stylesheet" href="assets/luxe.css">
+<script>
+(function () {
+  try {
+    if (sessionStorage.getItem('slate-intro') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('luxe-loading');
+      setTimeout(function () { document.documentElement.classList.remove('luxe-loading'); }, 4000);
+    }
+  } catch (e) {}
+})();
+</script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream: '#f5f3ee',
+        surface: '#efece4',
+        dark: '#1c1c1c',
+        moss: '#4f5343',
+        sand: '#cebfa9',
+      },
+      fontFamily: {
+        sans: ['Manrope', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+    },
+  },
+};
+</script>
+
+<style>
+  body {
+    background: #1c1c1c;
+    font-family: 'Manrope', sans-serif;
+  }
+  ::selection { background: #4f5343; color: #efece4; }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .gradient-border-inset {
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+
+  .custom-curve {
+    border-top-right-radius: 180px;
+  }
+
+  /* matte-noise overlay via inline SVG turbulence filter, applied as pseudo-element */
+  .matte-noise { position: relative; isolation: isolate; }
+  .matte-noise::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .magnetic-btn { will-change: transform; }
+
+  #webgl-bg { opacity: 0.6; }
+
+  .gsap-fade-up { opacity: 0; transform: translateY(40px); }
+  .gsap-scale-up { transform: scale(0.9); }
+
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0%; height: 1px;
+    background: currentColor;
+    transition: width 0.35s cubic-bezier(.16,1,.3,1);
+  }
+  .nav-link:hover::after { width: 100%; }
+
+  .price-bar-shadow {
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.35);
+  }
+
+  @media (max-width: 1023px) {
+    .product-img-mobile-curve { border-top-right-radius: 80px; }
+  }
+  @media (max-width: 639px) {
+    .product-img-mobile-curve { border-top-right-radius: 48px; }
+  }
+
+  /* Process timeline */
+  .timeline-track-mask {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  }
+  @media (min-width: 768px) {
+    .timeline-sticky-label { top: 10rem; }
+  }
+
+  /* Testimonials ticker */
+  @keyframes testimonial-ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  #testimonialTicker {
+    animation: testimonial-ticker 20s linear infinite;
+  }
+  .testimonial-word {
+    display: inline-block;
+    margin-right: 0.3em;
+  }
+  .testimonial-nav-fill {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .testimonial-nav-fill-left { transform: translateX(-100%); }
+  .testimonial-nav-fill-right { transform: translateX(100%); }
+  .testimonial-nav-btn:hover .testimonial-nav-fill { transform: translateX(0); }
+
+  /* ---------- Mobile layout (below 768px only; desktop untouched) ---------- */
+  @media (max-width: 767px) {
+    main > section:first-child { padding-top: 8rem; padding-bottom: 1rem; }
+    #boutique { padding-top: 2.5rem; padding-bottom: 4.5rem; }
+    #testimonialWrap > div:first-child {
+      top: -1.5rem;
+      left: auto;
+      right: -0.25rem;
+      transform: none;
+      font-size: 7.5rem;
+    }
+    #testimonialWrap .py-8 { padding-top: 1.5rem; padding-bottom: 0.5rem; }
+    #testimonialWrap .min-h-\[170px\] { min-height: 150px; }
+    #testimonialWrap .mt-16 { margin-top: 3rem; }
+    main > footer { padding-top: 4.5rem; }
+    main > footer > div.grid {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
+      row-gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    main > footer > div.grid > div:first-child { grid-column: 1 / -1; }
+  }
+
+</style>
+</head>
+<body class="antialiased overflow-x-hidden text-cream">
+
+<!-- LAYER 0: WebGL ambient background -->
+<canvas id="webgl-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+<!-- LAYER 2: NAVIGATION -->
+<nav id="main-nav" class="fixed top-0 left-0 w-full z-50 bg-dark/75 backdrop-blur-md border-b border-cream/10 py-4 transition-opacity duration-500 ease-out">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <a href="slate.html" class="font-serif text-2xl tracking-tight text-cream">SLATE</a>
+
+    <div class="hidden md:flex items-center gap-6 lg:gap-10 text-sm font-medium text-cream/80">
+      <a href="slate.html#heritage" class="nav-link">Our Process</a>
+      <a href="slate.html#work" class="nav-link">Why SLATE</a>
+      <a href="slate.html#services" class="nav-link">Services</a>
+      <a href="testimonials.html" class="nav-link">Testimonials</a>
+      <a href="slate.html#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- LAYER 1: MAIN CONTENT -->
+<main class="relative z-10">
+
+  <section class="relative bg-dark pt-40 pb-10 px-6">
+    <div class="max-w-3xl mx-auto">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Legal</p>
+      <h1 class="font-serif text-5xl sm:text-6xl font-light tracking-tight text-cream leading-tight">Privacy <em class="italic text-sand">Notice</em></h1>
+      <p class="text-cream/60 mt-6">Last updated <span data-co="lastUpdated"></span></p>
+    </div>
+  </section>
+
+  <section class="relative bg-dark pb-24 px-6">
+    <article class="max-w-3xl mx-auto">
+      <p class="text-cream/80 leading-relaxed mb-4">This notice explains what personal information <span data-co="businessName"></span> collects when you use this website or contact us, why we collect it, and the choices you have. We keep it short and in plain English.</p>
+
+      <h2 id="who" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">1. Who we are</h2>
+      <p class="text-cream/80 leading-relaxed mb-4"><span data-co="businessName"></span><span data-co-wrap="legalName"> (<span data-co="legalName"></span>)</span> is the controller of your personal information. That means we decide how it is used and we are responsible for looking after it.</p>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed">Address: <span data-co="address"></span></li>
+        <li class="text-cream/80 leading-relaxed">Email: <a data-co-href="mailto" data-co="email" class="text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-sand"></a></li>
+        <li class="text-cream/80 leading-relaxed">Phone: <a data-co-href="tel" data-co="phone" class="text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-sand"></a></li>
+        <li class="text-cream/80 leading-relaxed" data-co-wrap="icoNumber">ICO registration number: <span data-co="icoNumber"></span></li>
+      </ul>
+
+      <h2 id="collect" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">2. What we collect</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">When you fill in our booking form, call or email us, we collect:</p>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed">your name, phone number and, if you give it, your email address</li>
+        <li class="text-cream/80 leading-relaxed">the postcode of the property and the type of work you need</li>
+        <li class="text-cream/80 leading-relaxed">anything else you choose to tell us about your roof</li>
+      </ul>
+      <p class="text-cream/80 leading-relaxed mb-4">Please do not include sensitive information, such as health details, in your message.</p>
+      <p class="text-cream/80 leading-relaxed mb-4">When anyone visits the website, our hosting provider automatically records basic technical information, such as your IP address, browser type and the pages requested. This is used to keep the site running and secure.</p>
+
+      <h2 id="use" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">3. How we use it, and why we are allowed to</h2>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed"><strong class="text-cream font-medium">To reply to your enquiry and arrange a visit or quote.</strong> We do this because you have asked us to, as a step before entering a contract with you.</li>
+        <li class="text-cream/80 leading-relaxed"><strong class="text-cream font-medium">To carry out and manage any work you go ahead with</strong>, including invoices and your warranty. This is necessary to perform our contract with you.</li>
+        <li class="text-cream/80 leading-relaxed"><strong class="text-cream font-medium">To keep records we are legally required to keep</strong>, such as for tax. This is a legal obligation.</li>
+        <li class="text-cream/80 leading-relaxed"><strong class="text-cream font-medium">To keep the website secure and working.</strong> This is in our legitimate interests.</li>
+      </ul>
+      <p class="text-cream/80 leading-relaxed mb-4">We do not sell your information, use it for advertising, or send you marketing unless you have separately agreed to it. We do not use automated decision-making.</p>
+
+      <h2 id="share" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">4. Who we share it with</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">We only share your information with trusted providers who help us run the business, and only so they can provide their service to us:</p>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed"><span data-co="hostingProvider"></span>, which hosts this website</li>
+        <li class="text-cream/80 leading-relaxed" data-co-wrap="formProvider"><span data-co="formProvider"></span>, which delivers booking form enquiries to our inbox</li>
+        <li class="text-cream/80 leading-relaxed"><span data-co="emailProvider"></span>, which stores our emails</li>
+      </ul>
+      <p class="text-cream/80 leading-relaxed mb-4">We may also share information where the law requires it, for example with HMRC.</p>
+
+      <h2 id="transfers" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">5. Information stored outside the UK</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">Some of our providers may store information outside the UK, for example in the United States. Where this happens, the transfer is protected by safeguards recognised under UK data protection law, such as the UK Extension to the EU-US Data Privacy Framework or the UK International Data Transfer Agreement.</p>
+
+      <h2 id="keep" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">6. How long we keep it</h2>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed">Enquiries that do not lead to any work: <span data-co="retention"></span>, then deleted.</li>
+        <li class="text-cream/80 leading-relaxed">Customer records for work we carry out: <span data-co="jobRetention"></span> after the job is finished, to meet tax rules and support your warranty. Warranty records may be kept for the length of the warranty.</li>
+      </ul>
+
+      <h2 id="rights" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">7. Your rights</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">You have the right to:</p>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed">ask for a copy of the information we hold about you</li>
+        <li class="text-cream/80 leading-relaxed">ask us to correct anything that is wrong</li>
+        <li class="text-cream/80 leading-relaxed">ask us to delete your information</li>
+        <li class="text-cream/80 leading-relaxed">ask us to stop or limit how we use it, or object to how we use it</li>
+        <li class="text-cream/80 leading-relaxed">ask for your information in a format you can take elsewhere</li>
+      </ul>
+      <p class="text-cream/80 leading-relaxed mb-4">To use any of these rights, email <a data-co-href="mailto" data-co="email" class="text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-sand"></a>. It is free, and we will reply within one month.</p>
+
+      <h2 id="cookies" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">8. Cookies and storage</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">This website does not use cookies, and does not use any advertising or analytics tracking. All fonts, images and code are served from our own website, so your browser does not connect to third-party services when you visit.</p>
+      <p class="text-cream/80 leading-relaxed mb-4">The site stores one small note in your browser to remember that you have already seen the opening animation, so it does not replay on every page. It contains no personal information and is deleted automatically when you close the tab.</p>
+
+      <h2 id="complain" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">9. Complaints</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">If you are unhappy with how we have handled your information, please contact us first so we can put it right. You also have the right to complain to the Information Commissioner's Office (ICO), the UK regulator, at <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener" class="text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-sand">ico.org.uk/make-a-complaint</a> or on 0303 123 1113.</p>
+
+      <h2 id="changes" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">10. Changes to this notice</h2>
+      <p class="text-cream/80 leading-relaxed mb-4">We may update this notice from time to time. The date at the top shows when it was last changed.</p>
+
+      <h2 id="company" class="font-serif text-2xl sm:text-3xl text-cream mt-14 mb-4 scroll-mt-28">Company information</h2>
+      <ul class="list-disc pl-5 space-y-2 mb-4 marker:text-sand">
+        <li class="text-cream/80 leading-relaxed">Trading name: <span data-co="businessName"></span></li>
+        <li class="text-cream/80 leading-relaxed" data-co-wrap="legalName">Registered name: <span data-co="legalName"></span></li>
+        <li class="text-cream/80 leading-relaxed" data-co-wrap="companyNumber">Company number: <span data-co="companyNumber"></span>, registered in <span data-co="registeredIn"></span></li>
+        <li class="text-cream/80 leading-relaxed">Address: <span data-co="address"></span></li>
+        <li class="text-cream/80 leading-relaxed" data-co-wrap="vatNumber">VAT number: <span data-co="vatNumber"></span></li>
+        <li class="text-cream/80 leading-relaxed">Contact: <a data-co-href="mailto" data-co="email" class="text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-sand"></a></li>
+      </ul>
+    </article>
+  </section>
+
+  <!-- SECTION 6: FOOTER -->
+  <footer class="matte-noise relative overflow-hidden text-cream bg-dark border-cream/10 border-t pt-24">
+
+    <!-- Giant Brand Text -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none"
+      style="mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent);">
+      <h2 class="text-[26vw] leading-[0.7] select-none font-serif font-bold text-cream/5 tracking-tighter mix-blend-screen scale-y-110">
+        SLATE
+      </h2>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto grid md:grid-cols-[1.3fr_1fr_1fr_1fr] gap-x-10 gap-y-14 mb-16 px-6">
+      <div>
+        <p class="font-serif text-xl tracking-tight text-cream mb-4">SLATE</p>
+        <p class="text-cream/55 text-sm leading-relaxed max-w-xs">
+          Bespoke roofing, specified and installed to the standards of fine
+          craft. Every tile a material to be honored.
+        </p>
+        <div class="flex items-center gap-3 mt-7">
+          <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:camera-linear"></iconify-icon>
+          </a>
+          <a href="#" aria-label="More" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+          </a>
+          <a href="#" aria-label="Email" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:letter-linear"></iconify-icon>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
+        <ul class="space-y-3 text-cream/55 text-sm">
+          <li><a href="slate.html#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
+          <li><a href="slate.html#services" class="hover:text-cream transition-colors">Services</a></li>
+          <li><a href="testimonials.html" class="hover:text-cream transition-colors">Testimonials</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">The Studio</p>
+        <p class="text-cream/55 text-sm leading-relaxed">
+          12 Artisan Row<br>Mayfair, London
+        </p>
+        <p class="text-cream/55 text-sm leading-relaxed mt-4">
+          Mon to Fri: 8am to 6pm<br>Sat to Sun: 9am to 5pm
+        </p>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Contact</p>
+        <p class="text-cream/55 text-sm leading-relaxed"><a href="mailto:hello@slate-roofing.co" class="hover:text-cream transition-colors">hello@slate-roofing.co</a></p>
+        <p class="text-cream/55 text-sm leading-relaxed mt-2"><a href="tel:+442079460192" class="hover:text-cream transition-colors">+44 20 7946 0192</a></p>
+      </div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 border-t border-cream/10 pt-7 pb-10 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+      <p class="font-mono text-xs text-cream/35">© 2026 SLATE. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-mono text-xs text-cream/35">
+        <a href="privacy.html#company" class="hover:text-cream/70 transition-colors">Company info</a>
+        <a href="privacy.html" class="hover:text-cream/70 transition-colors">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+(function fillPrivacy() {
+  const c = window.PRIVACY_CONFIG || {};
+  document.querySelectorAll('[data-co-wrap]').forEach((el) => { if (!c[el.dataset.coWrap]) el.remove(); });
+  document.querySelectorAll('[data-co]').forEach((el) => {
+    const v = c[el.dataset.co] || '';
+    el.textContent = v;
+    if (el.dataset.coHref === 'mailto') el.href = 'mailto:' + v;
+    if (el.dataset.coHref === 'tel') el.href = 'tel:' + v.replace(/[^+0-9]/g, '');
+  });
+})();
+</script>
+<script src="assets/luxe.js"></script>
+<script>
+/* =========================================================
+   THREE.JS AMBIENT NOISE BACKGROUND
+   ========================================================= */
+(function initWebGL() {
+  const canvas = document.getElementById('webgl-bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform vec3 uColorA;
+    uniform vec3 uColorB;
+
+    float random(vec2 st) {
+      return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+
+    float noise(vec2 st) {
+      vec2 i = floor(st);
+      vec2 f = fract(st);
+      float a = random(i);
+      float b = random(i + vec2(1.0, 0.0));
+      float c = random(i + vec2(0.0, 1.0));
+      float d = random(i + vec2(1.0, 1.0));
+      vec2 u = f*f*(3.0-2.0*f);
+      return mix(a, b, u.x) + (c - a)*u.y*(1.0-u.x) + (d - b)*u.x*u.y;
+    }
+
+    float fbm(vec2 st) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      for (int i = 0; i < 5; i++) {
+        value += amplitude * noise(st);
+        st *= 2.0;
+        amplitude *= 0.5;
+      }
+      return value;
+    }
+
+    void main() {
+      vec2 uv = vUv;
+      uv.x *= uResolution.x / uResolution.y;
+
+      vec2 motion = vec2(uTime * 0.015, uTime * 0.01);
+      float n = fbm(uv * 3.0 + motion);
+      n += fbm(uv * 6.0 - motion * 1.5) * 0.5;
+
+      vec3 color = mix(uColorA, uColorB, n);
+      float alpha = smoothstep(0.2, 0.8, n) * 0.5;
+
+      gl_FragColor = vec4(color, alpha);
+    }
+  `;
+
+  const uniforms = {
+    uTime: { value: 0 },
+    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uColorA: { value: new THREE.Color('#cebfa9') },
+    uColorB: { value: new THREE.Color('#4f5343') },
+  };
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    uniforms,
+    transparent: true,
+  });
+
+  const geometry = new THREE.PlaneGeometry(2, 2);
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function resize() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', resize);
+
+  const clock = new THREE.Clock();
+  function animate() {
+    uniforms.uTime.value = clock.getElapsedTime();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* =========================================================
+   GSAP SCROLLTRIGGER ANIMATIONS
+   ========================================================= */
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero stagger fade-up (runs immediately, not scroll-triggered)
+gsap.to('.hero-anim', {
+  y: 0,
+  opacity: 1,
+  duration: 1.1,
+  ease: 'power3.out',
+  stagger: 0.12,
+  delay: 0.2,
+});
+
+// Generic fade-up on scroll
+document.querySelectorAll('.gsap-fade-up').forEach((el) => {
+  if (el.classList.contains('hero-anim')) return;
+  gsap.to(el, {
+    y: 0,
+    opacity: 1,
+    duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+    },
+  });
+});
+
+// Scale-up images on scroll
+document.querySelectorAll('.gsap-scale-up').forEach((el) => {
+  gsap.to(el, {
+    scale: 1,
+    duration: 1.4,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 80%',
+    },
+  });
+});
+
+/* =========================================================
+   NAV: fade out once scrolled past the top, fade back in at the top
+   ========================================================= */
+(function initNavFade() {
+  const nav = document.getElementById('main-nav');
+  if (!nav || window.matchMedia('(max-width: 767px)').matches) return;
+
+  const threshold = 40;
+
+  function updateNav() {
+    if (window.scrollY > threshold) {
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+    } else {
+      nav.style.opacity = '1';
+      nav.style.pointerEvents = 'auto';
+    }
+  }
+
+  updateNav();
+  window.addEventListener('scroll', updateNav, { passive: true });
+})();
+
+/* =========================================================
+   MAGNETIC BUTTONS
+   ========================================================= */
+document.querySelectorAll('.magnetic-btn').forEach((btn) => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const relX = e.clientX - rect.left - rect.width / 2;
+    const relY = e.clientY - rect.top - rect.height / 2;
+    gsap.to(btn, {
+      x: relX * 0.4,
+      y: relY * 0.4,
+      duration: 0.4,
+      ease: 'power2.out',
+    });
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    gsap.to(btn, {
+      x: 0,
+      y: 0,
+      duration: 0.6,
+      ease: 'elastic.out(1, 0.4)',
+    });
+  });
+});
+</script>
+</body>
+</html>
