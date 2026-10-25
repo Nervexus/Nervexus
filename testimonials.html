@@ -6,6 +6,11 @@
 <title>Testimonials | SLATE</title>
 <meta name="description" content="What our clients say about SLATE, a bespoke roofing company crafted with precision.">
 
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#1c1c1c">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -173,11 +178,12 @@ tailwind.config = {
   <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
     <a href="slate.html" class="font-serif text-2xl tracking-tight text-cream">SLATE</a>
 
-    <div class="hidden md:flex items-center gap-10 text-sm font-medium text-cream/80">
+    <div class="hidden md:flex items-center gap-6 lg:gap-10 text-sm font-medium text-cream/80">
       <a href="slate.html#heritage" class="nav-link">Our Process</a>
+      <a href="slate.html#work" class="nav-link">Our Work</a>
       <a href="slate.html#services" class="nav-link">Services</a>
-      <a href="slate.html#experience" class="nav-link">The Experience</a>
       <a href="testimonials.html" class="nav-link">Testimonials</a>
+      <a href="slate.html#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
     </div>
   </div>
 </nav>
@@ -250,6 +256,22 @@ tailwind.config = {
       <!-- Bottom ticker: faint repeating client names -->
       <div class="mt-16 sm:mt-24 overflow-hidden opacity-[0.08] pointer-events-none">
         <div id="testimonialTicker" class="flex whitespace-nowrap text-4xl sm:text-6xl font-bold tracking-tight"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING PROMPT -->
+  <section class="relative bg-dark text-cream border-t border-cream/10 py-20 sm:py-28 px-6">
+    <div class="max-w-4xl mx-auto text-center gsap-fade-up">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">Your project</p>
+      <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-[1.05] mb-6">Ready to be our next <em class="italic text-sand">story?</em></h2>
+      <p class="text-cream/75 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">Book a consultation and we will visit, look at your roof and give you a clear, itemised quote.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
+        <a href="slate.html#book" class="btn-shine inline-flex items-center gap-3 bg-cream text-dark px-8 py-4 rounded-full font-medium hover:bg-sand transition-colors">
+          Book a consultation
+          <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
+        </a>
+        <a href="tel:+442079460192" class="text-cream/80 border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">Or call +44 20 7946 0192</a>
       </div>
     </div>
   </section>

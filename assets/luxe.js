@@ -182,7 +182,7 @@
       ['#heritage', 'Our Process'],
       ['#work', 'Our Work'],
       ['#services', 'Services'],
-      ['#experience', 'The Experience'],
+      ['#faq', 'Questions'],
     ];
 
     const btn = document.createElement('button');
@@ -202,8 +202,8 @@
       '<a href="testimonials.html"><span class="mm-i"><em>05</em><strong>Testimonials</strong></span></a>';
     menu.innerHTML =
       '<div><p class="mm-label">Navigate</p><nav class="mm-links">' + linkHtml + '</nav></div>' +
-      '<div class="mm-foot"><p>12 Artisan Row<br>Mayfair, London<br>+44 20 7946 0192</p>' +
-      '<a class="mm-cta" href="' + base + '#experience">Book a consultation</a></div>';
+      '<div class="mm-foot"><p>12 Artisan Row<br>Mayfair, London<br><a href="tel:+442079460192" style="color:#f5f3ee">+44 20 7946 0192</a></p>' +
+      '<a class="mm-cta" href="' + base + '#book">Book a consultation</a></div>';
     document.body.appendChild(menu);
 
     let open = false;
@@ -243,6 +243,33 @@
       else if (y < lastY - 4 || y <= 120) nav.classList.remove('nav-hidden');
       lastY = y;
     }, { passive: true });
+  }
+
+  /* Booking shortcut: Call / Book bar on phones, floating Book button on desktop */
+  if (nav) {
+    const onHome = !/testimonials\.html$/.test(window.location.pathname);
+    const bookHref = (onHome ? '' : 'slate.html') + '#book';
+    const cta = document.createElement('div');
+    cta.id = 'luxe-cta';
+    cta.innerHTML =
+      '<a class="cta-call" href="tel:+442079460192">Call us</a>' +
+      '<a class="cta-book" href="' + bookHref + '">Book a consultation</a>';
+    document.body.appendChild(cta);
+
+    const book = document.getElementById('book');
+    let bookInView = false;
+    if (book && 'IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        bookInView = entries[0].isIntersecting;
+        updateCta();
+      }, { threshold: 0.15 }).observe(book);
+    }
+    function updateCta() {
+      const pastHero = window.scrollY > window.innerHeight * 0.75;
+      cta.classList.toggle('is-visible', pastHero && !bookInView);
+    }
+    window.addEventListener('scroll', updateCta, { passive: true });
+    updateCta();
   }
 
   if (hasST) window.addEventListener('load', () => ScrollTrigger.refresh());
