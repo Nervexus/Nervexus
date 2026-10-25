@@ -2,11 +2,11 @@
 
 import { usePathname } from "next/navigation";
 
-/** Layer 1: darkens the viewport's edges. Skipped on /laura and /login, where its
+/** Layer 1: darkens the viewport's edges. Skipped on /, /laura and /login, where its
  * radial gradient shows up as faint rings. */
 export function Vignette() {
   const pathname = usePathname();
-  if (pathname === "/laura" || pathname === "/login") return null;
+  if (pathname === "/" || pathname === "/laura" || pathname === "/login") return null;
   return (
     <div
       className="pointer-events-none fixed inset-0 z-[1]"

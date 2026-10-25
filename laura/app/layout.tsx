@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   description: "Personal assistant — core brain",
 };
 
-// Nav chrome lives per route group: (marketing)'s TopNav/SiteFooter for
-// the literal landing-page recreation, (app)'s Sidebar for the real
+// Nav chrome lives per route group: (marketing)'s slim header/footer for
+// the public front door, (app)'s Sidebar for the real
 // tool pages. The vignette and noise overlay are universal background
 // layers.
 export default function RootLayout({ children }: LayoutProps<"/">) {

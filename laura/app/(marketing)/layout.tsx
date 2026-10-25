@@ -1,12 +1,25 @@
-import { TopNav } from "@/components/TopNav";
-import { SiteFooter } from "@/components/SiteFooter";
+import Link from "next/link";
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
-    <>
-      <TopNav />
-      <main className="pt-24 pb-20 sm:pt-28">{children}</main>
-      <SiteFooter />
-    </>
+    <div className="relative z-10 flex min-h-screen flex-col">
+      <header className="flex items-center justify-between px-6 py-6 sm:px-10">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.9)]" />
+          <span className="text-sm font-medium tracking-[0.3em] text-neutral-100">LAURA</span>
+        </Link>
+        <Link
+          href="/laura"
+          className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-400 transition-colors hover:text-neutral-100"
+        >
+          Sign in
+        </Link>
+      </header>
+      <main className="flex-1">{children}</main>
+      <footer className="flex items-center justify-between px-6 py-6 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 sm:px-10">
+        <span>Laura</span>
+        <span>Personal assistant</span>
+      </footer>
+    </div>
   );
 }
