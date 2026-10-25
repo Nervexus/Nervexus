@@ -38,6 +38,8 @@ type Counts = {
 export function AppSidebar() {
   const pathname = usePathname();
   const rootRef = useRef<HTMLElement>(null);
+  // Phones: the sidebar is a drawer from the left, opened by the menu button.
+  const [open, setOpen] = useState(false);
   const [counts, setCounts] = useState<Counts>({
     notes: null,
     reminders: null,
@@ -135,19 +137,36 @@ export function AppSidebar() {
   }, []);
 
   return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Open menu"
+        aria-expanded={open}
+        className="fixed left-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-[#141416]/90 text-neutral-300 backdrop-blur-md sm:hidden"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" className="h-5 w-5" aria-hidden>
+          <path d="M4 7h16M4 12h16M4 17h10" />
+        </svg>
+      </button>
+      {open && (
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm sm:hidden" onClick={() => setOpen(false)} aria-hidden />
+      )}
     <nav
       ref={rootRef}
-      className="flex w-full shrink-0 flex-col border-b border-white/[0.06] bg-gradient-to-b from-[#19191b] to-[#121213] sm:sticky sm:top-4 sm:m-4 sm:h-[calc(100vh-2rem)] sm:w-60 sm:rounded-3xl sm:border sm:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.04)]"
+      className={`fixed inset-y-3 left-3 z-50 flex w-64 flex-col rounded-3xl border border-white/[0.06] bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.04)] transition-transform duration-300 sm:sticky sm:inset-auto sm:top-4 sm:m-4 sm:h-[calc(100vh-2rem)] sm:w-60 sm:translate-x-0 ${
+        open ? "translate-x-0" : "-translate-x-[110%]"
+      }`}
     >
       <Link
         href="/"
+        onClick={() => setOpen(false)}
         className="gsap-entrance mx-3 flex items-center gap-2.5 border-b border-white/[0.06] px-3 py-5"
       >
         <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.9)]" />
         <span className="text-sm font-medium tracking-[0.3em] text-neutral-100">LAURA</span>
       </Link>
 
-      <ul className="flex flex-1 flex-row gap-1 overflow-x-auto px-3 py-3 sm:flex-col sm:overflow-visible sm:py-4">
+      <ul className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4 sm:overflow-visible">
         {LINKS.map((link) => {
           const active = pathname === link.href;
           const count =
@@ -171,18 +190,19 @@ export function AppSidebar() {
           return (
             <li
               key={link.href}
-              className={`gsap-entrance relative shrink-0 sm:shrink ${
-                link.href === "/notes" || link.href === "/settings" ? "sm:mt-3 sm:border-t sm:border-white/[0.06] sm:pt-3" : ""
+              className={`gsap-entrance relative ${
+                link.href === "/notes" || link.href === "/settings" ? "mt-3 border-t border-white/[0.06] pt-3" : ""
               }`}
             >
               {active && (
                 <span
-                  className="absolute -left-3 top-1/2 hidden h-5 w-1 -translate-y-1/2 rounded-r-full bg-violet-500 shadow-[0_0_12px_rgba(139,92,246,0.9)] sm:block"
+                  className="absolute -left-3 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-violet-500 shadow-[0_0_12px_rgba(139,92,246,0.9)]"
                   aria-hidden="true"
                 />
               )}
               <Link
                 href={link.href}
+                onClick={() => setOpen(false)}
                 className={`group relative flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm transition-all ${
                   active
                     ? "border border-white/10 bg-gradient-to-r from-violet-500/25 via-violet-500/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_24px_-8px_rgba(139,92,246,0.6)]"
@@ -195,7 +215,7 @@ export function AppSidebar() {
                 />
                 <span>{link.label}</span>
                 {count !== null && count > 0 && (
-                  <span className="ml-auto hidden rounded-full border border-white/10 px-2 py-px font-mono text-[10px] text-neutral-400 sm:inline">
+                  <span className="ml-auto rounded-full border border-white/10 px-2 py-px font-mono text-[10px] text-neutral-400">
                     {count}
                   </span>
                 )}
@@ -205,7 +225,7 @@ export function AppSidebar() {
         })}
       </ul>
 
-      <div className="gsap-entrance mx-3 mb-3 hidden items-center gap-3 border-t border-white/[0.06] px-2 pt-4 sm:flex">
+      <div className="gsap-entrance mx-3 mb-3 flex items-center gap-3 border-t border-white/[0.06] px-2 pt-4">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-xs text-neutral-300">
           MH
         </span>
@@ -223,5 +243,6 @@ export function AppSidebar() {
         </div>
       </div>
     </nav>
+    </>
   );
 }
