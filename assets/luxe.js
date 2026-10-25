@@ -174,7 +174,7 @@
     const base = onHome ? '' : 'slate.html';
     const items = [
       ['#heritage', 'Our Process'],
-      ['#work', 'Our Work'],
+      ['#work', 'Why SLATE'],
       ['#services', 'Services'],
       ['#faq', 'Questions'],
     ];

@@ -235,7 +235,7 @@ tailwind.config = {
 
     <div class="hidden md:flex items-center gap-6 lg:gap-10 text-sm font-medium text-cream/80">
       <a href="#heritage" class="nav-link">Our Process</a>
-      <a href="#work" class="nav-link">Our Work</a>
+      <a href="#work" class="nav-link">Why SLATE</a>
       <a href="#services" class="nav-link">Services</a>
       <a href="testimonials.html" class="nav-link">Testimonials</a>
       <a href="#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
@@ -432,64 +432,97 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- SELECTED WORK: pinned horizontal gallery on desktop, swipe row on mobile -->
+  <!-- THE SLATE STANDARD: what every roof comes with (pinned sideways scroll on desktop, swipe row on mobile) -->
   <section id="work" class="relative bg-dark text-cream border-t border-cream/10">
     <div id="work-pin" class="relative flex flex-col justify-center py-24 lg:py-0 lg:h-screen lg:overflow-hidden">
       <div class="max-w-7xl w-full mx-auto px-6 flex items-end justify-between gap-6 mb-10 lg:mb-12">
         <div>
-          <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">Selected Work</p>
-          <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight">Roofs that <em class="italic text-sand">outlast</em> us</h2>
+          <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">The SLATE Standard</p>
+          <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight">What every roof <em class="italic text-sand">comes with</em></h2>
         </div>
-        <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 03</p>
+        <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 04</p>
       </div>
 
-      <div id="work-track" class="work-track-pad flex items-end gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
-        <article class="work-card group shrink-0 w-[78vw] sm:w-[50vw] lg:w-[36vw] snap-start">
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[50vh] border border-cream/10">
+      <div id="work-track" class="work-track-pad flex items-stretch gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
+        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/exploded-cutaway.webp" alt="Exploded diagram of roof construction layers" class="w-full h-full object-cover object-[center_48%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
+            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
+              <iconify-icon icon="solar:document-text-linear"></iconify-icon>
+            </span>
+          </div>
+          <h3 class="font-serif text-2xl sm:text-3xl mt-6">A clear, itemised quote</h3>
+          <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">You see every cost, line by line, before anything is ordered. No guesswork and no vague totals.</p>
+        </article>
+
+        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/aerial-night.webp" alt="Stone house with a natural slate roof lit at night" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
+            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
+              <iconify-icon icon="solar:map-point-linear"></iconify-icon>
+            </span>
+          </div>
+          <h3 class="font-serif text-2xl sm:text-3xl mt-6">Materials you can trace</h3>
+          <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">Slate and stone are hand-selected from our 15+ partner quarries and tracked all the way to your address.</p>
+        </article>
+
+        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
               <img src="assets/strata/facade.webp" alt="Timber-clad gable facade with cathedral glass window" class="w-full h-full object-cover object-[center_58%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-4 mt-5">
-            <h3 class="font-serif text-xl sm:text-2xl">Timber Gable</h3>
-            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Cedar cladding</p>
-          </div>
-        </article>
-
-        <article class="work-card group shrink-0 w-[78vw] sm:w-[50vw] lg:w-[36vw] snap-start">
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[50vh] border border-cream/10">
-            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/aerial-day.webp" alt="Aerial view of timber lodges along a rocky coastline" class="w-full h-full object-cover object-[center_72%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-4 mt-5">
-            <h3 class="font-serif text-xl sm:text-2xl">Coastal Lodges</h3>
-            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Standing seam</p>
-          </div>
-        </article>
-
-        <article class="work-card group shrink-0 w-[78vw] sm:w-[50vw] lg:w-[36vw] snap-start">
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[50vh] border border-cream/10">
-            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/exploded-cutaway.webp" alt="Exploded diagram of roof and facade construction layers" class="w-full h-full object-cover object-[center_48%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
             <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">03</span>
+            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
+              <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
+            </span>
           </div>
-          <div class="flex items-baseline justify-between gap-4 mt-5">
-            <h3 class="font-serif text-xl sm:text-2xl">Anatomy of a Roof</h3>
-            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Engineered layers</p>
+          <h3 class="font-serif text-2xl sm:text-3xl mt-6">Our own licensed crew</h3>
+          <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">Your roof is installed by our in-house team, with a site lead supervising every stage of the build.</p>
+        </article>
+
+        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/aerial-day.webp" alt="Aerial view of finished timber homes along a coastline" class="w-full h-full object-cover object-[center_72%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">04</span>
+            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
+              <iconify-icon icon="solar:shield-check-linear"></iconify-icon>
+            </span>
           </div>
+          <h3 class="font-serif text-2xl sm:text-3xl mt-6">A 25-year warranty</h3>
+          <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">Every install is signed off with a full walkthrough and backed by a 25-year workmanship warranty.</p>
+        </article>
+
+        <article class="work-card shrink-0 w-[80vw] sm:w-[50vw] lg:w-[26vw] snap-start flex">
+          <a href="#book" class="group flex flex-col justify-between w-full min-h-[22rem] rounded-2xl border border-sand/30 bg-cream/[0.04] p-8 hover:bg-cream/[0.07] transition-colors">
+            <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-sand">Your roof next</p>
+            <div>
+              <p class="font-serif text-3xl sm:text-4xl font-light leading-tight">All of this comes as <em class="italic text-sand">standard.</em></p>
+              <span class="btn-shine mt-8 inline-flex items-center gap-3 bg-cream text-dark px-6 py-3.5 rounded-full font-medium group-hover:bg-sand transition-colors">
+                Book a consultation
+                <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
+              </span>
+            </div>
+          </a>
         </article>
       </div>
 
       <div id="work-dots" class="md:hidden flex items-center justify-between px-6 mt-6" aria-hidden="true">
         <div class="flex items-center gap-2">
           <span class="work-dot h-[3px] w-8 rounded-full bg-sand transition-all duration-500"></span>
+          <span class="work-dot h-[3px] w-3 rounded-full bg-cream/20 transition-all duration-500"></span>
+          <span class="work-dot h-[3px] w-3 rounded-full bg-cream/20 transition-all duration-500"></span>
           <span class="work-dot h-[3px] w-3 rounded-full bg-cream/20 transition-all duration-500"></span>
           <span class="work-dot h-[3px] w-3 rounded-full bg-cream/20 transition-all duration-500"></span>
         </div>
@@ -1071,7 +1104,7 @@ if (!reduceMotion) {
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (progress) progress.style.transform = 'scaleX(' + self.progress + ')';
-          if (index) index.textContent = '0' + Math.min(3, Math.floor(self.progress * 3) + 1);
+          if (index) index.textContent = '0' + Math.min(4, Math.floor(self.progress * 4) + 1);
         },
       },
     });
