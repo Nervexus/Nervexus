@@ -135,32 +135,6 @@
   vignette.setAttribute('aria-hidden', 'true');
   document.body.appendChild(vignette);
 
-  /* Custom cursor */
-  if (hasGsap && finePointer) {
-    root.classList.add('has-luxe-cursor');
-    const dot = document.createElement('div');
-    dot.id = 'luxe-cursor-dot';
-    const ring = document.createElement('div');
-    ring.id = 'luxe-cursor-ring';
-    document.body.append(dot, ring);
-    gsap.set([dot, ring], { x: -100, y: -100 });
-
-    const dotX = gsap.quickTo(dot, 'x', { duration: 0.08 });
-    const dotY = gsap.quickTo(dot, 'y', { duration: 0.08 });
-    const ringX = gsap.quickTo(ring, 'x', { duration: 0.45, ease: 'power3' });
-    const ringY = gsap.quickTo(ring, 'y', { duration: 0.45, ease: 'power3' });
-
-    window.addEventListener('mousemove', (e) => {
-      dotX(e.clientX); dotY(e.clientY);
-      ringX(e.clientX); ringY(e.clientY);
-    });
-    document.addEventListener('mouseover', (e) => {
-      ring.classList.toggle('is-hover', !!e.target.closest('a, button, [data-cursor]'));
-    });
-    document.addEventListener('mouseleave', () => gsap.to([dot, ring], { opacity: 0, duration: 0.3 }));
-    document.addEventListener('mouseenter', () => gsap.to([dot, ring], { opacity: 1, duration: 0.3 }));
-  }
-
   /* Heading word reveals */
   if (hasST && !reduceMotion) {
     document.querySelectorAll('[data-reveal]').forEach((el) => {
