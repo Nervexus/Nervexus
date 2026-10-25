@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { SettingsCard } from "@/components/SettingsCard";
 import { Pill } from "@/components/Pill";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { FaceIdSettings } from "@/components/FaceIdSettings";
 
 type Status = "connected" | "expiring" | "missing";
 type Item = { key: string; label: string; status: Status; detail: string | null };
@@ -51,6 +52,10 @@ export default function SettingsPage() {
         actual secret values are ever shown here, only status
       </p>
       <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
+
+      <div className="gsap-entrance mt-8">
+        <FaceIdSettings />
+      </div>
 
       <a
         href={CREDENTIALS_GUIDE_URL}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE, SESSION_MAX_AGE_S, createSessionValue, passwordMatches } from "@/lib/session";
+import { SESSION_COOKIE, createSessionValue, passwordMatches, sessionCookieOptions } from "@/lib/session";
 
 export async function POST(request: Request) {
   const data = await request.json().catch(() => null);
@@ -15,12 +15,6 @@ export async function POST(request: Request) {
   }
 
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(SESSION_COOKIE, createSessionValue(), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE_S,
-  });
+  res.cookies.set(SESSION_COOKIE, createSessionValue(), sessionCookieOptions);
   return res;
 }

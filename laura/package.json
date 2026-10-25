@@ -13,6 +13,8 @@
     "@libsql/client": "^0.18.0",
     "@prisma/adapter-libsql": "^7.10.1",
     "@prisma/client": "^7.10.1",
+    "@simplewebauthn/browser": "^13.2.2",
+    "@simplewebauthn/server": "^13.3.3",
     "googleapis": "^186.0.0",
     "gsap": "^3.12.2",
     "iconify-icon": "^2.1.0",

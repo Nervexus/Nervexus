@@ -4,7 +4,14 @@ import { SESSION_COOKIE, isValidSession } from "@/lib/session";
 // Paths reachable without signing in: the public landing page, the login
 // itself, and the two endpoints that already check their own secrets
 // (Telegram's webhook secret header, Vercel Cron's CRON_SECRET).
-const PUBLIC = new Set(["/", "/login", "/api/auth/login", "/api/telegram/webhook", "/api/briefing/send"]);
+const PUBLIC = new Set([
+  "/",
+  "/login",
+  "/api/auth/login",
+  "/api/auth/passkey/login",
+  "/api/telegram/webhook",
+  "/api/briefing/send",
+]);
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

@@ -158,3 +158,17 @@ model ContentIdea {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+
+// A registered passkey (Face ID / Touch ID / device biometrics) that can
+// sign in instead of the password. id is the credential ID and publicKey
+// the COSE public key, both base64url; counter guards against cloned
+// authenticators. The app is single-user, so there's no user relation.
+model Passkey {
+  id         String   @id
+  publicKey  String
+  counter    Int      @default(0)
+  transports String?
+  label      String?
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime?
+}

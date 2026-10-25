@@ -40,3 +40,29 @@ export function isValidSession(value: string | undefined, now = Date.now()): boo
   if (!expires || !mac || Number(expires) < now) return false;
   return safeEqual(mac, sign(expires));
 }
+
+// A short-lived signed value for the WebAuthn challenge between the
+// "options" and "verify" steps -- "<challenge>.<expiry>.<hmac>", 5 minutes.
+export const CHALLENGE_COOKIE = "laura_pk_challenge";
+
+export function sealChallenge(challenge: string, now = Date.now()): string {
+  const payload = `${challenge}.${now + 5 * 60 * 1000}`;
+  return `${payload}.${sign(payload)}`;
+}
+
+export function openChallenge(value: string | undefined, now = Date.now()): string | null {
+  if (!value) return null;
+  const parts = value.split(".");
+  if (parts.length !== 3) return null;
+  const [challenge, expires, mac] = parts;
+  if (Number(expires) < now || !safeEqual(mac, sign(`${challenge}.${expires}`))) return null;
+  return challenge;
+}
+
+export const sessionCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: SESSION_MAX_AGE_S,
+};

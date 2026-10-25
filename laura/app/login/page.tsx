@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 
 // Only same-site paths, so ?next= can't be used to bounce you to another site.
 function safeNext(): string {
@@ -8,10 +9,42 @@ function safeNext(): string {
   return next.startsWith("/") && !next.startsWith("//") ? next : "/laura";
 }
 
+const noopSubscribe = () => () => {};
+
 export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const canUsePasskey = useSyncExternalStore(noopSubscribe, browserSupportsWebAuthn, () => false);
+
+  async function signInWithPasskey() {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const optRes = await fetch("/api/auth/passkey/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step: "options" }),
+      });
+      const options = await optRes.json();
+      if (!optRes.ok) throw new Error(options.error ?? "Face ID isn't available.");
+      const response = await startAuthentication({ optionsJSON: options });
+      const res = await fetch("/api/auth/passkey/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step: "verify", response }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Face ID didn't work.");
+      window.location.replace(safeNext());
+    } catch (err) {
+      const cancelled = err instanceof Error && err.name === "NotAllowedError";
+      setError(cancelled ? null : err instanceof Error ? err.message : "Face ID didn't work.");
+      setBusy(false);
+    }
+  }
+
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
@@ -69,6 +102,20 @@ export default function LoginPage() {
             <span className="absolute -top-[3px] right-0 h-[7px] w-[7px] rotate-45 border-r border-t border-neutral-500 group-hover:border-[var(--calendar-accent)]" />
           </span>
         </button>
+        {canUsePasskey && (
+          <button
+            type="button"
+            onClick={signInWithPasskey}
+            disabled={busy}
+            className="mt-8 flex w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] py-3 text-sm text-neutral-200 transition-colors hover:border-violet-400/40 hover:bg-violet-500/10 disabled:opacity-40"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" className="h-5 w-5 text-violet-300" aria-hidden>
+              <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+              <path d="M9 9v1.5M15 9v1.5M12 9v4l-1 .5M9.5 16a3.5 3.5 0 0 0 5 0" />
+            </svg>
+            Use Face ID
+          </button>
+        )}
       </form>
     </main>
   );
