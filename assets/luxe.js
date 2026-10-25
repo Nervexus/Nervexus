@@ -129,12 +129,6 @@
   grain.setAttribute('aria-hidden', 'true');
   document.body.appendChild(grain);
 
-  /* Vignette */
-  const vignette = document.createElement('div');
-  vignette.id = 'luxe-vignette';
-  vignette.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(vignette);
-
   /* Heading word reveals */
   if (hasST && !reduceMotion) {
     document.querySelectorAll('[data-reveal]').forEach((el) => {
