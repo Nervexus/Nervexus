@@ -102,6 +102,8 @@ html.luxe-loading::before {
   vertical-align: top;
   padding-bottom: 0.1em;
   margin-bottom: -0.1em;
+  padding-right: 0.12em;
+  margin-right: -0.12em;
 }
 .rw-i { display: inline-block; will-change: transform; }
 

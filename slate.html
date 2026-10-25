@@ -187,24 +187,21 @@ tailwind.config = {
     #cinema-copy { padding-top: 16svh; }
     #heritage .text-center.mb-16, #services .text-center.mb-16 { margin-bottom: 2.75rem; }
 
-    /* Process: one continuous rail with cards hanging off it */
-    #timeline-container { padding-left: 2rem; }
-    #timeline-container::before {
-      content: "";
-      position: absolute;
-      left: 9px;
-      top: 0;
-      bottom: 0;
-      width: 1px;
-      background: linear-gradient(to bottom, transparent, rgba(245,243,238,0.18) 6%, rgba(245,243,238,0.18) 94%, transparent);
-    }
-    #timeline-steps > .timeline-step + .timeline-step { margin-top: 1rem !important; }
-    .timeline-step { position: relative; flex-direction: column !important; align-items: stretch !important; gap: 0 !important; }
-    .timeline-step > .flex-1:empty { display: none; }
-    .timeline-step > .timeline-dot { position: absolute; left: -29px; top: 1.6rem; width: 13px; height: 13px; }
-    .timeline-step .rounded-3xl { padding: 1.4rem 1.4rem 1.25rem; border-radius: 1.25rem; }
-    .timeline-step h3 { font-size: 1.6rem; margin-top: 0.6rem; margin-bottom: 0.5rem; }
-    .timeline-step p { font-size: 0.95rem; margin-bottom: 0.9rem; }
+    /* Process: the desktop zigzag, scaled down with compact cards */
+    #timeline-container > div:first-child { display: block; }
+    #timeline-steps > .timeline-step + .timeline-step { margin-top: -1.5rem !important; }
+    .timeline-step { flex-direction: row !important; align-items: center !important; gap: 0.6rem !important; }
+    .timeline-step > .flex-1 { flex: 1 1 0; min-width: 0; }
+    .timeline-step > .timeline-dot { width: 11px; height: 11px; }
+    .timeline-step > .flex-1:first-child:not(:empty) { text-align: right; }
+    .timeline-step > .flex-1:first-child:not(:empty) .flex.items-center { justify-content: flex-end; }
+    .timeline-step .rounded-3xl { padding: 0.85rem 0.9rem 0.8rem; border-radius: 0.9rem; }
+    .timeline-step .rounded-3xl > span:first-child { font-size: 9px; letter-spacing: 0.18em; }
+    .timeline-step h3 { font-size: 1.1rem; line-height: 1.2; margin-top: 0.35rem; margin-bottom: 0.35rem; }
+    .timeline-step p { font-size: 0.72rem; line-height: 1.4; margin-bottom: 0.45rem; }
+    .timeline-step .rounded-3xl > div:last-child { font-size: 0.62rem; gap: 0.3rem; white-space: nowrap; margin-top: 0.1rem; }
+    .timeline-step .rounded-3xl > div:last-child span { white-space: nowrap; }
+    .timeline-step .rounded-3xl > div:last-child iconify-icon { font-size: 0.75rem; }
 
     /* Selected Work */
     #work-pin { padding-top: 4.5rem; padding-bottom: 3rem; }
@@ -371,7 +368,7 @@ tailwind.config = {
                 <p class="text-cream/60 leading-relaxed mb-6">We walk the site, discuss materials and scope, and provide a clear, itemized quote before anything is ordered.</p>
                 <div class="flex items-center gap-2 text-sm text-cream/40 lg:justify-end">
                   <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
-                  <span>Duration: 60 to 90 minutes</span>
+                  <span>Duration: 60 to 90 mins</span>
                 </div>
               </div>
             </div>
@@ -424,7 +421,7 @@ tailwind.config = {
                 <p class="text-cream/60 leading-relaxed mb-6">A full walkthrough and sign-off, backed by a 25-year workmanship warranty on every install.</p>
                 <div class="flex items-center gap-2 text-sm text-cream/40">
                   <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
-                  <span>Duration: 45 to 60 minutes</span>
+                  <span>Duration: 45 to 60 mins</span>
                 </div>
               </div>
             </div>
@@ -482,7 +479,7 @@ tailwind.config = {
         <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
           <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/standard-materials.webp" alt="Close-up of natural roof shingles laid in neat rows" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+              <img src="assets/strata/standard-materials.webp" alt="Close-up of natural slate roof tiles laid in overlapping rows" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
             <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
