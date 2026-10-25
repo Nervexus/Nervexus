@@ -547,7 +547,7 @@ tailwind.config = {
 
       <div class="max-w-4xl mx-auto gsap-fade-up border-t border-cream/10">
         <!-- Natural Slate -->
-        <div data-preview="assets/strata/standard-warranty.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
           <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
             <iconify-icon icon="solar:layers-linear"></iconify-icon>
           </span>
@@ -557,7 +557,7 @@ tailwind.config = {
         </div>
 
         <!-- Standing Seam Metal -->
-        <div data-preview="assets/strata/standard-crew.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
           <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
             <iconify-icon icon="solar:home-2-linear"></iconify-icon>
           </span>
@@ -567,7 +567,7 @@ tailwind.config = {
         </div>
 
         <!-- Clay Tile -->
-        <div data-preview="assets/strata/standard-quote.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
           <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
             <iconify-icon icon="solar:square-linear"></iconify-icon>
           </span>
@@ -577,7 +577,7 @@ tailwind.config = {
         </div>
 
         <!-- Cedar Shake -->
-        <div data-preview="assets/strata/standard-materials.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
           <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
             <iconify-icon icon="solar:leaf-linear"></iconify-icon>
           </span>
@@ -586,10 +586,6 @@ tailwind.config = {
           <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
         </div>
       </div>
-    </div>
-
-    <div id="svc-preview" class="hidden lg:block pointer-events-none fixed top-0 left-0 z-40 w-72 h-48 rounded-xl overflow-hidden border border-cream/10 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]" style="margin: -13rem 0 0 2rem; opacity: 0;">
-      <img id="svc-preview-img" src="assets/strata/standard-warranty.webp" alt="" class="w-full h-full object-cover">
     </div>
   </section>
 
@@ -1146,34 +1142,6 @@ if (!reduceMotion) {
   track.addEventListener('scroll', update, { passive: true });
 })();
 
-/* =========================================================
-   SERVICES: image preview that trails the cursor
-   ========================================================= */
-(function initServicePreview() {
-  const preview = document.getElementById('svc-preview');
-  const img = document.getElementById('svc-preview-img');
-  if (!preview || !img || !(window.luxe && window.luxe.finePointer)) return;
-
-  gsap.set(preview, { scale: 0.6, rotate: -6, opacity: 0 });
-  const moveX = gsap.quickTo(preview, 'x', { duration: 0.6, ease: 'power3' });
-  const moveY = gsap.quickTo(preview, 'y', { duration: 0.6, ease: 'power3' });
-  let visible = false;
-
-  window.addEventListener('mousemove', (e) => { moveX(e.clientX); moveY(e.clientY); });
-
-  document.querySelectorAll('[data-preview]').forEach((row) => {
-    row.addEventListener('mouseenter', (e) => {
-      img.src = row.dataset.preview;
-      if (!visible) gsap.set(preview, { x: e.clientX, y: e.clientY });
-      visible = true;
-      gsap.to(preview, { opacity: 1, scale: 1, rotate: 0, duration: 0.5, ease: 'power3.out', overwrite: 'auto' });
-    });
-    row.addEventListener('mouseleave', () => {
-      visible = false;
-      gsap.to(preview, { opacity: 0, scale: 0.6, rotate: -6, duration: 0.4, ease: 'power3.in', overwrite: 'auto' });
-    });
-  });
-})();
 
 // Generic fade-up on scroll
 document.querySelectorAll('.gsap-fade-up').forEach((el) => {
