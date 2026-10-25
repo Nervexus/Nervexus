@@ -166,6 +166,11 @@ tailwind.config = {
     #manifesto-text { font-size: 1.65rem; line-height: 1.3; }
 
     #heritage, #services { padding-top: 5rem; padding-bottom: 5rem; }
+
+    /* Built to endure: show the whole house, blurred copy fills the rest */
+    #cinema-img { position: relative; object-fit: contain; object-position: center 74%; }
+    #cinema-pin { align-items: flex-start; }
+    #cinema-copy { padding-top: 16svh; }
     #heritage .text-center.mb-16, #services .text-center.mb-16 { margin-bottom: 2.75rem; }
 
     /* Process: one continuous rail with cards hanging off it */
@@ -420,6 +425,7 @@ tailwind.config = {
   <section id="cinema" class="relative bg-dark" aria-label="Built to endure">
     <div id="cinema-pin" class="relative h-screen overflow-hidden flex items-center justify-center">
       <div id="cinema-frame" class="absolute inset-0">
+        <img id="cinema-backdrop" src="assets/strata/endure.webp" alt="" aria-hidden="true" class="md:hidden absolute inset-0 w-full h-full object-cover" style="filter: blur(22px) brightness(0.55); transform: scale(1.25);">
         <img id="cinema-img" src="assets/strata/endure.webp" alt="Curved concrete house lit at dusk among pines, reflected in still water" class="w-full h-full object-cover object-center">
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(20,20,20,0.75)_100%)]"></div>
         <div id="cinema-shade" class="absolute inset-0 bg-dark" style="opacity: 0.35;"></div>
