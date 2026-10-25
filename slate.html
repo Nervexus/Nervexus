@@ -345,37 +345,40 @@ tailwind.config = {
 
   <!-- SELECTED WORK: pinned horizontal gallery on desktop, swipe row on mobile -->
   <section id="work" class="relative bg-dark text-cream border-t border-cream/10">
+    <div id="work-feature" class="relative h-[85vh] lg:h-screen overflow-hidden">
+      <div id="work-feature-media" class="absolute -inset-y-[8%] inset-x-0">
+        <img id="work-feature-img" src="assets/strata/riverside.webp" alt="Two-storey timber and glass house cantilevered over a misty mountain lake" class="w-full h-full object-cover object-[60%_center]">
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/20 to-dark/30"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(20,20,20,0.6)_100%)]"></div>
+      <div class="absolute inset-x-0 bottom-0 z-10">
+        <div class="max-w-7xl mx-auto px-6 pb-14 sm:pb-20 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <div>
+            <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">Featured Project</p>
+            <h2 data-reveal class="font-serif text-5xl sm:text-7xl lg:text-8xl font-light tracking-tight leading-[0.95]">Riverside <em class="italic text-sand">Pavilion</em></h2>
+          </div>
+          <p class="text-cream/80 text-sm sm:text-base leading-relaxed max-w-xs">Cantilevered flat roof with cedar fascia, set above a mountain lake.</p>
+        </div>
+      </div>
+    </div>
+
     <div id="work-pin" class="relative flex flex-col justify-center py-24 lg:py-0 lg:h-screen lg:overflow-hidden">
       <div class="max-w-7xl w-full mx-auto px-6 flex items-end justify-between gap-6 mb-10 lg:mb-12">
         <div>
           <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">Selected Work</p>
           <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight">Roofs that <em class="italic text-sand">outlast</em> us</h2>
         </div>
-        <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 04</p>
+        <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 03</p>
       </div>
 
       <div id="work-track" class="work-track-pad flex items-end gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
-        <article class="work-card group shrink-0 w-[86vw] sm:w-[64vw] lg:w-[52vw] snap-start" data-cursor>
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[58vh] border border-cream/10">
-            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/aerial-night.webp" alt="Stone residence with slate roof lit at night beside a lake" class="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105">
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
-          </div>
-          <div class="flex items-baseline justify-between gap-4 mt-5">
-            <h3 class="font-serif text-2xl sm:text-4xl">Lochside Residence</h3>
-            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Natural slate</p>
-          </div>
-        </article>
-
-        <article class="work-card group shrink-0 w-[68vw] sm:w-[42vw] lg:w-[30vw] snap-start" data-cursor>
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[42vh] border border-cream/10">
+        <article class="work-card group shrink-0 w-[78vw] sm:w-[50vw] lg:w-[36vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[50vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
               <img src="assets/strata/facade.webp" alt="Timber-clad gable facade with cathedral glass window" class="w-full h-full object-cover object-[center_58%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
           </div>
           <div class="flex items-baseline justify-between gap-4 mt-5">
             <h3 class="font-serif text-xl sm:text-2xl">Timber Gable</h3>
@@ -383,13 +386,13 @@ tailwind.config = {
           </div>
         </article>
 
-        <article class="work-card group shrink-0 w-[68vw] sm:w-[42vw] lg:w-[30vw] snap-start" data-cursor>
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[42vh] border border-cream/10">
+        <article class="work-card group shrink-0 w-[78vw] sm:w-[50vw] lg:w-[36vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[50vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
               <img src="assets/strata/aerial-day.webp" alt="Aerial view of timber lodges along a rocky coastline" class="w-full h-full object-cover object-[center_72%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">03</span>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
           </div>
           <div class="flex items-baseline justify-between gap-4 mt-5">
             <h3 class="font-serif text-xl sm:text-2xl">Coastal Lodges</h3>
@@ -397,13 +400,13 @@ tailwind.config = {
           </div>
         </article>
 
-        <article class="work-card group shrink-0 w-[68vw] sm:w-[42vw] lg:w-[30vw] snap-start" data-cursor>
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[42vh] border border-cream/10">
+        <article class="work-card group shrink-0 w-[78vw] sm:w-[50vw] lg:w-[36vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[50vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
               <img src="assets/strata/exploded-cutaway.webp" alt="Exploded diagram of roof and facade construction layers" class="w-full h-full object-cover object-[center_48%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">04</span>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">03</span>
           </div>
           <div class="flex items-baseline justify-between gap-4 mt-5">
             <h3 class="font-serif text-xl sm:text-2xl">Anatomy of a Roof</h3>
@@ -822,6 +825,22 @@ if (!reduceMotion) {
 })();
 
 /* =========================================================
+   FEATURED PROJECT: slow zoom and drift as it passes
+   ========================================================= */
+if (!reduceMotion && document.getElementById('work-feature')) {
+  gsap.fromTo('#work-feature-img', { scale: 1.2 }, {
+    scale: 1,
+    ease: 'none',
+    scrollTrigger: { trigger: '#work-feature', start: 'top bottom', end: 'bottom top', scrub: true },
+  });
+  gsap.fromTo('#work-feature-media', { yPercent: -6 }, {
+    yPercent: 6,
+    ease: 'none',
+    scrollTrigger: { trigger: '#work-feature', start: 'top bottom', end: 'bottom top', scrub: true },
+  });
+}
+
+/* =========================================================
    SELECTED WORK: pinned horizontal scroll on desktop
    ========================================================= */
 (function initWorkGallery() {
@@ -846,7 +865,7 @@ if (!reduceMotion) {
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (progress) progress.style.transform = 'scaleX(' + self.progress + ')';
-          if (index) index.textContent = '0' + Math.min(4, Math.floor(self.progress * 4) + 1);
+          if (index) index.textContent = '0' + Math.min(3, Math.floor(self.progress * 3) + 1);
         },
       },
     });
