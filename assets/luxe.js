@@ -196,6 +196,81 @@
     });
   }
 
+  /* Mobile only: menu overlay and hide-on-scroll nav */
+  const mobileQuery = window.matchMedia('(max-width: 767px)');
+  const nav = document.getElementById('main-nav');
+  const navInner = nav && nav.querySelector('.max-w-7xl');
+
+  if (nav && navInner) {
+    const onHome = !/testimonials\.html$/.test(window.location.pathname);
+    const base = onHome ? '' : 'slate.html';
+    const items = [
+      ['#heritage', 'Our Process'],
+      ['#work', 'Our Work'],
+      ['#services', 'Services'],
+      ['#experience', 'The Experience'],
+    ];
+
+    const btn = document.createElement('button');
+    btn.id = 'luxe-menu-btn';
+    btn.type = 'button';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', 'luxe-menu');
+    btn.innerHTML = '<span class="mm-text">Menu</span><span class="bars" aria-hidden="true"><i></i><i></i></span>';
+    navInner.appendChild(btn);
+
+    const menu = document.createElement('div');
+    menu.id = 'luxe-menu';
+    menu.setAttribute('aria-hidden', 'true');
+    const linkHtml = items
+      .map(([hash, label], i) => '<a href="' + base + hash + '"><span class="mm-i"><em>0' + (i + 1) + '</em><strong>' + label + '</strong></span></a>')
+      .join('') +
+      '<a href="testimonials.html"><span class="mm-i"><em>05</em><strong>Testimonials</strong></span></a>';
+    menu.innerHTML =
+      '<div><p class="mm-label">Navigate</p><nav class="mm-links">' + linkHtml + '</nav></div>' +
+      '<div class="mm-foot"><p>12 Artisan Row<br>Mayfair, London<br>+44 20 7946 0192</p>' +
+      '<a class="mm-cta" href="' + base + '#experience">Book a consultation</a></div>';
+    document.body.appendChild(menu);
+
+    let open = false;
+    const inner = () => menu.querySelectorAll('.mm-i');
+    const setOpen = (next) => {
+      open = next;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.querySelector('.mm-text').textContent = open ? 'Close' : 'Menu';
+      menu.setAttribute('aria-hidden', String(!open));
+      root.classList.toggle('menu-open', open);
+      nav.classList.remove('nav-hidden');
+      if (lenis) open ? lenis.stop() : lenis.start();
+      if (!hasGsap) {
+        menu.style.visibility = open ? 'visible' : 'hidden';
+        menu.style.opacity = open ? '1' : '0';
+        return;
+      }
+      if (open) {
+        gsap.to(menu, { autoAlpha: 1, duration: 0.45, ease: 'power2.out' });
+        gsap.fromTo(inner(), { yPercent: 110 }, { yPercent: 0, duration: 0.9, ease: 'power4.out', stagger: 0.06, delay: 0.1 });
+        gsap.fromTo(menu.querySelector('.mm-foot'), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.35 });
+      } else {
+        gsap.to(menu, { autoAlpha: 0, duration: 0.35, ease: 'power2.in' });
+      }
+    };
+
+    btn.addEventListener('click', () => setOpen(!open));
+    menu.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) setOpen(false); });
+    mobileQuery.addEventListener('change', (e) => { if (!e.matches && open) setOpen(false); });
+
+    let lastY = window.scrollY;
+    window.addEventListener('scroll', () => {
+      if (!mobileQuery.matches || open) return;
+      const y = window.scrollY;
+      if (y > 120 && y > lastY + 4) nav.classList.add('nav-hidden');
+      else if (y < lastY - 4 || y <= 120) nav.classList.remove('nav-hidden');
+      lastY = y;
+    }, { passive: true });
+  }
+
   if (hasST) window.addEventListener('load', () => ScrollTrigger.refresh());
 
   window.luxe = { lenis, splitWords, reduceMotion, finePointer };

@@ -137,6 +137,30 @@ tailwind.config = {
   .testimonial-nav-fill-right { transform: translateX(100%); }
   .testimonial-nav-btn:hover .testimonial-nav-fill { transform: translateX(0); }
 
+  /* ---------- Mobile layout (below 768px only; desktop untouched) ---------- */
+  @media (max-width: 767px) {
+    main > section:first-child { padding-top: 8rem; padding-bottom: 1rem; }
+    #boutique { padding-top: 2.5rem; padding-bottom: 4.5rem; }
+    #testimonialWrap > div:first-child {
+      top: -1.5rem;
+      left: auto;
+      right: -0.25rem;
+      transform: none;
+      font-size: 7.5rem;
+    }
+    #testimonialWrap .py-8 { padding-top: 1.5rem; padding-bottom: 0.5rem; }
+    #testimonialWrap .min-h-\[170px\] { min-height: 150px; }
+    #testimonialWrap .mt-16 { margin-top: 3rem; }
+    main > footer { padding-top: 4.5rem; }
+    main > footer > div.grid {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
+      row-gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    main > footer > div.grid > div:first-child { grid-column: 1 / -1; }
+  }
+
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-cream">
@@ -640,7 +664,7 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
    ========================================================= */
 (function initNavFade() {
   const nav = document.getElementById('main-nav');
-  if (!nav) return;
+  if (!nav || window.matchMedia('(max-width: 767px)').matches) return;
 
   const threshold = 40;
 

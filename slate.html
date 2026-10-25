@@ -148,6 +148,67 @@ tailwind.config = {
 
   .cine #hero-media { clip-path: inset(48% 0% 48% 0%); }
 
+  /* ---------- Mobile layout (below 768px only; desktop untouched) ---------- */
+  @media (max-width: 767px) {
+    #hero { min-height: 100svh; }
+    #hero-content { padding-top: 7rem; padding-bottom: 6rem; }
+    #scroll-cue-wrap { bottom: 1.5rem; }
+
+    #manifesto { padding-top: 4.5rem; padding-bottom: 4.5rem; }
+    #manifesto-text { font-size: 1.65rem; line-height: 1.3; }
+
+    #heritage, #services { padding-top: 5rem; padding-bottom: 5rem; }
+    #heritage .text-center.mb-16, #services .text-center.mb-16 { margin-bottom: 2.75rem; }
+
+    /* Process: one continuous rail with cards hanging off it */
+    #timeline-container { padding-left: 2rem; }
+    #timeline-container::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(245,243,238,0.18) 6%, rgba(245,243,238,0.18) 94%, transparent);
+    }
+    #timeline-steps > .timeline-step + .timeline-step { margin-top: 1rem !important; }
+    .timeline-step { position: relative; flex-direction: column !important; align-items: stretch !important; gap: 0 !important; }
+    .timeline-step > .flex-1:empty { display: none; }
+    .timeline-step > .timeline-dot { position: absolute; left: -29px; top: 1.6rem; width: 13px; height: 13px; }
+    .timeline-step .rounded-3xl { padding: 1.4rem 1.4rem 1.25rem; border-radius: 1.25rem; }
+    .timeline-step h3 { font-size: 1.6rem; margin-top: 0.6rem; margin-bottom: 0.5rem; }
+    .timeline-step p { font-size: 0.95rem; margin-bottom: 0.9rem; }
+
+    /* Selected Work */
+    #work-pin { padding-top: 4.5rem; padding-bottom: 3rem; }
+    #work-pin > div:first-child { margin-bottom: 1.75rem; }
+
+    /* Services: icon beside title, description underneath */
+    #services .svc-row {
+      display: grid !important;
+      grid-template-columns: 2.5rem 1fr;
+      column-gap: 1rem;
+      row-gap: 0.35rem;
+      align-items: start;
+      padding-top: 1.35rem;
+      padding-bottom: 1.35rem;
+    }
+    .svc-row > span:first-child { grid-row: span 2; width: 2.5rem; height: 2.5rem; font-size: 1rem; }
+    .svc-row > span:nth-child(2) { font-size: 1.35rem; line-height: 1.2; padding-top: 0.45rem; }
+    .svc-row > span:nth-child(3) { padding-left: 0; font-size: 0.875rem; }
+
+    /* Footer */
+    #experience > div:first-child { padding-top: 5rem; padding-bottom: 3.5rem; }
+    #experience > div.grid {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
+      row-gap: 2.5rem;
+      padding-top: 3rem;
+      margin-bottom: 2.5rem;
+    }
+    #experience > div.grid > div:first-child { grid-column: 1 / -1; }
+  }
+
   @media (min-width: 1024px) {
     #work-track.work-track-pad { padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem)); padding-right: 12vw; }
   }
@@ -412,6 +473,15 @@ tailwind.config = {
             <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Engineered layers</p>
           </div>
         </article>
+      </div>
+
+      <div id="work-dots" class="md:hidden flex items-center justify-between px-6 mt-6" aria-hidden="true">
+        <div class="flex items-center gap-2">
+          <span class="work-dot h-[3px] w-8 rounded-full bg-sand transition-all duration-500"></span>
+          <span class="work-dot h-[3px] w-3 rounded-full bg-cream/20 transition-all duration-500"></span>
+          <span class="work-dot h-[3px] w-3 rounded-full bg-cream/20 transition-all duration-500"></span>
+        </div>
+        <span class="font-mono text-[10px] uppercase tracking-[0.3em] text-cream/40">Swipe</span>
       </div>
 
       <div class="hidden lg:block max-w-7xl w-full mx-auto px-6 mt-10">
@@ -854,6 +924,27 @@ if (!reduceMotion) {
 })();
 
 /* =========================================================
+   SELECTED WORK (mobile): swipe dots follow the row
+   ========================================================= */
+(function initWorkDots() {
+  const track = document.getElementById('work-track');
+  const dots = document.querySelectorAll('#work-dots .work-dot');
+  if (!track || !dots.length) return;
+  const cards = track.querySelectorAll('.work-card');
+  const update = () => {
+    const step = cards.length > 1 ? cards[1].offsetLeft - cards[0].offsetLeft : track.clientWidth;
+    const active = Math.min(dots.length - 1, Math.round(track.scrollLeft / step));
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('w-8', i === active);
+      dot.classList.toggle('bg-sand', i === active);
+      dot.classList.toggle('w-3', i !== active);
+      dot.classList.toggle('bg-cream/20', i !== active);
+    });
+  };
+  track.addEventListener('scroll', update, { passive: true });
+})();
+
+/* =========================================================
    SERVICES: image preview that trails the cursor
    ========================================================= */
 (function initServicePreview() {
@@ -987,7 +1078,7 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
    ========================================================= */
 (function initNavFade() {
   const nav = document.getElementById('main-nav');
-  if (!nav) return;
+  if (!nav || window.matchMedia('(max-width: 767px)').matches) return;
 
   const threshold = 40;
 
