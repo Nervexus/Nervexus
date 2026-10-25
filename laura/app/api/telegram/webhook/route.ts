@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { chat, type ChatMessage } from "@/lib/brain";
-import { downloadTelegramFile, ownerChatId, replyInChat, resolveButtonTap, showTyping } from "@/lib/telegram";
+import { downloadTelegramFile, ownerChatId, replyInChat, resolveButtonTap, sendPlaceCard, showTyping } from "@/lib/telegram";
+import { placeCaption } from "@/lib/places";
 import { transcribeAudio } from "@/lib/transcribe";
 import { parseRotaImage } from "@/lib/rota";
 import { friendlyDateTime, USER_TIMEZONE } from "@/lib/booking-links";
@@ -52,11 +53,11 @@ export async function POST(request: Request) {
       if (!transcript) {
         await replyInChat("I couldn't make out that voice note -- could you try again?");
       } else {
-        const reply = await answer(transcript);
-        await replyInChat(`🎙 "${transcript}"\n\n${reply}`);
+        await replyInChat(`🎙 "${transcript}"`);
+        await answer(transcript);
       }
     } else if (text) {
-      await replyInChat(await answer(text));
+      await answer(text);
     }
   } catch (error) {
     console.error("Telegram chat error:", error);
@@ -106,8 +107,10 @@ async function handleButtonTap(cq: CallbackQuery) {
   }
 }
 
-// Runs one turn through Laura's brain with the shared web/Telegram history.
-async function answer(text: string): Promise<string> {
+// Runs one turn through Laura's brain with the shared web/Telegram history
+// and sends the result: any places she's showing (photos + details) first,
+// then her own text, the way a person would send pictures then a message.
+async function answer(text: string): Promise<void> {
   const priorRows = await prisma.chatMessage.findMany({ orderBy: { createdAt: "asc" } });
   const history: ChatMessage[] = [
     ...priorRows.map((r) => ({
@@ -117,9 +120,12 @@ async function answer(text: string): Promise<string> {
     { role: "user", content: text },
   ];
   await prisma.chatMessage.create({ data: { role: "user", content: text } });
-  const { reply } = await chat(history);
+  const { reply, places } = await chat(history);
   await prisma.chatMessage.create({ data: { role: "assistant", content: reply } });
-  return reply;
+  for (const place of places) {
+    await sendPlaceCard(place.images, placeCaption(place));
+  }
+  if (reply.trim()) await replyInChat(reply);
 }
 
 // A photo is read as a work rota: any shifts found are saved straight away

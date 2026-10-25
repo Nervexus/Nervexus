@@ -37,9 +37,9 @@ export async function POST(request: Request) {
   await prisma.chatMessage.create({ data: { role: "user", content: message } });
 
   try {
-    const { reply, toolsUsed } = await chat(history);
+    const { reply, toolsUsed, places } = await chat(history);
     await prisma.chatMessage.create({ data: { role: "assistant", content: reply } });
-    return NextResponse.json({ reply, toolsUsed });
+    return NextResponse.json({ reply, toolsUsed, places });
   } catch (error) {
     console.error("Laura chat error:", error);
     const errMessage = error instanceof Error ? error.message : "Something went wrong.";

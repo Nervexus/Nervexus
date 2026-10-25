@@ -6,6 +6,7 @@ import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 import { getTomorrowBriefing } from "@/lib/briefing";
 import { searchBookingOptions, listBookings, readyToBookLinks, friendlyDateTime } from "@/lib/booking";
 import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
+import { lookupPlace, type PlaceCard } from "@/lib/places";
 
 const SYSTEM_PROMPT = `You are Laura, Madoxs Harvey's personal assistant. You text like a real,
 sharp PA who knows him well -- not like an AI chatbot.
@@ -73,6 +74,18 @@ the Rota page rather than guessing. For "what does tomorrow look like" or
 similar, use get_tomorrow_briefing rather than combining get_shifts and
 list_reminders yourself -- it already covers the shift, commute, and
 reminders together.
+
+Going out (restaurants, bars, activities, days out): before recommending
+anywhere, find out what it's for if you don't already know -- ask in one
+short, natural text, e.g. "Nice -- what's the occasion? Date, night out
+with the lads, something chill? And roughly what budget?" Read the
+occasion (a date, a group, larping/an event, a chill day, a work thing)
+and pick to fit it. Once you have a pick, call show_place for it (and at
+most one alternative) -- that sends him photos of the place with its
+rating, price, vibe and an honest verdict. Don't repeat those details in
+your own reply; add your personal take in a line, e.g. "Perfect for a
+date -- ask for a booth at the back." Then offer to book it
+(prepare_booking) once he's keen.
 
 Use list_bookings to check what the user is already tracking before
 suggesting something new (so you don't duplicate an existing idea).
@@ -293,6 +306,21 @@ const tools: FunctionDeclaration[] = [
     },
   },
   {
+    name: "show_place",
+    description:
+      "Show the user a specific venue you're recommending: looks up its current rating, " +
+      "price, vibe and an honest verdict from reviews, and sends photos of it from its " +
+      "website. Use for your top pick (and at most one alternative).",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        name: { type: Type.STRING, description: "The venue's name, e.g. 'The Cabinet'." },
+        location: { type: Type.STRING, description: "Town or area, e.g. 'Winchester'." },
+      },
+      required: ["name"],
+    },
+  },
+  {
     name: "prepare_booking",
     description:
       "When the user wants to book a specific place: save it as pending and send them a " +
@@ -404,6 +432,7 @@ const LOGGED_TOOLS = new Set([
   "search_booking_options",
   "create_booking",
   "prepare_booking",
+  "show_place",
   "research_instagram_account",
   "create_content_idea",
   "start_video_call",
@@ -415,9 +444,12 @@ async function logActivity(tool: string, summary: string) {
   });
 }
 
+type ToolContext = { places: PlaceCard[] };
+
 async function runTool(
   name: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
+  ctx: ToolContext
 ): Promise<Record<string, unknown>> {
   if (name === "get_current_time") {
     return { result: new Date().toString() };
@@ -599,6 +631,18 @@ async function runTool(
     await logActivity("create_booking", `Saved booking "${booking.title}" (${booking.status})`);
     return { result: `Saved "${booking.title}" as ${booking.status}.` };
   }
+  if (name === "show_place") {
+    const { name: placeName, location } = args as { name?: string; location?: string };
+    if (!placeName) return { error: "show_place needs a name" };
+    const card = await lookupPlace(placeName, location ?? null);
+    ctx.places.push(card);
+    await logActivity("show_place", `Looked up ${card.name}`);
+    return {
+      result:
+        `Shown to the user with ${card.images.length} photo(s): ` +
+        JSON.stringify({ rating: card.rating, price: card.price, vibe: card.vibe, verdict: card.verdict, website: card.website }),
+    };
+  }
   if (name === "prepare_booking") {
     const { title, category, dateTime, partySize, location, link } = args as {
       title?: string;
@@ -732,7 +776,7 @@ async function runTool(
   return { error: `Unknown tool: ${name}` };
 }
 
-export type ChatResult = { reply: string; toolsUsed: string[] };
+export type ChatResult = { reply: string; toolsUsed: string[]; places: PlaceCard[] };
 
 export async function chat(history: ChatMessage[]): Promise<ChatResult> {
   const ai = getGeminiClient();
@@ -741,6 +785,7 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
     parts: [{ text: m.content }],
   }));
   const toolsUsed = new Set<string>();
+  const ctx: ToolContext = { places: [] };
 
   for (let turn = 0; turn < 5; turn++) {
     const response = await ai.models.generateContent({
@@ -754,7 +799,7 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
 
     const functionCalls = response.functionCalls;
     if (!functionCalls || functionCalls.length === 0) {
-      return { reply: response.text ?? "", toolsUsed: [...toolsUsed] };
+      return { reply: response.text ?? "", toolsUsed: [...toolsUsed], places: ctx.places };
     }
 
     // Echo back the model's own content verbatim (not just the function
@@ -776,7 +821,7 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
           functionResponse: {
             name: call.name,
             id: call.id,
-            response: await runTool(name, call.args ?? {}),
+            response: await runTool(name, call.args ?? {}, ctx),
           },
         };
       })
@@ -788,5 +833,6 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
   return {
     reply: "Sorry, I got stuck thinking about that -- try asking again.",
     toolsUsed: [...toolsUsed],
+    places: ctx.places,
   };
 }

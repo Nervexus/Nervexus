@@ -180,3 +180,30 @@ export function stripMarkdown(text: string): string {
     .replace(/^#{1,6}\s+/gm, "")
     .replace(/^\s*[-*•]\s+/gm, "");
 }
+
+/** Sends a venue as a photo album with its details as the caption (Telegram
+ * fetches the image URLs itself). Falls back to a single photo, then to
+ * text, since some sites block hotlinking or serve oversized images. */
+export async function sendPlaceCard(images: string[], caption: string): Promise<void> {
+  const token = getBotToken();
+  const chatId = getChatId();
+  const call = (method: string, body: object) =>
+    fetch(`https://api.telegram.org/bot${token}/${method}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, ...body }),
+    }).then((r) => r.json()).catch(() => ({ ok: false }));
+
+  const cap = caption.slice(0, 1024);
+  if (images.length >= 2) {
+    const album = await call("sendMediaGroup", {
+      media: images.slice(0, 4).map((url, i) => ({ type: "photo", media: url, ...(i === 0 ? { caption: cap } : {}) })),
+    });
+    if (album.ok) return;
+  }
+  for (const url of images.slice(0, 2)) {
+    const single = await call("sendPhoto", { photo: url, caption: cap });
+    if (single.ok) return;
+  }
+  await replyInChat(caption);
+}

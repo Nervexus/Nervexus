@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VoiceOrb, type VoiceOrbHandle } from "@/components/VoiceOrb";
+import type { PlaceCard } from "@/lib/places";
 import { ActivityFeed } from "@/components/ActivityFeed";
 import { TomorrowBriefing } from "@/components/TomorrowBriefing";
 import { GsapEntrance } from "@/components/GsapEntrance";
 import { ParticleOrb } from "@/components/ParticleOrb";
 import { TelegramButton } from "@/components/TelegramButton";
 
-type Message = { role: "user" | "assistant"; content: string; createdAt?: string };
+type Message = { role: "user" | "assistant"; content: string; createdAt?: string; places?: PlaceCard[] };
 
 const SUGGESTIONS = [
   { icon: "solar:clock-circle-linear", label: "Set a reminder", prompt: "Remind me tomorrow at 9am to " },
@@ -74,7 +75,7 @@ export default function LauraPage() {
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Something went wrong.");
-      setMessages((prev) => [...prev, { role: "assistant", content: body.reply, createdAt: new Date().toISOString() }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: body.reply, createdAt: new Date().toISOString(), places: body.places ?? [] }]);
       if (body.toolsUsed?.length) setActivityKey((k) => k + 1);
       if (speakReply) await orbRef.current?.speak(body.reply);
     } catch (err) {
@@ -146,7 +147,7 @@ export default function LauraPage() {
           className="mt-2 flex max-h-[38vh] flex-col gap-5 overflow-y-auto px-1 py-4 [mask-image:linear-gradient(to_bottom,transparent,black_12%,black_92%,transparent)]"
         >
           {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] font-light leading-relaxed ${
                   m.role === "user"
@@ -156,6 +157,29 @@ export default function LauraPage() {
               >
                 {m.content}
               </div>
+              {m.places?.map((p) => (
+                <div key={p.name} className="mt-2 w-full max-w-[80%] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+                  {p.images.length > 0 && (
+                    <div className="flex gap-1 overflow-x-auto">
+                      {p.images.map((src) => (
+                        // eslint-disable-next-line @next/next/no-img-element -- arbitrary venue hosts, not worth next/image remotePatterns
+                        <img key={src} src={src} alt={p.name} className="h-36 w-auto max-w-none shrink-0 object-cover" loading="lazy" />
+                      ))}
+                    </div>
+                  )}
+                  <div className="space-y-1 px-4 py-3 text-sm">
+                    <p className="text-neutral-100">{p.name}{p.location ? <span className="text-neutral-500"> · {p.location}</span> : null}</p>
+                    {p.rating && <p className="font-mono text-xs text-[var(--calendar-accent)]">★ {p.rating}</p>}
+                    {(p.price || p.vibe) && <p className="text-xs text-neutral-400">{[p.price, p.vibe].filter(Boolean).join(" · ")}</p>}
+                    {p.verdict && <p className="font-light text-neutral-300">{p.verdict}</p>}
+                    {p.website && (
+                      <a href={p.website} target="_blank" rel="noopener noreferrer" className="inline-block pt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-200">
+                        Website ↗
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
           {sending && (
