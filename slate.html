@@ -149,7 +149,7 @@ tailwind.config = {
   .cine #hero-media { clip-path: inset(48% 0% 48% 0%); }
 
   @media (min-width: 1024px) {
-    .work-track-pad { padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem)); padding-right: 12vw; }
+    #work-track.work-track-pad { padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem)); padding-right: 12vw; }
   }
 
 </style>
@@ -354,9 +354,9 @@ tailwind.config = {
         <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 04</p>
       </div>
 
-      <div id="work-track" class="work-track-pad flex gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
-        <article class="work-card group shrink-0 w-[68vw] sm:w-[42vw] lg:w-[30vw] snap-start" data-cursor>
-          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[42vh] border border-cream/10">
+      <div id="work-track" class="work-track-pad flex items-end gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
+        <article class="work-card group shrink-0 w-[86vw] sm:w-[64vw] lg:w-[52vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[58vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
               <img src="assets/strata/aerial-night.webp" alt="Stone residence with slate roof lit at night beside a lake" class="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
@@ -364,7 +364,7 @@ tailwind.config = {
             <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
           </div>
           <div class="flex items-baseline justify-between gap-4 mt-5">
-            <h3 class="font-serif text-xl sm:text-2xl">Lochside Residence</h3>
+            <h3 class="font-serif text-2xl sm:text-4xl">Lochside Residence</h3>
             <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Natural slate</p>
           </div>
         </article>
