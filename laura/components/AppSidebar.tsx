@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { gsap } from "gsap";
-import { Pill } from "@/components/Pill";
 
 const LINKS = [
   { href: "/laura", label: "Laura", icon: "solar:soundwave-linear" },
@@ -137,14 +136,14 @@ export function AppSidebar() {
   return (
     <nav
       ref={rootRef}
-      className="flex w-full shrink-0 flex-col border-b border-neutral-800/60 bg-neutral-950/70 backdrop-blur-xl sm:sticky sm:top-0 sm:h-screen sm:w-64 sm:border-b-0 sm:border-r"
+      className="flex w-full shrink-0 flex-col border-b border-white/[0.06] bg-gradient-to-b from-[#19191b] to-[#121213] sm:sticky sm:top-4 sm:m-4 sm:h-[calc(100vh-2rem)] sm:w-60 sm:rounded-3xl sm:border sm:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.04)]"
     >
       <Link
         href="/"
-        className="gsap-entrance flex items-center gap-2.5 border-b border-neutral-800/60 px-6 py-5"
+        className="gsap-entrance mx-3 flex items-center gap-2.5 border-b border-white/[0.06] px-3 py-5"
       >
-        <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-neutral-200" />
-        <span className="font-thin text-lg tracking-tighter text-neutral-100">LAURA</span>
+        <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.9)]" />
+        <span className="text-sm font-medium tracking-[0.3em] text-neutral-100">LAURA</span>
       </Link>
 
       <ul className="flex flex-1 flex-row gap-1 overflow-x-auto px-3 py-3 sm:flex-col sm:overflow-visible sm:py-4">
@@ -169,25 +168,33 @@ export function AppSidebar() {
                             ? counts.settings
                             : null;
           return (
-            <li key={link.href} className="gsap-entrance shrink-0 sm:shrink">
+            <li
+              key={link.href}
+              className={`gsap-entrance relative shrink-0 sm:shrink ${
+                link.href === "/notes" || link.href === "/settings" ? "sm:mt-3 sm:border-t sm:border-white/[0.06] sm:pt-3" : ""
+              }`}
+            >
+              {active && (
+                <span
+                  className="absolute -left-3 top-1/2 hidden h-5 w-1 -translate-y-1/2 rounded-r-full bg-violet-500 shadow-[0_0_12px_rgba(139,92,246,0.9)] sm:block"
+                  aria-hidden="true"
+                />
+              )}
               <Link
                 href={link.href}
-                className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 font-mono text-xs tracking-tight transition-colors ${
+                className={`group relative flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm transition-all ${
                   active
-                    ? "bg-neutral-900/70 text-neutral-100"
-                    : "text-neutral-500 hover:bg-neutral-900/40 hover:text-neutral-200"
+                    ? "border border-white/10 bg-gradient-to-r from-violet-500/25 via-violet-500/[0.06] to-transparent text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_24px_-8px_rgba(139,92,246,0.6)]"
+                    : "border border-transparent text-neutral-400 hover:bg-white/[0.03] hover:text-neutral-100"
                 }`}
               >
-                {active && (
-                  <span
-                    className="absolute inset-y-1.5 left-0 hidden w-0.5 rounded-full bg-neutral-100 sm:block"
-                    aria-hidden="true"
-                  />
-                )}
-                <iconify-icon icon={link.icon} className="shrink-0 text-base" />
+                <iconify-icon
+                  icon={link.icon}
+                  className={`shrink-0 text-lg ${active ? "text-violet-200" : ""}`}
+                />
                 <span>{link.label}</span>
                 {count !== null && count > 0 && (
-                  <span className="ml-auto hidden font-mono text-[10px] text-neutral-600 sm:inline">
+                  <span className="ml-auto hidden rounded-full border border-white/10 px-2 py-px font-mono text-[10px] text-neutral-400 sm:inline">
                     {count}
                   </span>
                 )}
@@ -197,23 +204,22 @@ export function AppSidebar() {
         })}
       </ul>
 
-      <div className="gsap-entrance gradient-border m-3 hidden rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-4 backdrop-blur-sm sm:block">
-        <Pill>
-          <span className="normal-case tracking-normal">online</span>
-        </Pill>
-        <p className="mt-3 text-[11px] leading-relaxed text-neutral-600">
-          Laura&apos;s personal assistant HQ — notes, reminders, and a vault that only this page
-          can decrypt.
-        </p>
-        <button
-          onClick={async () => {
-            await fetch("/api/auth/logout", { method: "POST" });
-            window.location.replace("/login");
-          }}
-          className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 transition-colors hover:text-neutral-200"
-        >
-          Sign out
-        </button>
+      <div className="gsap-entrance mx-3 mb-3 hidden items-center gap-3 border-t border-white/[0.06] px-2 pt-4 sm:flex">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-xs text-neutral-300">
+          MH
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm text-neutral-200">Madoxs Harvey</p>
+          <button
+            onClick={async () => {
+              await fetch("/api/auth/logout", { method: "POST" });
+              window.location.replace("/login");
+            }}
+            className="font-mono text-[10px] uppercase tracking-[0.25em] text-neutral-600 transition-colors hover:text-violet-300"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     </nav>
   );
