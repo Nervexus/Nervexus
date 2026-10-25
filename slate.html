@@ -343,25 +343,24 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- SELECTED WORK: pinned horizontal gallery on desktop, swipe row on mobile -->
-  <section id="work" class="relative bg-dark text-cream border-t border-cream/10">
-    <div id="work-feature" class="relative h-[85vh] lg:h-screen overflow-hidden">
-      <div id="work-feature-media" class="absolute -inset-y-[8%] inset-x-0">
-        <img id="work-feature-img" src="assets/strata/dusk-house.webp" alt="Black-clad gabled house with a dark shingle roof and warmly lit windows at dusk, set against woodland" class="w-full h-full object-cover object-[60%_center]">
+  <!-- CINEMA: framed image expands to full screen as you scroll -->
+  <section id="cinema" class="relative bg-dark" aria-label="Built to endure">
+    <div id="cinema-pin" class="relative h-screen overflow-hidden flex items-center justify-center">
+      <div id="cinema-frame" class="absolute inset-0">
+        <img id="cinema-img" src="assets/strata/dusk-house.webp" alt="Black-clad gabled house with a dark shingle roof and warmly lit windows at dusk, set against woodland" class="w-full h-full object-cover object-[60%_center]">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(20,20,20,0.75)_100%)]"></div>
+        <div id="cinema-shade" class="absolute inset-0 bg-dark" style="opacity: 0.35;"></div>
       </div>
-      <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent"></div>
-      <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-dark/80 to-transparent"></div>
-      <div class="absolute inset-x-0 bottom-0 z-10">
-        <div class="max-w-7xl mx-auto px-6 pb-14 sm:pb-20 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
-          <div>
-            <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">Featured Project</p>
-            <h2 data-reveal class="font-serif text-5xl sm:text-7xl lg:text-8xl font-light tracking-tight leading-[0.95]">The Woodland <em class="italic text-sand">House</em></h2>
-          </div>
-          <p class="text-cream/80 text-sm sm:text-base leading-relaxed max-w-xs">Steep gabled roofs in dark shingle over black timber cladding.</p>
-        </div>
+      <div id="cinema-copy" class="relative z-10 text-center px-6">
+        <p class="font-mono text-xs uppercase tracking-[0.35em] text-sand mb-6">Built to endure</p>
+        <h2 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-light tracking-tight leading-[0.95]">One hundred <em class="italic text-sand">winters.</em></h2>
+        <p class="mt-8 text-cream/80 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">Every roof we lay is specified to stand for generations, long after the scaffolding comes down.</p>
       </div>
     </div>
+  </section>
 
+  <!-- SELECTED WORK: pinned horizontal gallery on desktop, swipe row on mobile -->
+  <section id="work" class="relative bg-dark text-cream border-t border-cream/10">
     <div id="work-pin" class="relative flex flex-col justify-center py-24 lg:py-0 lg:h-screen lg:overflow-hidden">
       <div class="max-w-7xl w-full mx-auto px-6 flex items-end justify-between gap-6 mb-10 lg:mb-12">
         <div>
@@ -419,22 +418,6 @@ tailwind.config = {
         <div class="relative h-px bg-cream/10 overflow-hidden">
           <div id="work-progress" class="absolute inset-0 bg-sand origin-left" style="transform: scaleX(0);"></div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CINEMA: framed image expands to full screen as you scroll -->
-  <section id="cinema" class="relative bg-dark" aria-label="Built to endure">
-    <div id="cinema-pin" class="relative h-screen overflow-hidden flex items-center justify-center">
-      <div id="cinema-frame" class="absolute inset-0">
-        <img id="cinema-img" src="assets/strata/grand-facade.webp" alt="Grand stone building with arched windows lit warmly at night" class="w-full h-full object-cover">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(20,20,20,0.75)_100%)]"></div>
-        <div id="cinema-shade" class="absolute inset-0 bg-dark" style="opacity: 0.35;"></div>
-      </div>
-      <div id="cinema-copy" class="relative z-10 text-center px-6">
-        <p class="font-mono text-xs uppercase tracking-[0.35em] text-sand mb-6">Built to endure</p>
-        <h2 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-light tracking-tight leading-[0.95]">One hundred <em class="italic text-sand">winters.</em></h2>
-        <p class="mt-8 text-cream/80 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">Every roof we lay is specified to stand for generations, long after the scaffolding comes down.</p>
       </div>
     </div>
   </section>
@@ -823,22 +806,6 @@ if (!reduceMotion) {
     .to('#cinema-copy', { opacity: 1, y: 0, ease: 'power3.out', duration: 0.5 }, 0.75)
     .to({}, { duration: 0.35 });
 })();
-
-/* =========================================================
-   FEATURED PROJECT: slow zoom and drift as it passes
-   ========================================================= */
-if (!reduceMotion && document.getElementById('work-feature')) {
-  gsap.fromTo('#work-feature-img', { scale: 1.2 }, {
-    scale: 1,
-    ease: 'none',
-    scrollTrigger: { trigger: '#work-feature', start: 'top bottom', end: 'bottom top', scrub: true },
-  });
-  gsap.fromTo('#work-feature-media', { yPercent: -6 }, {
-    yPercent: 6,
-    ease: 'none',
-    scrollTrigger: { trigger: '#work-feature', start: 'top bottom', end: 'bottom top', scrub: true },
-  });
-}
 
 /* =========================================================
    SELECTED WORK: pinned horizontal scroll on desktop
