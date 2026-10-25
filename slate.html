@@ -15,6 +15,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<link rel="stylesheet" href="assets/luxe.css">
+<script>
+(function () {
+  try {
+    if (sessionStorage.getItem('slate-intro') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('luxe-loading');
+      setTimeout(function () { document.documentElement.classList.remove('luxe-loading'); }, 4000);
+    }
+  } catch (e) {}
+})();
+</script>
 
 <script>
 tailwind.config = {
@@ -38,7 +50,6 @@ tailwind.config = {
 </script>
 
 <style>
-  html { scroll-behavior: smooth; }
   body {
     background: #1c1c1c;
     font-family: 'Manrope', sans-serif;
@@ -131,6 +142,10 @@ tailwind.config = {
   .testimonial-nav-fill-right { transform: translateX(100%); }
   .testimonial-nav-btn:hover .testimonial-nav-fill { transform: translateX(0); }
 
+  @media (min-width: 1024px) {
+    .work-track-pad { padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem)); padding-right: 12vw; }
+  }
+
 </style>
 </head>
 <body class="antialiased overflow-x-hidden text-cream">
@@ -156,17 +171,20 @@ tailwind.config = {
 <main class="relative z-10">
 
   <!-- SECTION 2: HERO -->
-  <section class="relative min-h-screen flex items-center overflow-hidden">
-    <img src="https://cdn.midjourney.com/e796b010-1fed-4709-bd1b-cc165351ee03/0_0.png"
-         alt="Natural stone landscape"
-         class="absolute inset-0 w-full h-full object-cover object-[65%_center] sm:object-center z-0 opacity-50">
+  <section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
+    <div id="hero-media" class="absolute inset-0 z-0">
+      <img id="hero-img" src="https://cdn.midjourney.com/e796b010-1fed-4709-bd1b-cc165351ee03/0_0.png"
+           alt="Natural stone landscape"
+           class="w-full h-full object-cover object-[65%_center] sm:object-center opacity-50">
+    </div>
     <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/20 to-transparent z-[1]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(20,20,20,0.7)_100%)] z-[1] pointer-events-none"></div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20">
+    <div id="hero-content" class="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20 w-full">
       <div class="hero-text-blur"></div>
       <p class="hero-anim gsap-fade-up font-mono text-xs uppercase tracking-[0.3em] text-cream/60 mb-6">Bespoke Roofing, Est. 2018</p>
-      <h1 class="hero-anim gsap-fade-up font-serif text-4xl sm:text-6xl lg:text-7xl leading-[0.95] text-cream max-w-5xl sm:whitespace-nowrap">
-        The Art of<br class="sm:hidden"> <em class="italic">Precision</em>
+      <h1 id="hero-title" class="relative font-serif text-5xl sm:text-6xl lg:text-8xl leading-[0.95] text-cream max-w-5xl sm:whitespace-nowrap">
+        The Art of<br class="sm:hidden"> <em class="italic text-sand">Precision</em>
       </h1>
       <p class="hero-anim gsap-fade-up mt-8 max-w-md text-cream/70 text-lg leading-relaxed">
         Rare materials, specified with exacting care, installed with patience.
@@ -174,9 +192,46 @@ tailwind.config = {
       </p>
 
       <div class="hero-anim gsap-fade-up mt-10 flex flex-wrap items-center gap-6">
-        <a href="#experience" class="magnetic-btn inline-flex items-center gap-2 text-cream/80 font-medium border-b border-cream/30 pb-1">
+        <a href="#experience" class="magnetic-btn btn-shine inline-flex items-center gap-3 bg-cream text-dark px-7 py-3.5 rounded-full font-medium">
           Book a consultation
+          <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
         </a>
+        <a href="#work" class="inline-flex items-center gap-2 text-cream/80 font-medium border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">
+          View our work
+        </a>
+      </div>
+    </div>
+
+    <div id="scroll-cue-wrap" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+      <div id="scroll-cue" class="flex flex-col items-center gap-3">
+        <span class="font-mono text-[10px] uppercase tracking-[0.35em] text-cream/50">Scroll</span>
+        <span class="scroll-cue-line"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATERIALS TICKER -->
+  <section aria-label="Materials" class="relative bg-dark border-y border-cream/10 py-8 sm:py-10 overflow-hidden">
+    <div id="materials-marquee" class="flex w-max whitespace-nowrap">
+      <div class="flex items-center shrink-0">
+        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Natural Slate</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Standing Seam</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Clay Tile</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Cedar Shake</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+      </div>
+      <div class="flex items-center shrink-0" aria-hidden="true">
+        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Natural Slate</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Standing Seam</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Clay Tile</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Cedar Shake</span>
+        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
       </div>
     </div>
   </section>
@@ -186,7 +241,7 @@ tailwind.config = {
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-16 gsap-fade-up">
         <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Our Process</p>
-        <h2 class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-tight mb-6">From Quarry to Roofline</h2>
+        <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-tight mb-6">From Quarry to <em class="italic text-sand">Roofline</em></h2>
         <p class="max-w-2xl mx-auto text-lg sm:text-xl text-cream/60 leading-relaxed">A straightforward journey from the first conversation to the final inspection.</p>
       </div>
 
@@ -271,55 +326,140 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- SECTION: SERVICES (placeholder, content to be filled in) -->
-  <section id="services" class="relative bg-dark py-28 px-6">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-16 gsap-fade-up">
-        <p class="font-mono text-xs uppercase tracking-[0.3em] text-cream/50 mb-4">Services</p>
-        <h2 class="font-serif text-3xl sm:text-4xl text-cream">What We Offer</h2>
+  <!-- SELECTED WORK: pinned horizontal gallery on desktop, swipe row on mobile -->
+  <section id="work" class="relative bg-dark text-cream border-t border-cream/10">
+    <div id="work-pin" class="relative flex flex-col justify-center py-24 lg:py-0 lg:h-screen lg:overflow-hidden">
+      <div class="max-w-7xl w-full mx-auto px-6 flex items-end justify-between gap-6 mb-10 lg:mb-12">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">Selected Work</p>
+          <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight">Roofs that <em class="italic text-sand">outlast</em> us</h2>
+        </div>
+        <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 04</p>
       </div>
 
-      <div class="max-w-3xl mx-auto gsap-fade-up border-t border-cream/10">
-        <!-- Natural Slate -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-4 sm:py-6 border-b border-cream/10">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:layers-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-base sm:text-xl text-cream shrink-0">Natural Slate</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0">Centuries-grade permanence with a deep graphite lustre. Our signature material.</span>
-        </div>
+      <div id="work-track" class="work-track-pad flex gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
+        <article class="work-card group shrink-0 w-[82vw] sm:w-[60vw] lg:w-[44vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[58vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/aerial-night.webp" alt="Stone residence with slate roof lit at night beside a lake" class="w-full h-full object-cover transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 mt-5">
+            <h3 class="font-serif text-2xl sm:text-3xl">Lochside Residence</h3>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Natural slate</p>
+          </div>
+        </article>
 
-        <!-- Standing Seam Metal -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-4 sm:py-6 border-b border-cream/10">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:home-2-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-base sm:text-xl text-cream shrink-0">Standing Seam Metal</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0">Precision-formed zinc and copper panels, built for clean architectural lines.</span>
-        </div>
+        <article class="work-card group shrink-0 w-[82vw] sm:w-[60vw] lg:w-[44vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[58vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/facade.webp" alt="Timber-clad gable facade with cathedral glass window" class="w-full h-full object-cover object-[center_58%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 mt-5">
+            <h3 class="font-serif text-2xl sm:text-3xl">Timber Gable</h3>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Cedar cladding</p>
+          </div>
+        </article>
 
-        <!-- Clay Tile -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-4 sm:py-6 border-b border-cream/10">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:square-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-base sm:text-xl text-cream shrink-0">Clay Tile</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</span>
-        </div>
+        <article class="work-card group shrink-0 w-[82vw] sm:w-[60vw] lg:w-[44vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[58vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/aerial-day.webp" alt="Aerial view of timber lodges along a rocky coastline" class="w-full h-full object-cover object-[center_72%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">03</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 mt-5">
+            <h3 class="font-serif text-2xl sm:text-3xl">Coastal Lodges</h3>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Standing seam</p>
+          </div>
+        </article>
 
-        <!-- Cedar Shake -->
-        <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-4 sm:py-6 border-b border-cream/10">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:leaf-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-base sm:text-xl text-cream shrink-0">Cedar Shake</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0">Hand-split cedar shingles that weather to a warm, silvered patina over time.</span>
+        <article class="work-card group shrink-0 w-[82vw] sm:w-[60vw] lg:w-[44vw] snap-start" data-cursor>
+          <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[58vh] border border-cream/10">
+            <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
+              <img src="assets/strata/exploded-cutaway.webp" alt="Exploded diagram of roof and facade construction layers" class="w-full h-full object-cover object-[center_48%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent"></div>
+            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">04</span>
+          </div>
+          <div class="flex items-baseline justify-between gap-4 mt-5">
+            <h3 class="font-serif text-2xl sm:text-3xl">Anatomy of a Roof</h3>
+            <p class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-cream/50">Engineered layers</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="hidden lg:block max-w-7xl w-full mx-auto px-6 mt-10">
+        <div class="relative h-px bg-cream/10 overflow-hidden">
+          <div id="work-progress" class="absolute inset-0 bg-sand origin-left" style="transform: scaleX(0);"></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SECTION 5: THE EXPERIENCE (cleared, ready for new content) -->
+  <!-- SECTION: SERVICES -->
+  <section id="services" class="relative bg-dark py-28 px-6 border-t border-cream/10">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-16 gsap-fade-up">
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">Services</p>
+        <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight text-cream">What We <em class="italic text-sand">Offer</em></h2>
+      </div>
+
+      <div class="max-w-4xl mx-auto gsap-fade-up border-t border-cream/10">
+        <!-- Natural Slate -->
+        <div data-preview="assets/strata/aerial-night.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
+            <iconify-icon icon="solar:layers-linear"></iconify-icon>
+          </span>
+          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Natural Slate</span>
+          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Centuries-grade permanence with a deep graphite lustre. Our signature material.</span>
+          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
+        </div>
+
+        <!-- Standing Seam Metal -->
+        <div data-preview="assets/strata/exploded-cutaway.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
+            <iconify-icon icon="solar:home-2-linear"></iconify-icon>
+          </span>
+          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Standing Seam Metal</span>
+          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Precision-formed zinc and copper panels, built for clean architectural lines.</span>
+          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
+        </div>
+
+        <!-- Clay Tile -->
+        <div data-preview="assets/strata/aerial-day.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
+            <iconify-icon icon="solar:square-linear"></iconify-icon>
+          </span>
+          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Clay Tile</span>
+          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</span>
+          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
+        </div>
+
+        <!-- Cedar Shake -->
+        <div data-preview="assets/strata/facade.webp" class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
+          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
+            <iconify-icon icon="solar:leaf-linear"></iconify-icon>
+          </span>
+          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Cedar Shake</span>
+          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Hand-split cedar shingles that weather to a warm, silvered patina over time.</span>
+          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
+        </div>
+      </div>
+    </div>
+
+    <div id="svc-preview" class="hidden lg:block pointer-events-none fixed top-0 left-0 z-40 w-72 h-48 rounded-xl overflow-hidden border border-cream/10 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]" style="margin: -13rem 0 0 2rem; opacity: 0;">
+      <img id="svc-preview-img" src="assets/strata/aerial-night.webp" alt="" class="w-full h-full object-cover">
+    </div>
+  </section>
+
+  <!-- SECTION 5: THE EXPERIENCE -->
   <!-- SECTION 6: FOOTER -->
   <footer id="experience" class="matte-noise relative overflow-hidden text-cream bg-dark border-cream/10 border-t">
 
@@ -335,7 +475,7 @@ tailwind.config = {
 
       <div class="relative z-10 max-w-4xl mx-auto text-center gsap-fade-up">
         <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">The Experience</p>
-        <h2 class="font-serif text-3xl sm:text-5xl leading-tight mb-6">Ready for a roof built to last generations?</h2>
+        <h2 data-reveal class="font-serif text-3xl sm:text-5xl lg:text-6xl font-light leading-tight mb-6">Ready for a roof built to last <em class="italic text-sand">generations?</em></h2>
         <p class="text-cream/70 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">
           From the first site visit to the final inspection, every project is
           handled by the same licensed crew, with full traceability and a
@@ -343,7 +483,7 @@ tailwind.config = {
         </p>
 
         <div class="flex items-center justify-center mb-16">
-          <button class="magnetic-btn group relative inline-flex items-center gap-3 bg-surface text-dark px-8 py-4 rounded-full font-medium overflow-hidden">
+          <button class="magnetic-btn btn-shine group relative inline-flex items-center gap-3 bg-surface text-dark px-8 py-4 rounded-full font-medium overflow-hidden">
             Book a consultation
             <iconify-icon icon="solar:arrow-right-linear" class="text-lg transition-transform group-hover:translate-x-1"></iconify-icon>
           </button>
@@ -351,15 +491,15 @@ tailwind.config = {
 
         <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto border-t border-cream/10 pt-10">
           <div>
-            <p class="font-serif text-3xl sm:text-4xl text-sand">500+</p>
+            <p class="font-serif text-3xl sm:text-5xl text-sand" data-count="500" data-suffix="+">500+</p>
             <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Roofs completed</p>
           </div>
           <div>
-            <p class="font-serif text-3xl sm:text-4xl text-sand">15+</p>
+            <p class="font-serif text-3xl sm:text-5xl text-sand" data-count="15" data-suffix="+">15+</p>
             <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Partner quarries</p>
           </div>
           <div>
-            <p class="font-serif text-3xl sm:text-4xl text-sand">25yr</p>
+            <p class="font-serif text-3xl sm:text-5xl text-sand" data-count="25" data-suffix="yr">25yr</p>
             <p class="font-mono text-[10px] sm:text-xs uppercase tracking-wider text-cream/50 mt-2">Workmanship warranty</p>
           </div>
         </div>
@@ -423,6 +563,7 @@ tailwind.config = {
 
 </main>
 
+<script src="assets/luxe.js"></script>
 <script>
 /* =========================================================
    THREE.JS AMBIENT NOISE BACKGROUND
@@ -531,15 +672,147 @@ tailwind.config = {
    ========================================================= */
 gsap.registerPlugin(ScrollTrigger);
 
-// Hero stagger fade-up (runs immediately, not scroll-triggered)
+const introDelay = window.__introDelay || 0.2;
+const reduceMotion = window.luxe ? window.luxe.reduceMotion : false;
+
+/* =========================================================
+   HERO: intro reveal, then parallax as it scrolls away
+   ========================================================= */
+const heroTitle = document.getElementById('hero-title');
+if (heroTitle && window.luxe && !reduceMotion) {
+  const heroWords = window.luxe.splitWords(heroTitle);
+  gsap.set(heroWords, { yPercent: 115 });
+  gsap.to(heroWords, { yPercent: 0, duration: 1.4, ease: 'power4.out', stagger: 0.09, delay: introDelay });
+}
+
 gsap.to('.hero-anim', {
   y: 0,
   opacity: 1,
   duration: 1.1,
   ease: 'power3.out',
   stagger: 0.12,
-  delay: 0.2,
+  delay: introDelay + 0.3,
 });
+
+if (!reduceMotion) {
+  gsap.fromTo('#hero-img', { scale: 1.25 }, { scale: 1, duration: 2.6, ease: 'power3.out', delay: Math.max(0, introDelay - 0.6) });
+  gsap.fromTo('#scroll-cue', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: introDelay + 1 });
+
+  gsap.to('#hero-media', {
+    yPercent: 20,
+    ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+  });
+  gsap.to('#hero-content', {
+    yPercent: -18,
+    opacity: 0,
+    ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+  });
+  gsap.to('#scroll-cue-wrap', {
+    opacity: 0,
+    ease: 'none',
+    scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=200', scrub: true },
+  });
+}
+
+/* =========================================================
+   MATERIALS TICKER: speeds up with scroll velocity, follows direction
+   ========================================================= */
+(function initMarquee() {
+  const track = document.getElementById('materials-marquee');
+  if (!track || reduceMotion) return;
+  const loop = gsap.to(track, { xPercent: -50, ease: 'none', duration: 30, repeat: -1 });
+  loop.totalTime(loop.duration() * 100);
+  let settle;
+  ScrollTrigger.create({
+    trigger: track,
+    start: 'top bottom',
+    end: 'bottom top',
+    onUpdate: (self) => {
+      const dir = self.direction;
+      const boost = 1 + Math.min(Math.abs(self.getVelocity()) / 350, 5);
+      gsap.to(loop, { timeScale: dir * boost, duration: 0.25, overwrite: true });
+      clearTimeout(settle);
+      settle = setTimeout(() => gsap.to(loop, { timeScale: dir, duration: 1.2, overwrite: true }), 120);
+    },
+  });
+})();
+
+/* =========================================================
+   SELECTED WORK: pinned horizontal scroll on desktop
+   ========================================================= */
+(function initWorkGallery() {
+  const pin = document.getElementById('work-pin');
+  const track = document.getElementById('work-track');
+  const progress = document.getElementById('work-progress');
+  const index = document.getElementById('work-index');
+  if (!pin || !track || reduceMotion) return;
+
+  gsap.matchMedia().add('(min-width: 1024px)', () => {
+    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+    const slide = gsap.to(track, {
+      x: () => -distance(),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: pin,
+        start: 'top top',
+        end: () => '+=' + distance(),
+        pin: true,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (progress) progress.style.transform = 'scaleX(' + self.progress + ')';
+          if (index) index.textContent = '0' + Math.min(4, Math.floor(self.progress * 4) + 1);
+        },
+      },
+    });
+
+    track.querySelectorAll('.work-parallax').forEach((layer) => {
+      gsap.fromTo(layer, { xPercent: -6 }, {
+        xPercent: 6,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: layer.closest('.work-card'),
+          containerAnimation: slide,
+          start: 'left right',
+          end: 'right left',
+          scrub: true,
+        },
+      });
+    });
+  });
+})();
+
+/* =========================================================
+   SERVICES: image preview that trails the cursor
+   ========================================================= */
+(function initServicePreview() {
+  const preview = document.getElementById('svc-preview');
+  const img = document.getElementById('svc-preview-img');
+  if (!preview || !img || !(window.luxe && window.luxe.finePointer)) return;
+
+  gsap.set(preview, { scale: 0.6, rotate: -6, opacity: 0 });
+  const moveX = gsap.quickTo(preview, 'x', { duration: 0.6, ease: 'power3' });
+  const moveY = gsap.quickTo(preview, 'y', { duration: 0.6, ease: 'power3' });
+  let visible = false;
+
+  window.addEventListener('mousemove', (e) => { moveX(e.clientX); moveY(e.clientY); });
+
+  document.querySelectorAll('[data-preview]').forEach((row) => {
+    row.addEventListener('mouseenter', (e) => {
+      img.src = row.dataset.preview;
+      if (!visible) gsap.set(preview, { x: e.clientX, y: e.clientY });
+      visible = true;
+      gsap.to(preview, { opacity: 1, scale: 1, rotate: 0, duration: 0.5, ease: 'power3.out', overwrite: 'auto' });
+    });
+    row.addEventListener('mouseleave', () => {
+      visible = false;
+      gsap.to(preview, { opacity: 0, scale: 0.6, rotate: -6, duration: 0.4, ease: 'power3.in', overwrite: 'auto' });
+    });
+  });
+})();
 
 // Generic fade-up on scroll
 document.querySelectorAll('.gsap-fade-up').forEach((el) => {
@@ -689,6 +962,9 @@ document.querySelectorAll('.magnetic-btn').forEach((btn) => {
     });
   });
 });
+
+ScrollTrigger.sort();
+ScrollTrigger.refresh();
 </script>
 </body>
 </html>

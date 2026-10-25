@@ -15,6 +15,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<link rel="stylesheet" href="assets/luxe.css">
+<script>
+(function () {
+  try {
+    if (sessionStorage.getItem('slate-intro') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('luxe-loading');
+      setTimeout(function () { document.documentElement.classList.remove('luxe-loading'); }, 4000);
+    }
+  } catch (e) {}
+})();
+</script>
 
 <script>
 tailwind.config = {
@@ -38,7 +50,6 @@ tailwind.config = {
 </script>
 
 <style>
-  html { scroll-behavior: smooth; }
   body {
     background: #1c1c1c;
     font-family: 'Manrope', sans-serif;
@@ -154,7 +165,7 @@ tailwind.config = {
   <section class="relative bg-dark pt-40 pb-16 px-6">
     <div class="max-w-5xl mx-auto gsap-fade-up">
       <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Testimonials</p>
-      <h1 class="font-serif text-4xl sm:text-5xl text-cream leading-tight">What our clients say</h1>
+      <h1 data-reveal class="font-serif text-5xl sm:text-7xl font-light tracking-tight text-cream leading-tight">What our clients <em class="italic text-sand">say</em></h1>
     </div>
   </section>
 
@@ -287,6 +298,7 @@ tailwind.config = {
 
 </main>
 
+<script src="assets/luxe.js"></script>
 <script>
 /* =========================================================
    THREE.JS AMBIENT NOISE BACKGROUND
