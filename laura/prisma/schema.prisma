@@ -172,3 +172,16 @@ model Passkey {
   createdAt  DateTime @default(now())
   lastUsedAt DateTime?
 }
+
+// A perfume oil the user owns, for the Routine page's fragrance picks.
+// day/night/cold say when it works best; lib/routine.ts scores these
+// against each plan (shift, booking) to suggest what to wear.
+model Fragrance {
+  id        String   @id @default(cuid())
+  name      String
+  notes     String?
+  day       Boolean  @default(false)
+  night     Boolean  @default(false)
+  cold      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

@@ -4,6 +4,7 @@ import { placeCall, sendText, sendWithButtons } from "@/lib/telegram";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
 import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 import { getTomorrowBriefing } from "@/lib/briefing";
+import { buildDay, todayYmd, tomorrowYmd, upcomingKeyDates, upcomingPlans } from "@/lib/routine";
 import { searchBookingOptions, listBookings, readyToBookLinks, friendlyDateTime } from "@/lib/booking";
 import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
 import { lookupPlace, type PlaceCard } from "@/lib/places";
@@ -74,6 +75,17 @@ the Rota page rather than guessing. For "what does tomorrow look like" or
 similar, use get_tomorrow_briefing rather than combining get_shifts and
 list_reminders yourself -- it already covers the shift, commute, and
 reminders together.
+
+Daily routine: Madoxs (19, Fawley, shift worker) has a routine built into
+the app -- skincare, hair and beard, perfume oils, work blocks (outreach to
+roofers Mon/Wed/Fri after shift, driving theory Tue/Thu, weekly review
+Sunday) and key dates up to the Budapest trip. Use get_routine for anything
+about it ("what's my routine today", "what should I wear tonight", "is it
+an exfoliator night"). When he tells you about a perfume oil he owns, save
+it with add_fragrance (work out day/night/cold from its notes if he doesn't
+say). His goals: grow the website business (£250 sites for roofers), pass
+his driving test and get a car, find a 2-bed rental near Waterside, and
+look his best -- keep advice short and practical toward those.
 
 Going out (restaurants, bars, activities, days out): before recommending
 anywhere, find out what it's for if you don't already know -- ask in one
@@ -257,6 +269,34 @@ const tools: FunctionDeclaration[] = [
     parameters: { type: Type.OBJECT, properties: {} },
   },
   {
+    name: "get_routine",
+    description:
+      "Get Madoxs's routine for today or tomorrow: shift, morning and night " +
+      "skincare steps, work block, hair/beard status, which perfume oil to wear " +
+      "(and picks for each plan this week), and key dates.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        day: { type: Type.STRING, enum: ["today", "tomorrow"], description: "Defaults to today." },
+      },
+    },
+  },
+  {
+    name: "add_fragrance",
+    description: "Save a perfume oil the user owns to their fragrance list.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        name: { type: Type.STRING },
+        notes: { type: Type.STRING, description: "Scent notes, e.g. 'oud, vanilla, smoky'." },
+        day: { type: Type.BOOLEAN, description: "Good for daytime." },
+        night: { type: Type.BOOLEAN, description: "Good for evenings/nights out." },
+        cold: { type: Type.BOOLEAN, description: "Good in cold weather." },
+      },
+      required: ["name"],
+    },
+  },
+  {
     name: "search_booking_options",
     description:
       "Search the live web for real restaurant/activity/travel options matching " +
@@ -436,6 +476,7 @@ const LOGGED_TOOLS = new Set([
   "research_instagram_account",
   "create_content_idea",
   "start_video_call",
+  "add_fragrance",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -580,6 +621,30 @@ async function runTool(
       console.error("get_tomorrow_briefing error:", err);
       return { error: err instanceof Error ? err.message : "Couldn't build tomorrow's briefing." };
     }
+  }
+  if (name === "get_routine") {
+    try {
+      const which = args.day === "tomorrow" ? "tomorrow" : "today";
+      const [day, plans] = await Promise.all([
+        buildDay(which === "tomorrow" ? tomorrowYmd() : todayYmd()),
+        upcomingPlans(7),
+      ]);
+      return { result: { day, plansThisWeek: plans, keyDates: upcomingKeyDates(4) } };
+    } catch (err) {
+      console.error("get_routine error:", err);
+      return { error: "Couldn't load the routine." };
+    }
+  }
+  if (name === "add_fragrance") {
+    const { name: oilName, notes, day, night, cold } = args as {
+      name?: string; notes?: string; day?: boolean; night?: boolean; cold?: boolean;
+    };
+    if (!oilName?.trim()) return { error: "add_fragrance needs a name" };
+    const oil = await prisma.fragrance.create({
+      data: { name: oilName.trim(), notes: notes?.trim() || null, day: !!day, night: !!night, cold: !!cold },
+    });
+    await logActivity("add_fragrance", `Added perfume oil: ${oil.name}`);
+    return { result: oil };
   }
   if (name === "search_booking_options") {
     const { query } = args as { query?: string };

@@ -11,6 +11,7 @@ const PUBLIC = new Set([
   "/api/auth/passkey/login",
   "/api/telegram/webhook",
   "/api/briefing/send",
+  "/api/routine/send",
 ]);
 
 export function proxy(request: NextRequest) {

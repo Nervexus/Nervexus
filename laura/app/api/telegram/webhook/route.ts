@@ -5,6 +5,7 @@ import { downloadTelegramFile, ownerChatId, replyInChat, resolveButtonTap, sendP
 import { placeCaption } from "@/lib/places";
 import { transcribeAudio } from "@/lib/transcribe";
 import { parseRotaImage } from "@/lib/rota";
+import { morningMessage, nightMessage } from "@/lib/routine";
 import { friendlyDateTime, USER_TIMEZONE } from "@/lib/booking-links";
 
 // Telegram calls this for every message sent to the bot (registered via
@@ -40,6 +41,10 @@ export async function POST(request: Request) {
 
   if (text === "/start") {
     await replyInChat("Hi, I'm Laura. Message me here any time, same as on the site. You can also send voice notes, or a photo of your rota.");
+    return NextResponse.json({ ok: true });
+  }
+  if (text === "/morning" || text === "/night") {
+    await replyInChat(text === "/morning" ? await morningMessage() : await nightMessage());
     return NextResponse.json({ ok: true });
   }
 

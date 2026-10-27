@@ -8,6 +8,7 @@ import { gsap } from "gsap";
 const LINKS = [
   { href: "/", label: "Home", icon: "solar:home-2-linear" },
   { href: "/laura", label: "Laura", icon: "solar:soundwave-linear" },
+  { href: "/routine", label: "Routine", icon: "solar:checklist-minimalistic-linear" },
   { href: "/notes", label: "Notes", icon: "solar:notebook-linear" },
   { href: "/reminders", label: "Reminders", icon: "solar:alarm-linear" },
   { href: "/rota", label: "Rota", icon: "solar:calendar-linear" },
