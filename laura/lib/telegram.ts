@@ -106,7 +106,9 @@ export function ownerChatId(): string {
  * (that history is for messages Laura sends you on purpose), sent as
  * plain text so a stray `*` or `_` in a reply can't fail Markdown parsing,
  * and capped at Telegram's 4096-character limit. */
-export async function replyInChat(text: string): Promise<void> {
+/** Sends a plain-text message to the owner. Resolves false (and logs) if
+ * Telegram refused it, so callers that need to know can tell. */
+export async function replyInChat(text: string): Promise<boolean> {
   text = stripMarkdown(text);
   const token = getBotToken();
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -115,6 +117,7 @@ export async function replyInChat(text: string): Promise<void> {
     body: JSON.stringify({ chat_id: getChatId(), text: text.slice(0, 4096) }),
   });
   if (!res.ok) console.error("Telegram reply failed:", res.status, await res.text());
+  return res.ok;
 }
 
 /** Shows "typing…" in the chat while Laura works on a reply. */

@@ -4,6 +4,7 @@ import { placeCall, sendText, sendWithButtons } from "@/lib/telegram";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
 import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
 import { getTomorrowBriefing } from "@/lib/briefing";
+import { outreach } from "@/lib/hq";
 import { buildDay, todayYmd, tomorrowYmd, upcomingKeyDates, upcomingPlans } from "@/lib/routine";
 import { searchBookingOptions, listBookings, readyToBookLinks, friendlyDateTime } from "@/lib/booking";
 import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
@@ -86,6 +87,17 @@ it with add_fragrance (work out day/night/cold from its notes if he doesn't
 say). His goals: grow the website business (£250 sites for roofers), pass
 his driving test and get a car, find a 2-bed rental near Waterside, and
 look his best -- keep advice short and practical toward those.
+
+Outreach: Madoxs runs a separate outreach app (Signal Outreach) that
+emails roofers about £250 websites; it's linked to you. Use
+get_outreach_stats for "how's outreach going", list_outreach_leads /
+get_outreach_lead for leads and who replied, add_outreach_lead when he
+mentions a new prospect, and set_outreach_lead_status when he says a lead
+booked a call, won, or went cold. You can draft an email to a lead with
+draft_outreach_email -- it only queues a draft for him to review in the
+outreach app; you never send outreach messages yourself, so say "I've
+queued a draft for you to check", never "I've sent it". Replies are
+checked about hourly on weekdays, so the newest ones can lag.
 
 Going out (restaurants, bars, activities, days out): before recommending
 anywhere, find out what it's for if you don't already know -- ask in one
@@ -297,6 +309,78 @@ const tools: FunctionDeclaration[] = [
     },
   },
   {
+    name: "get_outreach_stats",
+    description: "Outreach numbers from the outreach app: sent and replies today and this week, calls booked, won, and warm leads.",
+    parameters: { type: Type.OBJECT, properties: {} },
+  },
+  {
+    name: "list_outreach_leads",
+    description: "List outreach leads by status.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        status: {
+          type: Type.STRING,
+          enum: ["warm", "new", "contacted", "replied", "call_booked", "won", "lost"],
+          description: "Defaults to warm.",
+        },
+      },
+    },
+  },
+  {
+    name: "get_outreach_lead",
+    description: "One outreach lead with its message history. Needs the lead id from list_outreach_leads or get_outreach_stats.",
+    parameters: { type: Type.OBJECT, properties: { id: { type: Type.STRING } }, required: ["id"] },
+  },
+  {
+    name: "add_outreach_lead",
+    description: "Add a prospect to the outreach app. It starts as warm and stays out of the automatic email sequence. Duplicates return the existing lead.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        name: { type: Type.STRING, description: "Contact's name." },
+        company: { type: Type.STRING },
+        phone: { type: Type.STRING },
+        email: { type: Type.STRING },
+        website: { type: Type.STRING },
+        note: { type: Type.STRING },
+      },
+      required: ["name", "company"],
+    },
+  },
+  {
+    name: "set_outreach_lead_status",
+    description: "Update a lead's status in the outreach app. Any status stops automatic follow-ups to that lead.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        id: { type: Type.STRING },
+        status: { type: Type.STRING, enum: ["warm", "call_booked", "won", "lost"] },
+        note: { type: Type.STRING },
+      },
+      required: ["id", "status"],
+    },
+  },
+  {
+    name: "draft_outreach_email",
+    description:
+      "Queue a draft email to a lead for Madoxs to review and send from the outreach app. Never sends anything. Email only -- fails if the lead has no email address.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        leadId: { type: Type.STRING },
+        text: { type: Type.STRING, description: "The email body, in Madoxs's voice: short, friendly, no hard sell." },
+        subject: { type: Type.STRING, description: "Optional; defaults to 'Re: <last subject>'." },
+      },
+      required: ["leadId", "text"],
+    },
+  },
+  {
+    name: "recent_outreach_activity",
+    description: "The latest replies and lead status changes the outreach app has reported to you.",
+    parameters: { type: Type.OBJECT, properties: { days: { type: Type.NUMBER, description: "Defaults to 7." } } },
+  },
+  {
     name: "search_booking_options",
     description:
       "Search the live web for real restaurant/activity/travel options matching " +
@@ -477,6 +561,9 @@ const LOGGED_TOOLS = new Set([
   "create_content_idea",
   "start_video_call",
   "add_fragrance",
+  "add_outreach_lead",
+  "set_outreach_lead_status",
+  "draft_outreach_email",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -645,6 +732,13 @@ async function runTool(
     });
     await logActivity("add_fragrance", `Added perfume oil: ${oil.name}`);
     return { result: oil };
+  }
+  if (OUTREACH_TOOLS.has(name)) {
+    try {
+      return { result: await runOutreachTool(name, args) };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Outreach request failed." };
+    }
   }
   if (name === "search_booking_options") {
     const { query } = args as { query?: string };
@@ -900,4 +994,54 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
     toolsUsed: [...toolsUsed],
     places: ctx.places,
   };
+}
+
+const OUTREACH_TOOLS = new Set([
+  "get_outreach_stats",
+  "list_outreach_leads",
+  "get_outreach_lead",
+  "add_outreach_lead",
+  "set_outreach_lead_status",
+  "draft_outreach_email",
+  "recent_outreach_activity",
+]);
+
+async function runOutreachTool(name: string, args: Record<string, unknown>): Promise<unknown> {
+  const id = encodeURIComponent(String(args.id ?? args.leadId ?? ""));
+  switch (name) {
+    case "get_outreach_stats":
+      return outreach("/stats");
+    case "list_outreach_leads":
+      return outreach(`/leads?status=${encodeURIComponent(String(args.status ?? "warm"))}`);
+    case "get_outreach_lead":
+      return outreach(`/leads/${id}`);
+    case "add_outreach_lead": {
+      const lead = await outreach("/leads", { method: "POST", body: args });
+      await logActivity("add_outreach_lead", `Added outreach lead: ${String(args.company ?? args.name)}`);
+      return lead;
+    }
+    case "set_outreach_lead_status": {
+      const res = await outreach(`/leads/${id}/status`, { method: "POST", body: { status: args.status, note: args.note } });
+      await logActivity("set_outreach_lead_status", `Outreach lead marked ${String(args.status)}`);
+      return res;
+    }
+    case "draft_outreach_email": {
+      const res = await outreach("/drafts", {
+        method: "POST",
+        body: { leadId: args.leadId, text: args.text, ...(args.subject ? { subject: args.subject } : {}) },
+      });
+      await logActivity("draft_outreach_email", "Queued an outreach draft for review");
+      return res;
+    }
+    case "recent_outreach_activity": {
+      const days = Math.min(Math.max(Number(args.days) || 7, 1), 30);
+      return prisma.outreachEvent.findMany({
+        where: { type: { not: "message_sent" }, at: { gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } },
+        orderBy: { at: "desc" },
+        take: 30,
+        select: { type: true, leadId: true, leadName: true, company: true, preview: true, status: true, at: true },
+      });
+    }
+  }
+  throw new Error(`Unknown outreach tool ${name}`);
 }

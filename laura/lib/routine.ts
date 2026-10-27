@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { USER_TIMEZONE } from "@/lib/booking-links";
+import { outreachStatsOrNull } from "@/lib/hq";
 
 // Madoxs's daily routine: skincare, hair/beard, fragrance, work blocks and
 // key dates, fitted around whatever shifts are on the rota. The fixed parts
@@ -44,7 +45,7 @@ function localMidnight(ymd: string): Date {
   return new Date(guess - (asUtc - guess));
 }
 
-function addDays(ymd: string, n: number): string {
+export function addDays(ymd: string, n: number): string {
   return localParts(new Date(localMidnight(ymd).getTime() + n * DAY_MS + 12 * 60 * 60 * 1000)).ymd;
 }
 
@@ -311,8 +312,10 @@ export function upcomingKeyDates(limit = 6) {
 
 // ---------- Telegram messages ----------
 
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
 export async function morningMessage(): Promise<string> {
-  const d = await buildDay(todayYmd());
+  const [d, stats] = await Promise.all([buildDay(todayYmd()), outreachStatsOrNull()]);
   const lines = [`Morning. ${d.label}`];
   lines.push(d.shift ? `Shift ${d.shift.start}–${d.shift.end}${d.shift.location ? ` at ${d.shift.location}` : ""}.` : "No shift today.");
   if (d.today.length) lines.push(`Today: ${d.today.join(" · ")}`);
@@ -320,14 +323,20 @@ export async function morningMessage(): Promise<string> {
   lines.push(d.wear.oil ? `Wear: ${d.wear.oil.name}. ${d.wear.why}` : "Wear: tell me which oils you own and I'll pick.");
   if (d.block) lines.push(`${d.block.title}, ${d.block.when}.`);
   lines.push(d.hair.headline + ".");
+  if (stats) {
+    lines.push(`Outreach this week: ${stats.week.sent} sent, ${plural(stats.week.replies, "reply", "replies")}, ${plural(stats.week.callsBooked, "call")} booked.`);
+    const warm = stats.warmLeads.slice(0, 3).map((l) => l.company || l.name);
+    if (warm.length) lines.push(`Chase: ${warm.join(", ")}${stats.warmLeads.length > 3 ? ` +${stats.warmLeads.length - 3} more` : ""}.`);
+  }
   return lines.join("\n");
 }
 
 export async function nightMessage(): Promise<string> {
-  const d = await buildDay(todayYmd());
+  const [d, stats] = await Promise.all([buildDay(todayYmd()), outreachStatsOrNull()]);
   const lines = ["Night checklist", ...d.night.map((s) => `☐ ${s.text}`)];
   const t = d.tomorrow;
   const tomorrow = [t.shift ? `shift ${t.shift}` : "no shift", ...t.items].join(" · ");
+  if (stats) lines.push("", `Outreach today: ${stats.today.sent} sent, ${plural(stats.today.replies, "reply", "replies")}.`);
   lines.push("", `Tomorrow: ${tomorrow}`);
   return lines.join("\n");
 }

@@ -23,6 +23,11 @@ type Day = {
   tomorrow: { shift: string | null; items: string[]; alarm: string | null };
 };
 type KeyDate = { date: string; label: string; items: string[]; daysAway: number };
+type Outreach = {
+  today: { sent: number; replies: number };
+  week: { sent: number; replies: number; callsBooked: number; won: number };
+  warmLeads: { id: string | number; name: string; company: string | null }[];
+};
 
 const PANEL = "card card-pad";
 const LABEL = "label";
@@ -49,6 +54,7 @@ export default function RoutinePage() {
   const [day, setDay] = useState<Day | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
   const [keyDates, setKeyDates] = useState<KeyDate[]>([]);
+  const [outreach, setOutreach] = useState<Outreach | null>(null);
   const [oils, setOils] = useState<Oil[]>([]);
   const [ticks, setTicks] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +68,7 @@ export default function RoutinePage() {
         setDay(data.day);
         setPlans(data.plans ?? []);
         setKeyDates(data.keyDates ?? []);
+        setOutreach(data.outreach ?? null);
         setOils(data.oils ?? []);
         setTicks(readTicks(data.day.date));
       })
@@ -319,6 +326,33 @@ export default function RoutinePage() {
               {day.tomorrow.alarm && <p className="mt-1 text-xs text-neutral-500">Alarm {day.tomorrow.alarm}</p>}
               {day.tomorrow.items.length > 0 && <p className="mt-1 text-xs text-neutral-500">{day.tomorrow.items.join(" · ")}</p>}
             </SidebarCard>
+            {outreach && (
+              <SidebarCard title="Outreach">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="item px-3 py-2.5">
+                    <p className="stat-num !text-[26px]">{outreach.today.sent}</p>
+                    <p className="text-[12px] text-muted">sent today</p>
+                  </div>
+                  <div className="item px-3 py-2.5">
+                    <p className="stat-num !text-[26px] text-lilac">{outreach.today.replies}</p>
+                    <p className="text-[12px] text-muted">replies today</p>
+                  </div>
+                </div>
+                <p className="mt-3 text-[12px] text-muted">
+                  This week: {outreach.week.sent} sent · {outreach.week.replies} {outreach.week.replies === 1 ? "reply" : "replies"} · {outreach.week.callsBooked} {outreach.week.callsBooked === 1 ? "call" : "calls"} · {outreach.week.won} won
+                </p>
+                {outreach.warmLeads.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {outreach.warmLeads.slice(0, 6).map((l) => (
+                      <span key={l.id} className="tag tag-purple">{l.company || l.name}</span>
+                    ))}
+                  </div>
+                )}
+                <a href="https://signal-outreach-two.vercel.app" target="_blank" rel="noopener noreferrer" className="btn mt-4 w-full">
+                  Open outreach
+                </a>
+              </SidebarCard>
+            )}
             <SidebarCard title="On Telegram">
               <p className="text-xs leading-relaxed text-neutral-500">
                 Morning summary and night checklist arrive each day. Text /morning or /night any time.

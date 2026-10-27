@@ -185,3 +185,20 @@ model Fragrance {
   cold      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+
+// Activity pushed from the outreach app (Signal Outreach) over the HQ
+// link: emails sent, replies, lead status changes. A log for LAURA's
+// summaries and chat, not the source of truth -- that's the outreach app.
+model OutreachEvent {
+  id        String   @id @default(cuid())
+  type      String // "message_sent" | "reply_received" | "lead_status"
+  leadId    String?
+  leadName  String?
+  company   String?
+  preview   String?
+  status    String?
+  at        DateTime
+  createdAt DateTime @default(now())
+
+  @@index([at])
+}

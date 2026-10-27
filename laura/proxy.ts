@@ -17,6 +17,8 @@ const PUBLIC = new Set([
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   if (PUBLIC.has(pathname)) return NextResponse.next();
+  // The outreach app's link: each /api/hq route checks LAURA_LINK_SECRET itself.
+  if (pathname.startsWith("/api/hq/")) return NextResponse.next();
   if (isValidSession(request.cookies.get(SESSION_COOKIE)?.value)) return NextResponse.next();
 
   if (pathname.startsWith("/api/")) {

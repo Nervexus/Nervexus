@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "part must be morning or night" }, { status: 400 });
   }
   try {
-    await replyInChat(part === "morning" ? await morningMessage() : await nightMessage());
-    return NextResponse.json({ sent: true });
+    const sent = await replyInChat(part === "morning" ? await morningMessage() : await nightMessage());
+    return NextResponse.json({ sent }, { status: sent ? 200 : 502 });
   } catch (err) {
     console.error(`routine ${part} send failed:`, err);
     return NextResponse.json({ error: "Couldn't send." }, { status: 500 });
