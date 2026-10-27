@@ -244,9 +244,9 @@ export default function NotesPage() {
   }
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-3xl tracking-tight text-neutral-100">Notes</h1>
+        <h1 className="text-3xl tracking-tight text-neutral-100">Notes</h1>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         things you&apos;ve told Laura to remember, plus anything you jot down here
@@ -271,7 +271,7 @@ export default function NotesPage() {
               return (
                 <div key={folder.id} className="flex flex-col items-center gap-2" style={{ width: FOLDER_WIDTH }}>
                   <div className="flex w-full items-center justify-between px-1">
-                    <span className="truncate font-mono text-[11px] uppercase tracking-widest text-neutral-500">
+                    <span className="label truncate">
                       {folder.name}
                     </span>
                     <button
@@ -294,7 +294,7 @@ export default function NotesPage() {
 
                   {isLocked ? (
                     <div
-                      className="gradient-border relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md"
+                      className="gradient-border relative flex flex-col items-center justify-center gap-3 item p-6 backdrop-blur-md"
                       style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
                     >
                       <LockIcon className="h-6 w-6 text-neutral-500" />
@@ -307,7 +307,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitUnlock(folder.id)}
                             placeholder="PIN"
-                            className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -356,7 +356,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitSetPin(folder.id)}
                             placeholder="Choose a PIN"
-                            className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -387,7 +387,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitRemovePin(folder.id)}
                             placeholder="Current PIN"
-                            className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -407,10 +407,10 @@ export default function NotesPage() {
             })}
 
             <div className="flex flex-col items-center gap-2" style={{ width: FOLDER_WIDTH }}>
-              <span className="w-full px-1 font-mono text-[11px] uppercase tracking-widest text-transparent">·</span>
+              <span className="label w-full px-1 text-transparent">·</span>
               {addingFolder ? (
                 <div
-                  className="gradient-border relative flex flex-col items-center justify-center gap-3 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md"
+                  className="gradient-border relative flex flex-col items-center justify-center gap-3 item p-6 backdrop-blur-md"
                   style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
                 >
                   <input
@@ -418,7 +418,7 @@ export default function NotesPage() {
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.target.value)}
                     placeholder="Folder name"
-                    className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                    className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
                   />
                   <input
                     type="password"
@@ -426,7 +426,7 @@ export default function NotesPage() {
                     onChange={(e) => setNewFolderPin(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addFolder()}
                     placeholder="PIN (optional)"
-                    className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                    className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
                   />
                   {folderError && <p className="text-center text-xs text-red-400">{folderError}</p>}
                   <div className="flex justify-center gap-3">
@@ -450,7 +450,7 @@ export default function NotesPage() {
                 <button
                   type="button"
                   onClick={() => setAddingFolder(true)}
-                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-neutral-800 text-neutral-600 transition-colors hover:border-neutral-600 hover:text-neutral-300"
+                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line text-neutral-600 transition-colors hover:border-neutral-600 hover:text-neutral-300"
                   style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
                 >
                   <span className="text-2xl">+</span>
@@ -463,19 +463,19 @@ export default function NotesPage() {
       </div>
 
       {selected && (
-        <div className="gradient-border relative mt-10 rounded-2xl border border-neutral-800/60 bg-neutral-900/40 p-6 backdrop-blur-md">
+        <div className="gradient-border relative mt-10 item p-6 backdrop-blur-md">
           <input
             value={draftTitle}
             onChange={(e) => setDraftTitle(e.target.value)}
             placeholder="Title"
-            className="w-full rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3.5 py-2.5 text-sm font-normal text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
           />
           <textarea
             value={draftBody}
             onChange={(e) => setDraftBody(e.target.value)}
             placeholder="Write something…"
             rows={6}
-            className="mt-3 w-full resize-none rounded-lg border border-neutral-800/60 bg-neutral-950/60 px-3.5 py-2.5 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+            className="mt-3 w-full resize-none rounded-lg border border-line bg-neutral-950/60 px-3.5 py-2.5 text-sm font-normal text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
           />
           <div className="mt-3.5 flex justify-end gap-3">
             <Button variant="danger" onClick={remove}>

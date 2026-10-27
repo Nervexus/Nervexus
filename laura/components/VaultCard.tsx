@@ -25,8 +25,8 @@ export function VaultCard({
           <LockIcon className="h-4 w-4" />
         </IconTile>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-light text-neutral-100">{title}</h3>
-          <p className="mt-1.5 truncate rounded-xl bg-neutral-900/70 px-3 py-2 font-mono text-sm text-neutral-400">
+          <h3 className="truncate text-base font-normal text-neutral-100">{title}</h3>
+          <p className="mt-1.5 truncate item px-3 py-2 font-mono text-sm text-neutral-400">
             {revealedValue ?? "••••••••••••"}
           </p>
         </div>

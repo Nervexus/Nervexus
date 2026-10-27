@@ -29,13 +29,7 @@ export function SettingsCard({
         {detail && <p className="mt-0.5 truncate text-xs text-neutral-500">{detail}</p>}
       </div>
       <span
-        className={`shrink-0 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide ${
-          status === "connected"
-            ? "border-neutral-700 text-neutral-300"
-            : status === "expiring"
-              ? "border-red-900/60 text-red-400"
-              : "border-neutral-800 text-neutral-600"
-        }`}
+        className={`tag shrink-0 ${status === "connected" ? "tag-purple" : status === "expiring" ? "tag-red" : ""}`}
       >
         {STATUS_LABEL[status]}
       </span>

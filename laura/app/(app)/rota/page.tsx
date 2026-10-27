@@ -214,18 +214,17 @@ export default function RotaPage() {
   ];
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Rota</h1>
+        <h1 className="page-title">Rota</h1>
         <Pill>{upcoming.length} upcoming</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         your work schedule — upload a photo of it, or add shifts by hand
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
-      <div className="gsap-entrance relative mt-8 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+      <div className="gsap-entrance relative mt-8 card p-5">
+        <span className="label">
           Upload a rota photo
         </span>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -247,31 +246,31 @@ export default function RotaPage() {
             {parsed.map((s, i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 gap-2 rounded-xl bg-neutral-900/70 p-3 sm:grid-cols-2"
+                className="grid grid-cols-1 gap-2 item p-3 sm:grid-cols-2"
               >
                 <input
                   type="datetime-local"
                   value={toLocalInputValue(s.startAt)}
                   onChange={(e) => updateParsed(i, { startAt: new Date(e.target.value).toISOString() })}
-                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none [color-scheme:dark]"
+                  className="input text-xs [color-scheme:dark]"
                 />
                 <input
                   type="datetime-local"
                   value={toLocalInputValue(s.endAt)}
                   onChange={(e) => updateParsed(i, { endAt: new Date(e.target.value).toISOString() })}
-                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none [color-scheme:dark]"
+                  className="input text-xs [color-scheme:dark]"
                 />
                 <input
                   value={s.location ?? ""}
                   onChange={(e) => updateParsed(i, { location: e.target.value || null })}
                   placeholder="Location"
-                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                  className="input text-xs placeholder:text-neutral-600"
                 />
                 <input
                   value={s.colleagues ?? ""}
                   onChange={(e) => updateParsed(i, { colleagues: e.target.value || null })}
                   placeholder="Colleagues"
-                  className="rounded-xl bg-neutral-900/70 px-2.5 py-1.5 text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                  className="input text-xs placeholder:text-neutral-600"
                 />
               </div>
             ))}
@@ -287,8 +286,8 @@ export default function RotaPage() {
         )}
       </div>
 
-      <div className="gsap-entrance relative mt-4 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+      <div className="gsap-entrance relative mt-4 card p-5">
+        <span className="label">
           Add a shift by hand
         </span>
         <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -296,25 +295,25 @@ export default function RotaPage() {
             type="datetime-local"
             value={startAt}
             onChange={(e) => setStartAt(e.target.value)}
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
           />
           <input
             type="datetime-local"
             value={endAt}
             onChange={(e) => setEndAt(e.target.value)}
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
           />
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location (optional)"
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
           <input
             value={colleagues}
             onChange={(e) => setColleagues(e.target.value)}
             placeholder="Colleagues (optional)"
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
         </div>
         <div className="mt-3.5 flex justify-end">
@@ -339,7 +338,7 @@ export default function RotaPage() {
               ({ label, items }) =>
                 items.length > 0 && (
                   <div key={label} className="mb-8">
-                    <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+                    <h2 className="label mb-3">
                       {label} · {items.length}
                     </h2>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
@@ -362,13 +361,13 @@ export default function RotaPage() {
                 value={profileDraft.homeAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, homeAddress: e.target.value }))}
                 placeholder="Home address"
-                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="input text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
               />
               <input
                 value={profileDraft.workAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, workAddress: e.target.value }))}
                 placeholder="Work address"
-                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="input text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
               />
               <div className="flex items-center gap-2">
                 <input
@@ -378,7 +377,7 @@ export default function RotaPage() {
                   onChange={(e) =>
                     setProfileDraft((p) => ({ ...p, arrivalBufferMinutes: Number(e.target.value) }))
                   }
-                  className="w-16 border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-xs text-neutral-300 outline-none"
+                  className="w-16 input text-xs text-neutral-300 outline-none"
                 />
                 <span className="text-xs text-neutral-500">min arrival buffer</span>
               </div>

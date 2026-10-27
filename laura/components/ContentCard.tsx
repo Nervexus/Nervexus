@@ -83,18 +83,14 @@ export function ContentCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 border-t border-neutral-800/60 pt-3">
+      <div className="flex items-center gap-1.5 border-t border-line pt-3">
         {Object.keys(STATUS_LABEL)
           .filter((s) => s !== "discarded")
           .map((s) => (
             <button
               key={s}
               onClick={() => onStatusChange(s)}
-              className={`rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors ${
-                status === s
-                  ? "border-neutral-100 bg-neutral-100 text-neutral-950"
-                  : "border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300"
-              }`}
+              className={`tag capitalize transition-opacity ${status === s ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
             >
               {STATUS_LABEL[s]}
             </button>
@@ -102,7 +98,7 @@ export function ContentCard({
         {status !== "discarded" && (
           <button
             onClick={() => onStatusChange("discarded")}
-            className="ml-auto font-mono text-[10px] uppercase tracking-wide text-neutral-600 hover:text-red-400"
+            className="btn-ghost ml-auto !px-2 !py-1 !text-[12px] capitalize hover:!text-[#ff9a90]"
           >
             discard
           </button>

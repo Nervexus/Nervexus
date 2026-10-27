@@ -24,10 +24,9 @@ type Day = {
 };
 type KeyDate = { date: string; label: string; items: string[]; daysAway: number };
 
-const PANEL = "rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] p-5 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]";
-const LABEL = "font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500";
-const INPUT =
-  "border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 text-sm font-light text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-[var(--calendar-accent)]";
+const PANEL = "card card-pad";
+const LABEL = "label";
+const INPUT = "input";
 
 // Ticks are a per-device convenience, kept per day so they reset each morning.
 function readTicks(date: string): Record<string, boolean> {
@@ -116,23 +115,22 @@ export default function RoutinePage() {
       <div className={`gsap-entrance ${PANEL}`}>
         <div className="flex items-center justify-between">
           <span className={LABEL}>{title}</span>
-          <span className="font-mono text-[10px] tabular-nums text-neutral-500">
+          <span className="font-mono text-[12px] tabular text-muted">
             {done}/{steps.length}
           </span>
         </div>
-        <ul className="mt-4 flex flex-col gap-1">
+        <div className="progress mt-3">
+          <span style={{ width: `${steps.length ? (done / steps.length) * 100 : 0}%` }} />
+        </div>
+        <ul className="mt-3 flex flex-col gap-0.5">
           {steps.map((s) => (
             <li key={s.id}>
               <button
                 onClick={() => toggle(s.id)}
-                className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left text-sm transition-colors hover:bg-white/[0.03]"
+                className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left text-[14px] transition-colors hover:bg-white/[0.03]"
               >
                 <span
-                  className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border ${
-                    ticks[s.id]
-                      ? "border-[var(--calendar-accent)] bg-[var(--calendar-accent)]/20 text-[var(--calendar-accent)]"
-                      : "border-neutral-700"
-                  }`}
+                  className={`check ${ticks[s.id] ? "is-on" : ""}`}
                 >
                   {ticks[s.id] && (
                     <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -153,37 +151,32 @@ export default function RoutinePage() {
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.2em] transition-colors ${
-        on ? "border-violet-400/40 bg-violet-500/15 text-violet-200" : "border-white/10 text-neutral-600 hover:text-neutral-400"
-      }`}
+      className={`tag transition-opacity ${on ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
     >
       {label}
     </button>
   );
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex flex-wrap items-center gap-3">
-        <h1 className="text-4xl font-thin tracking-tight text-neutral-100">Routine</h1>
+        <h1 className="page-title">Routine</h1>
         <Pill>{day?.label ?? "…"}</Pill>
-        <div className="ml-auto flex gap-1 rounded-full border border-white/10 p-1">
+        <div className="tabs ml-auto">
           {(["today", "tomorrow"] as const).map((w) => (
             <button
               key={w}
               onClick={() => switchDay(w)}
-              className={`rounded-full px-3.5 py-1 font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
-                which === w ? "bg-white/10 text-neutral-100" : "text-neutral-500 hover:text-neutral-300"
-              }`}
+              className={`tab capitalize ${which === w ? "is-active" : ""}`}
             >
               {w}
             </button>
           ))}
         </div>
       </div>
-      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
+      <p className="gsap-entrance page-sub mt-1">
         skin, hair, scent and the work that moves things forward, fitted around your shifts
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
       {error && <p className="mt-6 text-sm text-red-400">{error}</p>}
 
@@ -192,28 +185,28 @@ export default function RoutinePage() {
           <div className="flex min-w-0 flex-col gap-4">
             <div className={`gsap-entrance ${PANEL}`}>
               <span className={LABEL}>The day</span>
-              <p className="mt-3 text-2xl font-extralight text-neutral-100">
+              <p className="mt-2 text-[24px] font-medium tracking-tight text-text">
                 {day.shift ? `Shift ${day.shift.start}–${day.shift.end}` : "No shift"}
                 {day.shift?.location && <span className="text-neutral-500"> · {day.shift.location}</span>}
               </p>
               {day.today.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {day.today.map((t) => (
-                    <span key={t} className="rounded-full border border-[var(--calendar-accent)]/40 px-3 py-1 text-xs text-[var(--calendar-accent)]">
+                    <span key={t} className="tag tag-purple">
                       {t}
                     </span>
                   ))}
                 </div>
               )}
               {day.block ? (
-                <div className="mt-5 border-t border-white/[0.06] pt-4">
+                <div className="mt-5 border-t border-line pt-4">
                   <p className="text-sm text-neutral-200">
                     {day.block.title} <span className="text-neutral-500">· {day.block.when}</span>
                   </p>
                   <p className="mt-1 text-xs text-neutral-500">{day.block.detail}</p>
                 </div>
               ) : (
-                <p className="mt-5 border-t border-white/[0.06] pt-4 text-xs text-neutral-500">No work block today. Rest.</p>
+                <p className="mt-5 border-t border-line pt-4 text-xs text-neutral-500">No work block today. Rest.</p>
               )}
             </div>
 
@@ -242,7 +235,7 @@ export default function RoutinePage() {
               {plans.length === 0 ? (
                 <p className="mt-3 text-xs text-neutral-500">Nothing on the rota or in bookings this week.</p>
               ) : (
-                <ul className="mt-3 flex flex-col divide-y divide-white/[0.05]">
+                <ul className="mt-3 flex flex-col divide-y divide-line">
                   {plans.map((p, i) => (
                     <li key={i} className="flex items-center justify-between gap-4 py-2.5">
                       <div className="min-w-0">
@@ -258,7 +251,7 @@ export default function RoutinePage() {
 
             <div className={`gsap-entrance ${PANEL}`}>
               <span className={LABEL}>Your perfume oils · {oils.length}</span>
-              <ul className="mt-3 flex flex-col divide-y divide-white/[0.05]">
+              <ul className="mt-3 flex flex-col divide-y divide-line">
                 {oils.map((o) => (
                   <li key={o.id} className="flex flex-wrap items-center gap-3 py-2.5">
                     <div className="min-w-0 flex-1">
@@ -309,9 +302,9 @@ export default function RoutinePage() {
             <SidebarCard title="Key dates">
               <ul className="flex flex-col gap-3">
                 {keyDates.map((k) => (
-                  <li key={k.date} className="rounded-xl bg-neutral-900/60 px-3 py-2.5">
+                  <li key={k.date} className="item px-3 py-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--calendar-accent)]">{k.label}</span>
+                      <span className="text-[12px] font-semibold text-lilac">{k.label}</span>
                       <span className="font-mono text-[10px] tabular-nums text-neutral-500">
                         {k.daysAway === 0 ? "today" : `${k.daysAway}d`}
                       </span>

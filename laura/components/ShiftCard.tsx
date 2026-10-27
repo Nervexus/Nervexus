@@ -70,7 +70,7 @@ export function ShiftCard({
             {location && <span>{location}</span>}
             {colleagues && <span>· with {colleagues}</span>}
             {source === "photo" && (
-              <span className="rounded-full border border-neutral-800 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-neutral-600">
+              <span className="tag">
                 from photo
               </span>
             )}
@@ -80,8 +80,8 @@ export function ShiftCard({
       </div>
 
       {plan ? (
-        <div className="rounded-xl bg-neutral-900/70 px-3 py-2.5">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-neutral-600">Commute plan</p>
+        <div className="item px-3 py-2.5">
+          <p className="label">Commute plan</p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-300">{plan}</p>
         </div>
       ) : (

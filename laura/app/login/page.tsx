@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
+import { LogoMark } from "@/components/NavIcon";
 
 // Only same-site paths, so ?next= can't be used to bounce you to another site.
 function safeNext(): string {
@@ -92,13 +93,13 @@ export default function LoginPage() {
       type="button"
       onClick={() => signInWithPasskey()}
       disabled={busy}
-      className="mt-16 flex w-full flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/[0.03] py-8 text-sm text-neutral-200 transition-colors hover:border-violet-400/40 hover:bg-violet-500/10 disabled:opacity-60"
+      className="item mt-8 flex w-full flex-col items-center gap-3 py-8 text-text transition-colors hover:!border-[rgba(139,111,212,0.4)] hover:!bg-[rgba(139,111,212,0.08)] disabled:opacity-60"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.2} strokeLinecap="round" className="h-12 w-12 text-violet-300" aria-hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" className="h-12 w-12 text-violet-300" aria-hidden>
         <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
         <path d="M9 9v1.5M15 9v1.5M12 9v4l-1 .5M9.5 16a3.5 3.5 0 0 0 5 0" />
       </svg>
-      <span className="font-mono text-[10px] uppercase tracking-[0.4em]">
+      <span className="text-[13px] font-semibold">
         {busy ? "Checking…" : "Unlock with Face ID"}
       </span>
     </button>
@@ -108,13 +109,21 @@ export default function LoginPage() {
     <main className="relative z-10 flex min-h-screen items-center justify-center px-6">
       <form
         onSubmit={signIn}
-        className="w-full max-w-sm rounded-3xl bg-gradient-to-b from-[#1b1b1d] to-[#121213] p-10 shadow-[0_40px_90px_-30px_rgba(0,0,0,1)]"
+        className={`modal w-full max-w-sm ${error ? "shake" : ""}`}
+        key={error ?? "ok"}
       >
-        <p className="flex items-center gap-3 text-sm font-medium tracking-[0.3em] text-neutral-100">
-          LAURA <span className="h-1 w-1 rounded-full bg-neutral-200" />
-        </p>
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-11 w-11 items-center justify-center rounded-[14px] border border-line-2 bg-[#0b0b0b]">
+            <span className="logo-ring absolute inset-0 rounded-[14px]" aria-hidden />
+            <LogoMark className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-[20px] font-semibold leading-tight">Welcome back</p>
+            <p className="text-[13px] text-muted">Sign in to LAURA</p>
+          </div>
+        </div>
 
-        {mode === "checking" && <div className="mt-16 h-[124px]" aria-hidden />}
+        {mode === "checking" && <div className="mt-8 h-[124px]" aria-hidden />}
 
         {mode === "faceid" && (
           <>
@@ -127,7 +136,7 @@ export default function LoginPage() {
 
         {mode === "password" && (
           <>
-            <label htmlFor="password" className="mt-16 block font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-400">
+            <label htmlFor="password" className="label mt-8 block">
               Password
             </label>
             <input
@@ -137,7 +146,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-3 w-full border-b border-[var(--calendar-accent)]/70 bg-transparent pb-2 text-lg font-light text-neutral-100 outline-none focus:border-[var(--calendar-accent)]"
+              className="input mt-2"
             />
             <p className="mt-3 min-h-5 text-xs text-red-400" role="alert">
               {error}
@@ -145,19 +154,16 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={!password || busy}
-              className="group mt-10 flex w-full items-center justify-between font-mono text-[10px] uppercase tracking-[0.4em] text-neutral-400 transition-colors hover:text-neutral-100 disabled:opacity-40"
+              className="btn btn-primary btn-hero mt-4 w-full"
             >
               {busy ? "Signing in…" : "Get access"}
-              <span className="relative h-px w-20 bg-neutral-500 transition-colors group-hover:bg-[var(--calendar-accent)]">
-                <span className="absolute -top-[3px] right-0 h-[7px] w-[7px] rotate-45 border-r border-t border-neutral-500 group-hover:border-[var(--calendar-accent)]" />
-              </span>
             </button>
             {canUsePasskey && (
               <button
                 type="button"
                 onClick={() => signInWithPasskey()}
                 disabled={busy}
-                className="mt-8 w-full text-center font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-600 transition-colors hover:text-violet-300"
+                className="btn-ghost mt-3 w-full justify-center"
               >
                 Use Face ID instead
               </button>

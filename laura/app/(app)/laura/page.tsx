@@ -99,7 +99,8 @@ export default function LauraPage() {
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 pb-10">
       <div className="laura-stars pointer-events-none fixed inset-0 -z-20 opacity-60" aria-hidden />
 
-      <div className="flex items-center justify-end gap-1 pt-2">
+      <div className="flex justify-end pt-2">
+        <div className="tabs">
         {(["chat", "activity"] as const).map((t) => (
           <button
             key={t}
@@ -107,13 +108,12 @@ export default function LauraPage() {
               setChatOpen(tab === t ? !chatOpen : true);
               setTab(t);
             }}
-            className={`rounded-full px-3 py-1 font-mono text-[11px] capitalize tracking-wide transition-colors ${
-              chatOpen && tab === t ? "bg-white/10 text-white" : "text-neutral-500 hover:text-neutral-300"
-            }`}
+            className={`tab capitalize ${chatOpen && tab === t ? "is-active" : ""}`}
           >
             {t}
           </button>
         ))}
+        </div>
       </div>
 
       <div
@@ -126,7 +126,7 @@ export default function LauraPage() {
           className={`transition-all duration-700 ${hasConversation ? "w-[240px] sm:w-[300px]" : "w-[340px] sm:w-[520px]"}`}
         />
         {!hasConversation && (
-          <p className="-mt-8 font-mono text-[11px] uppercase tracking-[0.4em] text-neutral-500">
+          <p className="label -mt-8">
             {greeting}, Madoxs Harvey
           </p>
         )}
@@ -149,7 +149,7 @@ export default function LauraPage() {
           {messages.map((m, i) => (
             <div key={i} className={`flex flex-col ${m.role === "user" ? "items-end" : "items-start"}`}>
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] font-light leading-relaxed ${
+                className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] font-normal leading-relaxed ${
                   m.role === "user"
                     ? "rounded-br-md bg-white text-neutral-900"
                     : "rounded-bl-md border border-white/10 bg-white/[0.04] text-neutral-100 backdrop-blur-md"
@@ -158,7 +158,7 @@ export default function LauraPage() {
                 {m.content}
               </div>
               {m.places?.map((p) => (
-                <div key={p.name} className="mt-2 w-full max-w-[80%] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
+                <div key={p.name} className="mt-2 w-full max-w-[80%] overflow-hidden rounded-2xl border border-line bg-white/[0.03]">
                   {p.images.length > 0 && (
                     <div className="flex gap-1 overflow-x-auto">
                       {p.images.map((src) => (
@@ -171,9 +171,9 @@ export default function LauraPage() {
                     <p className="text-neutral-100">{p.name}{p.location ? <span className="text-neutral-500"> · {p.location}</span> : null}</p>
                     {p.rating && <p className="font-mono text-xs text-[var(--calendar-accent)]">★ {p.rating}</p>}
                     {(p.price || p.vibe) && <p className="text-xs text-neutral-400">{[p.price, p.vibe].filter(Boolean).join(" · ")}</p>}
-                    {p.verdict && <p className="font-light text-neutral-300">{p.verdict}</p>}
+                    {p.verdict && <p className="text-neutral-300">{p.verdict}</p>}
                     {p.website && (
-                      <a href={p.website} target="_blank" rel="noopener noreferrer" className="inline-block pt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-neutral-200">
+                      <a href={p.website} target="_blank" rel="noopener noreferrer" className="label inline-block pt-1 hover:text-neutral-200">
                         Website ↗
                       </a>
                     )}
@@ -184,7 +184,7 @@ export default function LauraPage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="flex gap-1 rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.04] px-4 py-4">
+              <div className="flex gap-1 rounded-2xl rounded-bl-md border border-line bg-white/[0.04] px-4 py-4">
                 {[0, 1, 2].map((d) => (
                   <span
                     key={d}
@@ -213,10 +213,10 @@ export default function LauraPage() {
             }}
             placeholder="What do you want to know?"
             rows={2}
-            className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-light text-white outline-none placeholder:text-neutral-500"
+            className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-normal text-white outline-none placeholder:text-neutral-500"
           />
           <div className="mt-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-neutral-300">
+            <span className="flex items-center gap-1.5 rounded-full border border-line bg-white/[0.04] px-3 py-1.5 text-xs text-neutral-300">
               <iconify-icon icon="solar:stars-minimalistic-linear" className="text-sm"></iconify-icon>
               Laura
             </span>
@@ -240,7 +240,7 @@ export default function LauraPage() {
               <button
                 key={s.label}
                 onClick={() => applySuggestion(s.prompt)}
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3.5 py-2 text-xs text-neutral-300 backdrop-blur-md transition-colors hover:border-white/25 hover:text-white"
+                className="flex items-center gap-2 rounded-xl border border-line bg-white/[0.03] px-3.5 py-2 text-xs text-neutral-300 backdrop-blur-md transition-colors hover:border-white/25 hover:text-white"
               >
                 <iconify-icon icon={s.icon} className="text-sm"></iconify-icon>
                 {s.label}

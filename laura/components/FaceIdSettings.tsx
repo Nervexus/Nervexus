@@ -79,9 +79,9 @@ export function FaceIdSettings() {
     <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] p-6 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">Sign-in</p>
-          <h2 className="mt-3 text-xl font-thin text-neutral-100">Face ID</h2>
-          <p className="mt-1.5 max-w-md text-sm font-light text-neutral-500">
+          <p className="label">Sign-in</p>
+          <h2 className="mt-3 text-xl font-normal text-neutral-100">Face ID</h2>
+          <p className="mt-1.5 max-w-md text-sm font-normal text-neutral-500">
             Sign in with Face ID, Touch ID or your fingerprint instead of the password. Set it up once on each
             device you use.
           </p>
@@ -89,10 +89,9 @@ export function FaceIdSettings() {
         <button
           onClick={add}
           disabled={busy || !supported}
-          className="group flex shrink-0 items-center gap-3 py-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-300 transition-colors hover:text-neutral-50 disabled:opacity-30"
+          className="btn btn-primary shrink-0"
         >
           {busy ? "Waiting…" : "Add this device"}
-          <span className="h-px w-10 bg-neutral-500 transition-all group-hover:w-14 group-hover:bg-violet-400" />
         </button>
       </div>
       {!supported && <p className="mt-4 text-sm text-neutral-500">This browser doesn&apos;t support passkeys.</p>}
@@ -100,15 +99,15 @@ export function FaceIdSettings() {
       {passkeys && passkeys.length > 0 && (
         <div className="mt-5 flex flex-col">
           {passkeys.map((p) => (
-            <div key={p.id} className="flex items-center gap-4 border-t border-white/[0.05] py-3">
+            <div key={p.id} className="flex items-center gap-4 border-t border-line py-3">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-              <span className="flex-1 text-sm font-light text-neutral-200">{p.label ?? "Passkey"}</span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-600">
+              <span className="flex-1 text-sm font-normal text-neutral-200">{p.label ?? "Passkey"}</span>
+              <span className="label">
                 {p.lastUsedAt ? `Used ${new Date(p.lastUsedAt).toLocaleDateString()}` : `Added ${new Date(p.createdAt).toLocaleDateString()}`}
               </span>
               <button
                 onClick={() => remove(p.id)}
-                className="font-mono text-[10px] uppercase tracking-[0.2em] text-neutral-600 hover:text-red-400"
+                className="label hover:text-red-400"
               >
                 Remove
               </button>

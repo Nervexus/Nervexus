@@ -42,16 +42,15 @@ export default function SettingsPage() {
   const needsAttention = items?.filter((i) => i.status !== "connected").length ?? 0;
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-3xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Settings</h1>
+        <h1 className="page-title">Settings</h1>
         {items && <Pill>{needsAttention === 0 ? "all set" : `${needsAttention} need setup`}</Pill>}
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         every credential Laura uses or will use, and whether it&apos;s connected — none of the
         actual secret values are ever shown here, only status
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
       <div className="gsap-entrance mt-8">
         <FaceIdSettings />
@@ -61,7 +60,7 @@ export default function SettingsPage() {
         href={CREDENTIALS_GUIDE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="gsap-entrance mt-6 flex items-center gap-3 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5 transition-colors hover:border-neutral-600"
+        className="gsap-entrance mt-6 flex items-center gap-3 card p-5 transition-colors hover:border-neutral-600"
       >
         <iconify-icon icon="solar:document-text-linear" className="shrink-0 text-xl text-neutral-400" />
         <div className="min-w-0 flex-1">
@@ -82,7 +81,7 @@ export default function SettingsPage() {
             if (groupItems.length === 0) return null;
             return (
               <div key={label}>
-                <h2 className="gsap-entrance mb-3 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+                <h2 className="label gsap-entrance mb-3">
                   {label}
                 </h2>
                 <div className="flex flex-col gap-2">

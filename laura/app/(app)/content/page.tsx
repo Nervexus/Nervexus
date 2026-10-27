@@ -122,19 +122,18 @@ export default function ContentPage() {
   ];
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Content</h1>
+        <h1 className="page-title">Content</h1>
         <Pill>{active.length} tracked</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         Instagram post ideas Laura&apos;s helped brainstorm or you&apos;ve noted — no account is
         connected yet, so this is research and planning, never posting
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
-      <div className="gsap-entrance relative mt-8 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+      <div className="gsap-entrance relative mt-8 card p-5">
+        <span className="label">
           Research a public account
         </span>
         <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -143,21 +142,21 @@ export default function ContentPage() {
             onChange={(e) => setHandle(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && research()}
             placeholder="@someaccount"
-            className="min-w-0 flex-1 border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="min-w-0 flex-1 input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
           <Button variant="accent" onClick={research} disabled={researching || !handle.trim()}>
             {researching ? "Researching…" : "Research"}
           </Button>
         </div>
         {researchResult && (
-          <div className="mt-4 border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)]">
+          <div className="mt-4 input">
             <p className="whitespace-pre-wrap text-sm text-neutral-300">{researchResult}</p>
           </div>
         )}
       </div>
 
-      <div className="gsap-entrance relative mt-4 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+      <div className="gsap-entrance relative mt-4 card p-5">
+        <span className="label">
           Add an idea by hand
         </span>
         <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -165,12 +164,12 @@ export default function ContentPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title, e.g. Beach sunset reel"
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
           />
           <select
             value={type}
             onChange={(e) => setType(e.target.value as (typeof TYPES)[number])}
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
           >
             {TYPES.map((t) => (
               <option key={t} value={t}>
@@ -183,13 +182,13 @@ export default function ContentPage() {
             onChange={(e) => setCaption(e.target.value)}
             placeholder="Caption (optional)"
             rows={2}
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
+            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
           />
           <input
             value={hashtags}
             onChange={(e) => setHashtags(e.target.value)}
             placeholder="Hashtags, comma-separated (optional)"
-            className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
+            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
           />
         </div>
         <div className="mt-3.5 flex justify-end">
@@ -214,7 +213,7 @@ export default function ContentPage() {
               ({ label, items }) =>
                 items.length > 0 && (
                   <div key={label} className="mb-8">
-                    <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+                    <h2 className="label mb-3">
                       {label} · {items.length}
                     </h2>
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
@@ -236,7 +235,7 @@ export default function ContentPage() {
           {discarded.length > 0 && (
             <button
               onClick={() => setShowDiscarded((s) => !s)}
-              className="font-mono text-[11px] uppercase tracking-widest text-neutral-600 hover:text-neutral-300"
+              className="label hover:text-neutral-300"
             >
               {showDiscarded ? "Hide" : "Show"} discarded ({discarded.length})
             </button>

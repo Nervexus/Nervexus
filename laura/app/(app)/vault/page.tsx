@@ -100,29 +100,28 @@ export default function VaultPage() {
   }
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Vault</h1>
+        <h1 className="page-title">Vault</h1>
         <Pill>{items.length} items</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         encrypted at rest — Laura herself can&apos;t read these, only this page can
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
-      <div className="gsap-entrance relative mt-8 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
+      <div className="gsap-entrance relative mt-8 card p-5">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What is this? (e.g. Wi-Fi password)"
-          className="w-full border-b border-[var(--calendar-accent)]/40 bg-transparent pb-2 text-base font-light outline-none placeholder:text-neutral-600 focus:border-[var(--calendar-accent)]"
+          className="w-full input text-base font-normal outline-none placeholder:text-neutral-600"
         />
         <input
           value={secret}
           onChange={(e) => setSecret(e.target.value)}
           placeholder="Secret value"
           type="password"
-          className="mt-5 w-full border-b border-[var(--calendar-accent)]/40 bg-transparent pb-2 font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600 focus:border-[var(--calendar-accent)]"
+          className="mt-5 w-full input font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
         />
         <div className="mt-3 flex justify-end">
           <Button variant="accent" onClick={add} disabled={!title.trim() || !secret}>

@@ -43,7 +43,7 @@ export function LandingFooter() {
                     href={l.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-medium uppercase tracking-widest text-neutral-500 transition-colors hover:text-white"
+                    className="label text-xs transition-colors hover:text-white"
                   >
                     {l.label}
                   </a>
@@ -51,7 +51,7 @@ export function LandingFooter() {
                   <Link
                     key={l.label}
                     href={l.href}
-                    className="text-xs font-medium uppercase tracking-widest text-neutral-500 transition-colors hover:text-white"
+                    className="label text-xs transition-colors hover:text-white"
                   >
                     {l.label}
                   </Link>

@@ -1,25 +1,28 @@
-import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Manrope, Geist_Mono } from "next/font/google";
 import { Vignette } from "@/components/background/Vignette";
 import { NoiseOverlay } from "@/components/background/NoiseOverlay";
 import { IconifyRegister } from "@/components/IconifyRegister";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["400", "500", "600"],
 });
+
+export const viewport: Viewport = { themeColor: "#060606" };
 
 export const metadata: Metadata = {
   title: "Laura",
   description: "Personal assistant — core brain",
+  icons: { icon: "/icon.svg" },
 };
 
 // Nav chrome lives per route group: (marketing)'s slim header/footer for
@@ -28,8 +31,8 @@ export const metadata: Metadata = {
 // layers.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}>
-      <body className="min-h-full overflow-x-hidden bg-[#080808] text-[#FFFFFF] selection:bg-neutral-800">
+    <html lang="en" className={`${manrope.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="min-h-full overflow-x-hidden bg-bg text-text">
         <IconifyRegister />
         <Vignette />
         <div className="relative z-10 min-h-screen">{children}</div>

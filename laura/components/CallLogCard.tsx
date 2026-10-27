@@ -39,7 +39,7 @@ export function CallLogCard({
       </IconTile>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">
+          <span className="label">
             {kind === "call" ? "Call" : "Text"}
           </span>
           <span className="shrink-0 text-[11px] text-neutral-600">{timeAgo(createdAt)}</span>

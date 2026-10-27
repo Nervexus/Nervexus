@@ -26,8 +26,8 @@ export function TomorrowBriefing() {
   if (!briefing || (!briefing.shift && briefing.reminders.length === 0)) return null;
 
   return (
-    <div className="gsap-entrance gradient-border relative mt-6 w-full max-w-xl rounded-2xl border border-neutral-800/60 bg-neutral-900/40 px-4 py-3 backdrop-blur-sm">
-      <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+    <div className="gsap-entrance gradient-border relative mt-6 w-full max-w-xl item px-4 py-3 backdrop-blur-sm">
+      <span className="label">
         Tomorrow
       </span>
       <p className="mt-1 text-sm leading-relaxed text-neutral-300">{briefing.summary}</p>

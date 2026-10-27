@@ -69,28 +69,23 @@ export default function CallsPage() {
   const failed = logs.filter((l) => l.status === "failed").length;
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Calls & texts</h1>
+        <h1 className="page-title">Calls & texts</h1>
         <Pill>{logs.length} sent</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         have Laura send you an urgent notification or a plain message, via Telegram — free, but
         not an actual ringing phone call
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
-      <div className="gsap-entrance relative mt-8 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
-        <div className="flex gap-2">
+      <div className="gsap-entrance relative mt-8 card p-5">
+        <div className="tabs">
           {(["call", "sms"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setKind(k)}
-              className={`rounded-full border px-3.5 py-1 font-mono text-[11px] uppercase tracking-wide transition-colors ${
-                kind === k
-                  ? "border-neutral-300 bg-neutral-300/10 text-neutral-100"
-                  : "border-neutral-800 text-neutral-500 hover:text-neutral-300"
-              }`}
+              className={`tab ${kind === k ? "is-active" : ""}`}
             >
               {k === "call" ? "Call me" : "Text me"}
             </button>
@@ -104,7 +99,7 @@ export default function CallsPage() {
             kind === "call" ? "What should the urgent message say?" : "What should the message say?"
           }
           rows={3}
-          className="mt-5 w-full resize-none border-b border-[var(--calendar-accent)]/40 bg-transparent pb-2 text-base font-light text-neutral-200 outline-none placeholder:text-neutral-600 focus:border-[var(--calendar-accent)]"
+          className="mt-5 w-full resize-none input text-base font-normal text-neutral-200 outline-none placeholder:text-neutral-600"
         />
 
         <div className="mt-3.5 flex flex-wrap gap-2">

@@ -80,7 +80,7 @@ export function BookingRow({
           </div>
           {note && <p className="mt-2 text-sm text-neutral-400">{note}</p>}
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-neutral-800/60 pt-3">
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line pt-3">
             <div className="flex flex-wrap items-center gap-1.5">
               {Object.keys(STATUS_LABEL)
                 .filter((s) => s !== "cancelled")
@@ -88,11 +88,7 @@ export function BookingRow({
                   <button
                     key={s}
                     onClick={() => onStatusChange(s)}
-                    className={`whitespace-nowrap rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide transition-colors ${
-                      status === s
-                        ? "border-[var(--booking-accent)] bg-[var(--booking-accent)] text-neutral-950"
-                        : "border-neutral-800 text-neutral-500 hover:border-neutral-600 hover:text-neutral-300"
-                    }`}
+                    className={`tag whitespace-nowrap capitalize transition-opacity ${status === s ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
                   >
                     {STATUS_LABEL[s]}
                   </button>
@@ -112,7 +108,7 @@ export function BookingRow({
                   href={l.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="whitespace-nowrap font-mono text-[10px] uppercase tracking-wide text-neutral-400 hover:text-neutral-100"
+                  className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px]"
                 >
                   {l.label} ↗
                 </a>
@@ -121,14 +117,14 @@ export function BookingRow({
               {status !== "cancelled" && (
                 <button
                   onClick={() => onStatusChange("cancelled")}
-                  className="whitespace-nowrap font-mono text-[10px] uppercase tracking-wide text-neutral-600 hover:text-red-400"
+                  className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px] capitalize hover:!text-[#ff9a90]"
                 >
                   cancel
                 </button>
               )}
               <button
                 onClick={onDelete}
-                className="whitespace-nowrap font-mono text-[10px] uppercase tracking-wide text-neutral-600 hover:text-red-400"
+                className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px] capitalize hover:!text-[#ff9a90]"
               >
                 delete
               </button>

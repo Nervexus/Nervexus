@@ -1,23 +1,18 @@
 import type { ReactNode } from "react";
 
-/** A titled card used in each tool page's sidebar column. */
+/** A titled card used in each tool page's side column. */
 export function SidebarCard({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
-      <div className="flex items-center justify-between px-1">
-        <h2 className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">{title}</h2>
-      </div>
-      <div className="mt-4">{children}</div>
+    <div className="card card-pad">
+      <h2 className="label">{title}</h2>
+      <div className="mt-3.5">{children}</div>
     </div>
   );
 }
 
 export function Chip({ onClick, children }: { onClick: () => void; children: ReactNode }) {
   return (
-    <button
-      onClick={onClick}
-      className="rounded-xl bg-neutral-900/70 px-3.5 py-2 font-mono text-xs text-neutral-300 transition-colors hover:border-neutral-600 hover:text-neutral-100"
-    >
+    <button onClick={onClick} className="item px-3.5 py-2 text-[13px] text-muted transition-colors hover:text-text">
       {children}
     </button>
   );
@@ -25,9 +20,9 @@ export function Chip({ onClick, children }: { onClick: () => void; children: Rea
 
 export function Stat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="flex items-center justify-between rounded-xl bg-neutral-900/60 px-3 py-2.5">
-      <span className="text-sm text-neutral-300">{label}</span>
-      <span className="font-mono text-xs tabular-nums text-neutral-500">{value}</span>
+    <div className="item flex items-center justify-between px-3.5 py-2.5">
+      <span className="text-[13px] text-muted">{label}</span>
+      <span className="font-mono text-[13px] font-medium tabular text-text">{value}</span>
     </div>
   );
 }

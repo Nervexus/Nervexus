@@ -13,13 +13,13 @@ export function BookingsWidget({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
+    <div className="card p-5">
       <div className="flex items-end justify-between gap-3 px-1">
         <div>
-          <span className="text-5xl font-thin tabular-nums tracking-tight text-neutral-100">
+          <span className="stat-num !text-[46px]">
             {String(count).padStart(2, "0")}
           </span>
-          <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">{label}</span>
+          <span className="label ml-2">{label}</span>
         </div>
       </div>
       <div className="mt-4 flex flex-col gap-1.5">{children}</div>

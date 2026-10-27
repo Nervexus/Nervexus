@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "@/components/NavIcon";
 import { LandingFooter } from "@/components/LandingFooter";
 
 export default function MarketingLayout({ children }: LayoutProps<"/">) {
@@ -6,12 +7,14 @@ export default function MarketingLayout({ children }: LayoutProps<"/">) {
     <div className="relative z-10 flex min-h-screen flex-col">
       <header className="flex items-center justify-between px-6 py-6 sm:px-10">
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.9)]" />
-          <span className="text-sm font-medium tracking-[0.3em] text-neutral-100">LAURA</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-line-2 bg-[#0b0b0b]">
+            <LogoMark />
+          </span>
+          <span className="text-[15px] font-semibold tracking-tight">LAURA</span>
         </Link>
         <Link
           href="/laura"
-          className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-400 transition-colors hover:text-neutral-100"
+          className="btn"
         >
           Sign in
         </Link>

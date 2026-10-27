@@ -142,38 +142,35 @@ export default function BookingsPage() {
   ];
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-6 pb-20">
+    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="font-thin text-4xl tracking-tight text-neutral-100">Bookings</h1>
+        <h1 className="page-title">Bookings</h1>
         <Pill>{active.length} tracked</Pill>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         restaurants, activities, and trips Laura&apos;s helped you look into — she researches and
         tracks, you always complete the booking yourself
       </p>
-      <div className="gsap-entrance mt-5 h-px w-full bg-gradient-to-r from-[var(--calendar-accent)]/70 via-[var(--calendar-accent)]/20 to-transparent" />
 
       <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
+        <div className="card p-5">
           <div className="flex items-center justify-between px-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">Search</span>
+            <span className="label">Search</span>
           </div>
-          <div className="mt-4 flex items-center gap-3 border-b border-[var(--calendar-accent)]/40 pb-1">
-            <iconify-icon icon="solar:magnifer-linear" className="shrink-0 text-neutral-500"></iconify-icon>
+          <div className="mt-3.5 flex items-center gap-2.5">
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && search()}
               placeholder="Italian near Soho for 4, Friday 8pm"
-              className="min-w-0 flex-1 bg-transparent py-2 font-mono text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+              className="input min-w-0 flex-1"
             />
             <button
               onClick={search}
               disabled={searching || !query.trim()}
-              className="group shrink-0 inline-flex items-center gap-3 py-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-300 transition-colors hover:text-neutral-50 disabled:opacity-30"
+              className="btn btn-primary shrink-0"
             >
               {searching ? "…" : "Go"}
-              <span className="h-px w-8 bg-neutral-500 transition-all group-hover:w-12 group-hover:bg-[var(--calendar-accent)]" />
             </button>
           </div>
           {searchResult && (
@@ -188,16 +185,16 @@ export default function BookingsPage() {
           )}
         </div>
 
-        <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)] p-5">
+        <div className="card p-5">
           <div className="flex items-center justify-between px-1">
-            <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-500">Add by hand</span>
+            <span className="label">Add by hand</span>
           </div>
           <div className="mt-4 flex flex-col gap-2">
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Dinner at Lina's"
-              className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-200 outline-none placeholder:text-neutral-600 "
+              className="input text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
             />
             <div className="grid grid-cols-4 gap-2">
               {CATEGORIES.map((c) => (
@@ -205,13 +202,12 @@ export default function BookingsPage() {
                   key={c}
                   onClick={() => setCategory(c)}
                   aria-label={c}
-                  className={`flex flex-col items-center gap-1 rounded-2xl py-2.5 transition-colors ${
-                    category === c ? "bg-neutral-800 text-neutral-100" : "bg-neutral-900/70 text-neutral-500 hover:text-neutral-300"
+                  className={`item flex flex-col items-center gap-1 py-2.5 transition-colors ${
+                    category === c ? "!border-[rgba(139,111,212,0.4)] !bg-[rgba(139,111,212,0.14)] text-violet-200" : "text-muted hover:text-text"
                   }`}
                 >
                   <iconify-icon icon={CATEGORY_ICON[c]} className="text-lg"></iconify-icon>
-                  <span className="font-mono text-[9px] uppercase tracking-widest">{c}</span>
-                  <span className={`h-0.5 w-3 rounded-full ${category === c ? "bg-[var(--booking-accent)]" : "bg-transparent"}`} />
+                  <span className="text-[12px] capitalize">{c}</span>
                 </button>
               ))}
             </div>
@@ -220,13 +216,13 @@ export default function BookingsPage() {
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => setDateTime(e.target.value)}
-                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-300 outline-none [color-scheme:dark]"
+                className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
               />
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Location"
-                className="border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+                className="input text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -234,15 +230,14 @@ export default function BookingsPage() {
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
                 placeholder="Booking link"
-                className="min-w-0 flex-1 border-b border-[var(--calendar-accent)]/40 bg-transparent px-0 pb-2 pt-1 font-light focus:border-[var(--calendar-accent)] text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+                className="min-w-0 flex-1 input text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
               />
               <button
                 onClick={addBooking}
                 disabled={!title.trim()}
-                className="group shrink-0 inline-flex items-center gap-3 py-2 font-mono text-[10px] uppercase tracking-[0.35em] text-neutral-300 transition-colors hover:text-neutral-50 disabled:opacity-30"
+                className="btn btn-primary shrink-0"
               >
                 Add
-                <span className="h-px w-8 bg-neutral-500 transition-all group-hover:w-12 group-hover:bg-[var(--calendar-accent)]" />
               </button>
             </div>
           </div>
@@ -282,7 +277,7 @@ export default function BookingsPage() {
           {cancelled.length > 0 && (
             <button
               onClick={() => setShowCancelled((s) => !s)}
-              className="self-start font-mono text-[11px] uppercase tracking-widest text-neutral-600 hover:text-neutral-300"
+              className="label self-start hover:text-neutral-300"
             >
               {showCancelled ? "Hide" : "Show"} cancelled ({cancelled.length})
             </button>
@@ -296,7 +291,7 @@ export default function BookingsPage() {
               { label: "Pending", value: pending.length },
               { label: "Ideas", value: ideas.length },
             ].map((s) => (
-              <div key={s.label} className="flex items-center justify-between rounded-xl bg-neutral-900/60 px-3 py-2.5">
+              <div key={s.label} className="flex items-center justify-between item px-3 py-2.5">
                 <span className="text-sm text-neutral-300">{s.label}</span>
                 <span className="font-mono text-xs tabular-nums text-neutral-500">{s.value}</span>
               </div>
