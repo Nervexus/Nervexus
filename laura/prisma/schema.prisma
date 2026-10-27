@@ -202,3 +202,19 @@ model OutreachEvent {
 
   @@index([at])
 }
+
+// One step in the daily routine (Routine page cards), editable by the
+// user. slot is "morning" | "afternoon" | "night"; days is a comma list of
+// weekdays (0 = Sunday) or null for every day; owned=false marks a product
+// still to buy (shown with its link, left out of checklists).
+model RoutineItem {
+  id        String   @id @default(cuid())
+  slot      String
+  text      String
+  product   String?
+  link      String?
+  owned     Boolean  @default(true)
+  days      String?
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+}

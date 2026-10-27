@@ -708,3 +708,9 @@ body {
     animation: none;
   }
 }
+
+.tag-amber {
+  color: var(--amber);
+  background: rgba(255, 192, 70, 0.1);
+  border-color: rgba(255, 192, 70, 0.3);
+}

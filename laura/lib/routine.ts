@@ -88,10 +88,6 @@ export const KEY_DATES: { date: string; until?: string; items: string[] }[] = [
 const BARBER_DATE = "2026-11-27";
 const HAIRCUT_DATE = "2026-10-30";
 
-/** Nutmeg exfoliator nights (Mon, Wed, Sat): 3x a week, and on those nights
- * it replaces the Clean & Clear wash, never on top of it. */
-const EXFOLIATE_DAYS = new Set([1, 3, 6]);
-
 type Block = { title: string; detail: string };
 const WORK_BLOCKS: Record<number, Block> = {
   1: { title: "Outreach, 10 messages", detail: "Roofers, £250 sites. Note who replies." },
@@ -107,7 +103,18 @@ const WORK_BLOCKS: Record<number, Block> = {
 
 // ---------- types ----------
 
-export type Step = { id: string; text: string };
+export type Slot = "morning" | "afternoon" | "night";
+/** A checklist line. auto = generated from the rota (alarm, work block),
+ * not editable; owned=false = a product still to buy. */
+export type Step = { id: string; text: string; product: string | null; link: string | null; owned: boolean; auto?: boolean };
+export type RoutineItemRow = { id: string; slot: string; text: string; product: string | null; link: string | null; owned: boolean; days: string | null; sort: number };
+export type WeekDay = {
+  date: string;
+  label: string;
+  shift: { start: string; end: string; colleagues: string | null; location: string | null } | null;
+  block: (Block & { when: string }) | null;
+  items: string[];
+};
 export type Oil = { id: string; name: string; notes: string | null; day: boolean; night: boolean; cold: boolean };
 export type Pick = { oil: Oil | null; why: string };
 export type Plan = { when: string; title: string; kind: "shift" | "booking" | "trip"; pick: Pick };
@@ -117,7 +124,9 @@ export type RoutineDay = {
   label: string;
   shift: { start: string; end: string; startAt: string; endAt: string; location: string | null } | null;
   morning: Step[];
+  afternoon: Step[];
   night: Step[];
+  shopping: { product: string; link: string | null }[];
   block: (Block & { when: string }) | null;
   hair: { headline: string; detail: string };
   wear: Pick;
@@ -182,49 +191,62 @@ function hairFor(ymd: string): { headline: string; detail: string } {
   return { headline: "Short boxed beard", detail: `Tidy the lines once a week. ${curls}` };
 }
 
-export async function buildDay(ymd: string, oils?: Oil[]): Promise<RoutineDay> {
-  const date = localMidnight(ymd);
-  const { weekday, month } = localParts(new Date(date.getTime() + 12 * 60 * 60 * 1000));
-  const tomorrowYmd = addDays(ymd, 1);
-  const [shift, nextShift, ownedOils] = await Promise.all([shiftOn(ymd), shiftOn(tomorrowYmd), oils ?? loadOils()]);
+export async function loadRoutineItems(): Promise<RoutineItemRow[]> {
+  return prisma.routineItem.findMany({ orderBy: [{ slot: "asc" }, { sort: "asc" }, { createdAt: "asc" }] });
+}
 
-  const exfoliate = EXFOLIATE_DAYS.has(weekday);
-  const morning: Step[] = [
-    { id: "am-wash", text: "Clean & Clear wash" },
-    { id: "am-eye", text: "Caffeine eye serum, tap under the eyes" },
-    { id: "am-moist", text: "Mattifying moisturiser" },
-    { id: "am-spf", text: "SPF, every morning" },
-    { id: "am-oil", text: "Perfume oil once dressed" },
-  ];
-  const night: Step[] = [
-    exfoliate
-      ? { id: "pm-wash", text: "Nutmeg exfoliator (no Clean & Clear tonight)" }
-      : { id: "pm-wash", text: "Clean & Clear wash" },
-    { id: "pm-moist", text: "Rich moisturiser" },
-  ];
+const onDay = (item: RoutineItemRow, weekday: number) =>
+  !item.days || item.days.split(",").map((d) => Number(d.trim())).includes(weekday);
 
+const toStep = (i: RoutineItemRow): Step => ({ id: i.id, text: i.text, product: i.product, link: i.link, owned: i.owned });
+
+function blockFor(ymd: string, weekday: number, shift: { startAt: Date; endAt: Date } | null): (Block & { when: string }) | null {
   // No work blocks while away (the Budapest trip).
   const away = KEY_DATES.some((k) => k.until && ymd >= k.date && ymd <= k.until);
   const base = away ? undefined : WORK_BLOCKS[weekday];
-  const block = base
-    ? {
-        ...base,
-        when: !shift
-          ? base.title.startsWith("Weekly") ? "this evening" : "today, any time"
-          : // Theory is flexible: on a late shift do it before, not at 10pm.
-            !base.title.startsWith("Outreach") && localParts(shift.startAt).hour >= 12
-            ? `before your shift (${shortTime(shift.startAt)})`
-            : `after your shift (${shortTime(shift.endAt)})`,
-      }
-    : null;
-  if (block) night.push({ id: "pm-block", text: `Done: ${block.title.toLowerCase()}` });
+  if (!base) return null;
+  return {
+    ...base,
+    when: !shift
+      ? base.title.startsWith("Weekly") ? "this evening" : "any time"
+      : // Theory is flexible: on a late shift do it before, not at 10pm.
+        !base.title.startsWith("Outreach") && localParts(shift.startAt).hour >= 12
+        ? `before your shift (${shortTime(shift.startAt)})`
+        : `after your shift (${shortTime(shift.endAt)})`,
+  };
+}
 
+export async function buildDay(ymd: string, oils?: Oil[], routineItems?: RoutineItemRow[]): Promise<RoutineDay> {
+  const date = localMidnight(ymd);
+  const { weekday, month } = localParts(new Date(date.getTime() + 12 * 60 * 60 * 1000));
+  const tomorrowYmd = addDays(ymd, 1);
+  const [shift, nextShift, ownedOils, items] = await Promise.all([
+    shiftOn(ymd),
+    shiftOn(tomorrowYmd),
+    oils ?? loadOils(),
+    routineItems ?? loadRoutineItems(),
+  ]);
+
+  const today = items.filter((i) => onDay(i, weekday));
+  const slot = (name: Slot) => today.filter((i) => i.slot === name).map(toStep);
+  const morning = slot("morning");
+  const afternoon = slot("afternoon");
+  const night = slot("night");
+
+  const block = blockFor(ymd, weekday, shift);
+  if (block) {
+    afternoon.unshift({ id: "auto-block", text: `${block.title}, ${block.when}`, product: null, link: null, owned: true, auto: true });
+  }
   const alarm = nextShift ? shortTime(new Date(nextShift.startAt.getTime() - 90 * 60 * 1000)) : null;
   if (nextShift) {
-    night.push({ id: "pm-alarm", text: `Alarm for ${alarm} (shift ${shortTime(nextShift.startAt)})` });
-    night.push({ id: "pm-clothes", text: "Clothes out for tomorrow" });
+    night.push({ id: "auto-alarm", text: `Alarm for ${alarm} (shift ${shortTime(nextShift.startAt)})`, product: null, link: null, owned: true, auto: true });
   }
-  night.push({ id: "pm-charge", text: "Phone on charge" });
+
+  const shopping: RoutineDay["shopping"] = [];
+  for (const i of items) {
+    const product = i.product || i.text;
+    if (!i.owned && !shopping.some((x) => x.product === product)) shopping.push({ product, link: i.link });
+  }
 
   const night_ = shift ? localParts(shift.startAt).hour >= 17 : false;
   return {
@@ -240,7 +262,9 @@ export async function buildDay(ymd: string, oils?: Oil[]): Promise<RoutineDay> {
         }
       : null,
     morning,
+    afternoon,
     night,
+    shopping,
     block,
     hair: hairFor(ymd),
     wear: pickOil(ownedOils, { night: night_, cold: isCold(month), seed: Math.floor(date.getTime() / DAY_MS) }),
@@ -251,6 +275,27 @@ export async function buildDay(ymd: string, oils?: Oil[]): Promise<RoutineDay> {
       alarm,
     },
   };
+}
+
+/** The next `days` days of the rota: shift, work block and key dates each day. */
+export async function weekPlan(fromYmd: string, days = 7): Promise<WeekDay[]> {
+  const from = localMidnight(fromYmd);
+  const shifts = await prisma.shift.findMany({
+    where: { startAt: { gte: from, lt: new Date(from.getTime() + days * DAY_MS) } },
+    orderBy: { startAt: "asc" },
+  });
+  return Array.from({ length: days }, (_, i) => {
+    const ymd = addDays(fromYmd, i);
+    const s = shifts.find((x) => localParts(x.startAt).ymd === ymd) ?? null;
+    const { weekday } = localParts(new Date(localMidnight(ymd).getTime() + 12 * 60 * 60 * 1000));
+    return {
+      date: ymd,
+      label: dayLabel(ymd),
+      shift: s ? { start: shortTime(s.startAt), end: shortTime(s.endAt), colleagues: s.colleagues, location: s.location } : null,
+      block: blockFor(ymd, weekday, s),
+      items: keyItems(ymd),
+    };
+  });
 }
 
 export function todayYmd(): string {
@@ -319,9 +364,11 @@ export async function morningMessage(): Promise<string> {
   const lines = [`Morning. ${d.label}`];
   lines.push(d.shift ? `Shift ${d.shift.start}–${d.shift.end}${d.shift.location ? ` at ${d.shift.location}` : ""}.` : "No shift today.");
   if (d.today.length) lines.push(`Today: ${d.today.join(" · ")}`);
-  lines.push("Skin: wash, eye serum, matte moisturiser, SPF.");
+  const am = d.morning.filter((s) => s.owned).map((s) => s.text.split(",")[0]);
+  if (am.length) lines.push(`Morning: ${am.join(" · ")}`);
   lines.push(d.wear.oil ? `Wear: ${d.wear.oil.name}. ${d.wear.why}` : "Wear: tell me which oils you own and I'll pick.");
   if (d.block) lines.push(`${d.block.title}, ${d.block.when}.`);
+  if (d.shopping.length) lines.push(`Still to buy: ${d.shopping.map((x) => x.product).join(", ")}.`);
   lines.push(d.hair.headline + ".");
   if (stats) {
     lines.push(`Outreach this week: ${stats.week.sent} sent, ${plural(stats.week.replies, "reply", "replies")}, ${plural(stats.week.callsBooked, "call")} booked.`);
@@ -333,7 +380,8 @@ export async function morningMessage(): Promise<string> {
 
 export async function nightMessage(): Promise<string> {
   const [d, stats] = await Promise.all([buildDay(todayYmd()), outreachStatsOrNull()]);
-  const lines = ["Night checklist", ...d.night.map((s) => `☐ ${s.text}`)];
+  const lines = ["Night checklist", ...d.night.filter((s) => s.owned).map((s) => `☐ ${s.text}`)];
+  if (d.block) lines.push(`☐ Done: ${d.block.title.toLowerCase()}`);
   const t = d.tomorrow;
   const tomorrow = [t.shift ? `shift ${t.shift}` : "no shift", ...t.items].join(" · ");
   if (stats) lines.push("", `Outreach today: ${stats.today.sent} sent, ${plural(stats.today.replies, "reply", "replies")}.`);
