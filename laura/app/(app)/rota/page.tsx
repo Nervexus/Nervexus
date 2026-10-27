@@ -137,7 +137,7 @@ export default function RotaPage() {
       const res = await fetch("/api/rota/parse", { method: "POST", body: form });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't read that photo.");
-      if (!data.shifts?.length) throw new Error("Couldn't find any shifts in that photo.");
+      if (!data.shifts?.length) throw new Error("Couldn't find your shifts (Madoxs) in that photo.");
       setParsed(data.shifts);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't read that photo.");

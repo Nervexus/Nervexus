@@ -146,7 +146,7 @@ async function handleRotaPhoto(fileId: string) {
     return !Number.isNaN(a) && !Number.isNaN(b) && b > a;
   });
   if (valid.length === 0) {
-    await replyInChat("That doesn't look like a rota to me -- I couldn't find any shifts in it. If it is one, try a clearer, straight-on photo.");
+    await replyInChat("I couldn't find your shifts on that one. Is your name (Madoxs) on it? If so, try a clearer, straight-on photo.");
     return;
   }
   for (const s of valid) {

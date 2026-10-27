@@ -1,3 +1,4 @@
+import { USER_TIMEZONE } from "@/lib/booking-links";
 import { Type } from "@google/genai";
 import { prisma } from "@/lib/db";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
@@ -39,6 +40,27 @@ const SHIFT_SCHEMA = {
  * vision input -- no dedicated OCR service needed, since the existing
  * Gemini key already does this. Returns parsed shifts for the user to
  * review and correct before they're saved (never writes directly). */
+// Whose shifts to pull out of a team rota photo.
+const ROTA_NAME = process.env.ROTA_NAME?.trim() || "Madoxs";
+const ROTA_FULL_NAME = process.env.ROTA_FULL_NAME?.trim() || "Madoxs Harvey";
+
+/** Models sometimes put a rota in the wrong year. A rota is always about
+ * now: move any shift dated more than a week in the past forward a year at
+ * a time until it lands in the coming weeks. */
+function intoComingYear(shift: ParsedShift): ParsedShift {
+  const start = new Date(shift.startAt);
+  const end = new Date(shift.endAt);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return shift;
+  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  let years = 0;
+  while (start.getTime() < cutoff && years < 10) {
+    start.setUTCFullYear(start.getUTCFullYear() + 1);
+    end.setUTCFullYear(end.getUTCFullYear() + 1);
+    years++;
+  }
+  return years ? { ...shift, startAt: start.toISOString(), endAt: end.toISOString() } : shift;
+}
+
 export async function parseRotaImage(base64: string, mimeType: string): Promise<ParsedShift[]> {
   const ai = getGeminiClient();
   const now = new Date();
@@ -51,13 +73,22 @@ export async function parseRotaImage(base64: string, mimeType: string): Promise<
           { inlineData: { data: base64, mimeType } },
           {
             text:
-              `Today is ${now.toISOString()} (${now.toLocaleDateString(undefined, { weekday: "long" })}). ` +
-              "This image is a work rota/schedule. Extract every shift you can find as " +
-              "structured data. Resolve day names and partial dates (e.g. 'Mon 14th', " +
-              "'Tomorrow') to absolute ISO 8601 datetimes using today's date as the " +
-              "reference -- assume the nearest future occurrence for ambiguous dates. " +
-              "If a shift's colleagues are listed, include their names. If you can't " +
-              "find any shifts, return an empty array rather than guessing.",
+              `Today is ${new Intl.DateTimeFormat("en-GB", { timeZone: USER_TIMEZONE, weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now)} ` +
+              `(year ${now.getUTCFullYear()}); every date on the rota is in the coming weeks, never in a past year. ` +
+              `This image is a work rota/schedule belonging to ${ROTA_NAME}. A rota often ` +
+              "lists the whole team: extract ONLY the shifts for " +
+              `${ROTA_NAME} -- match his row or column by name case-insensitively, including ` +
+              `his full name (${ROTA_FULL_NAME}), surname only, initials, or a close misspelling ` +
+              "(e.g. 'Maddox', 'Madox'). Ignore everyone else's shifts. If the rota clearly " +
+              "shows only one person's own shifts with no names on it, extract all of them. " +
+              `If ${ROTA_NAME} isn't on it, return an empty array. Skip days marked off, ` +
+              "holiday, or blank. For colleagues, list the other people working on the same " +
+              "day at overlapping times. " +
+              "Resolve day names and partial dates (e.g. 'Mon 14th', 'Tomorrow') to " +
+              "absolute ISO 8601 datetimes using today's date as the reference -- assume the " +
+              "nearest future occurrence for ambiguous dates. The times on the rota are UK " +
+              `local time (${USER_TIMEZONE}); write each datetime with the correct UK UTC offset ` +
+              "for that date (+00:00 in winter, +01:00 in summer). Never guess shifts you can't read.",
           },
         ],
       },
@@ -70,7 +101,7 @@ export async function parseRotaImage(base64: string, mimeType: string): Promise<
 
   try {
     const parsed = JSON.parse(response.text ?? "{}");
-    return Array.isArray(parsed.shifts) ? parsed.shifts : [];
+    return Array.isArray(parsed.shifts) ? parsed.shifts.map(intoComingYear) : [];
   } catch (err) {
     console.error("Failed to parse rota extraction response:", err);
     return [];
