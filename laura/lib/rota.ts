@@ -1,4 +1,5 @@
-import { USER_TIMEZONE } from "@/lib/booking-links";
+import { shiftsFromGrid, type RotaGrid } from "@/lib/rota-grid";
+import { localTime } from "@/lib/routine";
 import { Type } from "@google/genai";
 import { prisma } from "@/lib/db";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
@@ -11,59 +12,63 @@ export type ParsedShift = {
   note: string | null;
 };
 
-const SHIFT_SCHEMA = {
-  type: Type.OBJECT,
-  properties: {
-    shifts: {
-      type: Type.ARRAY,
-      items: {
-        type: Type.OBJECT,
-        properties: {
-          startAt: { type: Type.STRING, description: "ISO 8601 datetime the shift starts." },
-          endAt: { type: Type.STRING, description: "ISO 8601 datetime the shift ends." },
-          location: { type: Type.STRING, nullable: true, description: "Workplace, if shown." },
-          colleagues: {
-            type: Type.STRING,
-            nullable: true,
-            description: "Comma-separated names of colleagues on this shift, if shown.",
-          },
-          note: { type: Type.STRING, nullable: true, description: "Anything else worth keeping." },
-        },
-        required: ["startAt", "endAt"],
-      },
-    },
-  },
-  required: ["shifts"],
-};
-
-/** Extracts shifts from a photographed/screenshotted rota using Gemini's
- * vision input -- no dedicated OCR service needed, since the existing
- * Gemini key already does this. Returns parsed shifts for the user to
- * review and correct before they're saved (never writes directly). */
 // Whose shifts to pull out of a team rota photo.
 const ROTA_NAME = process.env.ROTA_NAME?.trim() || "Madoxs";
 const ROTA_FULL_NAME = process.env.ROTA_FULL_NAME?.trim() || "Madoxs Harvey";
 
-/** Models sometimes put a rota in the wrong year. A rota is always about
- * now: move any shift dated more than a week in the past forward a year at
- * a time until it lands in the coming weeks. */
-function intoComingYear(shift: ParsedShift): ParsedShift {
-  const start = new Date(shift.startAt);
-  const end = new Date(shift.endAt);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return shift;
-  const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  let years = 0;
-  while (start.getTime() < cutoff && years < 10) {
-    start.setUTCFullYear(start.getUTCFullYear() + 1);
-    end.setUTCFullYear(end.getUTCFullYear() + 1);
-    years++;
-  }
-  return years ? { ...shift, startAt: start.toISOString(), endAt: end.toISOString() } : shift;
+const GRID_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    people: {
+      type: Type.ARRAY,
+      items: { type: Type.STRING },
+      description: "Every person's name, in column order (left to right). For a personal rota with no names, a single empty string.",
+    },
+    rows: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          date: { type: Type.STRING, description: "The row's date exactly as written, e.g. '28/10/2026'." },
+          cells: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING },
+            description: "Each person's cell for this date, same order as people, copied exactly (e.g. '8-6', 'D/O', 'HOL', ''). ",
+          },
+        },
+        required: ["date", "cells"],
+      },
+    },
+    location: { type: Type.STRING, nullable: true, description: "Workplace name if shown." },
+  },
+  required: ["people", "rows"],
+};
+
+/** Reads a photographed rota in two steps. Gemini only transcribes the
+ * grid (names, dates, each cell's text) -- the part vision is good at --
+ * and plain code (lib/rota-grid.ts) finds the owner's column, turns
+ * shorthand like "8-6" into times, skips D/O and HOL, and works out who
+ * else is on. Only shifts still to come are returned, for review before
+ * saving (never writes directly). */
+export async function parseRotaImage(base64: string, mimeType: string): Promise<ParsedShift[]> {
+  const grid = await transcribeRota(base64, mimeType);
+  if (!grid) return [];
+  const now = Date.now();
+  const year = new Date().getUTCFullYear();
+  return shiftsFromGrid(grid, ROTA_NAME, ROTA_FULL_NAME, year)
+    .map((s) => ({
+      startAt: localTime(s.ymd, s.start.h, s.start.m).toISOString(),
+      endAt: localTime(s.ymd, s.end.h, s.end.m).toISOString(),
+      location: grid.location ?? null,
+      colleagues: s.colleagues.length ? s.colleagues.join(", ") : null,
+      note: s.note,
+    }))
+    .filter((s) => new Date(s.endAt).getTime() > now);
 }
 
-export async function parseRotaImage(base64: string, mimeType: string): Promise<ParsedShift[]> {
+/** Step one: the grid exactly as written, or null if unreadable. */
+export async function transcribeRota(base64: string, mimeType: string): Promise<(RotaGrid & { location?: string | null }) | null> {
   const ai = getGeminiClient();
-  const now = new Date();
   const response = await ai.models.generateContent({
     model: MODEL,
     contents: [
@@ -73,38 +78,27 @@ export async function parseRotaImage(base64: string, mimeType: string): Promise<
           { inlineData: { data: base64, mimeType } },
           {
             text:
-              `Today is ${new Intl.DateTimeFormat("en-GB", { timeZone: USER_TIMEZONE, weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(now)} ` +
-              `(year ${now.getUTCFullYear()}); every date on the rota is in the coming weeks, never in a past year. ` +
-              `This image is a work rota/schedule belonging to ${ROTA_NAME}. A rota often ` +
-              "lists the whole team: extract ONLY the shifts for " +
-              `${ROTA_NAME} -- match his row or column by name case-insensitively, including ` +
-              `his full name (${ROTA_FULL_NAME}), surname only, initials, or a close misspelling ` +
-              "(e.g. 'Maddox', 'Madox'). Ignore everyone else's shifts. If the rota clearly " +
-              "shows only one person's own shifts with no names on it, extract all of them. " +
-              `If ${ROTA_NAME} isn't on it, return an empty array. Skip days marked off, ` +
-              "holiday, or blank. For colleagues, list the other people working on the same " +
-              "day at overlapping times. " +
-              "Resolve day names and partial dates (e.g. 'Mon 14th', 'Tomorrow') to " +
-              "absolute ISO 8601 datetimes using today's date as the reference -- assume the " +
-              "nearest future occurrence for ambiguous dates. The times on the rota are UK " +
-              `local time (${USER_TIMEZONE}); write each datetime with the correct UK UTC offset ` +
-              "for that date (+00:00 in winter, +01:00 in summer). Never guess shifts you can't read.",
+              "This is a photo of a work rota. Transcribe it exactly -- do not interpret it. " +
+              "List every person's name across the top in column order. Then for every row " +
+              "that has a date, give the date as written and each person's cell text in the " +
+              "same order. Columns that only hold numbers (paid hours, totals) are not people: " +
+              "leave them out of both the names and the cells. Skip total/blank rows. Copy " +
+              "cells character for character ('8-6', '9-5', 'D/O', 'HOL', 'D/O 9.45AM'); use " +
+              "an empty string for a blank cell. Be careful to keep each cell in the right " +
+              "row and column.",
           },
         ],
       },
     ],
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: SHIFT_SCHEMA,
-    },
+    config: { responseMimeType: "application/json", responseSchema: GRID_SCHEMA },
   });
 
   try {
-    const parsed = JSON.parse(response.text ?? "{}");
-    return Array.isArray(parsed.shifts) ? parsed.shifts.map(intoComingYear) : [];
+    const grid = JSON.parse(response.text ?? "{}");
+    return Array.isArray(grid.people) && Array.isArray(grid.rows) ? grid : null;
   } catch (err) {
-    console.error("Failed to parse rota extraction response:", err);
-    return [];
+    console.error("Failed to parse rota transcription:", err);
+    return null;
   }
 }
 
