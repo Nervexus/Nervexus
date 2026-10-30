@@ -1,5 +1,3 @@
-import { useId } from "react";
-
 // Thin line icons for the nav rail (stroke 1.8, currentColor, no fill).
 const PATHS: Record<string, string> = {
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -28,22 +26,18 @@ export function NavIcon({ name, className = "h-[18px] w-[18px]" }: { name: strin
   );
 }
 
-/** The LAURA mark: a purple padlock in a dark rounded square. */
+/** The LAURA mark: an engraved "L" on the dark tile its container
+ * provides -- a matte, debossed look (soft dark edge above-left, a light
+ * lip below-right) rather than a coloured glyph. */
 export function LogoMark({ className = "h-[18px] w-[18px]" }: { className?: string }) {
-  // Unique per instance: a hidden copy (e.g. the desktop rail on phones)
-  // would otherwise blank out every other copy's gradient.
-  const id = `laura-lock-${useId().replace(/:/g, "")}`;
+  const L = "M8.6 5.4h2.9v10.1h6v2.9H8.6z";
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      <defs>
-        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#9d84de" />
-          <stop offset="1" stopColor="#5b42a3" />
-        </linearGradient>
-      </defs>
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke={`url(#${id})`} strokeWidth={2} strokeLinecap="round" />
-      <rect x="5.5" y="11" width="13" height="10" rx="3" fill={`url(#${id})`} />
-      <circle cx="12" cy="15.5" r="1.3" fill="#0b0b0b" />
+      {/* top-left shadow, then bottom-right highlight, then the face -- the
+          stacking is what reads as carved-in. */}
+      <path d={L} transform="translate(-0.4,-0.5)" fill="#000" opacity="0.55" />
+      <path d={L} transform="translate(0.5,0.7)" fill="#fff" opacity="0.16" />
+      <path d={L} fill="#232326" />
     </svg>
   );
 }
