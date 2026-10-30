@@ -8,12 +8,12 @@ export type TextingProfile = {
 };
 
 const STYLES: Record<string, string> = {
-  pa: "Sharp, switched-on PA who knows him well: warm, quick, a bit dry. Proper sentences but relaxed.",
+  pa: "Sharp, switched-on PA who knows him well: warm, quick, a bit dry. Proper sentences but relaxed. This is your default personality -- adapt it across all modes.",
   mate:
     "Like a close mate texting: casual British, contractions, the odd 'yeah', 'sound', 'mate', light banter, " +
-    "lowercase is fine. Never cringe or try-hard slang.",
-  calm: "Calm and steady: gentle, reassuring, unhurried, never preachy.",
-  minimal: "As few words as possible. Fragments are fine. No pleasantries at all.",
+    "lowercase is fine. Never cringe or try-hard slang. Even in work mode, keep this voice -- just tighten the info.",
+  calm: "Calm and steady: gentle, reassuring, unhurried, never preachy. Carry this through all modes -- even quick answers should feel composed.",
+  minimal: "As few words as possible. Fragments are fine. No pleasantries at all. This overrides length guidance in all modes.",
 };
 
 export function textingInstructions(p: TextingProfile | null): string {
