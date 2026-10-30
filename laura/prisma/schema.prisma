@@ -125,11 +125,14 @@ model Profile {
   // Daily Telegram messages (Settings > Daily messages). Times are UK "HH:MM".
   morningOn            Boolean  @default(true)
   morningTime          String   @default("07:00")
+  afternoonOn          Boolean  @default(true)
+  afternoonTime        String   @default("14:00")
   nightOn              Boolean  @default(true)
   nightTime            String   @default("21:30")
   motivation           Boolean  @default(true)
   motivationTone       String   @default("harsh") // "harsh" | "firm" | "gentle"
   lastMorningOn        String? // YYYY-MM-DD the morning text last went out
+  lastAfternoonOn      String?
   lastNightOn          String?
   updatedAt            DateTime @updatedAt
 }

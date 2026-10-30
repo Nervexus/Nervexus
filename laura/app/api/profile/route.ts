@@ -31,13 +31,13 @@ export async function PATCH(request: Request) {
   pick("textStyle", ["pa", "mate", "calm", "minimal"]);
   pick("textLength", ["short", "normal"]);
   pick("motivationTone", ["harsh", "firm", "gentle"]);
-  for (const key of ["textEmoji", "morningOn", "nightOn", "motivation"]) {
+  for (const key of ["textEmoji", "morningOn", "afternoonOn", "nightOn", "motivation"]) {
     if (typeof data?.[key] === "boolean") update[key] = data[key];
   }
   if (typeof data?.textNotes === "string" || data?.textNotes === null) {
     update.textNotes = data.textNotes?.trim().slice(0, 600) || null;
   }
-  for (const key of ["morningTime", "nightTime"]) {
+  for (const key of ["morningTime", "afternoonTime", "nightTime"]) {
     if (typeof data?.[key] === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(data[key])) {
       update[key] = data[key];
     }

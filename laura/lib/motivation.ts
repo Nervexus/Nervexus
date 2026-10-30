@@ -9,6 +9,8 @@ export type MotivationFacts = {
   workBlock: string | null; // e.g. "Outreach, 10 messages"
   outreach: { weekSent: number; weekReplies: number; callsBooked: number; warmLeads: number } | null;
   dates: string[]; // key dates coming up, e.g. "Payday in 2 days"
+  moment?: "morning" | "afternoon";
+  todaySent?: number | null; // outreach sent so far today (afternoon check-in)
 };
 
 const TONES: Record<string, string> = {
@@ -26,7 +28,7 @@ export async function motivationLine(facts: MotivationFacts, tone = "harsh"): Pr
     const response = await ai.models.generateContent({
       model: MODEL,
       contents:
-        "Write the motivation line for Madoxs's morning text. He's 19, a shift worker in Fawley, Hampshire. His goals: " +
+        `Write the motivation line for Madoxs's ${facts.moment === "afternoon" ? "afternoon check-in text (a mid-day push to finish today's job, not a pep talk)" : "morning text"}. He's 19, a shift worker in Fawley, Hampshire. His goals: ` +
         "grow his website business (£250 sites for roofers; target 10 outreach messages on Mon/Wed/Fri), pass his driving " +
         "test and get a car, find a 2-bed rental near Waterside, and look his best.\n" +
         `Today's facts: ${JSON.stringify(facts)}\n` +

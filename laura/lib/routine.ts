@@ -399,14 +399,74 @@ export async function morningMessage(opts: { motivationTone?: string | null } = 
   return lines.join("\n");
 }
 
+/** Reminders not yet done between two instants, soonest first. */
+async function remindersBetween(from: Date, to: Date) {
+  return prisma.reminder.findMany({ where: { done: false, dueAt: { gte: from, lt: to } }, orderBy: { dueAt: "asc" } });
+}
+
+/** The night text: tomorrow's schedule first, then tonight's short checklist. */
 export async function nightMessage(): Promise<string> {
-  const [d, stats] = await Promise.all([buildDay(todayYmd()), outreachStatsOrNull()]);
-  const lines = ["Night checklist", ...d.night.filter((s) => s.owned).map((s) => `☐ ${s.text}`)];
-  if (d.block) lines.push(`☐ Done: ${d.block.title.toLowerCase()}`);
-  const t = d.tomorrow;
-  const tomorrow = [t.shift ? `shift ${t.shift}` : "no shift", ...t.items].join(" · ");
-  if (stats) lines.push("", `Outreach today: ${stats.today.sent} sent, ${plural(stats.today.replies, "reply", "replies")}.`);
-  lines.push("", `Tomorrow: ${tomorrow}`);
+  const tYmd = tomorrowYmd();
+  const [d, t, [tw], reminders] = await Promise.all([
+    buildDay(todayYmd()),
+    buildDay(tYmd),
+    weekPlan(tYmd, 1),
+    remindersBetween(localTime(tYmd, 0), localTime(addDays(tYmd, 1), 0)),
+  ]);
+  const lines = [`Tomorrow, ${t.label}`];
+  if (t.shift) {
+    lines.push(`Shift ${t.shift.start}–${t.shift.end}${t.shift.location ? ` at ${t.shift.location}` : ""}${tw?.shift?.colleagues ? `, with ${tw.shift.colleagues}` : ""}.`);
+    if (d.tomorrow.alarm) lines.push(`Alarm for ${d.tomorrow.alarm}.`);
+  } else {
+    lines.push("Day off.");
+  }
+  if (t.today.length) lines.push(`Dates: ${t.today.join(" · ")}`);
+  if (reminders.length) lines.push(`Reminders: ${reminders.map((r) => `${r.title} ${shortTime(r.dueAt)}`).join(" · ")}`);
+  if (t.block) lines.push(`${t.block.title}, ${t.block.when}.`);
+  if (t.wear.oil) lines.push(`Wear: ${t.wear.oil.name}.`);
+
+  const tonight = d.night.filter((s) => s.owned && !s.auto).map((s) => `☐ ${s.text}`);
+  if (tonight.length) lines.push("", "Tonight", ...tonight);
+  return lines.join("\n");
+}
+
+/** The afternoon check-in: where today's at and what's still to do. */
+export async function afternoonMessage(opts: { motivationTone?: string | null } = {}): Promise<string> {
+  const ymd = todayYmd();
+  const now = new Date();
+  const [d, stats, later] = await Promise.all([
+    buildDay(ymd),
+    outreachStatsOrNull(),
+    remindersBetween(now, localTime(addDays(ymd, 1), 0)),
+  ]);
+  const lines = ["Afternoon check-in"];
+  if (d.shift) {
+    const end = new Date(d.shift.endAt);
+    lines.push(end > now ? `On shift till ${d.shift.end}.` : `Shift's done (finished ${d.shift.end}).`);
+  } else {
+    lines.push("Day off.");
+  }
+  const todo = d.afternoon.filter((s) => s.owned).map((s) => s.text);
+  if (todo.length) lines.push(`Still to do: ${todo.join(" · ")}`);
+  if (stats) lines.push(`Outreach so far today: ${stats.today.sent} sent, ${plural(stats.today.replies, "reply", "replies")}.`);
+  if (later.length) lines.push(`Left today: ${later.map((r) => `${r.title} ${shortTime(r.dueAt)}`).join(" · ")}`);
+  if (opts.motivationTone) {
+    const line = await motivationLine(
+      {
+        moment: "afternoon",
+        weekday: d.label,
+        shift: d.shift ? `${d.shift.start}–${d.shift.end}` : null,
+        workBlock: d.block?.title ?? null,
+        outreach: stats
+          ? { weekSent: stats.week.sent, weekReplies: stats.week.replies, callsBooked: stats.week.callsBooked, warmLeads: stats.warmLeads.length }
+          : null,
+        todaySent: stats?.today.sent ?? null,
+        dates: [],
+      },
+      opts.motivationTone
+    );
+    lines.push("", line);
+  }
   return lines.join("\n");
 }
 

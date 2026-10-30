@@ -7,7 +7,7 @@ import { transcribeAudio } from "@/lib/transcribe";
 import { parseRotaFile, saveShifts } from "@/lib/rota";
 import { fileKind } from "@/lib/files";
 import { answerAboutFile } from "@/lib/read-file";
-import { morningMessage, nightMessage } from "@/lib/routine";
+import { afternoonMessage, morningMessage, nightMessage } from "@/lib/routine";
 import { friendlyDateTime, USER_TIMEZONE } from "@/lib/booking-links";
 
 // Telegram calls this for every message sent to the bot (registered via
@@ -47,10 +47,16 @@ export async function POST(request: Request) {
     await replyInChat("Hi, I'm Laura. Message me here any time, same as on the site. You can also send voice notes, or a photo of your rota.");
     return NextResponse.json({ ok: true });
   }
-  if (text === "/morning" || text === "/night") {
+  if (text === "/morning" || text === "/afternoon" || text === "/night") {
     const profile = await prisma.profile.findUnique({ where: { id: "me" } });
     const tone = profile && !profile.motivation ? null : (profile?.motivationTone ?? "harsh");
-    await replyInChat(text === "/morning" ? await morningMessage({ motivationTone: tone }) : await nightMessage());
+    await replyInChat(
+      text === "/morning"
+        ? await morningMessage({ motivationTone: tone })
+        : text === "/afternoon"
+          ? await afternoonMessage({ motivationTone: tone })
+          : await nightMessage()
+    );
     return NextResponse.json({ ok: true });
   }
 

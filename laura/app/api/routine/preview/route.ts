@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { morningMessage, nightMessage } from "@/lib/routine";
+import { afternoonMessage, morningMessage, nightMessage } from "@/lib/routine";
 
 // Settings' Preview button: the text as it would go out now, without sending it.
 export async function GET(request: Request) {
-  const part = new URL(request.url).searchParams.get("part") === "night" ? "night" : "morning";
+  const q = new URL(request.url).searchParams.get("part");
+  const part = q === "night" || q === "afternoon" ? q : "morning";
   try {
     const profile = await prisma.profile.findUnique({ where: { id: "me" } });
     const tone = profile && !profile.motivation ? null : (profile?.motivationTone ?? "harsh");
-    const text = part === "morning" ? await morningMessage({ motivationTone: tone }) : await nightMessage();
+    const text =
+      part === "morning"
+        ? await morningMessage({ motivationTone: tone })
+        : part === "afternoon"
+          ? await afternoonMessage({ motivationTone: tone })
+          : await nightMessage();
     return NextResponse.json({ text });
   } catch (err) {
     console.error("routine preview failed:", err);

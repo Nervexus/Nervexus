@@ -9,6 +9,8 @@ type Prefs = {
   textNotes: string | null;
   morningOn: boolean;
   morningTime: string;
+  afternoonOn: boolean;
+  afternoonTime: string;
   nightOn: boolean;
   nightTime: string;
   motivation: boolean;
@@ -61,7 +63,7 @@ export function MessageSettings() {
     savedTimer.current = setTimeout(() => setSaved(null), 1800);
   }
 
-  async function showPreview(part: "morning" | "night") {
+  async function showPreview(part: "morning" | "afternoon" | "night") {
     setPreviewing(true);
     try {
       const d = await fetch(`/api/routine/preview?part=${part}`).then((r) => r.json());
@@ -132,18 +134,19 @@ export function MessageSettings() {
 
       <div className="card card-pad">
         <h2 className="text-[15px] font-semibold text-text">Daily messages</h2>
-        <p className="text-[12.5px] text-muted">When the morning summary and night checklist land on Telegram (UK time).</p>
+        <p className="text-[12.5px] text-muted">When each text lands on Telegram (UK time).</p>
 
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-2">
           {(
             [
-              ["morning", "Morning summary", prefs.morningOn, prefs.morningTime],
-              ["night", "Night checklist", prefs.nightOn, prefs.nightTime],
+              ["morning", "Morning", "Today's plan and a push", prefs.morningOn, prefs.morningTime],
+              ["afternoon", "Afternoon check-in", "What's left today", prefs.afternoonOn, prefs.afternoonTime],
+              ["night", "Night", "Tomorrow's schedule + tonight's checklist", prefs.nightOn, prefs.nightTime],
             ] as const
-          ).map(([part, label, on, time]) => (
+          ).map(([part, label, hint, on, time]) => (
             <div key={part} className="item flex items-center gap-3 px-3.5 py-3">
               <button
-                onClick={() => save(part === "morning" ? { morningOn: !on } : { nightOn: !on })}
+                onClick={() => save({ [`${part}On`]: !on } as Partial<Prefs>)}
                 aria-label={`${label} ${on ? "on" : "off"}`}
                 className={`check ${on ? "is-on" : ""}`}
               >
@@ -153,12 +156,15 @@ export function MessageSettings() {
                   </svg>
                 )}
               </button>
-              <span className={`flex-1 text-[13.5px] ${on ? "text-text" : "text-dim"}`}>{label}</span>
+              <span className="min-w-0 flex-1">
+                <span className={`block text-[13.5px] ${on ? "text-text" : "text-dim"}`}>{label}</span>
+                <span className="block truncate text-[11.5px] text-dim">{hint}</span>
+              </span>
               <input
                 type="time"
                 value={time}
                 disabled={!on}
-                onChange={(e) => e.target.value && save(part === "morning" ? { morningTime: e.target.value } : { nightTime: e.target.value })}
+                onChange={(e) => e.target.value && save({ [`${part}Time`]: e.target.value } as Partial<Prefs>)}
                 className="input !w-auto !py-1.5 font-mono disabled:opacity-40"
               />
             </div>
@@ -189,6 +195,9 @@ export function MessageSettings() {
         <div className="mt-4 flex flex-wrap gap-2">
           <button onClick={() => showPreview("morning")} disabled={previewing} className="btn">
             Preview morning
+          </button>
+          <button onClick={() => showPreview("afternoon")} disabled={previewing} className="btn">
+            Preview afternoon
           </button>
           <button onClick={() => showPreview("night")} disabled={previewing} className="btn">
             Preview night
