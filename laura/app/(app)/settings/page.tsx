@@ -5,6 +5,7 @@ import { SettingsCard } from "@/components/SettingsCard";
 import { Pill } from "@/components/Pill";
 import { GsapEntrance } from "@/components/GsapEntrance";
 import { FaceIdSettings } from "@/components/FaceIdSettings";
+import { PasswordSettings } from "@/components/PasswordSettings";
 import { MessageSettings } from "@/components/MessageSettings";
 import { ClaudeRequests } from "@/components/ClaudeRequests";
 
@@ -60,6 +61,10 @@ export default function SettingsPage() {
 
       <div className="gsap-entrance mt-4">
         <ClaudeRequests />
+      </div>
+
+      <div className="gsap-entrance mt-4">
+        <PasswordSettings />
       </div>
 
       <div className="gsap-entrance mt-4">

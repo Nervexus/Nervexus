@@ -153,6 +153,10 @@ model Profile {
   lastMorningOn        String? // YYYY-MM-DD the morning text last went out
   lastAfternoonOn      String?
   lastNightOn          String?
+  // The main sign-in password, set by the owner inside the app (Settings).
+  // Salted hash only (lib/pin.ts); falls back to APP_PASSWORD env when unset.
+  passwordHash         String?
+  passwordSalt         String?
   updatedAt            DateTime @updatedAt
 }
 

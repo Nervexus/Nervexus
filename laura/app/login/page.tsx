@@ -131,6 +131,16 @@ export default function LoginPage() {
             <p className="mt-3 min-h-5 text-xs text-red-400" role="alert">
               {error}
             </p>
+            <button
+              type="button"
+              onClick={() => {
+                setError(null);
+                setMode("password");
+              }}
+              className="btn-ghost mt-2 w-full justify-center"
+            >
+              Use password instead
+            </button>
           </>
         )}
 
