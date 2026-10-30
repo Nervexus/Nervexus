@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { OUTREACH_URL, outreachStatsOrNull, type OutreachStats } from "@/lib/hq";
+import { prisma } from "@/lib/db";
 
 type SystemNode = {
   id: string;
@@ -47,6 +48,29 @@ export async function GET() {
     name: "Telegram",
     url: null,
     status: tgStatus,
+  });
+
+  // Vercel (always online if the app is running)
+  nodes.push({
+    id: "vercel",
+    name: "Vercel",
+    url: "https://laura-lyart.vercel.app",
+    status: "online",
+  });
+
+  // Database (Turso) — quick health check
+  let dbStatus: "online" | "offline" = "offline";
+  try {
+    await prisma.$queryRawUnsafe("SELECT 1");
+    dbStatus = "online";
+  } catch {
+    dbStatus = "offline";
+  }
+  nodes.push({
+    id: "database",
+    name: "Database",
+    url: null,
+    status: dbStatus,
   });
 
   return NextResponse.json({ nodes });

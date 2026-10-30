@@ -25,6 +25,8 @@ export default function HubPage() {
 
   const encrypted = nodes.find((n) => n.id === "encrypted");
   const telegram = nodes.find((n) => n.id === "telegram");
+  const vercelNode = nodes.find((n) => n.id === "vercel");
+  const dbNode = nodes.find((n) => n.id === "database");
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 sm:px-[26px]">
@@ -34,98 +36,111 @@ export default function HubPage() {
       </p>
 
       {/* Hub diagram */}
-      <div className="relative mt-8 overflow-hidden rounded-[22px] border border-line bg-[#0a0a0a]">
-        {/* Grid background */}
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-          aria-hidden
-        />
+      <div className="relative mt-8 overflow-hidden rounded-[22px] border border-line bg-[#080808]">
+        {/* Number matrix background */}
+        <NumberMatrix />
 
-        <div className="relative flex flex-col items-center px-6 py-12 sm:py-16">
-          {/* Top node — Encrypted */}
-          <button
-            onClick={() => encrypted?.url && window.open(encrypted.url, "_blank")}
-            disabled={!encrypted?.url}
-            className="group relative z-10 flex flex-col items-center gap-3"
+        <div className="relative flex items-center justify-center px-4 py-14 sm:px-10 sm:py-20">
+          {/* SVG curved connection lines */}
+          <svg
+            viewBox="0 0 600 340"
+            className="absolute inset-0 h-full w-full"
+            fill="none"
+            preserveAspectRatio="xMidYMid meet"
+            aria-hidden
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-[16px] border border-line-2 bg-[#111] shadow-[0_4px_24px_rgba(0,0,0,0.5)] transition-all group-hover:border-accent/40 group-hover:shadow-[0_4px_24px_rgba(139,111,212,0.15)]">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-muted group-hover:text-accent" aria-hidden>
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2" />
-              </svg>
+            {/* Laura → Encrypted (top-right) */}
+            <path
+              d="M200,170 C300,170 280,70 400,70"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="1.2"
+            />
+            <circle cx="400" cy="70" r="2.5" fill="rgba(139,111,212,0.4)" />
+            <circle cx="200" cy="170" r="2.5" fill="rgba(139,111,212,0.3)" />
+
+            {/* Laura → Telegram (bottom-right) */}
+            <path
+              d="M200,170 C300,170 280,270 400,270"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="1.2"
+            />
+            <circle cx="400" cy="270" r="2.5" fill="rgba(139,111,212,0.4)" />
+
+            {/* Laura → Vercel (top-left) — curve goes up-left */}
+            <path
+              d="M200,170 C100,170 120,70 40,70"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="1.2"
+            />
+            <circle cx="40" cy="70" r="2.5" fill="rgba(139,111,212,0.4)" />
+
+            {/* Laura → Database (bottom-left) — curve goes down-left */}
+            <path
+              d="M200,170 C100,170 120,270 40,270"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="1.2"
+            />
+            <circle cx="40" cy="270" r="2.5" fill="rgba(139,111,212,0.4)" />
+          </svg>
+
+          {/* Layout: 5-column grid — left nodes | gap | center | gap | right nodes */}
+          <div className="relative z-10 grid w-full grid-cols-[1fr_auto_auto_auto_1fr] items-center gap-y-6 sm:gap-x-4">
+
+            {/* Top-left: Vercel */}
+            <div className="col-start-1 row-start-1 flex justify-center">
+              <NodeBox
+                icon={<VercelIcon />}
+                label="Vercel"
+                status={loading ? null : vercelNode?.status ?? "online"}
+              />
             </div>
-            <span className="rounded-full border border-line bg-[#111] px-3.5 py-1 text-[11px] font-semibold tracking-wider text-muted uppercase transition-colors group-hover:border-accent/30 group-hover:text-accent">
-              Encrypted
-            </span>
-          </button>
 
-          {/* Connection line top */}
-          <div className="h-10 w-px bg-gradient-to-b from-line-2 to-line" aria-hidden />
+            {/* Spacer */}
+            <div className="col-start-2 row-span-2 row-start-1 hidden w-8 sm:block" />
 
-          {/* Central Laura node */}
-          <div className="relative z-10">
-            {/* Glow ring */}
-            <div className="absolute -inset-3 rounded-[24px] bg-accent/5 blur-xl" aria-hidden />
-            <div className="relative flex h-24 w-24 items-center justify-center rounded-[22px] border border-line-2 bg-gradient-to-b from-[#151515] to-[#0e0e0e] shadow-[0_8px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.04)]">
-              {/* Inner highlight */}
-              <div className="absolute inset-[6px] rounded-[16px] border border-line bg-gradient-to-b from-[#131313] to-[#0c0c0c]" aria-hidden />
-              <LogoMark className="relative h-8 w-8" />
+            {/* Central Laura node */}
+            <div className="col-start-3 row-span-2 row-start-1 flex justify-center">
+              <div className="relative">
+                {/* Glow ring */}
+                <div className="absolute -inset-4 rounded-full bg-[#d4a040]/10 blur-2xl" aria-hidden />
+                <div className="absolute -inset-1 rounded-full border border-[#c89530]/20" aria-hidden />
+                <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-[#c89530]/30 bg-gradient-to-b from-[#151515] to-[#0a0a0a] shadow-[0_0_30px_rgba(200,149,48,0.12),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                  <LogoMark className="h-7 w-7" />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Horizontal arms */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <svg viewBox="0 0 400 200" className="h-[200px] w-[400px]" fill="none" aria-hidden>
-              {/* Left arm to Stats */}
-              <path d="M200 100 H80 V50" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
-              <circle cx="80" cy="50" r="3" fill="rgba(255,255,255,0.1)" />
-              {/* Right arm to API */}
-              <path d="M200 100 H320 V50" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
-              <circle cx="320" cy="50" r="3" fill="rgba(255,255,255,0.1)" />
-              {/* Left arm to Leads */}
-              <path d="M200 100 H80 V150" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
-              <circle cx="80" cy="150" r="3" fill="rgba(255,255,255,0.1)" />
-              {/* Right arm to Activity */}
-              <path d="M200 100 H320 V150" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
-              <circle cx="320" cy="150" r="3" fill="rgba(255,255,255,0.1)" />
-            </svg>
-          </div>
+            {/* Spacer */}
+            <div className="col-start-4 row-span-2 row-start-1 hidden w-8 sm:block" />
 
-          {/* Connection line bottom */}
-          <div className="h-10 w-px bg-gradient-to-b from-line to-line-2" aria-hidden />
-
-          {/* Bottom node — Telegram */}
-          <div className="group relative z-10 flex flex-col items-center gap-3">
-            <span className="rounded-full border border-line bg-[#111] px-3.5 py-1 text-[11px] font-semibold tracking-wider text-muted uppercase">
-              Telegram
-            </span>
-            <div className="flex h-14 w-14 items-center justify-center rounded-[16px] border border-line-2 bg-[#111] shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-muted" aria-hidden>
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
+            {/* Top-right: Encrypted */}
+            <div className="col-start-5 row-start-1 flex justify-center">
+              <NodeBox
+                icon={<GlobeIcon />}
+                label="Encrypted"
+                status={loading ? null : encrypted?.status ?? "unconfigured"}
+                onClick={() => encrypted?.url && window.open(encrypted.url, "_blank")}
+              />
             </div>
-          </div>
 
-          {/* Labels on the arms (desktop) */}
-          <div className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 sm:block" aria-hidden>
-            <span className="absolute -left-[120px] -top-[52px] rounded-md border border-line bg-[#111] px-2.5 py-1 text-[10px] font-medium tracking-wider text-dim uppercase">
-              Stats
-            </span>
-            <span className="absolute -right-[110px] -top-[52px] rounded-md border border-line bg-[#111] px-2.5 py-1 text-[10px] font-medium tracking-wider text-dim uppercase">
-              API
-            </span>
-            <span className="absolute -left-[120px] top-[36px] rounded-md border border-line bg-[#111] px-2.5 py-1 text-[10px] font-medium tracking-wider text-dim uppercase">
-              Leads
-            </span>
-            <span className="absolute -right-[128px] top-[36px] rounded-md border border-line bg-[#111] px-2.5 py-1 text-[10px] font-medium tracking-wider text-dim uppercase">
-              Activity
-            </span>
+            {/* Bottom-left: Database */}
+            <div className="col-start-1 row-start-2 flex justify-center">
+              <NodeBox
+                icon={<DatabaseIcon />}
+                label="Database"
+                status={loading ? null : dbNode?.status ?? "online"}
+              />
+            </div>
+
+            {/* Bottom-right: Telegram */}
+            <div className="col-start-5 row-start-2 flex justify-center">
+              <NodeBox
+                icon={<MessageIcon />}
+                label="Telegram"
+                status={loading ? null : telegram?.status ?? "unconfigured"}
+                onClick={() => window.open("https://t.me/Laura1xbot", "_blank")}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -137,10 +152,7 @@ export default function HubPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-muted" aria-hidden>
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2" />
-                </svg>
+                <GlobeIcon />
               </div>
               <div>
                 <h2 className="text-[14px] font-semibold text-text">Encrypted</h2>
@@ -175,10 +187,7 @@ export default function HubPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-muted" aria-hidden>
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                  <polyline points="22,6 12,13 2,6" />
-                </svg>
+                <MessageIcon />
               </div>
               <div>
                 <h2 className="text-[14px] font-semibold text-text">Telegram</h2>
@@ -203,8 +212,151 @@ export default function HubPage() {
             </a>
           </div>
         </div>
+
+        {/* Vercel card */}
+        <div className="card card-pad">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
+                <VercelIcon />
+              </div>
+              <div>
+                <h2 className="text-[14px] font-semibold text-text">Vercel</h2>
+                <p className="text-[11px] text-dim">Deployment</p>
+              </div>
+            </div>
+            <StatusDot status={loading ? null : vercelNode?.status ?? "online"} />
+          </div>
+
+          <p className="mt-4 text-[12px] text-muted leading-relaxed">
+            Production hosting, edge functions, automatic deployments.
+          </p>
+
+          <div className="mt-4">
+            <a
+              href="https://laura-lyart.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn inline-flex justify-center text-[12px]"
+            >
+              Open production
+            </a>
+          </div>
+        </div>
+
+        {/* Database card */}
+        <div className="card card-pad">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
+                <DatabaseIcon />
+              </div>
+              <div>
+                <h2 className="text-[14px] font-semibold text-text">Database</h2>
+                <p className="text-[11px] text-dim">Turso / libSQL</p>
+              </div>
+            </div>
+            <StatusDot status={loading ? null : dbNode?.status ?? "online"} />
+          </div>
+
+          <p className="mt-4 text-[12px] text-muted leading-relaxed">
+            Encrypted storage for notes, shifts, vault, routines and all data.
+          </p>
+        </div>
       </div>
     </div>
+  );
+}
+
+/* ── Number matrix (client-only random) ── */
+function NumberMatrix() {
+  const [text, setText] = useState("");
+  useEffect(() => {
+    setText(
+      Array.from({ length: 18 }, () =>
+        Array.from({ length: 42 }, () => Math.floor(Math.random() * 10)).join("")
+      ).join("\n")
+    );
+  }, []);
+  if (!text) return null;
+  return (
+    <div className="absolute inset-0 overflow-hidden opacity-[0.04] select-none" aria-hidden>
+      <pre className="whitespace-pre-wrap break-all font-mono text-[11px] leading-[1.6] text-white p-6">{text}</pre>
+    </div>
+  );
+}
+
+/* ── Node box used in the diagram ── */
+function NodeBox({
+  icon,
+  label,
+  status,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  status: "online" | "offline" | "unconfigured" | null;
+  onClick?: () => void;
+}) {
+  const Tag = onClick ? "button" : "div";
+  return (
+    <Tag
+      onClick={onClick}
+      className="group flex flex-col items-center gap-2"
+    >
+      <div className="relative flex h-[72px] w-[100px] flex-col items-center justify-center rounded-[14px] border border-line-2 bg-[#0e0e0e] shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all group-hover:border-line-3 sm:h-[88px] sm:w-[130px]">
+        {/* Icon */}
+        <div className="flex h-8 w-8 items-center justify-center text-muted group-hover:text-text transition-colors sm:h-10 sm:w-10">
+          {icon}
+        </div>
+        {/* Status dot */}
+        {status && (
+          <span
+            className={`absolute right-2 top-2 h-2 w-2 rounded-full ${
+              status === "online"
+                ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]"
+                : status === "offline"
+                  ? "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.4)]"
+                  : "bg-dim/40"
+            }`}
+          />
+        )}
+      </div>
+      <span className="text-[11px] font-medium text-dim group-hover:text-muted transition-colors">{label}</span>
+    </Tag>
+  );
+}
+
+/* ── Icons ── */
+function GlobeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2" />
+    </svg>
+  );
+}
+function MessageIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+function VercelIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden>
+      <path d="M12 2L2 19.5h20L12 2z" />
+    </svg>
+  );
+}
+function DatabaseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden>
+      <ellipse cx="12" cy="5" rx="9" ry="3" />
+      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+    </svg>
   );
 }
 
