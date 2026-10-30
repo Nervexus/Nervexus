@@ -1,4 +1,8 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/slate", "destination": "/", "permanent": true },
+    { "source": "/index", "destination": "/", "permanent": true }
+  ]
 }
