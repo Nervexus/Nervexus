@@ -35,6 +35,11 @@ type Counts = {
 
 async function signOut() {
   await fetch("/api/auth/logout", { method: "POST" });
+  try {
+    sessionStorage.removeItem("laura_session_open");
+  } catch {
+    // ignore
+  }
   window.location.replace("/login");
 }
 

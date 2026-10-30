@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { ParticleOrb } from "@/components/ParticleOrb";
+import { GetAccessButton } from "@/components/GetAccessButton";
 
 // The public front door. Shows what Laura is, never any of the user's
 // data -- everything real sits behind the sign-in.
@@ -17,12 +17,7 @@ export default function Home() {
           Reminders, bookings, your rota and a private vault. One assistant you can talk to on the
           site or text on Telegram.
         </p>
-        <Link
-          href="/laura"
-          className="btn btn-primary btn-hero mt-8 !px-6 !py-3"
-        >
-          Get access
-        </Link>
+        <GetAccessButton />
       </section>
 
     </div>

@@ -12,6 +12,16 @@ function safeNext(): string {
 
 const noopSubscribe = () => () => {};
 
+// Marks that the app has been unlocked in this browser session, so the
+// landing page's "Get access" can go straight in until the app is closed.
+function markSessionOpen() {
+  try {
+    sessionStorage.setItem("laura_session_open", "1");
+  } catch {
+    // no sessionStorage -- next open will just ask again
+  }
+}
+
 type Mode = "checking" | "faceid" | "password";
 
 export default function LoginPage() {
@@ -50,6 +60,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Face ID didn't work.");
+      markSessionOpen();
       window.location.replace(safeNext());
     } catch (err) {
       // A cancelled prompt, or a browser that won't open Face ID without a
@@ -81,6 +92,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't sign in.");
+      markSessionOpen();
       window.location.replace(safeNext());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't sign in.");
