@@ -14,7 +14,7 @@ import { textingInstructions } from "@/lib/texting";
 import { isGoogleConfigured } from "@/lib/google";
 import { getCalendarEvents, createCalendarEvent } from "@/lib/calendar";
 import { sendEmail, readEmails, readEmailBody } from "@/lib/gmail";
-import { scrapePage, getWeather, getNews, translateText, calculate } from "@/lib/scrape";
+import { scrapePage, getWeather, getNews, translateText, calculate, findLeads, enrichLead } from "@/lib/scrape";
 
 const SYSTEM_PROMPT = `You are Laura, Madoxs Harvey's personal assistant. You text like a real,
 sharp PA who knows him well -- not like an AI chatbot.
@@ -105,6 +105,14 @@ draft_outreach_email -- it only queues a draft for him to review in the
 outreach app; you never send outreach messages yourself, so say "I've
 queued a draft for you to check", never "I've sent it". Replies are
 checked about hourly on weekdays, so the newest ones can lag.
+
+Lead generation: use find_leads to search Google, Yell, Checkatrade and
+other directories for roofers (or any trade) in a given area -- it
+returns their name, phone, email, and website. Use enrich_lead to dig
+deeper into a specific company (visit their site, rate its quality,
+find the owner). Companies with no website or a poor-quality one are the
+best prospects for a £250 rebuild. After finding leads, offer to add
+them to the outreach system with add_outreach_lead.
 
 Email: you can send emails on Madoxs's behalf with send_email (from his
 own Gmail), read his inbox with read_emails, and pull the full body of
@@ -826,6 +834,39 @@ const tools: FunctionDeclaration[] = [
       required: ["message", "sendAt"],
     },
   },
+  // ── Lead generation ──
+  {
+    name: "find_leads",
+    description:
+      "Search Google, Yell, Checkatrade and other directories for real businesses " +
+      "in an area — finds their name, phone, email, and website. Perfect for finding " +
+      "roofers (or any trade) to add to the outreach system. Returns structured results " +
+      "you can then add with add_outreach_lead.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        trade: { type: Type.STRING, description: "The trade or business type, e.g. 'roofers', 'builders', 'plumbers'." },
+        area: { type: Type.STRING, description: "Town, city or region to search in, e.g. 'Southampton', 'Hampshire', 'Bournemouth'." },
+        count: { type: Type.NUMBER, description: "How many leads to find. Defaults to 10, max 20." },
+      },
+      required: ["trade", "area"],
+    },
+  },
+  {
+    name: "enrich_lead",
+    description:
+      "Get more details about a specific company — visit their website to find email, " +
+      "phone, owner name, and rate their website quality (poor sites are the best " +
+      "prospects for a £250 website rebuild). Use after find_leads for promising prospects.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        company: { type: Type.STRING, description: "The company name to research." },
+        website: { type: Type.STRING, description: "Their website URL, if known." },
+      },
+      required: ["company"],
+    },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -890,6 +931,8 @@ const LOGGED_TOOLS = new Set([
   "list_notes",
   "update_note",
   "schedule_message",
+  "find_leads",
+  "enrich_lead",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -1556,6 +1599,55 @@ async function runTool(
     });
     await logActivity("schedule_message", `Scheduled message for ${friendlyDateTime(due)}`);
     return { result: `Scheduled. He'll get a Telegram notification at ${friendlyDateTime(due)}.` };
+  }
+  // ── Lead generation ──
+  if (name === "find_leads") {
+    const trade = String(args.trade ?? "").trim();
+    const area = String(args.area ?? "").trim();
+    if (!trade || !area) return { error: "find_leads needs a trade and area" };
+    const count = Math.min(Math.max(typeof args.count === "number" ? args.count : 10, 1), 20);
+    try {
+      const leads = await findLeads(trade, area, count);
+      await logActivity("find_leads", `Found ${leads.length} ${trade} in ${area}`);
+      if (leads.length === 0) return { result: `Couldn't find any ${trade} in ${area}. Try a broader area or different search term.` };
+      return {
+        result: leads
+          .map((l, i) =>
+            `${i + 1}. ${l.company}${l.name ? ` (${l.name})` : ""} — ${l.location}` +
+            (l.phone ? `\n   Phone: ${l.phone}` : "") +
+            (l.email ? `\n   Email: ${l.email}` : "") +
+            (l.website ? `\n   Website: ${l.website}` : " (no website)")
+          )
+          .join("\n"),
+        leads,
+      };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Lead search failed." };
+    }
+  }
+  if (name === "enrich_lead") {
+    const company = String(args.company ?? "").trim();
+    if (!company) return { error: "enrich_lead needs a company name" };
+    const website = typeof args.website === "string" ? args.website.trim() : null;
+    try {
+      const info = await enrichLead(company, website);
+      await logActivity("enrich_lead", `Enriched lead: ${company}`);
+      return {
+        result: {
+          company,
+          ...info,
+          verdict: !info.hasWebsite
+            ? "No website at all — strong prospect for a new build."
+            : info.websiteQuality === "poor"
+              ? "Has a website but it's poor quality — great prospect for a rebuild."
+              : info.websiteQuality === "decent"
+                ? "Decent website — might still be interested in an upgrade."
+                : "Good website — probably not a hot prospect.",
+        },
+      };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't enrich that lead." };
+    }
   }
   return { error: `Unknown tool: ${name}` };
 }
