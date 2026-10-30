@@ -1700,8 +1700,19 @@ async function runTool(
 }
 
 export type ChatResult = { reply: string; toolsUsed: string[]; places: PlaceCard[] };
+export type ChatOptions = { channel?: "web" | "telegram" };
 
-export async function chat(history: ChatMessage[]): Promise<ChatResult> {
+const TELEGRAM_NUDGE = `
+== CHANNEL: TELEGRAM ==
+This message came from Telegram. You're texting, not chatting on a website.
+Write like a real person sending a text: short, punchy, one or two lines
+unless he asked for detail. No preamble, no sign-offs, no "let me know".
+Drop capitals at the start if it feels more natural. Use line breaks
+instead of long sentences. Think about how a sharp friend would actually
+text — that's your register here. If the texting style settings say
+"minimal", be even shorter.`;
+
+export async function chat(history: ChatMessage[], opts?: ChatOptions): Promise<ChatResult> {
   const ai = getGeminiClient();
   const contents: Content[] = history.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
@@ -1710,7 +1721,8 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
   const toolsUsed = new Set<string>();
   const ctx: ToolContext = { places: [] };
   const profile = await prisma.profile.findUnique({ where: { id: "me" } }).catch(() => null);
-  const systemPrompt = `${SYSTEM_PROMPT}\n\n${textingInstructions(profile)}`;
+  const channelBlock = opts?.channel === "telegram" ? TELEGRAM_NUDGE : "";
+  const systemPrompt = `${SYSTEM_PROMPT}\n\n${textingInstructions(profile)}${channelBlock}`;
 
   for (let turn = 0; turn < 8; turn++) {
     const response = await ai.models.generateContent({

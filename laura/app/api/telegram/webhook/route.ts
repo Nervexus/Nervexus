@@ -170,7 +170,7 @@ async function answer(text: string): Promise<void> {
     { role: "user", content: text },
   ];
   await prisma.chatMessage.create({ data: { role: "user", content: text } });
-  const { reply, places } = await chat(history);
+  const { reply, places } = await chat(history, { channel: "telegram" });
   await prisma.chatMessage.create({ data: { role: "assistant", content: reply } });
   for (const place of places) {
     await sendPlaceCard(place.images, placeCaption(place));
