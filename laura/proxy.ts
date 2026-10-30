@@ -14,6 +14,7 @@ const PUBLIC = new Set([
   "/api/routine/send",
   "/api/routine/tick",
   "/api/admin/migrate",
+  "/api/telegram/register",
 ]);
 
 export function proxy(request: NextRequest) {
