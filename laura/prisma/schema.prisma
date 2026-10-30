@@ -232,3 +232,15 @@ model RoutineItem {
   sort      Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+// Something Laura is passing on to Claude Code (the developer chat): a
+// feature she can't do yet, a bug, or a note Madoxs asked her to forward.
+// Shown under Settings > For Claude Code with a copy-all button.
+model DevRequest {
+  id        String   @id @default(cuid())
+  kind      String   @default("feature") // "feature" | "bug" | "note"
+  summary   String
+  details   String?
+  status    String   @default("open") // "open" | "done"
+  createdAt DateTime @default(now())
+}

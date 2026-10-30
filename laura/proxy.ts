@@ -13,6 +13,7 @@ const PUBLIC = new Set([
   "/api/briefing/send",
   "/api/routine/send",
   "/api/routine/tick",
+  "/api/admin/migrate",
 ]);
 
 export function proxy(request: NextRequest) {

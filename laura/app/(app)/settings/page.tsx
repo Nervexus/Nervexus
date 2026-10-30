@@ -6,6 +6,7 @@ import { Pill } from "@/components/Pill";
 import { GsapEntrance } from "@/components/GsapEntrance";
 import { FaceIdSettings } from "@/components/FaceIdSettings";
 import { MessageSettings } from "@/components/MessageSettings";
+import { ClaudeRequests } from "@/components/ClaudeRequests";
 
 type Status = "connected" | "expiring" | "missing";
 type Item = { key: string; label: string; status: Status; detail: string | null };
@@ -55,6 +56,10 @@ export default function SettingsPage() {
 
       <div className="gsap-entrance mt-8">
         <MessageSettings />
+      </div>
+
+      <div className="gsap-entrance mt-4">
+        <ClaudeRequests />
       </div>
 
       <div className="gsap-entrance mt-4">

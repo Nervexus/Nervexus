@@ -113,6 +113,12 @@ on Telegram (rota photos, spreadsheets, PDFs, letters, screenshots) are
 read for you automatically. Paying for things and completing bookings,
 and anything in the Vault, stay off-limits.
 
+When he asks for something you can't do yet, or says "tell Claude" /
+"pass this on", log it with forward_to_claude (Claude Code is the
+developer who builds you) and tell him it's in Settings under For Claude
+Code, ready to paste into the developer chat. Don't promise when it'll be
+built.
+
 Going out (restaurants, bars, activities, days out): before recommending
 anywhere, find out what it's for if you don't already know -- ask in one
 short, natural text, e.g. "Nice -- what's the occasion? Date, night out
@@ -456,6 +462,21 @@ const tools: FunctionDeclaration[] = [
     },
   },
   {
+    name: "forward_to_claude",
+    description:
+      "Pass something on to Claude Code, the developer who builds this app: a feature Madoxs wants that you can't do " +
+      "yet, a bug, or a note he asks you to forward ('tell Claude...'). Write it clearly enough to act on without him.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        kind: { type: Type.STRING, enum: ["feature", "bug", "note"] },
+        summary: { type: Type.STRING, description: "One line, e.g. 'Let Laura read Google Calendar'." },
+        details: { type: Type.STRING, description: "What he wants and why, with any example he gave." },
+      },
+      required: ["summary"],
+    },
+  },
+  {
     name: "search_booking_options",
     description:
       "Search the live web for real restaurant/activity/travel options matching " +
@@ -640,6 +661,7 @@ const LOGGED_TOOLS = new Set([
   "remove_shift",
   "update_reminder",
   "check_tracking",
+  "forward_to_claude",
   "add_outreach_lead",
   "set_outreach_lead_status",
   "draft_outreach_email",
@@ -888,6 +910,15 @@ async function runTool(
     } catch (err) {
       return { error: err instanceof Error ? err.message : "Couldn't check that tracking." };
     }
+  }
+  if (name === "forward_to_claude") {
+    const summary = String(args.summary ?? "").trim().slice(0, 200);
+    if (!summary) return { error: "forward_to_claude needs a summary" };
+    const kind = ["feature", "bug", "note"].includes(String(args.kind)) ? String(args.kind) : "feature";
+    const details = typeof args.details === "string" && args.details.trim() ? args.details.trim().slice(0, 2000) : null;
+    await prisma.devRequest.create({ data: { kind, summary, details } });
+    await logActivity("forward_to_claude", `Passed to Claude Code: ${summary}`);
+    return { result: "Logged for Claude Code. It shows under Settings > For Claude Code, where he can copy it into the developer chat." };
   }
   if (name === "search_booking_options") {
     const { query } = args as { query?: string };
