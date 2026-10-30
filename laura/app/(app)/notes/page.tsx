@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import GlassFolder, {
+  type ArtPreset,
   type ArtRecipe,
   type FolderFile,
   hashString,
@@ -9,9 +10,22 @@ import GlassFolder, {
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
 import { LockIcon } from "@/components/icons";
+import { NoteEditor } from "@/components/NoteEditor";
 
-type Note = { id: string; title: string; body: string; pinned: boolean; folderId: string; updatedAt: string };
-type Folder = { id: string; name: string; locked: boolean; noteCount: number };
+type Note = { id: string; title: string; body: string; pinned: boolean; folderId: string; updatedAt: string; imageCount?: number };
+type Folder = { id: string; name: string; locked: boolean; noteCount: number; art: string; tone: "dark" | "light" };
+type FolderFileWithId = FolderFile & { _noteId: string };
+
+// The colours a folder can wear. "mono" is the default grey; the rest are
+// the folder component's built-in art presets.
+const FOLDER_COLORS: { value: string; label: string; swatch: string }[] = [
+  { value: "mono", label: "Mono", swatch: "linear-gradient(135deg,#737373,#d4d4d4)" },
+  { value: "aurora", label: "Aurora", swatch: "linear-gradient(135deg,#c2433f,#6f97c2)" },
+  { value: "ember", label: "Ember", swatch: "linear-gradient(135deg,#3d5f68,#ef4a2b)" },
+  { value: "dusk", label: "Dusk", swatch: "linear-gradient(135deg,#8f6c9c,#eab08a)" },
+  { value: "glacier", label: "Glacier", swatch: "linear-gradient(135deg,#9fb4c7,#ffffff)" },
+  { value: "verdant", label: "Verdant", swatch: "linear-gradient(135deg,#4f7a5a,#e9cf87)" },
+];
 
 // Pure greys -- the app has no color accents anywhere, so the folder's
 // generated artwork uses the same neutral palette as everything else
@@ -43,7 +57,6 @@ export default function NotesPage() {
   const [selected, setSelected] = useState<Note | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState("");
-  const [saving, setSaving] = useState(false);
   // Bumped after any change so <GlassFolder> remounts with the fresh list --
   // it only reads its `files` prop once, by design ("the folder owns the
   // list" after that), so syncing real server data back in means giving it
@@ -61,7 +74,9 @@ export default function NotesPage() {
   const [addingFolder, setAddingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderPin, setNewFolderPin] = useState("");
+  const [newFolderArt, setNewFolderArt] = useState("mono");
   const [folderError, setFolderError] = useState<string | null>(null);
+  const [paletteFor, setPaletteFor] = useState<string | null>(null);
 
   function load() {
     Promise.all([
@@ -171,57 +186,40 @@ export default function NotesPage() {
       const res = await fetch("/api/notes/folders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newFolderName.trim(), pin: newFolderPin.trim() || undefined }),
+        body: JSON.stringify({ name: newFolderName.trim(), pin: newFolderPin.trim() || undefined, art: newFolderArt }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't create the folder.");
       setAddingFolder(false);
       setNewFolderName("");
       setNewFolderPin("");
+      setNewFolderArt("mono");
       load();
     } catch (err) {
       setFolderError(err instanceof Error ? err.message : "Couldn't create the folder.");
     }
   }
 
-  function selectNote(folderId: string, index: number) {
-    const inFolder = notesByFolder(folderId);
-    const note = inFolder[index];
+  async function recolorFolder(folderId: string, art: string) {
+    setPaletteFor(null);
+    setFolders((prev) => prev.map((f) => (f.id === folderId ? { ...f, art } : f)));
+    setGeneration((g) => g + 1);
+    await fetch(`/api/notes/folders/${folderId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ art }),
+    }).catch(() => {});
+  }
+
+  function openNote(noteId: string) {
+    const note = notes.find((n) => n.id === noteId);
     if (!note) return;
     setSelected(note);
     setDraftTitle(note.title);
     setDraftBody(note.body);
   }
 
-  async function save() {
-    if (!selected || !draftTitle.trim()) return;
-    setSaving(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/notes/${selected.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: draftTitle.trim(), body: draftBody }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Couldn't save the note.");
-      setSelected(null);
-      setGeneration((g) => g + 1);
-      load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't save the note.");
-    } finally {
-      setSaving(false);
-    }
-  }
 
-  async function remove() {
-    if (!selected) return;
-    await fetch(`/api/notes/${selected.id}`, { method: "DELETE" });
-    setSelected(null);
-    setGeneration((g) => g + 1);
-    load();
-  }
 
   async function addNote(folderId: string) {
     // Fires once per "+" click: the folder shows "Untitled note" right
@@ -254,7 +252,7 @@ export default function NotesPage() {
 
       {error && <p className="gsap-entrance mt-4 text-sm text-red-400">{error}</p>}
 
-      <div className="gsap-entrance mt-10 flex flex-wrap justify-center gap-10">
+      <div className="gsap-entrance mt-8 flex flex-wrap justify-center gap-x-6 gap-y-8 sm:mt-10 sm:gap-10">
         {!loaded ? (
           <p className="py-10 text-sm text-neutral-600">Loading…</p>
         ) : (
@@ -263,33 +261,62 @@ export default function NotesPage() {
               const isLocked = folder.locked && !unlockedIds.has(folder.id);
               const panelHere = panel?.folderId === folder.id ? panel.mode : null;
               const oldestFirst = notesByFolder(folder.id);
-              const files: FolderFile[] = oldestFirst.map((n) => ({
+              const files: FolderFileWithId[] = oldestFirst.map((n) => ({
                 name: n.title,
-                meta: formatMeta(n.updatedAt),
+                meta: `${formatMeta(n.updatedAt)}${n.imageCount ? ` · ${n.imageCount}📷` : ""}`,
+                _noteId: n.id,
               }));
 
               return (
                 <div key={folder.id} className="flex flex-col items-center gap-2" style={{ width: FOLDER_WIDTH }}>
-                  <div className="flex w-full items-center justify-between px-1">
+                  <div className="relative flex w-full items-center justify-between px-1">
                     <span className="label truncate">
                       {folder.name}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        isLocked
-                          ? openPanel({ folderId: folder.id, mode: "unlock" })
-                          : folder.locked
-                            ? lockNow(folder.id)
-                            : openPanel({ folderId: folder.id, mode: "set-pin" })
-                      }
-                      aria-label={isLocked ? "Unlock folder" : folder.locked ? "Lock folder now" : "Lock this folder"}
-                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors ${
-                        folder.locked ? "text-neutral-300 hover:text-neutral-100" : "text-neutral-600 hover:text-neutral-300"
-                      }`}
-                    >
-                      <LockIcon className="h-3.5 w-3.5" />
-                    </button>
+                    <div className="flex shrink-0 items-center gap-1">
+                      {!isLocked && (
+                        <button
+                          type="button"
+                          onClick={() => setPaletteFor(paletteFor === folder.id ? null : folder.id)}
+                          aria-label="Folder colour"
+                          aria-expanded={paletteFor === folder.id}
+                          className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-600 transition-colors hover:text-neutral-300"
+                        >
+                          <span className="h-3.5 w-3.5 rounded-full border border-white/20" style={{ background: FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch }} />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          isLocked
+                            ? openPanel({ folderId: folder.id, mode: "unlock" })
+                            : folder.locked
+                              ? lockNow(folder.id)
+                              : openPanel({ folderId: folder.id, mode: "set-pin" })
+                        }
+                        aria-label={isLocked ? "Unlock folder" : folder.locked ? "Lock folder now" : "Lock this folder"}
+                        className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
+                          folder.locked ? "text-neutral-300 hover:text-neutral-100" : "text-neutral-600 hover:text-neutral-300"
+                        }`}
+                      >
+                        <LockIcon className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                    {paletteFor === folder.id && (
+                      <div className="absolute right-0 top-7 z-20 flex gap-1.5 rounded-xl border border-line bg-[#141414] p-2 shadow-[0_20px_40px_-14px_rgba(0,0,0,0.9)]">
+                        {FOLDER_COLORS.map((c) => (
+                          <button
+                            key={c.value}
+                            type="button"
+                            onClick={() => recolorFolder(folder.id, c.value)}
+                            aria-label={c.label}
+                            title={c.label}
+                            className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${folder.art === c.value ? "border-white" : "border-white/20"}`}
+                            style={{ background: c.swatch }}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {isLocked ? (
@@ -336,8 +363,8 @@ export default function NotesPage() {
                         width={FOLDER_WIDTH}
                         label={folder.name}
                         meta={`${folder.noteCount} saved`}
-                        tone="dark"
-                        art={MONO_ART}
+                        tone={folder.tone}
+                        art={folder.art === "mono" ? MONO_ART : (folder.art as ArtPreset)}
                         seed={hashString(folder.id) % 97}
                         files={files}
                         action="add"
@@ -345,7 +372,10 @@ export default function NotesPage() {
                           addNote(folder.id);
                           return { name: "Untitled note", meta: "Just now" };
                         }}
-                        onFileSelect={(_file, index) => selectNote(folder.id, index)}
+                        onFileSelect={(file) => {
+                          const id = (file as FolderFileWithId)._noteId;
+                          if (id) openNote(id);
+                        }}
                       />
                       {panelHere === "set-pin" && (
                         <div className="flex w-full flex-col gap-2 px-2">
@@ -428,6 +458,19 @@ export default function NotesPage() {
                     placeholder="PIN (optional)"
                     className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
                   />
+                  <div className="flex flex-wrap justify-center gap-1.5">
+                    {FOLDER_COLORS.map((c) => (
+                      <button
+                        key={c.value}
+                        type="button"
+                        onClick={() => setNewFolderArt(c.value)}
+                        aria-label={c.label}
+                        title={c.label}
+                        className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${newFolderArt === c.value ? "border-white" : "border-white/20"}`}
+                        style={{ background: c.swatch }}
+                      />
+                    ))}
+                  </div>
                   {folderError && <p className="text-center text-xs text-red-400">{folderError}</p>}
                   <div className="flex justify-center gap-3">
                     <Button
@@ -463,32 +506,16 @@ export default function NotesPage() {
       </div>
 
       {selected && (
-        <div className="gradient-border relative mt-10 item p-6 backdrop-blur-md">
-          <input
-            value={draftTitle}
-            onChange={(e) => setDraftTitle(e.target.value)}
-            placeholder="Title"
-            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3.5 py-2.5 text-sm font-normal text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
-          />
-          <textarea
-            value={draftBody}
-            onChange={(e) => setDraftBody(e.target.value)}
-            placeholder="Write something…"
-            rows={6}
-            className="mt-3 w-full resize-none rounded-lg border border-line bg-neutral-950/60 px-3.5 py-2.5 text-sm font-normal text-neutral-300 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
-          />
-          <div className="mt-3.5 flex justify-end gap-3">
-            <Button variant="danger" onClick={remove}>
-              Delete
-            </Button>
-            <Button variant="ghost" onClick={() => setSelected(null)}>
-              Cancel
-            </Button>
-            <Button onClick={save} disabled={saving || !draftTitle.trim()}>
-              {saving ? "Saving…" : "Save"}
-            </Button>
-          </div>
-        </div>
+        <NoteEditor
+          noteId={selected.id}
+          initialTitle={draftTitle}
+          initialBody={draftBody}
+          onClose={() => setSelected(null)}
+          onChanged={() => {
+            setGeneration((g) => g + 1);
+            load();
+          }}
+        />
       )}
     </GsapEntrance>
   );

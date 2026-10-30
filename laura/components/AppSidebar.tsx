@@ -38,6 +38,24 @@ async function signOut() {
   window.location.replace("/login");
 }
 
+/** A genuine refresh for when the app feels laggy or stale: drop any
+ * service worker and cached responses, then reload from the server. */
+async function refreshApp() {
+  try {
+    if ("serviceWorker" in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+    if ("caches" in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    }
+  } catch {
+    // best effort -- reload regardless
+  }
+  window.location.reload();
+}
+
 /** The app's nav: a 76px icon rail on desktop (tooltips on hover, purple
  * active tile with a bar on the rail's edge, small count badges), and a
  * bottom bar plus a "More" sheet on phones. */
@@ -156,6 +174,12 @@ export function AppSidebar() {
           })}
         </ul>
 
+        <div className="group relative mb-2">
+          <button onClick={refreshApp} aria-label="Refresh" className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-line bg-surface text-muted transition-colors hover:text-text">
+            <NavIcon name="refresh" />
+          </button>
+          <span className="rail-tip">Refresh the app</span>
+        </div>
         <div className="group relative">
           <button onClick={signOut} aria-label="Sign out" className="flex h-10 w-10 items-center justify-center rounded-full border border-line-2 bg-surface text-[11px] font-semibold text-muted transition-colors hover:text-text">
             MH
@@ -227,9 +251,14 @@ export function AppSidebar() {
                 );
               })}
             </ul>
-            <button onClick={signOut} className="btn mt-4 w-full">
-              <NavIcon name="logout" className="h-4 w-4" /> Sign out
-            </button>
+            <div className="mt-4 flex gap-2">
+              <button onClick={refreshApp} className="btn flex-1">
+                <NavIcon name="refresh" className="h-4 w-4" /> Refresh
+              </button>
+              <button onClick={signOut} className="btn flex-1">
+                <NavIcon name="logout" className="h-4 w-4" /> Sign out
+              </button>
+            </div>
           </div>
         </div>
       )}

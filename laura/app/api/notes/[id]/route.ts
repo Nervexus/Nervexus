@@ -3,6 +3,16 @@ import { prisma } from "@/lib/db";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+export async function GET(_request: Request, { params }: RouteContext) {
+  const { id } = await params;
+  const note = await prisma.note.findUnique({
+    where: { id },
+    include: { images: { orderBy: { createdAt: "asc" } } },
+  });
+  if (!note) return NextResponse.json({ error: "Note not found." }, { status: 404 });
+  return NextResponse.json({ note });
+}
+
 export async function PATCH(request: Request, { params }: RouteContext) {
   const { id } = await params;
   const data = await request.json().catch(() => null);

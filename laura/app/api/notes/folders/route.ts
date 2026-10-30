@@ -12,6 +12,8 @@ export async function GET() {
       id: f.id,
       name: f.name,
       locked: f.locked,
+      art: f.art,
+      tone: f.tone,
       noteCount: f._count.notes,
     })),
   });
@@ -21,6 +23,9 @@ export async function POST(request: Request) {
   const data = await request.json().catch(() => null);
   const name = typeof data?.name === "string" ? data.name.trim() : "";
   const pin = typeof data?.pin === "string" ? data.pin.trim() : "";
+  const ART = new Set(["mono", "aurora", "ember", "dusk", "glacier", "verdant"]);
+  const art = ART.has(data?.art) ? data.art : "mono";
+  const tone = data?.tone === "light" ? "light" : "dark";
 
   if (!name) {
     return NextResponse.json({ error: "A folder name is required." }, { status: 400 });
@@ -30,10 +35,10 @@ export async function POST(request: Request) {
   const { hash, salt } = locked ? hashPin(pin) : { hash: null, salt: null };
 
   const folder = await prisma.noteFolder.create({
-    data: { name, locked, pinHash: hash, pinSalt: salt },
+    data: { name, locked, pinHash: hash, pinSalt: salt, art, tone },
   });
   return NextResponse.json(
-    { folder: { id: folder.id, name: folder.name, locked: folder.locked, noteCount: 0 } },
+    { folder: { id: folder.id, name: folder.name, locked: folder.locked, art: folder.art, tone: folder.tone, noteCount: 0 } },
     { status: 201 }
   );
 }

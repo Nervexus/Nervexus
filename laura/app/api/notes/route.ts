@@ -4,8 +4,11 @@ import { prisma } from "@/lib/db";
 export async function GET() {
   const notes = await prisma.note.findMany({
     orderBy: [{ pinned: "desc" }, { updatedAt: "desc" }],
+    include: { _count: { select: { images: true } } },
   });
-  return NextResponse.json({ notes });
+  return NextResponse.json({
+    notes: notes.map(({ _count, ...n }) => ({ ...n, imageCount: _count.images })),
+  });
 }
 
 export async function POST(request: Request) {

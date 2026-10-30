@@ -15,9 +15,12 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const pin = typeof data?.pin === "string" ? data.pin.trim() : undefined;
   const currentPin = typeof data?.currentPin === "string" ? data.currentPin.trim() : "";
   const removeLock = data?.removeLock === true;
+  const ART = new Set(["mono", "aurora", "ember", "dusk", "glacier", "verdant"]);
 
-  const update: { name?: string; locked?: boolean; pinHash?: string | null; pinSalt?: string | null } = {};
+  const update: { name?: string; locked?: boolean; pinHash?: string | null; pinSalt?: string | null; art?: string; tone?: string } = {};
   if (name) update.name = name;
+  if (typeof data?.art === "string" && ART.has(data.art)) update.art = data.art;
+  if (data?.tone === "light" || data?.tone === "dark") update.tone = data.tone;
 
   if (removeLock || pin) {
     if (folder.locked && folder.pinHash && folder.pinSalt) {
@@ -42,5 +45,5 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 
   const updated = await prisma.noteFolder.update({ where: { id }, data: update });
-  return NextResponse.json({ folder: { id: updated.id, name: updated.name, locked: updated.locked } });
+  return NextResponse.json({ folder: { id: updated.id, name: updated.name, locked: updated.locked, art: updated.art, tone: updated.tone } });
 }

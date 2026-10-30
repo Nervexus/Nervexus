@@ -29,6 +29,16 @@ export function passwordMatches(candidate: string): boolean {
   return safeEqual(candidate, expected);
 }
 
+// A server-side backup credential (env var, never in the repo). It signs in
+// the same as the main password and also works when Face ID is otherwise
+// required, so a lost or broken phone can't lock the owner out. Absent by
+// default, in which case nothing changes.
+export function recoveryMatches(candidate: string): boolean {
+  const expected = process.env.RECOVERY_PASSWORD;
+  if (!expected) return false;
+  return safeEqual(candidate, expected);
+}
+
 export function createSessionValue(now = Date.now()): string {
   const expires = String(now + SESSION_MAX_AGE_S * 1000);
   return `${expires}.${sign(expires)}`;

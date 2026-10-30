@@ -16,6 +16,7 @@ const PATHS: Record<string, string> = {
   settings: "M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1M15 5v4M9 10v4M17 15v4",
   logout: "M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4",
   more: "M5 12h.01M12 12h.01M19 12h.01",
+  refresh: "M20 11a8 8 0 1 0-.9 4.3M20 5v6h-6",
   close: "M6 6l12 12M18 6 6 18",
 };
 

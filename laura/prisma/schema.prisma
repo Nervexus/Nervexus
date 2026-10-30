@@ -22,20 +22,39 @@ model NoteFolder {
   locked    Boolean  @default(false)
   pinHash   String?
   pinSalt   String?
+  // The folder's look on the Notes page. "mono" is the default grey art;
+  // other values are ArtPreset names (aurora, ember, dusk, glacier, verdant).
+  art       String   @default("mono")
+  tone      String   @default("dark") // "dark" | "light"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   notes     Note[]
 }
 
 model Note {
-  id        String     @id @default(cuid())
+  id        String      @id @default(cuid())
   title     String
   body      String
-  pinned    Boolean    @default(false)
-  folderId  String     @default("default")
-  folder    NoteFolder @relation(fields: [folderId], references: [id])
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  pinned    Boolean     @default(false)
+  folderId  String      @default("default")
+  folder    NoteFolder  @relation(fields: [folderId], references: [id])
+  images    NoteImage[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// A picture attached to a note -- e.g. a photo of what needs fixing, with
+// an optional caption describing the problem. Stored as a downscaled data
+// URL (the client shrinks it before upload); there's no blob store.
+model NoteImage {
+  id        String   @id @default(cuid())
+  noteId    String
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  data      String // data:image/...;base64,...
+  caption   String?
+  createdAt DateTime @default(now())
+
+  @@index([noteId])
 }
 
 // Secret values are encrypted (AES-256-GCM, see lib/crypto.ts) before they

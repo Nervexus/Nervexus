@@ -45,6 +45,7 @@ export default function LauraPage() {
   const greeting = useSyncExternalStore(noopSubscribe, greetingForNow, () => "Hello");
   const orbRef = useRef<VoiceOrbHandle>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,6 +83,31 @@ export default function LauraPage() {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setSending(false);
+    }
+  }
+
+  async function sendFile(file: File) {
+    if (sending) return;
+    const caption = input.trim();
+    setMessages((prev) => [...prev, { role: "user", content: `[Sent ${file.name}]${caption ? ` ${caption}` : ""}`, createdAt: new Date().toISOString() }]);
+    setInput("");
+    setTab("chat");
+    setChatOpen(true);
+    setSending(true);
+    setError(null);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      if (caption) body.append("caption", caption);
+      const res = await fetch("/api/chat/file", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Couldn't read that file.");
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply, createdAt: new Date().toISOString() }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't read that file.");
+    } finally {
+      setSending(false);
+      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
@@ -221,6 +247,26 @@ export default function LauraPage() {
               Laura
             </span>
             <div className="flex items-center gap-1.5">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*,.pdf,.csv,.xlsx,.txt"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) sendFile(f);
+                }}
+              />
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={sending}
+                aria-label="Attach a photo or file"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-neutral-300 transition-colors hover:text-white disabled:opacity-40"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
+                  <path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L9.8 16.8a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8" />
+                </svg>
+              </button>
               <VoiceOrb ref={orbRef} compact onTranscript={(text) => sendMessage(text, true)} />
               <button
                 onClick={() => sendMessage(input.trim(), false)}
