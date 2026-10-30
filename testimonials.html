@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Testimonials | SLATE</title>
-<meta name="description" content="What our clients say about SLATE, a bespoke roofing company crafted with precision.">
+<meta name="description" content="What homeowners, architects and contractors say about working with SLATE, bespoke roofing crafted with precision.">
 
-<link rel="canonical" href="https://slate-roofing-gules.vercel.app/testimonials.html">
+<link rel="canonical" href="https://slate-roofing-gules.vercel.app/testimonials">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SLATE">
 <meta property="og:title" content="Testimonials | SLATE">
-<meta property="og:description" content="What our clients say about SLATE, bespoke roofing crafted with precision.">
-<meta property="og:url" content="https://slate-roofing-gules.vercel.app/testimonials.html">
+<meta property="og:description" content="What homeowners, architects and contractors say about working with SLATE, bespoke roofing crafted with precision.">
+<meta property="og:url" content="https://slate-roofing-gules.vercel.app/testimonials">
 <meta property="og:image" content="https://slate-roofing-gules.vercel.app/assets/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -19,23 +19,23 @@
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Testimonials | SLATE">
-<meta name="twitter:description" content="What our clients say about SLATE, bespoke roofing crafted with precision.">
+<meta name="twitter:description" content="What homeowners, architects and contractors say about working with SLATE, bespoke roofing crafted with precision.">
 <meta name="twitter:image" content="https://slate-roofing-gules.vercel.app/assets/og-image.jpg">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <meta name="theme-color" content="#1c1c1c">
 
-<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
 
-<script src="assets/vendor/tailwind.js"></script>
-<script src="assets/vendor/icons.js"></script>
-<script src="assets/vendor/iconify-icon.min.js"></script>
-<script src="assets/vendor/gsap.min.js"></script>
-<script src="assets/vendor/ScrollTrigger.min.js"></script>
-<script src="assets/vendor/three.min.js"></script>
-<script src="assets/vendor/lenis.min.js"></script>
-<link rel="stylesheet" href="assets/luxe.css">
+<script src="/assets/vendor/tailwind.js"></script>
+<script src="/assets/vendor/icons.js"></script>
+<script src="/assets/vendor/iconify-icon.min.js"></script>
+<script src="/assets/vendor/gsap.min.js"></script>
+<script src="/assets/vendor/ScrollTrigger.min.js"></script>
+<script src="/assets/vendor/three.min.js"></script>
+<script src="/assets/vendor/lenis.min.js"></script>
+<link rel="stylesheet" href="/assets/luxe.css">
 <script>
 (function () {
   try {
@@ -190,14 +190,14 @@ tailwind.config = {
 <!-- LAYER 2: NAVIGATION -->
 <nav id="main-nav" class="fixed top-0 left-0 w-full z-50 bg-dark/75 backdrop-blur-md border-b border-cream/10 py-4 transition-opacity duration-500 ease-out">
   <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
-    <a href="slate.html" class="font-serif text-2xl tracking-tight text-cream">SLATE</a>
+    <a href="/" class="font-serif text-2xl tracking-tight text-cream">SLATE</a>
 
     <div class="hidden md:flex items-center gap-6 lg:gap-10 text-sm font-medium text-cream/80">
-      <a href="slate.html#heritage" class="nav-link">Our Process</a>
-      <a href="slate.html#work" class="nav-link">Why SLATE</a>
-      <a href="slate.html#services" class="nav-link">Services</a>
-      <a href="testimonials.html" class="nav-link">Testimonials</a>
-      <a href="slate.html#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
+      <a href="/#services" class="nav-link">Services</a>
+      <a href="/#heritage" class="nav-link">Our Process</a>
+      <a href="/#work" class="nav-link">Why SLATE</a>
+      <a href="/testimonials" class="nav-link">Testimonials</a>
+      <a href="/#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
     </div>
   </div>
 </nav>
@@ -205,83 +205,152 @@ tailwind.config = {
 <!-- LAYER 1: MAIN CONTENT -->
 <main class="relative z-10">
 
-  <!-- SIMPLE PAGE HEADER -->
-  <section class="relative bg-dark pt-40 pb-16 px-6">
-    <div class="max-w-5xl mx-auto gsap-fade-up">
-      <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Testimonials</p>
-      <h1 data-reveal class="font-serif text-5xl sm:text-7xl font-light tracking-tight text-cream leading-tight">What our clients <em class="italic text-sand">say</em></h1>
-    </div>
-  </section>
-
-  <!-- SECTION 4: CLIENT TESTIMONIALS -->
-  <section id="boutique" class="relative bg-dark py-28 px-6 overflow-hidden">
-    <div id="testimonialWrap" class="relative max-w-5xl mx-auto">
-
-      <!-- Oversized index number, bleeding off the left edge -->
-      <div class="absolute -left-4 sm:-left-8 top-1/2 -translate-y-1/2 text-[12rem] sm:text-[16rem] lg:text-[20rem] font-serif font-bold text-cream/[0.04] select-none pointer-events-none leading-none tracking-tighter">
-        <span id="testimonialNumber" class="block">01</span>
+  <section class="relative bg-dark pt-36 sm:pt-44 pb-14 sm:pb-20 px-6">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-10 lg:gap-16 items-end">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Testimonials</p>
+        <h1 data-reveal class="font-serif text-5xl sm:text-7xl font-light tracking-tight text-cream leading-[1.02]">In our clients&rsquo; <em class="italic text-sand">words</em></h1>
       </div>
-
-      <div class="relative flex">
-        <!-- Left rail: vertical label + progress line -->
-        <div class="hidden sm:flex flex-col items-center justify-center pr-10 md:pr-16 border-r border-cream/10 shrink-0">
-          <span class="text-xs font-mono text-cream/40 tracking-widest uppercase" style="writing-mode: vertical-rl; text-orientation: mixed;">Testimonials</span>
-          <div class="relative h-28 w-px bg-cream/10 mt-8">
-            <div id="testimonialProgress" class="absolute top-0 left-0 w-full bg-sand origin-top" style="height:0%"></div>
-          </div>
+      <div class="gsap-fade-up">
+        <p class="text-cream/70 leading-relaxed max-w-md">Homeowners, architects and contractors on what it is like to work with us, from the first visit to the final sign-off.</p>
+        <div class="mt-8 grid grid-cols-3 gap-4 border-t border-cream/10 pt-6">
+          <div><p class="font-serif text-3xl text-sand" data-count="500" data-suffix="+">500+</p><p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mt-1">Roofs completed</p></div>
+          <div><p class="font-serif text-3xl text-sand" data-count="25" data-suffix="yr">25yr</p><p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mt-1">Warranty</p></div>
+          <div><p class="font-serif text-3xl text-sand" data-count="15" data-suffix="+">15+</p><p class="font-mono text-[10px] uppercase tracking-wider text-cream/50 mt-1">Partner quarries</p></div>
         </div>
-
-        <!-- Center content -->
-        <div class="flex-1 sm:pl-10 md:pl-16 py-8">
-          <div id="testimonialBadge" class="mb-8">
-            <span class="inline-flex items-center gap-2 text-xs font-mono text-cream/50 border border-cream/15 rounded-full px-3 py-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-sand"></span>
-              <span id="testimonialCompany"></span>
-            </span>
-          </div>
-
-          <div class="relative mb-10 min-h-[170px] sm:min-h-[140px]">
-            <blockquote id="testimonialQuote" class="text-2xl sm:text-3xl md:text-4xl font-light text-cream leading-[1.15] tracking-tight"></blockquote>
-          </div>
-
-          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-8">
-            <div id="testimonialAuthor" class="flex items-center gap-4">
-              <div class="w-8 h-px bg-cream"></div>
-              <div>
-                <p id="testimonialName" class="text-base font-medium text-cream"></p>
-                <p id="testimonialRole" class="text-sm text-cream/50"></p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-              <button id="testimonialPrev" class="testimonial-nav-btn group relative w-12 h-12 rounded-full border border-cream/15 flex items-center justify-center overflow-hidden">
-                <span class="testimonial-nav-fill testimonial-nav-fill-left absolute inset-0 bg-cream"></span>
-                <iconify-icon icon="solar:arrow-left-linear" class="relative z-10 text-cream group-hover:text-dark transition-colors duration-300"></iconify-icon>
-              </button>
-              <button id="testimonialNext" class="testimonial-nav-btn group relative w-12 h-12 rounded-full border border-cream/15 flex items-center justify-center overflow-hidden">
-                <span class="testimonial-nav-fill testimonial-nav-fill-right absolute inset-0 bg-cream"></span>
-                <iconify-icon icon="solar:arrow-right-linear" class="relative z-10 text-cream group-hover:text-dark transition-colors duration-300"></iconify-icon>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom ticker: faint repeating client names -->
-      <div class="mt-16 sm:mt-24 overflow-hidden opacity-[0.08] pointer-events-none">
-        <div id="testimonialTicker" class="flex whitespace-nowrap text-4xl sm:text-6xl font-bold tracking-tight"></div>
       </div>
     </div>
   </section>
 
-  <!-- BOOKING PROMPT -->
-  <section class="relative bg-dark text-cream border-t border-cream/10 py-20 sm:py-28 px-6">
+  <!-- FEATURED STORY -->
+  <section class="relative bg-dark px-6 pb-16 sm:pb-24">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-14 items-center rounded-3xl border border-cream/10 bg-cream/[0.03] p-4 sm:p-6 lg:p-8 gsap-fade-up">
+      <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-full lg:min-h-[28rem]">
+        <img src="/assets/strata/standard-warranty.webp" alt="Restored natural slate roof with ornate gabled dormers" class="absolute inset-0 w-full h-full object-cover">
+        <span class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">Featured project</span>
+      </div>
+      <div class="px-2 pb-4 lg:p-4">
+        <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <blockquote class="mt-5 font-serif text-2xl sm:text-4xl font-light leading-[1.2] text-cream">&ldquo;The most elegant roofline we have ever specified. On a listed building, with a conservation officer watching every course, they did not put a slate wrong.&rdquo;</blockquote>
+        <div class="mt-8 flex items-center gap-4">
+          <span class="w-8 h-px bg-sand"></span>
+          <div>
+            <p class="text-cream font-medium">Sarah Bennett</p>
+            <p class="text-sm text-cream/55">Project Manager, Heritage Build Co.</p>
+          </div>
+        </div>
+        <dl class="mt-8 grid grid-cols-3 gap-4 border-t border-cream/10 pt-6">
+          <div><dt class="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/45">Material</dt><dd class="mt-1 text-sm text-cream">Natural slate</dd></div>
+          <div><dt class="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/45">Project</dt><dd class="mt-1 text-sm text-cream">Listed re-roof</dd></div>
+          <div><dt class="font-mono text-[10px] uppercase tracking-[0.2em] text-cream/45">Duration</dt><dd class="mt-1 text-sm text-cream">3 weeks</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEW WALL -->
+  <section class="relative bg-dark px-6 pb-16 sm:pb-24">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-end justify-between gap-6 mb-8 sm:mb-10">
+        <h2 data-reveal class="font-serif text-3xl sm:text-5xl font-light tracking-tight">Recent <em class="italic text-sand">projects</em></h2>
+        <p class="hidden sm:block font-mono text-xs uppercase tracking-[0.25em] text-cream/45">Every review from a completed job</p>
+      </div>
+      <div class="columns-1 md:columns-2 lg:columns-3 gap-4 lg:gap-5">
+        <article class="break-inside-avoid mb-4 lg:mb-5 rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p class="mt-4 font-serif text-xl sm:text-[1.35rem] leading-snug text-cream">&ldquo;Four days, zero surprises, flawless finish. The quote matched the final invoice to the pound, and the crew left the garden cleaner than they found it.&rdquo;</p>
+          <div class="mt-6 flex items-center justify-between gap-4 border-t border-cream/10 pt-5">
+            <div>
+              <p class="text-sm font-medium text-cream">Priya Shah</p>
+              <p class="text-xs text-cream/50 mt-0.5">Homeowner</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sand">Natural slate</p>
+              <p class="text-xs text-cream/50 mt-1">Full re-roof, Richmond</p>
+            </div>
+          </div>
+        </article>
+        <article class="break-inside-avoid mb-4 lg:mb-5 rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p class="mt-4 font-serif text-xl sm:text-[1.35rem] leading-snug text-cream">&ldquo;Pure craftsmanship in every single detail. Their site lead understood the drawings better than some contractors I have worked with for years.&rdquo;</p>
+          <div class="mt-6 flex items-center justify-between gap-4 border-t border-cream/10 pt-5">
+            <div>
+              <p class="text-sm font-medium text-cream">James Okafor</p>
+              <p class="text-xs text-cream/50 mt-0.5">Principal Architect, Studio Okafor</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sand">Standing seam zinc</p>
+              <p class="text-xs text-cream/50 mt-1">New build, Hackney</p>
+            </div>
+          </div>
+        </article>
+        <article class="break-inside-avoid mb-4 lg:mb-5 rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p class="mt-4 font-serif text-xl sm:text-[1.35rem] leading-snug text-cream">&ldquo;Transformed our home. We had a leak for two winters that three firms could not find. SLATE found it in an hour and the new roof is beautiful.&rdquo;</p>
+          <div class="mt-6 flex items-center justify-between gap-4 border-t border-cream/10 pt-5">
+            <div>
+              <p class="text-sm font-medium text-cream">Daniel R.</p>
+              <p class="text-xs text-cream/50 mt-0.5">Homeowner</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sand">Natural slate</p>
+              <p class="text-xs text-cream/50 mt-1">Re-roof, Guildford</p>
+            </div>
+          </div>
+        </article>
+        <article class="break-inside-avoid mb-4 lg:mb-5 rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p class="mt-4 font-serif text-xl sm:text-[1.35rem] leading-snug text-cream">&ldquo;They treat a roof like a piece of architecture. We now bring them in at design stage on every residential scheme we run.&rdquo;</p>
+          <div class="mt-6 flex items-center justify-between gap-4 border-t border-cream/10 pt-5">
+            <div>
+              <p class="text-sm font-medium text-cream">Marcus Webb</p>
+              <p class="text-xs text-cream/50 mt-0.5">Director, Webb & Sons Construction</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sand">Clay tile</p>
+              <p class="text-xs text-cream/50 mt-1">Commercial, Kingston</p>
+            </div>
+          </div>
+        </article>
+        <article class="break-inside-avoid mb-4 lg:mb-5 rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p class="mt-4 font-serif text-xl sm:text-[1.35rem] leading-snug text-cream">&ldquo;Our client’s listing sold within a week of the new roof going on. Buyers kept mentioning it at viewings.&rdquo;</p>
+          <div class="mt-6 flex items-center justify-between gap-4 border-t border-cream/10 pt-5">
+            <div>
+              <p class="text-sm font-medium text-cream">Elena Frost</p>
+              <p class="text-xs text-cream/50 mt-0.5">Partner, Frost & Partners</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sand">Cedar shake</p>
+              <p class="text-xs text-cream/50 mt-1">Pre-sale refurbishment, Wimbledon</p>
+            </div>
+          </div>
+        </article>
+        <article class="break-inside-avoid mb-4 lg:mb-5 rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="text-sand text-xs tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p class="mt-4 font-serif text-xl sm:text-[1.35rem] leading-snug text-cream">&ldquo;Patient, precise and honest about what would and would not work on an old structure. The copper is already starting to turn.&rdquo;</p>
+          <div class="mt-6 flex items-center justify-between gap-4 border-t border-cream/10 pt-5">
+            <div>
+              <p class="text-sm font-medium text-cream">Tom & Hannah Lewis</p>
+              <p class="text-xs text-cream/50 mt-0.5">Homeowners</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-sand">Standing seam copper</p>
+              <p class="text-xs text-cream/50 mt-1">Barn conversion, Surrey Hills</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative bg-dark text-cream border-t border-cream/10 py-16 sm:py-24 px-6">
     <div class="max-w-4xl mx-auto text-center gsap-fade-up">
       <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">Your project</p>
       <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-[1.05] mb-6">Ready to be our next <em class="italic text-sand">story?</em></h2>
       <p class="text-cream/75 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">Book a consultation and we will visit, look at your roof and give you a clear, itemised quote.</p>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
-        <a href="slate.html#book" class="btn-shine inline-flex items-center gap-3 bg-cream text-dark px-8 py-4 rounded-full font-medium hover:bg-sand transition-colors">
+        <a href="/#book" class="btn-shine inline-flex items-center gap-3 bg-cream text-dark px-8 py-4 rounded-full font-medium hover:bg-sand transition-colors">
           Book a consultation
           <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
         </a>
@@ -324,9 +393,9 @@ tailwind.config = {
       <div>
         <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
         <ul class="space-y-3 text-cream/55 text-sm">
-          <li><a href="slate.html#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
-          <li><a href="slate.html#services" class="hover:text-cream transition-colors">Services</a></li>
-          <li><a href="testimonials.html" class="hover:text-cream transition-colors">Testimonials</a></li>
+          <li><a href="/#services" class="hover:text-cream transition-colors">Services</a></li>
+          <li><a href="/#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
+          <li><a href="/testimonials" class="hover:text-cream transition-colors">Testimonials</a></li>
         </ul>
       </div>
 
@@ -350,15 +419,15 @@ tailwind.config = {
     <div class="relative z-10 max-w-7xl mx-auto px-6 border-t border-cream/10 pt-7 pb-10 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
       <p class="font-mono text-xs text-cream/35">© 2026 SLATE. All rights reserved.</p>
       <div class="flex items-center gap-6 font-mono text-xs text-cream/35">
-        <a href="privacy.html#company" class="hover:text-cream/70 transition-colors">Company info</a>
-        <a href="privacy.html" class="hover:text-cream/70 transition-colors">Privacy</a>
+        <a href="/privacy#company" class="hover:text-cream/70 transition-colors">Company info</a>
+        <a href="/privacy" class="hover:text-cream/70 transition-colors">Privacy</a>
       </div>
     </div>
   </footer>
 
 </main>
 
-<script src="assets/luxe.js"></script>
+<script src="/assets/luxe.js"></script>
 <script>
 /* =========================================================
    THREE.JS AMBIENT NOISE BACKGROUND
@@ -504,196 +573,6 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
     },
   });
 });
-
-/* =========================================================
-   CLIENT TESTIMONIALS CAROUSEL
-   ========================================================= */
-(function initTestimonials() {
-  const wrap = document.getElementById('testimonialWrap');
-  if (!wrap) return;
-
-  const testimonials = [
-    {
-      quote: 'Transformed our home into a sanctuary overnight.',
-      author: 'Daniel R.',
-      role: 'Homeowner, Re-roof Project',
-      company: 'Private Residence',
-    },
-    {
-      quote: 'The most elegant roofline we have ever specified.',
-      author: 'Sarah Bennett',
-      role: 'Project Manager',
-      company: 'Heritage Build Co.',
-    },
-    {
-      quote: 'Pure craftsmanship in every single detail.',
-      author: 'James Okafor',
-      role: 'Principal Architect',
-      company: 'Studio Okafor',
-    },
-    {
-      quote: 'Four days, zero surprises, flawless finish.',
-      author: 'Priya Shah',
-      role: 'Homeowner, Full Re-roof',
-      company: 'Private Residence',
-    },
-    {
-      quote: 'They treat a roof like a piece of architecture.',
-      author: 'Marcus Webb',
-      role: 'General Contractor',
-      company: 'Webb & Sons Construction',
-    },
-    {
-      quote: 'Our listing sold within a week of the new roof.',
-      author: 'Elena Frost',
-      role: 'Estate Agent',
-      company: 'Frost & Partners',
-    },
-  ];
-
-  const numberEl = document.getElementById('testimonialNumber');
-  const progressEl = document.getElementById('testimonialProgress');
-  const badgeEl = document.getElementById('testimonialBadge');
-  const companyEl = document.getElementById('testimonialCompany');
-  const quoteEl = document.getElementById('testimonialQuote');
-  const authorEl = document.getElementById('testimonialAuthor');
-  const nameEl = document.getElementById('testimonialName');
-  const roleEl = document.getElementById('testimonialRole');
-  const prevBtn = document.getElementById('testimonialPrev');
-  const nextBtn = document.getElementById('testimonialNext');
-  const tickerEl = document.getElementById('testimonialTicker');
-
-  if (tickerEl) {
-    const names = testimonials.map((t) => t.company).join(' • ');
-    tickerEl.innerHTML = `<span class="mx-8">${names} •</span>`.repeat(6);
-  }
-
-  let activeIndex = 0;
-  let autoplay;
-  let transitioning = false;
-
-  function fillQuote(text) {
-    if (!quoteEl) return;
-    quoteEl.innerHTML = '';
-    text.split(' ').forEach((word) => {
-      const span = document.createElement('span');
-      span.className = 'testimonial-word';
-      span.textContent = word;
-      quoteEl.appendChild(span);
-    });
-  }
-
-  function transitionTo(nextIndex, direction) {
-    if (transitioning) return;
-    transitioning = true;
-
-    const exitX = direction === 'next' ? -20 : 20;
-    const enterX = direction === 'next' ? 20 : -20;
-
-    const exitTl = gsap.timeline({
-      onComplete: () => {
-        activeIndex = nextIndex;
-        const t = testimonials[activeIndex];
-
-        if (numberEl) numberEl.textContent = String(activeIndex + 1).padStart(2, '0');
-        if (companyEl) companyEl.textContent = t.company;
-        if (nameEl) nameEl.textContent = t.author;
-        if (roleEl) roleEl.textContent = t.role;
-        fillQuote(t.quote);
-
-        if (progressEl) {
-          gsap.to(progressEl, {
-            height: `${((activeIndex + 1) / testimonials.length) * 100}%`,
-            duration: 0.5,
-            ease: 'power3.out',
-          });
-        }
-
-        const enterTl = gsap.timeline({
-          onComplete: () => { transitioning = false; },
-        });
-
-        if (numberEl) {
-          enterTl.fromTo(
-            numberEl,
-            { opacity: 0, scale: 0.8, filter: 'blur(10px)' },
-            { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.6, ease: 'power2.out' },
-            0
-          );
-        }
-        if (badgeEl) {
-          enterTl.fromTo(badgeEl, { opacity: 0, x: enterX }, { opacity: 1, x: 0, duration: 0.4, ease: 'power3.out' }, 0);
-        }
-        if (quoteEl) {
-          enterTl.fromTo(
-            quoteEl.querySelectorAll('.testimonial-word'),
-            { opacity: 0, y: 20, rotateX: 90 },
-            { opacity: 1, y: 0, rotateX: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' },
-            0
-          );
-        }
-        if (authorEl) {
-          enterTl.fromTo(authorEl, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, 0.1);
-        }
-      },
-    });
-
-    if (numberEl) exitTl.to(numberEl, { opacity: 0, scale: 1.1, filter: 'blur(10px)', duration: 0.2, ease: 'power2.in' }, 0);
-    if (badgeEl) exitTl.to(badgeEl, { opacity: 0, x: exitX, duration: 0.2, ease: 'power2.in' }, 0);
-    if (quoteEl) {
-      exitTl.to(quoteEl.querySelectorAll('.testimonial-word'), { opacity: 0, y: -10, duration: 0.15, stagger: 0.01 }, 0);
-    }
-    if (authorEl) exitTl.to(authorEl, { opacity: 0, y: -20, duration: 0.2, ease: 'power2.in' }, 0);
-  }
-
-  function goNext() {
-    transitionTo((activeIndex + 1) % testimonials.length, 'next');
-  }
-  function goPrev() {
-    transitionTo((activeIndex - 1 + testimonials.length) % testimonials.length, 'prev');
-  }
-  function resetAutoplay() {
-    clearInterval(autoplay);
-    autoplay = setInterval(goNext, 6000);
-  }
-
-  // Initial render (no transition)
-  const first = testimonials[0];
-  if (numberEl) numberEl.textContent = '01';
-  if (companyEl) companyEl.textContent = first.company;
-  if (nameEl) nameEl.textContent = first.author;
-  if (roleEl) roleEl.textContent = first.role;
-  fillQuote(first.quote);
-  if (progressEl) progressEl.style.height = `${(1 / testimonials.length) * 100}%`;
-  gsap.fromTo(
-    quoteEl.querySelectorAll('.testimonial-word'),
-    { opacity: 0, y: 20 },
-    { opacity: 1, y: 0, duration: 0.5, stagger: 0.04, ease: 'power3.out' }
-  );
-
-  resetAutoplay();
-
-  if (nextBtn) nextBtn.addEventListener('click', () => { goNext(); resetAutoplay(); });
-  if (prevBtn) prevBtn.addEventListener('click', () => { goPrev(); resetAutoplay(); });
-
-  // Subtle magnetic parallax on the oversized number
-  if (numberEl) {
-    wrap.addEventListener('mousemove', (e) => {
-      const rect = wrap.getBoundingClientRect();
-      const relX = (e.clientX - rect.left - rect.width / 2) / rect.width;
-      const relY = (e.clientY - rect.top - rect.height / 2) / rect.height;
-      gsap.to(numberEl, {
-        x: relX * 30,
-        y: relY * 16,
-        duration: 0.6,
-        ease: 'power2.out',
-      });
-    });
-    wrap.addEventListener('mouseleave', () => {
-      gsap.to(numberEl, { x: 0, y: 0, duration: 0.6, ease: 'power2.out' });
-    });
-  }
-})();
 
 /* =========================================================
    NAV: fade out once scrolled past the top, fade back in at the top

@@ -30,20 +30,35 @@
     else target.scrollIntoView({ behavior: 'smooth' });
   }
 
+  const samePage = (url) => url.origin === location.origin && url.pathname.replace(/\/index(\.html)?$|\.html$/, '').replace(/\/$/, '') === location.pathname.replace(/\/index(\.html)?$|\.html$/, '').replace(/\/$/, '');
   document.addEventListener('click', (e) => {
-    const link = e.target.closest('a[href^="#"]');
-    if (!link) return;
-    const hash = link.getAttribute('href');
-    if (hash === '#') {
-      e.preventDefault();
-      scrollToTarget(0);
-      return;
-    }
-    const target = document.getElementById(hash.slice(1));
+    const link = e.target.closest('a[href]');
+    if (!link || link.target === '_blank') return;
+    const href = link.getAttribute('href');
+    if (href === '#') { e.preventDefault(); scrollToTarget(0); return; }
+    const url = new URL(href, location.href);
+    if (!url.hash || !samePage(url)) return;
+    const target = document.getElementById(url.hash.slice(1));
     if (!target) return;
     e.preventDefault();
+    history.replaceState(null, '', url.hash);
     scrollToTarget(target);
   });
+
+  /* Arriving from another page with a #section: land there once pinned sections are measured */
+  if (location.hash.length > 1) {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.addEventListener('load', () => {
+      const target = document.getElementById(location.hash.slice(1));
+      if (!target) return;
+      setTimeout(() => {
+        if (hasST) ScrollTrigger.refresh();
+        const top = target.getBoundingClientRect().top + window.scrollY;
+        if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
+        else window.scrollTo(0, top);
+      }, window.__introDelay > 1 ? 50 : 120);
+    });
+  }
 
   /* Splits an element's text into masked words, keeping inline tags like <em> and <br> */
   function splitWords(el) {
@@ -171,11 +186,11 @@
 
   if (nav && navInner) {
     const onHome = !!document.getElementById('heritage');
-    const base = onHome ? '' : 'slate.html';
+    const base = onHome ? '' : '/';
     const items = [
+      ['#services', 'Services'],
       ['#heritage', 'Our Process'],
       ['#work', 'Why SLATE'],
-      ['#services', 'Services'],
       ['#faq', 'Questions'],
     ];
 
@@ -193,7 +208,7 @@
     const linkHtml = items
       .map(([hash, label], i) => '<a href="' + base + hash + '"><span class="mm-i"><em>0' + (i + 1) + '</em><strong>' + label + '</strong></span></a>')
       .join('') +
-      '<a href="testimonials.html"><span class="mm-i"><em>05</em><strong>Testimonials</strong></span></a>';
+      '<a href="/testimonials"><span class="mm-i"><em>05</em><strong>Testimonials</strong></span></a>';
     menu.innerHTML =
       '<div><p class="mm-label">Navigate</p><nav class="mm-links">' + linkHtml + '</nav></div>' +
       '<div class="mm-foot"><p>12 Artisan Row<br>Mayfair, London<br><a href="tel:+442079460192" style="color:#f5f3ee">+44 20 7946 0192</a></p>' +
@@ -242,7 +257,7 @@
   /* Booking shortcut: Call / Book bar on phones, floating Book button on desktop */
   if (nav) {
     const onHome = !!document.getElementById('heritage');
-    const bookHref = (onHome ? '' : 'slate.html') + '#book';
+    const bookHref = (onHome ? '' : '/') + '#book';
     const cta = document.createElement('div');
     cta.id = 'luxe-cta';
     cta.innerHTML =

@@ -21,21 +21,21 @@
 <meta name="twitter:title" content="SLATE | Bespoke Roofing">
 <meta name="twitter:description" content="Bespoke roofing in natural slate, standing seam metal, clay tile and cedar shake. Itemised quotes, our own licensed crew and a 25-year workmanship warranty.">
 <meta name="twitter:image" content="https://slate-roofing-gules.vercel.app/assets/og-image.jpg">
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <meta name="theme-color" content="#1c1c1c">
 
-<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
 
-<script src="assets/vendor/tailwind.js"></script>
-<script src="assets/vendor/icons.js"></script>
-<script src="assets/vendor/iconify-icon.min.js"></script>
-<script src="assets/vendor/gsap.min.js"></script>
-<script src="assets/vendor/ScrollTrigger.min.js"></script>
-<script src="assets/vendor/three.min.js"></script>
-<script src="assets/vendor/lenis.min.js"></script>
-<link rel="stylesheet" href="assets/luxe.css">
+<script src="/assets/vendor/tailwind.js"></script>
+<script src="/assets/vendor/icons.js"></script>
+<script src="/assets/vendor/iconify-icon.min.js"></script>
+<script src="/assets/vendor/gsap.min.js"></script>
+<script src="/assets/vendor/ScrollTrigger.min.js"></script>
+<script src="/assets/vendor/three.min.js"></script>
+<script src="/assets/vendor/lenis.min.js"></script>
+<link rel="stylesheet" href="/assets/luxe.css">
 <script>
 (function () {
   try {
@@ -189,41 +189,11 @@ tailwind.config = {
     #cinema-copy { padding-top: 16svh; }
     #heritage .text-center.mb-16, #services .text-center.mb-16 { margin-bottom: 2rem; }
 
-    /* Process: one stacked column of compact cards on a rail */
-    #timeline-container { padding-left: 1.6rem; }
-    #timeline-container::before {
-      content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 1px;
-      background: linear-gradient(to bottom, transparent, rgba(245,243,238,0.18) 6%, rgba(245,243,238,0.18) 94%, transparent);
-    }
-    #timeline-steps > .timeline-step + .timeline-step { margin-top: 0.75rem !important; }
-    .timeline-step { position: relative; flex-direction: column !important; align-items: stretch !important; gap: 0 !important; }
-    .timeline-step > .flex-1:empty { display: none; }
-    .timeline-step > .flex-1 { text-align: left !important; padding: 0 !important; }
-    .timeline-step .flex.items-center { justify-content: flex-start !important; }
-    .timeline-step > .timeline-dot { position: absolute; left: -1.6rem; margin-left: 1px; top: 1.15rem; width: 11px; height: 11px; }
-    .timeline-step .rounded-3xl { padding: 1rem 1.1rem 0.95rem; border-radius: 1rem; }
-    .timeline-step .rounded-3xl > span:first-child { font-size: 10px; letter-spacing: 0.18em; }
-    .timeline-step h3 { font-size: 1.3rem; line-height: 1.2; margin-top: 0.4rem; margin-bottom: 0.35rem; }
-    .timeline-step p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 0.55rem; }
-    .timeline-step .rounded-3xl > div:last-child { font-size: 0.72rem; gap: 0.35rem; }
 
     /* Selected Work */
     #work-pin { padding-top: 3.5rem; padding-bottom: 2.5rem; }
     #work-pin > div:first-child { margin-bottom: 1.75rem; }
 
-    /* Services: icon beside title, description underneath */
-    #services .svc-row {
-      display: grid !important;
-      grid-template-columns: 2.5rem 1fr;
-      column-gap: 1rem;
-      row-gap: 0.35rem;
-      align-items: start;
-      padding-top: 1.35rem;
-      padding-bottom: 1.35rem;
-    }
-    .svc-row > span:first-child { grid-row: span 2; width: 2.5rem; height: 2.5rem; font-size: 1rem; }
-    .svc-row > span:nth-child(2) { font-size: 1.35rem; line-height: 1.2; padding-top: 0.45rem; }
-    .svc-row > span:nth-child(3) { padding-left: 0; font-size: 0.875rem; }
 
     /* Footer */
     #experience > div:first-child { padding-top: 3.5rem; padding-bottom: 3rem; }
@@ -237,9 +207,28 @@ tailwind.config = {
     #experience > div.grid > div:first-child { grid-column: 1 / -1; }
   }
 
+  /* Process */
   @media (min-width: 1024px) {
-    #work-track.work-track-pad { padding-left: max(1.5rem, calc((100vw - 80rem) / 2 + 1.5rem)); padding-right: 12vw; }
+    .proc-step .proc-body { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.6s cubic-bezier(.16,1,.3,1), opacity 0.5s; }
+    .proc-step .proc-body > div { overflow: hidden; }
+    .proc-step.is-active .proc-body { grid-template-rows: 1fr; opacity: 1; }
+    .proc-step .proc-title { color: rgba(245,243,238,0.35); }
+    .proc-step.is-active .proc-title { color: #f5f3ee; }
+    .proc-step .proc-num { color: rgba(206,191,169,0.45); }
+    .proc-step.is-active .proc-num { color: #cebfa9; }
   }
+
+  /* The SLATE Standard: soft blurred edges inside the site margins */
+  .work-edge {
+    position: absolute; top: 0; bottom: 0; width: 3.5rem; z-index: 2; pointer-events: none;
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    background: linear-gradient(to right, rgba(28,28,28,0.85), rgba(28,28,28,0));
+    transition: opacity 0.4s;
+  }
+  .work-edge-l { left: 0; -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
+  .work-edge-r { right: 0; transform: scaleX(-1); -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
+  .work-edge.is-off { opacity: 0; }
+  @media (max-width: 767px) { .work-edge { width: 1.75rem; } }
 
 </style>
 </head>
@@ -254,10 +243,10 @@ tailwind.config = {
     <a href="#" class="font-serif text-2xl tracking-tight text-cream">SLATE</a>
 
     <div class="hidden md:flex items-center gap-6 lg:gap-10 text-sm font-medium text-cream/80">
+      <a href="#services" class="nav-link">Services</a>
       <a href="#heritage" class="nav-link">Our Process</a>
       <a href="#work" class="nav-link">Why SLATE</a>
-      <a href="#services" class="nav-link">Services</a>
-      <a href="testimonials.html" class="nav-link">Testimonials</a>
+      <a href="/testimonials" class="nav-link">Testimonials</a>
       <a href="#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
     </div>
   </div>
@@ -269,7 +258,7 @@ tailwind.config = {
   <!-- SECTION 2: HERO -->
   <section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
     <div id="hero-media" class="absolute inset-0 z-0">
-      <img id="hero-img" src="assets/strata/hero-landscape.webp"
+      <img id="hero-img" src="/assets/strata/hero-landscape.webp"
            alt="Natural stone landscape"
            class="w-full h-full object-cover object-[65%_center] sm:object-center opacity-50">
     </div>
@@ -292,8 +281,8 @@ tailwind.config = {
           Book a consultation
           <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
         </a>
-        <a href="#work" class="hidden md:inline-flex items-center gap-2 text-cream/80 font-medium border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">
-          View our work
+        <a href="#services" class="hidden md:inline-flex items-center gap-2 text-cream/80 font-medium border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">
+          Explore our services
         </a>
       </div>
       <p class="hero-anim gsap-fade-up mt-6 text-sm text-cream/70 hidden md:block">
@@ -309,30 +298,40 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- MATERIALS TICKER -->
-  <section aria-label="Materials" class="relative bg-dark border-y border-cream/10 py-8 sm:py-10 overflow-hidden">
-    <div id="materials-marquee" class="flex w-max whitespace-nowrap">
-      <div class="flex items-center shrink-0">
-        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Natural Slate</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Standing Seam</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Clay Tile</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Cedar Shake</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
+  <!-- REVIEWS TICKER: social proof straight after the hero -->
+  <section aria-label="What our clients say" class="relative bg-dark border-y border-cream/10 overflow-hidden">
+    <a href="/testimonials" class="block py-5 sm:py-6" aria-label="Read client testimonials">
+      <div id="materials-marquee" class="flex w-max whitespace-nowrap">
+        <div class="flex items-center shrink-0">
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Pure craftsmanship in every single detail.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">James Okafor, Architect</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Four days, zero surprises, flawless finish.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Priya Shah, Homeowner</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;The most elegant roofline we have ever specified.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Sarah Bennett, Project Manager</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;They treat a roof like a piece of architecture.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Marcus Webb, Contractor</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Transformed our home into a sanctuary.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Daniel R., Homeowner</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Our listing sold within a week of the new roof.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Elena Frost, Estate Agent</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        </div>
+        <div class="flex items-center shrink-0" aria-hidden="true">
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Pure craftsmanship in every single detail.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">James Okafor, Architect</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Four days, zero surprises, flawless finish.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Priya Shah, Homeowner</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;The most elegant roofline we have ever specified.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Sarah Bennett, Project Manager</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;They treat a roof like a piece of architecture.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Marcus Webb, Contractor</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Transformed our home into a sanctuary.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Daniel R., Homeowner</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        <span class="flex items-center gap-4 px-7 sm:px-10"><span class="text-sand text-[11px] tracking-[0.25em]" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="font-serif italic text-lg sm:text-2xl text-cream">&ldquo;Our listing sold within a week of the new roof.&rdquo;</span><span class="font-mono text-[10px] uppercase tracking-[0.25em] text-cream/45">Elena Frost, Estate Agent</span></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-sand/60 shrink-0" aria-hidden="true"></span>
+        </div>
       </div>
-      <div class="flex items-center shrink-0" aria-hidden="true">
-        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Natural Slate</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Standing Seam</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-        <span class="font-serif italic text-4xl sm:text-6xl text-cream px-8 sm:px-12">Clay Tile</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-        <span class="font-serif text-4xl sm:text-6xl text-outline px-8 sm:px-12">Cedar Shake</span>
-        <span class="w-2 h-2 rounded-full bg-sand shrink-0"></span>
-      </div>
-    </div>
+    </a>
   </section>
 
   <!-- MANIFESTO: words light up as you scroll -->
@@ -346,91 +345,152 @@ tailwind.config = {
     </div>
   </section>
 
-  <!-- SECTION 3: PROCESS TIMELINE -->
-  <section id="heritage" class="relative bg-dark text-cream py-16 sm:py-20 px-6">
+  <!-- SERVICES: the four materials, each with its own page -->
+  <section id="services" class="relative bg-dark text-cream py-16 sm:py-20 px-6 border-t border-cream/10">
     <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-16 gsap-fade-up">
-        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-6">Our Process</p>
-        <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-tight mb-6">From Quarry to <em class="italic text-sand">Roofline</em></h2>
-        <p class="max-w-2xl mx-auto text-lg sm:text-xl text-cream/60 leading-relaxed">A straightforward journey from the first conversation to the final inspection.</p>
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-9 sm:mb-12 gsap-fade-up">
+        <div>
+          <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">Services</p>
+          <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-[1.05]">Four materials, <em class="italic text-sand">one standard</em></h2>
+        </div>
+        <p class="max-w-sm text-cream/70 leading-relaxed">Every roof we build uses one of four materials, chosen for your home, its setting and how long you want it to last.</p>
       </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 gsap-fade-up">
+        <a href="/services/natural-slate" class="svc-card group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/11] sm:aspect-[4/5] lg:aspect-[3/4]">
+          <img src="/assets/services/slate.webp" alt="Natural Slate roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/35 to-dark/10"></div>
+          <span class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cream bg-dark/55 backdrop-blur-sm px-3 py-1.5 rounded-full">100+ year lifespan</span>
+          <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <h3 class="font-serif text-2xl sm:text-[1.7rem] leading-tight text-cream">Natural Slate</h3>
+            <p class="mt-2 text-sm text-cream/75 leading-relaxed">Riven stone with a deep graphite lustre. Our signature material.</p>
+            <span class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand">Explore
+              <iconify-icon icon="solar:arrow-right-up-linear" class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+            </span>
+          </div>
+        </a>
+        <a href="/services/standing-seam-metal" class="svc-card group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/11] sm:aspect-[4/5] lg:aspect-[3/4]">
+          <img src="/assets/services/metal.webp" alt="Standing Seam Metal roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-[center_72%] transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/35 to-dark/10"></div>
+          <span class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cream bg-dark/55 backdrop-blur-sm px-3 py-1.5 rounded-full">60+ year lifespan</span>
+          <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <h3 class="font-serif text-2xl sm:text-[1.7rem] leading-tight text-cream">Standing Seam Metal</h3>
+            <p class="mt-2 text-sm text-cream/75 leading-relaxed">Precision-formed zinc and copper for clean, modern lines.</p>
+            <span class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand">Explore
+              <iconify-icon icon="solar:arrow-right-up-linear" class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+            </span>
+          </div>
+        </a>
+        <a href="/services/clay-tile" class="svc-card group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/11] sm:aspect-[4/5] lg:aspect-[3/4]">
+          <img src="/assets/services/clay.webp" alt="Clay Tile roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/35 to-dark/10"></div>
+          <span class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cream bg-dark/55 backdrop-blur-sm px-3 py-1.5 rounded-full">60+ year lifespan</span>
+          <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <h3 class="font-serif text-2xl sm:text-[1.7rem] leading-tight text-cream">Clay Tile</h3>
+            <p class="mt-2 text-sm text-cream/75 leading-relaxed">Fired-earth tile with a warm, timeless profile.</p>
+            <span class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand">Explore
+              <iconify-icon icon="solar:arrow-right-up-linear" class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+            </span>
+          </div>
+        </a>
+        <a href="/services/cedar-shake" class="svc-card group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/11] sm:aspect-[4/5] lg:aspect-[3/4]">
+          <img src="/assets/services/cedar.webp" alt="Cedar Shake roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/35 to-dark/10"></div>
+          <span class="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cream bg-dark/55 backdrop-blur-sm px-3 py-1.5 rounded-full">30+ year lifespan</span>
+          <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <h3 class="font-serif text-2xl sm:text-[1.7rem] leading-tight text-cream">Cedar Shake</h3>
+            <p class="mt-2 text-sm text-cream/75 leading-relaxed">Hand-split cedar that weathers to a silvered patina.</p>
+            <span class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-sand">Explore
+              <iconify-icon icon="solar:arrow-right-up-linear" class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+            </span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 
-      <div class="relative" id="timeline-container">
-        <!-- Progress line -->
-        <div class="absolute left-1/2 -translate-x-1/2 w-px h-full bg-cream/10 hidden lg:block rounded-full overflow-hidden">
-          <div id="progress-line" class="w-full rounded-full" style="height: 0%; background: linear-gradient(#cebfa9, #4f5343); transition: height 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); box-shadow: 0 0 10px rgba(206,191,169,0.3);"></div>
+  <!-- OUR PROCESS: pinned split on desktop, photos wipe up step by step -->
+  <section id="heritage" class="relative bg-dark text-cream border-t border-cream/10">
+    <div id="process-pin" class="relative lg:h-screen lg:overflow-hidden">
+      <div class="max-w-7xl mx-auto px-6 py-16 sm:py-20 lg:py-0 lg:h-full lg:grid lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:items-center">
+        <div id="proc-media" class="hidden lg:block relative h-[78vh] rounded-2xl overflow-hidden border border-cream/10">
+          <img src="/assets/process/consultation.webp" alt="A man reviewing roof plans on site" class="proc-img absolute inset-0 w-full h-full object-cover object-[center_30%]">
+          <img src="/assets/process/sourcing.webp" alt="A slate quarry face beside still water" class="proc-img absolute inset-0 w-full h-full object-cover object-center" style="clip-path: inset(100% 0 0 0);">
+          <img src="/assets/process/installation.webp" alt="A roofer carrying a bundle of tiles across a roof" class="proc-img absolute inset-0 w-full h-full object-cover object-center" style="clip-path: inset(100% 0 0 0);">
+          <img src="/assets/process/inspection.webp" alt="A row of houses with finished slate roofs" class="proc-img absolute inset-0 w-full h-full object-cover object-center" style="clip-path: inset(100% 0 0 0);">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark/70 via-transparent to-transparent pointer-events-none"></div>
+          <div class="absolute bottom-6 left-7 right-7 flex items-end justify-between pointer-events-none">
+            <span id="proc-bignum" class="font-serif text-[6.5rem] leading-[0.8] text-cream">01</span>
+            <span class="font-mono text-xs tracking-[0.3em] text-cream/60 pb-2">/ 04</span>
+          </div>
         </div>
 
-        <div class="space-y-16" id="timeline-steps">
-
-          <!-- Step 1 -->
-          <div class="flex flex-col lg:flex-row gap-10 items-center timeline-step" data-step="1" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
-            <div class="flex-1 lg:text-right lg:pr-12">
-              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
-                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 01</span>
-                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Consultation</h3>
-                <p class="text-cream/60 leading-relaxed mb-6">We walk the site, discuss materials and scope, and provide a clear, itemized quote before anything is ordered.</p>
-                <div class="flex items-center gap-2 text-sm text-cream/40 lg:justify-end">
-                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
-                  <span>Duration: 60 to 90 mins</span>
+        <div>
+          <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">Our Process</p>
+          <h2 data-reveal class="font-serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.05]">From Quarry to <em class="italic text-sand">Roofline</em></h2>
+          <p class="mt-5 text-cream/65 leading-relaxed max-w-md">Four clear stages, one team, from the first conversation to the final sign-off.</p>
+          <div class="hidden lg:block relative h-px bg-cream/10 mt-9"><div id="proc-progress" class="absolute inset-0 bg-sand origin-left" style="transform: scaleX(0.25);"></div></div>
+          <ol id="proc-list" class="mt-6 lg:mt-0 border-t border-cream/10 lg:border-t-0">
+            <li class="proc-step is-active border-b border-cream/10">
+              <div class="flex gap-4 sm:gap-6 py-5 lg:py-[1.15rem]">
+                <span class="proc-num font-mono text-xs text-sand pt-2">01</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <h3 class="proc-title font-serif text-2xl sm:text-3xl text-cream transition-colors duration-500">Consultation</h3>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-cream/45 shrink-0">60 to 90 mins</span>
+                  </div>
+                  <div class="proc-body"><div><p class="pt-3 text-cream/70 leading-relaxed max-w-md">We walk the site, discuss materials and scope, and give you a clear, itemised quote before anything is ordered.</p></div></div>
+                  <div class="proc-mimg lg:hidden mt-5 overflow-hidden rounded-xl border border-cream/10 aspect-[4/3]">
+                    <img src="/assets/process/consultation.webp" alt="A man reviewing roof plans on site" loading="lazy" class="w-full h-full object-cover object-[center_30%]">
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="1" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
-            <div class="flex-1 lg:pl-12"></div>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="flex flex-col lg:flex-row items-center gap-10 timeline-step" data-step="2" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
-            <div class="flex-1 lg:pr-12"></div>
-            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="2" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
-            <div class="flex-1 lg:pl-12">
-              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
-                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 02</span>
-                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Sourcing</h3>
-                <p class="text-cream/60 leading-relaxed mb-6">Slate and stone are hand-selected from our partner quarries and tracked all the way to your address.</p>
-                <div class="flex items-center gap-2 text-sm text-cream/40">
-                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
-                  <span>Duration: 3 to 5 days</span>
+            </li>
+            <li class="proc-step border-b border-cream/10">
+              <div class="flex gap-4 sm:gap-6 py-5 lg:py-[1.15rem]">
+                <span class="proc-num font-mono text-xs text-sand pt-2">02</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <h3 class="proc-title font-serif text-2xl sm:text-3xl text-cream transition-colors duration-500">Sourcing</h3>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-cream/45 shrink-0">3 to 5 days</span>
+                  </div>
+                  <div class="proc-body"><div><p class="pt-3 text-cream/70 leading-relaxed max-w-md">Slate and stone are hand-selected from our partner quarries and tracked all the way to your address.</p></div></div>
+                  <div class="proc-mimg lg:hidden mt-5 overflow-hidden rounded-xl border border-cream/10 aspect-[4/3]">
+                    <img src="/assets/process/sourcing.webp" alt="A slate quarry face beside still water" loading="lazy" class="w-full h-full object-cover object-center">
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="flex flex-col lg:flex-row items-center gap-10 timeline-step" data-step="3" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
-            <div class="flex-1 lg:text-right lg:pr-12">
-              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
-                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 03</span>
-                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Installation</h3>
-                <p class="text-cream/60 leading-relaxed mb-6">A licensed, in-house crew installs to spec, with a site lead supervising every stage of the build.</p>
-                <div class="flex items-center gap-2 text-sm text-cream/40 lg:justify-end">
-                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
-                  <span>Duration: 1 to 3 weeks</span>
+            </li>
+            <li class="proc-step border-b border-cream/10">
+              <div class="flex gap-4 sm:gap-6 py-5 lg:py-[1.15rem]">
+                <span class="proc-num font-mono text-xs text-sand pt-2">03</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <h3 class="proc-title font-serif text-2xl sm:text-3xl text-cream transition-colors duration-500">Installation</h3>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-cream/45 shrink-0">1 to 3 weeks</span>
+                  </div>
+                  <div class="proc-body"><div><p class="pt-3 text-cream/70 leading-relaxed max-w-md">Our own licensed crew installs to spec, with a site lead supervising every stage of the build.</p></div></div>
+                  <div class="proc-mimg lg:hidden mt-5 overflow-hidden rounded-xl border border-cream/10 aspect-[4/3]">
+                    <img src="/assets/process/installation.webp" alt="A roofer carrying a bundle of tiles across a roof" loading="lazy" class="w-full h-full object-cover object-center">
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="3" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
-            <div class="flex-1 lg:pl-12"></div>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="flex flex-col lg:flex-row items-center gap-10 timeline-step" data-step="4" style="opacity: 0; transform: translateY(50px); transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);">
-            <div class="flex-1 lg:pr-12"></div>
-            <div class="w-5 h-5 z-10 shrink-0 rounded-full timeline-dot" data-dot="4" style="background: rgba(245,243,238,0.15); transform: scale(0.8); opacity: 0.5; transition: 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);"></div>
-            <div class="flex-1 lg:pl-12">
-              <div class="backdrop-blur-sm bg-cream/[0.04] border border-cream/10 rounded-3xl p-8 hover:border-cream/25 hover:-translate-y-1 transition-all duration-500">
-                <span class="uppercase text-xs font-mono tracking-[0.2em] text-sand">Step 04</span>
-                <h3 class="font-serif text-2xl sm:text-3xl font-light mt-4 mb-4 text-cream">Inspection</h3>
-                <p class="text-cream/60 leading-relaxed mb-6">A full walkthrough and sign-off, backed by a 25-year workmanship warranty on every install.</p>
-                <div class="flex items-center gap-2 text-sm text-cream/40">
-                  <iconify-icon icon="solar:clock-circle-linear" class="text-base"></iconify-icon>
-                  <span>Duration: 45 to 60 mins</span>
+            </li>
+            <li class="proc-step border-b border-cream/10">
+              <div class="flex gap-4 sm:gap-6 py-5 lg:py-[1.15rem]">
+                <span class="proc-num font-mono text-xs text-sand pt-2">04</span>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline justify-between gap-4">
+                    <h3 class="proc-title font-serif text-2xl sm:text-3xl text-cream transition-colors duration-500">Inspection</h3>
+                    <span class="font-mono text-[10px] sm:text-xs uppercase tracking-[0.15em] text-cream/45 shrink-0">45 to 60 mins</span>
+                  </div>
+                  <div class="proc-body"><div><p class="pt-3 text-cream/70 leading-relaxed max-w-md">A full walkthrough and sign-off, backed by a 25-year workmanship warranty on every install.</p></div></div>
+                  <div class="proc-mimg lg:hidden mt-5 overflow-hidden rounded-xl border border-cream/10 aspect-[4/3]">
+                    <img src="/assets/process/inspection.webp" alt="A row of houses with finished slate roofs" loading="lazy" class="w-full h-full object-cover object-center">
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-
+            </li>
+          </ol>
         </div>
       </div>
     </div>
@@ -440,8 +500,8 @@ tailwind.config = {
   <section id="cinema" class="relative bg-dark" aria-label="Built to endure">
     <div id="cinema-pin" class="relative h-screen overflow-hidden flex items-center justify-center">
       <div id="cinema-frame" class="absolute inset-0">
-        <img id="cinema-backdrop" src="assets/strata/endure.webp" alt="" aria-hidden="true" class="md:hidden absolute inset-0 w-full h-full object-cover" style="filter: blur(22px) brightness(0.55); transform: scale(1.25);">
-        <img id="cinema-img" src="assets/strata/endure.webp" alt="Curved concrete house lit at dusk among pines, reflected in still water" class="w-full h-full object-cover object-center">
+        <img id="cinema-backdrop" src="/assets/strata/endure.webp" alt="" aria-hidden="true" class="md:hidden absolute inset-0 w-full h-full object-cover" style="filter: blur(22px) brightness(0.55); transform: scale(1.25);">
+        <img id="cinema-img" src="/assets/strata/endure.webp" alt="Curved concrete house lit at dusk among pines, reflected in still water" class="w-full h-full object-cover object-center">
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(20,20,20,0.75)_100%)]"></div>
         <div id="cinema-shade" class="absolute inset-0 bg-dark" style="opacity: 0.35;"></div>
       </div>
@@ -461,71 +521,56 @@ tailwind.config = {
           <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">The SLATE Standard</p>
           <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight">What every roof <em class="italic text-sand">comes with</em></h2>
         </div>
-        <p class="hidden sm:block font-mono text-xs text-cream/50 tracking-[0.3em] shrink-0"><span id="work-index" class="text-cream">01</span> / 04</p>
       </div>
 
-      <div id="work-track" class="work-track-pad flex items-stretch gap-5 lg:gap-10 px-6 scroll-pl-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
-        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+      <div id="work-viewport" class="relative max-w-7xl w-full mx-auto px-6">
+      <div id="work-clip" class="relative overflow-hidden">
+      <div id="work-track" class="flex items-stretch gap-4 lg:gap-8 overflow-x-auto snap-x snap-mandatory hide-scrollbar lg:overflow-visible lg:w-max">
+        <article class="work-card group shrink-0 w-[85%] sm:w-[55%] lg:w-[26rem] snap-start flex flex-col">
           <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/standard-quote.webp" alt="Two people reviewing printed plans with a calculator" class="w-full h-full object-cover object-[center_35%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+              <img src="/assets/strata/standard-quote.webp" alt="Two people reviewing printed plans with a calculator" class="w-full h-full object-cover object-[center_35%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">01</span>
-            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
-              <iconify-icon icon="solar:document-text-linear"></iconify-icon>
-            </span>
           </div>
           <h3 class="font-serif text-2xl sm:text-3xl mt-6">A clear, itemised quote</h3>
           <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">You see every cost, line by line, before anything is ordered. No guesswork and no vague totals.</p>
         </article>
 
-        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+        <article class="work-card group shrink-0 w-[85%] sm:w-[55%] lg:w-[26rem] snap-start flex flex-col">
           <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/standard-materials.webp" alt="Newly laid natural slate roof with crisp, even courses and roof windows" class="w-full h-full object-cover object-[center_60%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+              <img src="/assets/strata/standard-materials.webp" alt="Newly laid natural slate roof with crisp, even courses and roof windows" class="w-full h-full object-cover object-[center_60%] transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">02</span>
-            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
-              <iconify-icon icon="solar:map-point-linear"></iconify-icon>
-            </span>
           </div>
           <h3 class="font-serif text-2xl sm:text-3xl mt-6">Materials you can trace</h3>
           <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">Slate and stone are hand-selected from our 15+ partner quarries and tracked all the way to your address.</p>
         </article>
 
-        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+        <article class="work-card group shrink-0 w-[85%] sm:w-[55%] lg:w-[26rem] snap-start flex flex-col">
           <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/standard-crew.webp" alt="Two roofers laying dark tiles on a new roof" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+              <img src="/assets/strata/standard-crew.webp" alt="Two roofers laying dark tiles on a new roof" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">03</span>
-            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
-              <iconify-icon icon="solar:users-group-rounded-linear"></iconify-icon>
-            </span>
           </div>
           <h3 class="font-serif text-2xl sm:text-3xl mt-6">Our own licensed crew</h3>
           <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">Your roof is installed by our in-house team, with a site lead supervising every stage of the build.</p>
         </article>
 
-        <article class="work-card group shrink-0 w-[80vw] sm:w-[50vw] lg:w-[32vw] snap-start flex flex-col">
+        <article class="work-card group shrink-0 w-[85%] sm:w-[55%] lg:w-[26rem] snap-start flex flex-col">
           <div class="relative overflow-hidden rounded-2xl aspect-[4/3] lg:aspect-auto lg:h-[40vh] border border-cream/10">
             <div class="work-parallax absolute inset-y-0 -left-[8%] w-[116%]">
-              <img src="assets/strata/standard-warranty.webp" alt="Natural slate roof with ornate gabled dormers and white windows" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
+              <img src="/assets/strata/standard-warranty.webp" alt="Natural slate roof with ornate gabled dormers and white windows" class="w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-105">
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-dark/80 via-dark/10 to-transparent"></div>
-            <span class="absolute top-5 left-5 font-mono text-[10px] tracking-[0.3em] text-cream bg-dark/60 backdrop-blur-sm px-3 py-1.5 rounded-full">04</span>
-            <span class="absolute bottom-5 left-5 w-11 h-11 rounded-full bg-cream text-dark flex items-center justify-center text-lg">
-              <iconify-icon icon="solar:shield-check-linear"></iconify-icon>
-            </span>
           </div>
           <h3 class="font-serif text-2xl sm:text-3xl mt-6">A 25-year warranty</h3>
           <p class="mt-3 text-cream/75 text-sm sm:text-base leading-relaxed max-w-sm">Every install is signed off with a full walkthrough and backed by a 25-year workmanship warranty.</p>
         </article>
 
-        <article class="work-card shrink-0 w-[80vw] sm:w-[50vw] lg:w-[26vw] snap-start flex">
+        <article class="work-card shrink-0 w-[85%] sm:w-[55%] lg:w-[22rem] snap-start flex">
           <a href="#book" class="group flex flex-col justify-between w-full min-h-[22rem] rounded-2xl border border-sand/30 bg-cream/[0.04] p-8 hover:bg-cream/[0.07] transition-colors">
             <p class="font-mono text-[10px] uppercase tracking-[0.3em] text-sand">Your roof next</p>
             <div>
@@ -537,6 +582,10 @@ tailwind.config = {
             </div>
           </a>
         </article>
+      </div>
+      <div class="work-edge work-edge-l is-off" aria-hidden="true"></div>
+      <div class="work-edge work-edge-r" aria-hidden="true"></div>
+      </div>
       </div>
 
       <div id="work-dots" class="md:hidden flex items-center justify-between px-6 mt-6" aria-hidden="true">
@@ -553,58 +602,6 @@ tailwind.config = {
       <div class="hidden lg:block max-w-7xl w-full mx-auto px-6 mt-10">
         <div class="relative h-px bg-cream/10 overflow-hidden">
           <div id="work-progress" class="absolute inset-0 bg-sand origin-left" style="transform: scaleX(0);"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION: SERVICES -->
-  <section id="services" class="relative bg-dark py-16 sm:py-20 px-6 border-t border-cream/10">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-16 gsap-fade-up">
-        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-4">Services</p>
-        <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight text-cream">What We <em class="italic text-sand">Offer</em></h2>
-      </div>
-
-      <div class="max-w-4xl mx-auto gsap-fade-up border-t border-cream/10">
-        <!-- Natural Slate -->
-        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:layers-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Natural Slate</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Centuries-grade permanence with a deep graphite lustre. Our signature material.</span>
-          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
-        </div>
-
-        <!-- Standing Seam Metal -->
-        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:home-2-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Standing Seam Metal</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Precision-formed zinc and copper panels, built for clean architectural lines.</span>
-          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
-        </div>
-
-        <!-- Clay Tile -->
-        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:widget-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Clay Tile</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Fired-earth tile with a timeless profile, suited to warm, Mediterranean-style homes.</span>
-          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
-        </div>
-
-        <!-- Cedar Shake -->
-        <div class="svc-row group flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 py-5 sm:py-7 border-b border-cream/10 transition-[padding] duration-500 ease-out sm:hover:pl-4">
-          <span class="w-7 h-7 sm:w-9 sm:h-9 shrink-0 rounded-full bg-cream text-dark flex items-center justify-center text-[11px] sm:text-sm">
-            <iconify-icon icon="solar:leaf-linear"></iconify-icon>
-          </span>
-          <span class="font-serif text-lg sm:text-2xl text-cream shrink-0 sm:w-56">Cedar Shake</span>
-          <span class="text-cream text-xs sm:text-sm leading-relaxed pl-11 sm:pl-0 sm:max-w-md">Hand-split cedar shingles that weather to a warm, silvered patina over time.</span>
-          <iconify-icon icon="solar:arrow-right-up-linear" class="hidden sm:block ml-auto shrink-0 text-xl text-sand opacity-0 -translate-x-2 transition-all duration-500 group-hover:opacity-100 group-hover:translate-x-0"></iconify-icon>
         </div>
       </div>
     </div>
@@ -737,7 +734,7 @@ tailwind.config = {
             Request my consultation
             <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
           </button>
-          <p class="text-cream/50 text-xs text-center mt-4 leading-relaxed">No obligation. We only use your details to contact you about your enquiry. See our <a href="privacy.html" class="underline decoration-cream/30 underline-offset-4 hover:text-cream">Privacy Notice</a>.</p>
+          <p class="text-cream/50 text-xs text-center mt-4 leading-relaxed">No obligation. We only use your details to contact you about your enquiry. See our <a href="/privacy" class="underline decoration-cream/30 underline-offset-4 hover:text-cream">Privacy Notice</a>.</p>
         </form>
 
         <div id="booking-success" class="hidden rounded-3xl border border-sand/30 bg-cream/[0.04] p-8 sm:p-12 text-center" role="status" aria-live="polite">
@@ -861,9 +858,9 @@ tailwind.config = {
       <div>
         <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
         <ul class="space-y-3 text-cream/55 text-sm">
-          <li><a href="#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
           <li><a href="#services" class="hover:text-cream transition-colors">Services</a></li>
-          <li><a href="testimonials.html" class="hover:text-cream transition-colors">Testimonials</a></li>
+          <li><a href="#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
+          <li><a href="/testimonials" class="hover:text-cream transition-colors">Testimonials</a></li>
         </ul>
       </div>
 
@@ -887,15 +884,15 @@ tailwind.config = {
     <div class="relative z-10 max-w-7xl mx-auto px-6 border-t border-cream/10 pt-7 pb-10 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
       <p class="font-mono text-xs text-cream/35">© 2026 SLATE. All rights reserved.</p>
       <div class="flex items-center gap-6 font-mono text-xs text-cream/35">
-        <a href="privacy.html#company" class="hover:text-cream/70 transition-colors">Company info</a>
-        <a href="privacy.html" class="hover:text-cream/70 transition-colors">Privacy</a>
+        <a href="/privacy#company" class="hover:text-cream/70 transition-colors">Company info</a>
+        <a href="/privacy" class="hover:text-cream/70 transition-colors">Privacy</a>
       </div>
     </div>
   </footer>
 
 </main>
 
-<script src="assets/luxe.js"></script>
+<script src="/assets/luxe.js"></script>
 <script>
 /* =========================================================
    THREE.JS AMBIENT NOISE BACKGROUND
@@ -1116,10 +1113,6 @@ if (!reduceMotion) {
   });
 
   ScrollTrigger.create({ trigger: pin, start: 'top top', end: () => '+=' + window.innerHeight, pin: true, pinSpacing: false });
-  gsap.timeline({ scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true } })
-    .to('#cinema-img', { scale: 1.12, ease: 'none' }, 0)
-    .to('#cinema-copy', { y: -60, opacity: 0, ease: 'none' }, 0)
-    .to('#cinema-shade', { opacity: 0.85, ease: 'none' }, 0);
 })();
 
 /* =========================================================
@@ -1127,13 +1120,25 @@ if (!reduceMotion) {
    ========================================================= */
 (function initWorkGallery() {
   const pin = document.getElementById('work-pin');
+  const clip = document.getElementById('work-clip');
   const track = document.getElementById('work-track');
   const progress = document.getElementById('work-progress');
-  const index = document.getElementById('work-index');
-  if (!pin || !track || reduceMotion) return;
+  const edgeL = document.querySelector('.work-edge-l');
+  const edgeR = document.querySelector('.work-edge-r');
+  if (!pin || !track || !clip) return;
+  const edges = (p) => {
+    if (edgeL) edgeL.classList.toggle('is-off', p < 0.02);
+    if (edgeR) edgeR.classList.toggle('is-off', p > 0.98);
+  };
 
+  track.addEventListener('scroll', () => {
+    const max = track.scrollWidth - track.clientWidth;
+    edges(max > 0 ? track.scrollLeft / max : 0);
+  }, { passive: true });
+
+  if (reduceMotion) return;
   gsap.matchMedia().add('(min-width: 1024px)', () => {
-    const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+    const distance = () => Math.max(0, track.scrollWidth - clip.clientWidth);
     const slide = gsap.to(track, {
       x: () => -distance(),
       ease: 'none',
@@ -1147,7 +1152,7 @@ if (!reduceMotion) {
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (progress) progress.style.transform = 'scaleX(' + self.progress + ')';
-          if (index) index.textContent = '0' + Math.min(4, Math.floor(self.progress * 4) + 1);
+          edges(self.progress);
         },
       },
     });
@@ -1219,74 +1224,59 @@ document.querySelectorAll('.gsap-scale-up').forEach((el) => {
 });
 
 /* =========================================================
-   PROCESS TIMELINE (sequential reveal on scroll into view)
+   OUR PROCESS: pinned split on desktop, photos wipe up per step
    ========================================================= */
-(function initSmoothTimeline() {
-  const progressLine = document.getElementById('progress-line');
-  const timelineSteps = document.querySelectorAll('.timeline-step');
-  const timelineDots = document.querySelectorAll('.timeline-dot');
-  const timelineContainer = document.getElementById('timeline-container');
+(function initProcess() {
+  const pin = document.getElementById('process-pin');
+  if (!pin) return;
+  const steps = [...document.querySelectorAll('.proc-step')];
+  const imgs = [...document.querySelectorAll('.proc-img')];
+  const bignum = document.getElementById('proc-bignum');
+  const bar = document.getElementById('proc-progress');
 
-  if (!progressLine || !timelineSteps.length || !timelineDots.length || !timelineContainer) return;
-
-  let animationStarted = false;
-
-  function resetTimeline() {
-    progressLine.style.height = '0%';
-    timelineSteps.forEach((step) => {
-      step.style.opacity = '0';
-      step.style.transform = 'translateY(50px)';
+  document.querySelectorAll('.proc-mimg').forEach((box) => {
+    if (reduceMotion) return;
+    gsap.fromTo(box, { clipPath: 'inset(100% 0 0 0)' }, {
+      clipPath: 'inset(0% 0 0 0)', duration: 1.2, ease: 'power3.out',
+      scrollTrigger: { trigger: box, start: 'top 88%' },
     });
-    timelineDots.forEach((dot) => {
-      dot.style.background = 'rgba(245,243,238,0.15)';
-      dot.style.transform = 'scale(0.8)';
-      dot.style.opacity = '0.5';
-      dot.style.boxShadow = 'none';
+    gsap.fromTo(box.querySelector('img'), { scale: 1.2 }, {
+      scale: 1, duration: 1.6, ease: 'power3.out',
+      scrollTrigger: { trigger: box, start: 'top 88%' },
     });
-  }
+  });
 
-  function animateTimeline() {
-    if (animationStarted) return;
-    animationStarted = true;
+  gsap.matchMedia().add('(min-width: 1024px)', () => {
+    let current = -1;
+    const setActive = (i) => {
+      if (i === current) return;
+      current = i;
+      steps.forEach((el, k) => el.classList.toggle('is-active', k === i));
+      if (bignum) bignum.textContent = '0' + (i + 1);
+    };
+    setActive(0);
+    if (reduceMotion) return;
 
-    setTimeout(() => {
-      progressLine.style.height = '100%';
-    }, 200);
-
-    timelineSteps.forEach((step, index) => {
-      const dot = timelineDots[index];
-      const delay = 400 + index * 600;
-
-      setTimeout(() => {
-        step.style.opacity = '1';
-        step.style.transform = 'translateY(0px)';
-
-        if (dot) {
-          dot.style.background = '#cebfa9';
-          dot.style.transform = 'scale(1)';
-          dot.style.opacity = '1';
-          dot.style.boxShadow = '0 0 20px rgba(206,191,169,0.4)';
-        }
-      }, delay);
+    const tl = gsap.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: {
+        trigger: pin, start: 'top top', end: () => '+=' + window.innerHeight * 3,
+        pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          setActive(Math.min(steps.length - 1, Math.floor(self.progress * steps.length + 0.15)));
+          if (bar) bar.style.transform = 'scaleX(' + (0.25 + self.progress * 0.75) + ')';
+        },
+      },
     });
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animateTimeline();
-        } else if (!entry.isIntersecting && entry.boundingClientRect.top > 0) {
-          animationStarted = false;
-          resetTimeline();
-        }
-      });
-    },
-    { threshold: 0.2, rootMargin: '-100px 0px -50px 0px' }
-  );
-
-  resetTimeline();
-  observer.observe(timelineContainer);
+    imgs.forEach((img, i) => {
+      if (i === 0) return;
+      tl.fromTo(img, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 0.6 }, i - 0.6)
+        .fromTo(img, { scale: 1.18 }, { scale: 1, duration: 0.9 }, i - 0.6)
+        .to(imgs[i - 1], { scale: 1.08, filter: 'brightness(0.6)', duration: 0.6 }, i - 0.6);
+    });
+    tl.to({}, { duration: 0.4 });
+    return () => { imgs.forEach((img, i) => { if (i) img.style.clipPath = 'inset(100% 0 0 0)'; }); };
+  });
 })();
 
 

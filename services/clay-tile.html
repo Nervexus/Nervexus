@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clay Tile Roofing | SLATE</title>
+<meta name="description" content="Clay Tile roofing by SLATE: Fired-earth tile with a warm, timeless profile. Itemised quotes, our own licensed crew and a 25-year workmanship warranty.">
+
+<link rel="canonical" href="https://slate-roofing-gules.vercel.app/services/clay-tile">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SLATE">
+<meta property="og:title" content="Clay Tile Roofing | SLATE">
+<meta property="og:description" content="Clay Tile roofing by SLATE: Fired-earth tile with a warm, timeless profile. Itemised quotes, our own licensed crew and a 25-year workmanship warranty.">
+<meta property="og:url" content="https://slate-roofing-gules.vercel.app/services/clay-tile">
+<meta property="og:image" content="https://slate-roofing-gules.vercel.app/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SLATE bespoke roofing: The Art of Precision">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Clay Tile Roofing | SLATE">
+<meta name="twitter:description" content="Clay Tile roofing by SLATE: Fired-earth tile with a warm, timeless profile. Itemised quotes, our own licensed crew and a 25-year workmanship warranty.">
+<meta name="twitter:image" content="https://slate-roofing-gules.vercel.app/assets/og-image.jpg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<meta name="theme-color" content="#1c1c1c">
+
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+
+<script src="/assets/vendor/tailwind.js"></script>
+<script src="/assets/vendor/icons.js"></script>
+<script src="/assets/vendor/iconify-icon.min.js"></script>
+<script src="/assets/vendor/gsap.min.js"></script>
+<script src="/assets/vendor/ScrollTrigger.min.js"></script>
+<script src="/assets/vendor/three.min.js"></script>
+<script src="/assets/vendor/lenis.min.js"></script>
+<link rel="stylesheet" href="/assets/luxe.css">
+<script>
+(function () {
+  try {
+    if (sessionStorage.getItem('slate-intro') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('luxe-loading');
+      setTimeout(function () { document.documentElement.classList.remove('luxe-loading'); }, 4000);
+    }
+  } catch (e) {}
+})();
+</script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream: '#f5f3ee',
+        surface: '#efece4',
+        dark: '#1c1c1c',
+        moss: '#4f5343',
+        sand: '#cebfa9',
+      },
+      fontFamily: {
+        sans: ['Manrope', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+    },
+  },
+};
+</script>
+
+<style>
+  body {
+    background: #1c1c1c;
+    font-family: 'Manrope', sans-serif;
+  }
+  ::selection { background: #4f5343; color: #efece4; }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .gradient-border-inset {
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+
+  .custom-curve {
+    border-top-right-radius: 180px;
+  }
+
+  /* matte-noise overlay via inline SVG turbulence filter, applied as pseudo-element */
+  .matte-noise { position: relative; isolation: isolate; }
+  .matte-noise::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .magnetic-btn { will-change: transform; }
+
+  #webgl-bg { opacity: 0.6; }
+
+  .gsap-fade-up { opacity: 0; transform: translateY(40px); }
+  .gsap-scale-up { transform: scale(0.9); }
+
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -4px;
+    width: 0%; height: 1px;
+    background: currentColor;
+    transition: width 0.35s cubic-bezier(.16,1,.3,1);
+  }
+  .nav-link:hover::after { width: 100%; }
+
+  .price-bar-shadow {
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.35);
+  }
+
+  @media (max-width: 1023px) {
+    .product-img-mobile-curve { border-top-right-radius: 80px; }
+  }
+  @media (max-width: 639px) {
+    .product-img-mobile-curve { border-top-right-radius: 48px; }
+  }
+
+  /* Process timeline */
+  .timeline-track-mask {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  }
+  @media (min-width: 768px) {
+    .timeline-sticky-label { top: 10rem; }
+  }
+
+  /* Testimonials ticker */
+  @keyframes testimonial-ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  #testimonialTicker {
+    animation: testimonial-ticker 20s linear infinite;
+  }
+  .testimonial-word {
+    display: inline-block;
+    margin-right: 0.3em;
+  }
+  .testimonial-nav-fill {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .testimonial-nav-fill-left { transform: translateX(-100%); }
+  .testimonial-nav-fill-right { transform: translateX(100%); }
+  .testimonial-nav-btn:hover .testimonial-nav-fill { transform: translateX(0); }
+
+  /* ---------- Mobile layout (below 768px only; desktop untouched) ---------- */
+  @media (max-width: 767px) {
+    main > section:first-child { padding-top: 8rem; padding-bottom: 1rem; }
+    #boutique { padding-top: 2.5rem; padding-bottom: 4.5rem; }
+    #testimonialWrap > div:first-child {
+      top: -1.5rem;
+      left: auto;
+      right: -0.25rem;
+      transform: none;
+      font-size: 7.5rem;
+    }
+    #testimonialWrap .py-8 { padding-top: 1.5rem; padding-bottom: 0.5rem; }
+    #testimonialWrap .min-h-\[170px\] { min-height: 150px; }
+    #testimonialWrap .mt-16 { margin-top: 3rem; }
+    main > footer { padding-top: 4.5rem; }
+    main > footer > div.grid {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
+      row-gap: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+    main > footer > div.grid > div:first-child { grid-column: 1 / -1; }
+  }
+
+</style>
+</head>
+<body class="antialiased overflow-x-hidden text-cream">
+
+<!-- LAYER 0: WebGL ambient background -->
+<canvas id="webgl-bg" class="fixed inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+<!-- LAYER 2: NAVIGATION -->
+<nav id="main-nav" class="fixed top-0 left-0 w-full z-50 bg-dark/75 backdrop-blur-md border-b border-cream/10 py-4 transition-opacity duration-500 ease-out">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <a href="/" class="font-serif text-2xl tracking-tight text-cream">SLATE</a>
+
+    <div class="hidden md:flex items-center gap-6 lg:gap-10 text-sm font-medium text-cream/80">
+      <a href="/#services" class="nav-link">Services</a>
+      <a href="/#heritage" class="nav-link">Our Process</a>
+      <a href="/#work" class="nav-link">Why SLATE</a>
+      <a href="/testimonials" class="nav-link">Testimonials</a>
+      <a href="/#book" class="btn-shine inline-flex items-center gap-2 bg-cream text-dark px-5 py-2.5 rounded-full hover:bg-sand transition-colors">Book a consultation</a>
+    </div>
+  </div>
+</nav>
+
+<!-- LAYER 1: MAIN CONTENT -->
+<main class="relative z-10">
+
+  <!-- SERVICE HERO -->
+  <section class="relative min-h-[78svh] sm:min-h-[86vh] flex items-end overflow-hidden">
+    <img id="svc-hero-img" src="/assets/services/clay.webp" alt="Clay Tile roof" class="absolute inset-0 w-full h-full object-cover object-center">
+    <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/45 to-dark/25"></div>
+    <div class="relative z-10 max-w-7xl w-full mx-auto px-6 pb-14 sm:pb-20 pt-36">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-cream/70 mb-6"><a href="/#services" class="hover:text-sand transition-colors">Services</a> <span class="text-sand mx-2">/</span> Clay Tile</p>
+      <h1 data-reveal class="font-serif text-5xl sm:text-7xl lg:text-8xl font-light tracking-tight leading-[0.98] text-cream">Clay Tile</h1>
+      <p class="mt-6 max-w-xl text-cream/80 text-lg leading-relaxed gsap-fade-up">Fired-earth tile with a warm, timeless profile.</p>
+      <div class="mt-9 flex flex-wrap items-center gap-6 gsap-fade-up">
+        <a href="/#book" class="btn-shine inline-flex items-center gap-3 bg-cream text-dark px-7 py-3.5 rounded-full font-medium hover:bg-sand transition-colors">
+          Book a consultation
+          <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
+        </a>
+        <a href="tel:+442079460192" class="hidden sm:inline text-cream/80 border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">Or call +44 20 7946 0192</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEY FACTS -->
+  <section class="relative bg-dark border-b border-cream/10 px-6">
+    <div class="max-w-7xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gsap-fade-up">
+        <div class="py-5 sm:py-6 sm:px-6 first:sm:pl-0 border-b sm:border-b-0 sm:border-l first:sm:border-l-0 border-cream/10">
+          <p class="font-mono text-[10px] uppercase tracking-[0.25em] text-sand">Typical lifespan</p>
+          <p class="mt-2 font-serif text-xl text-cream leading-snug">60 to 100 years</p>
+        </div>
+        <div class="py-5 sm:py-6 sm:px-6 first:sm:pl-0 border-b sm:border-b-0 sm:border-l first:sm:border-l-0 border-cream/10">
+          <p class="font-mono text-[10px] uppercase tracking-[0.25em] text-sand">Best suited to</p>
+          <p class="mt-2 font-serif text-xl text-cream leading-snug">Traditional and Mediterranean-style homes</p>
+        </div>
+        <div class="py-5 sm:py-6 sm:px-6 first:sm:pl-0 border-b sm:border-b-0 sm:border-l first:sm:border-l-0 border-cream/10">
+          <p class="font-mono text-[10px] uppercase tracking-[0.25em] text-sand">Look and feel</p>
+          <p class="mt-2 font-serif text-xl text-cream leading-snug">Warm earth tones that hold their colour</p>
+        </div>
+        <div class="py-5 sm:py-6 sm:px-6 first:sm:pl-0 border-b sm:border-b-0 sm:border-l first:sm:border-l-0 border-cream/10">
+          <p class="font-mono text-[10px] uppercase tracking-[0.25em] text-sand">Maintenance</p>
+          <p class="mt-2 font-serif text-xl text-cream leading-snug">Low</p>
+        </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="relative bg-dark px-6 py-16 sm:py-24">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-[1fr_1.3fr] gap-8 lg:gap-20">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">The material</p>
+        <h2 data-reveal class="font-serif text-4xl sm:text-5xl font-light tracking-tight leading-[1.05]">Why clay tile</h2>
+      </div>
+      <div class="gsap-fade-up">
+        <p class="text-cream/75 text-base sm:text-lg leading-relaxed">Clay tiles are fired at high temperature, which makes them dense, durable and colour-fast. Their warm tones and gentle curves give a roof real character, from English plain tiles to Mediterranean profiles.</p>
+        <p class="text-cream/75 text-base sm:text-lg leading-relaxed mt-5">Because clay is heavy, we always check the roof structure first and recommend the right tile and fixing for your pitch and exposure.</p>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-4 lg:gap-5 mt-12 sm:mt-16">
+        <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="font-mono text-xs text-sand">01</span>
+          <h3 class="mt-4 font-serif text-2xl text-cream">Colour that lasts</h3>
+          <p class="mt-3 text-cream/70 leading-relaxed">The colour is fired into the clay, so it does not fade with sun and weather.</p>
+        </div>
+        <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="font-mono text-xs text-sand">02</span>
+          <h3 class="mt-4 font-serif text-2xl text-cream">Long service life</h3>
+          <p class="mt-3 text-cream/70 leading-relaxed">Good-quality clay tiles regularly last well beyond half a century.</p>
+        </div>
+        <div class="rounded-2xl border border-cream/10 bg-cream/[0.03] p-6 sm:p-7 gsap-fade-up">
+          <span class="font-mono text-xs text-sand">03</span>
+          <h3 class="mt-4 font-serif text-2xl text-cream">Character and choice</h3>
+          <p class="mt-3 text-cream/70 leading-relaxed">A wide range of profiles and finishes to suit both period and new homes.</p>
+        </div>
+    </div>
+  </section>
+
+  <!-- IMAGE + HOW WE INSTALL -->
+  <section class="relative bg-dark px-6 pb-16 sm:pb-24">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+      <figure class="gsap-fade-up">
+        <div class="overflow-hidden rounded-2xl border border-cream/10 aspect-[4/3]">
+          <img src="/assets/services/clay-2.webp" alt="Clay tiles laid in neat, even courses" loading="lazy" class="w-full h-full object-cover object-center">
+        </div>
+        <figcaption class="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-cream/45">Clay tiles laid in neat, even courses</figcaption>
+      </figure>
+      <div>
+        <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">How we install it</p>
+        <h2 data-reveal class="font-serif text-4xl sm:text-5xl font-light tracking-tight leading-[1.05]">Done properly, <em class="italic text-sand">once</em></h2>
+        <ol class="mt-8 border-t border-cream/10 gsap-fade-up">
+            <li class="flex gap-5 py-5 border-b border-cream/10">
+              <span class="font-mono text-xs text-sand pt-1">01</span>
+              <p class="text-cream/80 leading-relaxed">Check the roof structure can carry the weight, and specify battens and underlay.</p>
+            </li>
+            <li class="flex gap-5 py-5 border-b border-cream/10">
+              <span class="font-mono text-xs text-sand pt-1">02</span>
+              <p class="text-cream/80 leading-relaxed">Set out courses and gauge so tiles line up cleanly at ridges, hips and verges.</p>
+            </li>
+            <li class="flex gap-5 py-5 border-b border-cream/10">
+              <span class="font-mono text-xs text-sand pt-1">03</span>
+              <p class="text-cream/80 leading-relaxed">Fix tiles to the latest wind-uplift guidance, with ridges and hips mechanically fixed.</p>
+            </li>
+            <li class="flex gap-5 py-5 border-b border-cream/10">
+              <span class="font-mono text-xs text-sand pt-1">04</span>
+              <p class="text-cream/80 leading-relaxed">Inspect every detail, then sign off with a full walkthrough.</p>
+            </li>
+        </ol>
+        <p class="mt-6 text-sm text-cream/55">Every install is backed by our 25-year workmanship warranty.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- OTHER SERVICES -->
+  <section class="relative bg-dark border-t border-cream/10 px-6 py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex items-end justify-between gap-6 mb-8">
+        <h2 class="font-serif text-3xl sm:text-4xl font-light tracking-tight">Other <em class="italic text-sand">materials</em></h2>
+        <a href="/#services" class="hidden sm:inline font-mono text-xs uppercase tracking-[0.25em] text-cream/55 hover:text-sand transition-colors">All services</a>
+      </div>
+      <div class="grid sm:grid-cols-3 gap-4 lg:gap-5">
+        <a href="/services/natural-slate" class="group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/10]">
+          <img src="/assets/services/slate.webp" alt="Natural Slate roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/30 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-5 flex items-end justify-between gap-4">
+            <h3 class="font-serif text-2xl text-cream">Natural Slate</h3>
+            <iconify-icon icon="solar:arrow-right-up-linear" class="text-xl text-sand transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+          </div>
+        </a>
+        <a href="/services/standing-seam-metal" class="group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/10]">
+          <img src="/assets/services/metal.webp" alt="Standing Seam Metal roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-[center_72%] transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/30 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-5 flex items-end justify-between gap-4">
+            <h3 class="font-serif text-2xl text-cream">Standing Seam Metal</h3>
+            <iconify-icon icon="solar:arrow-right-up-linear" class="text-xl text-sand transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+          </div>
+        </a>
+        <a href="/services/cedar-shake" class="group relative block overflow-hidden rounded-2xl border border-cream/10 aspect-[16/10]">
+          <img src="/assets/services/cedar.webp" alt="Cedar Shake roof" loading="lazy" class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1.4s] ease-out group-hover:scale-110">
+          <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/30 to-transparent"></div>
+          <div class="absolute inset-x-0 bottom-0 p-5 flex items-end justify-between gap-4">
+            <h3 class="font-serif text-2xl text-cream">Cedar Shake</h3>
+            <iconify-icon icon="solar:arrow-right-up-linear" class="text-xl text-sand transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"></iconify-icon>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="relative bg-dark text-cream border-t border-cream/10 py-16 sm:py-24 px-6">
+    <div class="max-w-4xl mx-auto text-center gsap-fade-up">
+      <p class="font-mono text-xs uppercase tracking-[0.3em] text-sand mb-5">Clay Tile</p>
+      <h2 data-reveal class="font-serif text-4xl sm:text-6xl font-light tracking-tight leading-[1.05] mb-6">Thinking about a <em class="italic text-sand">clay tile</em> roof?</h2>
+      <p class="text-cream/75 text-base sm:text-lg leading-relaxed max-w-xl mx-auto mb-10">Book a consultation and we will visit, look at your roof and give you a clear, itemised quote.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-5">
+        <a href="/#book" class="btn-shine inline-flex items-center gap-3 bg-cream text-dark px-8 py-4 rounded-full font-medium hover:bg-sand transition-colors">
+          Book a consultation
+          <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
+        </a>
+        <a href="tel:+442079460192" class="text-cream/80 border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">Or call +44 20 7946 0192</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FOOTER -->
+  <footer class="matte-noise relative overflow-hidden text-cream bg-dark border-cream/10 border-t pt-24">
+
+    <!-- Giant Brand Text -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none"
+      style="mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, black 0%, black 55%, transparent);">
+      <h2 class="text-[26vw] leading-[0.7] select-none font-serif font-bold text-cream/5 tracking-tighter mix-blend-screen scale-y-110">
+        SLATE
+      </h2>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto grid md:grid-cols-[1.3fr_1fr_1fr_1fr] gap-x-10 gap-y-14 mb-16 px-6">
+      <div>
+        <p class="font-serif text-xl tracking-tight text-cream mb-4">SLATE</p>
+        <p class="text-cream/55 text-sm leading-relaxed max-w-xs">
+          Bespoke roofing, specified and installed to the standards of fine
+          craft. Every tile a material to be honored.
+        </p>
+        <div class="flex items-center gap-3 mt-7">
+          <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:camera-linear"></iconify-icon>
+          </a>
+          <a href="#" aria-label="More" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:menu-dots-circle-linear"></iconify-icon>
+          </a>
+          <a href="#" aria-label="Email" class="w-9 h-9 rounded-full border border-cream/15 flex items-center justify-center text-cream/60 hover:text-cream hover:border-cream/40 transition-colors">
+            <iconify-icon icon="solar:letter-linear"></iconify-icon>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Explore</p>
+        <ul class="space-y-3 text-cream/55 text-sm">
+          <li><a href="/#services" class="hover:text-cream transition-colors">Services</a></li>
+          <li><a href="/#heritage" class="hover:text-cream transition-colors">Our Process</a></li>
+          <li><a href="/testimonials" class="hover:text-cream transition-colors">Testimonials</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">The Studio</p>
+        <p class="text-cream/55 text-sm leading-relaxed">
+          12 Artisan Row<br>Mayfair, London
+        </p>
+        <p class="text-cream/55 text-sm leading-relaxed mt-4">
+          Mon to Fri: 8am to 6pm<br>Sat to Sun: 9am to 5pm
+        </p>
+      </div>
+
+      <div>
+        <p class="font-mono text-xs uppercase tracking-wider text-sand mb-5">Contact</p>
+        <p class="text-cream/55 text-sm leading-relaxed"><a href="mailto:hello@slate-roofing.co" class="hover:text-cream transition-colors">hello@slate-roofing.co</a></p>
+        <p class="text-cream/55 text-sm leading-relaxed mt-2"><a href="tel:+442079460192" class="hover:text-cream transition-colors">+44 20 7946 0192</a></p>
+      </div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-6 border-t border-cream/10 pt-7 pb-10 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
+      <p class="font-mono text-xs text-cream/35">© 2026 SLATE. All rights reserved.</p>
+      <div class="flex items-center gap-6 font-mono text-xs text-cream/35">
+        <a href="/privacy#company" class="hover:text-cream/70 transition-colors">Company info</a>
+        <a href="/privacy" class="hover:text-cream/70 transition-colors">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+</main>
+
+<script src="/assets/luxe.js"></script>
+<script>
+/* =========================================================
+   THREE.JS AMBIENT NOISE BACKGROUND
+   ========================================================= */
+(function initWebGL() {
+  const canvas = document.getElementById('webgl-bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+  const vertexShader = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position, 1.0);
+    }
+  `;
+
+  const fragmentShader = `
+    precision highp float;
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform vec3 uColorA;
+    uniform vec3 uColorB;
+
+    float random(vec2 st) {
+      return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+    }
+
+    float noise(vec2 st) {
+      vec2 i = floor(st);
+      vec2 f = fract(st);
+      float a = random(i);
+      float b = random(i + vec2(1.0, 0.0));
+      float c = random(i + vec2(0.0, 1.0));
+      float d = random(i + vec2(1.0, 1.0));
+      vec2 u = f*f*(3.0-2.0*f);
+      return mix(a, b, u.x) + (c - a)*u.y*(1.0-u.x) + (d - b)*u.x*u.y;
+    }
+
+    float fbm(vec2 st) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      for (int i = 0; i < 5; i++) {
+        value += amplitude * noise(st);
+        st *= 2.0;
+        amplitude *= 0.5;
+      }
+      return value;
+    }
+
+    void main() {
+      vec2 uv = vUv;
+      uv.x *= uResolution.x / uResolution.y;
+
+      vec2 motion = vec2(uTime * 0.015, uTime * 0.01);
+      float n = fbm(uv * 3.0 + motion);
+      n += fbm(uv * 6.0 - motion * 1.5) * 0.5;
+
+      vec3 color = mix(uColorA, uColorB, n);
+      float alpha = smoothstep(0.2, 0.8, n) * 0.5;
+
+      gl_FragColor = vec4(color, alpha);
+    }
+  `;
+
+  const uniforms = {
+    uTime: { value: 0 },
+    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uColorA: { value: new THREE.Color('#cebfa9') },
+    uColorB: { value: new THREE.Color('#4f5343') },
+  };
+
+  const material = new THREE.ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    uniforms,
+    transparent: true,
+  });
+
+  const geometry = new THREE.PlaneGeometry(2, 2);
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function resize() {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', resize);
+
+  const clock = new THREE.Clock();
+  function animate() {
+    uniforms.uTime.value = clock.getElapsedTime();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* =========================================================
+   GSAP SCROLLTRIGGER ANIMATIONS
+   ========================================================= */
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero stagger fade-up (runs immediately, not scroll-triggered)
+gsap.to('.hero-anim', {
+  y: 0,
+  opacity: 1,
+  duration: 1.1,
+  ease: 'power3.out',
+  stagger: 0.12,
+  delay: 0.2,
+});
+
+// Generic fade-up on scroll
+document.querySelectorAll('.gsap-fade-up').forEach((el) => {
+  if (el.classList.contains('hero-anim')) return;
+  gsap.to(el, {
+    y: 0,
+    opacity: 1,
+    duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+    },
+  });
+});
+
+// Scale-up images on scroll
+document.querySelectorAll('.gsap-scale-up').forEach((el) => {
+  gsap.to(el, {
+    scale: 1,
+    duration: 1.4,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 80%',
+    },
+  });
+});
+
+/* =========================================================
+   NAV: fade out once scrolled past the top, fade back in at the top
+   ========================================================= */
+(function initNavFade() {
+  const nav = document.getElementById('main-nav');
+  if (!nav || window.matchMedia('(max-width: 767px)').matches) return;
+
+  const threshold = 40;
+
+  function updateNav() {
+    if (window.scrollY > threshold) {
+      nav.style.opacity = '0';
+      nav.style.pointerEvents = 'none';
+    } else {
+      nav.style.opacity = '1';
+      nav.style.pointerEvents = 'auto';
+    }
+  }
+
+  updateNav();
+  window.addEventListener('scroll', updateNav, { passive: true });
+})();
+
+/* =========================================================
+   MAGNETIC BUTTONS
+   ========================================================= */
+document.querySelectorAll('.magnetic-btn').forEach((btn) => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const relX = e.clientX - rect.left - rect.width / 2;
+    const relY = e.clientY - rect.top - rect.height / 2;
+    gsap.to(btn, {
+      x: relX * 0.4,
+      y: relY * 0.4,
+      duration: 0.4,
+      ease: 'power2.out',
+    });
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    gsap.to(btn, {
+      x: 0,
+      y: 0,
+      duration: 0.6,
+      ease: 'elastic.out(1, 0.4)',
+    });
+  });
+});
+</script>
+<script>
+if (!(window.luxe && window.luxe.reduceMotion)) {
+  gsap.fromTo('#svc-hero-img', { scale: 1.15 }, { scale: 1, duration: 2.4, ease: 'power3.out' });
+  gsap.to('#svc-hero-img', { yPercent: 12, ease: 'none', scrollTrigger: { trigger: '#svc-hero-img', start: 'top top', end: 'bottom top', scrub: true } });
+}
+</script>
+</body>
+</html>
