@@ -6,7 +6,7 @@ function botToken(): string | null {
   return process.env.TELEGRAM_BOT_TOKEN?.trim() || null;
 }
 
-/** GET — show the current webhook state. */
+/** GET — show the current webhook state. Auth is handled by the proxy. */
 export async function GET() {
   const token = botToken();
   if (!token) return NextResponse.json({ error: "TELEGRAM_BOT_TOKEN not set" }, { status: 500 });

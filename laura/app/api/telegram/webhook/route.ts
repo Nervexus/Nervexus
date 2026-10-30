@@ -10,6 +10,37 @@ import { answerAboutFile } from "@/lib/read-file";
 import { afternoonMessage, morningMessage, nightMessage } from "@/lib/routine";
 import { friendlyDateTime, USER_TIMEZONE } from "@/lib/booking-links";
 
+// GET with ?register=<TELEGRAM_WEBHOOK_SECRET> registers the webhook with
+// Telegram. Safe to call repeatedly; only works with the correct secret.
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const registerSecret = url.searchParams.get("register");
+  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (!registerSecret || !secret || registerSecret !== secret) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return NextResponse.json({ error: "TELEGRAM_BOT_TOKEN not set" }, { status: 500 });
+
+  let baseUrl = process.env.NEXT_PUBLIC_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (!baseUrl) return NextResponse.json({ error: "No base URL" }, { status: 500 });
+  if (!baseUrl.startsWith("http")) baseUrl = `https://${baseUrl}`;
+  const webhookUrl = `${baseUrl.replace(/\/$/, "")}/api/telegram/webhook`;
+
+  const res = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      url: webhookUrl,
+      secret_token: secret,
+      allowed_updates: ["message", "callback_query"],
+      drop_pending_updates: false,
+    }),
+  });
+  const data = await res.json();
+  return NextResponse.json({ ok: data.ok, description: data.description, webhook_url: webhookUrl });
+}
+
 // Telegram calls this for every message sent to the bot (registered via
 // setWebhook with a secret_token). Only the owner's chat gets answers;
 // anything else is acknowledged and ignored so Telegram stops retrying.
