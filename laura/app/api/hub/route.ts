@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { OUTREACH_URL, outreachStatsOrNull, type OutreachStats } from "@/lib/hq";
 import { prisma } from "@/lib/db";
+import { isGoogleConfigured } from "@/lib/google";
 
 type SystemNode = {
   id: string;
@@ -84,6 +85,27 @@ export async function GET() {
     name: "Vercel",
     url: "https://laura-lyart.vercel.app",
     status: "online",
+  });
+
+  // Google (Calendar + Gmail)
+  const googleConfigured = isGoogleConfigured();
+  let googleStatus: "online" | "offline" | "unconfigured" = "unconfigured";
+  if (googleConfigured) {
+    try {
+      const { getGoogleAuth } = await import("@/lib/google");
+      const auth = getGoogleAuth();
+      await auth.getAccessToken();
+      googleStatus = "online";
+    } catch {
+      googleStatus = "offline";
+    }
+  }
+  nodes.push({
+    id: "google",
+    name: "Google",
+    url: null,
+    status: googleStatus,
+    stats: { calendar: googleStatus === "online", gmail: googleStatus === "online" },
   });
 
   // Database (Turso) — quick health check

@@ -11,6 +11,10 @@ import { searchBookingOptions, listBookings, readyToBookLinks, friendlyDateTime 
 import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
 import { lookupPlace, type PlaceCard } from "@/lib/places";
 import { textingInstructions } from "@/lib/texting";
+import { isGoogleConfigured } from "@/lib/google";
+import { getCalendarEvents, createCalendarEvent } from "@/lib/calendar";
+import { sendEmail, readEmails, readEmailBody } from "@/lib/gmail";
+import { scrapePage, getWeather, getNews, translateText, calculate } from "@/lib/scrape";
 
 const SYSTEM_PROMPT = `You are Laura, Madoxs Harvey's personal assistant. You text like a real,
 sharp PA who knows him well -- not like an AI chatbot.
@@ -37,12 +41,11 @@ How you write:
 - Never repeat, quote or restate what he just said or asked. No "So you
   want to..." or "You asked about...". Go straight to the answer.
 
-You do not yet have real-world tools wired up beyond the ones listed for
-this conversation. You can send the user an urgent notification or a
-plain message via Telegram (call_me, text_me) -- call_me does NOT place
-an actual ringing phone call, it just sends an urgent-styled message, so
-never claim to have "called" or "rung" the user, say you've "sent an
-urgent message" or similar instead. You cannot send email, and you can
+You have a full set of real-world tools. You can send the user an urgent
+notification or a plain message via Telegram (call_me, text_me) --
+call_me does NOT place an actual ringing phone call, it just sends an
+urgent-styled message, so never claim to have "called" or "rung" the
+user, say you've "sent an urgent message" or similar instead. You can
 NEVER complete, confirm, or pay for a booking yourself -- no matter how
 clearly the user authorizes it. For restaurants/activities/travel, use
 search_booking_options to find real current options and links, then
@@ -102,6 +105,25 @@ draft_outreach_email -- it only queues a draft for him to review in the
 outreach app; you never send outreach messages yourself, so say "I've
 queued a draft for you to check", never "I've sent it". Replies are
 checked about hourly on weekdays, so the newest ones can lag.
+
+Email: you can send emails on Madoxs's behalf with send_email (from his
+own Gmail), read his inbox with read_emails, and pull the full body of
+a specific email with read_email_body. Confirm before sending. If Google
+isn't connected yet, tell him to visit the System page and connect it.
+
+Calendar: use get_calendar to see his upcoming events, and
+create_calendar_event to add one. Combine this with his rota for full
+scheduling questions.
+
+Web: you can read any web page with scrape_page (articles, products,
+tracking pages, anything), get_weather for forecasts, get_news for
+headlines, translate text, and do maths with calculate. scrape_page is
+your go-to for checking anything live on the web -- parcel tracking
+pages, product prices, event tickets, opening hours. Use it freely.
+
+Notes: you can search and list saved notes with list_notes, update them
+with update_note, and create new ones with create_note. Use notes to
+keep track of things for him.
 
 Your rota and reminders are yours to keep tidy: when he pastes a rota or
 tells you his hours, add them with add_shifts (only his shifts, skip days
@@ -635,6 +657,175 @@ const tools: FunctionDeclaration[] = [
       "gives the user a link to start one, e.g. to loop in someone else.",
     parameters: { type: Type.OBJECT, properties: {} },
   },
+  // ── Email & Calendar ──
+  {
+    name: "send_email",
+    description:
+      "Send an email from Madoxs's Gmail. This sends a real email — always confirm with " +
+      "him first. If Google isn't connected, say so.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        to: { type: Type.STRING, description: "Recipient email address." },
+        subject: { type: Type.STRING },
+        body: { type: Type.STRING, description: "Plain text email body. Write in Madoxs's voice unless told otherwise." },
+        cc: { type: Type.STRING, description: "CC address, if any." },
+      },
+      required: ["to", "subject", "body"],
+    },
+  },
+  {
+    name: "read_emails",
+    description:
+      "Read recent emails from Madoxs's Gmail inbox. Use Gmail search syntax for the query " +
+      "(e.g. 'from:amazon.co.uk', 'is:unread', 'subject:invoice', 'newer_than:2d').",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        query: { type: Type.STRING, description: "Gmail search query. Defaults to recent inbox." },
+        maxResults: { type: Type.NUMBER, description: "How many to return, max 20. Defaults to 10." },
+      },
+    },
+  },
+  {
+    name: "read_email_body",
+    description: "Read the full body of a specific email. Needs the message id from read_emails.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: { id: { type: Type.STRING, description: "The email's message id." } },
+      required: ["id"],
+    },
+  },
+  {
+    name: "get_calendar",
+    description:
+      "Get upcoming events from Madoxs's Google Calendar. Combine with get_shifts for a full " +
+      "picture of his schedule.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        days: { type: Type.NUMBER, description: "How many days ahead to look. Defaults to 7." },
+      },
+    },
+  },
+  {
+    name: "create_calendar_event",
+    description:
+      "Add an event to Madoxs's Google Calendar. This creates a real calendar event — confirm first.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        title: { type: Type.STRING },
+        start: { type: Type.STRING, description: "ISO 8601 datetime with timezone offset, e.g. 2026-11-01T14:00:00+00:00." },
+        end: { type: Type.STRING, description: "ISO 8601 datetime with timezone offset." },
+        location: { type: Type.STRING },
+        description: { type: Type.STRING },
+      },
+      required: ["title", "start", "end"],
+    },
+  },
+  // ── Web & scraping ──
+  {
+    name: "scrape_page",
+    description:
+      "Read any web page and extract information from it — articles, product pages, " +
+      "tracking pages, timetables, anything public. Much more reliable than web_search " +
+      "when you already have the URL. Can answer a specific question about the page.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        url: { type: Type.STRING, description: "The full URL to read." },
+        question: { type: Type.STRING, description: "Optional: a specific question to answer about the page." },
+      },
+      required: ["url"],
+    },
+  },
+  {
+    name: "get_weather",
+    description: "Get the current weather and forecast for a location. Temperatures in Celsius.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        location: { type: Type.STRING, description: "City or area, e.g. 'Fawley, Hampshire' or 'London'." },
+      },
+      required: ["location"],
+    },
+  },
+  {
+    name: "get_news",
+    description: "Get the latest news headlines — general UK news or about a specific topic.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        topic: { type: Type.STRING, description: "Optional: a topic to search for, e.g. 'Premier League' or 'tech'." },
+      },
+    },
+  },
+  {
+    name: "translate",
+    description: "Translate text between languages.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        text: { type: Type.STRING, description: "The text to translate." },
+        to: { type: Type.STRING, description: "Target language, e.g. 'Spanish', 'French', 'Japanese'." },
+      },
+      required: ["text", "to"],
+    },
+  },
+  {
+    name: "calculate",
+    description:
+      "Do maths — from simple sums to unit conversions, percentages, mortgage calculations, " +
+      "currency conversions, tip splitting, anything with numbers.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        expression: { type: Type.STRING, description: "The calculation or question, e.g. '15% of 340', '£250 in euros', 'split £87.50 between 4 people'." },
+      },
+      required: ["expression"],
+    },
+  },
+  // ── Notes management ──
+  {
+    name: "list_notes",
+    description: "Search and list saved notes. Returns titles, ids, and a preview of each.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        search: { type: Type.STRING, description: "Optional: search term to filter notes by title or body." },
+        limit: { type: Type.NUMBER, description: "Max notes to return, defaults to 10." },
+      },
+    },
+  },
+  {
+    name: "update_note",
+    description: "Edit or delete a saved note. Needs the note id from list_notes.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        id: { type: Type.STRING },
+        action: { type: Type.STRING, enum: ["edit", "delete"], description: "What to do with the note." },
+        title: { type: Type.STRING, description: "New title, for edit." },
+        body: { type: Type.STRING, description: "New body text, for edit." },
+      },
+      required: ["id", "action"],
+    },
+  },
+  {
+    name: "schedule_message",
+    description:
+      "Schedule a Telegram message to send later — e.g. 'remind me at 7am' or 'text me " +
+      "tonight at 10pm'. Creates a reminder that triggers a Telegram notification when due.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        message: { type: Type.STRING, description: "The message to send." },
+        sendAt: { type: Type.STRING, description: "ISO 8601 datetime when to send it." },
+      },
+      required: ["message", "sendAt"],
+    },
+  },
 ];
 
 // Isolated from the main tool-calling loop: Gemini doesn't support mixing
@@ -686,6 +877,19 @@ const LOGGED_TOOLS = new Set([
   "add_outreach_lead",
   "set_outreach_lead_status",
   "draft_outreach_email",
+  "send_email",
+  "read_emails",
+  "read_email_body",
+  "get_calendar",
+  "create_calendar_event",
+  "scrape_page",
+  "get_weather",
+  "get_news",
+  "translate",
+  "calculate",
+  "list_notes",
+  "update_note",
+  "schedule_message",
 ]);
 
 async function logActivity(tool: string, summary: string) {
@@ -1168,6 +1372,191 @@ async function runTool(
     await logActivity("start_video_call", "Sent a video call link");
     return { result: `Sent the call link: ${link}` };
   }
+  // ── Email ──
+  if (name === "send_email") {
+    if (!isGoogleConfigured()) return { error: "Google isn't connected yet. Tell him to visit System and connect Google." };
+    const { to, subject, body, cc } = args as { to?: string; subject?: string; body?: string; cc?: string };
+    if (!to || !subject || !body) return { error: "send_email needs to, subject, and body" };
+    try {
+      const res = await sendEmail({ to, subject, body, cc });
+      await logActivity("send_email", `Sent email to ${to}: "${subject}"`);
+      return { result: `Email sent to ${to}.`, id: res.id };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Failed to send email." };
+    }
+  }
+  if (name === "read_emails") {
+    if (!isGoogleConfigured()) return { error: "Google isn't connected yet. Tell him to visit System and connect Google." };
+    try {
+      const emails = await readEmails({
+        query: typeof args.query === "string" ? args.query : undefined,
+        maxResults: typeof args.maxResults === "number" ? args.maxResults : undefined,
+      });
+      await logActivity("read_emails", `Read ${emails.length} email(s)`);
+      if (emails.length === 0) return { result: "No emails matching that search." };
+      return {
+        result: emails
+          .map((e) => `- [id:${e.id}] ${e.unread ? "(unread) " : ""}From: ${e.from}\n  Subject: ${e.subject}\n  ${e.snippet.slice(0, 120)}`)
+          .join("\n"),
+      };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't read emails." };
+    }
+  }
+  if (name === "read_email_body") {
+    if (!isGoogleConfigured()) return { error: "Google isn't connected yet." };
+    const id = String(args.id ?? "");
+    if (!id) return { error: "read_email_body needs a message id" };
+    try {
+      const body = await readEmailBody(id);
+      return { result: body };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't read that email." };
+    }
+  }
+  // ── Calendar ──
+  if (name === "get_calendar") {
+    if (!isGoogleConfigured()) return { error: "Google isn't connected yet. Tell him to visit System and connect Google." };
+    try {
+      const days = typeof args.days === "number" ? args.days : 7;
+      const events = await getCalendarEvents(days);
+      await logActivity("get_calendar", `Checked calendar (${events.length} events)`);
+      if (events.length === 0) return { result: `Nothing on the calendar for the next ${days} day${days === 1 ? "" : "s"}.` };
+      return {
+        result: events
+          .map((e) => `- ${e.title}${e.allDay ? " (all day)" : ` ${e.start} to ${e.end}`}${e.location ? ` at ${e.location}` : ""}`)
+          .join("\n"),
+      };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't read the calendar." };
+    }
+  }
+  if (name === "create_calendar_event") {
+    if (!isGoogleConfigured()) return { error: "Google isn't connected yet." };
+    const { title, start, end, location, description } = args as {
+      title?: string; start?: string; end?: string; location?: string; description?: string;
+    };
+    if (!title || !start || !end) return { error: "create_calendar_event needs title, start, and end" };
+    try {
+      const res = await createCalendarEvent({ title, start, end, location, description });
+      await logActivity("create_calendar_event", `Added "${title}" to calendar`);
+      return { result: `Added "${title}" to the calendar.`, link: res.link };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't create the event." };
+    }
+  }
+  // ── Web & scraping ──
+  if (name === "scrape_page") {
+    const url = String(args.url ?? "").trim();
+    if (!url) return { error: "scrape_page needs a URL" };
+    try {
+      const result = await scrapePage(url, typeof args.question === "string" ? args.question : undefined);
+      await logActivity("scrape_page", `Read ${url.slice(0, 60)}`);
+      return { result };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't read that page." };
+    }
+  }
+  if (name === "get_weather") {
+    const location = String(args.location ?? "").trim();
+    if (!location) return { error: "get_weather needs a location" };
+    try {
+      const result = await getWeather(location);
+      await logActivity("get_weather", `Checked weather for ${location}`);
+      return { result };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't get the weather." };
+    }
+  }
+  if (name === "get_news") {
+    try {
+      const result = await getNews(typeof args.topic === "string" ? args.topic : undefined);
+      await logActivity("get_news", args.topic ? `Got news about ${args.topic}` : "Got latest news");
+      return { result };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't fetch the news." };
+    }
+  }
+  if (name === "translate") {
+    const text = String(args.text ?? "").trim();
+    const to = String(args.to ?? "").trim();
+    if (!text || !to) return { error: "translate needs text and a target language" };
+    try {
+      const result = await translateText(text, to);
+      await logActivity("translate", `Translated to ${to}`);
+      return { result };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Translation failed." };
+    }
+  }
+  if (name === "calculate") {
+    const expression = String(args.expression ?? "").trim();
+    if (!expression) return { error: "calculate needs an expression" };
+    try {
+      const result = await calculate(expression);
+      await logActivity("calculate", `Calculated: ${expression.slice(0, 60)}`);
+      return { result };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Calculation failed." };
+    }
+  }
+  // ── Notes management ──
+  if (name === "list_notes") {
+    const search = typeof args.search === "string" ? args.search.trim() : null;
+    const limit = typeof args.limit === "number" ? Math.min(args.limit, 50) : 10;
+    const where = search
+      ? { OR: [{ title: { contains: search } }, { body: { contains: search } }] }
+      : {};
+    const notes = await prisma.note.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+    if (notes.length === 0) return { result: search ? `No notes matching "${search}".` : "No saved notes." };
+    return {
+      result: notes
+        .map((n) => `- [id:${n.id}] ${n.title}\n  ${(n.body ?? "").slice(0, 100)}${(n.body ?? "").length > 100 ? "…" : ""}`)
+        .join("\n"),
+    };
+  }
+  if (name === "update_note") {
+    const id = String(args.id ?? "");
+    const action = String(args.action ?? "");
+    const note = await prisma.note.findUnique({ where: { id } });
+    if (!note) return { error: "No note with that id -- use list_notes first." };
+    if (action === "delete") {
+      await prisma.note.delete({ where: { id } });
+      await logActivity("update_note", `Deleted note "${note.title}"`);
+      return { result: `Deleted "${note.title}".` };
+    }
+    if (action === "edit") {
+      const data: Record<string, string> = {};
+      if (typeof args.title === "string" && args.title.trim()) data.title = args.title.trim();
+      if (typeof args.body === "string") data.body = args.body;
+      if (Object.keys(data).length === 0) return { error: "edit needs a title or body to change" };
+      await prisma.note.update({ where: { id }, data });
+      await logActivity("update_note", `Updated note "${data.title ?? note.title}"`);
+      return { result: `Updated "${data.title ?? note.title}".` };
+    }
+    return { error: "action must be edit or delete" };
+  }
+  if (name === "schedule_message") {
+    const message = String(args.message ?? "").trim();
+    const sendAt = String(args.sendAt ?? "");
+    if (!message || !sendAt) return { error: "schedule_message needs message and sendAt" };
+    const due = new Date(sendAt);
+    if (Number.isNaN(due.getTime())) return { error: "sendAt must be a valid ISO 8601 datetime" };
+    await prisma.reminder.create({
+      data: {
+        title: `📩 ${message.slice(0, 80)}`,
+        dueAt: due,
+        note: `__scheduled_message__:${message}`,
+        priority: "high",
+      },
+    });
+    await logActivity("schedule_message", `Scheduled message for ${friendlyDateTime(due)}`);
+    return { result: `Scheduled. He'll get a Telegram notification at ${friendlyDateTime(due)}.` };
+  }
   return { error: `Unknown tool: ${name}` };
 }
 
@@ -1184,7 +1573,7 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
   const profile = await prisma.profile.findUnique({ where: { id: "me" } }).catch(() => null);
   const systemPrompt = `${SYSTEM_PROMPT}\n\n${textingInstructions(profile)}`;
 
-  for (let turn = 0; turn < 5; turn++) {
+  for (let turn = 0; turn < 8; turn++) {
     const response = await ai.models.generateContent({
       model: MODEL,
       contents,

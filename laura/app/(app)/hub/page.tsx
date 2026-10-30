@@ -60,6 +60,7 @@ export default function HubPage() {
   const telegram = nodes.find((n) => n.id === "telegram");
   const vercelNode = nodes.find((n) => n.id === "vercel");
   const dbNode = nodes.find((n) => n.id === "database");
+  const googleNode = nodes.find((n) => n.id === "google");
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-[26px]">
@@ -111,6 +112,11 @@ export default function HubPage() {
                 status={loading ? null : telegram?.status ?? "unconfigured"}
                 onClick={() => window.open("https://t.me/Laura1xbot", "_blank")}
               />
+              <NodeBox
+                icon={<GoogleIcon />}
+                label="Google"
+                status={loading ? null : googleNode?.status ?? "unconfigured"}
+              />
             </div>
           </div>
 
@@ -129,11 +135,14 @@ export default function HubPage() {
             <path d="M50,50 C35,50 30,72 15,72" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
             <circle cx="15" cy="72" r="0.7" fill="rgba(139,111,212,0.35)" />
             {/* Centre → top-right (Encrypted) */}
-            <path d="M50,50 C65,50 70,28 85,28" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="28" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C65,45 70,35 85,35" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
+            <circle cx="85" cy="35" r="0.7" fill="rgba(139,111,212,0.35)" />
             {/* Centre → bottom-right (Telegram) */}
-            <path d="M50,50 C65,50 70,72 85,72" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="72" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C65,50 70,60 85,60" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
+            <circle cx="85" cy="60" r="0.7" fill="rgba(139,111,212,0.35)" />
+            {/* Centre → far-bottom-right (Google) */}
+            <path d="M50,50 C65,55 70,82 85,82" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
+            <circle cx="85" cy="82" r="0.7" fill="rgba(139,111,212,0.35)" />
           </svg>
         </div>
       </div>
@@ -228,6 +237,56 @@ export default function HubPage() {
           </div>
         </div>
 
+        {/* Google card */}
+        <div className="card card-pad sm:col-span-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
+                <GoogleIcon />
+              </div>
+              <div>
+                <h2 className="text-[14px] font-semibold text-text">Google</h2>
+                <p className="text-[11px] text-dim">Calendar & Gmail</p>
+              </div>
+            </div>
+            <StatusDot status={loading ? null : googleNode?.status ?? "unconfigured"} />
+          </div>
+
+          <div className="mt-4 space-y-2">
+            {googleNode?.status === "online" && (
+              <div className="flex gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
+                  <span className="text-[12px] text-muted">Calendar connected</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
+                  <span className="text-[12px] text-muted">Gmail connected</span>
+                </div>
+              </div>
+            )}
+            {googleNode?.status === "unconfigured" && (
+              <p className="text-[12px] text-muted">
+                Not connected. Visit <span className="text-text">/api/google/auth</span> to link your Google account.
+              </p>
+            )}
+            {googleNode?.status === "offline" && (
+              <p className="text-[12px] text-red-400/80">
+                Credentials expired. Reconnect via /api/google/auth.
+              </p>
+            )}
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <a
+              href="/api/google/auth"
+              className="btn flex-1 justify-center text-[12px]"
+            >
+              {googleNode?.status === "online" ? "Reconnect" : "Connect Google"}
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -294,6 +353,15 @@ function VercelIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden>
       <path d="M12 2L2 19.5h20L12 2z" />
+    </svg>
+  );
+}
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden>
+      <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12s4.48 10 10 10c2.76 0 5.26-1.12 7.07-2.93" />
+      <path d="M22 12H12v4h5.74c-.77 2.12-2.81 3.64-5.24 3.96" />
+      <path d="M12 8V2.18C7.86 2.56 4.56 5.86 4.18 10" />
     </svg>
   );
 }
