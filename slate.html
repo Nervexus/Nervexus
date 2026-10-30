@@ -187,21 +187,23 @@ tailwind.config = {
     #cinema-copy { padding-top: 16svh; }
     #heritage .text-center.mb-16, #services .text-center.mb-16 { margin-bottom: 2.75rem; }
 
-    /* Process: the desktop zigzag, scaled down with compact cards */
-    #timeline-container > div:first-child { display: block; }
-    #timeline-steps > .timeline-step + .timeline-step { margin-top: -1.5rem !important; }
-    .timeline-step { flex-direction: row !important; align-items: center !important; gap: 0.6rem !important; }
-    .timeline-step > .flex-1 { flex: 1 1 0; min-width: 0; }
-    .timeline-step > .timeline-dot { width: 11px; height: 11px; }
-    .timeline-step > .flex-1:first-child:not(:empty) { text-align: right; }
-    .timeline-step > .flex-1:first-child:not(:empty) .flex.items-center { justify-content: flex-end; }
-    .timeline-step .rounded-3xl { padding: 0.85rem 0.9rem 0.8rem; border-radius: 0.9rem; }
-    .timeline-step .rounded-3xl > span:first-child { font-size: 9px; letter-spacing: 0.18em; }
-    .timeline-step h3 { font-size: 1.1rem; line-height: 1.2; margin-top: 0.35rem; margin-bottom: 0.35rem; }
-    .timeline-step p { font-size: 0.72rem; line-height: 1.4; margin-bottom: 0.45rem; }
-    .timeline-step .rounded-3xl > div:last-child { font-size: 0.62rem; gap: 0.3rem; white-space: nowrap; margin-top: 0.1rem; }
-    .timeline-step .rounded-3xl > div:last-child span { white-space: nowrap; }
-    .timeline-step .rounded-3xl > div:last-child iconify-icon { font-size: 0.75rem; }
+    /* Process: one stacked column of compact cards on a rail */
+    #timeline-container { padding-left: 1.6rem; }
+    #timeline-container::before {
+      content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(245,243,238,0.18) 6%, rgba(245,243,238,0.18) 94%, transparent);
+    }
+    #timeline-steps > .timeline-step + .timeline-step { margin-top: 0.75rem !important; }
+    .timeline-step { position: relative; flex-direction: column !important; align-items: stretch !important; gap: 0 !important; }
+    .timeline-step > .flex-1:empty { display: none; }
+    .timeline-step > .flex-1 { text-align: left !important; padding: 0 !important; }
+    .timeline-step .flex.items-center { justify-content: flex-start !important; }
+    .timeline-step > .timeline-dot { position: absolute; left: -1.6rem; margin-left: 1px; top: 1.15rem; width: 11px; height: 11px; }
+    .timeline-step .rounded-3xl { padding: 1rem 1.1rem 0.95rem; border-radius: 1rem; }
+    .timeline-step .rounded-3xl > span:first-child { font-size: 10px; letter-spacing: 0.18em; }
+    .timeline-step h3 { font-size: 1.3rem; line-height: 1.2; margin-top: 0.4rem; margin-bottom: 0.35rem; }
+    .timeline-step p { font-size: 0.85rem; line-height: 1.5; margin-bottom: 0.55rem; }
+    .timeline-step .rounded-3xl > div:last-child { font-size: 0.72rem; gap: 0.35rem; }
 
     /* Selected Work */
     #work-pin { padding-top: 4.5rem; padding-bottom: 3rem; }
@@ -288,16 +290,16 @@ tailwind.config = {
           Book a consultation
           <iconify-icon icon="solar:arrow-right-linear" class="text-lg"></iconify-icon>
         </a>
-        <a href="#work" class="inline-flex items-center gap-2 text-cream/80 font-medium border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">
+        <a href="#work" class="hidden md:inline-flex items-center gap-2 text-cream/80 font-medium border-b border-cream/30 pb-1 hover:text-cream hover:border-cream transition-colors">
           View our work
         </a>
       </div>
-      <p class="hero-anim gsap-fade-up mt-6 text-sm text-cream/70">
+      <p class="hero-anim gsap-fade-up mt-6 text-sm text-cream/70 hidden md:block">
         Or call us on <a href="tel:+442079460192" class="text-cream underline decoration-cream/30 underline-offset-4 hover:decoration-sand transition-colors">+44 20 7946 0192</a>
       </p>
     </div>
 
-    <div id="scroll-cue-wrap" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+    <div id="scroll-cue-wrap" class="hidden md:block absolute bottom-8 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
       <div id="scroll-cue" class="flex flex-col items-center gap-3">
         <span class="font-mono text-[10px] uppercase tracking-[0.35em] text-cream/50">Scroll</span>
         <span class="scroll-cue-line"></span>
@@ -450,7 +452,7 @@ tailwind.config = {
   </section>
 
   <!-- THE SLATE STANDARD: what every roof comes with (pinned sideways scroll on desktop, swipe row on mobile) -->
-  <section id="work" class="relative bg-dark text-cream border-t border-cream/10">
+  <section id="work" class="relative z-[2] bg-dark text-cream border-t border-cream/10 rounded-t-[28px] md:rounded-t-[40px] shadow-[0_-30px_60px_-20px_rgba(0,0,0,0.8)]">
     <div id="work-pin" class="relative flex flex-col justify-center py-24 lg:py-0 lg:h-screen lg:overflow-hidden">
       <div class="max-w-7xl w-full mx-auto px-6 flex items-end justify-between gap-6 mb-10 lg:mb-12">
         <div>
@@ -1074,22 +1076,24 @@ if (!reduceMotion) {
    ========================================================= */
 (function initCinema() {
   const pin = document.getElementById('cinema-pin');
-  if (!pin || reduceMotion) return;
+  const next = document.getElementById('work');
+  if (!pin || !next || reduceMotion) return;
 
-  gsap.set('#cinema-frame', { clipPath: 'inset(0% 0% 0% 0%)' });
-  gsap.set('#cinema-img', { scale: 1.05 });
-  gsap.set('#cinema-shade', { opacity: 0.55 });
+  gsap.set('#cinema-frame', { clipPath: 'none' });
+  gsap.fromTo('#cinema-img', { scale: 1.15 }, {
+    scale: 1, ease: 'none',
+    scrollTrigger: { trigger: '#cinema', start: 'top bottom', end: 'top top', scrub: true },
+  });
+  gsap.from('#cinema-copy > *', {
+    y: 50, opacity: 0, duration: 1.1, ease: 'power3.out', stagger: 0.12,
+    scrollTrigger: { trigger: '#cinema', start: 'top 55%' },
+  });
 
-  gsap.timeline({
-    scrollTrigger: { trigger: pin, start: 'top top', end: '+=150%', pin: true, scrub: 1, anticipatePin: 1 },
-  })
-    .to('#cinema-copy', { y: -120, opacity: 0, ease: 'power2.in', duration: 0.45 }, 0)
-    .to('#cinema-img', { scale: 1.3, ease: 'none', duration: 1 }, 0)
-    .to('#cinema-shade', { opacity: 0.25, ease: 'none', duration: 0.6 }, 0.2)
-    .fromTo('#cinema-frame',
-      { clipPath: 'inset(0% 0% 0% 0%)' },
-      { clipPath: 'inset(49.5% 0% 49.5% 0%)', ease: 'power3.inOut', duration: 0.7 }, 0.3)
-    .to({}, { duration: 0.1 });
+  ScrollTrigger.create({ trigger: pin, start: 'top top', end: () => '+=' + window.innerHeight, pin: true, pinSpacing: false });
+  gsap.timeline({ scrollTrigger: { trigger: next, start: 'top bottom', end: 'top top', scrub: true } })
+    .to('#cinema-img', { scale: 1.12, ease: 'none' }, 0)
+    .to('#cinema-copy', { y: -60, opacity: 0, ease: 'none' }, 0)
+    .to('#cinema-shade', { opacity: 0.85, ease: 'none' }, 0);
 })();
 
 /* =========================================================
