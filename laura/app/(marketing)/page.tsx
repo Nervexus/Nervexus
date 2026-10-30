@@ -12,7 +12,7 @@ export default function Home() {
       <section className="relative flex min-h-[80vh] flex-col items-center justify-center text-center">
         {/* Giant LAURA wordmark sitting behind the orb */}
         <p
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none scale-y-110 text-[clamp(6rem,22vw,16rem)] font-bold leading-[0.7] tracking-tighter text-[#141414]"
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none scale-y-110 text-[clamp(6rem,22vw,16rem)] font-bold leading-[0.7] tracking-tighter text-neutral-100"
           aria-hidden
         >
           LAURA
