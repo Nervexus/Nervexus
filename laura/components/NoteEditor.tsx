@@ -158,27 +158,60 @@ export function NoteEditor({
         </div>
 
         {/* body (scrolls) */}
-        <div className="min-h-0 flex-1 overflow-y-auto py-4">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto py-4">
+          {/* shared, used by both modes */}
+          <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => addImages(e.target.files)} />
+
           {viewing ? (
-            <article>
-              <h2 className="text-[22px] font-semibold tracking-tight text-text">{title || "Untitled note"}</h2>
-              <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-neutral-200">
-                {body || <span className="text-dim">No text yet.</span>}
-              </p>
+            <>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Title"
+                className="input !border-0 !bg-transparent !px-0 !text-[22px] !font-semibold !shadow-none"
+              />
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Write what's going on…"
+                className="input mt-2 min-h-[42vh] flex-1 resize-none !border-0 !bg-transparent !px-0 !text-[15px] !leading-relaxed !shadow-none"
+              />
+              <div className="mt-4 flex items-center justify-between">
+                <span className="label">Pictures {images.length > 0 && `· ${images.length}`}</span>
+                <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn !py-1.5 !text-[12.5px]">
+                  {uploading ? "Adding…" : "Add picture"}
+                </button>
+              </div>
               {images.length > 0 && (
-                <div className="mt-5 flex flex-col gap-4">
+                <div className="mt-3 flex flex-col gap-4">
                   {images.map((img) => (
-                    <figure key={img.id}>
-                      <button onClick={() => setLightbox(img.data)} className="block w-full overflow-hidden rounded-xl border border-line">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={img.data} alt={img.caption ?? "Note picture"} className="max-h-[60vh] w-full object-contain bg-black" />
-                      </button>
-                      {img.caption && <figcaption className="mt-1.5 text-[13px] text-muted">{img.caption}</figcaption>}
-                    </figure>
+                    <div key={img.id}>
+                      <div className="relative overflow-hidden rounded-xl border border-line">
+                        <button onClick={() => setLightbox(img.data)} className="block w-full">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={img.data} alt={img.caption ?? "Note picture"} className="max-h-[60vh] w-full object-contain bg-black" />
+                        </button>
+                        <button
+                          onClick={() => removeImage(img.id)}
+                          aria-label="Remove picture"
+                          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white hover:bg-black"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="h-4 w-4" aria-hidden>
+                            <path d="M6 6l12 12M18 6 6 18" />
+                          </svg>
+                        </button>
+                      </div>
+                      <input
+                        defaultValue={img.caption ?? ""}
+                        onBlur={(e) => saveCaption(img.id, e.target.value)}
+                        placeholder="What's the problem here?"
+                        className="input mt-2 !py-1.5 !text-[13px]"
+                      />
+                    </div>
                   ))}
                 </div>
               )}
-            </article>
+            </>
           ) : (
             <>
               <input
@@ -200,7 +233,6 @@ export function NoteEditor({
                 <button onClick={() => fileRef.current?.click()} disabled={uploading} className="btn !py-1.5 !text-[12.5px]">
                   {uploading ? "Adding…" : "Add picture"}
                 </button>
-                <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => addImages(e.target.files)} />
               </div>
               <p className="mt-1 text-[12px] text-dim">Add a photo of what needs fixing, then write the problem under it.</p>
 
@@ -243,20 +275,12 @@ export function NoteEditor({
           <Button variant="danger" onClick={remove}>
             Delete
           </Button>
-          {viewing ? (
-            <Button variant="ghost" onClick={onClose}>
-              Done
-            </Button>
-          ) : (
-            <>
-              <Button variant="ghost" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button onClick={save} disabled={saving || !title.trim()}>
-                {saving ? "Saving…" : "Save"}
-              </Button>
-            </>
-          )}
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={save} disabled={saving || !title.trim()}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
         </div>
       </div>
 
