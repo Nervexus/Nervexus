@@ -11,9 +11,20 @@ type SystemNode = {
   stats?: Record<string, unknown>;
 };
 
+type WebhookInfo = {
+  url: string;
+  has_custom_certificate: boolean;
+  pending_update_count: number;
+  last_error_date?: number;
+  last_error_message?: string;
+} | null;
+
 export default function HubPage() {
   const [nodes, setNodes] = useState<SystemNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [webhook, setWebhook] = useState<WebhookInfo>(null);
+  const [webhookLoading, setWebhookLoading] = useState(true);
+  const [settingUp, setSettingUp] = useState(false);
 
   useEffect(() => {
     fetch("/api/hub")
@@ -21,7 +32,29 @@ export default function HubPage() {
       .then((d) => setNodes(d.nodes ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
+    fetch("/api/telegram/setup")
+      .then((r) => r.json())
+      .then((d) => setWebhook(d.url ? d : null))
+      .catch(() => {})
+      .finally(() => setWebhookLoading(false));
   }, []);
+
+  async function setupWebhook() {
+    setSettingUp(true);
+    try {
+      const res = await fetch("/api/telegram/setup", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) {
+        setWebhook({ url: data.webhook_url, has_custom_certificate: false, pending_update_count: 0 });
+      } else {
+        alert(data.error || data.description || "Setup failed");
+      }
+    } catch {
+      alert("Network error");
+    } finally {
+      setSettingUp(false);
+    }
+  }
 
   const encrypted = nodes.find((n) => n.id === "encrypted");
   const telegram = nodes.find((n) => n.id === "telegram");
@@ -157,19 +190,41 @@ export default function HubPage() {
             <StatusDot status={loading ? null : telegram?.status ?? "unconfigured"} />
           </div>
 
-          <p className="mt-4 text-[12px] text-muted leading-relaxed">
-            Two-way messaging, daily texts, rota photos, file attachments.
-          </p>
+          <div className="mt-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${webhookLoading ? "bg-dim/40 animate-pulse" : webhook?.url ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.4)]"}`} />
+              <span className="text-[12px] text-muted">
+                {webhookLoading ? "Checking webhook…" : webhook?.url ? "Webhook active" : "Webhook not connected"}
+              </span>
+            </div>
+            {webhook?.last_error_message && (
+              <p className="text-[11px] text-red-400/80">
+                Last error: {webhook.last_error_message}
+              </p>
+            )}
+            {webhook?.pending_update_count ? (
+              <p className="text-[11px] text-amber-400/80">
+                {webhook.pending_update_count} pending update{webhook.pending_update_count === 1 ? "" : "s"}
+              </p>
+            ) : null}
+          </div>
 
-          <div className="mt-4">
+          <div className="mt-4 flex gap-2">
             <a
               href="https://t.me/Laura1xbot"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn inline-flex justify-center text-[12px]"
+              className="btn flex-1 justify-center text-[12px]"
             >
               Open in Telegram
             </a>
+            <button
+              onClick={setupWebhook}
+              disabled={settingUp}
+              className="btn flex-1 justify-center text-[12px]"
+            >
+              {settingUp ? "Setting up…" : webhook?.url ? "Reconnect" : "Connect Webhook"}
+            </button>
           </div>
         </div>
 
