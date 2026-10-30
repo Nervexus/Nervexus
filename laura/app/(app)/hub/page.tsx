@@ -32,7 +32,7 @@ export default function HubPage() {
       .then((d) => setNodes(d.nodes ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
-    fetch("/api/telegram/setup")
+    fetch("/api/telegram/connect")
       .then((r) => r.json())
       .then((d) => setWebhook(d.url ? d : null))
       .catch(() => {})
@@ -42,7 +42,7 @@ export default function HubPage() {
   async function setupWebhook() {
     setSettingUp(true);
     try {
-      const res = await fetch("/api/telegram/setup", { method: "POST" });
+      const res = await fetch("/api/telegram/connect", { method: "POST" });
       const data = await res.json();
       if (data.ok) {
         setWebhook({ url: data.webhook_url, has_custom_certificate: false, pending_update_count: 0 });

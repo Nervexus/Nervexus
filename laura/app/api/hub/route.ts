@@ -34,7 +34,9 @@ export async function GET() {
 
   // Telegram bot
   const tgToken = process.env.TELEGRAM_BOT_TOKEN;
+  const tgSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
   let tgStatus: "online" | "offline" | "unconfigured" = "unconfigured";
+  let webhookConnected = false;
   if (tgToken) {
     try {
       const res = await fetch(`https://api.telegram.org/bot${tgToken}/getMe`, { signal: AbortSignal.timeout(4000) });
@@ -42,12 +44,38 @@ export async function GET() {
     } catch {
       tgStatus = "offline";
     }
+
+    // Auto-register webhook if not set
+    if (tgStatus === "online" && tgSecret) {
+      try {
+        const info = await fetch(`https://api.telegram.org/bot${tgToken}/getWebhookInfo`, { signal: AbortSignal.timeout(4000) }).then(r => r.json());
+        let baseUrl = process.env.NEXT_PUBLIC_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL;
+        if (baseUrl && !baseUrl.startsWith("http")) baseUrl = `https://${baseUrl}`;
+        const expectedUrl = baseUrl ? `${baseUrl.replace(/\/$/, "")}/api/telegram/webhook` : null;
+
+        if (info.result?.url === expectedUrl) {
+          webhookConnected = true;
+        } else if (expectedUrl) {
+          const reg = await fetch(`https://api.telegram.org/bot${tgToken}/setWebhook`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: expectedUrl,
+              secret_token: tgSecret,
+              allowed_updates: ["message", "callback_query"],
+            }),
+          }).then(r => r.json());
+          webhookConnected = reg.ok === true;
+        }
+      } catch {}
+    }
   }
   nodes.push({
     id: "telegram",
     name: "Telegram",
     url: null,
     status: tgStatus,
+    stats: { webhookConnected },
   });
 
   // Vercel (always online if the app is running)
