@@ -47,3 +47,11 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   const updated = await prisma.noteFolder.update({ where: { id }, data: update });
   return NextResponse.json({ folder: { id: updated.id, name: updated.name, locked: updated.locked, art: updated.art, tone: updated.tone } });
 }
+
+export async function DELETE(_request: Request, { params }: RouteContext) {
+  const { id } = await params;
+  // Delete all notes in the folder first (images cascade from notes).
+  await prisma.note.deleteMany({ where: { folderId: id } });
+  await prisma.noteFolder.delete({ where: { id } }).catch(() => null);
+  return NextResponse.json({ ok: true });
+}

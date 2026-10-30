@@ -77,6 +77,8 @@ export default function NotesPage() {
   const [newFolderArt, setNewFolderArt] = useState("mono");
   const [folderError, setFolderError] = useState<string | null>(null);
   const [paletteFor, setPaletteFor] = useState<string | null>(null);
+  const [renamingFolder, setRenamingFolder] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   function load() {
     Promise.all([
@@ -211,6 +213,25 @@ export default function NotesPage() {
     }).catch(() => {});
   }
 
+  async function renameFolder(folderId: string, name: string) {
+    if (!name.trim()) return;
+    setRenamingFolder(null);
+    setFolders((prev) => prev.map((f) => (f.id === folderId ? { ...f, name: name.trim() } : f)));
+    setGeneration((g) => g + 1);
+    await fetch(`/api/notes/folders/${folderId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name.trim() }),
+    }).catch(() => {});
+  }
+
+  async function deleteFolder(folderId: string) {
+    setFolders((prev) => prev.filter((f) => f.id !== folderId));
+    setNotes((prev) => prev.filter((n) => n.folderId !== folderId));
+    setGeneration((g) => g + 1);
+    await fetch(`/api/notes/folders/${folderId}`, { method: "DELETE" }).catch(() => {});
+  }
+
   function openNote(noteId: string) {
     const note = notes.find((n) => n.id === noteId);
     if (!note) return;
@@ -270,20 +291,51 @@ export default function NotesPage() {
               return (
                 <div key={folder.id} className="flex flex-col items-center gap-2" style={{ width: FOLDER_WIDTH }}>
                   <div className="relative flex w-full items-center justify-between px-1">
-                    <span className="label truncate">
-                      {folder.name}
-                    </span>
+                    {renamingFolder === folder.id ? (
+                      <input
+                        autoFocus
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onBlur={() => renameFolder(folder.id, renameValue)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") renameFolder(folder.id, renameValue);
+                          if (e.key === "Escape") setRenamingFolder(null);
+                        }}
+                        className="label w-0 min-w-0 flex-1 truncate rounded border border-line bg-transparent px-1 outline-none focus:border-accent/40"
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => { setRenamingFolder(folder.id); setRenameValue(folder.name); }}
+                        className="label truncate hover:text-text transition-colors"
+                        title="Rename folder"
+                      >
+                        {folder.name}
+                      </button>
+                    )}
                     <div className="flex shrink-0 items-center gap-1">
                       {!isLocked && (
-                        <button
-                          type="button"
-                          onClick={() => setPaletteFor(paletteFor === folder.id ? null : folder.id)}
-                          aria-label="Folder colour"
-                          aria-expanded={paletteFor === folder.id}
-                          className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-600 transition-colors hover:text-neutral-300"
-                        >
-                          <span className="h-3.5 w-3.5 rounded-full border border-white/20" style={{ background: FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch }} />
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setPaletteFor(paletteFor === folder.id ? null : folder.id)}
+                            aria-label="Folder colour"
+                            aria-expanded={paletteFor === folder.id}
+                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-600 transition-colors hover:text-neutral-300"
+                          >
+                            <span className="h-3.5 w-3.5 rounded-full border border-white/20" style={{ background: FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch }} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { if (confirm(`Delete "${folder.name}" and all its notes?`)) deleteFolder(folder.id); }}
+                            aria-label="Delete folder"
+                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-600 transition-colors hover:text-red-400"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="h-3.5 w-3.5" aria-hidden>
+                              <path d="M3 6h18M8 6V4h8v2M19 6v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6" />
+                            </svg>
+                          </button>
+                        </>
                       )}
                       <button
                         type="button"
