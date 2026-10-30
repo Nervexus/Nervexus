@@ -98,5 +98,5 @@ export function ParticleOrb({ active = false, className = "" }: { active?: boole
     };
   }, []);
 
-  return <canvas ref={canvasRef} className={`aspect-square ${className}`} aria-hidden />;
+  return <canvas ref={canvasRef} className={`aspect-square pointer-events-none ${className}`} style={{ overflow: "visible" }} aria-hidden />;
 }

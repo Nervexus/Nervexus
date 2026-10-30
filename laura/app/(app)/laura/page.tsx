@@ -147,7 +147,7 @@ export default function LauraPage() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center text-center pt-0 transition-all duration-700">
+      <div className="flex flex-col items-center text-center pt-0 transition-all duration-700 overflow-visible">
         <ParticleOrb
           active={sending}
           className={`transition-all duration-700 ${hasConversation ? "w-[240px] sm:w-[300px]" : "w-[340px] sm:w-[520px]"}`}
