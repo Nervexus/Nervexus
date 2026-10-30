@@ -37,8 +37,6 @@ export default function HubPage() {
 
       {/* Hub diagram */}
       <div className="relative mt-8 overflow-hidden rounded-[22px] border border-line bg-[#080808]">
-        {/* Number matrix background */}
-        <NumberMatrix />
 
         <div className="relative px-6 py-12 sm:px-12 sm:py-16">
           {/* Three-column layout: left pair | center orb | right pair */}
@@ -175,75 +173,7 @@ export default function HubPage() {
           </div>
         </div>
 
-        {/* Vercel card */}
-        <div className="card card-pad">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
-                <VercelIcon />
-              </div>
-              <div>
-                <h2 className="text-[14px] font-semibold text-text">Vercel</h2>
-                <p className="text-[11px] text-dim">Deployment</p>
-              </div>
-            </div>
-            <StatusDot status={loading ? null : vercelNode?.status ?? "online"} />
-          </div>
-
-          <p className="mt-4 text-[12px] text-muted leading-relaxed">
-            Production hosting, edge functions, automatic deployments.
-          </p>
-
-          <div className="mt-4">
-            <a
-              href="https://laura-lyart.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn inline-flex justify-center text-[12px]"
-            >
-              Open production
-            </a>
-          </div>
-        </div>
-
-        {/* Database card */}
-        <div className="card card-pad">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
-                <DatabaseIcon />
-              </div>
-              <div>
-                <h2 className="text-[14px] font-semibold text-text">Database</h2>
-                <p className="text-[11px] text-dim">Turso / libSQL</p>
-              </div>
-            </div>
-            <StatusDot status={loading ? null : dbNode?.status ?? "online"} />
-          </div>
-
-          <p className="mt-4 text-[12px] text-muted leading-relaxed">
-            Encrypted storage for notes, shifts, vault, routines and all data.
-          </p>
-        </div>
       </div>
-    </div>
-  );
-}
-
-/* ── Number matrix (client-only random) ── */
-function NumberMatrix() {
-  const [text, setText] = useState("");
-  useEffect(() => {
-    setText(
-      Array.from({ length: 18 }, () =>
-        Array.from({ length: 42 }, () => Math.floor(Math.random() * 10)).join("")
-      ).join("\n")
-    );
-  }, []);
-  if (!text) return null;
-  return (
-    <div className="absolute inset-0 overflow-hidden opacity-[0.04] select-none" aria-hidden>
-      <pre className="whitespace-pre-wrap break-all font-mono text-[11px] leading-[1.6] text-white p-6">{text}</pre>
     </div>
   );
 }
