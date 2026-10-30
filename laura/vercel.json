@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/routine/send?part=morning",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/routine/send?part=night",
+      "schedule": "30 21 * * *"
+    }
+  ]
+}

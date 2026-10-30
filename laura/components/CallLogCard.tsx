@@ -1,0 +1,52 @@
+import { IconTile } from "@/components/IconTile";
+
+function timeAgo(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.round(diffMs / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  return `${days}d ago`;
+}
+
+export function CallLogCard({
+  kind,
+  message,
+  status,
+  error,
+  createdAt,
+}: {
+  kind: string;
+  message: string;
+  status: string;
+  error: string | null;
+  createdAt: string;
+}) {
+  const failed = status === "failed";
+  return (
+    <div
+      className={`relative flex items-start gap-3 rounded-[24px] border p-4 ${
+        failed ? "border-red-200 bg-red-50" : "border-transparent bg-white"
+      }`}
+    >
+      <IconTile>
+        <iconify-icon
+          icon={kind === "call" ? "solar:phone-calling-linear" : "solar:chat-round-line-linear"}
+          className="text-lg"
+        />
+      </IconTile>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <span className="label">
+            {kind === "call" ? "Call" : "Text"}
+          </span>
+          <span className="shrink-0 text-[11px] text-neutral-400">{timeAgo(createdAt)}</span>
+        </div>
+        <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-700">{message}</p>
+        {failed && <p className="mt-1.5 text-xs text-red-400">{error ?? "Failed to send."}</p>}
+      </div>
+    </div>
+  );
+}

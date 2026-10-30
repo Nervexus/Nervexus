@@ -1,0 +1,288 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// A folder notes live in. There's always at least the "default" one
+// (seeded by the migration that added this table); the user can add more
+// from the Notes page. Locking stores a salted hash of a PIN, never the
+// PIN itself -- see lib/pin.ts.
+model NoteFolder {
+  id        String   @id @default(cuid())
+  name      String
+  locked    Boolean  @default(false)
+  pinHash   String?
+  pinSalt   String?
+  // The folder's look on the Notes page. "mono" is the default grey art;
+  // other values are ArtPreset names (aurora, ember, dusk, glacier, verdant).
+  art       String   @default("mono")
+  tone      String   @default("dark") // "dark" | "light"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  notes     Note[]
+}
+
+model Note {
+  id        String      @id @default(cuid())
+  title     String
+  body      String
+  pinned    Boolean     @default(false)
+  folderId  String      @default("default")
+  folder    NoteFolder  @relation(fields: [folderId], references: [id])
+  images    NoteImage[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// A picture attached to a note -- e.g. a photo of what needs fixing, with
+// an optional caption describing the problem. Stored as a downscaled data
+// URL (the client shrinks it before upload); there's no blob store.
+model NoteImage {
+  id        String   @id @default(cuid())
+  noteId    String
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  data      String // data:image/...;base64,...
+  caption   String?
+  createdAt DateTime @default(now())
+
+  @@index([noteId])
+}
+
+// Secret values are encrypted (AES-256-GCM, see lib/crypto.ts) before they
+// ever reach the database -- cipherText/iv/authTag are the only things
+// stored, never the plaintext secret.
+model VaultItem {
+  id         String   @id @default(cuid())
+  title      String
+  cipherText String
+  iv         String
+  authTag    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Reminder {
+  id        String    @id @default(cuid())
+  title     String
+  note      String?
+  dueAt     DateTime
+  done      Boolean   @default(false)
+  priority  String    @default("normal") // "low" | "normal" | "high"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// A record of what Laura actually did, for the home page's Activity feed --
+// not every tool call (get_current_time/list_reminders are read-only noise),
+// just the ones with a real-world effect or worth showing you happened.
+model ActivityLog {
+  id        String   @id @default(cuid())
+  tool      String
+  summary   String
+  createdAt DateTime @default(now())
+}
+
+// A record of every real notification Laura has sent via Telegram -- the
+// Calls page's history, and a paper trail if one fails.
+model CallLog {
+  id         String   @id @default(cuid())
+  kind       String // "call" (urgent-styled) | "sms" (plain message)
+  target     String // the Telegram chat id this went to
+  message    String
+  status     String // "sent" | "failed"
+  error      String?
+  providerId String? // Telegram's own message_id, if sent
+  createdAt  DateTime @default(now())
+}
+
+// One work shift, entered by hand or extracted from a photographed rota
+// (see lib/rota.ts) -- confidence/source let the Rota page flag
+// AI-extracted shifts for review before they're trusted the same as a
+// hand-entered one.
+model Shift {
+  id          String   @id @default(cuid())
+  startAt     DateTime
+  endAt       DateTime
+  location    String?
+  colleagues  String? // comma-separated names, as given
+  note        String?
+  source      String   @default("manual") // "manual" | "photo"
+  commutePlan String? // Laura's generated "when to leave" text, if asked for
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Singleton (id is always "me") -- the home/work addresses and arrival
+// buffer that commute planning needs. Deliberately not per-user since
+// this whole app is single-user.
+model Profile {
+  id                   String   @id @default("me")
+  homeAddress          String?
+  workAddress          String?
+  arrivalBufferMinutes Int      @default(15)
+  // How Laura texts (Settings > Texting style).
+  textStyle            String   @default("pa") // "pa" | "mate" | "calm" | "minimal"
+  textLength           String   @default("short") // "short" | "normal"
+  textEmoji            Boolean  @default(false)
+  textNotes            String?
+  // Daily Telegram messages (Settings > Daily messages). Times are UK "HH:MM".
+  morningOn            Boolean  @default(true)
+  morningTime          String   @default("07:00")
+  afternoonOn          Boolean  @default(true)
+  afternoonTime        String   @default("14:00")
+  nightOn              Boolean  @default(true)
+  nightTime            String   @default("21:30")
+  motivation           Boolean  @default(true)
+  motivationTone       String   @default("harsh") // "harsh" | "firm" | "gentle"
+  lastMorningOn        String? // YYYY-MM-DD the morning text last went out
+  lastAfternoonOn      String?
+  lastNightOn          String?
+  // The main sign-in password, set by the owner inside the app (Settings).
+  // Salted hash only (lib/pin.ts); falls back to APP_PASSWORD env when unset.
+  passwordHash         String?
+  passwordSalt         String?
+  updatedAt            DateTime @updatedAt
+}
+
+// A restaurant/activity booking Laura is tracking -- never one she's paid
+// for or finalized herself (see lib/booking.ts): status moves from "idea"
+// (just researched) to "pending" (the user said they'd book it) to
+// "confirmed" (the user did, usually with a confirmation number in note)
+// or "cancelled". link points at wherever the user actually completes it.
+model Booking {
+  id        String   @id @default(cuid())
+  title     String
+  category  String   @default("other") // "restaurant" | "activity" | "travel" | "other"
+  dateTime  DateTime?
+  partySize Int?
+  location  String?
+  link      String?
+  status    String   @default("idea") // "idea" | "pending" | "confirmed" | "cancelled"
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// A content idea Laura's helped brainstorm (caption, hashtags, location,
+// outfit) or the user's noted themselves -- no real Instagram account is
+// connected yet (see lib/instagram.ts), so this is planning/tracking only.
+// status moves "idea" -> "scheduled" (user picked a date) -> "posted"
+// (user tells Laura they posted it) or "discarded".
+model ContentIdea {
+  id          String    @id @default(cuid())
+  type        String    @default("post") // "post" | "reel" | "story" | "other"
+  title       String
+  caption     String?
+  hashtags    String? // comma-separated, no '#'
+  location    String?
+  outfit      String?
+  scheduledAt DateTime?
+  status      String    @default("idea") // "idea" | "scheduled" | "posted" | "discarded"
+  note        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// A registered passkey (Face ID / Touch ID / device biometrics) that can
+// sign in instead of the password. id is the credential ID and publicKey
+// the COSE public key, both base64url; counter guards against cloned
+// authenticators. The app is single-user, so there's no user relation.
+model Passkey {
+  id         String   @id
+  publicKey  String
+  counter    Int      @default(0)
+  transports String?
+  label      String?
+  createdAt  DateTime @default(now())
+  lastUsedAt DateTime?
+}
+
+// A perfume oil the user owns, for the Routine page's fragrance picks.
+// day/night/cold say when it works best; lib/routine.ts scores these
+// against each plan (shift, booking) to suggest what to wear.
+model Fragrance {
+  id        String   @id @default(cuid())
+  name      String
+  notes     String?
+  day       Boolean  @default(false)
+  night     Boolean  @default(false)
+  cold      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// Activity pushed from the outreach app (Signal Outreach) over the HQ
+// link: emails sent, replies, lead status changes. A log for LAURA's
+// summaries and chat, not the source of truth -- that's the outreach app.
+model OutreachEvent {
+  id        String   @id @default(cuid())
+  type      String // "message_sent" | "reply_received" | "lead_status"
+  leadId    String?
+  leadName  String?
+  company   String?
+  preview   String?
+  status    String?
+  at        DateTime
+  createdAt DateTime @default(now())
+
+  @@index([at])
+}
+
+// One step in the daily routine (Routine page cards), editable by the
+// user. slot is "morning" | "afternoon" | "night"; days is a comma list of
+// weekdays (0 = Sunday) or null for every day; owned=false marks a product
+// still to buy (shown with its link, left out of checklists).
+model RoutineItem {
+  id        String   @id @default(cuid())
+  slot      String
+  text      String
+  product   String?
+  link      String?
+  owned     Boolean  @default(true)
+  days      String?
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// An API key the user has added through Settings for a service (gemini,
+// etc.). Multiple keys per service allow automatic fallback: if one is
+// rate-limited or invalid, the next active key by priority is tried.
+model ApiKey {
+  id        String   @id @default(cuid())
+  service   String // "gemini" | "openai" | etc.
+  label     String
+  apiKey    String
+  priority  Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([service, active])
+}
+
+// Something Laura is passing on to Claude Code (the developer chat): a
+// feature she can't do yet, a bug, or a note Madoxs asked her to forward.
+// Shown under Settings > For Claude Code with a copy-all button.
+model DevRequest {
+  id        String   @id @default(cuid())
+  kind      String   @default("feature") // "feature" | "bug" | "note"
+  summary   String
+  details   String?
+  status    String   @default("open") // "open" | "done"
+  createdAt DateTime @default(now())
+}

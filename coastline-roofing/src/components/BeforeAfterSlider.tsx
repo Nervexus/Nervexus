@@ -1,0 +1,85 @@
+"use client";
+
+import Image from "next/image";
+import { useId, useState } from "react";
+
+type BeforeAfterSliderProps = {
+  before: { src: string; alt: string };
+  after: { src: string; alt: string };
+  caption: string;
+};
+
+export function BeforeAfterSlider({
+  before,
+  after,
+  caption,
+}: BeforeAfterSliderProps) {
+  const [value, setValue] = useState(50);
+  const sliderId = useId();
+
+  return (
+    <div className="dark-surface overflow-hidden border border-warm/10 bg-ink-950 light:rounded-[3px]">
+      <div className="relative aspect-[4/3] select-none overflow-hidden bg-ink-800">
+        <Image
+          src={after.src}
+          alt={after.alt}
+          fill
+          sizes="(min-width: 1024px) 420px, 100vw"
+          className="object-cover"
+        />
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{ clipPath: `inset(0 ${100 - value}% 0 0)` }}
+        >
+          <Image
+            src={before.src}
+            alt={before.alt}
+            fill
+            sizes="(min-width: 1024px) 420px, 100vw"
+            className="object-cover"
+          />
+        </div>
+
+        {/* Divider line + handle, purely visual */}
+        <div
+          className="pointer-events-none absolute inset-y-0 w-0.5 bg-gold-500"
+          style={{ left: `${value}%` }}
+        >
+          <span className="absolute top-1/2 left-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-gold-500 text-ink-950">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+              <path
+                d="M9 7 4 12l5 5M15 7l5 5-5 5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </div>
+
+        <span className="pointer-events-none absolute top-3 left-3 bg-ink-950/85 px-3 py-1 text-[11px] font-medium tracking-[0.12em] text-warm uppercase backdrop-blur">
+          Before
+        </span>
+        <span className="pointer-events-none absolute top-3 right-3 bg-gold-500/90 px-3 py-1 text-[11px] font-medium tracking-[0.12em] text-ink-950 uppercase backdrop-blur">
+          After
+        </span>
+
+        <label htmlFor={sliderId} className="sr-only">
+          Drag to compare before and after for {caption}
+        </label>
+        <input
+          id={sliderId}
+          type="range"
+          min={0}
+          max={100}
+          value={value}
+          onChange={(event) => setValue(Number(event.target.value))}
+          className="absolute inset-0 h-full w-full cursor-ew-resize appearance-none bg-transparent opacity-0"
+        />
+      </div>
+      <p className="px-5 py-4 font-display text-base text-warm">{caption}</p>
+    </div>
+  );
+}

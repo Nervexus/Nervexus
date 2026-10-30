@@ -1,0 +1,182 @@
+"use client";
+
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import { canSpeak, getSpeechRecognitionCtor, type SpeechRecognitionLike } from "@/lib/speech";
+
+export type OrbStatus = "idle" | "listening" | "thinking" | "speaking" | "unsupported";
+
+export type VoiceOrbHandle = {
+  /** Speaks the given text aloud, resolving once it finishes (or on error). */
+  speak: (text: string) => Promise<void>;
+};
+
+const ARIA_LABEL: Record<OrbStatus, string> = {
+  idle: "Tap to talk to Laura",
+  listening: "Listening…",
+  thinking: "Thinking…",
+  speaking: "Speaking…",
+  unsupported: "Voice isn't supported in this browser — try Chrome or Edge",
+};
+
+const STATUS_LABEL: Record<OrbStatus, { line1?: string; line2: string }> = {
+  idle: { line1: "tap to", line2: "talk" },
+  listening: { line2: "listening…" },
+  thinking: { line2: "thinking…" },
+  speaking: { line2: "speaking…" },
+  unsupported: { line1: "voice isn't supported —", line2: "try chrome or edge" },
+};
+
+function MicIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect x="9" y="2.5" width="6" height="11" rx="3" />
+      <path d="M5.5 11a6.5 6.5 0 0 0 13 0" />
+      <path d="M12 17.5V21" />
+      <path d="M8.5 21h7" />
+    </svg>
+  );
+}
+
+export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string) => void; compact?: boolean }>(
+  function VoiceOrb({ onTranscript, compact = false }, ref) {
+    const [status, setStatus] = useState<OrbStatus>("idle");
+    const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+    const onTranscriptRef = useRef(onTranscript);
+
+    useEffect(() => {
+      onTranscriptRef.current = onTranscript;
+    }, [onTranscript]);
+
+    useEffect(() => {
+      const Ctor = getSpeechRecognitionCtor();
+      if (!Ctor) {
+        setStatus("unsupported");
+        return;
+      }
+      const recognition = new Ctor();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = "en-US";
+      recognition.onresult = (event) => {
+        const transcript = event.results[0]?.[0]?.transcript;
+        if (transcript) {
+          setStatus("thinking");
+          onTranscriptRef.current(transcript);
+        }
+      };
+      recognition.onerror = () => setStatus("idle");
+      recognition.onend = () =>
+        setStatus((s) => (s === "listening" ? "idle" : s));
+      recognitionRef.current = recognition;
+
+      return () => {
+        recognition.onresult = null;
+        recognition.onerror = null;
+        recognition.onend = null;
+      };
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+      speak: (text: string) =>
+        new Promise((resolve) => {
+          if (!canSpeak()) {
+            resolve();
+            return;
+          }
+          setStatus("speaking");
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.onend = () => {
+            setStatus("idle");
+            resolve();
+          };
+          utterance.onerror = () => {
+            setStatus("idle");
+            resolve();
+          };
+          window.speechSynthesis.speak(utterance);
+        }),
+    }));
+
+    function handleClick() {
+      if (status === "unsupported" || status === "thinking" || status === "speaking") return;
+      if (status === "idle") {
+        setStatus("listening");
+        recognitionRef.current?.start();
+      } else if (status === "listening") {
+        recognitionRef.current?.stop();
+        setStatus("idle");
+      }
+    }
+
+    if (compact) {
+      return (
+        <button
+          onClick={handleClick}
+          aria-label={ARIA_LABEL[status]}
+          title={ARIA_LABEL[status]}
+          disabled={status === "unsupported"}
+          className={`flex h-9 w-9 items-center justify-center rounded-full transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+            status === "listening"
+              ? "animate-[pulse_1.4s_ease-in-out_infinite] bg-neutral-800 text-white shadow-[0_0_24px_rgba(0,0,0,0.15)]"
+              : status === "speaking" || status === "thinking"
+                ? "bg-neutral-200 text-neutral-600"
+                : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-800"
+          }`}
+        >
+          <MicIcon className="h-[18px] w-[18px]" />
+        </button>
+      );
+    }
+
+    const label = STATUS_LABEL[status];
+    const ringColorClass =
+      status === "listening"
+        ? "border-neutral-800/60 text-neutral-800"
+        : status === "thinking"
+          ? "border-neutral-400/60 text-neutral-600"
+          : status === "speaking"
+            ? "border-neutral-500/60 text-neutral-700"
+            : status === "unsupported"
+              ? "border-neutral-300 text-neutral-400"
+              : "border-neutral-400/60 text-neutral-500";
+
+    return (
+      <div className="flex flex-col items-center gap-5">
+        <button
+          onClick={handleClick}
+          aria-label={ARIA_LABEL[status]}
+          disabled={status === "unsupported"}
+          className="group relative flex h-32 w-32 items-center justify-center outline-none disabled:cursor-not-allowed"
+        >
+          {/* The ambient WebGL mesh behind the page is the orb now -- this
+              button is just the tap target, not a second decorative ring. */}
+          <span
+            className={`relative flex h-20 w-20 items-center justify-center rounded-full border bg-white/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
+              status === "listening" ? "animate-[pulse_1.4s_ease-in-out_infinite]" : ""
+            }`}
+          >
+            <MicIcon className="h-7 w-7" />
+          </span>
+        </button>
+        <p className="flex flex-col items-center text-center text-xs tracking-wide text-neutral-500">
+          {label.line1 && <span>{label.line1}</span>}
+          <span className="font-medium text-neutral-700">{label.line2}</span>
+        </p>
+      </div>
+    );
+  }
+);
