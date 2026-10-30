@@ -344,7 +344,7 @@ export default function RotaPage() {
                     <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
                       {items.map((shift) => (
                         <div key={shift.id} className="gsap-entrance">
-                          <ShiftCard {...shift} onDelete={() => remove(shift.id)} />
+                          <ShiftCard {...shift} onDelete={() => remove(shift.id)} onUpdated={load} />
                         </div>
                       ))}
                     </div>

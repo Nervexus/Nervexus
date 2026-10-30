@@ -125,7 +125,19 @@ export default function LauraPage() {
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 pb-10">
       <div className="laura-stars pointer-events-none fixed inset-0 -z-20 opacity-60" aria-hidden />
 
-      <div className="flex justify-end pt-2">
+      <div className="flex items-center justify-end gap-3 pt-2">
+        {chatOpen && tab === "chat" && messages.length > 0 && (
+          <button
+            onClick={async () => {
+              if (!confirm("Clear the entire chat history?")) return;
+              await fetch("/api/chat", { method: "DELETE" });
+              setMessages([]);
+            }}
+            className="label transition-colors hover:text-red-400"
+          >
+            Clear chat
+          </button>
+        )}
         <div className="tabs">
         {(["chat", "activity"] as const).map((t) => (
           <button

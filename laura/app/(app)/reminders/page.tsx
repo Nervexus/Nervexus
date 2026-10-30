@@ -138,16 +138,16 @@ export default function RemindersPage() {
     ? (byDay.get(dateKey(selected)) ?? []).sort((a, b) => new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime())
     : [];
 
-  function changeMonth(delta: number) {
-    setCursor((c) => {
-      if (!c) return c;
-      const d = new Date(c.year, c.month + delta, 1);
-      return { year: d.getFullYear(), month: d.getMonth() };
-    });
+  function changeDay(delta: number) {
+    const base = selected ?? today ?? new Date();
+    const next = new Date(base.getFullYear(), base.getMonth(), base.getDate() + delta);
+    setSelected(next);
+    setCursor({ year: next.getFullYear(), month: next.getMonth() });
   }
 
   function goToToday() {
     if (!today) return;
+    setSelected(today);
     setCursor({ year: today.getFullYear(), month: today.getMonth() });
   }
 
@@ -173,13 +173,13 @@ export default function RemindersPage() {
           </h1>
         </div>
         <div className="label flex items-center gap-5 pb-1">
-          <button onClick={() => changeMonth(-1)} aria-label="Previous month" className="transition-colors hover:text-neutral-100">
+          <button onClick={() => changeDay(-1)} aria-label="Previous day" className="transition-colors hover:text-neutral-100">
             ←
           </button>
           <button onClick={goToToday} className="transition-colors hover:text-neutral-100">
             Today
           </button>
-          <button onClick={() => changeMonth(1)} aria-label="Next month" className="transition-colors hover:text-neutral-100">
+          <button onClick={() => changeDay(1)} aria-label="Next day" className="transition-colors hover:text-neutral-100">
             →
           </button>
         </div>
