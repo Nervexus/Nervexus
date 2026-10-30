@@ -1,35 +1,39 @@
 @import "tailwindcss";
 
-/* LAURA design system -- the "Encrypted" look: near-black, soft charcoal
-   surfaces, one matte purple accent, hairline borders with a top-edge
-   highlight, deep soft shadows, quiet motion. Fixed dark theme. */
+/* LAURA design system — white minimalist: clean whites, soft greys,
+   glassmorphic surfaces with frosted blur, neumorphic buttons with
+   subtle pink-lavender glow, airy spacing. Fixed light theme. */
 
 :root {
-  --bg: #060606;
-  --bg-1: #0b0b0b;
-  --surface: #141414;
-  --surface-2: #1b1b1b;
-  --surface-3: #232323;
-  --line: rgba(255, 255, 255, 0.07);
-  --line-2: rgba(255, 255, 255, 0.12);
-  --line-3: rgba(255, 255, 255, 0.2);
-  --text: #f2f2f0;
-  --muted: #8d8d89;
-  --dim: #55554f;
+  --bg: #f5f5f7;
+  --bg-1: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f0f0f2;
+  --surface-3: #e8e8ec;
+  --line: rgba(0, 0, 0, 0.06);
+  --line-2: rgba(0, 0, 0, 0.1);
+  --line-3: rgba(0, 0, 0, 0.16);
+  --text: #1a1a1e;
+  --muted: #6e6e78;
+  --dim: #a0a0a8;
   --accent: #8b6fd4;
-  --accent-2: #5b42a3;
+  --accent-2: #6a50bf;
   --accent-ink: #f4f1ff;
-  --accent-soft: rgba(139, 111, 212, 0.12);
-  --accent-glow: rgba(139, 111, 212, 0.28);
-  --lilac: #b3a6dc;
-  --red: #ff5a4e;
-  --red-soft: rgba(255, 90, 78, 0.12);
-  --amber: #ffc046;
+  --accent-soft: rgba(139, 111, 212, 0.08);
+  --accent-glow: rgba(139, 111, 212, 0.18);
+  --lilac: #8b6fd4;
+  --pink: #e8b4c0;
+  --pink-soft: rgba(232, 180, 192, 0.15);
+  --pink-glow: rgba(232, 180, 192, 0.3);
+  --red: #e5484d;
+  --red-soft: rgba(229, 72, 77, 0.08);
+  --amber: #e5a000;
+  --green: #30a46c;
+  --green-soft: rgba(48, 164, 108, 0.08);
   --radius: 18px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* Older accent names some pages still use -- now the matte purple. */
   --calendar-accent: var(--accent);
   --booking-accent: var(--accent);
 }
@@ -53,31 +57,28 @@
   --color-accent-2: var(--accent-2);
   --color-lilac: var(--lilac);
 
-  /* Neutrals retuned to the warm greys of the palette, so every existing
-     neutral-* class lands on text / muted / dim / surfaces. */
-  --color-neutral-50: #fafaf8;
-  --color-neutral-100: #f2f2f0;
-  --color-neutral-200: #e2e2de;
-  --color-neutral-300: #bdbdb8;
-  --color-neutral-400: #8d8d89;
-  --color-neutral-500: #77776f;
-  --color-neutral-600: #55554f;
-  --color-neutral-700: #3a3a36;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-  --color-neutral-950: #0b0b0b;
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f7;
+  --color-neutral-200: #e8e8ec;
+  --color-neutral-300: #d1d1d8;
+  --color-neutral-400: #a0a0a8;
+  --color-neutral-500: #6e6e78;
+  --color-neutral-600: #4a4a52;
+  --color-neutral-700: #333338;
+  --color-neutral-800: #1a1a1e;
+  --color-neutral-900: #111114;
+  --color-neutral-950: #09090b;
 
-  /* Violets retuned to the matte purple family (no neon). */
-  --color-violet-100: #efeaff;
-  --color-violet-200: #e4dcff;
-  --color-violet-300: #cdbff5;
+  --color-violet-100: #f4f0ff;
+  --color-violet-200: #e8deff;
+  --color-violet-300: #d4c4f8;
   --color-violet-400: #b3a6dc;
   --color-violet-500: #8b6fd4;
   --color-violet-600: #6a50bf;
   --color-violet-700: #5b42a3;
 
-  --color-red-300: #ff9a90;
-  --color-red-400: #ff5a4e;
+  --color-red-300: #f5a0a0;
+  --color-red-400: #e5484d;
 }
 
 html {
@@ -111,7 +112,7 @@ body {
 
 .page-title {
   font-size: 26px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--text);
 }
@@ -126,7 +127,7 @@ body {
 }
 .stat-num {
   font-size: 34px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
   line-height: 1.05;
@@ -139,32 +140,33 @@ body {
   position: relative;
   border-radius: 22px;
   border: 1px solid var(--line);
-  background: linear-gradient(160deg, #1e1e21, #151517);
+  background: #ffffff;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 20px 40px -14px rgba(0, 0, 0, 0.9);
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 8px 24px -8px rgba(0, 0, 0, 0.06);
 }
 .card-pad {
   padding: 20px;
 }
 .frost {
   border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 20px 40px -14px rgba(0, 0, 0, 0.9);
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 12px 32px -8px rgba(0, 0, 0, 0.08);
 }
 .item {
   border-radius: 16px;
   border: 1px solid var(--line);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
-  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+  background: #ffffff;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 .item:hover {
   border-color: var(--line-2);
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.08);
 }
 .icon-tile {
   display: flex;
@@ -174,12 +176,12 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: rgba(139, 111, 212, 0.14);
-  color: #cdbff5;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 .icon-tile.is-red {
   background: var(--red-soft);
-  color: #ff9a90;
+  color: var(--red);
 }
 
 /* ---------- buttons ---------- */
@@ -192,38 +194,26 @@ body {
   justify-content: center;
   gap: 8px;
   overflow: hidden;
-  border-radius: 12px;
-  padding: 9px 15px;
+  border-radius: 14px;
+  padding: 10px 18px;
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
-  border: 1px solid transparent;
-  background:
-    linear-gradient(#252528, #19191b) padding-box,
-    linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(139, 111, 212, 0.45), transparent 60%, rgba(139, 111, 212, 0.35)) border-box;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-2);
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 4px 12px -4px rgba(0, 0, 0, 0.06);
   transition:
     transform 0.2s var(--ease),
     box-shadow 0.2s var(--ease),
     opacity 0.2s var(--ease);
 }
-.btn::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
-  transform: translateX(-120%);
-  transition: transform 0.6s var(--ease);
-  pointer-events: none;
-}
 .btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 10px 24px -10px var(--accent-glow);
-}
-.btn:hover:not(:disabled)::after {
-  transform: translateX(120%);
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 24px -8px rgba(0, 0, 0, 0.1);
 }
 .btn:active:not(:disabled) {
   transform: scale(0.97);
@@ -234,18 +224,16 @@ body {
 }
 .btn-primary {
   color: #fff;
-  background:
-    linear-gradient(#9077d8, #6a50bf 55%, #573fa6) padding-box,
-    linear-gradient(160deg, #e4dcff, rgba(179, 166, 220, 0.5)) border-box;
+  border-color: transparent;
+  background: linear-gradient(135deg, #9077d8, #6a50bf);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 8px 22px -10px var(--accent-glow);
+    0 2px 4px rgba(139, 111, 212, 0.2),
+    0 8px 24px -8px rgba(139, 111, 212, 0.3);
 }
 .btn-primary:hover:not(:disabled) {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 10px 26px -10px var(--accent-glow),
-    0 0 0 4px rgba(139, 111, 212, 0.14);
+    0 4px 8px rgba(139, 111, 212, 0.25),
+    0 12px 32px -8px rgba(139, 111, 212, 0.4);
 }
 .btn-hero {
   isolation: isolate;
@@ -257,7 +245,7 @@ body {
   z-index: -1;
   border-radius: inherit;
   padding: 1px;
-  background: conic-gradient(from var(--spin, 0deg), #fff, #8b6fd4, #5b42a3, #fff);
+  background: conic-gradient(from var(--spin, 0deg), #e8b4c0, #8b6fd4, #b3a6dc, #e8b4c0);
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -287,31 +275,32 @@ body {
   transition: background 0.2s var(--ease), color 0.2s var(--ease);
 }
 .btn-ghost:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--text);
 }
 .btn-ghost:disabled {
   opacity: 0.4;
 }
 .btn-danger {
-  color: #ff9a90;
-  background:
-    linear-gradient(#2a1716, #1a1110) padding-box,
-    linear-gradient(160deg, rgba(255, 90, 78, 0.4), transparent 70%) border-box;
+  color: var(--red);
+  border-color: rgba(229, 72, 77, 0.2);
+  background: rgba(229, 72, 77, 0.04);
 }
 
 /* ---------- inputs ---------- */
 
 .input {
   width: 100%;
-  border-radius: 11px;
+  border-radius: 14px;
   border: 1px solid var(--line-2);
-  background: #0c0c0c;
-  padding: 9px 12px;
+  background: #ffffff;
+  padding: 10px 14px;
   font-size: 14px;
   color: var(--text);
   outline: none;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    inset 0 1px 2px rgba(0, 0, 0, 0.02);
   transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 .input::placeholder {
@@ -320,13 +309,13 @@ body {
 .input:focus {
   border-color: var(--accent);
   box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.4),
-    0 0 0 3px rgba(139, 111, 212, 0.16);
+    0 0 0 3px rgba(139, 111, 212, 0.1),
+    inset 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 .input[type="datetime-local"],
 .input[type="date"],
 .input[type="time"] {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 /* ---------- tags, pills, tabs ---------- */
@@ -335,42 +324,42 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border-radius: 7px;
+  border-radius: 8px;
   border: 1px solid var(--line-2);
-  padding: 2px 7px;
+  padding: 2px 8px;
   font-size: 10.5px;
   font-weight: 600;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.02);
 }
 .tag-purple {
-  color: #cdbff5;
+  color: var(--accent);
   background: var(--accent-soft);
-  border-color: rgba(139, 111, 212, 0.3);
+  border-color: rgba(139, 111, 212, 0.2);
 }
 .tag-red {
-  color: #ff9a90;
+  color: var(--red);
   background: var(--red-soft);
-  border-color: rgba(255, 90, 78, 0.3);
+  border-color: rgba(229, 72, 77, 0.2);
 }
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: 8px;
-  border: 1px solid rgba(139, 111, 212, 0.3);
-  background: rgba(139, 111, 212, 0.16);
-  padding: 3px 9px;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 111, 212, 0.2);
+  background: rgba(139, 111, 212, 0.06);
+  padding: 4px 10px;
   font-size: 12px;
-  color: #e4dcff;
+  color: var(--accent);
 }
 .pill {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid var(--line-2);
-  padding: 3px 9px;
+  padding: 4px 10px;
   font-size: 11.5px;
   color: var(--muted);
 }
@@ -379,14 +368,14 @@ body {
   height: 6px;
   width: 6px;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--green);
 }
 .dot.is-live::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--green);
   animation: ring-out 2.6s var(--ease) infinite;
 }
 @keyframes ring-out {
@@ -403,13 +392,13 @@ body {
   display: inline-flex;
   gap: 2px;
   border-radius: 14px;
-  background: var(--surface);
+  background: var(--surface-2);
   border: 1px solid var(--line);
   padding: 4px;
 }
 .tab {
   border-radius: 10px;
-  padding: 6px 13px;
+  padding: 6px 14px;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
@@ -420,8 +409,8 @@ body {
 }
 .tab.is-active {
   color: var(--text);
-  background: linear-gradient(#262626, #1b1b1b);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 /* ---------- checkboxes & progress ---------- */
@@ -434,44 +423,44 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  border: 1px solid var(--line-3);
-  background: #0c0c0c;
+  border: 1.5px solid var(--line-3);
+  background: #ffffff;
   transition: all 0.2s var(--ease);
 }
 .check.is-on {
   border-color: transparent;
-  background: linear-gradient(#9077d8, #5b42a3);
+  background: linear-gradient(135deg, #9077d8, #6a50bf);
   color: #fff;
 }
 .progress {
   height: 6px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.05);
 }
 .progress > span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #5b42a3, #9077d8);
+  background: linear-gradient(90deg, #8b6fd4, #b3a6dc);
   transition: width 1.2s var(--ease);
 }
 
 /* ---------- overlays & motion ---------- */
 
 .modal-backdrop {
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 .modal {
-  border-radius: 22px;
-  border: 1px solid var(--line-2);
-  background: linear-gradient(#1a1a1a, #101010);
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: #ffffff;
   padding: 24px;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 30px 60px -20px rgba(0, 0, 0, 0.95);
+    0 4px 8px rgba(0, 0, 0, 0.04),
+    0 24px 48px -12px rgba(0, 0, 0, 0.12);
   animation: pop-in 0.25s var(--ease);
 }
 @keyframes pop-in {
@@ -509,16 +498,12 @@ body {
   }
 }
 
-/* Ambient "data flowing" shimmer along the flow diagram's connector lines. */
 @keyframes flow-dash {
   to {
     stroke-dashoffset: -20;
   }
 }
 
-/* Staggered entrance for flow-diagram nodes and activity feed rows (the
-   GSAP-driven .gsap-entrance reveal is used for page-level sections; this
-   lighter CSS-only version covers small dynamic lists). */
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -530,40 +515,29 @@ body {
   }
 }
 
-/* Pre-hidden so GSAP's .from() reveal has no flash-of-unstyled-content
-   before the entrance script runs. */
 .gsap-entrance {
   opacity: 0;
 }
 
-/* A faint dot grid -- a small decorative texture swatch in each Bookings
-   widget's header, echoing a physical device screen's pixel grid. */
 .widget-dots {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.12) 1px, transparent 1px);
   background-size: 5px 5px;
 }
 
-/* Diagonal hatch for a calendar's leading/trailing (out-of-month) days --
-   marks them as "not really here" without just dimming them to near
-   invisibility. */
 .day-hatch {
   background-image: repeating-linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.05) 0px,
-    rgba(255, 255, 255, 0.05) 1px,
+    rgba(0, 0, 0, 0.04) 0px,
+    rgba(0, 0, 0, 0.04) 1px,
     transparent 1px,
     transparent 7px
   );
 }
 
-/* Procedural film-grain noise, used by the fixed full-viewport overlay. */
 .noise-overlay {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* A hairline border whose gradient fades per-edge rather than being a flat
-   color -- a mask-composite trick: paint the gradient over the whole box,
-   then subtract everything but a 1px ring. */
 .gradient-border {
   position: relative;
 }
@@ -573,7 +547,7 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2) 60%);
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -582,19 +556,10 @@ body {
   pointer-events: none;
 }
 
-
-/* Sparse starfield behind the Laura page -- a few layered dot grids at
-   offset sizes so the pattern never reads as a regular grid. */
 .laura-stars {
-  background-image:
-    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(1px 1px at 140px 90px, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1.5px 1.5px at 260px 180px, rgba(255, 255, 255, 0.45), transparent),
-    radial-gradient(1px 1px at 330px 40px, rgba(255, 255, 255, 0.3), transparent);
-  background-size: 360px 240px, 420px 300px, 520px 380px, 300px 260px;
+  background: none;
 }
 
-/* Landing footer illustration: the phone's purple liquid ripples on hover. */
 .laura-wire .liquid-fill,
 .laura-wire .liquid-wave {
   transform-box: fill-box;
@@ -634,23 +599,20 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 14px;
-  border: 1px solid var(--line);
-  background: linear-gradient(#191919, #111);
+  border: 1px solid transparent;
+  background: transparent;
   color: var(--muted);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
 }
 .rail-btn:hover {
   color: var(--text);
-  border-color: var(--line-2);
+  background: rgba(0, 0, 0, 0.04);
 }
 .rail-btn.is-active {
   color: #fff;
-  border-color: rgba(228, 220, 255, 0.35);
-  background: linear-gradient(#9077d8, #5b42a3);
+  background: linear-gradient(135deg, #9077d8, #6a50bf);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    0 8px 20px -10px var(--accent-glow);
+    0 4px 12px -4px rgba(139, 111, 212, 0.3);
 }
 .rail-badge {
   position: absolute;
@@ -658,7 +620,7 @@ body {
   top: -5px;
   min-width: 17px;
   border-radius: 999px;
-  border: 1.5px solid var(--bg-1);
+  border: 2px solid var(--bg-1);
   background: var(--accent);
   padding: 0 4px;
   text-align: center;
@@ -675,15 +637,16 @@ body {
   top: 50%;
   z-index: 60;
   white-space: nowrap;
-  border-radius: 999px;
-  border: 1px solid var(--line-2);
-  background: #000;
-  padding: 5px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  padding: 6px 12px;
   font-size: 12px;
   color: var(--text);
   opacity: 0;
   transform: translate(-4px, -50%);
   transition: opacity 0.15s var(--ease), transform 0.15s var(--ease);
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.08);
 }
 .group:hover > .rail-tip {
   opacity: 1;
@@ -710,7 +673,7 @@ body {
 }
 
 .tag-amber {
-  color: var(--amber);
-  background: rgba(255, 192, 70, 0.1);
-  border-color: rgba(255, 192, 70, 0.3);
+  color: #b86e00;
+  background: rgba(229, 160, 0, 0.08);
+  border-color: rgba(229, 160, 0, 0.2);
 }

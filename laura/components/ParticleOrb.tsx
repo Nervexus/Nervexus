@@ -79,10 +79,10 @@ export function ParticleOrb({ active = false, className = "" }: { active?: boole
         const py = cy + y * R * persp * 1.6;
 
         const mix = Math.min(1, Math.max(0, (y + 0.9) / 1.8));
-        const red = Math.round(90 + 110 * mix);
-        const green = Math.round(180 - 70 * mix);
-        const blue = 255;
-        ctx.fillStyle = `rgba(${red},${green},${blue},${0.2 + depth * 0.8})`;
+        const red = Math.round(160 + 72 * mix);
+        const green = Math.round(140 - 30 * mix);
+        const blue = Math.round(200 + 12 * mix);
+        ctx.fillStyle = `rgba(${red},${green},${blue},${0.3 + depth * 0.7})`;
         const s = 0.55 + depth * 1.45;
         ctx.beginPath();
         ctx.arc(px, py, s, 0, Math.PI * 2);

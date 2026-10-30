@@ -40,8 +40,6 @@ export default function LauraPage() {
   const [tab, setTab] = useState<"chat" | "activity">("chat");
   const [activityKey, setActivityKey] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
-  // Read from the browser clock only -- the prerender gets a neutral
-  // "Hello" instead of baking in whatever hour the build ran at.
   const greeting = useSyncExternalStore(noopSubscribe, greetingForNow, () => "Hello");
   const orbRef = useRef<VoiceOrbHandle>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -116,15 +114,10 @@ export default function LauraPage() {
     inputRef.current?.focus();
   }
 
-  // The hero (full-size orb, heading, chips) stays until the chat is
-  // opened -- by sending a message or tapping Chat/Activity -- even when
-  // there is history from earlier sessions.
   const hasConversation = chatOpen;
 
   return (
     <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col px-6 pb-10">
-      <div className="laura-stars pointer-events-none fixed inset-0 -z-20 opacity-60" aria-hidden />
-
       <div className="flex items-center justify-end gap-3 pt-2">
         {chatOpen && tab === "chat" && messages.length > 0 && (
           <button
@@ -154,11 +147,7 @@ export default function LauraPage() {
         </div>
       </div>
 
-      <div
-        className={`flex flex-col items-center text-center transition-all duration-700 ${
-          "pt-0"
-        }`}
-      >
+      <div className="flex flex-col items-center text-center pt-0 transition-all duration-700">
         <ParticleOrb
           active={sending}
           className={`transition-all duration-700 ${hasConversation ? "w-[240px] sm:w-[300px]" : "w-[340px] sm:w-[520px]"}`}
@@ -169,7 +158,7 @@ export default function LauraPage() {
           </p>
         )}
         {!hasConversation && (
-          <h1 className="mt-3 text-balance text-3xl font-medium tracking-tight text-white sm:text-4xl">
+          <h1 className="mt-3 text-balance text-3xl font-semibold tracking-tight text-text sm:text-4xl">
             How can I help you today?
           </h1>
         )}
@@ -189,29 +178,29 @@ export default function LauraPage() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] font-normal leading-relaxed ${
                   m.role === "user"
-                    ? "rounded-br-md bg-white text-neutral-900"
-                    : "rounded-bl-md border border-white/10 bg-white/[0.04] text-neutral-100 backdrop-blur-md"
+                    ? "rounded-br-md bg-gradient-to-br from-[#8b6fd4] to-[#6a50bf] text-white"
+                    : "rounded-bl-md border border-black/[0.06] bg-white text-neutral-800 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
                 }`}
               >
                 {m.content}
               </div>
               {m.places?.map((p) => (
-                <div key={p.name} className="mt-2 w-full max-w-[80%] overflow-hidden rounded-2xl border border-line bg-white/[0.03]">
+                <div key={p.name} className="mt-2 w-full max-w-[80%] overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
                   {p.images.length > 0 && (
                     <div className="flex gap-1 overflow-x-auto">
                       {p.images.map((src) => (
-                        // eslint-disable-next-line @next/next/no-img-element -- arbitrary venue hosts, not worth next/image remotePatterns
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img key={src} src={src} alt={p.name} className="h-36 w-auto max-w-none shrink-0 object-cover" loading="lazy" />
                       ))}
                     </div>
                   )}
                   <div className="space-y-1 px-4 py-3 text-sm">
-                    <p className="text-neutral-100">{p.name}{p.location ? <span className="text-neutral-500"> · {p.location}</span> : null}</p>
-                    {p.rating && <p className="font-mono text-xs text-[var(--calendar-accent)]">★ {p.rating}</p>}
-                    {(p.price || p.vibe) && <p className="text-xs text-neutral-400">{[p.price, p.vibe].filter(Boolean).join(" · ")}</p>}
-                    {p.verdict && <p className="text-neutral-300">{p.verdict}</p>}
+                    <p className="text-neutral-800">{p.name}{p.location ? <span className="text-neutral-400"> · {p.location}</span> : null}</p>
+                    {p.rating && <p className="font-mono text-xs text-accent">★ {p.rating}</p>}
+                    {(p.price || p.vibe) && <p className="text-xs text-neutral-500">{[p.price, p.vibe].filter(Boolean).join(" · ")}</p>}
+                    {p.verdict && <p className="text-neutral-600">{p.verdict}</p>}
                     {p.website && (
-                      <a href={p.website} target="_blank" rel="noopener noreferrer" className="label inline-block pt-1 hover:text-neutral-200">
+                      <a href={p.website} target="_blank" rel="noopener noreferrer" className="label inline-block pt-1 hover:text-accent">
                         Website ↗
                       </a>
                     )}
@@ -222,23 +211,23 @@ export default function LauraPage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="flex gap-1 rounded-2xl rounded-bl-md border border-line bg-white/[0.04] px-4 py-4">
+              <div className="flex gap-1.5 rounded-2xl rounded-bl-md border border-line bg-white px-4 py-4 shadow-sm">
                 {[0, 1, 2].map((d) => (
                   <span
                     key={d}
-                    className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/70"
+                    className="h-1.5 w-1.5 animate-pulse rounded-full bg-neutral-300"
                     style={{ animationDelay: `${d * 160}ms` }}
                   />
                 ))}
               </div>
             </div>
           )}
-          {error && <p className="text-center text-sm text-red-400">{error}</p>}
+          {error && <p className="text-center text-sm text-red-500">{error}</p>}
         </div>
       )}
 
       <div className={hasConversation ? "mt-4" : "mt-6"}>
-        <div className="relative rounded-[22px] border border-white/15 bg-white/[0.05] p-3 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl">
+        <div className="relative rounded-[22px] border border-black/[0.08] bg-white/80 p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.08)] backdrop-blur-xl">
           <textarea
             ref={inputRef}
             value={input}
@@ -249,12 +238,12 @@ export default function LauraPage() {
                 sendMessage(input.trim(), false);
               }
             }}
-            placeholder="What do you want to know?"
+            placeholder="Ask Laura anything..."
             rows={2}
-            className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-normal text-white outline-none placeholder:text-neutral-500"
+            className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-normal text-text outline-none placeholder:text-neutral-400"
           />
           <div className="mt-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 rounded-full border border-line bg-white/[0.04] px-3 py-1.5 text-xs text-neutral-300">
+            <span className="flex items-center gap-1.5 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-xs text-muted">
               <iconify-icon icon="solar:stars-minimalistic-linear" className="text-sm"></iconify-icon>
               Laura
             </span>
@@ -273,10 +262,10 @@ export default function LauraPage() {
                 onClick={() => fileRef.current?.click()}
                 disabled={sending}
                 aria-label="Attach a photo or file"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-neutral-300 transition-colors hover:text-white disabled:opacity-40"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-neutral-400 transition-colors hover:text-text disabled:opacity-40"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
-                  <path d="M21 11.5 12.5 20a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L9.8 16.8a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8" />
+                  <path d="M12 5v14M5 12h14" />
                 </svg>
               </button>
               <VoiceOrb ref={orbRef} compact onTranscript={(text) => sendMessage(text, true)} />
@@ -284,7 +273,7 @@ export default function LauraPage() {
                 onClick={() => sendMessage(input.trim(), false)}
                 disabled={sending || !input.trim()}
                 aria-label="Send"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-neutral-950 shadow-[0_0_20px_rgba(255,255,255,0.35)] transition-all hover:shadow-[0_0_28px_rgba(255,255,255,0.55)] disabled:bg-white/15 disabled:text-neutral-500 disabled:shadow-none"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-800 text-white shadow-[0_2px_8px_rgba(0,0,0,0.15)] transition-all hover:bg-neutral-900 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] disabled:bg-neutral-200 disabled:text-neutral-400 disabled:shadow-none"
               >
                 <SendIcon className="h-4 w-4" />
               </button>
@@ -298,7 +287,7 @@ export default function LauraPage() {
               <button
                 key={s.label}
                 onClick={() => applySuggestion(s.prompt)}
-                className="flex items-center gap-2 rounded-xl border border-line bg-white/[0.03] px-3.5 py-2 text-xs text-neutral-300 backdrop-blur-md transition-colors hover:border-white/25 hover:text-white"
+                className="flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2 text-xs text-muted shadow-sm transition-all hover:border-line-2 hover:text-text hover:shadow-md"
               >
                 <iconify-icon icon={s.icon} className="text-sm"></iconify-icon>
                 {s.label}

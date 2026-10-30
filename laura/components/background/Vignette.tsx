@@ -2,8 +2,6 @@
 
 import { usePathname } from "next/navigation";
 
-/** Layer 1: darkens the viewport's edges. Skipped on /, /laura and /login, where its
- * radial gradient shows up as faint rings. */
 export function Vignette() {
   const pathname = usePathname();
   if (pathname === "/" || pathname === "/laura" || pathname === "/login") return null;
@@ -11,7 +9,7 @@ export function Vignette() {
     <div
       className="pointer-events-none fixed inset-0 z-[1]"
       style={{
-        background: "radial-gradient(circle, transparent 0%, rgba(8,8,8,0.85) 100%)",
+        background: "radial-gradient(circle at 50% 0%, rgba(139,111,212,0.03) 0%, transparent 70%)",
       }}
       aria-hidden="true"
     />

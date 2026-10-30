@@ -27,18 +27,13 @@ export function NavIcon({ name, className = "h-[18px] w-[18px]" }: { name: strin
   );
 }
 
-/** The LAURA mark: an engraved "L" on the dark tile its container
- * provides -- a matte, debossed look (soft dark edge above-left, a light
- * lip below-right) rather than a coloured glyph. */
 export function LogoMark({ className = "h-[18px] w-[18px]" }: { className?: string }) {
   const L = "M8.6 5.4h2.9v10.1h6v2.9H8.6z";
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      {/* top-left shadow, then bottom-right highlight, then the face -- the
-          stacking is what reads as carved-in. */}
-      <path d={L} transform="translate(-0.4,-0.5)" fill="#000" opacity="0.55" />
-      <path d={L} transform="translate(0.5,0.7)" fill="#fff" opacity="0.16" />
-      <path d={L} fill="#232326" />
+      <path d={L} transform="translate(-0.3,-0.4)" fill="rgba(0,0,0,0.08)" />
+      <path d={L} transform="translate(0.3,0.4)" fill="rgba(255,255,255,0.6)" />
+      <path d={L} fill="#6a50bf" />
     </svg>
   );
 }
