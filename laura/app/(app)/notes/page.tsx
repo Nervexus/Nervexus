@@ -301,7 +301,7 @@ export default function NotesPage() {
                           if (e.key === "Enter") renameFolder(folder.id, renameValue);
                           if (e.key === "Escape") setRenamingFolder(null);
                         }}
-                        className="label w-0 min-w-0 flex-1 truncate rounded border border-line bg-transparent px-1 outline-none focus:border-accent/40"
+                        className="label w-0 min-w-0 flex-1 truncate rounded border border-line bg-transparent px-1 outline-none focus:border-neutral-300"
                       />
                     ) : (
                       <button
@@ -386,7 +386,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitUnlock(folder.id)}
                             placeholder="PIN"
-                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
+                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -438,7 +438,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitSetPin(folder.id)}
                             placeholder="Choose a PIN"
-                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
+                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -469,7 +469,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitRemovePin(folder.id)}
                             placeholder="Current PIN"
-                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
+                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -500,7 +500,7 @@ export default function NotesPage() {
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.target.value)}
                     placeholder="Folder name"
-                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
+                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
                   />
                   <input
                     type="password"
@@ -508,7 +508,7 @@ export default function NotesPage() {
                     onChange={(e) => setNewFolderPin(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addFolder()}
                     placeholder="PIN (optional)"
-                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
+                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
                   />
                   <div className="flex flex-wrap justify-center gap-1.5">
                     {FOLDER_COLORS.map((c) => (

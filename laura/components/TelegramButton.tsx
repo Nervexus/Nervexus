@@ -12,7 +12,7 @@ export function TelegramButton() {
       aria-label="Chat with Laura on Telegram"
       className="group flex flex-col items-center gap-4 outline-none"
     >
-      <span className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1),0_12px_32px_-8px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:scale-[1.03] group-focus-visible:ring-2 group-focus-visible:ring-violet-500/60">
+      <span className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.1),0_12px_32px_-8px_rgba(0,0,0,0.08)] transition-transform duration-300 group-hover:scale-[1.03] group-focus-visible:ring-2 group-focus-visible:ring-neutral-300">
         <span className="flex h-20 w-20 items-center justify-center rounded-full bg-surface-2 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.06),inset_-2px_-2px_6px_rgba(255,255,255,0.8)]">
           <svg
             viewBox="0 0 24 24"
