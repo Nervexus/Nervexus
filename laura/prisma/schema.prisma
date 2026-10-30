@@ -259,6 +259,22 @@ model RoutineItem {
   createdAt DateTime @default(now())
 }
 
+// An API key the user has added through Settings for a service (gemini,
+// etc.). Multiple keys per service allow automatic fallback: if one is
+// rate-limited or invalid, the next active key by priority is tried.
+model ApiKey {
+  id        String   @id @default(cuid())
+  service   String // "gemini" | "openai" | etc.
+  label     String
+  apiKey    String
+  priority  Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([service, active])
+}
+
 // Something Laura is passing on to Claude Code (the developer chat): a
 // feature she can't do yet, a bug, or a note Madoxs asked her to forward.
 // Shown under Settings > For Claude Code with a copy-all button.

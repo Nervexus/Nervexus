@@ -8,6 +8,7 @@ import { FaceIdSettings } from "@/components/FaceIdSettings";
 import { PasswordSettings } from "@/components/PasswordSettings";
 import { MessageSettings } from "@/components/MessageSettings";
 import { ClaudeRequests } from "@/components/ClaudeRequests";
+import { ApiKeySettings } from "@/components/ApiKeySettings";
 
 type Status = "connected" | "expiring" | "missing";
 type Item = { key: string; label: string; status: Status; detail: string | null };
@@ -61,6 +62,10 @@ export default function SettingsPage() {
 
       <div className="gsap-entrance mt-4">
         <ClaudeRequests />
+      </div>
+
+      <div className="gsap-entrance mt-4">
+        <ApiKeySettings />
       </div>
 
       <div className="gsap-entrance mt-4">
