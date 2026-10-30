@@ -11,7 +11,7 @@ export default function Home() {
 
       <section className="flex min-h-[80vh] flex-col items-center justify-center text-center">
         <ParticleOrb className="w-[260px] sm:w-[400px]" />
-        <h1 className="-mt-2 select-none scale-y-110 text-[clamp(3rem,15vw,8rem)] font-bold leading-[0.8] tracking-tighter text-text">
+        <h1 className="-mt-2 select-none scale-y-110 text-[clamp(3rem,15vw,8rem)] font-bold leading-[0.8] tracking-tighter text-[#141414]">
           LAURA
         </h1>
         <GetAccessButton />

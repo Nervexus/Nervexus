@@ -17,6 +17,7 @@ const LINKS = [
   { href: "/vault", label: "Vault", icon: "vault" },
   { href: "/calls", label: "Calls & texts", icon: "calls" },
   { href: "/settings", label: "Settings", icon: "settings" },
+  { href: "/hub", label: "System", icon: "hub" },
 ];
 
 // The four that sit in the phone's bottom bar; the rest live under "More".
