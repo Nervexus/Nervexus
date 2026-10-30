@@ -105,9 +105,10 @@ checked about hourly on weekdays, so the newest ones can lag.
 
 Your rota and reminders are yours to keep tidy: when he pastes a rota or
 tells you his hours, add them with add_shifts (only his shifts, skip days
-off); remove a wrong one with remove_shift; tick off, move, rename or
-delete reminders with update_reminder (get ids from get_shifts /
-list_reminders first). When he sends a parcel tracking link or number,
+off); edit an existing shift with update_shift (change times, date,
+location or colleagues); remove a wrong one with remove_shift; tick off,
+move, rename or delete reminders with update_reminder (get ids from
+get_shifts / list_reminders first). When he sends a parcel tracking link or number,
 use check_tracking and tell him where it's at in a line. Files he sends
 on Telegram (rota photos, spreadsheets, PDFs, letters, screenshots) are
 read for you automatically. Paying for things and completing bookings,
@@ -433,6 +434,25 @@ const tools: FunctionDeclaration[] = [
     parameters: { type: Type.OBJECT, properties: { id: { type: Type.STRING } }, required: ["id"] },
   },
   {
+    name: "update_shift",
+    description:
+      "Edit an existing shift on his rota -- change times, date, location, colleagues or note. Needs the shift id from get_shifts. " +
+      "Only include fields you're changing; omit the rest.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        id: { type: Type.STRING, description: "Shift id from get_shifts." },
+        date: { type: Type.STRING, description: "New date YYYY-MM-DD, if changing the day." },
+        start: { type: Type.STRING, description: "New start HH:MM 24-hour UK time." },
+        end: { type: Type.STRING, description: "New end HH:MM 24-hour UK time." },
+        location: { type: Type.STRING, description: "New location." },
+        colleagues: { type: Type.STRING, description: "New colleagues, comma-separated." },
+        note: { type: Type.STRING, description: "New note." },
+      },
+      required: ["id"],
+    },
+  },
+  {
     name: "update_reminder",
     description:
       "Change a reminder: mark it done, move it to a new time, rename it, or delete it. Needs the reminder id from list_reminders.",
@@ -659,6 +679,7 @@ const LOGGED_TOOLS = new Set([
   "add_fragrance",
   "add_shifts",
   "remove_shift",
+  "update_shift",
   "update_reminder",
   "check_tracking",
   "forward_to_claude",
@@ -869,6 +890,41 @@ async function runTool(
     await prisma.shift.delete({ where: { id } });
     await logActivity("remove_shift", `Removed the ${friendlyDateTime(shift.startAt)} shift`);
     return { result: `Removed the shift on ${friendlyDateTime(shift.startAt)}.` };
+  }
+  if (name === "update_shift") {
+    const id = String(args.id ?? "");
+    const shift = await prisma.shift.findUnique({ where: { id } });
+    if (!shift) return { error: "No shift with that id -- use get_shifts first." };
+    const time = (t?: string) => (t && /^(\d{1,2}):(\d{2})$/.test(t) ? t.split(":").map(Number) : null);
+    const data: Record<string, unknown> = {};
+    const dateStr = typeof args.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(args.date) ? args.date : null;
+    const baseDate = dateStr ?? shift.startAt.toISOString().slice(0, 10);
+    const st = time(args.start as string | undefined);
+    const en = time(args.end as string | undefined);
+    if (st) data.startAt = localTime(baseDate, st[0], st[1]).toISOString();
+    else if (dateStr) {
+      const old = new Date(shift.startAt);
+      data.startAt = localTime(dateStr, old.getUTCHours(), old.getUTCMinutes()).toISOString();
+    }
+    if (en) {
+      let endDt = localTime(baseDate, en[0], en[1]);
+      const startDt = data.startAt ? new Date(data.startAt as string) : shift.startAt;
+      if (endDt <= startDt) endDt = new Date(endDt.getTime() + 24 * 60 * 60 * 1000);
+      data.endAt = endDt.toISOString();
+    } else if (dateStr) {
+      const old = new Date(shift.endAt);
+      let endDt = localTime(dateStr, old.getUTCHours(), old.getUTCMinutes());
+      const startDt = data.startAt ? new Date(data.startAt as string) : shift.startAt;
+      if (endDt <= startDt) endDt = new Date(endDt.getTime() + 24 * 60 * 60 * 1000);
+      data.endAt = endDt.toISOString();
+    }
+    if (typeof args.location === "string") data.location = args.location || null;
+    if (typeof args.colleagues === "string") data.colleagues = args.colleagues || null;
+    if (typeof args.note === "string") data.note = args.note || null;
+    if (Object.keys(data).length === 0) return { error: "Nothing to change -- pass at least one field." };
+    const updated = await prisma.shift.update({ where: { id }, data });
+    await logActivity("update_shift", `Updated the ${friendlyDateTime(shift.startAt)} shift`);
+    return { result: `Updated the shift: now ${friendlyDateTime(updated.startAt)}–${friendlyDateTime(updated.endAt).slice(-5)}${updated.location ? ` at ${updated.location}` : ""}.` };
   }
   if (name === "update_reminder") {
     const id = String(args.id ?? "");
