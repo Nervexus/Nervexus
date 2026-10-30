@@ -142,7 +142,7 @@ export default function ContentPage() {
             onChange={(e) => setHandle(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && research()}
             placeholder="@someaccount"
-            className="min-w-0 flex-1 input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="min-w-0 flex-1 input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
           />
           <Button variant="accent" onClick={research} disabled={researching || !handle.trim()}>
             {researching ? "Researching…" : "Research"}
@@ -150,7 +150,7 @@ export default function ContentPage() {
         </div>
         {researchResult && (
           <div className="mt-4 input">
-            <p className="whitespace-pre-wrap text-sm text-neutral-300">{researchResult}</p>
+            <p className="whitespace-pre-wrap text-sm text-neutral-600">{researchResult}</p>
           </div>
         )}
       </div>
@@ -164,12 +164,12 @@ export default function ContentPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Title, e.g. Beach sunset reel"
-            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
           />
           <select
             value={type}
             onChange={(e) => setType(e.target.value as (typeof TYPES)[number])}
-            className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
           >
             {TYPES.map((t) => (
               <option key={t} value={t}>
@@ -182,13 +182,13 @@ export default function ContentPage() {
             onChange={(e) => setCaption(e.target.value)}
             placeholder="Caption (optional)"
             rows={2}
-            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
+            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400 sm:col-span-2"
           />
           <input
             value={hashtags}
             onChange={(e) => setHashtags(e.target.value)}
             placeholder="Hashtags, comma-separated (optional)"
-            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600 sm:col-span-2"
+            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400 sm:col-span-2"
           />
         </div>
         <div className="mt-3.5 flex justify-end">
@@ -235,7 +235,7 @@ export default function ContentPage() {
           {discarded.length > 0 && (
             <button
               onClick={() => setShowDiscarded((s) => !s)}
-              className="label hover:text-neutral-300"
+              className="label hover:text-neutral-600"
             >
               {showDiscarded ? "Hide" : "Show"} discarded ({discarded.length})
             </button>

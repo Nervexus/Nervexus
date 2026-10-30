@@ -105,39 +105,39 @@ export function ShiftCard({
 
   if (editing) {
     return (
-      <div className="relative flex flex-col gap-3 rounded-2xl bg-[#1b1b1d] p-4">
+      <div className="relative flex flex-col gap-3 rounded-2xl bg-white p-4">
         <span className="label">Edit shift</span>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <input
             type="datetime-local"
             value={editStart}
             onChange={(e) => setEditStart(e.target.value)}
-            className="input text-xs [color-scheme:dark]"
+            className="input text-xs"
           />
           <input
             type="datetime-local"
             value={editEnd}
             onChange={(e) => setEditEnd(e.target.value)}
-            className="input text-xs [color-scheme:dark]"
+            className="input text-xs"
           />
           <input
             value={editLocation}
             onChange={(e) => setEditLocation(e.target.value)}
             placeholder="Location"
-            className="input text-xs placeholder:text-neutral-600"
+            className="input text-xs placeholder:text-neutral-400"
           />
           <input
             value={editColleagues}
             onChange={(e) => setEditColleagues(e.target.value)}
             placeholder="Colleagues"
-            className="input text-xs placeholder:text-neutral-600"
+            className="input text-xs placeholder:text-neutral-400"
           />
         </div>
         <input
           value={editNote}
           onChange={(e) => setEditNote(e.target.value)}
           placeholder="Note"
-          className="input text-xs placeholder:text-neutral-600"
+          className="input text-xs placeholder:text-neutral-400"
         />
         {error && <p className="text-xs text-red-400">{error}</p>}
         <div className="flex justify-end gap-2">
@@ -151,16 +151,16 @@ export function ShiftCard({
   }
 
   return (
-    <div className="relative flex flex-col gap-3 rounded-2xl bg-[#1b1b1d] p-4">
+    <div className="relative flex flex-col gap-3 rounded-2xl bg-white p-4">
       <div className="flex items-start gap-3">
         <IconTile>
           <iconify-icon icon="solar:calendar-linear" className="text-lg" />
         </IconTile>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="text-sm font-medium text-neutral-100">{formatRange(startAt, endAt)}</h3>
+            <h3 className="text-sm font-medium text-neutral-800">{formatRange(startAt, endAt)}</h3>
             <div className="flex shrink-0 gap-2">
-              <button onClick={openEdit} className="text-xs text-neutral-500 hover:text-neutral-200">
+              <button onClick={openEdit} className="text-xs text-neutral-500 hover:text-neutral-800">
                 Edit
               </button>
               <button onClick={onDelete} className="text-xs text-neutral-500 hover:text-red-400">
@@ -184,7 +184,7 @@ export function ShiftCard({
       {plan ? (
         <div className="item px-3 py-2.5">
           <p className="label">Commute plan</p>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-300">{plan}</p>
+          <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{plan}</p>
         </div>
       ) : (
         <div className="flex items-center justify-between gap-3">

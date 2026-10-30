@@ -75,11 +75,11 @@ export default function SettingsPage() {
         href={CREDENTIALS_GUIDE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="gsap-entrance mt-6 flex items-center gap-3 card p-5 transition-colors hover:border-neutral-600"
+        className="gsap-entrance mt-6 flex items-center gap-3 card p-5 transition-colors hover:border-neutral-300"
       >
         <iconify-icon icon="solar:document-text-linear" className="shrink-0 text-xl text-neutral-400" />
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-medium text-neutral-100">Full credentials setup guide</h3>
+          <h3 className="text-sm font-medium text-neutral-800">Full credentials setup guide</h3>
           <p className="mt-0.5 text-xs text-neutral-500">
             step-by-step instructions for every item below
           </p>

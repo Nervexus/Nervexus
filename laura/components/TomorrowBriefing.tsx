@@ -30,7 +30,7 @@ export function TomorrowBriefing() {
       <span className="label">
         Tomorrow
       </span>
-      <p className="mt-1 text-sm leading-relaxed text-neutral-300">{briefing.summary}</p>
+      <p className="mt-1 text-sm leading-relaxed text-neutral-600">{briefing.summary}</p>
     </div>
   );
 }

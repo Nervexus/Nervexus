@@ -1,7 +1,7 @@
 /** The front page's footer: just the giant faded LAURA wordmark. */
 export function LandingFooter() {
   return (
-    <footer className="overflow-hidden border-t border-neutral-900 bg-[#050505] pt-24 text-white">
+    <footer className="overflow-hidden border-t border-neutral-200 bg-white pt-24 text-neutral-800">
       <div
         className="mb-16 w-full px-4 text-center"
         style={{
@@ -10,7 +10,7 @@ export function LandingFooter() {
         }}
         aria-hidden
       >
-        <p className="scale-y-110 select-none text-[22vw] font-bold leading-[0.7] tracking-tighter text-[#141414]">LAURA</p>
+        <p className="scale-y-110 select-none text-[22vw] font-bold leading-[0.7] tracking-tighter text-neutral-100">LAURA</p>
       </div>
     </footer>
   );

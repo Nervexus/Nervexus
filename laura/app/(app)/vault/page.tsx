@@ -114,14 +114,14 @@ export default function VaultPage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="What is this? (e.g. Wi-Fi password)"
-          className="w-full input text-base font-normal outline-none placeholder:text-neutral-600"
+          className="w-full input text-base font-normal outline-none placeholder:text-neutral-400"
         />
         <input
           value={secret}
           onChange={(e) => setSecret(e.target.value)}
           placeholder="Secret value"
           type="password"
-          className="mt-5 w-full input font-mono text-sm text-neutral-300 outline-none placeholder:font-sans placeholder:text-neutral-600"
+          className="mt-5 w-full input font-mono text-sm text-neutral-700 outline-none placeholder:font-sans placeholder:text-neutral-400"
         />
         <div className="mt-3 flex justify-end">
           <Button variant="accent" onClick={add} disabled={!title.trim() || !secret}>

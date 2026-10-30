@@ -174,8 +174,8 @@ export default function BookingsPage() {
             </button>
           </div>
           {searchResult && (
-            <div className="mt-3 rounded-2xl bg-[#1b1b1d] px-4 py-3">
-              <p className="whitespace-pre-wrap text-sm text-neutral-300">{searchResult}</p>
+            <div className="mt-3 rounded-2xl border border-line bg-surface-2 px-4 py-3">
+              <p className="whitespace-pre-wrap text-sm text-neutral-600">{searchResult}</p>
               <div className="mt-2 flex justify-end">
                 <Button variant="ghost" onClick={saveSearchAsIdea}>
                   Save as an idea
@@ -194,7 +194,7 @@ export default function BookingsPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Dinner at Lina's"
-              className="input text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+              className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
             />
             <div className="grid grid-cols-4 gap-2">
               {CATEGORIES.map((c) => (
@@ -203,7 +203,7 @@ export default function BookingsPage() {
                   onClick={() => setCategory(c)}
                   aria-label={c}
                   className={`item flex flex-col items-center gap-1 py-2.5 transition-colors ${
-                    category === c ? "!border-[rgba(139,111,212,0.4)] !bg-[rgba(139,111,212,0.14)] text-violet-200" : "text-muted hover:text-text"
+                    category === c ? "!border-[rgba(139,111,212,0.4)] !bg-[rgba(139,111,212,0.08)] text-accent" : "text-muted hover:text-text"
                   }`}
                 >
                   <iconify-icon icon={CATEGORY_ICON[c]} className="text-lg"></iconify-icon>
@@ -216,13 +216,13 @@ export default function BookingsPage() {
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => setDateTime(e.target.value)}
-                className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
+                className="input text-sm text-neutral-700 outline-none"
               />
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Location"
-                className="input text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+                className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export default function BookingsPage() {
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
                 placeholder="Booking link"
-                className="min-w-0 flex-1 input text-sm text-neutral-200 outline-none placeholder:text-neutral-600"
+                className="min-w-0 flex-1 input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
               />
               <button
                 onClick={addBooking}
@@ -277,7 +277,7 @@ export default function BookingsPage() {
           {cancelled.length > 0 && (
             <button
               onClick={() => setShowCancelled((s) => !s)}
-              className="label self-start hover:text-neutral-300"
+              className="label self-start hover:text-neutral-600"
             >
               {showCancelled ? "Hide" : "Show"} cancelled ({cancelled.length})
             </button>
@@ -292,7 +292,7 @@ export default function BookingsPage() {
               { label: "Ideas", value: ideas.length },
             ].map((s) => (
               <div key={s.label} className="flex items-center justify-between item px-3 py-2.5">
-                <span className="text-sm text-neutral-300">{s.label}</span>
+                <span className="text-sm text-neutral-600">{s.label}</span>
                 <span className="font-mono text-xs tabular-nums text-neutral-500">{s.value}</span>
               </div>
             ))}

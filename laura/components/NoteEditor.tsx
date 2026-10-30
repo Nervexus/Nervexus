@@ -189,7 +189,7 @@ export function NoteEditor({
                       <div className="relative overflow-hidden rounded-xl border border-line">
                         <button onClick={() => setLightbox(img.data)} className="block w-full">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={img.data} alt={img.caption ?? "Note picture"} className="max-h-[60vh] w-full object-contain bg-black" />
+                          <img src={img.data} alt={img.caption ?? "Note picture"} className="max-h-[60vh] w-full object-contain bg-neutral-100" />
                         </button>
                         <button
                           onClick={() => removeImage(img.id)}
@@ -243,7 +243,7 @@ export function NoteEditor({
                       <div className="relative">
                         <button onClick={() => setLightbox(img.data)} className="block w-full overflow-hidden rounded-lg">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={img.data} alt={img.caption ?? "Note picture"} className="h-36 w-full object-cover bg-black" />
+                          <img src={img.data} alt={img.caption ?? "Note picture"} className="h-36 w-full object-cover bg-neutral-100" />
                         </button>
                         <button
                           onClick={() => removeImage(img.id)}

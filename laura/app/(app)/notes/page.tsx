@@ -265,7 +265,7 @@ export default function NotesPage() {
   return (
     <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
       <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="text-3xl tracking-tight text-neutral-100">Notes</h1>
+        <h1 className="page-title">Notes</h1>
       </div>
       <p className="gsap-entrance mt-2 text-sm text-neutral-500">
         things you&apos;ve told Laura to remember, plus anything you jot down here
@@ -321,15 +321,15 @@ export default function NotesPage() {
                             onClick={() => setPaletteFor(paletteFor === folder.id ? null : folder.id)}
                             aria-label="Folder colour"
                             aria-expanded={paletteFor === folder.id}
-                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-600 transition-colors hover:text-neutral-300"
+                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-600"
                           >
-                            <span className="h-3.5 w-3.5 rounded-full border border-white/20" style={{ background: FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch }} />
+                            <span className="h-3.5 w-3.5 rounded-full border border-neutral-200" style={{ background: FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch }} />
                           </button>
                           <button
                             type="button"
                             onClick={() => { if (confirm(`Delete "${folder.name}" and all its notes?`)) deleteFolder(folder.id); }}
                             aria-label="Delete folder"
-                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-600 transition-colors hover:text-red-400"
+                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-red-500"
                           >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="h-3.5 w-3.5" aria-hidden>
                               <path d="M3 6h18M8 6V4h8v2M19 6v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6" />
@@ -348,14 +348,14 @@ export default function NotesPage() {
                         }
                         aria-label={isLocked ? "Unlock folder" : folder.locked ? "Lock folder now" : "Lock this folder"}
                         className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
-                          folder.locked ? "text-neutral-300 hover:text-neutral-100" : "text-neutral-600 hover:text-neutral-300"
+                          folder.locked ? "text-neutral-600 hover:text-neutral-800" : "text-neutral-400 hover:text-neutral-600"
                         }`}
                       >
                         <LockIcon className="h-3.5 w-3.5" />
                       </button>
                     </div>
                     {paletteFor === folder.id && (
-                      <div className="absolute right-0 top-7 z-20 flex gap-1.5 rounded-xl border border-line bg-[#141414] p-2 shadow-[0_20px_40px_-14px_rgba(0,0,0,0.9)]">
+                      <div className="absolute right-0 top-7 z-20 flex gap-1.5 rounded-xl border border-line bg-white p-2 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)]">
                         {FOLDER_COLORS.map((c) => (
                           <button
                             key={c.value}
@@ -363,7 +363,7 @@ export default function NotesPage() {
                             onClick={() => recolorFolder(folder.id, c.value)}
                             aria-label={c.label}
                             title={c.label}
-                            className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${folder.art === c.value ? "border-white" : "border-white/20"}`}
+                            className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${folder.art === c.value ? "border-neutral-800" : "border-neutral-200"}`}
                             style={{ background: c.swatch }}
                           />
                         ))}
@@ -386,7 +386,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitUnlock(folder.id)}
                             placeholder="PIN"
-                            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -402,7 +402,7 @@ export default function NotesPage() {
                         <button
                           type="button"
                           onClick={() => openPanel({ folderId: folder.id, mode: "unlock" })}
-                          className="font-mono text-xs text-neutral-500 transition-colors hover:text-neutral-200"
+                          className="font-mono text-xs text-neutral-500 transition-colors hover:text-neutral-700"
                         >
                           Enter PIN to open
                         </button>
@@ -438,7 +438,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitSetPin(folder.id)}
                             placeholder="Choose a PIN"
-                            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -455,7 +455,7 @@ export default function NotesPage() {
                         <button
                           type="button"
                           onClick={() => openPanel({ folderId: folder.id, mode: "remove-pin" })}
-                          className="font-mono text-[11px] text-neutral-600 transition-colors hover:text-neutral-300"
+                          className="font-mono text-[11px] text-neutral-400 transition-colors hover:text-neutral-600"
                         >
                           Remove lock
                         </button>
@@ -469,7 +469,7 @@ export default function NotesPage() {
                             onChange={(e) => setPinDraft(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && submitRemovePin(folder.id)}
                             placeholder="Current PIN"
-                            className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
                           />
                           {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
                           <div className="flex justify-center gap-3">
@@ -500,7 +500,7 @@ export default function NotesPage() {
                     value={newFolderName}
                     onChange={(e) => setNewFolderName(e.target.value)}
                     placeholder="Folder name"
-                    className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
                   />
                   <input
                     type="password"
@@ -508,7 +508,7 @@ export default function NotesPage() {
                     onChange={(e) => setNewFolderPin(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addFolder()}
                     placeholder="PIN (optional)"
-                    className="w-full rounded-lg border border-line bg-neutral-950/60 px-3 py-1.5 text-center text-sm text-neutral-100 outline-none placeholder:text-neutral-600 focus:border-neutral-600"
+                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-accent/40"
                   />
                   <div className="flex flex-wrap justify-center gap-1.5">
                     {FOLDER_COLORS.map((c) => (
@@ -518,7 +518,7 @@ export default function NotesPage() {
                         onClick={() => setNewFolderArt(c.value)}
                         aria-label={c.label}
                         title={c.label}
-                        className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${newFolderArt === c.value ? "border-white" : "border-white/20"}`}
+                        className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${newFolderArt === c.value ? "border-neutral-800" : "border-neutral-200"}`}
                         style={{ background: c.swatch }}
                       />
                     ))}
@@ -545,7 +545,7 @@ export default function NotesPage() {
                 <button
                   type="button"
                   onClick={() => setAddingFolder(true)}
-                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line text-neutral-600 transition-colors hover:border-neutral-600 hover:text-neutral-300"
+                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-neutral-300 text-neutral-400 transition-colors hover:border-neutral-400 hover:text-neutral-600"
                   style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
                 >
                   <span className="text-2xl">+</span>

@@ -52,14 +52,14 @@ export function ContentCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="relative flex flex-col gap-3 rounded-2xl bg-[#1b1b1d] p-4">
+    <div className="relative flex flex-col gap-3 rounded-2xl bg-white p-4">
       <div className="flex items-start gap-3">
         <IconTile>
           <iconify-icon icon={TYPE_ICON[type] ?? TYPE_ICON.other} className="text-lg" />
         </IconTile>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="truncate text-sm font-medium text-neutral-100">{title}</h3>
+            <h3 className="truncate text-sm font-medium text-neutral-800">{title}</h3>
             <button onClick={onDelete} className="shrink-0 text-xs text-neutral-500 hover:text-red-400">
               Delete
             </button>
@@ -79,6 +79,7 @@ export function ContentCard({
                 .map((h) => `#${h}`)
                 .join(" ")}
             </p>
+
           )}
         </div>
       </div>

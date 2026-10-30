@@ -28,7 +28,7 @@ export function CallLogCard({
   return (
     <div
       className={`relative flex items-start gap-3 rounded-[24px] border p-4 ${
-        failed ? "border-red-900/60 bg-red-950/20" : "border-transparent bg-[#1b1b1d]"
+        failed ? "border-red-200 bg-red-50" : "border-transparent bg-white"
       }`}
     >
       <IconTile>
@@ -42,9 +42,9 @@ export function CallLogCard({
           <span className="label">
             {kind === "call" ? "Call" : "Text"}
           </span>
-          <span className="shrink-0 text-[11px] text-neutral-600">{timeAgo(createdAt)}</span>
+          <span className="shrink-0 text-[11px] text-neutral-400">{timeAgo(createdAt)}</span>
         </div>
-        <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-200">{message}</p>
+        <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-700">{message}</p>
         {failed && <p className="mt-1.5 text-xs text-red-400">{error ?? "Failed to send."}</p>}
       </div>
     </div>

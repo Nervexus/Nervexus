@@ -173,13 +173,13 @@ export default function RemindersPage() {
           </h1>
         </div>
         <div className="label flex items-center gap-5 pb-1">
-          <button onClick={() => changeDay(-1)} aria-label="Previous day" className="transition-colors hover:text-neutral-100">
+          <button onClick={() => changeDay(-1)} aria-label="Previous day" className="transition-colors hover:text-text">
             ←
           </button>
-          <button onClick={goToToday} className="transition-colors hover:text-neutral-100">
+          <button onClick={goToToday} className="transition-colors hover:text-text">
             Today
           </button>
-          <button onClick={() => changeDay(1)} aria-label="Next day" className="transition-colors hover:text-neutral-100">
+          <button onClick={() => changeDay(1)} aria-label="Next day" className="transition-colors hover:text-text">
             →
           </button>
         </div>
@@ -194,7 +194,7 @@ export default function RemindersPage() {
           <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr]">
             {/* The month dial: one dot per day around a matte knob, lit where
                 something's due, gold for today, with the needle on today. */}
-            <div className="flex flex-col items-center rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] px-6 pb-6 pt-8 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]">
+            <div className="flex flex-col items-center rounded-3xl border border-line bg-white px-6 pb-6 pt-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
               <div className="relative h-56 w-56">
                 {Array.from({ length: monthDays }, (_, d) => {
                   const angle = (d / monthDays) * Math.PI * 2 - Math.PI / 2;
@@ -204,19 +204,19 @@ export default function RemindersPage() {
                     <span
                       key={d}
                       className={`absolute h-1 w-1 rounded-full ${
-                        isToday ? "bg-[var(--calendar-accent)] shadow-[0_0_6px_var(--calendar-accent)]" : has ? "bg-neutral-100" : "bg-neutral-700"
+                        isToday ? "bg-[var(--calendar-accent)] shadow-[0_0_6px_var(--calendar-accent)]" : has ? "bg-neutral-800" : "bg-neutral-300"
                       }`}
                       style={{ left: `${50 + Math.cos(angle) * 47}%`, top: `${50 + Math.sin(angle) * 47}%`, transform: "translate(-50%,-50%)" }}
                     />
                   );
                 })}
-                <div className="absolute inset-[14%] rounded-full bg-[radial-gradient(circle_at_50%_40%,#202022,#141415_75%)] shadow-[0_14px_30px_-8px_rgba(0,0,0,0.9),inset_0_0_0_1px_rgba(255,255,255,0.03)]">
+                <div className="absolute inset-[14%] rounded-full bg-[radial-gradient(circle_at_50%_40%,#ffffff,#f0f0f2_75%)] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(0,0,0,0.04)]">
                   {todayIndex !== null && (
                     <span
                       className="absolute left-1/2 top-1/2 h-1/2 w-px origin-top"
                       style={{ transform: `rotate(${(todayIndex / monthDays) * 360 + 180}deg)` }}
                     >
-                      <span className="absolute bottom-1.5 left-0 h-3 w-px bg-neutral-200" />
+                      <span className="absolute bottom-1.5 left-0 h-3 w-px bg-neutral-700" />
                     </span>
                   )}
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -224,21 +224,21 @@ export default function RemindersPage() {
                   </div>
                 </div>
               </div>
-              <p className="label mt-6 text-neutral-300">Upcoming</p>
+              <p className="label mt-6 text-neutral-600">Upcoming</p>
               <p className="label mt-1.5">This month</p>
             </div>
 
-            <div className="flex flex-col rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] p-6 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]">
+            <div className="flex flex-col rounded-3xl border border-line bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
               <div className="flex items-center justify-between">
                 <p className="label">Next up</p>
                 <p className="label flex items-center gap-2">
-                  <span className={`h-1.5 w-1.5 rounded-full ${upcoming.length ? "bg-accent" : "bg-neutral-700"}`} />
+                  <span className={`h-1.5 w-1.5 rounded-full ${upcoming.length ? "bg-accent" : "bg-neutral-300"}`} />
                   {upcoming.length} active
                 </p>
               </div>
               <div className="mt-4 flex flex-1 flex-col">
                 {nextUp.length === 0 ? (
-                  <p className="my-auto text-sm font-normal text-neutral-600">Nothing coming up. Pick a day below to add one.</p>
+                  <p className="my-auto text-sm font-normal text-neutral-400">Nothing coming up. Pick a day below to add one.</p>
                 ) : (
                   nextUp.map((r) => (
                     <button
@@ -247,7 +247,7 @@ export default function RemindersPage() {
                       className="flex items-center gap-4 border-b border-line py-3.5 text-left last:border-0"
                     >
                       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal}`} />
-                      <span className="min-w-0 flex-1 truncate text-[15px] font-normal text-neutral-200">{r.title}</span>
+                      <span className="min-w-0 flex-1 truncate text-[15px] font-normal text-neutral-700">{r.title}</span>
                       <span className="label shrink-0">
                         {new Date(r.dueAt).toLocaleString([], { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
                       </span>
@@ -264,7 +264,7 @@ export default function RemindersPage() {
             </div>
           </div>
 
-          <div className="gsap-entrance mt-4 rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] p-6 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]">
+          <div className="gsap-entrance mt-4 rounded-3xl border border-line bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
             <div className="label grid grid-cols-7 gap-2 text-center">
               {WEEKDAYS.map((w) => (
                 <div key={w}>
@@ -283,17 +283,17 @@ export default function RemindersPage() {
                     key={i}
                     onClick={() => setSelected(day)}
                     className={`relative flex min-h-[54px] flex-col items-center justify-center gap-1.5 rounded-xl transition-colors sm:min-h-[68px] ${
-                      inMonth ? "bg-[#1b1b1d] text-neutral-300 hover:bg-[#222225]" : "bg-transparent text-neutral-700 hover:bg-[#161618]"
+                      inMonth ? "bg-surface-2 text-neutral-600 hover:bg-neutral-100" : "bg-transparent text-neutral-300 hover:bg-neutral-50"
                     }`}
                   >
-                    <span className={`text-sm font-normal tabular-nums ${isToday ? "text-neutral-50" : ""}`}>{day.getDate()}</span>
+                    <span className={`text-sm font-normal tabular-nums ${isToday ? "text-neutral-900 font-medium" : ""}`}>{day.getDate()}</span>
                     {isToday && <span className="absolute bottom-2 h-px w-4 bg-[var(--calendar-accent)]" />}
                     {dots.length > 0 && (
                       <div className="flex items-center gap-0.5">
                         {dots.slice(0, MAX_DOTS_PER_DAY).map((r) => (
                           <span
                             key={r.id}
-                            className={`h-1 w-1 rounded-full ${r.done ? "bg-neutral-700" : (PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal)}`}
+                            className={`h-1 w-1 rounded-full ${r.done ? "bg-neutral-300" : (PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal)}`}
                           />
                         ))}
                       </div>
@@ -312,7 +312,7 @@ export default function RemindersPage() {
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-6" onClick={() => setSelected(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-6" onClick={() => setSelected(null)}>
           <div
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md animate-[rise-in_0.2s_ease-out_backwards] modal"
@@ -322,14 +322,14 @@ export default function RemindersPage() {
                 <p className="label">
                   {selected.toLocaleDateString([], { weekday: "long" })}
                 </p>
-                <h2 className="mt-2 text-2xl font-normal text-neutral-100">
+                <h2 className="mt-2 text-2xl font-normal text-neutral-800">
                   {selected.toLocaleDateString([], { day: "numeric", month: "long" })}
                 </h2>
               </div>
               <button
                 onClick={() => setSelected(null)}
                 aria-label="Close"
-                className="label transition-colors hover:text-neutral-200"
+                className="label transition-colors hover:text-text"
               >
                 Close
               </button>
@@ -337,18 +337,18 @@ export default function RemindersPage() {
 
             <div className="mt-6 flex flex-col">
               {selectedReminders.length === 0 ? (
-                <p className="py-3 text-sm font-normal text-neutral-600">Nothing scheduled.</p>
+                <p className="py-3 text-sm font-normal text-neutral-400">Nothing scheduled.</p>
               ) : (
                 selectedReminders.map((r) => (
                   <div key={r.id} className="flex items-center gap-4 border-b border-line py-3.5 last:border-0">
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal}`} />
                     <div className="min-w-0 flex-1">
-                      <p className={`truncate text-[15px] font-normal ${r.done ? "text-neutral-600 line-through" : "text-neutral-100"}`}>{r.title}</p>
+                      <p className={`truncate text-[15px] font-normal ${r.done ? "text-neutral-400 line-through" : "text-neutral-800"}`}>{r.title}</p>
                       <p className="label mt-0.5">
                         {new Date(r.dueAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                       </p>
                     </div>
-                    <button onClick={() => toggleDone(r)} className="label hover:text-neutral-100">
+                    <button onClick={() => toggleDone(r)} className="label hover:text-text">
                       {r.done ? "Undo" : "Done"}
                     </button>
                     <button onClick={() => remove(r.id)} className="label hover:text-red-400">
@@ -369,14 +369,14 @@ export default function RemindersPage() {
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addOnSelectedDay()}
-                className="mt-2 w-full input text-lg font-normal text-neutral-100 outline-none"
+                className="mt-2 w-full input text-lg font-normal text-neutral-800 outline-none"
               />
               <div className="mt-5 flex items-center gap-3">
                 <input
                   type="time"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
-                  className="rounded-xl bg-[#1f1f22] px-3 py-2 font-mono text-sm text-neutral-300 outline-none [color-scheme:dark]"
+                  className="rounded-xl border border-line bg-white px-3 py-2 font-mono text-sm text-neutral-700 outline-none"
                 />
                 <PriorityPicker value={newPriority} onChange={setNewPriority} />
               </div>

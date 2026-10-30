@@ -499,7 +499,7 @@ function RoutineCard({
                   tabIndex={s.owned ? 0 : undefined}
                   onClick={() => s.owned && onToggle(s.id)}
                   onKeyDown={(e) => s.owned && (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onToggle(s.id))}
-                  className={`flex w-full items-start gap-3.5 text-left transition-colors ${large ? "px-1 py-3.5" : "px-1 py-2.5"} ${s.owned ? "cursor-pointer hover:bg-white/[0.02]" : ""}`}
+                  className={`flex w-full items-start gap-3.5 text-left transition-colors ${large ? "px-1 py-3.5" : "px-1 py-2.5"} ${s.owned ? "cursor-pointer hover:bg-black/[0.02]" : ""}`}
                 >
                   <span className={`check mt-0.5 ${ticks[s.id] && s.owned ? "is-on" : ""} ${s.owned ? "" : "opacity-30"}`}>
                     {ticks[s.id] && s.owned && (
@@ -542,7 +542,7 @@ function RoutineCard({
                   {i.product && <p className="truncate text-[12px] text-dim">{i.product}</p>}
                   <p className="text-[11.5px] text-muted">{daysLabel(i.days)}</p>
                 </div>
-                <button onClick={() => onRemove(i.id)} aria-label={`Remove ${i.text}`} className="btn-ghost !px-1.5 !py-0.5 hover:!text-[#ff9a90]">
+                <button onClick={() => onRemove(i.id)} aria-label={`Remove ${i.text}`} className="btn-ghost !px-1.5 !py-0.5 hover:!text-red-500">
                   ×
                 </button>
               </div>

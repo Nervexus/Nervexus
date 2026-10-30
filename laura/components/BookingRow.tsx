@@ -55,11 +55,11 @@ export function BookingRow({
   const meta = [location, partySize ? `${partySize} people` : null].filter(Boolean).join(" · ");
 
   return (
-    <div className="rounded-2xl bg-[#1b1b1d] p-4">
+    <div className="rounded-2xl bg-white p-4">
       <div className="flex items-start gap-3">
         <span
           className={`mt-1 h-8 w-[3px] shrink-0 rounded-full ${
-            status === "cancelled" ? "bg-neutral-800" : active ? "bg-[var(--booking-accent)]" : "bg-neutral-700"
+            status === "cancelled" ? "bg-neutral-200" : active ? "bg-[var(--booking-accent)]" : "bg-neutral-300"
           }`}
         />
         <div className="min-w-0 flex-1">
@@ -69,7 +69,7 @@ export function BookingRow({
                 icon={CATEGORY_ICON[category] ?? CATEGORY_ICON.other}
                 className="shrink-0 text-sm text-neutral-500"
               ></iconify-icon>
-              <h3 className={`text-sm font-medium ${status === "cancelled" ? "text-neutral-600 line-through" : "text-neutral-100"}`}>
+              <h3 className={`text-sm font-medium ${status === "cancelled" ? "text-neutral-400 line-through" : "text-neutral-800"}`}>
                 {title}
               </h3>
             </div>

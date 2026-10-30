@@ -99,7 +99,7 @@ export default function CallsPage() {
             kind === "call" ? "What should the urgent message say?" : "What should the message say?"
           }
           rows={3}
-          className="mt-5 w-full resize-none input text-base font-normal text-neutral-200 outline-none placeholder:text-neutral-600"
+          className="mt-5 w-full resize-none input text-base font-normal text-neutral-700 outline-none placeholder:text-neutral-400"
         />
 
         <div className="mt-3.5 flex flex-wrap gap-2">

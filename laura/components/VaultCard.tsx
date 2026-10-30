@@ -19,13 +19,13 @@ export function VaultCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="group relative flex h-full flex-col rounded-2xl bg-[#1b1b1d] p-5 transition-colors hover:border-neutral-700">
+    <div className="group relative flex h-full flex-col rounded-2xl bg-white p-5 transition-colors hover:border-neutral-300">
       <div className="flex items-start gap-3">
         <IconTile>
           <LockIcon className="h-4 w-4" />
         </IconTile>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-normal text-neutral-100">{title}</h3>
+          <h3 className="truncate text-base font-normal text-neutral-800">{title}</h3>
           <p className="mt-1.5 truncate item px-3 py-2 font-mono text-sm text-neutral-400">
             {revealedValue ?? "••••••••••••"}
           </p>
@@ -36,7 +36,7 @@ export function VaultCard({
         <button
           onClick={onCopy}
           disabled={revealing}
-          className="flex items-center gap-1 hover:text-neutral-200 disabled:opacity-50"
+          className="flex items-center gap-1 hover:text-neutral-800 disabled:opacity-50"
         >
           <CopyIcon className="h-3.5 w-3.5" />
           {copied ? "Copied!" : "Copy"}
@@ -44,7 +44,7 @@ export function VaultCard({
         <button
           onClick={onReveal}
           disabled={revealing}
-          className="hover:text-neutral-200 disabled:opacity-50"
+          className="hover:text-neutral-800 disabled:opacity-50"
         >
           {revealing ? "…" : revealedValue !== undefined ? "Hide" : "Reveal"}
         </button>

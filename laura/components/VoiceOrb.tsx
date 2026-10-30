@@ -131,10 +131,10 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
           disabled={status === "unsupported"}
           className={`flex h-9 w-9 items-center justify-center rounded-full transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
             status === "listening"
-              ? "animate-[pulse_1.4s_ease-in-out_infinite] bg-white/90 text-neutral-950 shadow-[0_0_24px_rgba(255,255,255,0.5)]"
+              ? "animate-[pulse_1.4s_ease-in-out_infinite] bg-neutral-800 text-white shadow-[0_0_24px_rgba(0,0,0,0.15)]"
               : status === "speaking" || status === "thinking"
-                ? "bg-white/15 text-white"
-                : "text-neutral-400 hover:bg-white/10 hover:text-white"
+                ? "bg-neutral-200 text-neutral-600"
+                : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-800"
           }`}
         >
           <MicIcon className="h-[18px] w-[18px]" />
@@ -145,14 +145,14 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
     const label = STATUS_LABEL[status];
     const ringColorClass =
       status === "listening"
-        ? "border-neutral-100/60 text-neutral-50"
+        ? "border-neutral-800/60 text-neutral-800"
         : status === "thinking"
-          ? "border-neutral-300/60 text-neutral-200"
+          ? "border-neutral-400/60 text-neutral-600"
           : status === "speaking"
-            ? "border-neutral-200/60 text-neutral-100"
+            ? "border-neutral-500/60 text-neutral-700"
             : status === "unsupported"
-              ? "border-neutral-700 text-neutral-600"
-              : "border-neutral-500/60 text-neutral-300";
+              ? "border-neutral-300 text-neutral-400"
+              : "border-neutral-400/60 text-neutral-500";
 
     return (
       <div className="flex flex-col items-center gap-5">
@@ -165,7 +165,7 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
           {/* The ambient WebGL mesh behind the page is the orb now -- this
               button is just the tap target, not a second decorative ring. */}
           <span
-            className={`relative flex h-20 w-20 items-center justify-center rounded-full border bg-neutral-950/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
+            className={`relative flex h-20 w-20 items-center justify-center rounded-full border bg-white/60 backdrop-blur-sm transition-colors duration-500 ${ringColorClass} ${
               status === "listening" ? "animate-[pulse_1.4s_ease-in-out_infinite]" : ""
             }`}
           >
@@ -174,7 +174,7 @@ export const VoiceOrb = forwardRef<VoiceOrbHandle, { onTranscript: (text: string
         </button>
         <p className="flex flex-col items-center text-center text-xs tracking-wide text-neutral-500">
           {label.line1 && <span>{label.line1}</span>}
-          <span className="font-medium text-neutral-300">{label.line2}</span>
+          <span className="font-medium text-neutral-700">{label.line2}</span>
         </p>
       </div>
     );

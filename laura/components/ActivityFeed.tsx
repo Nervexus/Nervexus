@@ -164,13 +164,13 @@ export function ActivityFeed({ refreshKey }: { refreshKey?: number }) {
           style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
           className="flex animate-[rise-in_0.4s_ease-out_backwards] items-center gap-3 item px-3.5 py-2.5 backdrop-blur-sm"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-800 text-neutral-300">
-            {TOOL_ICON[entry.tool]?.("h-4 w-4") ?? <span className="h-1.5 w-1.5 rounded-full bg-neutral-300" />}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-neutral-500">
+            {TOOL_ICON[entry.tool]?.("h-4 w-4") ?? <span className="h-1.5 w-1.5 rounded-full bg-neutral-400" />}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm text-neutral-200">{entry.summary}</p>
+            <p className="truncate text-sm text-neutral-700">{entry.summary}</p>
           </div>
-          <span className="shrink-0 text-[11px] text-neutral-600">{timeAgo(entry.createdAt)}</span>
+          <span className="shrink-0 text-[11px] text-neutral-400">{timeAgo(entry.createdAt)}</span>
         </div>
       ))}
     </div>

@@ -236,7 +236,7 @@ export default function RotaPage() {
               const file = e.target.files?.[0];
               if (file) parsePhoto(file);
             }}
-            className="text-sm text-neutral-400 file:mr-3 file:rounded-full file:border file:border-neutral-800 file:bg-neutral-950/60 file:px-3.5 file:py-1.5 file:text-xs file:text-neutral-300 file:transition-colors hover:file:border-neutral-600"
+            className="text-sm text-neutral-500 file:mr-3 file:rounded-full file:border file:border-neutral-200 file:bg-white file:px-3.5 file:py-1.5 file:text-xs file:text-neutral-600 file:transition-colors hover:file:border-neutral-400"
           />
           {parsing && <span className="text-xs text-neutral-500">Reading photo…</span>}
         </div>
@@ -252,25 +252,25 @@ export default function RotaPage() {
                   type="datetime-local"
                   value={toLocalInputValue(s.startAt)}
                   onChange={(e) => updateParsed(i, { startAt: new Date(e.target.value).toISOString() })}
-                  className="input text-xs [color-scheme:dark]"
+                  className="input text-xs [color-scheme:light]"
                 />
                 <input
                   type="datetime-local"
                   value={toLocalInputValue(s.endAt)}
                   onChange={(e) => updateParsed(i, { endAt: new Date(e.target.value).toISOString() })}
-                  className="input text-xs [color-scheme:dark]"
+                  className="input text-xs [color-scheme:light]"
                 />
                 <input
                   value={s.location ?? ""}
                   onChange={(e) => updateParsed(i, { location: e.target.value || null })}
                   placeholder="Location"
-                  className="input text-xs placeholder:text-neutral-600"
+                  className="input text-xs placeholder:text-neutral-400"
                 />
                 <input
                   value={s.colleagues ?? ""}
                   onChange={(e) => updateParsed(i, { colleagues: e.target.value || null })}
                   placeholder="Colleagues"
-                  className="input text-xs placeholder:text-neutral-600"
+                  className="input text-xs placeholder:text-neutral-400"
                 />
               </div>
             ))}
@@ -295,25 +295,25 @@ export default function RotaPage() {
             type="datetime-local"
             value={startAt}
             onChange={(e) => setStartAt(e.target.value)}
-            className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
           />
           <input
             type="datetime-local"
             value={endAt}
             onChange={(e) => setEndAt(e.target.value)}
-            className="input text-sm text-neutral-300 outline-none [color-scheme:dark]"
+            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
           />
           <input
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Location (optional)"
-            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
           />
           <input
             value={colleagues}
             onChange={(e) => setColleagues(e.target.value)}
             placeholder="Colleagues (optional)"
-            className="input text-sm text-neutral-300 outline-none placeholder:text-neutral-600"
+            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
           />
         </div>
         <div className="mt-3.5 flex justify-end">
@@ -361,13 +361,13 @@ export default function RotaPage() {
                 value={profileDraft.homeAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, homeAddress: e.target.value }))}
                 placeholder="Home address"
-                className="input text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="input text-xs text-neutral-700 outline-none placeholder:text-neutral-400"
               />
               <input
                 value={profileDraft.workAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, workAddress: e.target.value }))}
                 placeholder="Work address"
-                className="input text-xs text-neutral-300 outline-none placeholder:text-neutral-600"
+                className="input text-xs text-neutral-700 outline-none placeholder:text-neutral-400"
               />
               <div className="flex items-center gap-2">
                 <input
@@ -377,7 +377,7 @@ export default function RotaPage() {
                   onChange={(e) =>
                     setProfileDraft((p) => ({ ...p, arrivalBufferMinutes: Number(e.target.value) }))
                   }
-                  className="w-16 input text-xs text-neutral-300 outline-none"
+                  className="w-16 input text-xs text-neutral-700 outline-none"
                 />
                 <span className="text-xs text-neutral-500">min arrival buffer</span>
               </div>

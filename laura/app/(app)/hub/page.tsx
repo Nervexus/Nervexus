@@ -70,7 +70,7 @@ export default function HubPage() {
       </p>
 
       {/* Hub diagram */}
-      <div className="relative mt-8 overflow-hidden rounded-[22px] border border-line bg-[#080808]">
+      <div className="relative mt-8 overflow-hidden rounded-[22px] border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
 
         <div className="relative px-6 py-12 sm:px-12 sm:py-16">
           {/* Three-column layout: left pair | center orb | right pair */}
@@ -91,9 +91,9 @@ export default function HubPage() {
 
             {/* Central Laura node */}
             <div className="relative shrink-0">
-              <div className="absolute -inset-5 rounded-full bg-[#d4a040]/8 blur-2xl" aria-hidden />
-              <div className="absolute -inset-1.5 rounded-full border border-[#c89530]/20" aria-hidden />
-              <div className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#c89530]/30 bg-gradient-to-b from-[#151515] to-[#0a0a0a] shadow-[0_0_30px_rgba(200,149,48,0.12),inset_0_1px_0_rgba(255,255,255,0.05)]">
+              <div className="absolute -inset-5 rounded-full bg-accent/[0.06] blur-2xl" aria-hidden />
+              <div className="absolute -inset-1.5 rounded-full border border-accent/15" aria-hidden />
+              <div className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full border border-accent/20 bg-gradient-to-b from-white to-surface-2 shadow-[0_4px_16px_rgba(139,111,212,0.1),0_1px_3px_rgba(0,0,0,0.04)]">
                 <LogoMark className="h-8 w-8" />
               </div>
             </div>
@@ -129,20 +129,20 @@ export default function HubPage() {
             aria-hidden
           >
             {/* Centre → top-left (Vercel) */}
-            <path d="M50,50 C35,50 30,28 15,28" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="15" cy="28" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C35,50 30,28 15,28" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
+            <circle cx="15" cy="28" r="0.7" fill="rgba(139,111,212,0.3)" />
             {/* Centre → bottom-left (Database) */}
-            <path d="M50,50 C35,50 30,72 15,72" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="15" cy="72" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C35,50 30,72 15,72" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
+            <circle cx="15" cy="72" r="0.7" fill="rgba(139,111,212,0.3)" />
             {/* Centre → top-right (Encrypted) */}
-            <path d="M50,50 C65,45 70,35 85,35" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="35" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C65,45 70,35 85,35" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
+            <circle cx="85" cy="35" r="0.7" fill="rgba(139,111,212,0.3)" />
             {/* Centre → bottom-right (Telegram) */}
-            <path d="M50,50 C65,50 70,60 85,60" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="60" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C65,50 70,60 85,60" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
+            <circle cx="85" cy="60" r="0.7" fill="rgba(139,111,212,0.3)" />
             {/* Centre → far-bottom-right (Google) */}
-            <path d="M50,50 C65,55 70,82 85,82" stroke="rgba(255,255,255,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="82" r="0.7" fill="rgba(139,111,212,0.35)" />
+            <path d="M50,50 C65,55 70,82 85,82" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
+            <circle cx="85" cy="82" r="0.7" fill="rgba(139,111,212,0.3)" />
           </svg>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function HubPage() {
         <div className="card card-pad">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-surface-2 text-muted">
                 <GlobeIcon />
               </div>
               <div>
@@ -188,7 +188,7 @@ export default function HubPage() {
         <div className="card card-pad">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-surface-2 text-muted">
                 <MessageIcon />
               </div>
               <div>
@@ -201,18 +201,18 @@ export default function HubPage() {
 
           <div className="mt-4 space-y-2">
             <div className="flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${webhookLoading ? "bg-dim/40 animate-pulse" : webhook?.url ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.4)]"}`} />
+              <span className={`h-2 w-2 rounded-full ${webhookLoading ? "bg-dim/40 animate-pulse" : webhook?.url ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.3)]"}`} />
               <span className="text-[12px] text-muted">
                 {webhookLoading ? "Checking webhook…" : webhook?.url ? "Webhook active" : "Webhook not connected"}
               </span>
             </div>
             {webhook?.last_error_message && (
-              <p className="text-[11px] text-red-400/80">
+              <p className="text-[11px] text-red-500/80">
                 Last error: {webhook.last_error_message}
               </p>
             )}
             {webhook?.pending_update_count ? (
-              <p className="text-[11px] text-amber-400/80">
+              <p className="text-[11px] text-amber-600/80">
                 {webhook.pending_update_count} pending update{webhook.pending_update_count === 1 ? "" : "s"}
               </p>
             ) : null}
@@ -241,7 +241,7 @@ export default function HubPage() {
         <div className="card card-pad sm:col-span-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line-2 bg-[#0e0e0e]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-surface-2 text-muted">
                 <GoogleIcon />
               </div>
               <div>
@@ -256,22 +256,22 @@ export default function HubPage() {
             {googleNode?.status === "online" && (
               <div className="flex gap-4">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
                   <span className="text-[12px] text-muted">Calendar connected</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]" />
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
                   <span className="text-[12px] text-muted">Gmail connected</span>
                 </div>
               </div>
             )}
             {googleNode?.status === "unconfigured" && (
               <p className="text-[12px] text-muted">
-                Not connected. Visit <span className="text-text">/api/google/auth</span> to link your Google account.
+                Not connected. Visit <span className="font-medium text-text">/api/google/auth</span> to link your Google account.
               </p>
             )}
             {googleNode?.status === "offline" && (
-              <p className="text-[12px] text-red-400/80">
+              <p className="text-[12px] text-red-500/80">
                 Credentials expired. Reconnect via /api/google/auth.
               </p>
             )}
@@ -310,7 +310,7 @@ function NodeBox({
       onClick={onClick}
       className="group flex flex-col items-center gap-2"
     >
-      <div className="relative flex h-[80px] w-[110px] flex-col items-center justify-center rounded-[14px] border border-line-2 bg-[#0e0e0e] shadow-[0_4px_20px_rgba(0,0,0,0.5)] transition-all group-hover:border-line-3 sm:h-[100px] sm:w-[150px]">
+      <div className="relative flex h-[80px] w-[110px] flex-col items-center justify-center rounded-[14px] border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.06)] transition-all group-hover:border-line-2 group-hover:shadow-[0_2px_6px_rgba(0,0,0,0.06),0_8px_20px_-6px_rgba(0,0,0,0.08)] sm:h-[100px] sm:w-[150px]">
         {/* Icon */}
         <div className="flex h-8 w-8 items-center justify-center text-muted group-hover:text-text transition-colors sm:h-10 sm:w-10">
           {icon}
@@ -320,9 +320,9 @@ function NodeBox({
           <span
             className={`absolute right-2 top-2 h-2 w-2 rounded-full ${
               status === "online"
-                ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]"
+                ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]"
                 : status === "offline"
-                  ? "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.4)]"
+                  ? "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.3)]"
                   : "bg-dim/40"
             }`}
           />
@@ -379,9 +379,9 @@ function StatusDot({ status }: { status: "online" | "offline" | "unconfigured" |
   if (!status) return <span className="h-2.5 w-2.5 rounded-full bg-dim/40 animate-pulse" />;
   const color =
     status === "online"
-      ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]"
+      ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]"
       : status === "offline"
-        ? "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.4)]"
+        ? "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.3)]"
         : "bg-dim/40";
   const label = status === "online" ? "Connected" : status === "offline" ? "Offline" : "Not set up";
   return (
@@ -394,7 +394,7 @@ function StatusDot({ status }: { status: "online" | "offline" | "unconfigured" |
 
 function Stat({ label, value }: { label: string; value: unknown }) {
   return (
-    <div className="rounded-lg border border-line bg-[#0e0e0e] px-2.5 py-2 text-center">
+    <div className="rounded-lg border border-line bg-surface-2 px-2.5 py-2 text-center">
       <p className="text-[16px] font-semibold text-text tabular-nums">{String(value ?? 0)}</p>
       <p className="mt-0.5 text-[10px] text-dim">{label}</p>
     </div>

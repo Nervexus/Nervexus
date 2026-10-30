@@ -20,12 +20,12 @@ export function SettingsCard({
   status: "connected" | "expiring" | "missing";
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl bg-[#1b1b1d] p-4">
+    <div className="flex items-center gap-3 rounded-2xl bg-white p-4">
       <IconTile>
         <iconify-icon icon={icon} className="text-lg" />
       </IconTile>
       <div className="min-w-0 flex-1">
-        <h3 className="text-sm font-medium text-neutral-100">{label}</h3>
+        <h3 className="text-sm font-medium text-neutral-800">{label}</h3>
         {detail && <p className="mt-0.5 truncate text-xs text-neutral-500">{detail}</p>}
       </div>
       <span

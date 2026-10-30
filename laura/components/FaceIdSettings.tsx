@@ -76,11 +76,11 @@ export function FaceIdSettings() {
   }
 
   return (
-    <div className="rounded-3xl bg-gradient-to-b from-[#19191b] to-[#121213] p-6 shadow-[0_20px_50px_-25px_rgba(0,0,0,0.9)]">
+    <div className="rounded-3xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="label">Sign-in</p>
-          <h2 className="mt-3 text-xl font-normal text-neutral-100">Face ID</h2>
+          <h2 className="mt-3 text-xl font-normal text-neutral-800">Face ID</h2>
           <p className="mt-1.5 max-w-md text-sm font-normal text-neutral-500">
             Sign in with Face ID, Touch ID or your fingerprint instead of the password. Set it up once on each
             device you use.
@@ -95,13 +95,13 @@ export function FaceIdSettings() {
         </button>
       </div>
       {!supported && <p className="mt-4 text-sm text-neutral-500">This browser doesn&apos;t support passkeys.</p>}
-      {message && <p className="mt-4 text-sm text-neutral-300">{message}</p>}
+      {message && <p className="mt-4 text-sm text-neutral-600">{message}</p>}
       {passkeys && passkeys.length > 0 && (
         <div className="mt-5 flex flex-col">
           {passkeys.map((p) => (
             <div key={p.id} className="flex items-center gap-4 border-t border-line py-3">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-              <span className="flex-1 text-sm font-normal text-neutral-200">{p.label ?? "Passkey"}</span>
+              <span className="flex-1 text-sm font-normal text-neutral-700">{p.label ?? "Passkey"}</span>
               <span className="label">
                 {p.lastUsedAt ? `Used ${new Date(p.lastUsedAt).toLocaleDateString()}` : `Added ${new Date(p.createdAt).toLocaleDateString()}`}
               </span>
