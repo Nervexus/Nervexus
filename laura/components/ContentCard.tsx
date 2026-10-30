@@ -52,7 +52,7 @@ export function ContentCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="relative flex flex-col gap-3 rounded-2xl bg-white p-4">
+    <div className="card flex flex-col gap-3 p-4">
       <div className="flex items-start gap-3">
         <IconTile>
           <iconify-icon icon={TYPE_ICON[type] ?? TYPE_ICON.other} className="text-lg" />

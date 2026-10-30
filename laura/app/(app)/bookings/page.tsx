@@ -174,7 +174,7 @@ export default function BookingsPage() {
             </button>
           </div>
           {searchResult && (
-            <div className="mt-3 rounded-2xl border border-line bg-surface-2 px-4 py-3">
+            <div className="panel mt-3 px-4 py-3">
               <p className="whitespace-pre-wrap text-sm text-neutral-600">{searchResult}</p>
               <div className="mt-2 flex justify-end">
                 <Button variant="ghost" onClick={saveSearchAsIdea}>
@@ -203,7 +203,7 @@ export default function BookingsPage() {
                   onClick={() => setCategory(c)}
                   aria-label={c}
                   className={`item flex flex-col items-center gap-1 py-2.5 transition-colors ${
-                    category === c ? "!border-[rgba(139,111,212,0.4)] !bg-[rgba(139,111,212,0.08)] text-accent" : "text-muted hover:text-text"
+                    category === c ? "!border-white/10 !bg-ink !text-white" : "text-muted hover:text-text"
                   }`}
                 >
                   <iconify-icon icon={CATEGORY_ICON[c]} className="text-lg"></iconify-icon>

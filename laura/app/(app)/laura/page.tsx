@@ -178,14 +178,14 @@ export default function LauraPage() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] font-normal leading-relaxed ${
                   m.role === "user"
-                    ? "rounded-br-md bg-gradient-to-br from-[#8b6fd4] to-[#6a50bf] text-white"
-                    : "rounded-bl-md border border-black/[0.06] bg-white text-neutral-800 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                    ? "panel-ink !rounded-br-md"
+                    : "card !rounded-[var(--r-inner)] !rounded-bl-md text-neutral-800"
                 }`}
               >
                 {m.content}
               </div>
               {m.places?.map((p) => (
-                <div key={p.name} className="mt-2 w-full max-w-[80%] overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+                <div key={p.name} className="card mt-2 w-full max-w-[80%] overflow-hidden !rounded-[var(--r-inner)]">
                   {p.images.length > 0 && (
                     <div className="flex gap-1 overflow-x-auto">
                       {p.images.map((src) => (
@@ -211,7 +211,7 @@ export default function LauraPage() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="flex gap-1.5 rounded-2xl rounded-bl-md border border-line bg-white px-4 py-4 shadow-sm">
+              <div className="card flex gap-1.5 !rounded-[var(--r-inner)] !rounded-bl-md px-4 py-4">
                 {[0, 1, 2].map((d) => (
                   <span
                     key={d}
@@ -243,7 +243,7 @@ export default function LauraPage() {
             className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-normal text-text outline-none placeholder:text-neutral-400"
           />
           <div className="mt-2 flex items-center justify-between">
-            <span className="flex items-center gap-1.5 rounded-full border border-line bg-surface-2 px-3 py-1.5 text-xs text-muted">
+            <span className="pill">
               <iconify-icon icon="solar:stars-minimalistic-linear" className="text-sm"></iconify-icon>
               Laura
             </span>
@@ -262,7 +262,7 @@ export default function LauraPage() {
                 onClick={() => fileRef.current?.click()}
                 disabled={sending}
                 aria-label="Attach a photo or file"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-neutral-400 transition-colors hover:text-text disabled:opacity-40"
+                className="icon-tile !h-9 !w-9 !text-neutral-400 transition-colors hover:!text-text disabled:opacity-40"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4" aria-hidden>
                   <path d="M12 5v14M5 12h14" />
@@ -287,7 +287,7 @@ export default function LauraPage() {
               <button
                 key={s.label}
                 onClick={() => applySuggestion(s.prompt)}
-                className="flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2 text-xs text-muted shadow-sm transition-all hover:border-line-2 hover:text-text hover:shadow-md"
+                className="item flex items-center gap-2 !rounded-full px-3.5 py-2 text-xs text-muted hover:text-text"
               >
                 <iconify-icon icon={s.icon} className="text-sm"></iconify-icon>
                 {s.label}

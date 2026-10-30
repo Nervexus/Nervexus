@@ -175,7 +175,24 @@ async function answer(text: string): Promise<void> {
   for (const place of places) {
     await sendPlaceCard(place.images, placeCaption(place));
   }
-  if (reply.trim()) await replyInChat(reply);
+  for (const [i, bubble] of textBubbles(reply).entries()) {
+    if (i > 0) {
+      await showTyping();
+      await new Promise((r) => setTimeout(r, Math.min(400 + bubble.length * 12, 1500)));
+    }
+    await replyInChat(bubble);
+  }
+}
+
+// A short reply written as separate paragraphs goes out as separate texts,
+// the way a person sends a couple of messages in a row. Anything long or
+// structured stays as one message.
+function textBubbles(reply: string): string[] {
+  const parts = reply.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  if (parts.length < 2 || parts.length > 3 || parts.some((p) => p.length > 320)) {
+    return reply.trim() ? [reply.trim()] : [];
+  }
+  return parts;
 }
 
 // Photos and files. A rota (said so in the caption, or a photo/sheet sent

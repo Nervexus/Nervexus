@@ -105,7 +105,7 @@ export function ShiftCard({
 
   if (editing) {
     return (
-      <div className="relative flex flex-col gap-3 rounded-2xl bg-white p-4">
+      <div className="card flex flex-col gap-3 p-4">
         <span className="label">Edit shift</span>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <input
@@ -151,7 +151,7 @@ export function ShiftCard({
   }
 
   return (
-    <div className="relative flex flex-col gap-3 rounded-2xl bg-white p-4">
+    <div className="card flex flex-col gap-3 p-4">
       <div className="flex items-start gap-3">
         <IconTile>
           <iconify-icon icon="solar:calendar-linear" className="text-lg" />

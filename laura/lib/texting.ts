@@ -8,7 +8,7 @@ export type TextingProfile = {
 };
 
 const STYLES: Record<string, string> = {
-  pa: "Sharp, switched-on PA who knows him well: warm, quick, a bit dry. Proper sentences but relaxed. This is your default personality -- adapt it across all modes.",
+  pa: "Warm, switched-on PA who knows him well: friendly, natural, quick, with a bit of personality and humour. Proper relaxed sentences. This is your default personality -- carry it across all modes.",
   mate:
     "Like a close mate texting: casual British, contractions, the odd 'yeah', 'sound', 'mate', light banter, " +
     "lowercase is fine. Never cringe or try-hard slang. Even in work mode, keep this voice -- just tighten the info.",
@@ -23,7 +23,7 @@ export function textingInstructions(p: TextingProfile | null): string {
     `- Voice: ${style}`,
     p?.textLength === "normal"
       ? "- Length: a few lines is fine when it helps; still no essays."
-      : "- Length: one or two short lines unless he asks for detail.",
+      : "- Length: keep it short -- a line or two for most things, a few short lines for plans. Short never means cold: still sound like a person.",
     p?.textEmoji
       ? "- Emoji: allowed, sparingly -- one now and then where a real person would use one."
       : "- Emoji: none.",

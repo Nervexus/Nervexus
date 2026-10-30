@@ -146,9 +146,10 @@ export function AppSidebar() {
   return (
     <>
       {/* Desktop rail */}
-      <nav className="sticky top-0 z-40 hidden h-screen w-[76px] shrink-0 flex-col items-center border-r border-line bg-bg-1 py-5 sm:flex">
-        <Link href="/" aria-label="LAURA home" className="relative flex h-11 w-11 items-center justify-center rounded-[14px] border border-line-2 bg-white">
-          <span className="logo-ring absolute inset-0 rounded-[14px]" aria-hidden />
+      <div className="sticky top-0 z-40 hidden h-screen shrink-0 py-3 pl-3 sm:block">
+      <nav className="card flex h-full w-[68px] flex-col items-center py-4">
+        <Link href="/" aria-label="LAURA home" className="icon-tile relative !h-11 !w-11">
+          <span className="logo-ring absolute inset-0 rounded-full" aria-hidden />
           <LogoMark className="h-5 w-5" />
         </Link>
 
@@ -158,7 +159,6 @@ export function AppSidebar() {
             const count = countFor(link.href);
             return (
               <li key={link.href} className={`group relative ${i === 3 || i === 10 ? "mt-3" : ""}`}>
-                {active && <span className="absolute -left-4 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-accent" aria-hidden />}
                 <Link
                   href={link.href}
                   aria-label={link.label}
@@ -175,28 +175,29 @@ export function AppSidebar() {
         </ul>
 
         <div className="group relative mb-2">
-          <button onClick={refreshApp} aria-label="Refresh" className="flex h-10 w-10 items-center justify-center rounded-[14px] text-muted transition-colors hover:text-text hover:bg-black/[0.04]">
+          <button onClick={refreshApp} aria-label="Refresh" className="rail-btn !h-10 !w-10">
             <NavIcon name="refresh" />
           </button>
           <span className="rail-tip">Refresh the app</span>
         </div>
         <div className="group relative">
-          <button onClick={signOut} aria-label="Sign out" className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-2 text-[11px] font-semibold text-muted transition-colors hover:text-text">
+          <button onClick={signOut} aria-label="Sign out" className="icon-tile !h-10 !w-10 text-[11px] font-semibold !text-muted transition-colors hover:!text-text">
             MH
           </button>
           <span className="rail-tip">Madoxs Harvey · Sign out</span>
         </div>
       </nav>
+      </div>
 
       {/* Phone bottom bar */}
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl sm:hidden">
-        <ul className="mx-auto flex max-w-md items-center justify-around px-2 py-2">
+      <nav className="card !fixed !bg-white/80 inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+10px)] z-40 sm:hidden">
+        <ul className="mx-auto flex max-w-md items-center justify-around px-1 py-2">
           {LINKS.filter((l) => PHONE_BAR.includes(l.href)).map((link) => {
             const active = isActive(link.href);
             return (
               <li key={link.href}>
                 <Link href={link.href} className={`flex flex-col items-center gap-1 rounded-xl px-3 py-1 text-[10.5px] font-medium ${active ? "text-text" : "text-dim"}`}>
-                  <span className={`flex h-8 w-11 items-center justify-center rounded-[11px] ${active ? "bg-gradient-to-b from-[#9077d8] to-[#6a50bf] text-white" : ""}`}>
+                  <span className={`flex h-8 w-11 items-center justify-center rounded-full ${active ? "bg-ink text-white shadow-[0_6px_14px_-6px_rgba(25,12,20,0.5)]" : ""}`}>
                     <NavIcon name={link.icon} />
                   </span>
                   {link.label}
@@ -218,10 +219,10 @@ export function AppSidebar() {
       {more && (
         <div className="fixed inset-0 z-50 sm:hidden">
           <div className="modal-backdrop absolute inset-0" onClick={() => setMore(false)} aria-hidden />
-          <div className="modal absolute inset-x-3 bottom-3 rounded-[24px] pb-[calc(env(safe-area-inset-bottom)+16px)]">
+          <div className="modal absolute inset-x-3 bottom-3 pb-[calc(env(safe-area-inset-bottom)+16px)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-line-2 bg-surface-2">
+                <span className="icon-tile !h-9 !w-9">
                   <LogoMark />
                 </span>
                 <span className="text-[15px] font-semibold text-text">LAURA</span>
@@ -241,7 +242,7 @@ export function AppSidebar() {
                       onClick={() => setMore(false)}
                       className={`item relative flex flex-col items-center gap-2 px-2 py-3.5 text-[12px] ${active ? "text-text" : "text-muted"}`}
                     >
-                      <span className={`icon-tile ${active ? "!bg-gradient-to-b !from-[#9077d8] !to-[#6a50bf] !text-white" : ""}`}>
+                      <span className={`icon-tile ${active ? "!border-white/10 !bg-ink !text-white" : ""}`}>
                         <NavIcon name={link.icon} />
                       </span>
                       {link.label}

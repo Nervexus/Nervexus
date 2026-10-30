@@ -105,7 +105,7 @@ export default function LoginPage() {
       type="button"
       onClick={() => signInWithPasskey()}
       disabled={busy}
-      className="item mt-8 flex w-full flex-col items-center gap-3 py-8 text-text transition-colors hover:!border-[rgba(139,111,212,0.4)] hover:!bg-[rgba(139,111,212,0.08)] disabled:opacity-60"
+      className="item mt-8 flex w-full flex-col items-center gap-3 py-8 text-text transition-colors hover:!border-white hover:!bg-white/70 disabled:opacity-60"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.4} strokeLinecap="round" className="h-12 w-12 text-accent" aria-hidden>
         <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
@@ -125,7 +125,7 @@ export default function LoginPage() {
         key={error ?? "ok"}
       >
         <div className="flex items-center gap-3">
-          <span className="relative flex h-11 w-11 items-center justify-center rounded-[14px] border border-line-2 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+          <span className="icon-tile relative !h-11 !w-11">
             <span className="logo-ring absolute inset-0 rounded-[14px]" aria-hidden />
             <LogoMark className="h-5 w-5" />
           </span>

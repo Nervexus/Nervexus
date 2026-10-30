@@ -28,7 +28,7 @@ export function CallLogCard({
   return (
     <div
       className={`relative flex items-start gap-3 rounded-[24px] border p-4 ${
-        failed ? "border-red-200 bg-red-50" : "border-transparent bg-white"
+        failed ? "border-red-200 bg-red-50" : "card"
       }`}
     >
       <IconTile>

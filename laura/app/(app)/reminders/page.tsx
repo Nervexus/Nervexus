@@ -194,7 +194,7 @@ export default function RemindersPage() {
           <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr]">
             {/* The month dial: one dot per day around a matte knob, lit where
                 something's due, gold for today, with the needle on today. */}
-            <div className="flex flex-col items-center rounded-3xl border border-line bg-white px-6 pb-6 pt-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
+            <div className="card flex flex-col items-center px-6 pb-6 pt-8">
               <div className="relative h-56 w-56">
                 {Array.from({ length: monthDays }, (_, d) => {
                   const angle = (d / monthDays) * Math.PI * 2 - Math.PI / 2;
@@ -228,7 +228,7 @@ export default function RemindersPage() {
               <p className="label mt-1.5">This month</p>
             </div>
 
-            <div className="flex flex-col rounded-3xl border border-line bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
+            <div className="card flex flex-col p-6">
               <div className="flex items-center justify-between">
                 <p className="label">Next up</p>
                 <p className="label flex items-center gap-2">
@@ -264,7 +264,7 @@ export default function RemindersPage() {
             </div>
           </div>
 
-          <div className="gsap-entrance mt-4 rounded-3xl border border-line bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
+          <div className="card gsap-entrance mt-4 p-6">
             <div className="label grid grid-cols-7 gap-2 text-center">
               {WEEKDAYS.map((w) => (
                 <div key={w}>
@@ -376,7 +376,7 @@ export default function RemindersPage() {
                   type="time"
                   value={newTime}
                   onChange={(e) => setNewTime(e.target.value)}
-                  className="rounded-xl border border-line bg-white px-3 py-2 font-mono text-sm text-neutral-700 outline-none"
+                  className="input !w-auto font-mono text-sm text-neutral-700"
                 />
                 <PriorityPicker value={newPriority} onChange={setNewPriority} />
               </div>
