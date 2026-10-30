@@ -38,10 +38,24 @@ type Outreach = {
 };
 
 const SLOTS: { slot: Slot; title: string; hint: string }[] = [
-  { slot: "morning", title: "Morning", hint: "Products and getting ready" },
-  { slot: "afternoon", title: "Afternoon", hint: "Work block and the middle of the day" },
-  { slot: "night", title: "Night", hint: "Wind down and set up tomorrow" },
+  { slot: "morning", title: "Morning", hint: "Until 12pm" },
+  { slot: "afternoon", title: "Afternoon", hint: "12pm – 5pm" },
+  { slot: "night", title: "Night", hint: "From 5pm" },
 ];
+
+/** Which card is "now", by UK time: morning till 12, afternoon till 5, then night. */
+function currentSlot(): Slot {
+  const h = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", hourCycle: "h23" }).format(new Date()));
+  return h < 12 ? "morning" : h < 17 ? "afternoon" : "night";
+}
+
+function readView(): "now" | "all" {
+  try {
+    return localStorage.getItem("routine:view") === "all" ? "all" : "now";
+  } catch {
+    return "now";
+  }
+}
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -81,6 +95,8 @@ export default function RoutinePage() {
   const [outreach, setOutreach] = useState<Outreach | null>(null);
   const [ticks, setTicks] = useState<Record<string, boolean>>({});
   const [editing, setEditing] = useState<Slot | null>(null);
+  const [view, setView] = useState<"now" | "all">("now");
+  const [nowSlot, setNowSlot] = useState<Slot>("morning");
   const [error, setError] = useState<string | null>(null);
   const [oilDraft, setOilDraft] = useState({ name: "", notes: "", day: false, night: false, cold: false });
 
@@ -97,11 +113,22 @@ export default function RoutinePage() {
         setOils(data.oils ?? []);
         setOutreach(data.outreach ?? null);
         setTicks(readTicks(data.day.date));
+        setNowSlot(currentSlot());
+        setView(readView());
       })
       .catch(() => setError("Couldn't load the routine."));
   }
 
   useEffect(() => load("today"), []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function switchView(v: "now" | "all") {
+    setView(v);
+    try {
+      localStorage.setItem("routine:view", v);
+    } catch {
+      // remembered for this visit only
+    }
+  }
 
   function switchDay(w: "today" | "tomorrow") {
     setWhich(w);
@@ -172,46 +199,81 @@ export default function RoutinePage() {
     </button>
   );
 
+  // Tomorrow is a plan, so it always shows the whole day.
+  const showAll = view === "all" || which === "tomorrow";
+  const card = (slot: Slot, size: "large" | "normal") => {
+    const meta = SLOTS.find((x) => x.slot === slot)!;
+    return (
+      <RoutineCard
+        key={slot}
+        size={size}
+        title={meta.title}
+        hint={meta.hint}
+        current={which === "today" && slot === nowSlot}
+        steps={day ? day[slot] : []}
+        items={items.filter((i) => i.slot === slot)}
+        ticks={ticks}
+        onToggle={toggle}
+        editing={editing === slot}
+        onEdit={() => setEditing(editing === slot ? null : slot)}
+        onSave={saveItem}
+        onRemove={removeItem}
+        onAdd={(draft) => addItem(slot, draft)}
+      />
+    );
+  };
+
   return (
     <GsapEntrance className="relative mx-auto max-w-6xl px-4 sm:px-[26px]">
       <div className="gsap-entrance flex flex-wrap items-center gap-3">
         <h1 className="page-title">Routine</h1>
         <Pill>{day?.label ?? "…"}</Pill>
         {day && <span className="pill">{day.shift ? `Shift ${day.shift.start}–${day.shift.end}` : "Day off"}</span>}
-        <div className="tabs ml-auto">
-          {(["today", "tomorrow"] as const).map((w) => (
-            <button key={w} onClick={() => switchDay(w)} className={`tab capitalize ${which === w ? "is-active" : ""}`}>
-              {w}
-            </button>
-          ))}
+        <div className="ml-auto flex flex-wrap gap-2">
+          {which === "today" && (
+            <div className="tabs">
+              {(["now", "all"] as const).map((v) => (
+                <button key={v} onClick={() => switchView(v)} className={`tab ${view === v ? "is-active" : ""}`}>
+                  {v === "now" ? "Now" : "All day"}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="tabs">
+            {(["today", "tomorrow"] as const).map((w) => (
+              <button key={w} onClick={() => switchDay(w)} className={`tab capitalize ${which === w ? "is-active" : ""}`}>
+                {w}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-      <p className="gsap-entrance page-sub mt-1">Tick things off as you go. Tap Edit on a card to add or remove steps.</p>
 
       {error && <p className="mt-6 text-sm text-red-400">{error}</p>}
 
       {day && (
         <>
-          {/* Morning / Afternoon / Night + Key dates */}
-          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {SLOTS.map(({ slot, title, hint }) => (
-              <RoutineCard
-                key={slot}
-                title={title}
-                hint={hint}
-                steps={day[slot]}
-                items={items.filter((i) => i.slot === slot)}
-                ticks={ticks}
-                onToggle={toggle}
-                editing={editing === slot}
-                onEdit={() => setEditing(editing === slot ? null : slot)}
-                onSave={saveItem}
-                onRemove={removeItem}
-                onAdd={(draft) => addItem(slot, draft)}
-              />
-            ))}
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
+            <div className="flex min-w-0 flex-col gap-4">
+              {showAll ? (
+                <>
+                  {card("morning", "large")}
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {card("afternoon", "normal")}
+                    {card("night", "normal")}
+                  </div>
+                </>
+              ) : (
+                <>
+                  {card(nowSlot, "large")}
+                  <button onClick={() => switchView("all")} className="btn-ghost self-start !text-[12.5px]">
+                    {nowSlot === "night" ? "Show morning and afternoon too" : `Up next: ${nowSlot === "morning" ? "afternoon and night" : "night"} · show all day`}
+                  </button>
+                </>
+              )}
+            </div>
 
-            <div className="gsap-entrance card card-pad">
+            <div className="gsap-entrance card card-pad self-start">
               <h2 className="label">Key dates</h2>
               <ul className="mt-3.5 flex flex-col gap-2">
                 {keyDates.map((k) => (
@@ -226,23 +288,6 @@ export default function RoutinePage() {
               </ul>
             </div>
           </div>
-
-          {day.shopping.length > 0 && (
-            <div className="gsap-entrance card card-pad mt-4 flex flex-wrap items-center gap-2">
-              <span className="label mr-1">Still to buy</span>
-              {day.shopping.map((s) =>
-                s.link ? (
-                  <a key={s.product} href={s.link} target="_blank" rel="noopener noreferrer" className="tag tag-amber hover:opacity-80">
-                    {s.product} ↗
-                  </a>
-                ) : (
-                  <span key={s.product} className="tag tag-amber">
-                    {s.product}
-                  </span>
-                )
-              )}
-            </div>
-          )}
 
           {/* Work rota */}
           <div className="gsap-entrance card card-pad mt-4">
@@ -275,99 +320,104 @@ export default function RoutinePage() {
             </div>
           </div>
 
-          {/* Hair, scent, outreach */}
-          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <div className="gsap-entrance card card-pad">
-              <h2 className="label">Hair &amp; beard</h2>
-              <p className="mt-3 text-[14px] text-text">{day.hair.headline}</p>
-              <p className="mt-1 text-[12.5px] text-muted">{day.hair.detail}</p>
-            </div>
+          {/* Regular routine: hair & beard, perfume oils, outreach */}
+          <div className="gsap-entrance card mt-4 mb-4">
+            <h2 className="px-6 pt-6 text-[17px] font-semibold text-text">Regular Routine</h2>
+            <div className="grid grid-cols-1 divide-y divide-line lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+              <section className="p-6">
+                <h3 className="label">Hair &amp; beard</h3>
+                <p className="mt-3 text-[15px] text-text">{day.hair.headline}</p>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{day.hair.detail}</p>
+              </section>
 
-            <div className="gsap-entrance card card-pad">
-              <h2 className="label">Perfume oils · {oils.length}</h2>
-              <p className="mt-3 text-[14px] text-text">Wear: {day.wear.oil?.name ?? "add an oil below"}</p>
-              <p className="mt-1 text-[12.5px] text-muted">
-                {day.wear.oil ? day.wear.why : "1–2 dabs on moisturised wrists and neck, after you're dressed."}
-              </p>
-              {plans.length > 0 && day.wear.oil && (
-                <ul className="mt-3 flex flex-col gap-1">
-                  {plans.slice(0, 4).map((p, i) => (
-                    <li key={i} className="flex justify-between gap-3 text-[12px]">
-                      <span className="truncate text-muted">
-                        {p.title} · {p.when}
+              <section className="p-6">
+                <h3 className="label">Perfume oils · {oils.length}</h3>
+                <p className="mt-3 text-[15px] text-text">{day.wear.oil ? `Wear ${day.wear.oil.name}` : "No oils added yet"}</p>
+                <p className="mt-1.5 text-[13px] text-muted">
+                  {day.wear.oil ? day.wear.why : "1–2 dabs on moisturised wrists and neck, after you're dressed."}
+                </p>
+                {plans.length > 0 && day.wear.oil && (
+                  <ul className="mt-3 flex flex-col gap-1">
+                    {plans.slice(0, 3).map((p, i) => (
+                      <li key={i} className="flex justify-between gap-3 text-[12px]">
+                        <span className="truncate text-muted">
+                          {p.title} · {p.when}
+                        </span>
+                        <span className="shrink-0 text-lilac">{p.pick.oil?.name ?? "—"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <ul className="mt-3 flex flex-col divide-y divide-line">
+                  {oils.map((o) => (
+                    <li key={o.id} className="flex flex-wrap items-center gap-2 py-2">
+                      <span className="min-w-0 flex-1 truncate text-[13px] text-text" title={o.notes ?? undefined}>
+                        {o.name}
                       </span>
-                      <span className="shrink-0 text-lilac">{p.pick.oil?.name ?? "—"}</span>
+                      {flag(o.day, "day", () => toggleOil(o, "day"))}
+                      {flag(o.night, "night", () => toggleOil(o, "night"))}
+                      {flag(o.cold, "cold", () => toggleOil(o, "cold"))}
+                      <button onClick={() => removeOil(o.id)} aria-label={`Remove ${o.name}`} className="btn-ghost !px-1.5 !py-0.5">
+                        ×
+                      </button>
                     </li>
                   ))}
                 </ul>
-              )}
-              <ul className="mt-3 flex flex-col divide-y divide-line">
-                {oils.map((o) => (
-                  <li key={o.id} className="flex flex-wrap items-center gap-2 py-2">
-                    <span className="min-w-0 flex-1 truncate text-[13px] text-text" title={o.notes ?? undefined}>
-                      {o.name}
-                    </span>
-                    {flag(o.day, "day", () => toggleOil(o, "day"))}
-                    {flag(o.night, "night", () => toggleOil(o, "night"))}
-                    {flag(o.cold, "cold", () => toggleOil(o, "cold"))}
-                    <button onClick={() => removeOil(o.id)} aria-label={`Remove ${o.name}`} className="btn-ghost !px-1.5 !py-0.5">
-                      ×
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-3 flex flex-col gap-2">
-                <input
-                  value={oilDraft.name}
-                  onChange={(e) => setOilDraft((d) => ({ ...d, name: e.target.value }))}
-                  placeholder="Oil name"
-                  className="input"
-                />
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {flag(oilDraft.day, "day", () => setOilDraft((d) => ({ ...d, day: !d.day })))}
-                  {flag(oilDraft.night, "night", () => setOilDraft((d) => ({ ...d, night: !d.night })))}
-                  {flag(oilDraft.cold, "cold", () => setOilDraft((d) => ({ ...d, cold: !d.cold })))}
-                  <Button variant="accent" onClick={addOil} disabled={!oilDraft.name.trim()} className="ml-auto !py-1.5">
-                    Add oil
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="gsap-entrance card card-pad">
-              <h2 className="label">Outreach</h2>
-              {outreach ? (
-                <>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <div className="item px-3 py-2.5">
-                      <p className="stat-num !text-[26px]">{outreach.today.sent}</p>
-                      <p className="text-[12px] text-muted">sent today</p>
-                    </div>
-                    <div className="item px-3 py-2.5">
-                      <p className="stat-num !text-[26px] text-lilac">{outreach.today.replies}</p>
-                      <p className="text-[12px] text-muted">replies today</p>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-[12px] text-muted">
-                    This week: {outreach.week.sent} sent · {plural(outreach.week.replies, "reply", "replies")} ·{" "}
-                    {plural(outreach.week.callsBooked, "call")} · {outreach.week.won} won
-                  </p>
-                  {outreach.warmLeads.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {outreach.warmLeads.slice(0, 6).map((l) => (
-                        <span key={l.id} className="tag tag-purple">
-                          {l.company || l.name}
-                        </span>
-                      ))}
+                <div className="mt-3 flex flex-col gap-2">
+                  <input
+                    value={oilDraft.name}
+                    onChange={(e) => setOilDraft((d) => ({ ...d, name: e.target.value }))}
+                    placeholder="Add an oil"
+                    className="input"
+                  />
+                  {oilDraft.name.trim() && (
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {flag(oilDraft.day, "day", () => setOilDraft((d) => ({ ...d, day: !d.day })))}
+                      {flag(oilDraft.night, "night", () => setOilDraft((d) => ({ ...d, night: !d.night })))}
+                      {flag(oilDraft.cold, "cold", () => setOilDraft((d) => ({ ...d, cold: !d.cold })))}
+                      <Button variant="accent" onClick={addOil} className="ml-auto !py-1.5">
+                        Add
+                      </Button>
                     </div>
                   )}
-                </>
-              ) : (
-                <p className="mt-3 text-[12.5px] text-muted">The outreach app isn&apos;t answering right now.</p>
-              )}
-              <a href="https://signal-outreach-two.vercel.app" target="_blank" rel="noopener noreferrer" className="btn mt-4 w-full">
-                Open outreach
-              </a>
+                </div>
+              </section>
+
+              <section className="p-6">
+                <h3 className="label">Outreach</h3>
+                {outreach ? (
+                  <>
+                    <div className="mt-3 flex items-end gap-6">
+                      <div>
+                        <p className="stat-num">{outreach.today.sent}</p>
+                        <p className="text-[12px] text-muted">sent today</p>
+                      </div>
+                      <div>
+                        <p className="stat-num text-lilac">{outreach.today.replies}</p>
+                        <p className="text-[12px] text-muted">replies today</p>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-[12.5px] text-muted">
+                      This week: {outreach.week.sent} sent · {plural(outreach.week.replies, "reply", "replies")} ·{" "}
+                      {plural(outreach.week.callsBooked, "call")} · {outreach.week.won} won
+                    </p>
+                    {outreach.warmLeads.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {outreach.warmLeads.slice(0, 6).map((l) => (
+                          <span key={l.id} className="tag tag-purple">
+                            {l.company || l.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p className="mt-3 text-[13px] text-muted">The outreach app isn&apos;t answering right now.</p>
+                )}
+                <a href="https://signal-outreach-two.vercel.app" target="_blank" rel="noopener noreferrer" className="btn mt-4 w-full">
+                  Open outreach
+                </a>
+              </section>
             </div>
           </div>
         </>
@@ -380,6 +430,8 @@ type NewItem = { text: string; product: string; link: string; owned: boolean; da
 const EMPTY: NewItem = { text: "", product: "", link: "", owned: true, days: [] };
 
 function RoutineCard({
+  size = "normal",
+  current = false,
   title,
   hint,
   steps,
@@ -392,6 +444,8 @@ function RoutineCard({
   onRemove,
   onAdd,
 }: {
+  size?: "large" | "normal";
+  current?: boolean;
   title: string;
   hint: string;
   steps: Step[];
@@ -405,19 +459,23 @@ function RoutineCard({
   onAdd: (draft: NewItem) => Promise<boolean>;
 }) {
   const [draft, setDraft] = useState<NewItem>(EMPTY);
+  const large = size === "large";
   const doable = steps.filter((s) => s.owned);
   const done = doable.filter((s) => ticks[s.id]).length;
 
   return (
-    <div className="gsap-entrance card card-pad flex flex-col">
+    <div className={`gsap-entrance card flex flex-col ${large ? "p-6 sm:p-8" : "card-pad"}`}>
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h2 className="text-[15px] font-semibold text-text">{title}</h2>
-          <p className="text-[12px] text-dim">{hint}</p>
+          <p className="flex items-center gap-2 text-[12px] text-dim">
+            {current && <span className="dot is-live" />}
+            {current ? `Now · ${hint}` : hint}
+          </p>
+          <h2 className={`mt-1 font-semibold tracking-tight text-text ${large ? "text-[30px] leading-tight" : "text-[18px]"}`}>{title}</h2>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {!editing && (
-            <span className="font-mono text-[12px] tabular text-muted">
+            <span className={`font-mono tabular text-muted ${large ? "text-[15px]" : "text-[12px]"}`}>
               {done}/{doable.length}
             </span>
           )}
@@ -429,10 +487,10 @@ function RoutineCard({
 
       {!editing && (
         <>
-          <div className="progress mt-3">
+          <div className={`progress ${large ? "mt-5" : "mt-3"}`}>
             <span style={{ width: `${doable.length ? (done / doable.length) * 100 : 0}%` }} />
           </div>
-          <ul className="mt-3 flex flex-col gap-0.5">
+          <ul className={`flex flex-col divide-y divide-line ${large ? "mt-4" : "mt-2"}`}>
             {steps.length === 0 && <li className="px-2 py-2 text-[13px] text-dim">Nothing here. Tap Edit to add a step.</li>}
             {steps.map((s) => (
               <li key={s.id}>
@@ -441,7 +499,7 @@ function RoutineCard({
                   tabIndex={s.owned ? 0 : undefined}
                   onClick={() => s.owned && onToggle(s.id)}
                   onKeyDown={(e) => s.owned && (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onToggle(s.id))}
-                  className={`flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition-colors ${s.owned ? "cursor-pointer hover:bg-white/[0.03]" : ""}`}
+                  className={`flex w-full items-start gap-3.5 text-left transition-colors ${large ? "px-1 py-3.5" : "px-1 py-2.5"} ${s.owned ? "cursor-pointer hover:bg-white/[0.02]" : ""}`}
                 >
                   <span className={`check mt-0.5 ${ticks[s.id] && s.owned ? "is-on" : ""} ${s.owned ? "" : "opacity-30"}`}>
                     {ticks[s.id] && s.owned && (
@@ -451,7 +509,7 @@ function RoutineCard({
                     )}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className={`block text-[14px] ${ticks[s.id] && s.owned ? "text-dim line-through" : s.owned ? "text-text" : "text-muted"}`}>
+                    <span className={`block ${large ? "text-[16px]" : "text-[14px]"} ${ticks[s.id] && s.owned ? "text-dim line-through" : s.owned ? "text-text" : "text-muted"}`}>
                       {s.text}
                     </span>
                     {s.product && <span className="mt-0.5 block truncate text-[12px] text-dim">{s.product}</span>}
