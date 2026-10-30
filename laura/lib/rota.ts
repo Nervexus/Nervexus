@@ -1,4 +1,5 @@
-import { shiftsFromGrid, type RotaGrid } from "@/lib/rota-grid";
+import { findOwnerColumn, parseUkDate, shiftsFromGrid, type RotaGrid } from "@/lib/rota-grid";
+import { fileKind, imageMime, tableFromFile } from "@/lib/files";
 import { localTime } from "@/lib/routine";
 import { Type } from "@google/genai";
 import { prisma } from "@/lib/db";
@@ -52,7 +53,46 @@ const GRID_SCHEMA = {
  * saving (never writes directly). */
 export async function parseRotaImage(base64: string, mimeType: string): Promise<ParsedShift[]> {
   const grid = await transcribeRota(base64, mimeType);
-  if (!grid) return [];
+  return grid ? gridToShifts(grid) : [];
+}
+
+/** Any rota file: a photo or PDF (read by Gemini), or an Excel/CSV sheet
+ * (read directly -- no AI needed, so it's exact). */
+export async function parseRotaFile(buf: Buffer, mime: string | null, name: string | null): Promise<ParsedShift[]> {
+  const kind = fileKind(mime, name);
+  if (kind === "image") return parseRotaImage(buf.toString("base64"), imageMime(mime, name));
+  if (kind === "pdf") return parseRotaImage(buf.toString("base64"), "application/pdf");
+  if (kind === "xlsx" || kind === "csv") {
+    const grid = tableToGrid(await tableFromFile(buf, kind));
+    return grid ? gridToShifts(grid) : [];
+  }
+  throw new Error("I can read rotas as a photo, PDF, Excel (.xlsx) or CSV file.");
+}
+
+/** A spreadsheet's rows as a rota grid: the header row is the one with his
+ * name in it; every later row with a date in it is a day. */
+export function tableToGrid(rows: string[][]): RotaGrid | null {
+  const year = new Date().getUTCFullYear();
+  const dateCol = (r: string[]) => r.findIndex((c) => !!parseUkDate(c, year) && /\d{1,2}[/.-]\d{1,2}/.test(c));
+  const headerIdx = rows.findIndex(
+    (r) => dateCol(r) < 0 && r.filter((c) => c).length >= 2 && findOwnerColumn(r, ROTA_NAME, ROTA_FULL_NAME) >= 0
+  );
+  if (headerIdx >= 0) {
+    const people = rows[headerIdx];
+    const days = rows
+      .slice(headerIdx + 1)
+      .filter((r) => dateCol(r) >= 0)
+      .map((r) => ({ date: r[dateCol(r)], cells: people.map((_, i) => r[i] ?? "") }));
+    return days.length ? { people, rows: days } : null;
+  }
+  // A personal rota with no names: each row has a date and a time like 8-6.
+  const days = rows
+    .filter((r) => dateCol(r) >= 0)
+    .map((r) => ({ date: r[dateCol(r)], cells: [r.find((c) => /\d\s*[-–]\s*\d/.test(c) && !/\d{1,2}[/.]\d{1,2}[/.]/.test(c)) ?? ""] }));
+  return days.length ? { people: [""], rows: days } : null;
+}
+
+function gridToShifts(grid: RotaGrid & { location?: string | null }): ParsedShift[] {
   const now = Date.now();
   const year = new Date().getUTCFullYear();
   return shiftsFromGrid(grid, ROTA_NAME, ROTA_FULL_NAME, year)
@@ -64,6 +104,20 @@ export async function parseRotaImage(base64: string, mimeType: string): Promise<
       note: s.note,
     }))
     .filter((s) => new Date(s.endAt).getTime() > now);
+}
+
+/** Saves parsed shifts, skipping any already on the rota at the same start time. */
+export async function saveShifts(shifts: ParsedShift[], source: string): Promise<ParsedShift[]> {
+  const added: ParsedShift[] = [];
+  for (const s of shifts) {
+    const startAt = new Date(s.startAt);
+    const endAt = new Date(s.endAt);
+    if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime()) || endAt <= startAt) continue;
+    if (await prisma.shift.findFirst({ where: { startAt } })) continue;
+    await prisma.shift.create({ data: { startAt, endAt, location: s.location, colleagues: s.colleagues, note: s.note, source } });
+    added.push(s);
+  }
+  return added;
 }
 
 /** Step one: the grid exactly as written, or null if unreadable. */

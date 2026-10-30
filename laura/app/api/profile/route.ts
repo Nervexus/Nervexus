@@ -13,11 +13,7 @@ export async function GET() {
 export async function PATCH(request: Request) {
   const data = await request.json().catch(() => null);
 
-  const update: {
-    homeAddress?: string | null;
-    workAddress?: string | null;
-    arrivalBufferMinutes?: number;
-  } = {};
+  const update: Record<string, string | number | boolean | null> = {};
   if (typeof data?.homeAddress === "string" || data?.homeAddress === null) {
     update.homeAddress = data.homeAddress?.trim() || null;
   }
@@ -26,6 +22,25 @@ export async function PATCH(request: Request) {
   }
   if (typeof data?.arrivalBufferMinutes === "number" && data.arrivalBufferMinutes >= 0) {
     update.arrivalBufferMinutes = Math.round(data.arrivalBufferMinutes);
+  }
+
+  // Texting style and daily message settings.
+  const pick = (key: string, allowed: string[]) => {
+    if (typeof data?.[key] === "string" && allowed.includes(data[key])) update[key] = data[key];
+  };
+  pick("textStyle", ["pa", "mate", "calm", "minimal"]);
+  pick("textLength", ["short", "normal"]);
+  pick("motivationTone", ["harsh", "firm", "gentle"]);
+  for (const key of ["textEmoji", "morningOn", "nightOn", "motivation"]) {
+    if (typeof data?.[key] === "boolean") update[key] = data[key];
+  }
+  if (typeof data?.textNotes === "string" || data?.textNotes === null) {
+    update.textNotes = data.textNotes?.trim().slice(0, 600) || null;
+  }
+  for (const key of ["morningTime", "nightTime"]) {
+    if (typeof data?.[key] === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(data[key])) {
+      update[key] = data[key];
+    }
   }
 
   if (Object.keys(update).length === 0) {

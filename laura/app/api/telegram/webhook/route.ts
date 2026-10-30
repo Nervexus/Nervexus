@@ -4,7 +4,9 @@ import { chat, type ChatMessage } from "@/lib/brain";
 import { downloadTelegramFile, ownerChatId, replyInChat, resolveButtonTap, sendPlaceCard, showTyping } from "@/lib/telegram";
 import { placeCaption } from "@/lib/places";
 import { transcribeAudio } from "@/lib/transcribe";
-import { parseRotaImage } from "@/lib/rota";
+import { parseRotaFile, saveShifts } from "@/lib/rota";
+import { fileKind } from "@/lib/files";
+import { answerAboutFile } from "@/lib/read-file";
 import { morningMessage, nightMessage } from "@/lib/routine";
 import { friendlyDateTime, USER_TIMEZONE } from "@/lib/booking-links";
 
@@ -29,12 +31,14 @@ export async function POST(request: Request) {
   const text: string | undefined = typeof msg?.text === "string" ? msg.text.trim() : undefined;
   const voice: { file_id: string; mime_type?: string } | undefined = msg?.voice ?? msg?.audio;
   const photos: { file_id: string }[] | undefined = msg?.photo;
+  const doc: { file_id: string; mime_type?: string; file_name?: string } | undefined = msg?.document;
+  const caption: string = typeof msg?.caption === "string" ? msg.caption.trim() : "";
   const fromOwner = String(msg?.chat?.id) === ownerChatId();
-  if (!msg || !fromOwner || (!text && !voice && !photos?.length)) {
+  if (!msg || !fromOwner || (!text && !voice && !photos?.length && !doc)) {
     console.warn("Telegram update ignored:", {
       hasMessage: Boolean(msg),
       fromOwner,
-      hasContent: Boolean(text || voice || photos?.length),
+      hasContent: Boolean(text || voice || photos?.length || doc),
     });
     return NextResponse.json({ ok: true });
   }
@@ -44,21 +48,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
   if (text === "/morning" || text === "/night") {
-    await replyInChat(text === "/morning" ? await morningMessage() : await nightMessage());
+    const profile = await prisma.profile.findUnique({ where: { id: "me" } });
+    const tone = profile && !profile.motivation ? null : (profile?.motivationTone ?? "harsh");
+    await replyInChat(text === "/morning" ? await morningMessage({ motivationTone: tone }) : await nightMessage());
     return NextResponse.json({ ok: true });
   }
 
   await showTyping();
   try {
-    if (photos?.length) {
-      await handleRotaPhoto(photos[photos.length - 1].file_id);
+    if (photos?.length || doc) {
+      await handleFile(
+        photos?.length ? { fileId: photos[photos.length - 1].file_id, mime: "image/jpeg", name: null } : { fileId: doc!.file_id, mime: doc!.mime_type ?? null, name: doc!.file_name ?? null },
+        caption
+      );
     } else if (voice) {
       const { base64 } = await downloadTelegramFile(voice.file_id);
       const transcript = await transcribeAudio(base64, voice.mime_type ?? "audio/ogg");
       if (!transcript) {
         await replyInChat("I couldn't make out that voice note -- could you try again?");
       } else {
-        await replyInChat(`🎙 "${transcript}"`);
         await answer(transcript);
       }
     } else if (text) {
@@ -133,40 +141,50 @@ async function answer(text: string): Promise<void> {
   if (reply.trim()) await replyInChat(reply);
 }
 
-// A photo is read as a work rota: any shifts found are saved straight away
-// with source "photo" (the same marker the Rota page's upload uses), then
-// listed back so a misread is easy to spot and fix on the Rota page.
-async function handleRotaPhoto(fileId: string) {
-  const { base64, path } = await downloadTelegramFile(fileId);
-  const mimeType = path.endsWith(".png") ? "image/png" : "image/jpeg";
-  const shifts = await parseRotaImage(base64, mimeType);
-  const valid = shifts.filter((s) => {
-    const a = new Date(s.startAt).getTime();
-    const b = new Date(s.endAt).getTime();
-    return !Number.isNaN(a) && !Number.isNaN(b) && b > a;
-  });
-  if (valid.length === 0) {
-    await replyInChat("I couldn't find your shifts on that one. Is your name (Madoxs) on it? If so, try a clearer, straight-on photo.");
-    return;
+// Photos and files. A rota (said so in the caption, or a photo/sheet sent
+// with no caption) is read and its shifts saved straight away, then listed
+// back so a misread is easy to spot. Anything else -- a letter, a bill, a
+// screenshot -- is read and answered, using the caption as the question.
+async function handleFile(file: { fileId: string; mime: string | null; name: string | null }, caption: string) {
+  const { base64, path } = await downloadTelegramFile(file.fileId);
+  const buf = Buffer.from(base64, "base64");
+  const name = file.name ?? path.split("/").pop() ?? null;
+  const kind = fileKind(file.mime, name);
+  const saysRota = /\b(rota|shifts?|schedule)\b/i.test(caption);
+  const rotaShaped = !caption && (kind === "image" || kind === "xlsx" || kind === "csv");
+
+  if (saysRota || rotaShaped) {
+    let shifts: Awaited<ReturnType<typeof parseRotaFile>> = [];
+    try {
+      shifts = await parseRotaFile(buf, file.mime, name);
+    } catch (err) {
+      if (saysRota) return void (await replyInChat(err instanceof Error ? err.message : "I couldn't read that rota."));
+    }
+    if (shifts.length > 0) {
+      const added = await saveShifts(shifts, "photo");
+      await prisma.activityLog.create({ data: { tool: "get_shifts", summary: `Added ${added.length} shifts from a rota file` } }).catch(() => {});
+      const t = (d: Date) => d.toLocaleTimeString("en-GB", { timeZone: USER_TIMEZONE, hour: "2-digit", minute: "2-digit" });
+      const lines = shifts.map((s) => {
+        const start = new Date(s.startAt);
+        return `• ${friendlyDateTime(start).replace(/, \d\d:\d\d$/, "")} ${t(start)}–${t(new Date(s.endAt))}${s.colleagues ? ` · with ${s.colleagues}` : ""}`;
+      });
+      const already = shifts.length - added.length;
+      await replyInChat(
+        `${added.length ? `Added ${added.length} shift${added.length === 1 ? "" : "s"}` : "Nothing new to add"}:\n${lines.join("\n")}` +
+          (already ? `\n\n${already} ${already === 1 ? "was" : "were"} already on your rota.` : "") +
+          "\n\nAnything wrong, fix it on the Rota page."
+      );
+      return;
+    }
+    if (saysRota) {
+      await replyInChat("I couldn't find any upcoming shifts for you (Madoxs) on that. Is your name on it? A clearer photo or the original spreadsheet helps.");
+      return;
+    }
   }
-  for (const s of valid) {
-    await prisma.shift.create({
-      data: {
-        startAt: new Date(s.startAt),
-        endAt: new Date(s.endAt),
-        location: s.location,
-        colleagues: s.colleagues,
-        note: s.note,
-        source: "photo",
-      },
-    });
-  }
-  await prisma.activityLog.create({ data: { tool: "get_shifts", summary: `Added ${valid.length} shifts from a rota photo` } }).catch(() => {});
-  const lines = valid.map((s) => {
-    const start = new Date(s.startAt);
-    const end = new Date(s.endAt);
-    const t = (d: Date) => d.toLocaleTimeString("en-GB", { timeZone: USER_TIMEZONE, hour: "2-digit", minute: "2-digit" });
-    return `• ${friendlyDateTime(start).replace(/, \d\d:\d\d$/, "")} ${t(start)}–${t(end)}${s.location ? ` · ${s.location}` : ""}`;
-  });
-  await replyInChat(`Added ${valid.length} shift${valid.length === 1 ? "" : "s"} from your rota:\n${lines.join("\n")}\n\nAnything wrong, you can fix it on the Rota page.`);
+
+  const question = caption || "What's this? Give me the key points.";
+  const reply = await answerAboutFile(buf, file.mime, name, question);
+  await prisma.chatMessage.create({ data: { role: "user", content: `[Sent a file${name ? `: ${name}` : ""}] ${caption}`.trim() } });
+  await prisma.chatMessage.create({ data: { role: "assistant", content: reply } });
+  await replyInChat(reply);
 }

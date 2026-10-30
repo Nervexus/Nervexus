@@ -225,13 +225,13 @@ export default function RotaPage() {
 
       <div className="gsap-entrance relative mt-8 card p-5">
         <span className="label">
-          Upload a rota photo
+          Upload a rota (photo, PDF, Excel or CSV)
         </span>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/*,.pdf,.csv,.xlsx"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) parsePhoto(file);

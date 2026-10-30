@@ -2,13 +2,15 @@ import { Type, type Content, type FunctionDeclaration } from "@google/genai";
 import { prisma } from "@/lib/db";
 import { placeCall, sendText, sendWithButtons } from "@/lib/telegram";
 import { getGeminiClient, MODEL } from "@/lib/gemini";
-import { getShifts, whoAmIWorkingWith, planCommute } from "@/lib/rota";
+import { getShifts, whoAmIWorkingWith, planCommute, saveShifts } from "@/lib/rota";
+import { checkTracking } from "@/lib/tracking";
 import { getTomorrowBriefing } from "@/lib/briefing";
 import { outreach } from "@/lib/hq";
-import { buildDay, todayYmd, tomorrowYmd, upcomingKeyDates, upcomingPlans } from "@/lib/routine";
+import { buildDay, localTime, todayYmd, tomorrowYmd, upcomingKeyDates, upcomingPlans } from "@/lib/routine";
 import { searchBookingOptions, listBookings, readyToBookLinks, friendlyDateTime } from "@/lib/booking";
 import { researchInstagramAccount, listContentIdeas } from "@/lib/instagram";
 import { lookupPlace, type PlaceCard } from "@/lib/places";
+import { textingInstructions } from "@/lib/texting";
 
 const SYSTEM_PROMPT = `You are Laura, Madoxs Harvey's personal assistant. You text like a real,
 sharp PA who knows him well -- not like an AI chatbot.
@@ -32,6 +34,8 @@ How you write:
   moody cocktail bar, about £12 a drink. Want me to sort a table?" not
   "There are several options that might suit your needs."
 - Don't mention being an AI, a model, or "my tools" unless asked.
+- Never repeat, quote or restate what he just said or asked. No "So you
+  want to..." or "You asked about...". Go straight to the answer.
 
 You do not yet have real-world tools wired up beyond the ones listed for
 this conversation. You can send the user an urgent notification or a
@@ -98,6 +102,16 @@ draft_outreach_email -- it only queues a draft for him to review in the
 outreach app; you never send outreach messages yourself, so say "I've
 queued a draft for you to check", never "I've sent it". Replies are
 checked about hourly on weekdays, so the newest ones can lag.
+
+Your rota and reminders are yours to keep tidy: when he pastes a rota or
+tells you his hours, add them with add_shifts (only his shifts, skip days
+off); remove a wrong one with remove_shift; tick off, move, rename or
+delete reminders with update_reminder (get ids from get_shifts /
+list_reminders first). When he sends a parcel tracking link or number,
+use check_tracking and tell him where it's at in a line. Files he sends
+on Telegram (rota photos, spreadsheets, PDFs, letters, screenshots) are
+read for you automatically. Paying for things and completing bookings,
+and anything in the Vault, stay off-limits.
 
 Going out (restaurants, bars, activities, days out): before recommending
 anywhere, find out what it's for if you don't already know -- ask in one
@@ -381,6 +395,67 @@ const tools: FunctionDeclaration[] = [
     parameters: { type: Type.OBJECT, properties: { days: { type: Type.NUMBER, description: "Defaults to 7." } } },
   },
   {
+    name: "add_shifts",
+    description:
+      "Add one or more work shifts to his rota -- e.g. when he pastes his rota as text or tells you his hours. " +
+      "Only add his own shifts (Madoxs), skip days off (D/O, OFF, HOL). Read shorthand like '8-6' as 08:00-18:00. " +
+      "Use UK local times. Shifts already on the rota at the same start are skipped.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        shifts: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              date: { type: Type.STRING, description: "YYYY-MM-DD" },
+              start: { type: Type.STRING, description: "HH:MM, 24-hour UK time" },
+              end: { type: Type.STRING, description: "HH:MM, 24-hour UK time (past midnight is fine for nights)" },
+              colleagues: { type: Type.STRING, description: "Comma-separated, if known." },
+              location: { type: Type.STRING },
+            },
+            required: ["date", "start", "end"],
+          },
+        },
+      },
+      required: ["shifts"],
+    },
+  },
+  {
+    name: "remove_shift",
+    description: "Delete a shift from his rota. Needs the shift id from get_shifts.",
+    parameters: { type: Type.OBJECT, properties: { id: { type: Type.STRING } }, required: ["id"] },
+  },
+  {
+    name: "update_reminder",
+    description:
+      "Change a reminder: mark it done, move it to a new time, rename it, or delete it. Needs the reminder id from list_reminders.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        id: { type: Type.STRING },
+        action: { type: Type.STRING, enum: ["done", "reschedule", "rename", "delete"] },
+        dueAt: { type: Type.STRING, description: "New absolute ISO 8601 time, for reschedule." },
+        title: { type: Type.STRING, description: "New title, for rename." },
+      },
+      required: ["id", "action"],
+    },
+  },
+  {
+    name: "check_tracking",
+    description:
+      "Check a parcel's delivery status from a tracking link or tracking number he sends. Report the status, expected " +
+      "delivery and latest update in a line or two; if it couldn't be read, say so.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        input: { type: Type.STRING, description: "The tracking URL or tracking number." },
+        courier: { type: Type.STRING, description: "Courier name if known (Royal Mail, Evri, DPD...)." },
+      },
+      required: ["input"],
+    },
+  },
+  {
     name: "search_booking_options",
     description:
       "Search the live web for real restaurant/activity/travel options matching " +
@@ -561,6 +636,10 @@ const LOGGED_TOOLS = new Set([
   "create_content_idea",
   "start_video_call",
   "add_fragrance",
+  "add_shifts",
+  "remove_shift",
+  "update_reminder",
+  "check_tracking",
   "add_outreach_lead",
   "set_outreach_lead_status",
   "draft_outreach_email",
@@ -620,7 +699,7 @@ async function runTool(
     if (reminders.length === 0) return { result: "No upcoming reminders." };
     return {
       result: reminders
-        .map((r) => `- ${r.title} (${r.dueAt.toString()})${r.note ? `: ${r.note}` : ""}`)
+        .map((r) => `- [id:${r.id}] ${r.title} (${friendlyDateTime(r.dueAt)})${r.note ? `: ${r.note}` : ""}`)
         .join("\n"),
     };
   }
@@ -660,7 +739,7 @@ async function runTool(
       result: shifts
         .map(
           (s) =>
-            `- ${s.startAt.toString()} to ${s.endAt.toString()}` +
+            `- [id:${s.id}] ${friendlyDateTime(s.startAt)} to ${friendlyDateTime(s.endAt)}` +
             (s.location ? ` at ${s.location}` : "") +
             (s.colleagues ? ` (with ${s.colleagues})` : "")
         )
@@ -738,6 +817,76 @@ async function runTool(
       return { result: await runOutreachTool(name, args) };
     } catch (err) {
       return { error: err instanceof Error ? err.message : "Outreach request failed." };
+    }
+  }
+  if (name === "add_shifts") {
+    const list = Array.isArray(args.shifts) ? (args.shifts as { date?: string; start?: string; end?: string; colleagues?: string; location?: string }[]) : [];
+    const parsed = [];
+    for (const x of list) {
+      const time = (t?: string) => (t && /^(\d{1,2}):(\d{2})$/.test(t) ? t.split(":").map(Number) : null);
+      const st = time(x.start);
+      const en = time(x.end);
+      if (!x.date || !/^\d{4}-\d{2}-\d{2}$/.test(x.date) || !st || !en) continue;
+      const startAt = localTime(x.date, st[0], st[1]);
+      let endAt = localTime(x.date, en[0], en[1]);
+      if (endAt <= startAt) endAt = new Date(endAt.getTime() + 24 * 60 * 60 * 1000); // night shift
+      parsed.push({ startAt: startAt.toISOString(), endAt: endAt.toISOString(), location: x.location ?? null, colleagues: x.colleagues ?? null, note: null });
+    }
+    if (parsed.length === 0) return { error: "No valid shifts to add (need date YYYY-MM-DD, start and end HH:MM)." };
+    const added = await saveShifts(parsed, "chat");
+    await logActivity("add_shifts", `Added ${added.length} shift${added.length === 1 ? "" : "s"} from chat`);
+    return {
+      result: `Added ${added.length} of ${parsed.length}${parsed.length - added.length ? ` (${parsed.length - added.length} already on the rota)` : ""}: ` +
+        added.map((a) => `${friendlyDateTime(new Date(a.startAt))}–${friendlyDateTime(new Date(a.endAt)).slice(-5)}`).join("; "),
+    };
+  }
+  if (name === "remove_shift") {
+    const id = String(args.id ?? "");
+    const shift = await prisma.shift.findUnique({ where: { id } });
+    if (!shift) return { error: "No shift with that id -- use get_shifts first." };
+    await prisma.shift.delete({ where: { id } });
+    await logActivity("remove_shift", `Removed the ${friendlyDateTime(shift.startAt)} shift`);
+    return { result: `Removed the shift on ${friendlyDateTime(shift.startAt)}.` };
+  }
+  if (name === "update_reminder") {
+    const id = String(args.id ?? "");
+    const reminder = await prisma.reminder.findUnique({ where: { id } });
+    if (!reminder) return { error: "No reminder with that id -- use list_reminders first." };
+    const action = String(args.action ?? "");
+    if (action === "delete") {
+      await prisma.reminder.delete({ where: { id } });
+      await logActivity("update_reminder", `Deleted reminder "${reminder.title}"`);
+      return { result: `Deleted "${reminder.title}".` };
+    }
+    if (action === "done") {
+      await prisma.reminder.update({ where: { id }, data: { done: true } });
+      await logActivity("update_reminder", `Ticked off "${reminder.title}"`);
+      return { result: `Ticked off "${reminder.title}".` };
+    }
+    if (action === "reschedule") {
+      const due = new Date(String(args.dueAt ?? ""));
+      if (Number.isNaN(due.getTime())) return { error: "reschedule needs a valid ISO dueAt" };
+      await prisma.reminder.update({ where: { id }, data: { dueAt: due, done: false } });
+      await logActivity("update_reminder", `Moved "${reminder.title}"`);
+      return { result: `Moved "${reminder.title}" to ${friendlyDateTime(due)}.` };
+    }
+    if (action === "rename") {
+      const title = String(args.title ?? "").trim();
+      if (!title) return { error: "rename needs a title" };
+      await prisma.reminder.update({ where: { id }, data: { title } });
+      return { result: `Renamed to "${title}".` };
+    }
+    return { error: "action must be done, reschedule, rename or delete" };
+  }
+  if (name === "check_tracking") {
+    const input = String(args.input ?? "").trim();
+    if (!input) return { error: "check_tracking needs a link or number" };
+    try {
+      const result = await checkTracking(input, typeof args.courier === "string" ? args.courier : null);
+      await logActivity("check_tracking", "Checked a delivery");
+      return { result };
+    } catch (err) {
+      return { error: err instanceof Error ? err.message : "Couldn't check that tracking." };
     }
   }
   if (name === "search_booking_options") {
@@ -945,13 +1094,15 @@ export async function chat(history: ChatMessage[]): Promise<ChatResult> {
   }));
   const toolsUsed = new Set<string>();
   const ctx: ToolContext = { places: [] };
+  const profile = await prisma.profile.findUnique({ where: { id: "me" } }).catch(() => null);
+  const systemPrompt = `${SYSTEM_PROMPT}\n\n${textingInstructions(profile)}`;
 
   for (let turn = 0; turn < 5; turn++) {
     const response = await ai.models.generateContent({
       model: MODEL,
       contents,
       config: {
-        systemInstruction: SYSTEM_PROMPT,
+        systemInstruction: systemPrompt,
         tools: [{ functionDeclarations: tools }],
       },
     });

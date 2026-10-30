@@ -21,7 +21,8 @@
     "next": "16.4.2",
     "prisma": "^7.10.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "read-excel-file": "^5.8.8"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

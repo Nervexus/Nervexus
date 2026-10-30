@@ -12,6 +12,7 @@ const PUBLIC = new Set([
   "/api/telegram/webhook",
   "/api/briefing/send",
   "/api/routine/send",
+  "/api/routine/tick",
 ]);
 
 export function proxy(request: NextRequest) {

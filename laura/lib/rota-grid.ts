@@ -26,9 +26,10 @@ export function findOwnerColumn(people: string[], name: string, fullName: string
     const n = norm(p);
     if (!n) return { i, score: 0 };
     if (targets.includes(n) || n === initials) return { i, score: 3 };
-    if (targets.some((t) => n.includes(t) || t.includes(n))) return { i, score: 2 };
+    // Partial matches need a few letters, or "D/O" ("do") would match "Madoxs".
+    if (n.length >= 4 && targets.some((t) => n.includes(t) || t.includes(n))) return { i, score: 2 };
     // near miss: same first 3 letters as the first name (madoxs / maddox / madox)
-    if (n.slice(0, 3) === norm(name).slice(0, 3)) return { i, score: 1 };
+    if (n.length >= 4 && n.slice(0, 3) === norm(name).slice(0, 3)) return { i, score: 1 };
     return { i, score: 0 };
   });
   const best = scored.sort((a, b) => b.score - a.score)[0];

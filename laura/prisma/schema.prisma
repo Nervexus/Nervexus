@@ -117,6 +117,20 @@ model Profile {
   homeAddress          String?
   workAddress          String?
   arrivalBufferMinutes Int      @default(15)
+  // How Laura texts (Settings > Texting style).
+  textStyle            String   @default("pa") // "pa" | "mate" | "calm" | "minimal"
+  textLength           String   @default("short") // "short" | "normal"
+  textEmoji            Boolean  @default(false)
+  textNotes            String?
+  // Daily Telegram messages (Settings > Daily messages). Times are UK "HH:MM".
+  morningOn            Boolean  @default(true)
+  morningTime          String   @default("07:00")
+  nightOn              Boolean  @default(true)
+  nightTime            String   @default("21:30")
+  motivation           Boolean  @default(true)
+  motivationTone       String   @default("harsh") // "harsh" | "firm" | "gentle"
+  lastMorningOn        String? // YYYY-MM-DD the morning text last went out
+  lastNightOn          String?
   updatedAt            DateTime @updatedAt
 }
 

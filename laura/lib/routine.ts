@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { USER_TIMEZONE } from "@/lib/booking-links";
 import { outreachStatsOrNull } from "@/lib/hq";
+import { motivationLine } from "@/lib/motivation";
 
 // Madoxs's daily routine: skincare, hair/beard, fragrance, work blocks and
 // key dates, fitted around whatever shifts are on the rota. The fixed parts
@@ -359,7 +360,9 @@ export function upcomingKeyDates(limit = 6) {
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
-export async function morningMessage(): Promise<string> {
+/** The morning text. With a motivation tone, ends with a push written
+ * from the day's real numbers (lib/motivation.ts). */
+export async function morningMessage(opts: { motivationTone?: string | null } = {}): Promise<string> {
   const [d, stats] = await Promise.all([buildDay(todayYmd()), outreachStatsOrNull()]);
   const lines = [`Morning. ${d.label}`];
   lines.push(d.shift ? `Shift ${d.shift.start}–${d.shift.end}${d.shift.location ? ` at ${d.shift.location}` : ""}.` : "No shift today.");
@@ -374,6 +377,24 @@ export async function morningMessage(): Promise<string> {
     lines.push(`Outreach this week: ${stats.week.sent} sent, ${plural(stats.week.replies, "reply", "replies")}, ${plural(stats.week.callsBooked, "call")} booked.`);
     const warm = stats.warmLeads.slice(0, 3).map((l) => l.company || l.name);
     if (warm.length) lines.push(`Chase: ${warm.join(", ")}${stats.warmLeads.length > 3 ? ` +${stats.warmLeads.length - 3} more` : ""}.`);
+  }
+  if (opts.motivationTone) {
+    const upcoming = upcomingKeyDates(3)
+      .filter((k) => k.daysAway <= 14)
+      .map((k) => `${k.items[0]} ${k.daysAway === 0 ? "today" : `in ${plural(k.daysAway, "day")}`}`);
+    const line = await motivationLine(
+      {
+        weekday: d.label,
+        shift: d.shift ? `${d.shift.start}–${d.shift.end}` : null,
+        workBlock: d.block?.title ?? null,
+        outreach: stats
+          ? { weekSent: stats.week.sent, weekReplies: stats.week.replies, callsBooked: stats.week.callsBooked, warmLeads: stats.warmLeads.length }
+          : null,
+        dates: upcoming,
+      },
+      opts.motivationTone
+    );
+    lines.push("", line);
   }
   return lines.join("\n");
 }
