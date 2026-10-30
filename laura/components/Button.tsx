@@ -1,8 +1,8 @@
 import type { ButtonHTMLAttributes } from "react";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  /** primary/accent: purple; hero: purple with a rotating border;
-   * default: dark; ghost: text only; danger: red-tinted. */
+  /** primary/accent: charcoal pill; hero: charcoal with a rotating rose border;
+   * default: glass; ghost: text only; danger: red-tinted. */
   variant?: "primary" | "accent" | "hero" | "default" | "ghost" | "danger";
   withArrow?: boolean;
 };

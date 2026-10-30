@@ -33,7 +33,7 @@ export function LogoMark({ className = "h-[18px] w-[18px]" }: { className?: stri
     <svg viewBox="0 0 24 24" className={className} aria-hidden>
       <path d={L} transform="translate(-0.3,-0.4)" fill="rgba(0,0,0,0.08)" />
       <path d={L} transform="translate(0.3,0.4)" fill="rgba(255,255,255,0.6)" />
-      <path d={L} fill="#6a50bf" />
+      <path d={L} fill="#232226" />
     </svg>
   );
 }

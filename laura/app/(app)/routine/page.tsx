@@ -299,7 +299,7 @@ export default function RoutinePage() {
             </div>
             <div className="mt-3.5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-7">
               {week.map((d, i) => (
-                <div key={d.date} className={`item flex flex-col gap-1.5 px-3 py-3 ${i === 0 ? "!border-[rgba(139,111,212,0.4)]" : ""}`}>
+                <div key={d.date} className={`item flex flex-col gap-1.5 px-3 py-3 ${i === 0 ? "!border-white !bg-white/70" : ""}`}>
                   <span className={`text-[12px] font-semibold ${i === 0 ? "text-lilac" : "text-muted"}`}>{i === 0 ? "Today" : d.label}</span>
                   {d.shift ? (
                     <span className="text-[15px] font-medium text-text">

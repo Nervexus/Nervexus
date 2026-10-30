@@ -55,7 +55,7 @@ export function BookingRow({
   const meta = [location, partySize ? `${partySize} people` : null].filter(Boolean).join(" · ");
 
   return (
-    <div className="rounded-2xl bg-white p-4">
+    <div className="card p-4">
       <div className="flex items-start gap-3">
         <span
           className={`mt-1 h-8 w-[3px] shrink-0 rounded-full ${

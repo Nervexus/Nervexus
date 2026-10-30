@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/NavIcon";
 
 type SystemNode = {
@@ -62,6 +62,38 @@ export default function HubPage() {
   const dbNode = nodes.find((n) => n.id === "database");
   const googleNode = nodes.find((n) => n.id === "google");
 
+  const diagramRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  const [links, setLinks] = useState<{ d: string; x: number; y: number }[]>([]);
+
+  useLayoutEffect(() => {
+    const root = diagramRef.current;
+    if (!root) return;
+    const measure = () => {
+      const box = root.getBoundingClientRect();
+      const hub = root.querySelector<HTMLElement>("[data-hub]")?.getBoundingClientRect();
+      if (!hub) return;
+      const cx = hub.left + hub.width / 2 - box.left;
+      const cy = hub.top + hub.height / 2 - box.top;
+      const r = hub.width / 2;
+      const next = Array.from(root.querySelectorAll<HTMLElement>("[data-node]")).map((el) => {
+        const n = el.getBoundingClientRect();
+        const onLeft = n.left + n.width / 2 - box.left < cx;
+        const x = (onLeft ? n.right : n.left) - box.left;
+        const y = n.top + n.height / 2 - box.top;
+        const sx = cx + (onLeft ? -r : r);
+        const mid = (sx + x) / 2;
+        return { d: `M${sx},${cy} C${mid},${cy} ${mid},${y} ${x},${y}`, x, y };
+      });
+      setSize({ w: box.width, h: box.height });
+      setLinks(next);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [loading]);
+
   return (
     <div className="mx-auto w-full max-w-5xl px-4 sm:px-[26px]">
       <h1 className="text-[22px] font-semibold text-text">System</h1>
@@ -70,11 +102,11 @@ export default function HubPage() {
       </p>
 
       {/* Hub diagram */}
-      <div className="relative mt-8 overflow-hidden rounded-[22px] border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
+      <div className="card relative mt-8 overflow-hidden">
 
-        <div className="relative px-6 py-12 sm:px-12 sm:py-16">
+        <div ref={diagramRef} className="relative px-3 py-10 sm:px-12 sm:py-16">
           {/* Three-column layout: left pair | center orb | right pair */}
-          <div className="relative z-10 flex items-center justify-between gap-4">
+          <div className="relative z-10 flex items-center justify-between gap-2 sm:gap-4">
             {/* Left column */}
             <div className="flex flex-col items-center gap-8">
               <NodeBox
@@ -91,9 +123,9 @@ export default function HubPage() {
 
             {/* Central Laura node */}
             <div className="relative shrink-0">
-              <div className="absolute -inset-5 rounded-full bg-accent/[0.06] blur-2xl" aria-hidden />
-              <div className="absolute -inset-1.5 rounded-full border border-accent/15" aria-hidden />
-              <div className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full border border-accent/20 bg-gradient-to-b from-white to-surface-2 shadow-[0_4px_16px_rgba(139,111,212,0.1),0_1px_3px_rgba(0,0,0,0.04)]">
+              <div className="absolute -inset-5 rounded-full bg-rose/50 blur-2xl" aria-hidden />
+              <div className="absolute -inset-1.5 rounded-full border border-white/80" aria-hidden />
+              <div data-hub className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full border border-white/80 bg-white/60 shadow-[inset_0_1px_0_#fff,0_12px_30px_-10px_rgba(212,138,158,0.5)] backdrop-blur-xl">
                 <LogoMark className="h-8 w-8" />
               </div>
             </div>
@@ -120,29 +152,23 @@ export default function HubPage() {
             </div>
           </div>
 
-          {/* SVG curved connections overlaying the layout */}
+          {/* Connections, drawn from measured positions so each line meets
+              the edge of its card at any screen width. */}
           <svg
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-0"
+            width={size.w}
+            height={size.h}
+            viewBox={`0 0 ${size.w || 1} ${size.h || 1}`}
             fill="none"
             aria-hidden
           >
-            {/* Centre → top-left (Vercel) */}
-            <path d="M50,50 C35,50 30,28 15,28" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
-            <circle cx="15" cy="28" r="0.7" fill="rgba(139,111,212,0.3)" />
-            {/* Centre → bottom-left (Database) */}
-            <path d="M50,50 C35,50 30,72 15,72" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
-            <circle cx="15" cy="72" r="0.7" fill="rgba(139,111,212,0.3)" />
-            {/* Centre → top-right (Encrypted) */}
-            <path d="M50,50 C65,45 70,35 85,35" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="35" r="0.7" fill="rgba(139,111,212,0.3)" />
-            {/* Centre → bottom-right (Telegram) */}
-            <path d="M50,50 C65,50 70,60 85,60" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="60" r="0.7" fill="rgba(139,111,212,0.3)" />
-            {/* Centre → far-bottom-right (Google) */}
-            <path d="M50,50 C65,55 70,82 85,82" stroke="rgba(0,0,0,0.08)" strokeWidth="0.3" />
-            <circle cx="85" cy="82" r="0.7" fill="rgba(139,111,212,0.3)" />
+            {links.map((l, i) => (
+              <g key={i}>
+                <path d={l.d} stroke="rgba(58,44,52,0.2)" strokeWidth="1" strokeLinecap="round" />
+                <circle cx={l.x} cy={l.y} r="6" fill="rgba(239,195,207,0.45)" />
+                <circle cx={l.x} cy={l.y} r="3" fill="#efc3cf" />
+              </g>
+            ))}
           </svg>
         </div>
       </div>
@@ -153,7 +179,7 @@ export default function HubPage() {
         <div className="card card-pad">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-surface-2 text-muted">
+              <div className="icon-tile !h-10 !w-10 !text-muted">
                 <GlobeIcon />
               </div>
               <div>
@@ -188,7 +214,7 @@ export default function HubPage() {
         <div className="card card-pad">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-surface-2 text-muted">
+              <div className="icon-tile !h-10 !w-10 !text-muted">
                 <MessageIcon />
               </div>
               <div>
@@ -241,7 +267,7 @@ export default function HubPage() {
         <div className="card card-pad sm:col-span-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-line bg-surface-2 text-muted">
+              <div className="icon-tile !h-10 !w-10 !text-muted">
                 <GoogleIcon />
               </div>
               <div>
@@ -310,7 +336,7 @@ function NodeBox({
       onClick={onClick}
       className="group flex flex-col items-center gap-2"
     >
-      <div className="relative flex h-[80px] w-[110px] flex-col items-center justify-center rounded-[14px] border border-line bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.06)] transition-all group-hover:border-line-2 group-hover:shadow-[0_2px_6px_rgba(0,0,0,0.06),0_8px_20px_-6px_rgba(0,0,0,0.08)] sm:h-[100px] sm:w-[150px]">
+      <div data-node className="item relative flex h-[80px] w-[100px] flex-col items-center justify-center sm:h-[100px] sm:w-[150px]">
         {/* Icon */}
         <div className="flex h-8 w-8 items-center justify-center text-muted group-hover:text-text transition-colors sm:h-10 sm:w-10">
           {icon}
@@ -394,7 +420,7 @@ function StatusDot({ status }: { status: "online" | "offline" | "unconfigured" |
 
 function Stat({ label, value }: { label: string; value: unknown }) {
   return (
-    <div className="rounded-lg border border-line bg-surface-2 px-2.5 py-2 text-center">
+    <div className="rounded-[14px] border border-white/60 bg-white/40 px-2.5 py-2 text-center">
       <p className="text-[16px] font-semibold text-text tabular-nums">{String(value ?? 0)}</p>
       <p className="mt-0.5 text-[10px] text-dim">{label}</p>
     </div>

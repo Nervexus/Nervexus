@@ -18,7 +18,7 @@ type Prefs = {
 };
 
 const STYLES: { value: Prefs["textStyle"]; label: string; example: string }[] = [
-  { value: "pa", label: "Sharp PA", example: "Booked in for 7. I'd leave by 6:20, the A326's slow." },
+  { value: "pa", label: "Warm PA", example: "You're booked in for 7! I'd head off around 6:20, the A326 gets slow." },
   { value: "mate", label: "Close mate", example: "sorted mate, 7 o'clock. leave by 20 past, A326 is a nightmare" },
   { value: "calm", label: "Calm", example: "All set for 7. No rush, but leaving around 6:20 keeps it easy." },
   { value: "minimal", label: "Minimal", example: "7pm. Leave 6:20." },
@@ -94,7 +94,7 @@ export function MessageSettings() {
             <button
               key={s.value}
               onClick={() => save({ textStyle: s.value })}
-              className={`item px-3 py-2.5 text-left text-[13px] ${prefs.textStyle === s.value ? "!border-[rgba(139,111,212,0.45)] !bg-[rgba(139,111,212,0.14)] text-text" : "text-muted"}`}
+              className={`item px-3 py-2.5 text-left text-[13px] ${prefs.textStyle === s.value ? "!border-white/10 !bg-ink !text-white" : "text-muted"}`}
             >
               {s.label}
             </button>

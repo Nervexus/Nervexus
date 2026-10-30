@@ -3,193 +3,255 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 
-type ApiKeyEntry = {
-  id: string;
-  service: string;
-  label: string;
-  maskedKey: string;
-  priority: number;
-  active: boolean;
-  createdAt: string;
-};
-
-const SERVICES = [
-  { value: "gemini", label: "Gemini" },
-  { value: "openai", label: "OpenAI" },
-  { value: "anthropic", label: "Anthropic" },
-  { value: "other", label: "Other" },
-] as const;
+type Service = { id: string; label: string; detail: string; main: { maskedKey: string } | null };
+type BackupKey = { id: string; service: string; label: string; maskedKey: string; active: boolean };
 
 export function ApiKeySettings() {
-  const [keys, setKeys] = useState<ApiKeyEntry[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [keys, setKeys] = useState<BackupKey[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
-
-  const [service, setService] = useState("gemini");
-  const [label, setLabel] = useState("");
-  const [apiKey, setApiKey] = useState("");
-  const [priority, setPriority] = useState(0);
-  const [saving, setSaving] = useState(false);
 
   function load() {
     fetch("/api/settings/api-keys")
-      .then((res) => res.json())
-      .then((data) => setKeys(data.keys ?? []))
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        setServices(data.services ?? []);
+        setKeys(data.keys ?? []);
+      })
       .catch(() => setError("Couldn't load API keys."))
       .finally(() => setLoaded(true));
   }
 
   useEffect(load, []);
 
+  return (
+    <div className="card p-5">
+      <span className="label">API keys</span>
+      <p className="mt-1 text-xs text-neutral-500">
+        Laura uses the main key first. If it hits its limit or stops working she moves down the list, so add as many
+        backups as you like.
+      </p>
+
+      {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
+      {!loaded && <p className="mt-4 text-xs text-neutral-400">Loading…</p>}
+
+      <div className="mt-4 flex flex-col gap-3">
+        {services.map((s) => (
+          <ServiceKeys
+            key={s.id}
+            service={s}
+            keys={keys.filter((k) => k.service === s.id)}
+            onChange={load}
+            onError={setError}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ServiceKeys({
+  service,
+  keys,
+  onChange,
+  onError,
+}: {
+  service: Service;
+  keys: BackupKey[];
+  onChange: () => void;
+  onError: (msg: string | null) => void;
+}) {
+  const [adding, setAdding] = useState(false);
+  const [label, setLabel] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [saving, setSaving] = useState(false);
+  const total = keys.length + (service.main ? 1 : 0);
+
   async function add() {
-    if (!label.trim() || !apiKey.trim()) return;
+    if (!apiKey.trim()) return;
     setSaving(true);
-    setError(null);
+    onError(null);
     try {
       const res = await fetch("/api/settings/api-keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service, label: label.trim(), apiKey: apiKey.trim(), priority }),
+        body: JSON.stringify({ service: service.id, label: label.trim(), apiKey: apiKey.trim() }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't save.");
       setLabel("");
       setApiKey("");
-      setPriority(0);
       setAdding(false);
-      load();
+      onChange();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't save.");
+      onError(err instanceof Error ? err.message : "Couldn't save.");
     } finally {
       setSaving(false);
     }
   }
 
-  async function toggle(id: string, active: boolean) {
-    await fetch(`/api/settings/api-keys/${id}`, {
+  async function toggle(k: BackupKey) {
+    await fetch(`/api/settings/api-keys/${k.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ active }),
+      body: JSON.stringify({ active: !k.active }),
     });
-    load();
+    onChange();
   }
 
-  async function remove(id: string) {
-    await fetch(`/api/settings/api-keys/${id}`, { method: "DELETE" });
-    load();
+  async function remove(k: BackupKey) {
+    if (!confirm(`Remove "${k.label}"?`)) return;
+    await fetch(`/api/settings/api-keys/${k.id}`, { method: "DELETE" });
+    onChange();
   }
 
-  const envKey = process.env.NEXT_PUBLIC_HAS_GEMINI_KEY;
-  const hasEnvKey = typeof window !== "undefined";
+  async function move(index: number, by: -1 | 1) {
+    const ids = keys.map((k) => k.id);
+    const target = index + by;
+    if (target < 0 || target >= ids.length) return;
+    [ids[index], ids[target]] = [ids[target], ids[index]];
+    await fetch("/api/settings/api-keys", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ service: service.id, ids }),
+    });
+    onChange();
+  }
 
-  const grouped = SERVICES.map((s) => ({
-    ...s,
-    keys: keys.filter((k) => k.service === s.value),
-  })).filter((g) => g.keys.length > 0);
+  const offset = service.main ? 2 : 1;
 
   return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between">
-        <span className="label">API Keys</span>
-        <Button variant="ghost" onClick={() => setAdding(!adding)}>
-          {adding ? "Cancel" : "+ Add key"}
-        </Button>
+    <div className="panel p-3">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold text-neutral-800">{service.label}</h3>
+          <p className="truncate text-[11px] text-neutral-500">{service.detail}</p>
+        </div>
+        <span className="pill shrink-0">
+          {total} {total === 1 ? "key" : "keys"}
+        </span>
       </div>
-      <p className="mt-1 text-xs text-neutral-500">
-        add multiple keys per service for automatic fallback
-      </p>
 
-      {error && <p className="mt-3 text-xs text-red-400">{error}</p>}
+      <div className="mt-3 flex flex-col gap-1.5">
+        {service.main ? (
+          <KeyRow position={1} label="Main key" sub={`${service.main.maskedKey} · set in Vercel`}>
+            <span className="tag tag-purple">in use</span>
+          </KeyRow>
+        ) : (
+          <p className="px-1 text-xs text-neutral-500">No main key in Vercel, so backups are used directly.</p>
+        )}
 
-      {adding && (
-        <div className="mt-4 flex flex-col gap-2.5 rounded-2xl border border-line bg-surface-2 p-4">
-          <select
-            value={service}
-            onChange={(e) => setService(e.target.value)}
-            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
-          >
-            {SERVICES.map((s) => (
-              <option key={s.value} value={s.value}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-          <input
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            placeholder="Label, e.g. Gemini Key 1"
-            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-          />
+        {keys.map((k, i) => (
+          <KeyRow key={k.id} position={i + offset} label={k.label} sub={k.maskedKey} dimmed={!k.active}>
+            <div className="flex items-center gap-0.5">
+              <IconButton label="Move up" disabled={i === 0} onClick={() => move(i, -1)} icon="solar:alt-arrow-up-linear" />
+              <IconButton
+                label="Move down"
+                disabled={i === keys.length - 1}
+                onClick={() => move(i, 1)}
+                icon="solar:alt-arrow-down-linear"
+              />
+            </div>
+            <button
+              onClick={() => toggle(k)}
+              className={`tag transition-colors ${k.active ? "!border-green/20 !bg-green-soft !text-green" : ""}`}
+            >
+              {k.active ? "on" : "paused"}
+            </button>
+            <IconButton label={`Remove ${k.label}`} onClick={() => remove(k)} icon="solar:trash-bin-2-linear" danger />
+          </KeyRow>
+        ))}
+      </div>
+
+      {adding ? (
+        <div className="mt-3 flex flex-col gap-2">
           <input
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="API key"
+            placeholder={`${service.label} API key`}
             type="password"
-            className="input font-mono text-sm text-neutral-700 outline-none placeholder:font-sans placeholder:text-neutral-400"
+            autoComplete="off"
+            className="input font-mono text-sm placeholder:font-sans"
           />
-          <div className="flex items-center gap-3">
-            <label className="text-xs text-neutral-500">Priority (lower = tried first)</label>
-            <input
-              type="number"
-              value={priority}
-              onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
-              className="input w-20 text-center text-sm text-neutral-700 outline-none"
-            />
-          </div>
-          <div className="flex justify-end">
-            <Button variant="accent" onClick={add} disabled={!label.trim() || !apiKey.trim() || saving}>
-              {saving ? "Saving…" : "Save key"}
+          <input
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder={`Name (optional), e.g. Backup ${keys.length + 1}`}
+            className="input text-sm"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setAdding(false)}>
+              Cancel
+            </Button>
+            <Button variant="accent" onClick={add} disabled={!apiKey.trim() || saving}>
+              {saving ? "Checking…" : "Save key"}
             </Button>
           </div>
         </div>
+      ) : (
+        <button
+          onClick={() => setAdding(true)}
+          className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-line-3 py-2.5 text-xs font-medium text-neutral-500 transition-colors hover:border-neutral-400 hover:bg-white/40 hover:text-neutral-800"
+        >
+          <iconify-icon icon="solar:add-circle-linear" className="text-sm" />
+          Add backup key
+        </button>
       )}
-
-      <div className="mt-4 flex flex-col gap-2">
-        {loaded && keys.length === 0 && !adding && (
-          <p className="text-xs text-neutral-400">
-            No custom API keys yet. Using environment defaults.
-          </p>
-        )}
-
-        {grouped.map((group) => (
-          <div key={group.value}>
-            <h3 className="mb-1.5 text-xs font-medium text-neutral-500">{group.label}</h3>
-            <div className="flex flex-col gap-1.5">
-              {group.keys.map((k) => (
-                <div
-                  key={k.id}
-                  className="flex items-center gap-3 rounded-xl bg-white px-3.5 py-2.5 border border-line"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-neutral-800">{k.label}</span>
-                      <span className="font-mono text-[11px] text-neutral-400">{k.maskedKey}</span>
-                    </div>
-                    <span className="text-[11px] text-neutral-400">priority {k.priority}</span>
-                  </div>
-                  <button
-                    onClick={() => toggle(k.id, !k.active)}
-                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
-                      k.active
-                        ? "bg-green-soft text-green"
-                        : "bg-neutral-100 text-neutral-400"
-                    }`}
-                  >
-                    {k.active ? "active" : "off"}
-                  </button>
-                  <button
-                    onClick={() => remove(k.id)}
-                    className="shrink-0 text-neutral-300 transition-colors hover:text-red-400"
-                  >
-                    <iconify-icon icon="solar:trash-bin-2-linear" className="text-base" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
+  );
+}
+
+function KeyRow({
+  position,
+  label,
+  sub,
+  dimmed = false,
+  children,
+}: {
+  position: number;
+  label: string;
+  sub: string;
+  dimmed?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={`item flex items-center gap-3 !rounded-[14px] px-3 py-2.5 ${dimmed ? "opacity-60" : ""}`}>
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/70 font-mono text-[11px] text-neutral-500">
+        {position}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-neutral-800">{label}</p>
+        <p className="truncate font-mono text-[11px] text-neutral-400">{sub}</p>
+      </div>
+      <div className="flex shrink-0 items-center gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+function IconButton({
+  label,
+  icon,
+  onClick,
+  disabled = false,
+  danger = false,
+}: {
+  label: string;
+  icon: string;
+  onClick: () => void;
+  disabled?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className={`flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-white/60 disabled:opacity-30 disabled:hover:bg-transparent ${
+        danger ? "hover:text-red-400" : "hover:text-neutral-800"
+      }`}
+    >
+      <iconify-icon icon={icon} className="text-base" />
+    </button>
   );
 }

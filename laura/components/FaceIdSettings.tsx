@@ -76,7 +76,7 @@ export function FaceIdSettings() {
   }
 
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_-8px_rgba(0,0,0,0.06)]">
+    <div className="card p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="label">Sign-in</p>
