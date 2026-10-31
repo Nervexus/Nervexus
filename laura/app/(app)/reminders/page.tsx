@@ -162,6 +162,8 @@ export default function RemindersPage() {
     : [];
   const inCursorMonth = (d: Date) => cursor !== null && d.getFullYear() === cursor.year && d.getMonth() === cursor.month;
   const monthCount = upcoming.filter((r) => inCursorMonth(new Date(r.dueAt))).length;
+  const monthDays = cursor ? new Date(cursor.year, cursor.month + 1, 0).getDate() : 30;
+  const todayIndex = today && cursor && inCursorMonth(today) ? today.getDate() - 1 : null;
 
   return (
     <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
@@ -169,7 +171,6 @@ export default function RemindersPage() {
         <PageHeader
           title="Reminders"
           meta={<Pill>{upcoming.length} active</Pill>}
-          sub={cursor ? `${monthCount} coming up in ${MONTH_NAMES[cursor.month]}` : " "}
           actions={
             <button onClick={() => today && setSelected(today)} className="btn btn-primary">
               New reminder
@@ -184,6 +185,42 @@ export default function RemindersPage() {
         <p className="gsap-entrance py-10 text-center text-sm text-neutral-600">Loading…</p>
       ) : (
         <div className="flex flex-col gap-6">
+          {/* The month dial: one dot per day around a matte knob, lit where
+              something's due, accent for today, with the needle on today. */}
+          <div className="card gsap-entrance flex flex-col items-center px-6 pb-6 pt-8">
+            <div className="relative h-56 w-56">
+              {Array.from({ length: monthDays }, (_, d) => {
+                const angle = (d / monthDays) * Math.PI * 2 - Math.PI / 2;
+                const has = (byDay.get(dateKey(new Date(cursor.year, cursor.month, d + 1))) ?? []).some((r) => !r.done);
+                const isToday = d === todayIndex;
+                return (
+                  <span
+                    key={d}
+                    className={`absolute h-1 w-1 rounded-full ${
+                      isToday ? "bg-[var(--calendar-accent)] shadow-[0_0_6px_var(--calendar-accent)]" : has ? "bg-neutral-800" : "bg-neutral-300"
+                    }`}
+                    style={{ left: `${50 + Math.cos(angle) * 47}%`, top: `${50 + Math.sin(angle) * 47}%`, transform: "translate(-50%,-50%)" }}
+                  />
+                );
+              })}
+              <div className="absolute inset-[14%] rounded-full bg-[radial-gradient(circle_at_50%_40%,#ffffff,#f0f0f2_75%)] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(0,0,0,0.04)]">
+                {todayIndex !== null && (
+                  <span
+                    className="absolute left-1/2 top-1/2 h-1/2 w-px origin-top"
+                    style={{ transform: `rotate(${(todayIndex / monthDays) * 360 + 180}deg)` }}
+                  >
+                    <span className="absolute bottom-1.5 left-0 h-3 w-px bg-neutral-700" />
+                  </span>
+                )}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="stat-num !text-[46px]">{String(monthCount).padStart(2, "0")}</span>
+                </div>
+              </div>
+            </div>
+            <p className="label mt-6 text-neutral-600">Upcoming</p>
+            <p className="label mt-1.5">This month</p>
+          </div>
+
           <Group title="Next up" className="gsap-entrance">
             {nextUp.length === 0 ? (
               <Empty>Nothing coming up. Pick a day below to add one.</Empty>
