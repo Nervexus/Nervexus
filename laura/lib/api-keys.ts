@@ -8,6 +8,12 @@ export const KEY_SERVICES = [
     label: "Gemini",
     env: "GEMINI_API_KEY",
     detail: "Laura's brain: chat, vision, voice notes and web search",
+    limits: "Free keys have a daily request limit that resets every day. When one runs out Laura moves to the next key.",
+    how: [
+      "Go to aistudio.google.com/apikey and sign in with a Google account",
+      "Press Create API key (pick or create a Google Cloud project if asked)",
+      "Copy the key and paste it here",
+    ],
   },
 ] as const;
 

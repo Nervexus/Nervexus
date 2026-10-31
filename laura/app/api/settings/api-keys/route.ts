@@ -26,6 +26,8 @@ export async function GET() {
       id: s.id,
       label: s.label,
       detail: s.detail,
+      limits: s.limits,
+      how: s.how,
       main: process.env[s.env] ? { maskedKey: maskTail(process.env[s.env]) } : null,
     })),
     keys: keys.map(present),

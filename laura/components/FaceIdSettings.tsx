@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { browserSupportsWebAuthn, startRegistration } from "@simplewebauthn/browser";
+import { markPasskeyHere } from "@/lib/passkey-device";
 
 type Passkey = { id: string; label: string | null; createdAt: string; lastUsedAt: string | null };
 
@@ -52,10 +53,12 @@ export function FaceIdSettings() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't save Face ID.");
+      markPasskeyHere();
       setMessage("Face ID is set up on this device.");
       load();
     } catch (err) {
       const name = err instanceof Error ? err.name : "";
+      if (name === "InvalidStateError") markPasskeyHere();
       setMessage(
         name === "NotAllowedError"
           ? null

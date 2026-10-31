@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 import { LogoMark } from "@/components/NavIcon";
+import { hasPasskeyHere, markPasskeyHere } from "@/lib/passkey-device";
 
 // Only same-site paths, so ?next= can't be used to bounce you to another site.
 function safeNext(): string {
@@ -30,8 +31,10 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [chosenMode, setMode] = useState<Mode>("checking");
   const canUsePasskey = useSyncExternalStore(noopSubscribe, browserSupportsWebAuthn, () => false);
-  // Browsers without Face ID/passkey support go straight to the password.
-  const mode: Mode = canUsePasskey ? chosenMode : "password";
+  const passkeyHere = useSyncExternalStore(noopSubscribe, hasPasskeyHere, () => false);
+  // Face ID opens by itself only where it was set up for this site; anywhere
+  // else (or without passkey support) it starts on the password.
+  const mode: Mode = !canUsePasskey ? "password" : chosenMode === "checking" && !passkeyHere ? "password" : chosenMode;
 
   async function signInWithPasskey(auto = false) {
     if (busy) return;
@@ -60,6 +63,7 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Face ID didn't work.");
+      markPasskeyHere();
       markSessionOpen();
       window.location.replace(safeNext());
     } catch (err) {
@@ -73,7 +77,7 @@ export default function LoginPage() {
 
   // Open Face ID as soon as the page loads, on devices that support it.
   useEffect(() => {
-    if (!browserSupportsWebAuthn()) return;
+    if (!browserSupportsWebAuthn() || !hasPasskeyHere()) return;
     const t = setTimeout(() => void signInWithPasskey(true), 0);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
