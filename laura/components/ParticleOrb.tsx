@@ -79,10 +79,9 @@ export function ParticleOrb({ active = false, className = "" }: { active?: boole
         const py = cy + y * R * persp * 1.6;
 
         const mix = Math.min(1, Math.max(0, (y + 0.9) / 1.8));
-        // Soft pink at the top to neon red (#ff2d55) at the bottom.
-        const red = 255;
-        const green = Math.round(150 - 105 * mix);
-        const blue = Math.round(175 - 90 * mix);
+        const red = Math.round(160 + 72 * mix);
+        const green = Math.round(140 - 30 * mix);
+        const blue = Math.round(200 + 12 * mix);
         ctx.fillStyle = `rgba(${red},${green},${blue},${0.3 + depth * 0.7})`;
         const s = 0.55 + depth * 1.45;
         ctx.beginPath();
