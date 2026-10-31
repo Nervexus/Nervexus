@@ -15,8 +15,10 @@ type Key = {
   uses: number;
   fromEnv: boolean;
 };
+type CatalogueEntry = { id: string; label: string; what: string; limits: string; how: readonly string[] };
 type Service = {
   id: string;
+  builtIn: boolean;
   label: string;
   what: string;
   limits: string;
@@ -38,6 +40,7 @@ function keyPill(k: Key, active: boolean): { text: string; tone: string } {
 
 export function ApiKeySettings() {
   const [services, setServices] = useState<Service[] | null>(null);
+  const [catalogue, setCatalogue] = useState<CatalogueEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   function load() {
@@ -45,6 +48,7 @@ export function ApiKeySettings() {
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => {
         setServices(data.services ?? []);
+        setCatalogue(data.catalogue ?? []);
         setError(null);
       })
       .catch(() => setError("Couldn't load API keys."));
@@ -61,6 +65,7 @@ export function ApiKeySettings() {
       {error && <p className="text-xs text-red-400">{error}</p>}
       {!services && !error && <p className="text-xs text-neutral-400">Loading…</p>}
       {services?.map((s) => <ServiceCard key={s.id} service={s} onState={setServices} />)}
+      {services && <AddApiCard catalogue={catalogue} added={services.map((s) => s.id)} onState={setServices} />}
     </div>
   );
 }
@@ -218,6 +223,112 @@ function ServiceCard({ service, onState }: { service: Service; onState: (s: Serv
         </ol>
         <p className="mt-2">{service.limits}</p>
       </details>
+    </div>
+  );
+}
+
+const CUSTOM = "custom";
+
+/** Add a key for any other service: one from the catalogue, or a custom one by name. */
+function AddApiCard({
+  catalogue,
+  added,
+  onState,
+}: {
+  catalogue: CatalogueEntry[];
+  added: string[];
+  onState: (s: Service[]) => void;
+}) {
+  const [service, setService] = useState(catalogue[0]?.id ?? CUSTOM);
+  const [name, setName] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [label, setLabel] = useState("");
+  const [busy, setBusy] = useState(false);
+  const picked = catalogue.find((c) => c.id === service);
+
+  async function save() {
+    if (service === CUSTOM && !name.trim()) return toast("Give the API a name.", true);
+    if (!apiKey.trim()) return toast("Paste a key first.", true);
+    setBusy(true);
+    try {
+      const res = await fetch("/api/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ service, name: name.trim(), key: apiKey.trim(), label: label.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Couldn't save that key.");
+      onState(data.services);
+      const ok = data.result?.ok !== false;
+      toast(ok ? `${picked?.label ?? name.trim()} added. ${data.result?.message ?? ""}` : `Added but not working: ${data.result?.message}`, !ok);
+      if (ok) {
+        setApiKey("");
+        setLabel("");
+        setName("");
+      }
+      window.dispatchEvent(new Event(KEYS_CHANGED));
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Couldn't save that key.", true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="card p-5">
+      <div className="flex items-center gap-3">
+        <span className="icon-tile !h-9 !w-9">
+          <iconify-icon icon="solar:add-circle-linear" className="text-base" />
+        </span>
+        <div>
+          <h3 className="text-[15px] font-semibold text-neutral-800">Add an API</h3>
+          <p className="text-xs text-neutral-500">Store keys for other services, like Google Places. Each one gets its own card with backups.</p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-2">
+        <select value={service} onChange={(e) => setService(e.target.value)} className="input text-sm">
+          {catalogue.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.label}
+              {added.includes(c.id) ? " (added, adds a backup)" : ""}
+            </option>
+          ))}
+          <option value={CUSTOM}>Other (custom API)</option>
+        </select>
+        {service === CUSTOM && (
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="API name, e.g. Spotify" maxLength={40} className="input text-sm" />
+        )}
+        <input
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          placeholder="Paste the API key"
+          type="password"
+          autoComplete="off"
+          className="input font-mono text-sm placeholder:font-sans"
+        />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Label (optional)" className="input flex-1 text-sm" />
+          <button onClick={save} disabled={busy} className="btn btn-primary shrink-0">
+            {busy ? "Testing…" : "Save & test"}
+          </button>
+        </div>
+      </div>
+
+      {picked ? (
+        <details className="mt-3 text-xs text-neutral-500">
+          <summary className="cursor-pointer select-none font-medium text-neutral-600">How to get a {picked.label} key</summary>
+          <p className="mt-2">{picked.what}</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5">
+            {picked.how.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+          <p className="mt-2">{picked.limits}</p>
+        </details>
+      ) : (
+        <p className="mt-3 text-xs text-neutral-500">Custom keys are stored encrypted but can&apos;t be tested, so they&apos;re saved as working.</p>
+      )}
     </div>
   );
 }

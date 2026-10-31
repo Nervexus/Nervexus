@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { CONNECTIONS, KEY_SERVICES, loadKeys, mask, nextReset, usableKeys, type KeyService } from "@/lib/api-keys";
+import { CONNECTIONS, activeServices, loadKeys, mask, nextReset, serviceMeta, usableKeys } from "@/lib/api-keys";
 import { replyInChat } from "@/lib/telegram";
 
 // Every time a service goes down it's stored with when it started and why.
@@ -31,8 +31,8 @@ const REASON: Record<string, string> = { invalid: "rejected", exhausted: "used u
 /** What's wrong right now, worked out from the keys and service health. */
 async function currentIssues(): Promise<Current[]> {
   const found: Current[] = [];
-  for (const service of Object.keys(KEY_SERVICES) as KeyService[]) {
-    const meta = KEY_SERVICES[service];
+  for (const service of await activeServices()) {
+    const meta = serviceMeta(service);
     const keys = await loadKeys(service);
     if (!keys.length) continue;
     const working = await usableKeys(keys);

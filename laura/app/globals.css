@@ -121,6 +121,16 @@ body {
   outline: 2px solid rgba(35, 34, 38, 0.3);
   outline-offset: 2px;
 }
+/* Text fields never get a focus outline. */
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+[contenteditable]:focus-visible {
+  outline: none;
+}
 
 .tabular {
   font-variant-numeric: tabular-nums;

@@ -7,10 +7,15 @@ import { decrypt, encrypt, type EncryptedValue } from "@/lib/crypto";
 // (and when that lifts) and the next usable key takes over in the same call.
 // The key set in Vercel is imported as "Main key" and can't be removed here.
 
-export const KEY_SERVICES = {
+type ServiceMeta = { label: string; env?: string; what: string; limits: string; how: readonly string[]; builtIn?: boolean };
+
+// Gemini is built in (Laura's brain). The rest can be added from Settings →
+// API keys → Add an API; any other service can be added by name as a custom API.
+export const KEY_SERVICES: Record<string, ServiceMeta> = {
   gemini: {
     label: "Gemini",
     env: "GEMINI_API_KEY",
+    builtIn: true,
     what: "Laura's brain: chat, vision, voice notes and web search.",
     limits: "Free keys have per-minute and daily request limits. Daily limits reset at midnight Pacific time (8am UK).",
     how: [
@@ -19,9 +24,74 @@ export const KEY_SERVICES = {
       "Copy the key and paste it here",
     ],
   },
-} as const;
+  google_places: {
+    label: "Google Places",
+    env: "GOOGLE_PLACES_API_KEY",
+    what: "Business and place search with ratings, opening hours and photos.",
+    limits: "Google gives a free monthly credit. Daily request quotas reset at midnight Pacific time.",
+    how: [
+      "Open console.cloud.google.com and create (or pick) a project",
+      "Turn on billing (a card is needed; light use is normally covered by the free credit)",
+      'APIs & Services → Library → enable "Places API (New)"',
+      "APIs & Services → Credentials → Create credentials → API key",
+      "Copy the key and paste it here",
+    ],
+  },
+  openai: {
+    label: "OpenAI",
+    env: "OPENAI_API_KEY",
+    what: "GPT models, image generation and Whisper transcription.",
+    limits: "Pay as you go. Rate limits depend on your usage tier; a key stops when the account runs out of credit.",
+    how: ["Sign in at platform.openai.com", "Go to API keys → Create new secret key", "Copy the key (starts with sk-) and paste it here"],
+  },
+  anthropic: {
+    label: "Anthropic (Claude)",
+    env: "ANTHROPIC_API_KEY",
+    what: "Claude models.",
+    limits: "Pay as you go, with per-minute rate limits that depend on your usage tier.",
+    how: ["Sign in at console.anthropic.com", "Go to API keys → Create key", "Copy the key (starts with sk-ant-) and paste it here"],
+  },
+  elevenlabs: {
+    label: "ElevenLabs",
+    env: "ELEVENLABS_API_KEY",
+    what: "Natural-sounding text-to-speech voices.",
+    limits: "Free plan: about 10,000 characters a month, resetting on your plan date.",
+    how: ["Sign in at elevenlabs.io", "Click your profile → API keys → Create API key", "Copy the key and paste it here"],
+  },
+  openweather: {
+    label: "OpenWeather",
+    env: "OPENWEATHER_API_KEY",
+    what: "Current weather and forecasts.",
+    limits: "Free plan: 60 calls a minute and 1,000,000 a month. New keys can take up to 2 hours to start working.",
+    how: ["Sign up at openweathermap.org", "Open your profile → My API keys", "Copy the default key (or generate one) and paste it here"],
+  },
+};
 
-export type KeyService = keyof typeof KEY_SERVICES;
+const CUSTOM = "custom:";
+
+/** A catalogue service, or a custom one stored as "custom:<name>". */
+export function serviceMeta(service: string): ServiceMeta {
+  if (service.startsWith(CUSTOM)) {
+    return {
+      label: service.slice(CUSTOM.length),
+      what: "A custom API you added.",
+      limits: "Laura can't check custom keys, so they're saved as working.",
+      how: ["Get the key from the service's dashboard", "Paste it here"],
+    };
+  }
+  return KEY_SERVICES[service];
+}
+
+export function customServiceId(name: string): string {
+  return CUSTOM + name.trim().replace(/\s+/g, " ").slice(0, 40);
+}
+
+function envKey(service: string): string | undefined {
+  const name = serviceMeta(service).env;
+  return name ? process.env[name]?.trim() || undefined : undefined;
+}
+
+export type KeyService = string;
 export type KeyStatus = "ok" | "limited" | "exhausted" | "invalid";
 export type TestResult = { ok: boolean; status: KeyStatus | "error"; message: string; until?: Date | null };
 
@@ -34,7 +104,7 @@ export const CONNECTIONS: Record<string, { label: string; fix: string }> = {
 };
 
 export function isKeyService(value: unknown): value is KeyService {
-  return typeof value === "string" && value in KEY_SERVICES;
+  return typeof value === "string" && (value in KEY_SERVICES || (value.startsWith(CUSTOM) && value.length > CUSTOM.length));
 }
 
 export function sealKey(plain: string): string {
@@ -51,7 +121,7 @@ export function mask(plain: string): string {
 
 export class NoWorkingKeyError extends Error {
   constructor(service: KeyService) {
-    super(`${KEY_SERVICES[service].label} has no working API key. Add one in Settings → API keys.`);
+    super(`${serviceMeta(service).label} has no working API key. Add one in Settings → API keys.`);
     this.name = "NoWorkingKeyError";
   }
 }
@@ -63,7 +133,7 @@ export type LoadedKey = Row & { secret: string | null; fromEnv: boolean };
 
 /** The key set in Vercel joins the list as "Main key" the first time it's seen. */
 async function ensureEnvKey(service: KeyService, rows: LoadedKey[]): Promise<boolean> {
-  const env = process.env[KEY_SERVICES[service].env]?.trim();
+  const env = envKey(service);
   if (!env || rows.some((r) => r.secret === env)) return false;
   const first = rows.reduce((min, r) => Math.min(min, r.priority), 1);
   await prisma.apiKey.create({ data: { service, label: "Main key", apiKey: sealKey(env), priority: first - 1 } });
@@ -73,7 +143,7 @@ async function ensureEnvKey(service: KeyService, rows: LoadedKey[]): Promise<boo
 export async function loadKeys(service: KeyService): Promise<LoadedKey[]> {
   const read = async () => {
     const rows = await prisma.apiKey.findMany({ where: { service }, orderBy: [{ priority: "asc" }, { createdAt: "asc" }] });
-    const env = process.env[KEY_SERVICES[service].env]?.trim();
+    const env = envKey(service);
     return rows.map((r) => {
       let secret: string | null = null;
       try {
@@ -155,7 +225,7 @@ type Classified =
   | { kind: "other" };
 
 /** Is this the key's fault (mark it, try the next), the service's (health), or the request's (rethrow)? */
-export function classifyGeminiError(err: unknown): Classified {
+export function classifyProviderError(err: unknown): Classified {
   const status = (err as { status?: number }).status;
   const text = err instanceof Error ? err.message : String(err);
   if (status === 401 || status === 403 || (status === 400 && /api key/i.test(text))) {
@@ -165,7 +235,7 @@ export function classifyGeminiError(err: unknown): Classified {
     if (/PerDay|per day|daily/i.test(text)) {
       return { kind: "exhausted", until: nextPacificMidnight(), message: "Daily limit used up." };
     }
-    if (/billing|credit/i.test(text)) {
+    if (/billing|credit|insufficient_quota/i.test(text)) {
       return { kind: "exhausted", until: new Date(Date.now() + 24 * 3600_000), message: "Out of credit or billing problem." };
     }
     const delay = Number(/retryDelay"?:\s*"?(\d+)/.exec(text)?.[1] ?? 60);
@@ -187,7 +257,7 @@ export async function withKey<T>(service: KeyService, call: (secret: string) => 
   } catch (err) {
     // database unreachable or not migrated yet: the Vercel key alone still works
     console.error("Couldn't load API keys, using the Vercel key:", err);
-    const env = process.env[KEY_SERVICES[service].env];
+    const env = envKey(service);
     if (!env) throw new NoWorkingKeyError(service);
     return call(env);
   }
@@ -211,7 +281,7 @@ export async function withKey<T>(service: KeyService, call: (secret: string) => 
       );
       return out;
     } catch (err) {
-      const c = classifyGeminiError(err);
+      const c = classifyProviderError(err);
       if (c.kind === "other") throw err;
       if (c.kind === "network") {
         await quietly(recordHealthFail(service, c.message));
@@ -243,7 +313,7 @@ export async function testKey(service: KeyService, secret: string): Promise<Test
       });
       return { ok: true, status: "ok", message: "Working" };
     } catch (err) {
-      const c = classifyGeminiError(err);
+      const c = classifyProviderError(err);
       if (c.kind === "invalid" || c.kind === "limited" || c.kind === "exhausted") {
         return { ok: false, status: c.kind, message: c.message, until: c.until };
       }
@@ -252,7 +322,61 @@ export async function testKey(service: KeyService, secret: string): Promise<Test
       return { ok: false, status: "error", message: "Couldn't reach Google. Try again." };
     }
   }
-  return { ok: false, status: "error", message: "Unknown service" };
+
+  const check = HTTP_CHECKS[service];
+  if (!check) return { ok: true, status: "ok", message: "Saved. Laura can't test custom keys, so it's assumed to work." };
+  let res: Response;
+  try {
+    res = await check(secret);
+  } catch {
+    return { ok: false, status: "error", message: `Couldn't reach ${serviceMeta(service).label}. Try again.` };
+  }
+  if (res.ok) return { ok: true, status: "ok", message: "Working" };
+  const body = (await res.text()).slice(0, 400);
+  if (res.status === 429) {
+    if (/quota|insufficient|credit|billing/i.test(body) && service !== "openai") {
+      return { ok: false, status: "exhausted", message: "Quota used up.", until: nextPacificMidnight() };
+    }
+    if (/insufficient_quota/i.test(body)) {
+      return { ok: false, status: "exhausted", message: "Out of credit.", until: new Date(Date.now() + 24 * 3600_000) };
+    }
+    return { ok: false, status: "limited", message: "Rate-limited, try again in a minute.", until: new Date(Date.now() + 60_000) };
+  }
+  if (res.status === 401 || res.status === 403 || res.status === 400) {
+    return { ok: false, status: "invalid", message: `${serviceMeta(service).label} rejected this key.` };
+  }
+  return { ok: false, status: "error", message: `${serviceMeta(service).label} answered with an error (${res.status}). Try again later.` };
+}
+
+// A cheap request per service that only succeeds with a valid key.
+const HTTP_CHECKS: Record<string, (key: string) => Promise<Response>> = {
+  google_places: (key) =>
+    fetch("https://places.googleapis.com/v1/places:searchText", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Goog-Api-Key": key, "X-Goog-FieldMask": "places.id" },
+      body: JSON.stringify({ textQuery: "cafe in London", pageSize: 1 }),
+    }),
+  openai: (key) => fetch("https://api.openai.com/v1/models", { headers: { Authorization: `Bearer ${key}` } }),
+  anthropic: (key) =>
+    fetch("https://api.anthropic.com/v1/models", { headers: { "x-api-key": key, "anthropic-version": "2023-06-01" } }),
+  elevenlabs: (key) => fetch("https://api.elevenlabs.io/v1/user", { headers: { "xi-api-key": key } }),
+  openweather: (key) =>
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=London&appid=${encodeURIComponent(key)}`),
+};
+
+/** Built-in services, catalogue services set in Vercel, and any service that has keys saved. */
+export async function activeServices(): Promise<KeyService[]> {
+  const saved = await prisma.apiKey.findMany({ distinct: ["service"], select: { service: true } });
+  const ids = new Set<string>(Object.entries(KEY_SERVICES).filter(([id, m]) => m.builtIn || envKey(id)).map(([id]) => id));
+  for (const { service } of saved) if (isKeyService(service)) ids.add(service);
+  return [...ids];
+}
+
+/** The services offered under "Add an API". */
+export function catalogue() {
+  return Object.entries(KEY_SERVICES)
+    .filter(([, m]) => !m.builtIn)
+    .map(([id, m]) => ({ id, label: m.label, what: m.what, limits: m.limits, how: m.how }));
 }
 
 /** Tests a stored key and saves the result on it. */
@@ -281,7 +405,12 @@ export async function addKey(service: KeyService, plain: string, label?: string)
   if (existing) return { id: existing.id, result: await testStoredKey(existing.id) };
   const priority = keys.reduce((max, k) => Math.max(max, k.priority), 0) + 1;
   const row = await prisma.apiKey.create({
-    data: { service, label: label?.trim().slice(0, 40) || `Backup ${keys.length}`, apiKey: sealKey(plain), priority },
+    data: {
+      service,
+      label: label?.trim().slice(0, 40) || (keys.length ? `Backup ${keys.length}` : "Main key"),
+      apiKey: sealKey(plain),
+      priority,
+    },
   });
   return { id: row.id, result: await testStoredKey(row.id) };
 }
@@ -301,13 +430,14 @@ export async function activateKey(id: string) {
 /** Everything the Settings page needs, keys masked. */
 export async function publicKeyState() {
   return Promise.all(
-    (Object.keys(KEY_SERVICES) as KeyService[]).map(async (service) => {
-      const meta = KEY_SERVICES[service];
+    (await activeServices()).map(async (service) => {
+      const meta = serviceMeta(service);
       const keys = await loadKeys(service);
       const active = (await usableKeys(keys))[0];
       return {
         id: service,
         label: meta.label,
+        builtIn: !!meta.builtIn,
         what: meta.what,
         limits: meta.limits,
         how: meta.how,
