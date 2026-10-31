@@ -26,7 +26,7 @@ export function SettingsCard({
       title={label}
       sub={detail ?? undefined}
       trailing={
-        <span className={`tag ${status === "connected" ? "tag-purple" : status === "expiring" ? "tag-red" : ""}`}>
+        <span className={`tag ${status === "connected" ? "!border-green/20 !bg-green-soft !text-green" : status === "expiring" ? "tag-red" : ""}`}>
           {STATUS_LABEL[status]}
         </span>
       }
