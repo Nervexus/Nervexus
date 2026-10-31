@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   weight: ["400", "500", "600"],
 });
 
-export const viewport: Viewport = { themeColor: "#e3dfe9" };
+export const viewport: Viewport = { themeColor: "#ffffff" };
 
 export const metadata: Metadata = {
   title: "Laura",
