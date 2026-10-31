@@ -9,7 +9,11 @@ const nextConfig: NextConfig = {
   // The migrate route reads the SQL files at runtime.
   outputFileTracingIncludes: { "/api/admin/migrate": ["./prisma/migrations/**/*"] },
   partialPrefetching: true,
+  // Pin the root to this app: on Vercel it otherwise resolves to the monorepo
+  // root and next/font/google fails to resolve its font files.
+  outputFileTracingRoot: process.cwd(),
   turbopack: {
+    root: process.cwd(),
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
