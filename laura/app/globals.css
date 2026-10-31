@@ -774,3 +774,104 @@ select:focus-visible,
     var(--face);
   box-shadow: var(--raise), inset 0 0 40px rgba(255, 45, 85, 0.1);
 }
+
+/* ---------- minimal layout: groups, collapsible sections, flat rows ---------- */
+
+.group-title {
+  margin: 0 0 8px 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.group-list {
+  overflow: hidden;
+  padding: 4px 0;
+}
+.group-list > * + * {
+  border-top: 1px solid rgba(20, 18, 24, 0.06);
+}
+.section-head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 20px;
+  transition: background 0.2s var(--ease);
+}
+.section-head:hover {
+  background: rgba(20, 18, 24, 0.025);
+}
+.section-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+  color: var(--muted);
+}
+.section-summary {
+  flex-shrink: 0;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  color: var(--dim);
+}
+.section-chevron {
+  height: 16px;
+  width: 16px;
+  flex-shrink: 0;
+  color: var(--dim);
+  transition: transform 0.3s var(--ease);
+}
+.section[data-open] .section-chevron {
+  transform: rotate(90deg);
+}
+.section-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--ease);
+}
+.section[data-open] .section-body {
+  grid-template-rows: 1fr;
+}
+.section-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+.section-content {
+  padding: 2px 20px 20px;
+}
+.section:not([data-open]) .section-content {
+  visibility: hidden;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 20px;
+}
+.row.is-link {
+  transition: background 0.2s var(--ease);
+}
+.row.is-link:hover {
+  background: rgba(20, 18, 24, 0.025);
+}
+.row-icon {
+  display: flex;
+  height: 32px;
+  width: 32px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ececef;
+  color: var(--ink);
+  font-size: 16px;
+}
+/* Rows inside a section's content sit flush with its padding. */
+.section-content .row {
+  padding-left: 0;
+  padding-right: 0;
+}
+.section-content .row + .row {
+  border-top: 1px solid rgba(20, 18, 24, 0.06);
+}
