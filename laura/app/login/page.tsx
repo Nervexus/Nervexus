@@ -3,7 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { browserSupportsWebAuthn, startAuthentication } from "@simplewebauthn/browser";
 import { LogoMark } from "@/components/NavIcon";
-import { hasPasskeyHere, markPasskeyHere } from "@/lib/passkey-device";
+import { forgetPasskeyHere, hasPasskeyHere, markPasskeyHere } from "@/lib/passkey-device";
 
 // Only same-site paths, so ?next= can't be used to bounce you to another site.
 function safeNext(): string {
@@ -70,6 +70,13 @@ export default function LoginPage() {
       // A cancelled prompt, or a browser that won't open Face ID without a
       // tap, isn't an error worth showing -- the button is right there.
       const cancelled = err instanceof Error && err.name === "NotAllowedError";
+      if (auto) {
+        // The automatic attempt failed (often iOS offering a QR code because
+        // this phone has no passkey for this site): go to the password and
+        // don't open Face ID by itself again until it works once.
+        forgetPasskeyHere();
+        setMode("password");
+      }
       setError(cancelled ? null : err instanceof Error ? err.message : "Face ID didn't work.");
       setBusy(false);
     }

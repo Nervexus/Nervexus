@@ -59,7 +59,6 @@ export function FaceIdSettings() {
       load();
     } catch (err) {
       const name = err instanceof Error ? err.name : "";
-      if (name === "InvalidStateError") markPasskeyHere();
       setMessage(
         name === "NotAllowedError"
           ? null

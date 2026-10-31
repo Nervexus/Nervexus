@@ -18,3 +18,12 @@ export function hasPasskeyHere(): boolean {
     return false;
   }
 }
+
+/** Face ID opened by itself but didn't sign in: stop opening it automatically. */
+export function forgetPasskeyHere() {
+  try {
+    localStorage.removeItem(FLAG);
+  } catch {
+    // nothing stored to clear
+  }
+}
