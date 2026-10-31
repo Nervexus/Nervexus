@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTomorrowBriefing } from "@/lib/briefing";
 import { sendText } from "@/lib/telegram";
+import { syncApiIssues } from "@/lib/api-issues";
 
 // Vercel Cron calls this on a schedule (see vercel.json) to push tomorrow's
 // briefing without the user having to ask. Gated on CRON_SECRET so this
@@ -27,5 +28,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("GET /api/briefing/send failed:", err);
     return NextResponse.json({ error: "Couldn't send tomorrow's briefing." }, { status: 500 });
+  } finally {
+    await syncApiIssues().catch((err) => console.error("API issue sync failed:", err));
   }
 }

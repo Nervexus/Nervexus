@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runDailyMessages } from "@/lib/daily";
+import { syncApiIssues } from "@/lib/api-issues";
 
 // Vercel's two daily crons (vercel.json) -- a fallback for the scheduler
 // that calls /api/routine/tick. Same rules: each text at most once a day,
@@ -15,5 +16,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("routine send failed:", err);
     return NextResponse.json({ error: "Couldn't send." }, { status: 500 });
+  } finally {
+    await syncApiIssues().catch((err) => console.error("API issue sync failed:", err));
   }
 }

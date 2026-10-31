@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { quietly, recordHealthFail, recordHealthOk } from "@/lib/api-keys";
 
 // Telegram's Bot API is free with no trial limits, no card, and no
 // approval process -- unlike a real PSTN call/SMS, nobody charges per
@@ -73,10 +74,12 @@ async function send(kind: "call" | "sms", text: string): Promise<CallResult> {
       throw new Error(data.description ?? `Telegram API returned ${res.status}.`);
     }
     const messageId = String(data.result.message_id);
+    await quietly(recordHealthOk("telegram"));
     await logAttempt({ kind, target: chatId, message: text, status: "sent", providerId: messageId });
     return { ok: true, sid: messageId };
   } catch (err) {
     const error = err instanceof Error ? err.message : "Telegram send failed.";
+    await quietly(recordHealthFail("telegram", error));
     await logAttempt({ kind, target: chatId, message: text, status: "failed", error });
     return { ok: false, error };
   }
@@ -116,7 +119,13 @@ export async function replyInChat(text: string): Promise<boolean> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: getChatId(), text: text.slice(0, 4096) }),
   });
-  if (!res.ok) console.error("Telegram reply failed:", res.status, await res.text());
+  if (res.ok) {
+    await quietly(recordHealthOk("telegram"));
+  } else {
+    const body = await res.text();
+    console.error("Telegram reply failed:", res.status, body);
+    await quietly(recordHealthFail("telegram", `Telegram refused a message (${res.status}).`));
+  }
   return res.ok;
 }
 

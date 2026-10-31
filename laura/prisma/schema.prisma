@@ -269,10 +269,47 @@ model ApiKey {
   apiKey    String
   priority  Int      @default(0)
   active    Boolean  @default(true)
+  // ok | limited (short rate limit) | exhausted (used up until a reset) | invalid (rejected)
+  status    String    @default("ok")
+  until     DateTime?
+  error     String?
+  info      String? // JSON: plan, credits left, reset date
+  lastUsed  DateTime?
+  uses      Int       @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([service, active])
+}
+
+// Health of each outside service, including ones without keys (Telegram).
+model ServiceHealth {
+  service       String    @id
+  lastOk        DateTime?
+  lastError     DateTime?
+  error         String?
+  fails         Int       @default(0)
+  cooldownUntil DateTime?
+}
+
+// Every time a service goes down it is logged here; the pop-up reads it.
+// resolvedAt null = still open.
+model ApiIssue {
+  id          Int       @id @default(autoincrement())
+  ikey        String
+  service     String
+  label       String
+  kind        String // down | key
+  title       String
+  detail      String
+  needsKey    Boolean
+  resetAt     DateTime?
+  firstSeen   DateTime
+  lastSeen    DateTime
+  resolvedAt  DateTime?
+  snoozeUntil DateTime?
+
+  @@index([resolvedAt])
 }
 
 // Something Laura is passing on to Claude Code (the developer chat): a

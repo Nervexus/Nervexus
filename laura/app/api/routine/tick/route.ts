@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runDailyMessages } from "@/lib/daily";
+import { syncApiIssues } from "@/lib/api-issues";
 
 // Hit every 5-10 minutes by an external scheduler (cron-job.org), with
 // "Authorization: Bearer <CRON_SECRET>". Sends the morning/night texts
@@ -15,5 +16,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     console.error("routine tick failed:", err);
     return NextResponse.json({ error: "Tick failed." }, { status: 500 });
+  } finally {
+    await syncApiIssues().catch((err) => console.error("API issue sync failed:", err));
   }
 }

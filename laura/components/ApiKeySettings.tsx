@@ -1,208 +1,186 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { KEYS_CHANGED, ago, inTime, toast } from "@/components/api-keys/shared";
 
+type Key = {
+  id: string;
+  label: string;
+  masked: string;
+  status: "ok" | "limited" | "exhausted" | "invalid";
+  until: string | null;
+  error: string | null;
+  info: Record<string, unknown>;
+  lastUsed: string | null;
+  uses: number;
+  fromEnv: boolean;
+};
 type Service = {
   id: string;
   label: string;
-  detail: string;
+  what: string;
   limits: string;
   how: readonly string[];
-  main: { maskedKey: string } | null;
+  activeId: string | null;
+  nextReset: string | null;
+  keys: Key[];
 };
-type BackupKey = { id: string; service: string; label: string; maskedKey: string; active: boolean };
-type TestState = "ok" | "limited" | "invalid" | "error";
-type TestResult = { status: TestState; message: string };
-type Row = { id: string; label: string; masked: string; source: "main" | "backup"; active: boolean; index: number };
 
-const PILL: Record<TestState | "inuse" | "ready" | "paused", { text: string; tone: string }> = {
-  inuse: { text: "In use", tone: "!border-green/20 !bg-green-soft !text-green" },
-  ready: { text: "Ready", tone: "" },
-  paused: { text: "Paused", tone: "opacity-70" },
-  ok: { text: "Working", tone: "!border-green/20 !bg-green-soft !text-green" },
-  limited: { text: "At its limit", tone: "tag-amber" },
-  invalid: { text: "Rejected", tone: "tag-red" },
-  error: { text: "Couldn't check", tone: "tag-amber" },
-};
+const GREEN = "!border-green/20 !bg-green-soft !text-green";
+
+function keyPill(k: Key, active: boolean): { text: string; tone: string } {
+  const wait = inTime(k.until);
+  if (k.status === "invalid") return { text: "Rejected", tone: "tag-red" };
+  if (k.status === "exhausted") return { text: wait ? `Used up, resets in ${wait}` : "Used up", tone: "tag-amber" };
+  if (k.status === "limited") return { text: wait ? `Rate-limited, back in ${wait}` : "Rate-limited", tone: "tag-amber" };
+  return active ? { text: "In use", tone: GREEN } : { text: "Working", tone: "" };
+}
 
 export function ApiKeySettings() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [keys, setKeys] = useState<BackupKey[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [services, setServices] = useState<Service[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   function load() {
-    fetch("/api/settings/api-keys")
+    fetch("/api/keys")
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => {
         setServices(data.services ?? []);
-        setKeys(data.keys ?? []);
         setError(null);
       })
-      .catch(() => setError("Couldn't load API keys."))
-      .finally(() => setLoaded(true));
+      .catch(() => setError("Couldn't load API keys."));
   }
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+    window.addEventListener(KEYS_CHANGED, load);
+    return () => window.removeEventListener(KEYS_CHANGED, load);
+  }, []);
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-neutral-500">
-        Each service can hold several keys. Laura uses the first working one, and when it hits a limit or gets
-        rejected she moves to the next, so add as many backups as you like.
-      </p>
       {error && <p className="text-xs text-red-400">{error}</p>}
-      {!loaded && <p className="text-xs text-neutral-400">Loading…</p>}
-      {services.map((s) => (
-        <ServicePanel key={s.id} service={s} keys={keys.filter((k) => k.service === s.id)} onChange={load} />
-      ))}
+      {!services && !error && <p className="text-xs text-neutral-400">Loading…</p>}
+      {services?.map((s) => <ServiceCard key={s.id} service={s} onState={setServices} />)}
     </div>
   );
 }
 
-function ServicePanel({ service, keys, onChange }: { service: Service; keys: BackupKey[]; onChange: () => void }) {
+function ServiceCard({ service, onState }: { service: Service; onState: (s: Service[]) => void }) {
+  const [busy, setBusy] = useState<string | null>(null);
   const [apiKey, setApiKey] = useState("");
   const [label, setLabel] = useState("");
-  const [busy, setBusy] = useState<string | null>(null);
-  const [tests, setTests] = useState<Record<string, TestResult>>({});
-  const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
 
-  const rows: Row[] = [
-    ...(service.main
-      ? [{ id: "main", label: "Main key", masked: `${service.main.maskedKey} · set in Vercel`, source: "main" as const, active: true, index: -1 }]
-      : []),
-    ...keys.map((k, i) => ({ id: k.id, label: k.label, masked: k.maskedKey, source: "backup" as const, active: k.active, index: i })),
-  ];
-  const usable = rows.filter((r) => r.active && tests[r.id]?.status !== "invalid" && tests[r.id]?.status !== "limited");
-  const inUseId = usable[0]?.id;
-  const anyBad = rows.some((r) => tests[r.id] && tests[r.id].status !== "ok");
-  const header = rows.length === 0 ? "Not set up" : !inUseId ? "Needs attention" : anyBad ? "Check" : "Working";
-  const headerTone =
-    header === "Working" ? "!border-green/20 !bg-green-soft !text-green" : header === "Needs attention" ? "tag-red" : header === "Check" ? "tag-amber" : "";
+  const header =
+    service.keys.length === 0
+      ? { text: "Not set up", tone: "" }
+      : !service.activeId
+        ? { text: "Down", tone: "tag-red" }
+        : service.keys.some((k) => k.status !== "ok")
+          ? { text: "Using a backup", tone: "tag-amber" }
+          : { text: "Working", tone: GREEN };
 
-  async function test(id: string) {
+  async function act(id: string, path: string, init: RequestInit, done?: (r: { ok: boolean; message: string }) => void) {
     setBusy(id);
     try {
-      const res = await fetch(`/api/settings/api-keys/${id}/test`, { method: "POST" });
+      const res = await fetch(path, init);
       const data = await res.json();
-      if (data.status) setTests((t) => ({ ...t, [id]: { status: data.status, message: data.message } }));
-      return data as { ok: boolean; message: string };
+      if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
+      if (data.services) onState(data.services);
+      if (data.result) done?.(data.result);
+      window.dispatchEvent(new Event(KEYS_CHANGED));
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Something went wrong.", true);
     } finally {
       setBusy(null);
     }
   }
 
-  async function add() {
-    if (!apiKey.trim()) return setNote({ text: "Paste a key first.", bad: true });
-    setBusy("add");
-    setNote(null);
-    try {
-      const res = await fetch("/api/settings/api-keys", {
+  function add() {
+    if (!apiKey.trim()) return toast("Paste a key first.", true);
+    act(
+      "add",
+      "/api/keys",
+      {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ service: service.id, label: label.trim(), apiKey: apiKey.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Couldn't save.");
-      setApiKey("");
-      setLabel("");
-      setTests((t) => ({ ...t, [data.key.id]: { status: "ok", message: "Working" } }));
-      setNote({ text: `Key added and working: ${data.key.label}`, bad: false });
-      onChange();
-    } catch (err) {
-      setNote({ text: err instanceof Error ? err.message : "Couldn't save.", bad: true });
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  async function makeFirst(row: Row) {
-    setBusy(row.id);
-    const ids = [row.id, ...keys.map((k) => k.id).filter((id) => id !== row.id)];
-    await fetch("/api/settings/api-keys", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ service: service.id, ids }),
-    });
-    if (!row.active) {
-      await fetch(`/api/settings/api-keys/${row.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ active: true }),
-      });
-    }
-    setBusy(null);
-    setNote({
-      text: service.main ? `${row.label} is now the first backup. The main key in Vercel is still tried first.` : `Swapped. ${row.label} is now in use.`,
-      bad: false,
-    });
-    onChange();
-  }
-
-  async function togglePause(row: Row) {
-    await fetch(`/api/settings/api-keys/${row.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ active: !row.active }),
-    });
-    onChange();
-  }
-
-  async function remove(row: Row) {
-    if (!confirm(`Remove "${row.label}"?`)) return;
-    await fetch(`/api/settings/api-keys/${row.id}`, { method: "DELETE" });
-    setNote({ text: "Key removed.", bad: false });
-    onChange();
+        body: JSON.stringify({ service: service.id, key: apiKey.trim(), label: label.trim() }),
+      },
+      (r) => {
+        toast(r.ok ? `Key added and working.` : `Key added but not working: ${r.message}`, !r.ok);
+        if (r.ok) {
+          setApiKey("");
+          setLabel("");
+        }
+      }
+    );
   }
 
   return (
     <div className="card p-5">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-[15px] font-semibold text-neutral-800">{service.label}</h3>
-        <span className={`tag shrink-0 ${headerTone}`}>{header}</span>
+        <span className={`tag shrink-0 ${header.tone}`}>{header.text}</span>
       </div>
       <p className="mt-1 text-xs leading-relaxed text-neutral-500">
-        {service.detail}. {service.limits}
+        {service.what} {service.limits}
       </p>
 
       <div className="mt-4 flex flex-col gap-1.5">
-        {rows.length === 0 && <p className="px-1 text-xs text-neutral-500">No key yet.</p>}
-        {rows.map((row) => {
-          const result = tests[row.id];
-          const pill = result ? PILL[result.status] : !row.active ? PILL.paused : row.id === inUseId ? PILL.inuse : PILL.ready;
+        {service.keys.length === 0 && <p className="px-1 text-xs text-neutral-500">No key yet.</p>}
+        {service.keys.map((k) => {
+          const active = k.id === service.activeId;
+          const pill = keyPill(k, active);
+          const info = Object.entries(k.info).map(([name, v]) => `${name.replace(/_/g, " ")}: ${String(v)}`);
           return (
-            <div key={row.id} className={`item flex flex-wrap items-center gap-x-3 gap-y-2 !rounded-[14px] px-3 py-2.5 ${row.active ? "" : "opacity-60"}`}>
+            <div key={k.id} className="item flex flex-wrap items-center gap-x-3 gap-y-2 !rounded-[14px] px-3 py-2.5">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-neutral-800">{row.label}</p>
-                <p className="truncate font-mono text-[11px] text-neutral-400">{row.masked}</p>
+                <p className="truncate text-sm font-medium text-neutral-800">
+                  {k.label}
+                  {k.fromEnv && <span className="ml-1.5 text-[11px] font-normal text-neutral-400">set in Vercel</span>}
+                </p>
+                <p className="truncate font-mono text-[11px] text-neutral-400">{k.masked}</p>
+                <p className="mt-0.5 text-[11px] text-neutral-400">
+                  {k.uses} {k.uses === 1 ? "use" : "uses"} · last used {ago(k.lastUsed)}
+                  {info.length ? ` · ${info.join(" · ")}` : ""}
+                </p>
+                {k.error && k.status !== "ok" && <p className="mt-0.5 text-[11px] text-red-400">{k.error}</p>}
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-0.5">
-                <span className={`tag ${pill.tone}`}>{row.id === inUseId && result?.status === "ok" ? "In use" : pill.text}</span>
-                {result && result.status !== "ok" && <span className="text-[10.5px] text-neutral-400">{result.message}</span>}
-              </div>
-              <div className="flex w-full shrink-0 items-center justify-end gap-1 sm:w-auto">
-                {row.source === "backup" && row.id !== inUseId && (
-                  <button onClick={() => makeFirst(row)} disabled={busy !== null} className="btn-ghost !px-2.5 !py-1 text-xs">
-                    Use this
+              <span className={`tag shrink-0 ${pill.tone}`}>{pill.text}</span>
+              <div className="flex w-full items-center justify-end gap-1 sm:w-auto">
+                {!active && (
+                  <button
+                    onClick={() => act(k.id, `/api/keys/${k.id}/activate`, { method: "POST" }, undefined)}
+                    disabled={busy !== null}
+                    className="btn-ghost !px-2.5 !py-1 text-xs"
+                  >
+                    Use this key
                   </button>
                 )}
-                <button onClick={() => test(row.id)} disabled={busy !== null} className="btn-ghost !px-2.5 !py-1 text-xs">
-                  {busy === row.id ? "Testing…" : "Test"}
+                <button
+                  onClick={() =>
+                    act(k.id, `/api/keys/${k.id}/test`, { method: "POST" }, (r) =>
+                      toast(r.ok ? `${k.label}: working.` : `${k.label}: ${r.message}`, !r.ok)
+                    )
+                  }
+                  disabled={busy !== null}
+                  className="btn-ghost !px-2.5 !py-1 text-xs"
+                >
+                  {busy === k.id ? "Testing…" : "Test"}
                 </button>
-                {row.source === "backup" && (
-                  <>
-                    <button onClick={() => togglePause(row)} disabled={busy !== null} className="btn-ghost !px-2.5 !py-1 text-xs">
-                      {row.active ? "Pause" : "Resume"}
-                    </button>
-                    <button
-                      onClick={() => remove(row)}
-                      disabled={busy !== null}
-                      aria-label={`Remove ${row.label}`}
-                      className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-white hover:text-red-400"
-                    >
-                      <iconify-icon icon="solar:trash-bin-2-linear" className="text-base" />
-                    </button>
-                  </>
+                {!k.fromEnv && (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Remove "${k.label}"?`)) {
+                        act(k.id, `/api/keys/${k.id}`, { method: "DELETE" }, undefined);
+                        toast("Key removed.");
+                      }
+                    }}
+                    disabled={busy !== null}
+                    aria-label={`Remove ${k.label}`}
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-white hover:text-red-400"
+                  >
+                    <iconify-icon icon="solar:trash-bin-2-linear" className="text-base" />
+                  </button>
                 )}
               </div>
             </div>
@@ -210,11 +188,12 @@ function ServicePanel({ service, keys, onChange }: { service: Service; keys: Bac
         })}
       </div>
 
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+      <p className="label mt-4">Add backup key</p>
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
         <input
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          placeholder={`Paste a${rows.length ? " backup" : "n"} API key`}
+          placeholder={`Paste a${service.keys.length ? " backup" : "n"} ${service.label} key`}
           type="password"
           autoComplete="off"
           className="input flex-1 font-mono text-sm placeholder:font-sans"
@@ -226,10 +205,9 @@ function ServicePanel({ service, keys, onChange }: { service: Service; keys: Bac
           className="input text-sm sm:max-w-[150px]"
         />
         <button onClick={add} disabled={busy !== null} className="btn btn-primary shrink-0">
-          {busy === "add" ? "Testing…" : "Add & test"}
+          {busy === "add" ? "Testing…" : "Save & test"}
         </button>
       </div>
-      {note && <p className={`mt-2 text-xs ${note.bad ? "text-red-400" : "text-green"}`}>{note.text}</p>}
 
       <details className="mt-3 text-xs text-neutral-500">
         <summary className="cursor-pointer select-none font-medium text-neutral-600">How to get a {service.label} key</summary>
@@ -238,6 +216,7 @@ function ServicePanel({ service, keys, onChange }: { service: Service; keys: Bac
             <li key={step}>{step}</li>
           ))}
         </ol>
+        <p className="mt-2">{service.limits}</p>
       </details>
     </div>
   );

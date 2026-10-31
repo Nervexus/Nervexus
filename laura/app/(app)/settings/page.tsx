@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { SettingsCard } from "@/components/SettingsCard";
 import { Pill } from "@/components/Pill";
 import { GsapEntrance } from "@/components/GsapEntrance";
@@ -9,6 +9,8 @@ import { PasswordSettings } from "@/components/PasswordSettings";
 import { MessageSettings } from "@/components/MessageSettings";
 import { ClaudeRequests } from "@/components/ClaudeRequests";
 import { ApiKeySettings } from "@/components/ApiKeySettings";
+import { ApiProblemsCard } from "@/components/api-keys/ApiProblemsCard";
+import { OPEN_KEYS_TAB } from "@/components/api-keys/shared";
 
 type Status = "connected" | "expiring" | "missing";
 type Item = {
@@ -38,10 +40,26 @@ const GROUPS: { label: string; keys: string[] }[] = [
 const CREDENTIALS_GUIDE_URL =
   "https://claude.ai/artifact/AodDP54kAa3VXMB5K1kunt";
 
+// The tab lives in the URL hash so "Open API keys" in the pop-up lands on it.
+function subscribeHash(onChange: () => void) {
+  window.addEventListener("hashchange", onChange);
+  window.addEventListener(OPEN_KEYS_TAB, onChange);
+  return () => {
+    window.removeEventListener("hashchange", onChange);
+    window.removeEventListener(OPEN_KEYS_TAB, onChange);
+  };
+}
+
+function pickTab(next: "general" | "keys") {
+  history.replaceState(history.state, "", next === "keys" ? "#api-keys" : window.location.pathname);
+  window.dispatchEvent(new Event(OPEN_KEYS_TAB));
+}
+
 export default function SettingsPage() {
   const [items, setItems] = useState<Item[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"general" | "keys">("general");
+  const hash = useSyncExternalStore(subscribeHash, () => window.location.hash, () => "");
+  const tab = hash === "#api-keys" ? "keys" : "general";
 
   useEffect(() => {
     fetch("/api/settings/status")
@@ -77,7 +95,7 @@ export default function SettingsPage() {
         ).map(([id, name]) => (
           <button
             key={id}
-            onClick={() => setTab(id)}
+            onClick={() => pickTab(id)}
             className={`tab ${tab === id ? "is-active" : ""}`}
           >
             {name}
@@ -86,7 +104,8 @@ export default function SettingsPage() {
       </div>
 
       {tab === "keys" ? (
-        <div className="mt-6">
+        <div className="mt-6 flex flex-col gap-4">
+          <ApiProblemsCard />
           <ApiKeySettings />
         </div>
       ) : (

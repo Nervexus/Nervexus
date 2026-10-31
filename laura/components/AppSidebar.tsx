@@ -125,16 +125,17 @@ export function AppSidebar() {
         }))
       )
       .catch(() => setCounts((c) => ({ ...c, content: 0 })));
-    fetch("/api/settings/status")
-      .then((res) => res.json())
-      .then((data) =>
-        setCounts((c) => ({
-          ...c,
-          settings: (data.items ?? []).filter((i: { status: string }) => i.status !== "connected")
-            .length,
-        }))
-      )
-      .catch(() => setCounts((c) => ({ ...c, settings: 0 })));
+    Promise.all([
+      fetch("/api/settings/status").then((res) => res.json()).catch(() => ({})),
+      fetch("/api/issues").then((res) => res.json()).catch(() => ({})),
+    ]).then(([status, issues]) =>
+      setCounts((c) => ({
+        ...c,
+        settings:
+          (status.items ?? []).filter((i: { status: string }) => i.status !== "connected").length +
+          (issues.open ?? []).filter((i: { kind: string }) => i.kind === "down").length,
+      }))
+    );
   }, []);
 
   const countFor = (href: string): number | null => {
