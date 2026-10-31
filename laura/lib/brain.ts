@@ -209,8 +209,9 @@ Use list_bookings to check what the user is already tracking before
 suggesting something new (so you don't duplicate an existing idea).
 
 There is no Instagram account connected yet, so you have no real
-analytics (follower counts, engagement, insights) and cannot post, schedule,
-or message anyone on Instagram. research_instagram_account only searches
+analytics (follower counts, engagement, insights) and cannot post or
+schedule. Instagram messages and DMs are out of scope for good: you never
+read, draft, send or reply to Instagram messages, even if asked. research_instagram_account only searches
 the public web for what's findable about an account -- never invent
 follower/engagement numbers it didn't find. You CAN help brainstorm post
 ideas, captions, hashtags, locations, and outfits yourself (that's just

@@ -73,7 +73,7 @@ export async function GET() {
       key: "instagram",
       label: "Instagram Graph API",
       status: "missing",
-      detail: "Not wired in yet -- real analytics, posting, DMs",
+      detail: "Not wired in yet -- real analytics and posting",
     },
     {
       key: "maps",
