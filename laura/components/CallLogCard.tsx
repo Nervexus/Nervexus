@@ -1,5 +1,3 @@
-import { IconTile } from "@/components/IconTile";
-
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
   const mins = Math.round(diffMs / 60000);
@@ -11,6 +9,7 @@ function timeAgo(iso: string): string {
   return `${days}d ago`;
 }
 
+/** One sent call or text as a flat row. */
 export function CallLogCard({
   kind,
   message,
@@ -26,27 +25,18 @@ export function CallLogCard({
 }) {
   const failed = status === "failed";
   return (
-    <div
-      className={`relative flex items-start gap-3 rounded-[24px] border p-4 ${
-        failed ? "border-red-200 bg-red-50" : "card"
-      }`}
-    >
-      <IconTile>
-        <iconify-icon
-          icon={kind === "call" ? "solar:phone-calling-linear" : "solar:chat-round-line-linear"}
-          className="text-lg"
-        />
-      </IconTile>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-start justify-between gap-3">
-          <span className="label">
-            {kind === "call" ? "Call" : "Text"}
-          </span>
-          <span className="shrink-0 text-[11px] text-neutral-400">{timeAgo(createdAt)}</span>
-        </div>
-        <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-700">{message}</p>
-        {failed && <p className="mt-1.5 text-xs text-red-400">{error ?? "Failed to send."}</p>}
-      </div>
+    <div className="row !items-start">
+      <span className={`row-icon ${failed ? "!text-red-400" : ""}`}>
+        <iconify-icon icon={kind === "call" ? "solar:phone-calling-linear" : "solar:chat-round-line-linear"} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block whitespace-pre-wrap text-[14px] text-text">{message}</span>
+        <span className={`mt-0.5 block text-[12px] ${failed ? "text-red-400" : "text-muted"}`}>
+          {kind === "call" ? "Call" : "Text"}
+          {failed ? ` · ${error ?? "Failed to send."}` : ""}
+        </span>
+      </span>
+      <span className="shrink-0 pt-0.5 text-[11px] text-dim">{timeAgo(createdAt)}</span>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Section } from "@/components/ui/layout";
 
 type Prefs = {
   textStyle: "pa" | "mate" | "calm" | "minimal";
@@ -73,34 +74,48 @@ export function MessageSettings() {
     }
   }
 
-  if (!prefs) return <div className="card card-pad text-[13px] text-muted">Loading…</div>;
+  if (!prefs) {
+    return (
+      <>
+        <Section title="Texting style" summary="…">
+          <p className="text-[13px] text-muted">Loading…</p>
+        </Section>
+        <Section title="Daily messages" summary="…">
+          <p className="text-[13px] text-muted">Loading…</p>
+        </Section>
+      </>
+    );
+  }
 
   const style = STYLES.find((s) => s.value === prefs.textStyle) ?? STYLES[0];
   const tone = TONES.find((t) => t.value === prefs.motivationTone) ?? TONES[0];
+  const times = (
+    [
+      [prefs.morningOn, prefs.morningTime],
+      [prefs.afternoonOn, prefs.afternoonTime],
+      [prefs.nightOn, prefs.nightTime],
+    ] as const
+  )
+    .filter(([on]) => on)
+    .map(([, t]) => t);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="card card-pad">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-[15px] font-semibold text-text">Texting style</h2>
-            <p className="text-[12.5px] text-muted">How Laura sounds on Telegram and in chat.</p>
-          </div>
-          {saved && <span className="text-[12px] text-lilac">{saved}</span>}
-        </div>
+    <>
+      <Section title="Texting style" icon="solar:chat-round-dots-linear" summary={saved ?? style.label}>
+        <p className="text-[12.5px] text-muted">How Laura sounds on Telegram and in chat.</p>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {STYLES.map((s) => (
             <button
               key={s.value}
               onClick={() => save({ textStyle: s.value })}
-              className={`item px-3 py-2.5 text-left text-[13px] ${prefs.textStyle === s.value ? "!border-white/10 !bg-ink !text-white" : "text-muted"}`}
+              className={`rounded-full px-3 py-2 text-left text-[13px] transition-colors ${prefs.textStyle === s.value ? "bg-ink text-white" : "bg-[#ececef] text-muted hover:text-text"}`}
             >
               {s.label}
             </button>
           ))}
         </div>
-        <p className="item mt-3 px-3.5 py-2.5 text-[13px] text-text">
+        <p className="mt-3 text-[13px] text-text">
           <span className="mr-2 text-[11.5px] text-dim">Sounds like</span>
           {style.example}
         </p>
@@ -130,13 +145,16 @@ export function MessageSettings() {
           placeholder="e.g. call me Mads, don't say 'mate', no full stop at the end of a text"
           className="input mt-2 resize-none"
         />
-      </div>
+      </Section>
 
-      <div className="card card-pad">
-        <h2 className="text-[15px] font-semibold text-text">Daily messages</h2>
+      <Section
+        title="Daily messages"
+        icon="solar:clock-circle-linear"
+        summary={saved ?? (times.length ? times.join(" · ") : "All off")}
+      >
         <p className="text-[12.5px] text-muted">When each text lands on Telegram (UK time).</p>
 
-        <div className="mt-4 grid grid-cols-1 gap-2">
+        <div className="mt-2 flex flex-col">
           {(
             [
               ["morning", "Morning", "Today's plan and a push", prefs.morningOn, prefs.morningTime],
@@ -144,7 +162,7 @@ export function MessageSettings() {
               ["night", "Night", "Tomorrow's schedule + tonight's checklist", prefs.nightOn, prefs.nightTime],
             ] as const
           ).map(([part, label, hint, on, time]) => (
-            <div key={part} className="item flex items-center gap-3 px-3.5 py-3">
+            <div key={part} className="flex items-center gap-3 border-b border-[rgba(20,18,24,0.06)] py-3 last:border-b-0">
               <button
                 onClick={() => save({ [`${part}On`]: !on } as Partial<Prefs>)}
                 aria-label={`${label} ${on ? "on" : "off"}`}
@@ -186,7 +204,7 @@ export function MessageSettings() {
           )}
         </div>
         {prefs.motivation && (
-          <p className="item mt-3 px-3.5 py-2.5 text-[13px] text-text">
+          <p className="mt-3 text-[13px] text-text">
             <span className="mr-2 text-[11.5px] text-dim">e.g.</span>
             {tone.example}
           </p>
@@ -204,9 +222,9 @@ export function MessageSettings() {
           </button>
         </div>
         {preview && (
-          <pre className="item mt-3 whitespace-pre-wrap px-3.5 py-3 font-sans text-[13px] leading-relaxed text-text">{preview.text}</pre>
+          <pre className="mt-3 whitespace-pre-wrap rounded-2xl bg-[#ececef] px-3.5 py-3 font-sans text-[13px] leading-relaxed text-text">{preview.text}</pre>
         )}
-      </div>
-    </div>
+      </Section>
+    </>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { IssueRow, KEYS_CHANGED, duration, type Issue } from "@/components/api-keys/shared";
+import { Section } from "@/components/ui/layout";
 
 /** Settings: what's down now (with a paste box) and the history of past outages. */
 export function ApiProblemsCard() {
@@ -20,24 +21,21 @@ export function ApiProblemsCard() {
     return () => window.removeEventListener(KEYS_CHANGED, load);
   }, []);
 
+  // Mount the Section only once data is in, so it can open itself when something is down.
   if (!data) return null;
   return (
-    <div className="card p-5">
-      <div className="flex items-center gap-3">
-        <span className={`icon-tile !h-9 !w-9 ${data.open.length ? "is-alert" : ""}`}>
-          <iconify-icon icon="solar:key-linear" className="text-base" />
-        </span>
-        <div>
-          <h3 className="text-[15px] font-semibold text-neutral-800">API problems</h3>
-          <p className="text-xs text-neutral-500">Every time an API goes down it&apos;s saved here, so you can come back with a new key.</p>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-2">
+    <Section
+      title="API problems"
+      icon="solar:danger-triangle-linear"
+      summary={<span className={data.open.length ? "text-neon" : ""}>{data.open.length ? `${data.open.length} open` : "All clear"}</span>}
+      defaultOpen={data.open.length > 0}
+    >
+      <p className="text-[12.5px] text-muted">Every time an API goes down it&apos;s saved here, so you can come back with a new key.</p>
+      <div className="mt-3 flex flex-col gap-2">
         {data.open.length ? (
           data.open.map((i) => <IssueRow key={i.id} issue={i} onSaved={load} />)
         ) : (
-          <p className="px-1 text-sm text-neutral-500">Nothing down right now.</p>
+          <p className="text-[13px] text-muted">Nothing down right now.</p>
         )}
       </div>
 
@@ -58,6 +56,6 @@ export function ApiProblemsCard() {
           </ul>
         </details>
       )}
-    </div>
+    </Section>
   );
 }

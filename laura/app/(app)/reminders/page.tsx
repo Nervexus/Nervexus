@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { PriorityPicker } from "@/components/PriorityPicker";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { Pill } from "@/components/Pill";
+import { Empty, Group, PageHeader, Row } from "@/components/ui/layout";
 
 type Reminder = {
   id: string;
@@ -152,7 +154,6 @@ export default function RemindersPage() {
   }
 
   const upcoming = reminders.filter((r) => !r.done);
-  const monthDays = cursor ? new Date(cursor.year, cursor.month + 1, 0).getDate() : 30;
   const nextUp = today
     ? upcoming
         .filter((r) => new Date(r.dueAt).getTime() >= today.getTime() - 60_000)
@@ -161,111 +162,66 @@ export default function RemindersPage() {
     : [];
   const inCursorMonth = (d: Date) => cursor !== null && d.getFullYear() === cursor.year && d.getMonth() === cursor.month;
   const monthCount = upcoming.filter((r) => inCursorMonth(new Date(r.dueAt))).length;
-  const todayIndex = today && cursor && inCursorMonth(today) ? today.getDate() - 1 : null;
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
-      <div className="gsap-entrance flex items-end justify-between gap-4">
-        <div>
-          <p className="label">Reminders</p>
-          <h1 className="mt-3 page-title">
-            {cursor ? `${MONTH_NAMES[cursor.month]} ${cursor.year}` : " "}
-          </h1>
-        </div>
-        <div className="label flex items-center gap-5 pb-1">
-          <button onClick={() => changeDay(-1)} aria-label="Previous day" className="transition-colors hover:text-text">
-            ←
-          </button>
-          <button onClick={goToToday} className="transition-colors hover:text-text">
-            Today
-          </button>
-          <button onClick={() => changeDay(1)} aria-label="Next day" className="transition-colors hover:text-text">
-            →
-          </button>
-        </div>
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
+      <div className="gsap-entrance">
+        <PageHeader
+          title="Reminders"
+          meta={<Pill>{upcoming.length} active</Pill>}
+          sub={cursor ? `${monthCount} coming up in ${MONTH_NAMES[cursor.month]}` : " "}
+          actions={
+            <button onClick={() => today && setSelected(today)} className="btn btn-primary">
+              New reminder
+            </button>
+          }
+        />
       </div>
 
-      {error && <p className="gsap-entrance mt-4 text-sm text-red-400">{error}</p>}
+      {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
 
       {!loaded || !cursor ? (
-        <p className="gsap-entrance mt-10 py-10 text-center text-sm text-neutral-600">Loading…</p>
+        <p className="gsap-entrance py-10 text-center text-sm text-neutral-600">Loading…</p>
       ) : (
-        <>
-          <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[320px_1fr]">
-            {/* The month dial: one dot per day around a matte knob, lit where
-                something's due, gold for today, with the needle on today. */}
-            <div className="card flex flex-col items-center px-6 pb-6 pt-8">
-              <div className="relative h-56 w-56">
-                {Array.from({ length: monthDays }, (_, d) => {
-                  const angle = (d / monthDays) * Math.PI * 2 - Math.PI / 2;
-                  const has = (byDay.get(dateKey(new Date(cursor.year, cursor.month, d + 1))) ?? []).some((r) => !r.done);
-                  const isToday = d === todayIndex;
-                  return (
-                    <span
-                      key={d}
-                      className={`absolute h-1 w-1 rounded-full ${
-                        isToday ? "bg-[var(--calendar-accent)] shadow-[0_0_6px_var(--calendar-accent)]" : has ? "bg-neutral-800" : "bg-neutral-300"
-                      }`}
-                      style={{ left: `${50 + Math.cos(angle) * 47}%`, top: `${50 + Math.sin(angle) * 47}%`, transform: "translate(-50%,-50%)" }}
-                    />
-                  );
-                })}
-                <div className="absolute inset-[14%] rounded-full bg-[radial-gradient(circle_at_50%_40%,#ffffff,#f0f0f2_75%)] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08),inset_0_0_0_1px_rgba(0,0,0,0.04)]">
-                  {todayIndex !== null && (
-                    <span
-                      className="absolute left-1/2 top-1/2 h-1/2 w-px origin-top"
-                      style={{ transform: `rotate(${(todayIndex / monthDays) * 360 + 180}deg)` }}
-                    >
-                      <span className="absolute bottom-1.5 left-0 h-3 w-px bg-neutral-700" />
+        <div className="flex flex-col gap-6">
+          <Group title="Next up" className="gsap-entrance">
+            {nextUp.length === 0 ? (
+              <Empty>Nothing coming up. Pick a day below to add one.</Empty>
+            ) : (
+              nextUp.map((r) => (
+                <Row
+                  key={r.id}
+                  onClick={() => setSelected(new Date(r.dueAt))}
+                  icon={<span className={`h-1.5 w-1.5 rounded-full ${PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal}`} />}
+                  title={r.title}
+                  trailing={
+                    <span className="text-[12px] text-muted">
+                      {new Date(r.dueAt).toLocaleString([], { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
                     </span>
-                  )}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="stat-num !text-[46px]">{String(monthCount).padStart(2, "0")}</span>
-                  </div>
-                </div>
-              </div>
-              <p className="label mt-6 text-neutral-600">Upcoming</p>
-              <p className="label mt-1.5">This month</p>
-            </div>
+                  }
+                />
+              ))
+            )}
+          </Group>
 
-            <div className="card flex flex-col p-6">
-              <div className="flex items-center justify-between">
-                <p className="label">Next up</p>
-                <p className="label flex items-center gap-2">
-                  <span className={`h-1.5 w-1.5 rounded-full ${upcoming.length ? "bg-accent" : "bg-neutral-300"}`} />
-                  {upcoming.length} active
-                </p>
+          <div className="card gsap-entrance p-5 sm:p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-[15px] font-medium text-text">
+                {MONTH_NAMES[cursor.month]} {cursor.year}
+              </p>
+              <div className="label flex items-center gap-4">
+                <button onClick={() => changeDay(-1)} aria-label="Previous day" className="transition-colors hover:text-text">
+                  ←
+                </button>
+                <button onClick={goToToday} className="transition-colors hover:text-text">
+                  Today
+                </button>
+                <button onClick={() => changeDay(1)} aria-label="Next day" className="transition-colors hover:text-text">
+                  →
+                </button>
               </div>
-              <div className="mt-4 flex flex-1 flex-col">
-                {nextUp.length === 0 ? (
-                  <p className="my-auto text-sm font-normal text-neutral-400">Nothing coming up. Pick a day below to add one.</p>
-                ) : (
-                  nextUp.map((r) => (
-                    <button
-                      key={r.id}
-                      onClick={() => setSelected(new Date(r.dueAt))}
-                      className="flex items-center gap-4 border-b border-line py-3.5 text-left last:border-0"
-                    >
-                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${PRIORITY_DOT[r.priority] ?? PRIORITY_DOT.normal}`} />
-                      <span className="min-w-0 flex-1 truncate text-[15px] font-normal text-neutral-700">{r.title}</span>
-                      <span className="label shrink-0">
-                        {new Date(r.dueAt).toLocaleString([], { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}
-                      </span>
-                    </button>
-                  ))
-                )}
-              </div>
-              <button
-                onClick={() => today && setSelected(today)}
-                className="btn btn-primary mt-4 self-end"
-              >
-                New reminder
-              </button>
             </div>
-          </div>
-
-          <div className="card gsap-entrance mt-4 p-6">
-            <div className="label grid grid-cols-7 gap-2 text-center">
+            <div className="label grid grid-cols-7 gap-1.5 text-center">
               {WEEKDAYS.map((w) => (
                 <div key={w}>
                   <span className="hidden sm:inline">{w.slice(0, 3)}</span>
@@ -273,7 +229,7 @@ export default function RemindersPage() {
                 </div>
               ))}
             </div>
-            <div className="mt-3 grid grid-cols-7 gap-2">
+            <div className="mt-3 grid grid-cols-7 gap-1.5">
               {grid.map((day, i) => {
                 const inMonth = day.getMonth() === cursor.month;
                 const isToday = today !== null && sameDay(day, today);
@@ -282,12 +238,12 @@ export default function RemindersPage() {
                   <button
                     key={i}
                     onClick={() => setSelected(day)}
-                    className={`relative flex min-h-[54px] flex-col items-center justify-center gap-1.5 rounded-xl transition-colors sm:min-h-[68px] ${
-                      inMonth ? "bg-surface-2 text-neutral-600 hover:bg-neutral-100" : "bg-transparent text-neutral-300 hover:bg-neutral-50"
-                    }`}
+                    className={`relative flex min-h-[46px] flex-col items-center justify-center gap-1 rounded-xl transition-colors sm:min-h-[60px] ${
+                      inMonth ? "text-neutral-700 hover:bg-black/[0.03]" : "text-neutral-300 hover:bg-black/[0.02]"
+                    } ${isToday ? "bg-black/[0.04]" : ""}`}
                   >
-                    <span className={`text-sm font-normal tabular-nums ${isToday ? "text-neutral-900 font-medium" : ""}`}>{day.getDate()}</span>
-                    {isToday && <span className="absolute bottom-2 h-px w-4 bg-[var(--calendar-accent)]" />}
+                    <span className={`text-sm font-normal tabular-nums ${isToday ? "font-medium text-neutral-900" : ""}`}>{day.getDate()}</span>
+                    {isToday && <span className="absolute bottom-1.5 h-px w-4 bg-[var(--calendar-accent)]" />}
                     {dots.length > 0 && (
                       <div className="flex items-center gap-0.5">
                         {dots.slice(0, MAX_DOTS_PER_DAY).map((r) => (
@@ -308,7 +264,7 @@ export default function RemindersPage() {
               <span className="flex items-center gap-2"><span className="h-1 w-1 rounded-full bg-neutral-600" /> Low</span>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {selected && (

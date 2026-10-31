@@ -3,6 +3,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { browserSupportsWebAuthn, startRegistration } from "@simplewebauthn/browser";
 import { markPasskeyHere } from "@/lib/passkey-device";
+import { Section } from "@/components/ui/layout";
 
 type Passkey = { id: string; label: string | null; createdAt: string; lastUsedAt: string | null };
 
@@ -79,16 +80,16 @@ export function FaceIdSettings() {
   }
 
   return (
-    <div className="card p-6">
+    <Section
+      title="Face ID"
+      icon="solar:face-scan-square-linear"
+      summary={passkeys === null ? "…" : passkeys.length ? `${passkeys.length} device${passkeys.length === 1 ? "" : "s"}` : "Not set up"}
+    >
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="label">Sign-in</p>
-          <h2 className="mt-3 text-xl font-normal text-neutral-800">Face ID</h2>
-          <p className="mt-1.5 max-w-md text-sm font-normal text-neutral-500">
-            Sign in with Face ID, Touch ID or your fingerprint instead of the password. Set it up once on each
-            device you use.
-          </p>
-        </div>
+        <p className="max-w-md text-[12.5px] text-muted">
+          Sign in with Face ID, Touch ID or your fingerprint instead of the password. Set it up once on each device
+          you use.
+        </p>
         <button
           onClick={add}
           disabled={busy || !supported}
@@ -97,13 +98,13 @@ export function FaceIdSettings() {
           {busy ? "Waiting…" : "Add this device"}
         </button>
       </div>
-      {!supported && <p className="mt-4 text-sm text-neutral-500">This browser doesn&apos;t support passkeys.</p>}
-      {message && <p className="mt-4 text-sm text-neutral-600">{message}</p>}
+      {!supported && <p className="mt-3 text-sm text-neutral-500">This browser doesn&apos;t support passkeys.</p>}
+      {message && <p className="mt-3 text-sm text-neutral-600">{message}</p>}
       {passkeys && passkeys.length > 0 && (
-        <div className="mt-5 flex flex-col">
+        <div className="mt-3 flex flex-col">
           {passkeys.map((p) => (
             <div key={p.id} className="flex items-center gap-4 border-t border-line py-3">
-              <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+              <iconify-icon icon="solar:smartphone-linear" className="text-base text-muted" />
               <span className="flex-1 text-sm font-normal text-neutral-700">{p.label ?? "Passkey"}</span>
               <span className="label">
                 {p.lastUsedAt ? `Used ${new Date(p.lastUsedAt).toLocaleDateString()}` : `Added ${new Date(p.createdAt).toLocaleDateString()}`}
@@ -118,6 +119,6 @@ export function FaceIdSettings() {
           ))}
         </div>
       )}
-    </div>
+    </Section>
   );
 }

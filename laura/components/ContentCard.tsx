@@ -1,6 +1,6 @@
 "use client";
 
-import { IconTile } from "@/components/IconTile";
+import { useState } from "react";
 
 const TYPE_ICON: Record<string, string> = {
   post: "solar:gallery-linear",
@@ -18,16 +18,10 @@ const STATUS_LABEL: Record<string, string> = {
 
 function formatDateTime(iso: string | null): string | null {
   if (!iso) return null;
-  const date = new Date(iso);
-  return date.toLocaleString([], {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return new Date(iso).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
+/** One content idea as a flat row; tap it for the caption, hashtags and status. */
 export function ContentCard({
   title,
   type,
@@ -51,60 +45,57 @@ export function ContentCard({
   onStatusChange: (status: string) => void;
   onDelete: () => void;
 }) {
+  const [open, setOpen] = useState(false);
+  const meta = [formatDateTime(scheduledAt), location, outfit].filter(Boolean).join(" · ") || type;
+  const tags = hashtags
+    ?.split(",")
+    .map((h) => h.trim())
+    .filter(Boolean)
+    .map((h) => `#${h}`)
+    .join(" ");
+
   return (
-    <div className="card flex flex-col gap-3 p-4">
-      <div className="flex items-start gap-3">
-        <IconTile>
-          <iconify-icon icon={TYPE_ICON[type] ?? TYPE_ICON.other} className="text-lg" />
-        </IconTile>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="truncate text-sm font-medium text-neutral-800">{title}</h3>
-            <button onClick={onDelete} className="shrink-0 text-xs text-neutral-500 hover:text-red-400">
-              Delete
-            </button>
-          </div>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-neutral-500">
-            {formatDateTime(scheduledAt) && <span>{formatDateTime(scheduledAt)}</span>}
-            {location && <span>· {location}</span>}
-            {outfit && <span>· {outfit}</span>}
-          </div>
-          {caption && <p className="mt-1.5 whitespace-pre-wrap text-sm text-neutral-400">{caption}</p>}
-          {hashtags && (
-            <p className="mt-1.5 text-xs text-neutral-600">
-              {hashtags
-                .split(",")
-                .map((h) => h.trim())
-                .filter(Boolean)
-                .map((h) => `#${h}`)
-                .join(" ")}
-            </p>
+    <div>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="row is-link w-full text-left">
+        <span className="row-icon">
+          <iconify-icon icon={TYPE_ICON[type] ?? TYPE_ICON.other} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className={`block truncate text-[14px] ${status === "discarded" ? "text-dim line-through" : "text-text"}`}>{title}</span>
+          <span className="mt-0.5 block truncate text-[12px] capitalize text-muted">{meta}</span>
+        </span>
+        <span className={`tag shrink-0 capitalize ${status === "scheduled" ? "tag-purple" : ""}`}>{STATUS_LABEL[status] ?? status}</span>
+      </button>
 
-          )}
+      {open && (
+        <div className="px-5 pb-4 pl-[64px]">
+          {caption && <p className="whitespace-pre-wrap text-[13px] text-muted">{caption}</p>}
+          {tags && <p className="mt-1.5 text-[12px] text-neutral-600">{tags}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            {Object.keys(STATUS_LABEL)
+              .filter((s) => s !== "discarded")
+              .map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onStatusChange(s)}
+                  className={`tag capitalize transition-opacity ${status === s ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
+                >
+                  {STATUS_LABEL[s]}
+                </button>
+              ))}
+            <span className="ml-auto flex items-center gap-1">
+              {status !== "discarded" && (
+                <button onClick={() => onStatusChange("discarded")} className="btn-ghost !px-2 !py-1 !text-[12px] hover:!text-red-400">
+                  Discard
+                </button>
+              )}
+              <button onClick={onDelete} className="btn-ghost !px-2 !py-1 !text-[12px] hover:!text-red-400">
+                Delete
+              </button>
+            </span>
+          </div>
         </div>
-      </div>
-
-      <div className="flex items-center gap-1.5 border-t border-line pt-3">
-        {Object.keys(STATUS_LABEL)
-          .filter((s) => s !== "discarded")
-          .map((s) => (
-            <button
-              key={s}
-              onClick={() => onStatusChange(s)}
-              className={`tag capitalize transition-opacity ${status === s ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
-            >
-              {STATUS_LABEL[s]}
-            </button>
-          ))}
-        {status !== "discarded" && (
-          <button
-            onClick={() => onStatusChange("discarded")}
-            className="btn-ghost ml-auto !px-2 !py-1 !text-[12px] capitalize hover:!text-[#ff9a90]"
-          >
-            discard
-          </button>
-        )}
-      </div>
+      )}
     </div>
   );
 }

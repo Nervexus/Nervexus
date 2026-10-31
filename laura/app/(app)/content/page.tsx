@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EmptyState } from "@/components/EmptyState";
-import { SidebarCard, Stat } from "@/components/SidebarCard";
 import { ContentCard } from "@/components/ContentCard";
 import { Pill } from "@/components/Pill";
-import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { Empty, Group, PageHeader, Row, Section } from "@/components/ui/layout";
 
 type Idea = {
   id: string;
@@ -21,12 +19,20 @@ type Idea = {
 };
 
 const TYPES = ["post", "reel", "story", "other"] as const;
+const VIEWS = ["all", "scheduled", "idea", "posted", "discarded"] as const;
+const VIEW_LABEL: Record<(typeof VIEWS)[number], string> = {
+  all: "All",
+  scheduled: "Scheduled",
+  idea: "Ideas",
+  posted: "Posted",
+  discarded: "Discarded",
+};
 
 export default function ContentPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDiscarded, setShowDiscarded] = useState(false);
+  const [view, setView] = useState<(typeof VIEWS)[number]>("all");
 
   const [handle, setHandle] = useState("");
   const [researching, setResearching] = useState(false);
@@ -114,143 +120,97 @@ export default function ContentPage() {
   const posted = active.filter((i) => i.status === "posted");
   const drafts = active.filter((i) => i.status === "idea");
 
-  const SECTIONS: { label: string; items: Idea[] }[] = [
-    { label: "Scheduled", items: scheduled },
-    { label: "Ideas", items: drafts },
-    { label: "Posted", items: posted },
-    ...(showDiscarded ? [{ label: "Discarded", items: discarded }] : []),
-  ];
+  const shown = view === "all" ? [...scheduled, ...drafts, ...posted] : ideas.filter((i) => i.status === view);
+  const views = VIEWS.filter((v) => v !== "discarded" || discarded.length > 0);
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
-      <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="page-title">Content</h1>
-        <Pill>{active.length} tracked</Pill>
-      </div>
-      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
-        Instagram post ideas Laura&apos;s helped brainstorm or you&apos;ve noted — no account is
-        connected yet, so this is research and planning, never posting
-      </p>
-
-      <div className="gsap-entrance relative mt-8 card p-5">
-        <span className="label">
-          Research a public account
-        </span>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <input
-            value={handle}
-            onChange={(e) => setHandle(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && research()}
-            placeholder="@someaccount"
-            className="min-w-0 flex-1 input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-          />
-          <Button variant="accent" onClick={research} disabled={researching || !handle.trim()}>
-            {researching ? "Researching…" : "Research"}
-          </Button>
-        </div>
-        {researchResult && (
-          <div className="mt-4 input">
-            <p className="whitespace-pre-wrap text-sm text-neutral-600">{researchResult}</p>
-          </div>
-        )}
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
+      <div className="gsap-entrance">
+        <PageHeader title="Content" meta={<Pill>{active.length} tracked</Pill>} sub="Instagram ideas and research. Nothing is ever posted for you." />
       </div>
 
-      <div className="gsap-entrance relative mt-4 card p-5">
-        <span className="label">
-          Add an idea by hand
-        </span>
-        <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title, e.g. Beach sunset reel"
-            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-          />
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value as (typeof TYPES)[number])}
-            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
-          >
-            {TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-          <textarea
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder="Caption (optional)"
-            rows={2}
-            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400 sm:col-span-2"
-          />
-          <input
-            value={hashtags}
-            onChange={(e) => setHashtags(e.target.value)}
-            placeholder="Hashtags, comma-separated (optional)"
-            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400 sm:col-span-2"
-          />
-        </div>
-        <div className="mt-3.5 flex justify-end">
-          <Button variant="accent" onClick={addIdea} disabled={!title.trim()}>
-            Add idea
-          </Button>
-        </div>
-      </div>
+      {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
-        <div className="min-w-0">
-          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
-
-          {loaded && active.length === 0 ? (
-            <EmptyState
-              icon={<iconify-icon icon="solar:gallery-linear" className="text-lg" />}
-              title="No content ideas yet"
-              description="Research an account for inspiration, or add one above."
-            />
-          ) : (
-            SECTIONS.map(
-              ({ label, items }) =>
-                items.length > 0 && (
-                  <div key={label} className="mb-8">
-                    <h2 className="label mb-3">
-                      {label} · {items.length}
-                    </h2>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
-                      {items.map((idea) => (
-                        <div key={idea.id} className="gsap-entrance">
-                          <ContentCard
-                            {...idea}
-                            onStatusChange={(status) => updateStatus(idea.id, status)}
-                            onDelete={() => remove(idea.id)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-            )
-          )}
-
-          {discarded.length > 0 && (
-            <button
-              onClick={() => setShowDiscarded((s) => !s)}
-              className="label hover:text-neutral-600"
-            >
-              {showDiscarded ? "Hide" : "Show"} discarded ({discarded.length})
+      <div className="gsap-entrance overflow-x-auto">
+        <div className="tabs">
+          {views.map((v) => (
+            <button key={v} onClick={() => setView(v)} className={`tab whitespace-nowrap ${view === v ? "is-active" : ""}`}>
+              {VIEW_LABEL[v]}
             </button>
-          )}
+          ))}
         </div>
+      </div>
 
-        <aside className="gsap-entrance flex flex-col gap-4">
-          <SidebarCard title="Stats">
-            <div className="flex flex-col gap-2">
-              <Stat label="Scheduled" value={scheduled.length} />
-              <Stat label="Ideas" value={drafts.length} />
-              <Stat label="Posted" value={posted.length} />
+      <div className="gsap-entrance mt-3">
+        <Group>
+          {!loaded ? (
+            <Empty>Loading…</Empty>
+          ) : shown.length === 0 ? (
+            <Empty>{view === "all" ? "No content ideas yet. Add one below, or research an account." : `Nothing ${VIEW_LABEL[view].toLowerCase()}.`}</Empty>
+          ) : (
+            shown.map((idea) => (
+              <ContentCard
+                key={idea.id}
+                {...idea}
+                onStatusChange={(status) => updateStatus(idea.id, status)}
+                onDelete={() => remove(idea.id)}
+              />
+            ))
+          )}
+        </Group>
+      </div>
+
+      <div className="gsap-entrance mt-6">
+        <Group>
+          <Section title="Add an idea" icon="solar:add-circle-linear">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title, e.g. Beach sunset reel" className="input text-sm" />
+              <select value={type} onChange={(e) => setType(e.target.value as (typeof TYPES)[number])} className="input text-sm capitalize [color-scheme:light]">
+                {TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+              <textarea value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption (optional)" rows={2} className="input text-sm sm:col-span-2" />
+              <input value={hashtags} onChange={(e) => setHashtags(e.target.value)} placeholder="Hashtags, comma-separated (optional)" className="input text-sm sm:col-span-2" />
             </div>
-          </SidebarCard>
-        </aside>
+            <div className="mt-3 flex justify-end">
+              <button onClick={addIdea} disabled={!title.trim()} className="btn btn-primary">
+                Add idea
+              </button>
+            </div>
+          </Section>
+          <Section title="Research an account" icon="solar:magnifer-linear" summary="Public accounts">
+            <div className="flex items-center gap-2">
+              <input
+                value={handle}
+                onChange={(e) => setHandle(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && research()}
+                placeholder="@someaccount"
+                className="input min-w-0 flex-1 text-sm"
+              />
+              <button onClick={research} disabled={researching || !handle.trim()} className="btn btn-primary shrink-0">
+                {researching ? "Researching…" : "Research"}
+              </button>
+            </div>
+            {researchResult && (
+              <div className="panel mt-3 px-4 py-3">
+                <p className="whitespace-pre-wrap text-sm text-neutral-600">{researchResult}</p>
+              </div>
+            )}
+          </Section>
+          <Section title="Overview" icon="solar:chart-2-linear" summary={`${scheduled.length} scheduled · ${drafts.length} ideas`}>
+            {[
+              { label: "Scheduled", value: scheduled.length },
+              { label: "Ideas", value: drafts.length },
+              { label: "Posted", value: posted.length },
+              { label: "Discarded", value: discarded.length },
+            ].map((s) => (
+              <Row key={s.label} title={s.label} trailing={<span className="font-mono text-[13px] tabular-nums text-muted">{s.value}</span>} />
+            ))}
+          </Section>
+        </Group>
       </div>
     </GsapEntrance>
   );

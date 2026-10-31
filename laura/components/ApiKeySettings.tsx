@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Empty, Group, Section } from "@/components/ui/layout";
 import { KEYS_CHANGED, ago, inTime, toast } from "@/components/api-keys/shared";
 
 type Key = {
@@ -38,7 +39,8 @@ function keyPill(k: Key, active: boolean): { text: string; tone: string } {
   return active ? { text: "In use", tone: GREEN } : { text: "Working", tone: "" };
 }
 
-export function ApiKeySettings() {
+/** Settings → API keys: problems, one collapsible Section per service, and "Add an API". */
+export function ApiKeySettings({ problems }: { problems?: ReactNode }) {
   const [services, setServices] = useState<Service[] | null>(null);
   const [catalogue, setCatalogue] = useState<CatalogueEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -61,12 +63,13 @@ export function ApiKeySettings() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-4">
-      {error && <p className="text-xs text-red-400">{error}</p>}
-      {!services && !error && <p className="text-xs text-neutral-400">Loading…</p>}
+    <Group>
+      {problems}
+      {error && <Empty>{error}</Empty>}
+      {!services && !error && <Empty>Loading…</Empty>}
       {services?.map((s) => <ServiceCard key={s.id} service={s} onState={setServices} />)}
       {services && <AddApiCard catalogue={catalogue} added={services.map((s) => s.id)} onState={setServices} />}
-    </div>
+    </Group>
   );
 }
 
@@ -75,14 +78,15 @@ function ServiceCard({ service, onState }: { service: Service; onState: (s: Serv
   const [apiKey, setApiKey] = useState("");
   const [label, setLabel] = useState("");
 
+  const count = `${service.keys.length} key${service.keys.length === 1 ? "" : "s"}`;
   const header =
     service.keys.length === 0
       ? { text: "Not set up", tone: "" }
       : !service.activeId
-        ? { text: "Down", tone: "tag-red" }
+        ? { text: `Down · ${count}`, tone: "text-neon" }
         : service.keys.some((k) => k.status !== "ok")
-          ? { text: "Using a backup", tone: "tag-amber" }
-          : { text: "Working", tone: GREEN };
+          ? { text: `Using a backup · ${count}`, tone: "text-[var(--amber)]" }
+          : { text: `Working · ${count}`, tone: "" };
 
   async function act(id: string, path: string, init: RequestInit, done?: (r: { ok: boolean; message: string }) => void) {
     setBusy(id);
@@ -121,23 +125,23 @@ function ServiceCard({ service, onState }: { service: Service; onState: (s: Serv
   }
 
   return (
-    <div className="card p-5">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-[15px] font-semibold text-neutral-800">{service.label}</h3>
-        <span className={`tag shrink-0 ${header.tone}`}>{header.text}</span>
-      </div>
-      <p className="mt-1 text-xs leading-relaxed text-neutral-500">
+    <Section
+      title={service.label}
+      icon={service.builtIn ? "solar:cpu-bolt-linear" : "solar:key-linear"}
+      summary={<span className={header.tone}>{header.text}</span>}
+    >
+      <p className="text-xs leading-relaxed text-neutral-500">
         {service.what} {service.limits}
       </p>
 
-      <div className="mt-4 flex flex-col gap-1.5">
+      <div className="mt-2 flex flex-col">
         {service.keys.length === 0 && <p className="px-1 text-xs text-neutral-500">No key yet.</p>}
         {service.keys.map((k) => {
           const active = k.id === service.activeId;
           const pill = keyPill(k, active);
           const info = Object.entries(k.info).map(([name, v]) => `${name.replace(/_/g, " ")}: ${String(v)}`);
           return (
-            <div key={k.id} className="item flex flex-wrap items-center gap-x-3 gap-y-2 !rounded-[14px] px-3 py-2.5">
+            <div key={k.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-[rgba(20,18,24,0.06)] py-3 last:border-b-0">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-neutral-800">
                   {k.label}
@@ -223,7 +227,7 @@ function ServiceCard({ service, onState }: { service: Service; onState: (s: Serv
         </ol>
         <p className="mt-2">{service.limits}</p>
       </details>
-    </div>
+    </Section>
   );
 }
 
@@ -275,18 +279,10 @@ function AddApiCard({
   }
 
   return (
-    <div className="card p-5">
-      <div className="flex items-center gap-3">
-        <span className="icon-tile !h-9 !w-9">
-          <iconify-icon icon="solar:add-circle-linear" className="text-base" />
-        </span>
-        <div>
-          <h3 className="text-[15px] font-semibold text-neutral-800">Add an API</h3>
-          <p className="text-xs text-neutral-500">Store keys for other services, like Google Places. Each one gets its own card with backups.</p>
-        </div>
-      </div>
+    <Section title="Add an API" icon="solar:add-circle-linear" summary="Google Places, OpenAI…">
+      <p className="text-xs text-neutral-500">Store keys for other services. Each one gets its own section with backups.</p>
 
-      <div className="mt-4 flex flex-col gap-2">
+      <div className="mt-3 flex flex-col gap-2">
         <select value={service} onChange={(e) => setService(e.target.value)} className="input text-sm">
           {catalogue.map((c) => (
             <option key={c.id} value={c.id}>
@@ -329,6 +325,6 @@ function AddApiCard({
       ) : (
         <p className="mt-3 text-xs text-neutral-500">Custom keys are stored encrypted but can&apos;t be tested, so they&apos;re saved as working.</p>
       )}
-    </div>
+    </Section>
   );
 }

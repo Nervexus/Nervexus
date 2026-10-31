@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { LogoMark } from "@/components/NavIcon";
+import { Group, PageHeader, Section } from "@/components/ui/layout";
 
 type SystemNode = {
   id: string;
@@ -95,14 +96,11 @@ export default function HubPage() {
   }, [loading]);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-[26px]">
-      <h1 className="text-[22px] font-semibold text-text">System</h1>
-      <p className="mt-1 text-[13px] text-muted">
-        Laura is the HQ. Everything connects here.
-      </p>
+    <div className="mx-auto w-full max-w-3xl px-4 pb-20 sm:px-[26px]">
+      <PageHeader title="System" sub="Everything Laura connects to." />
 
       {/* Hub diagram */}
-      <div className="card relative mt-8 overflow-hidden">
+      <div className="card relative overflow-hidden">
 
         <div ref={diagramRef} className="relative px-3 py-10 sm:px-12 sm:py-16">
           {/* Three-column layout: left pair | center orb | right pair */}
@@ -173,147 +171,72 @@ export default function HubPage() {
         </div>
       </div>
 
-      {/* System cards */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        {/* Encrypted card */}
-        <div className="card card-pad">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="icon-tile !h-10 !w-10 !text-muted">
-                <GlobeIcon />
-              </div>
-              <div>
-                <h2 className="text-[14px] font-semibold text-text">Encrypted</h2>
-                <p className="text-[11px] text-dim">Signal Outreach</p>
-              </div>
-            </div>
-            <StatusDot status={loading ? null : encrypted?.status ?? "unconfigured"} />
-          </div>
-
+      {/* Services: one group, each folded until opened */}
+      <Group title="Services" className="mt-6">
+        <Section
+          title="Encrypted"
+          icon="solar:global-linear"
+          summary={<StatusText status={loading ? null : encrypted?.status ?? "unconfigured"} />}
+        >
+          <p className="text-[12px] text-muted">Signal Outreach</p>
           {encrypted?.stats && (
-            <div className="mt-4 grid grid-cols-3 gap-2">
+            <div className="mt-3 grid grid-cols-3 gap-2">
               <Stat label="Sent today" value={encrypted.stats.sentToday} />
               <Stat label="Replies" value={encrypted.stats.repliesToday} />
               <Stat label="Warm leads" value={encrypted.stats.warmLeads} />
             </div>
           )}
+          <a href={encrypted?.url ?? "#"} target="_blank" rel="noopener noreferrer" className="btn mt-4 w-full justify-center text-[12px]">
+            Open Encrypted
+          </a>
+        </Section>
 
-          <div className="mt-4 flex gap-2">
-            <a
-              href={encrypted?.url ?? "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn flex-1 justify-center text-[12px]"
-            >
-              Open Encrypted
-            </a>
-          </div>
-        </div>
-
-        {/* Telegram card */}
-        <div className="card card-pad">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="icon-tile !h-10 !w-10 !text-muted">
-                <MessageIcon />
-              </div>
-              <div>
-                <h2 className="text-[14px] font-semibold text-text">Telegram</h2>
-                <p className="text-[11px] text-dim">@Laura1xbot</p>
-              </div>
-            </div>
-            <StatusDot status={loading ? null : telegram?.status ?? "unconfigured"} />
-          </div>
-
-          <div className="mt-4 space-y-2">
+        <Section
+          title="Telegram"
+          icon="solar:chat-round-line-linear"
+          summary={<StatusText status={loading ? null : telegram?.status ?? "unconfigured"} />}
+        >
+          <p className="text-[12px] text-muted">@Laura1xbot</p>
+          <div className="mt-3 space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${webhookLoading ? "bg-dim/40 animate-pulse" : webhook?.url ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" : "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.3)]"}`} />
+              <span className={`h-2 w-2 rounded-full ${webhookLoading ? "bg-dim/40 animate-pulse" : webhook?.url ? "bg-emerald-500" : "bg-red-400"}`} />
               <span className="text-[12px] text-muted">
                 {webhookLoading ? "Checking webhook…" : webhook?.url ? "Webhook active" : "Webhook not connected"}
               </span>
             </div>
-            {webhook?.last_error_message && (
-              <p className="text-[11px] text-red-500/80">
-                Last error: {webhook.last_error_message}
-              </p>
-            )}
+            {webhook?.last_error_message && <p className="text-[11px] text-red-500/80">Last error: {webhook.last_error_message}</p>}
             {webhook?.pending_update_count ? (
               <p className="text-[11px] text-amber-600/80">
                 {webhook.pending_update_count} pending update{webhook.pending_update_count === 1 ? "" : "s"}
               </p>
             ) : null}
           </div>
-
           <div className="mt-4 flex gap-2">
-            <a
-              href="https://t.me/Laura1xbot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn flex-1 justify-center text-[12px]"
-            >
+            <a href="https://t.me/Laura1xbot" target="_blank" rel="noopener noreferrer" className="btn flex-1 justify-center text-[12px]">
               Open in Telegram
             </a>
-            <button
-              onClick={setupWebhook}
-              disabled={settingUp}
-              className="btn flex-1 justify-center text-[12px]"
-            >
-              {settingUp ? "Setting up…" : webhook?.url ? "Reconnect" : "Connect Webhook"}
+            <button onClick={setupWebhook} disabled={settingUp} className="btn flex-1 justify-center text-[12px]">
+              {settingUp ? "Setting up…" : webhook?.url ? "Reconnect" : "Connect webhook"}
             </button>
           </div>
-        </div>
+        </Section>
 
-        {/* Google card */}
-        <div className="card card-pad sm:col-span-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="icon-tile !h-10 !w-10 !text-muted">
-                <GoogleIcon />
-              </div>
-              <div>
-                <h2 className="text-[14px] font-semibold text-text">Google</h2>
-                <p className="text-[11px] text-dim">Calendar & Gmail</p>
-              </div>
-            </div>
-            <StatusDot status={loading ? null : googleNode?.status ?? "unconfigured"} />
+        <Section
+          title="Google"
+          icon="solar:calendar-linear"
+          summary={<StatusText status={loading ? null : googleNode?.status ?? "unconfigured"} />}
+        >
+          <p className="text-[12px] text-muted">Calendar & Gmail</p>
+          <div className="mt-3">
+            {googleNode?.status === "online" && <p className="text-[12px] text-muted">Calendar and Gmail connected.</p>}
+            {googleNode?.status === "unconfigured" && <p className="text-[12px] text-muted">Not connected yet.</p>}
+            {googleNode?.status === "offline" && <p className="text-[12px] text-red-500/80">Credentials expired. Reconnect below.</p>}
           </div>
-
-          <div className="mt-4 space-y-2">
-            {googleNode?.status === "online" && (
-              <div className="flex gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-                  <span className="text-[12px] text-muted">Calendar connected</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-                  <span className="text-[12px] text-muted">Gmail connected</span>
-                </div>
-              </div>
-            )}
-            {googleNode?.status === "unconfigured" && (
-              <p className="text-[12px] text-muted">
-                Not connected. Visit <span className="font-medium text-text">/api/google/auth</span> to link your Google account.
-              </p>
-            )}
-            {googleNode?.status === "offline" && (
-              <p className="text-[12px] text-red-500/80">
-                Credentials expired. Reconnect via /api/google/auth.
-              </p>
-            )}
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            <a
-              href="/api/google/auth"
-              className="btn flex-1 justify-center text-[12px]"
-            >
-              {googleNode?.status === "online" ? "Reconnect" : "Connect Google"}
-            </a>
-          </div>
-        </div>
-
-      </div>
+          <a href="/api/google/auth" className="btn mt-4 w-full justify-center text-[12px]">
+            {googleNode?.status === "online" ? "Reconnect" : "Connect Google"}
+          </a>
+        </Section>
+      </Group>
     </div>
   );
 }
@@ -401,26 +324,21 @@ function DatabaseIcon() {
   );
 }
 
-function StatusDot({ status }: { status: "online" | "offline" | "unconfigured" | null }) {
-  if (!status) return <span className="h-2.5 w-2.5 rounded-full bg-dim/40 animate-pulse" />;
-  const color =
-    status === "online"
-      ? "bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]"
-      : status === "offline"
-        ? "bg-red-400 shadow-[0_0_6px_rgba(248,113,113,0.3)]"
-        : "bg-dim/40";
+function StatusText({ status }: { status: "online" | "offline" | "unconfigured" | null }) {
+  if (!status) return <span className="text-dim">Checking…</span>;
+  const color = status === "online" ? "bg-emerald-500" : status === "offline" ? "bg-red-400" : "bg-dim/40";
   const label = status === "online" ? "Connected" : status === "offline" ? "Offline" : "Not set up";
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-[10px] font-medium text-dim uppercase tracking-wider">{label}</span>
-      <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
-    </div>
+    <span className="inline-flex items-center gap-1.5">
+      <span className={`h-1.5 w-1.5 rounded-full ${color}`} />
+      {label}
+    </span>
   );
 }
 
 function Stat({ label, value }: { label: string; value: unknown }) {
   return (
-    <div className="rounded-[14px] border border-white/60 bg-white/40 px-2.5 py-2 text-center">
+    <div className="rounded-[14px] bg-black/[0.03] px-2.5 py-2 text-center">
       <p className="text-[16px] font-semibold text-text tabular-nums">{String(value ?? 0)}</p>
       <p className="mt-0.5 text-[10px] text-dim">{label}</p>
     </div>

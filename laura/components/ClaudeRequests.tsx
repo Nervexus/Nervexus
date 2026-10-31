@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Section } from "@/components/ui/layout";
 
 type Req = { id: string; kind: string; summary: string; details: string | null; status: string; createdAt: string };
 
@@ -43,22 +44,19 @@ export function ClaudeRequests() {
   }
 
   return (
-    <div className="card card-pad">
+    <Section title="Passed to Claude" icon="solar:code-square-linear" summary={open.length ? `${open.length} open` : "Nothing yet"}>
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-[15px] font-semibold text-text">For Claude Code</h2>
-          <p className="text-[12.5px] text-muted">
-            Things Laura has passed on. Tell her &ldquo;pass this to Claude&rdquo;, then copy these into the developer chat.
-          </p>
-        </div>
+        <p className="text-[12.5px] text-muted">
+          Things Laura has passed on. Tell her &ldquo;pass this to Claude&rdquo;, then copy these into the developer chat.
+        </p>
         <button onClick={copyAll} disabled={open.length === 0} className="btn btn-primary shrink-0">
           {copied ? "Copied" : `Copy all${open.length ? ` (${open.length})` : ""}`}
         </button>
       </div>
-      <ul className="mt-4 flex flex-col gap-2">
+      <ul className="mt-2 flex flex-col">
         {items.length === 0 && <li className="text-[13px] text-dim">Nothing yet.</li>}
         {items.map((r) => (
-          <li key={r.id} className={`item px-3.5 py-3 ${r.status === "done" ? "opacity-50" : ""}`}>
+          <li key={r.id} className={`border-b border-[rgba(20,18,24,0.06)] py-3 last:border-b-0 ${r.status === "done" ? "opacity-50" : ""}`}>
             <div className="flex items-start gap-2">
               <span className={`tag ${r.kind === "bug" ? "tag-red" : r.kind === "note" ? "" : "tag-purple"}`}>{r.kind}</span>
               <div className="min-w-0 flex-1">
@@ -75,6 +73,6 @@ export function ClaudeRequests() {
           </li>
         ))}
       </ul>
-    </div>
+    </Section>
   );
 }

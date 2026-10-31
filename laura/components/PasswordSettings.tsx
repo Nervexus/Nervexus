@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
+import { Section } from "@/components/ui/layout";
 
 /** Settings > Password: set or change the main sign-in password. */
 export function PasswordSettings() {
@@ -48,8 +49,8 @@ export function PasswordSettings() {
   }
 
   return (
-    <form onSubmit={save} className="card card-pad">
-      <h2 className="text-[15px] font-semibold text-text">Password</h2>
+    <Section title="Password" icon="solar:lock-password-linear" summary={isSet === null ? "…" : isSet ? "Set" : "Not set"}>
+    <form onSubmit={save}>
       <p className="text-[12.5px] text-muted">
         {isSet === null
           ? "…"
@@ -58,7 +59,7 @@ export function PasswordSettings() {
             : "No password set yet. Choose one so you can sign in without Face ID."}
       </p>
 
-      <div className="mt-4 flex flex-col gap-2 sm:max-w-sm">
+      <div className="mt-3 flex flex-col gap-2 sm:max-w-sm">
         {isSet && (
           <input
             type="password"
@@ -91,5 +92,6 @@ export function PasswordSettings() {
         </Button>
       </div>
     </form>
+    </Section>
   );
 }

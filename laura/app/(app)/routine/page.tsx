@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { GsapEntrance } from "@/components/GsapEntrance";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
+import { Group, PageHeader, Row, Section } from "@/components/ui/layout";
 
 type Slot = "morning" | "afternoon" | "night";
 type Step = { id: string; text: string; product: string | null; link: string | null; owned: boolean; auto?: boolean };
@@ -223,13 +224,23 @@ export default function RoutinePage() {
     );
   };
 
+  const shiftDays = week.filter((d) => d.shift).length;
+  const nextKey = keyDates[0];
+  const otherSlots = SLOTS.filter((x) => x.slot !== nowSlot).map((x) => x.slot);
+
   return (
-    <GsapEntrance className="relative mx-auto max-w-6xl px-4 sm:px-[26px]">
-      <div className="gsap-entrance flex flex-wrap items-center gap-3">
-        <h1 className="page-title">Routine</h1>
-        <Pill>{day?.label ?? "…"}</Pill>
-        {day && <span className="pill">{day.shift ? `Shift ${day.shift.start}–${day.shift.end}` : "Day off"}</span>}
-        <div className="ml-auto flex flex-wrap gap-2">
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 pb-10 sm:px-[26px]">
+      <div className="gsap-entrance">
+        <PageHeader
+          title="Routine"
+          meta={
+            <>
+              <Pill>{day?.label ?? "…"}</Pill>
+              {day && <span className="pill">{day.shift ? `Shift ${day.shift.start}–${day.shift.end}` : "Day off"}</span>}
+            </>
+          }
+        />
+        <div className="-mt-2 mb-6 flex flex-wrap gap-2">
           {which === "today" && (
             <div className="tabs">
               {(["now", "all"] as const).map((v) => (
@@ -249,178 +260,208 @@ export default function RoutinePage() {
         </div>
       </div>
 
-      {error && <p className="mt-6 text-sm text-red-400">{error}</p>}
+      {error && <p className="mb-6 text-sm text-red-400">{error}</p>}
 
       {day && (
-        <>
-          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_300px]">
-            <div className="flex min-w-0 flex-col gap-4">
-              {showAll ? (
-                <>
-                  {card("morning", "large")}
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {card("afternoon", "normal")}
-                    {card("night", "normal")}
-                  </div>
-                </>
-              ) : (
-                <>
-                  {card(nowSlot, "large")}
-                  <button onClick={() => switchView("all")} className="btn-ghost self-start !text-[12.5px]">
-                    {nowSlot === "night" ? "Show morning and afternoon too" : `Up next: ${nowSlot === "morning" ? "afternoon and night" : "night"} · show all day`}
+        <div className="flex flex-col gap-6">
+          {showAll ? (
+            <div className="flex flex-col gap-4">
+              {card("morning", "large")}
+              {card("afternoon", "normal")}
+              {card("night", "normal")}
+            </div>
+          ) : (
+            card(nowSlot, "large")
+          )}
+
+          <Group className="gsap-entrance">
+            {!showAll && (
+              <Section title="Up next" summary={otherSlots.map((x) => SLOTS.find((m) => m.slot === x)!.title).join(" · ")}>
+                <div className="flex flex-col divide-y divide-line">
+                  {otherSlots.map((slot) => {
+                    const meta = SLOTS.find((x) => x.slot === slot)!;
+                    const steps = day[slot];
+                    return (
+                      <div key={slot} className="py-3 first:pt-0 last:pb-0">
+                        <p className="flex items-center justify-between text-[13px]">
+                          <span className="font-medium text-text">{meta.title}</span>
+                          <span className="text-dim">{meta.hint}</span>
+                        </p>
+                        <ul className="mt-1.5 flex flex-col gap-1">
+                          {steps.length === 0 && <li className="text-[12.5px] text-dim">Nothing planned.</li>}
+                          {steps.map((st) => (
+                            <li key={st.id} className="text-[12.5px] text-muted">
+                              {st.text}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+                  <button onClick={() => switchView("all")} className="btn-ghost mt-2 self-start !px-0 !text-[12.5px]">
+                    Show all day
                   </button>
-                </>
-              )}
-            </div>
-
-            <div className="gsap-entrance card card-pad self-start">
-              <h2 className="label">Key dates</h2>
-              <ul className="mt-3.5 flex flex-col gap-2">
-                {keyDates.map((k) => (
-                  <li key={k.date} className="item px-3 py-2.5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[12px] font-semibold text-lilac">{k.label}</span>
-                      <span className="font-mono text-[11px] tabular text-dim">{k.daysAway === 0 ? "today" : `${k.daysAway}d`}</span>
-                    </div>
-                    <p className="mt-1 text-[12.5px] leading-relaxed text-text">{k.items.join(" · ")}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Work rota */}
-          <div className="gsap-entrance card card-pad mt-4">
-            <div className="flex items-center justify-between">
-              <h2 className="label">Work rota · next 7 days</h2>
-              <a href="/rota" className="btn-ghost !py-1 !text-[12px]">
-                Edit rota
-              </a>
-            </div>
-            <div className="mt-3.5 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-7">
-              {week.map((d, i) => (
-                <div key={d.date} className={`item flex flex-col gap-1.5 px-3 py-3 ${i === 0 ? "!border-white !bg-white/70" : ""}`}>
-                  <span className={`text-[12px] font-semibold ${i === 0 ? "text-lilac" : "text-muted"}`}>{i === 0 ? "Today" : d.label}</span>
-                  {d.shift ? (
-                    <span className="text-[15px] font-medium text-text">
-                      {d.shift.start}–{d.shift.end}
-                    </span>
-                  ) : (
-                    <span className="text-[15px] text-dim">Off</span>
-                  )}
-                  {d.shift?.colleagues && <span className="text-[11.5px] text-muted">with {d.shift.colleagues}</span>}
-                  {d.block && <span className="tag tag-purple self-start">{d.block.title}</span>}
-                  {d.items.map((k) => (
-                    <span key={k} className="text-[11.5px] text-lilac">
-                      {k}
-                    </span>
-                  ))}
                 </div>
+              </Section>
+            )}
+
+            <Section
+              title="Key dates"
+              icon="solar:calendar-mark-linear"
+              summary={nextKey ? `${nextKey.items[0] ?? nextKey.label} · ${nextKey.daysAway === 0 ? "today" : `${nextKey.daysAway}d`}` : "None"}
+            >
+              {keyDates.length === 0 && <p className="text-[13px] text-dim">No key dates coming up.</p>}
+              {keyDates.map((k) => (
+                <Row
+                  key={k.date}
+                  title={k.items.join(" · ")}
+                  sub={k.label}
+                  trailing={<span className="font-mono text-[11px] tabular text-dim">{k.daysAway === 0 ? "today" : `${k.daysAway}d`}</span>}
+                />
               ))}
-            </div>
-          </div>
+            </Section>
 
-          {/* Regular routine: hair & beard, perfume oils, outreach */}
-          <div className="gsap-entrance card mt-4 mb-4">
-            <h2 className="px-6 pt-6 text-[17px] font-semibold text-text">Regular Routine</h2>
-            <div className="grid grid-cols-1 divide-y divide-line lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-              <section className="p-6">
-                <h3 className="label">Hair &amp; beard</h3>
-                <p className="mt-3 text-[15px] text-text">{day.hair.headline}</p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{day.hair.detail}</p>
-              </section>
-
-              <section className="p-6">
-                <h3 className="label">Perfume oils · {oils.length}</h3>
-                <p className="mt-3 text-[15px] text-text">{day.wear.oil ? `Wear ${day.wear.oil.name}` : "No oils added yet"}</p>
-                <p className="mt-1.5 text-[13px] text-muted">
-                  {day.wear.oil ? day.wear.why : "1–2 dabs on moisturised wrists and neck, after you're dressed."}
-                </p>
-                {plans.length > 0 && day.wear.oil && (
-                  <ul className="mt-3 flex flex-col gap-1">
-                    {plans.slice(0, 3).map((p, i) => (
-                      <li key={i} className="flex justify-between gap-3 text-[12px]">
-                        <span className="truncate text-muted">
-                          {p.title} · {p.when}
-                        </span>
-                        <span className="shrink-0 text-lilac">{p.pick.oil?.name ?? "—"}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <ul className="mt-3 flex flex-col divide-y divide-line">
-                  {oils.map((o) => (
-                    <li key={o.id} className="flex flex-wrap items-center gap-2 py-2">
-                      <span className="min-w-0 flex-1 truncate text-[13px] text-text" title={o.notes ?? undefined}>
-                        {o.name}
+            <Section
+              title="Work rota, next 7 days"
+              icon="solar:case-minimalistic-linear"
+              summary={shiftDays === 0 ? "Off all week" : plural(shiftDays, "shift")}
+            >
+              {week.map((d, i) => (
+                <Row
+                  key={d.date}
+                  title={
+                    <span className={i === 0 ? "font-medium" : ""}>
+                      {i === 0 ? "Today" : d.label}
+                    </span>
+                  }
+                  sub={
+                    d.shift
+                      ? `${d.shift.start}–${d.shift.end}${d.shift.colleagues ? ` · with ${d.shift.colleagues}` : ""}`
+                      : "Off"
+                  }
+                  trailing={
+                    (d.block || d.items.length > 0) && (
+                      <span className="flex max-w-[180px] flex-wrap justify-end gap-1">
+                        {d.block && (
+                          <span className="tag">
+                            <span className="h-1.5 w-1.5 rounded-full bg-neon" />
+                            {d.block.title}
+                          </span>
+                        )}
+                        {d.items.map((k) => (
+                          <span key={k} className="tag">
+                            <span className="h-1.5 w-1.5 rounded-full bg-neon" />
+                            {k}
+                          </span>
+                        ))}
                       </span>
-                      {flag(o.day, "day", () => toggleOil(o, "day"))}
-                      {flag(o.night, "night", () => toggleOil(o, "night"))}
-                      {flag(o.cold, "cold", () => toggleOil(o, "cold"))}
-                      <button onClick={() => removeOil(o.id)} aria-label={`Remove ${o.name}`} className="btn-ghost !px-1.5 !py-0.5">
-                        ×
-                      </button>
+                    )
+                  }
+                />
+              ))}
+              <a href="/rota" className="btn-ghost mt-2 !px-0 !text-[12.5px]">
+                Edit rota ›
+              </a>
+            </Section>
+
+            <Section title="Hair & beard" icon="solar:scissors-linear" summary={day.hair.headline}>
+              <p className="text-[14px] text-text">{day.hair.headline}</p>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{day.hair.detail}</p>
+            </Section>
+
+            <Section title="Perfume oils" icon="solar:bottle-linear" summary={day.wear.oil ? `Wear ${day.wear.oil.name}` : plural(oils.length, "oil")}>
+              <p className="text-[14px] text-text">{day.wear.oil ? `Wear ${day.wear.oil.name}` : "No oils added yet"}</p>
+              <p className="mt-1.5 text-[13px] text-muted">
+                {day.wear.oil ? day.wear.why : "1–2 dabs on moisturised wrists and neck, after you're dressed."}
+              </p>
+              {plans.length > 0 && day.wear.oil && (
+                <ul className="mt-3 flex flex-col gap-1">
+                  {plans.slice(0, 3).map((p, i) => (
+                    <li key={i} className="flex justify-between gap-3 text-[12px]">
+                      <span className="truncate text-muted">
+                        {p.title} · {p.when}
+                      </span>
+                      <span className="shrink-0 text-lilac">{p.pick.oil?.name ?? "—"}</span>
                     </li>
                   ))}
                 </ul>
-                <div className="mt-3 flex flex-col gap-2">
-                  <input
-                    value={oilDraft.name}
-                    onChange={(e) => setOilDraft((d) => ({ ...d, name: e.target.value }))}
-                    placeholder="Add an oil"
-                    className="input"
-                  />
-                  {oilDraft.name.trim() && (
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {flag(oilDraft.day, "day", () => setOilDraft((d) => ({ ...d, day: !d.day })))}
-                      {flag(oilDraft.night, "night", () => setOilDraft((d) => ({ ...d, night: !d.night })))}
-                      {flag(oilDraft.cold, "cold", () => setOilDraft((d) => ({ ...d, cold: !d.cold })))}
-                      <Button variant="accent" onClick={addOil} className="ml-auto !py-1.5">
-                        Add
-                      </Button>
+              )}
+              <ul className="mt-3 flex flex-col divide-y divide-line">
+                {oils.map((o) => (
+                  <li key={o.id} className="flex flex-wrap items-center gap-2 py-2">
+                    <span className="min-w-0 flex-1 truncate text-[13px] text-text" title={o.notes ?? undefined}>
+                      {o.name}
+                    </span>
+                    {flag(o.day, "day", () => toggleOil(o, "day"))}
+                    {flag(o.night, "night", () => toggleOil(o, "night"))}
+                    {flag(o.cold, "cold", () => toggleOil(o, "cold"))}
+                    <button onClick={() => removeOil(o.id)} aria-label={`Remove ${o.name}`} className="btn-ghost !px-1.5 !py-0.5">
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-3 flex flex-col gap-2">
+                <input
+                  value={oilDraft.name}
+                  onChange={(e) => setOilDraft((d) => ({ ...d, name: e.target.value }))}
+                  placeholder="Add an oil"
+                  className="input"
+                />
+                {oilDraft.name.trim() && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {flag(oilDraft.day, "day", () => setOilDraft((d) => ({ ...d, day: !d.day })))}
+                    {flag(oilDraft.night, "night", () => setOilDraft((d) => ({ ...d, night: !d.night })))}
+                    {flag(oilDraft.cold, "cold", () => setOilDraft((d) => ({ ...d, cold: !d.cold })))}
+                    <Button variant="accent" onClick={addOil} className="ml-auto !py-1.5">
+                      Add
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Section>
+
+            <Section
+              title="Outreach"
+              icon="solar:letter-linear"
+              summary={outreach ? `${outreach.today.sent} sent today` : "Offline"}
+            >
+              {outreach ? (
+                <>
+                  <div className="flex items-end gap-6">
+                    <div>
+                      <p className="stat-num">{outreach.today.sent}</p>
+                      <p className="text-[12px] text-muted">sent today</p>
+                    </div>
+                    <div>
+                      <p className="stat-num text-lilac">{outreach.today.replies}</p>
+                      <p className="text-[12px] text-muted">replies today</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-[12.5px] text-muted">
+                    This week: {outreach.week.sent} sent · {plural(outreach.week.replies, "reply", "replies")} ·{" "}
+                    {plural(outreach.week.callsBooked, "call")} · {outreach.week.won} won
+                  </p>
+                  {outreach.warmLeads.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {outreach.warmLeads.slice(0, 6).map((l) => (
+                        <span key={l.id} className="tag">
+                          <span className="h-1.5 w-1.5 rounded-full bg-neon" />
+                          {l.company || l.name}
+                        </span>
+                      ))}
                     </div>
                   )}
-                </div>
-              </section>
-
-              <section className="p-6">
-                <h3 className="label">Outreach</h3>
-                {outreach ? (
-                  <>
-                    <div className="mt-3 flex items-end gap-6">
-                      <div>
-                        <p className="stat-num">{outreach.today.sent}</p>
-                        <p className="text-[12px] text-muted">sent today</p>
-                      </div>
-                      <div>
-                        <p className="stat-num text-lilac">{outreach.today.replies}</p>
-                        <p className="text-[12px] text-muted">replies today</p>
-                      </div>
-                    </div>
-                    <p className="mt-3 text-[12.5px] text-muted">
-                      This week: {outreach.week.sent} sent · {plural(outreach.week.replies, "reply", "replies")} ·{" "}
-                      {plural(outreach.week.callsBooked, "call")} · {outreach.week.won} won
-                    </p>
-                    {outreach.warmLeads.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {outreach.warmLeads.slice(0, 6).map((l) => (
-                          <span key={l.id} className="tag tag-purple">
-                            {l.company || l.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <p className="mt-3 text-[13px] text-muted">The outreach app isn&apos;t answering right now.</p>
-                )}
-                <a href="https://signal-outreach-two.vercel.app" target="_blank" rel="noopener noreferrer" className="btn mt-4 w-full">
-                  Open outreach
-                </a>
-              </section>
-            </div>
-          </div>
-        </>
+                </>
+              ) : (
+                <p className="text-[13px] text-muted">The outreach app isn&apos;t answering right now.</p>
+              )}
+              <a href="https://signal-outreach-two.vercel.app" target="_blank" rel="noopener noreferrer" className="btn mt-4 w-full">
+                Open outreach
+              </a>
+            </Section>
+          </Group>
+        </div>
       )}
     </GsapEntrance>
   );
@@ -533,9 +574,9 @@ function RoutineCard({
       )}
 
       {editing && (
-        <div className="mt-3 flex flex-col gap-2">
+        <div className="mt-3 flex flex-col">
           {items.map((i) => (
-            <div key={i.id} className="item px-3 py-2.5">
+            <div key={i.id} className="border-b border-line px-1 py-2.5 last:border-b-0">
               <div className="flex items-start gap-2">
                 <div className="min-w-0 flex-1">
                   <p className="text-[13.5px] text-text">{i.text}</p>
@@ -555,7 +596,7 @@ function RoutineCard({
           ))}
 
           <form
-            className="mt-1 flex flex-col gap-2 border-t border-line pt-3"
+            className="mt-3 flex flex-col gap-2 border-t border-line pt-3"
             onSubmit={async (e) => {
               e.preventDefault();
               if (!draft.text.trim()) return;

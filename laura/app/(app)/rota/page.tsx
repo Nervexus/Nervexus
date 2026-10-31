@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EmptyState } from "@/components/EmptyState";
-import { SidebarCard, Stat } from "@/components/SidebarCard";
 import { ShiftCard } from "@/components/ShiftCard";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { Empty, Group, PageHeader, Row, Section } from "@/components/ui/layout";
 
 type Shift = {
   id: string;
@@ -214,190 +213,170 @@ export default function RotaPage() {
   ];
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
-      <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="page-title">Rota</h1>
-        <Pill>{upcoming.length} upcoming</Pill>
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
+      <div className="gsap-entrance">
+        <PageHeader title="Rota" meta={<Pill>{upcoming.length} upcoming</Pill>} sub="Your work schedule." />
       </div>
-      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
-        your work schedule — upload a photo of it, or add shifts by hand
-      </p>
 
-      <div className="gsap-entrance relative mt-8 card p-5">
-        <span className="label">
-          Upload a rota (photo, PDF, Excel or CSV)
-        </span>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,.pdf,.csv,.xlsx"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) parsePhoto(file);
-            }}
-            className="text-sm text-neutral-500 file:mr-3 file:rounded-full file:border file:border-neutral-200 file:bg-white file:px-3.5 file:py-1.5 file:text-xs file:text-neutral-600 file:transition-colors hover:file:border-neutral-400"
-          />
-          {parsing && <span className="text-xs text-neutral-500">Reading photo…</span>}
-        </div>
+      {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
 
-        {parsed && (
-          <div className="mt-4 flex flex-col gap-3">
-            {parsed.map((s, i) => (
-              <div
-                key={i}
-                className="grid grid-cols-1 gap-2 item p-3 sm:grid-cols-2"
-              >
-                <input
-                  type="datetime-local"
-                  value={toLocalInputValue(s.startAt)}
-                  onChange={(e) => updateParsed(i, { startAt: new Date(e.target.value).toISOString() })}
-                  className="input text-xs [color-scheme:light]"
-                />
-                <input
-                  type="datetime-local"
-                  value={toLocalInputValue(s.endAt)}
-                  onChange={(e) => updateParsed(i, { endAt: new Date(e.target.value).toISOString() })}
-                  className="input text-xs [color-scheme:light]"
-                />
-                <input
-                  value={s.location ?? ""}
-                  onChange={(e) => updateParsed(i, { location: e.target.value || null })}
-                  placeholder="Location"
-                  className="input text-xs placeholder:text-neutral-400"
-                />
-                <input
-                  value={s.colleagues ?? ""}
-                  onChange={(e) => updateParsed(i, { colleagues: e.target.value || null })}
-                  placeholder="Colleagues"
-                  className="input text-xs placeholder:text-neutral-400"
-                />
+      <div className="flex flex-col gap-6">
+        {loaded && upcoming.length === 0 ? (
+          <Group className="gsap-entrance">
+            <Empty>No shifts yet. Upload your rota or add one below.</Empty>
+          </Group>
+        ) : (
+          SECTIONS.map(
+            ({ label, items }) =>
+              items.length > 0 && (
+                <Group key={label} title={`${label} · ${items.length}`} className="gsap-entrance">
+                  {items.map((shift) => (
+                    <ShiftCard key={shift.id} {...shift} onDelete={() => remove(shift.id)} onUpdated={load} />
+                  ))}
+                </Group>
+              )
+          )
+        )}
+
+        <Group className="gsap-entrance">
+          <Section title="Upload a rota" icon="solar:upload-minimalistic-linear" summary="Photo, PDF, Excel or CSV" defaultOpen={!!parsed}>
+            <div className="flex flex-wrap items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf,.csv,.xlsx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) parsePhoto(file);
+                }}
+                className="text-sm text-neutral-500 file:mr-3 file:rounded-full file:border-0 file:bg-surface-2 file:px-3.5 file:py-1.5 file:text-xs file:text-neutral-600"
+              />
+              {parsing && <span className="text-xs text-neutral-500">Reading photo…</span>}
+            </div>
+
+            {parsed && (
+              <div className="mt-4 flex flex-col gap-3">
+                {parsed.map((s, i) => (
+                  <div key={i} className="grid grid-cols-1 gap-2 border-b border-line pb-3 sm:grid-cols-2">
+                    <input
+                      type="datetime-local"
+                      value={toLocalInputValue(s.startAt)}
+                      onChange={(e) => updateParsed(i, { startAt: new Date(e.target.value).toISOString() })}
+                      className="input text-xs [color-scheme:light]"
+                    />
+                    <input
+                      type="datetime-local"
+                      value={toLocalInputValue(s.endAt)}
+                      onChange={(e) => updateParsed(i, { endAt: new Date(e.target.value).toISOString() })}
+                      className="input text-xs [color-scheme:light]"
+                    />
+                    <input
+                      value={s.location ?? ""}
+                      onChange={(e) => updateParsed(i, { location: e.target.value || null })}
+                      placeholder="Location"
+                      className="input text-xs placeholder:text-neutral-400"
+                    />
+                    <input
+                      value={s.colleagues ?? ""}
+                      onChange={(e) => updateParsed(i, { colleagues: e.target.value || null })}
+                      placeholder="Colleagues"
+                      className="input text-xs placeholder:text-neutral-400"
+                    />
+                  </div>
+                ))}
+                <div className="flex justify-end gap-2">
+                  <Button variant="ghost" onClick={() => setParsed(null)}>
+                    Discard
+                  </Button>
+                  <Button variant="accent" onClick={saveParsed} disabled={savingParsed}>
+                    {savingParsed ? "Saving…" : `Save ${parsed.length} shift${parsed.length === 1 ? "" : "s"}`}
+                  </Button>
+                </div>
               </div>
-            ))}
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setParsed(null)}>
-                Discard
-              </Button>
-              <Button variant="accent" onClick={saveParsed} disabled={savingParsed}>
-                {savingParsed ? "Saving…" : `Save ${parsed.length} shift${parsed.length === 1 ? "" : "s"}`}
+            )}
+          </Section>
+
+          <Section title="Add a shift" icon="solar:add-circle-linear">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <input
+                type="datetime-local"
+                value={startAt}
+                onChange={(e) => setStartAt(e.target.value)}
+                className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
+              />
+              <input
+                type="datetime-local"
+                value={endAt}
+                onChange={(e) => setEndAt(e.target.value)}
+                className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
+              />
+              <input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Location (optional)"
+                className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+              />
+              <input
+                value={colleagues}
+                onChange={(e) => setColleagues(e.target.value)}
+                placeholder="Colleagues (optional)"
+                className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+              />
+            </div>
+            <div className="mt-3.5 flex justify-end">
+              <Button variant="accent" onClick={addShift} disabled={!startAt || !endAt}>
+                Add shift
               </Button>
             </div>
-          </div>
-        )}
-      </div>
+          </Section>
 
-      <div className="gsap-entrance relative mt-4 card p-5">
-        <span className="label">
-          Add a shift by hand
-        </span>
-        <div className="mt-2 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-          <input
-            type="datetime-local"
-            value={startAt}
-            onChange={(e) => setStartAt(e.target.value)}
-            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
-          />
-          <input
-            type="datetime-local"
-            value={endAt}
-            onChange={(e) => setEndAt(e.target.value)}
-            className="input text-sm text-neutral-700 outline-none [color-scheme:light]"
-          />
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="Location (optional)"
-            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-          />
-          <input
-            value={colleagues}
-            onChange={(e) => setColleagues(e.target.value)}
-            placeholder="Colleagues (optional)"
-            className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-          />
-        </div>
-        <div className="mt-3.5 flex justify-end">
-          <Button variant="accent" onClick={addShift} disabled={!startAt || !endAt}>
-            Add shift
-          </Button>
-        </div>
-      </div>
-
-      <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_280px]">
-        <div className="min-w-0">
-          {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
-
-          {loaded && upcoming.length === 0 ? (
-            <EmptyState
-              icon={<iconify-icon icon="solar:calendar-linear" className="text-lg" />}
-              title="No shifts on the rota"
-              description="Upload a photo of your rota, or add one above."
-            />
-          ) : (
-            SECTIONS.map(
-              ({ label, items }) =>
-                items.length > 0 && (
-                  <div key={label} className="mb-8">
-                    <h2 className="label mb-3">
-                      {label} · {items.length}
-                    </h2>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-3">
-                      {items.map((shift) => (
-                        <div key={shift.id} className="gsap-entrance">
-                          <ShiftCard {...shift} onDelete={() => remove(shift.id)} onUpdated={load} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-            )
-          )}
-        </div>
-
-        <aside className="gsap-entrance flex flex-col gap-4">
-          <SidebarCard title="Commute settings">
+          <Section
+            title="Commute"
+            icon="solar:bus-linear"
+            summary={profile.workAddress ? `${profile.arrivalBufferMinutes} min buffer` : "Not set"}
+          >
             <div className="flex flex-col gap-2">
               <input
                 value={profileDraft.homeAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, homeAddress: e.target.value }))}
                 placeholder="Home address"
-                className="input text-xs text-neutral-700 outline-none placeholder:text-neutral-400"
+                className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
               />
               <input
                 value={profileDraft.workAddress ?? ""}
                 onChange={(e) => setProfileDraft((p) => ({ ...p, workAddress: e.target.value }))}
                 placeholder="Work address"
-                className="input text-xs text-neutral-700 outline-none placeholder:text-neutral-400"
+                className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
               />
               <div className="flex items-center gap-2">
                 <input
                   type="number"
                   min={0}
                   value={profileDraft.arrivalBufferMinutes}
-                  onChange={(e) =>
-                    setProfileDraft((p) => ({ ...p, arrivalBufferMinutes: Number(e.target.value) }))
-                  }
-                  className="w-16 input text-xs text-neutral-700 outline-none"
+                  onChange={(e) => setProfileDraft((p) => ({ ...p, arrivalBufferMinutes: Number(e.target.value) }))}
+                  className="w-20 input text-sm text-neutral-700 outline-none"
                 />
                 <span className="text-xs text-neutral-500">min arrival buffer</span>
+                <Button variant="accent" onClick={saveProfile} disabled={savingProfile} className="ml-auto">
+                  {savingProfile ? "Saving…" : "Save"}
+                </Button>
               </div>
-              <Button variant="accent" onClick={saveProfile} disabled={savingProfile} className="mt-1 self-end">
-                {savingProfile ? "Saving…" : "Save"}
-              </Button>
             </div>
-          </SidebarCard>
+          </Section>
 
-          <SidebarCard title="Stats">
-            <div className="flex flex-col gap-2">
-              <Stat label="Upcoming shifts" value={upcoming.length} />
-              <Stat label="This week" value={thisWeek.length + today.length} />
-              <Stat
-                label="Next shift"
-                value={nextShift ? new Date(nextShift.startAt).toLocaleDateString([], { weekday: "short" }) : "—"}
-              />
-            </div>
-          </SidebarCard>
-        </aside>
+          <Section title="Stats" icon="solar:chart-2-linear" summary={`${upcoming.length} upcoming`}>
+            <Row title="Upcoming shifts" trailing={<span className="font-mono text-[13px] tabular text-text">{upcoming.length}</span>} />
+            <Row title="This week" trailing={<span className="font-mono text-[13px] tabular text-text">{thisWeek.length + today.length}</span>} />
+            <Row
+              title="Next shift"
+              trailing={
+                <span className="font-mono text-[13px] tabular text-text">
+                  {nextShift ? new Date(nextShift.startAt).toLocaleDateString([], { weekday: "short" }) : "—"}
+                </span>
+              }
+            />
+          </Section>
+        </Group>
       </div>
     </GsapEntrance>
   );

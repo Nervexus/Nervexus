@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { EmptyState } from "@/components/EmptyState";
-import { BookingsWidget } from "@/components/BookingsWidget";
 import { BookingRow } from "@/components/BookingRow";
 import { Pill } from "@/components/Pill";
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { Empty, Group, PageHeader, Row, Section } from "@/components/ui/layout";
 
 type Booking = {
   id: string;
@@ -28,11 +27,21 @@ const CATEGORY_ICON: Record<string, string> = {
   other: "solar:bookmark-linear",
 };
 
+const VIEWS = ["all", "confirmed", "pending", "idea", "cancelled"] as const;
+const VIEW_LABEL: Record<(typeof VIEWS)[number], string> = {
+  all: "All",
+  confirmed: "Confirmed",
+  pending: "Pending",
+  idea: "Ideas",
+  cancelled: "Cancelled",
+};
+const STATUS_ORDER: Record<string, number> = { confirmed: 0, pending: 1, idea: 2, cancelled: 3 };
+
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showCancelled, setShowCancelled] = useState(false);
+  const [view, setView] = useState<(typeof VIEWS)[number]>("all");
 
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -134,170 +143,112 @@ export default function BookingsPage() {
   const pending = active.filter((b) => b.status === "pending");
   const ideas = active.filter((b) => b.status === "idea");
 
-  const SECTIONS: { label: string; items: Booking[] }[] = [
-    { label: "Confirmed", items: confirmed },
-    { label: "Pending", items: pending },
-    { label: "Ideas", items: ideas },
-    ...(showCancelled ? [{ label: "Cancelled", items: cancelled }] : []),
-  ];
+  const shown = (view === "all" ? active : bookings.filter((b) => b.status === view))
+    .slice()
+    .sort((a, b) => (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9));
+  const views = VIEWS.filter((v) => v !== "cancelled" || cancelled.length > 0);
 
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
-      <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="page-title">Bookings</h1>
-        <Pill>{active.length} tracked</Pill>
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
+      <div className="gsap-entrance">
+        <PageHeader title="Bookings" meta={<Pill>{active.length} tracked</Pill>} sub="Laura researches and tracks. You always book it yourself." />
       </div>
-      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
-        restaurants, activities, and trips Laura&apos;s helped you look into — she researches and
-        tracks, you always complete the booking yourself
-      </p>
 
-      <div className="gsap-entrance mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="card p-5">
-          <div className="flex items-center justify-between px-1">
-            <span className="label">Search</span>
+      <div className="gsap-entrance card flex items-center gap-2 p-2 pl-4">
+        <iconify-icon icon="solar:magnifer-linear" className="shrink-0 text-lg text-muted" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && search()}
+          placeholder="Italian near Soho for 4, Friday 8pm"
+          className="min-w-0 flex-1 bg-transparent py-2 text-[14px] text-text placeholder:text-dim"
+        />
+        <button onClick={search} disabled={searching || !query.trim()} className="btn btn-primary shrink-0 !px-4 !py-2">
+          {searching ? "…" : "Search"}
+        </button>
+      </div>
+      {searchResult && (
+        <div className="gsap-entrance panel mt-3 px-4 py-3">
+          <p className="whitespace-pre-wrap text-sm text-neutral-600">{searchResult}</p>
+          <div className="mt-2 flex justify-end">
+            <Button variant="ghost" onClick={saveSearchAsIdea}>
+              Save as an idea
+            </Button>
           </div>
-          <div className="mt-3.5 flex items-center gap-2.5">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && search()}
-              placeholder="Italian near Soho for 4, Friday 8pm"
-              className="input min-w-0 flex-1"
-            />
-            <button
-              onClick={search}
-              disabled={searching || !query.trim()}
-              className="btn btn-primary shrink-0"
-            >
-              {searching ? "…" : "Go"}
+        </div>
+      )}
+
+      {error && <p className="gsap-entrance mt-4 text-sm text-red-400">{error}</p>}
+
+      <div className="gsap-entrance mt-6 overflow-x-auto">
+        <div className="tabs">
+          {views.map((v) => (
+            <button key={v} onClick={() => setView(v)} className={`tab whitespace-nowrap ${view === v ? "is-active" : ""}`}>
+              {VIEW_LABEL[v]}
             </button>
-          </div>
-          {searchResult && (
-            <div className="panel mt-3 px-4 py-3">
-              <p className="whitespace-pre-wrap text-sm text-neutral-600">{searchResult}</p>
-              <div className="mt-2 flex justify-end">
-                <Button variant="ghost" onClick={saveSearchAsIdea}>
-                  Save as an idea
-                </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="gsap-entrance mt-3">
+        <Group>
+          {!loaded ? (
+            <Empty>Loading…</Empty>
+          ) : shown.length === 0 ? (
+            <Empty>{view === "all" ? "Nothing being tracked. Search above, or add one by hand." : `No ${VIEW_LABEL[view].toLowerCase()} bookings.`}</Empty>
+          ) : (
+            shown.map((booking) => (
+              <BookingRow
+                key={booking.id}
+                {...booking}
+                onStatusChange={(status) => updateStatus(booking.id, status)}
+                onDelete={() => remove(booking.id)}
+              />
+            ))
+          )}
+        </Group>
+      </div>
+
+      <div className="gsap-entrance mt-6">
+        <Group>
+          <Section title="Add by hand" icon="solar:add-circle-linear">
+            <div className="flex flex-col gap-2">
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Dinner at Lina's" className="input text-sm" />
+              <div className="tabs w-full">
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setCategory(c)}
+                    className={`tab flex flex-1 items-center justify-center gap-1.5 !px-2 capitalize ${category === c ? "is-active" : ""}`}
+                  >
+                    <iconify-icon icon={CATEGORY_ICON[c]} className="text-base" />
+                    <span className="hidden text-[12px] sm:inline">{c}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <input type="datetime-local" value={dateTime} onChange={(e) => setDateTime(e.target.value)} className="input text-sm" />
+                <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" className="input text-sm" />
+              </div>
+              <div className="flex items-center gap-2">
+                <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="Booking link" className="input min-w-0 flex-1 text-sm" />
+                <button onClick={addBooking} disabled={!title.trim()} className="btn btn-primary shrink-0">
+                  Add
+                </button>
               </div>
             </div>
-          )}
-        </div>
-
-        <div className="card p-5">
-          <div className="flex items-center justify-between px-1">
-            <span className="label">Add by hand</span>
-          </div>
-          <div className="mt-4 flex flex-col gap-2">
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Dinner at Lina's"
-              className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-            />
-            <div className="grid grid-cols-4 gap-2">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCategory(c)}
-                  aria-label={c}
-                  className={`item flex flex-col items-center gap-1 py-2.5 transition-colors ${
-                    category === c ? "!border-white/10 !bg-ink !text-white" : "text-muted hover:text-text"
-                  }`}
-                >
-                  <iconify-icon icon={CATEGORY_ICON[c]} className="text-lg"></iconify-icon>
-                  <span className="text-[12px] capitalize">{c}</span>
-                </button>
-              ))}
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <input
-                type="datetime-local"
-                value={dateTime}
-                onChange={(e) => setDateTime(e.target.value)}
-                className="input text-sm text-neutral-700 outline-none"
-              />
-              <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Location"
-                className="input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                placeholder="Booking link"
-                className="min-w-0 flex-1 input text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
-              />
-              <button
-                onClick={addBooking}
-                disabled={!title.trim()}
-                className="btn btn-primary shrink-0"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_260px]">
-        <div className="flex min-w-0 flex-col gap-5">
-          {error && <p className="gsap-entrance text-sm text-red-400">{error}</p>}
-
-          {loaded && active.length === 0 ? (
-            <EmptyState
-              icon={<iconify-icon icon="solar:bookmark-linear" className="text-lg" />}
-              title="Nothing being tracked"
-              description="Search for somewhere to go, or add one above."
-            />
-          ) : (
-            SECTIONS.map(
-              ({ label, items }) =>
-                items.length > 0 && (
-                  <div key={label} className="gsap-entrance">
-                    <BookingsWidget count={items.length} label={label}>
-                      {items.map((booking) => (
-                        <BookingRow
-                          key={booking.id}
-                          {...booking}
-                          onStatusChange={(status) => updateStatus(booking.id, status)}
-                          onDelete={() => remove(booking.id)}
-                        />
-                      ))}
-                    </BookingsWidget>
-                  </div>
-                )
-            )
-          )}
-
-          {cancelled.length > 0 && (
-            <button
-              onClick={() => setShowCancelled((s) => !s)}
-              className="label self-start hover:text-neutral-600"
-            >
-              {showCancelled ? "Hide" : "Show"} cancelled ({cancelled.length})
-            </button>
-          )}
-        </div>
-
-        <aside className="gsap-entrance">
-          <BookingsWidget count={active.length} label="tracked">
+          </Section>
+          <Section title="Overview" icon="solar:chart-2-linear" summary={`${confirmed.length} confirmed · ${pending.length} pending`}>
             {[
               { label: "Confirmed", value: confirmed.length },
               { label: "Pending", value: pending.length },
               { label: "Ideas", value: ideas.length },
+              { label: "Cancelled", value: cancelled.length },
             ].map((s) => (
-              <div key={s.label} className="flex items-center justify-between item px-3 py-2.5">
-                <span className="text-sm text-neutral-600">{s.label}</span>
-                <span className="font-mono text-xs tabular-nums text-neutral-500">{s.value}</span>
-              </div>
+              <Row key={s.label} title={s.label} trailing={<span className="font-mono text-[13px] tabular-nums text-muted">{s.value}</span>} />
             ))}
-          </BookingsWidget>
-        </aside>
+          </Section>
+        </Group>
       </div>
     </GsapEntrance>
   );

@@ -262,36 +262,128 @@ export default function NotesPage() {
       .sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime());
   }
 
+  const pinInput = (onEnter: () => void, placeholder: string) => (
+    <input
+      type="password"
+      autoFocus
+      value={pinDraft}
+      onChange={(e) => setPinDraft(e.target.value)}
+      onKeyDown={(e) => e.key === "Enter" && onEnter()}
+      placeholder={placeholder}
+      className="input min-w-0 flex-1 text-sm"
+    />
+  );
+
   return (
-    <GsapEntrance className="relative mx-auto max-w-5xl px-4 sm:px-[26px] pb-20">
-      <div className="gsap-entrance flex items-center gap-3">
-        <h1 className="page-title">Notes</h1>
+    <GsapEntrance className="relative mx-auto max-w-3xl px-4 sm:px-[26px] pb-20">
+      <div className="gsap-entrance">
+        <PageHeader
+          title="Notes"
+          meta={<Pill>{notes.length} saved</Pill>}
+          sub="Things you've told Laura to remember, plus anything you jot down."
+        />
       </div>
-      <p className="gsap-entrance mt-2 text-sm text-neutral-500">
-        things you&apos;ve told Laura to remember, plus anything you jot down here
-      </p>
 
-      {error && <p className="gsap-entrance mt-4 text-sm text-red-400">{error}</p>}
+      {error && <p className="gsap-entrance mb-4 text-sm text-red-400">{error}</p>}
 
-      <div className="gsap-entrance mt-8 flex flex-wrap justify-center gap-x-6 gap-y-8 sm:mt-10 sm:gap-10">
-        {!loaded ? (
-          <p className="py-10 text-sm text-neutral-600">Loading…</p>
-        ) : (
-          <>
-            {folders.map((folder) => {
-              const isLocked = folder.locked && !unlockedIds.has(folder.id);
-              const panelHere = panel?.folderId === folder.id ? panel.mode : null;
-              const oldestFirst = notesByFolder(folder.id);
-              const files: FolderFileWithId[] = oldestFirst.map((n) => ({
-                name: n.title,
-                meta: `${formatMeta(n.updatedAt)}${n.imageCount ? ` · ${n.imageCount}📷` : ""}`,
-                _noteId: n.id,
-              }));
+      {!loaded ? (
+        <p className="gsap-entrance py-10 text-center text-sm text-neutral-600">Loading…</p>
+      ) : (
+        <Group title="Folders" className="gsap-entrance">
+          {folders.length === 0 && <Empty>No folders yet. Create one below.</Empty>}
+          {folders.map((folder) => {
+            const isLocked = folder.locked && !unlockedIds.has(folder.id);
+            const panelHere = panel?.folderId === folder.id ? panel.mode : null;
+            const newestFirst = notesByFolder(folder.id).reverse();
+            const swatch = FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch;
+            return (
+              <Section
+                key={folder.id}
+                title={folder.name}
+                icon={folder.locked ? "solar:lock-keyhole-minimalistic-linear" : "solar:folder-linear"}
+                summary={
+                  <span className="inline-flex items-center gap-2">
+                    {isLocked ? "Locked" : `${folder.noteCount} ${folder.noteCount === 1 ? "note" : "notes"}`}
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: swatch }} />
+                  </span>
+                }
+              >
+                {isLocked ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      {pinInput(() => submitUnlock(folder.id), "Enter PIN")}
+                      <Button
+                        onClick={() => (panelHere === "unlock" ? submitUnlock(folder.id) : openPanel({ folderId: folder.id, mode: "unlock" }))}
+                        disabled={pinBusy || (panelHere === "unlock" && !pinDraft)}
+                      >
+                        {pinBusy ? "Checking…" : "Unlock"}
+                      </Button>
+                    </div>
+                    {panelHere === "unlock" && pinError && <p className="text-xs text-red-400">{pinError}</p>}
+                  </div>
+                ) : (
+                  <>
+                    {newestFirst.length === 0 ? (
+                      <p className="py-2 text-[13px] text-muted">No notes in this folder yet.</p>
+                    ) : (
+                      newestFirst.map((n) => (
+                        <Row
+                          key={n.id}
+                          onClick={() => openNote(n.id)}
+                          title={n.title || "Untitled note"}
+                          sub={n.body ? n.body.slice(0, 90) : undefined}
+                          trailing={
+                            <span className="text-[12px] text-dim">
+                              {formatMeta(n.updatedAt)}
+                              {n.imageCount ? ` · ${n.imageCount} 📷` : ""}
+                            </span>
+                          }
+                        />
+                      ))
+                    )}
 
-              return (
-                <div key={folder.id} className="flex flex-col items-center gap-2" style={{ width: FOLDER_WIDTH }}>
-                  <div className="relative flex w-full items-center justify-between px-1">
-                    {renamingFolder === folder.id ? (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button type="button" onClick={() => addNote(folder.id)} className="btn !px-4 !py-2 text-xs">
+                        + New note
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setRenamingFolder(folder.id); setRenameValue(folder.name); }}
+                        className="btn-ghost text-xs"
+                      >
+                        Rename
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaletteFor(paletteFor === folder.id ? null : folder.id)}
+                        aria-expanded={paletteFor === folder.id}
+                        className="btn-ghost text-xs"
+                      >
+                        Colour
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => (folder.locked ? lockNow(folder.id) : openPanel({ folderId: folder.id, mode: "set-pin" }))}
+                        className="btn-ghost text-xs"
+                      >
+                        <LockIcon className="h-3.5 w-3.5" />
+                        {folder.locked ? "Lock now" : "Add lock"}
+                      </button>
+                      {folder.locked && (
+                        <button type="button" onClick={() => openPanel({ folderId: folder.id, mode: "remove-pin" })} className="btn-ghost text-xs">
+                          Remove lock
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => { if (confirm(`Delete "${folder.name}" and all its notes?`)) deleteFolder(folder.id); }}
+                        className="btn-ghost text-xs hover:!text-red-500"
+                      >
+                        Delete
+                      </button>
+                    </div>
+
+                    {renamingFolder === folder.id && (
                       <input
                         autoFocus
                         value={renameValue}
@@ -301,61 +393,12 @@ export default function NotesPage() {
                           if (e.key === "Enter") renameFolder(folder.id, renameValue);
                           if (e.key === "Escape") setRenamingFolder(null);
                         }}
-                        className="label w-0 min-w-0 flex-1 truncate rounded border border-line bg-transparent px-1 outline-none focus:border-neutral-300"
+                        className="input mt-3 text-sm"
                       />
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => { setRenamingFolder(folder.id); setRenameValue(folder.name); }}
-                        className="label truncate hover:text-text transition-colors"
-                        title="Rename folder"
-                      >
-                        {folder.name}
-                      </button>
                     )}
-                    <div className="flex shrink-0 items-center gap-1">
-                      {!isLocked && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() => setPaletteFor(paletteFor === folder.id ? null : folder.id)}
-                            aria-label="Folder colour"
-                            aria-expanded={paletteFor === folder.id}
-                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-600"
-                          >
-                            <span className="h-3.5 w-3.5 rounded-full border border-neutral-200" style={{ background: FOLDER_COLORS.find((c) => c.value === folder.art)?.swatch ?? FOLDER_COLORS[0].swatch }} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { if (confirm(`Delete "${folder.name}" and all its notes?`)) deleteFolder(folder.id); }}
-                            aria-label="Delete folder"
-                            className="flex h-6 w-6 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-red-500"
-                          >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" className="h-3.5 w-3.5" aria-hidden>
-                              <path d="M3 6h18M8 6V4h8v2M19 6v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V6" />
-                            </svg>
-                          </button>
-                        </>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          isLocked
-                            ? openPanel({ folderId: folder.id, mode: "unlock" })
-                            : folder.locked
-                              ? lockNow(folder.id)
-                              : openPanel({ folderId: folder.id, mode: "set-pin" })
-                        }
-                        aria-label={isLocked ? "Unlock folder" : folder.locked ? "Lock folder now" : "Lock this folder"}
-                        className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
-                          folder.locked ? "text-neutral-600 hover:text-neutral-800" : "text-neutral-400 hover:text-neutral-600"
-                        }`}
-                      >
-                        <LockIcon className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+
                     {paletteFor === folder.id && (
-                      <div className="absolute right-0 top-7 z-20 flex gap-1.5 rounded-xl border border-line bg-white p-2 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12)]">
+                      <div className="mt-3 flex gap-2">
                         {FOLDER_COLORS.map((c) => (
                           <button
                             key={c.value}
@@ -363,199 +406,78 @@ export default function NotesPage() {
                             onClick={() => recolorFolder(folder.id, c.value)}
                             aria-label={c.label}
                             title={c.label}
-                            className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${folder.art === c.value ? "border-neutral-800" : "border-neutral-200"}`}
+                            className={`h-7 w-7 rounded-full border-2 transition-transform hover:scale-110 ${folder.art === c.value ? "border-neutral-800" : "border-transparent"}`}
                             style={{ background: c.swatch }}
                           />
                         ))}
                       </div>
                     )}
-                  </div>
 
-                  {isLocked ? (
-                    <div
-                      className="gradient-border relative flex flex-col items-center justify-center gap-3 item p-6 backdrop-blur-md"
-                      style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
-                    >
-                      <LockIcon className="h-6 w-6 text-neutral-500" />
-                      {panelHere === "unlock" ? (
-                        <div className="flex w-full flex-col gap-2 px-2">
-                          <input
-                            type="password"
-                            autoFocus
-                            value={pinDraft}
-                            onChange={(e) => setPinDraft(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && submitUnlock(folder.id)}
-                            placeholder="PIN"
-                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
-                          />
-                          {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
-                          <div className="flex justify-center gap-3">
-                            <Button variant="ghost" onClick={closePanel}>
-                              Cancel
-                            </Button>
-                            <Button onClick={() => submitUnlock(folder.id)} disabled={pinBusy || !pinDraft}>
-                              {pinBusy ? "Checking…" : "Unlock"}
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => openPanel({ folderId: folder.id, mode: "unlock" })}
-                          className="font-mono text-xs text-neutral-500 transition-colors hover:text-neutral-700"
-                        >
-                          Enter PIN to open
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <GlassFolder
-                        key={`${folder.id}-${generation}`}
-                        width={FOLDER_WIDTH}
-                        label={folder.name}
-                        meta={`${folder.noteCount} saved`}
-                        tone={folder.tone}
-                        art={folder.art === "mono" ? MONO_ART : (folder.art as ArtPreset)}
-                        seed={hashString(folder.id) % 97}
-                        files={files}
-                        action="add"
-                        onAdd={() => {
-                          addNote(folder.id);
-                          return { name: "Untitled note", meta: "Just now" };
-                        }}
-                        onFileSelect={(file) => {
-                          const id = (file as FolderFileWithId)._noteId;
-                          if (id) openNote(id);
-                        }}
-                      />
-                      {panelHere === "set-pin" && (
-                        <div className="flex w-full flex-col gap-2 px-2">
-                          <input
-                            type="password"
-                            autoFocus
-                            value={pinDraft}
-                            onChange={(e) => setPinDraft(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && submitSetPin(folder.id)}
-                            placeholder="Choose a PIN"
-                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
-                          />
-                          {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
-                          <div className="flex justify-center gap-3">
-                            <Button variant="ghost" onClick={closePanel}>
-                              Cancel
-                            </Button>
+                    {(panelHere === "set-pin" || panelHere === "remove-pin") && (
+                      <div className="mt-3 flex flex-col gap-2">
+                        <div className="flex gap-2">
+                          {panelHere === "set-pin"
+                            ? pinInput(() => submitSetPin(folder.id), "Choose a PIN")
+                            : pinInput(() => submitRemovePin(folder.id), "Current PIN")}
+                          <Button variant="ghost" onClick={closePanel}>
+                            Cancel
+                          </Button>
+                          {panelHere === "set-pin" ? (
                             <Button onClick={() => submitSetPin(folder.id)} disabled={pinBusy || !pinDraft.trim()}>
                               {pinBusy ? "Locking…" : "Lock it"}
                             </Button>
-                          </div>
-                        </div>
-                      )}
-                      {folder.locked && panelHere !== "remove-pin" && (
-                        <button
-                          type="button"
-                          onClick={() => openPanel({ folderId: folder.id, mode: "remove-pin" })}
-                          className="font-mono text-[11px] text-neutral-400 transition-colors hover:text-neutral-600"
-                        >
-                          Remove lock
-                        </button>
-                      )}
-                      {panelHere === "remove-pin" && (
-                        <div className="flex w-full flex-col gap-2 px-2">
-                          <input
-                            type="password"
-                            autoFocus
-                            value={pinDraft}
-                            onChange={(e) => setPinDraft(e.target.value)}
-                            onKeyDown={(e) => e.key === "Enter" && submitRemovePin(folder.id)}
-                            placeholder="Current PIN"
-                            className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
-                          />
-                          {pinError && <p className="text-center text-xs text-red-400">{pinError}</p>}
-                          <div className="flex justify-center gap-3">
-                            <Button variant="ghost" onClick={closePanel}>
-                              Cancel
-                            </Button>
+                          ) : (
                             <Button variant="danger" onClick={() => submitRemovePin(folder.id)} disabled={pinBusy || !pinDraft}>
                               {pinBusy ? "Removing…" : "Remove"}
                             </Button>
-                          </div>
+                          )}
                         </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            })}
+                        {pinError && <p className="text-xs text-red-400">{pinError}</p>}
+                      </div>
+                    )}
+                  </>
+                )}
+              </Section>
+            );
+          })}
 
-            <div className="flex flex-col items-center gap-2" style={{ width: FOLDER_WIDTH }}>
-              <span className="label w-full px-1 text-transparent">·</span>
-              {addingFolder ? (
-                <div
-                  className="gradient-border relative flex flex-col items-center justify-center gap-3 item p-6 backdrop-blur-md"
-                  style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
-                >
-                  <input
-                    autoFocus
-                    value={newFolderName}
-                    onChange={(e) => setNewFolderName(e.target.value)}
-                    placeholder="Folder name"
-                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
+          <Section title="New folder" icon="solar:add-folder-linear" defaultOpen={addingFolder}>
+            <div className="flex flex-col gap-2">
+              <input
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                placeholder="Folder name"
+                className="input text-sm"
+              />
+              <input
+                type="password"
+                value={newFolderPin}
+                onChange={(e) => setNewFolderPin(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addFolder()}
+                placeholder="PIN (optional)"
+                className="input text-sm"
+              />
+              <div className="flex flex-wrap gap-2 py-1">
+                {FOLDER_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setNewFolderArt(c.value)}
+                    aria-label={c.label}
+                    title={c.label}
+                    className={`h-7 w-7 rounded-full border-2 transition-transform hover:scale-110 ${newFolderArt === c.value ? "border-neutral-800" : "border-transparent"}`}
+                    style={{ background: c.swatch }}
                   />
-                  <input
-                    type="password"
-                    value={newFolderPin}
-                    onChange={(e) => setNewFolderPin(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addFolder()}
-                    placeholder="PIN (optional)"
-                    className="w-full rounded-lg border border-line bg-white px-3 py-1.5 text-center text-sm text-neutral-800 outline-none placeholder:text-neutral-400 focus:border-neutral-300"
-                  />
-                  <div className="flex flex-wrap justify-center gap-1.5">
-                    {FOLDER_COLORS.map((c) => (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => setNewFolderArt(c.value)}
-                        aria-label={c.label}
-                        title={c.label}
-                        className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${newFolderArt === c.value ? "border-neutral-800" : "border-neutral-200"}`}
-                        style={{ background: c.swatch }}
-                      />
-                    ))}
-                  </div>
-                  {folderError && <p className="text-center text-xs text-red-400">{folderError}</p>}
-                  <div className="flex justify-center gap-3">
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        setAddingFolder(false);
-                        setNewFolderName("");
-                        setNewFolderPin("");
-                        setFolderError(null);
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button onClick={addFolder} disabled={!newFolderName.trim()}>
-                      Create
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setAddingFolder(true)}
-                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-neutral-300 text-neutral-400 transition-colors hover:border-neutral-400 hover:text-neutral-600"
-                  style={{ width: FOLDER_WIDTH, height: FOLDER_WIDTH * 0.96 }}
-                >
-                  <span className="text-2xl">+</span>
-                  <span className="font-mono text-xs">New folder</span>
-                </button>
-              )}
+                ))}
+              </div>
+              {folderError && <p className="text-xs text-red-400">{folderError}</p>}
+              <Button onClick={addFolder} disabled={!newFolderName.trim()}>
+                Create folder
+              </Button>
             </div>
-          </>
-        )}
-      </div>
+          </Section>
+        </Group>
+      )}
 
       {selected && (
         <NoteEditor

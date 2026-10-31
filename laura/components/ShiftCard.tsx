@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { IconTile } from "@/components/IconTile";
 import { Button } from "@/components/Button";
 
 function formatRange(startAt: string, endAt: string): string {
@@ -105,7 +104,7 @@ export function ShiftCard({
 
   if (editing) {
     return (
-      <div className="card flex flex-col gap-3 p-4">
+      <div className="flex flex-col gap-3 px-5 py-4">
         <span className="label">Edit shift</span>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <input
@@ -151,11 +150,11 @@ export function ShiftCard({
   }
 
   return (
-    <div className="card flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-3 px-5 py-4">
       <div className="flex items-start gap-3">
-        <IconTile>
-          <iconify-icon icon="solar:calendar-linear" className="text-lg" />
-        </IconTile>
+        <span className="row-icon">
+          <iconify-icon icon="solar:calendar-linear" />
+        </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <h3 className="text-sm font-medium text-neutral-800">{formatRange(startAt, endAt)}</h3>
@@ -182,12 +181,12 @@ export function ShiftCard({
       </div>
 
       {plan ? (
-        <div className="item px-3 py-2.5">
+        <div className="panel px-3.5 py-3">
           <p className="label">Commute plan</p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-neutral-600">{plan}</p>
         </div>
       ) : (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 pl-11">
           <Button variant="ghost" onClick={planCommute} disabled={planning}>
             {planning ? "Planning…" : "Plan commute"}
           </Button>

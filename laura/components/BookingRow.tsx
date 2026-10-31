@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { readyToBookLinks } from "@/lib/booking-links";
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -16,15 +17,12 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "cancelled",
 };
 
-function formatWhen(iso: string | null): string {
-  if (!iso) return "—";
-  const date = new Date(iso);
-  return date.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+function formatWhen(iso: string | null): string | null {
+  if (!iso) return null;
+  return new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-/** One booking, styled as its own small device panel (dotted texture,
- * rounded-2xl, monospace meta) rather than a row you have to expand --
- * everything about it is visible at a glance. */
+/** One booking as a flat row; tap it to show status, booking links and delete. */
 export function BookingRow({
   title,
   category,
@@ -48,52 +46,40 @@ export function BookingRow({
   onStatusChange: (status: string) => void;
   onDelete: () => void;
 }) {
-  // Confirmed/pending are the ones actually happening soon -- idea and
-  // cancelled stay the quiet neutral tick, same "one accent for what
-  // matters" rule as the rest of this page.
+  const [open, setOpen] = useState(false);
   const active = status === "confirmed" || status === "pending";
-  const meta = [location, partySize ? `${partySize} people` : null].filter(Boolean).join(" · ");
+  const meta = [formatWhen(dateTime), location, partySize ? `${partySize} people` : null].filter(Boolean).join(" · ");
 
   return (
-    <div className="card p-4">
-      <div className="flex items-start gap-3">
-        <span
-          className={`mt-1 h-8 w-[3px] shrink-0 rounded-full ${
-            status === "cancelled" ? "bg-neutral-200" : active ? "bg-[var(--booking-accent)]" : "bg-neutral-300"
-          }`}
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <iconify-icon
-                icon={CATEGORY_ICON[category] ?? CATEGORY_ICON.other}
-                className="shrink-0 text-sm text-neutral-500"
-              ></iconify-icon>
-              <h3 className={`text-sm font-medium ${status === "cancelled" ? "text-neutral-400 line-through" : "text-neutral-800"}`}>
-                {title}
-              </h3>
-            </div>
-          </div>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs tabular-nums text-neutral-500">
-            <span>{formatWhen(dateTime)}</span>
-            {meta && <span>· {meta}</span>}
-          </div>
-          {note && <p className="mt-2 text-sm text-neutral-400">{note}</p>}
+    <div>
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="row is-link w-full text-left">
+        <span className="row-icon">
+          <iconify-icon icon={CATEGORY_ICON[category] ?? CATEGORY_ICON.other} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className={`block truncate text-[14px] ${status === "cancelled" ? "text-dim line-through" : "text-text"}`}>{title}</span>
+          {meta && <span className="mt-0.5 block truncate text-[12px] text-muted">{meta}</span>}
+        </span>
+        <span className={`tag shrink-0 capitalize ${active ? "tag-purple" : ""}`}>{STATUS_LABEL[status] ?? status}</span>
+      </button>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line pt-3">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {Object.keys(STATUS_LABEL)
-                .filter((s) => s !== "cancelled")
-                .map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => onStatusChange(s)}
-                    className={`tag whitespace-nowrap capitalize transition-opacity ${status === s ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
-                  >
-                    {STATUS_LABEL[s]}
-                  </button>
-                ))}
-            </div>
+      {open && (
+        <div className="px-5 pb-4 pl-[64px]">
+          {note && <p className="mb-3 whitespace-pre-wrap text-[13px] text-muted">{note}</p>}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {Object.keys(STATUS_LABEL)
+              .filter((s) => s !== "cancelled")
+              .map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onStatusChange(s)}
+                  className={`tag whitespace-nowrap capitalize transition-opacity ${status === s ? "tag-purple" : "opacity-60 hover:opacity-100"}`}
+                >
+                  {STATUS_LABEL[s]}
+                </button>
+              ))}
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-1">
             {status !== "cancelled" &&
               readyToBookLinks({
                 title,
@@ -103,35 +89,23 @@ export function BookingRow({
                 partySize,
                 dateTime: dateTime ? new Date(dateTime) : null,
               }).map((l) => (
-                <a
-                  key={l.label}
-                  href={l.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px]"
-                >
+                <a key={l.label} href={l.url} target="_blank" rel="noopener noreferrer" className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px]">
                   {l.label} ↗
                 </a>
               ))}
-            <div className="ml-auto flex items-center gap-3">
+            <span className="ml-auto flex items-center gap-1">
               {status !== "cancelled" && (
-                <button
-                  onClick={() => onStatusChange("cancelled")}
-                  className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px] capitalize hover:!text-[#ff9a90]"
-                >
-                  cancel
+                <button onClick={() => onStatusChange("cancelled")} className="btn-ghost !px-2 !py-1 !text-[12px] hover:!text-red-400">
+                  Cancel
                 </button>
               )}
-              <button
-                onClick={onDelete}
-                className="btn-ghost whitespace-nowrap !px-2 !py-1 !text-[12px] capitalize hover:!text-[#ff9a90]"
-              >
-                delete
+              <button onClick={onDelete} className="btn-ghost !px-2 !py-1 !text-[12px] hover:!text-red-400">
+                Delete
               </button>
-            </div>
+            </span>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
