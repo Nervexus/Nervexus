@@ -130,7 +130,7 @@ export default function VaultPage() {
 
       <div className="gsap-entrance mt-6">
         <Group>
-          <Section title="Add to vault" icon="solar:add-circle-linear" defaultOpen={loaded && items.length === 0}>
+          <Section title="Add to vault" icon="solar:add-circle-linear">
             <div className="flex flex-col gap-2">
               <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="What is this? (e.g. Wi-Fi password)" className="input text-sm" />
               <input

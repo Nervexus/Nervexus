@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Group, Section } from "@/components/ui/layout";
 
 type Briefing = {
   shift: { startAt: string; endAt: string; location: string | null } | null;
@@ -8,7 +9,7 @@ type Briefing = {
   summary: string;
 };
 
-/** A compact "what's tomorrow look like" card on the Laura page -- the same
+/** A folded "what's tomorrow look like" row on the Laura page -- the same
  * answer get_tomorrow_briefing gives in conversation, surfaced without
  * having to ask. Renders nothing while loading or on failure (the chat
  * tool is the fallback either way), so a Turso outage never shows an
@@ -25,12 +26,16 @@ export function TomorrowBriefing() {
 
   if (!briefing || (!briefing.shift && briefing.reminders.length === 0)) return null;
 
+  const count = briefing.reminders.length;
   return (
-    <div className="gsap-entrance gradient-border relative mt-6 w-full max-w-xl item px-4 py-3 backdrop-blur-sm">
-      <span className="label">
-        Tomorrow
-      </span>
-      <p className="mt-1 text-sm leading-relaxed text-neutral-600">{briefing.summary}</p>
-    </div>
+    <Group className="gsap-entrance mt-8 w-full max-w-xl">
+      <Section
+        title="Tomorrow"
+        icon="solar:calendar-linear"
+        summary={[briefing.shift ? "Shift" : null, count ? `${count} reminder${count === 1 ? "" : "s"}` : null].filter(Boolean).join(" · ")}
+      >
+        <p className="text-sm leading-relaxed text-neutral-600">{briefing.summary}</p>
+      </Section>
+    </Group>
   );
 }

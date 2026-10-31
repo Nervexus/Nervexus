@@ -275,18 +275,22 @@ export default function NotesPage() {
                 }
               >
                 {isLocked ? (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      {pinInput(() => submitUnlock(folder.id), "Enter PIN")}
-                      <Button
-                        onClick={() => (panelHere === "unlock" ? submitUnlock(folder.id) : openPanel({ folderId: folder.id, mode: "unlock" }))}
-                        disabled={pinBusy || (panelHere === "unlock" && !pinDraft)}
-                      >
-                        {pinBusy ? "Checking…" : "Unlock"}
-                      </Button>
+                  panelHere === "unlock" ? (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        {pinInput(() => submitUnlock(folder.id), "Enter PIN")}
+                        <Button onClick={() => submitUnlock(folder.id)} disabled={pinBusy || !pinDraft}>
+                          {pinBusy ? "Checking…" : "Unlock"}
+                        </Button>
+                      </div>
+                      {pinError && <p className="text-xs text-red-400">{pinError}</p>}
                     </div>
-                    {panelHere === "unlock" && pinError && <p className="text-xs text-red-400">{pinError}</p>}
-                  </div>
+                  ) : (
+                    <button type="button" onClick={() => openPanel({ folderId: folder.id, mode: "unlock" })} className="btn !px-4 !py-2 text-xs">
+                      <LockIcon className="h-3.5 w-3.5" />
+                      Enter PIN to open
+                    </button>
+                  )
                 ) : (
                   <>
                     {newestFirst.length === 0 ? (

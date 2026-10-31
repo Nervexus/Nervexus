@@ -131,19 +131,22 @@ export default function LauraPage() {
             Clear chat
           </button>
         )}
-        <div className="tabs">
-        {(["chat", "activity"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => {
-              setChatOpen(tab === t ? !chatOpen : true);
-              setTab(t);
-            }}
-            className={`tab capitalize ${chatOpen && tab === t ? "is-active" : ""}`}
-          >
-            {t}
-          </button>
-        ))}
+        <div className="flex items-center gap-4">
+          {(["chat", "activity"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => {
+                setChatOpen(tab === t ? !chatOpen : true);
+                setTab(t);
+              }}
+              className={`relative py-1 text-[13px] capitalize transition-colors ${
+                chatOpen && tab === t ? "font-medium text-text" : "text-dim hover:text-muted"
+              }`}
+            >
+              {t}
+              {chatOpen && tab === t && <span className="absolute inset-x-0 -bottom-0.5 mx-auto h-px w-4 bg-[var(--neon)]" />}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -298,14 +301,11 @@ export default function LauraPage() {
       </div>
 
       {!hasConversation && (
-        <div className="mt-12 flex justify-center">
-          <TelegramButton />
-        </div>
-      )}
-
-      {!hasConversation && (
-        <GsapEntrance className="mt-8 flex justify-center">
+        <GsapEntrance className="flex flex-col items-center">
           <TomorrowBriefing />
+          <div className="mt-6">
+            <TelegramButton />
+          </div>
         </GsapEntrance>
       )}
     </div>
