@@ -1,20 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import GlassFolder, {
-  type ArtPreset,
-  type ArtRecipe,
-  type FolderFile,
-  hashString,
-} from "@/components/ui/glass-folder-cards";
 import { Button } from "@/components/Button";
 import { GsapEntrance } from "@/components/GsapEntrance";
+import { Pill } from "@/components/Pill";
+import { Empty, Group, PageHeader, Row, Section } from "@/components/ui/layout";
 import { LockIcon } from "@/components/icons";
 import { NoteEditor } from "@/components/NoteEditor";
 
 type Note = { id: string; title: string; body: string; pinned: boolean; folderId: string; updatedAt: string; imageCount?: number };
 type Folder = { id: string; name: string; locked: boolean; noteCount: number; art: string; tone: "dark" | "light" };
-type FolderFileWithId = FolderFile & { _noteId: string };
 
 // The colours a folder can wear. "mono" is the default grey; the rest are
 // the folder component's built-in art presets.
@@ -26,20 +21,6 @@ const FOLDER_COLORS: { value: string; label: string; swatch: string }[] = [
   { value: "glacier", label: "Glacier", swatch: "linear-gradient(135deg,#9fb4c7,#ffffff)" },
   { value: "verdant", label: "Verdant", swatch: "linear-gradient(135deg,#4f7a5a,#e9cf87)" },
 ];
-
-// Pure greys -- the app has no color accents anywhere, so the folder's
-// generated artwork uses the same neutral palette as everything else
-// instead of one of the component's colorful built-in presets.
-const MONO_ART: ArtRecipe = {
-  style: "marble",
-  colors: ["#050505", "#171717", "#404040", "#737373", "#a3a3a3", "#d4d4d4", "#f5f5f5"],
-  scale: 0.7,
-  warp: 3,
-  gloss: 0.35,
-  veins: 0.3,
-};
-
-const FOLDER_WIDTH = 270;
 
 function formatMeta(iso: string): string {
   return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric" });
@@ -57,12 +38,6 @@ export default function NotesPage() {
   const [selected, setSelected] = useState<Note | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [draftBody, setDraftBody] = useState("");
-  // Bumped after any change so <GlassFolder> remounts with the fresh list --
-  // it only reads its `files` prop once, by design ("the folder owns the
-  // list" after that), so syncing real server data back in means giving it
-  // a fresh instance rather than expecting a prop update to take effect.
-  const [generation, setGeneration] = useState(0);
-
   // Which locked folders have been unlocked for this visit -- never
   // persisted; reloading the page re-locks everything.
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
@@ -71,7 +46,6 @@ export default function NotesPage() {
   const [pinError, setPinError] = useState<string | null>(null);
   const [pinBusy, setPinBusy] = useState(false);
 
-  const [addingFolder, setAddingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderPin, setNewFolderPin] = useState("");
   const [newFolderArt, setNewFolderArt] = useState("mono");
@@ -192,7 +166,6 @@ export default function NotesPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Couldn't create the folder.");
-      setAddingFolder(false);
       setNewFolderName("");
       setNewFolderPin("");
       setNewFolderArt("mono");
@@ -205,7 +178,6 @@ export default function NotesPage() {
   async function recolorFolder(folderId: string, art: string) {
     setPaletteFor(null);
     setFolders((prev) => prev.map((f) => (f.id === folderId ? { ...f, art } : f)));
-    setGeneration((g) => g + 1);
     await fetch(`/api/notes/folders/${folderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -217,7 +189,6 @@ export default function NotesPage() {
     if (!name.trim()) return;
     setRenamingFolder(null);
     setFolders((prev) => prev.map((f) => (f.id === folderId ? { ...f, name: name.trim() } : f)));
-    setGeneration((g) => g + 1);
     await fetch(`/api/notes/folders/${folderId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -228,7 +199,6 @@ export default function NotesPage() {
   async function deleteFolder(folderId: string) {
     setFolders((prev) => prev.filter((f) => f.id !== folderId));
     setNotes((prev) => prev.filter((n) => n.folderId !== folderId));
-    setGeneration((g) => g + 1);
     await fetch(`/api/notes/folders/${folderId}`, { method: "DELETE" }).catch(() => {});
   }
 
@@ -243,19 +213,15 @@ export default function NotesPage() {
 
 
   async function addNote(folderId: string) {
-    // Fires once per "+" click: the folder shows "Untitled note" right
-    // away, and this persists the same thing behind it so a reload matches.
     await fetch("/api/notes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: "Untitled note", body: "", folderId }),
     });
-    setGeneration((g) => g + 1);
     load();
   }
 
-  // Oldest first, so the newest note ends up at the end of the array --
-  // GlassFolder stacks the LAST files frontmost, nearest the glass.
+  // Oldest first; the folder list reverses it to show the newest on top.
   function notesByFolder(folderId: string): Note[] {
     return notes
       .filter((n) => n.folderId === folderId)
@@ -441,7 +407,7 @@ export default function NotesPage() {
             );
           })}
 
-          <Section title="New folder" icon="solar:add-folder-linear" defaultOpen={addingFolder}>
+          <Section title="New folder" icon="solar:add-folder-linear">
             <div className="flex flex-col gap-2">
               <input
                 value={newFolderName}
@@ -485,10 +451,7 @@ export default function NotesPage() {
           initialTitle={draftTitle}
           initialBody={draftBody}
           onClose={() => setSelected(null)}
-          onChanged={() => {
-            setGeneration((g) => g + 1);
-            load();
-          }}
+          onChanged={load}
         />
       )}
     </GsapEntrance>
