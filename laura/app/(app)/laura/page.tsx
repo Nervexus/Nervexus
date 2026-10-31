@@ -227,7 +227,7 @@ export default function LauraPage() {
       )}
 
       <div className={hasConversation ? "mt-4" : "mt-6"}>
-        <div className="relative rounded-[22px] border border-black/[0.08] bg-white/80 p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.08)] backdrop-blur-xl focus-within:outline-none !ring-0">
+        <div className="card relative !rounded-[28px] p-3">
           <textarea
             ref={inputRef}
             value={input}
@@ -273,7 +273,7 @@ export default function LauraPage() {
                 onClick={() => sendMessage(input.trim(), false)}
                 disabled={sending || !input.trim()}
                 aria-label="Send"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-800 text-white shadow-[0_2px_8px_rgba(0,0,0,0.15)] transition-all hover:bg-neutral-900 hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] disabled:bg-neutral-200 disabled:text-neutral-400 disabled:shadow-none"
+                className="btn btn-primary !h-9 !w-9 !p-0 disabled:!opacity-30"
               >
                 <SendIcon className="h-4 w-4" />
               </button>

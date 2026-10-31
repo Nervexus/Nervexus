@@ -125,7 +125,7 @@ export default function HubPage() {
             <div className="relative shrink-0">
               <div className="absolute -inset-5 rounded-full bg-rose/50 blur-2xl" aria-hidden />
               <div className="absolute -inset-1.5 rounded-full border border-white/80" aria-hidden />
-              <div data-hub className="relative flex h-[88px] w-[88px] items-center justify-center rounded-full border border-white/80 bg-white/60 shadow-[inset_0_1px_0_#fff,0_12px_30px_-10px_rgba(212,138,158,0.5)] backdrop-blur-xl">
+              <div data-hub className="card-glow relative flex h-[88px] w-[88px] items-center justify-center !rounded-full">
                 <LogoMark className="h-8 w-8" />
               </div>
             </div>
@@ -165,8 +165,8 @@ export default function HubPage() {
             {links.map((l, i) => (
               <g key={i}>
                 <path d={l.d} stroke="rgba(58,44,52,0.2)" strokeWidth="1" strokeLinecap="round" />
-                <circle cx={l.x} cy={l.y} r="6" fill="rgba(239,195,207,0.45)" />
-                <circle cx={l.x} cy={l.y} r="3" fill="#efc3cf" />
+                <circle cx={l.x} cy={l.y} r="6" fill="rgba(255,45,85,0.18)" />
+                <circle cx={l.x} cy={l.y} r="3" fill="#ff2d55" />
               </g>
             ))}
           </svg>
