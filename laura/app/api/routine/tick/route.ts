@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runDailyMessages } from "@/lib/daily";
+import { sendDueReminders } from "@/lib/reminder-pings";
 import { syncApiIssues } from "@/lib/api-issues";
 
 // Hit every 5-10 minutes by an external scheduler (cron-job.org), with
@@ -12,7 +13,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    return NextResponse.json(await runDailyMessages());
+    const reminders = await sendDueReminders().catch((err) => {
+      console.error("reminder pings failed:", err);
+      return { sent: 0, failed: -1 };
+    });
+    return NextResponse.json({ ...(await runDailyMessages()), reminders });
   } catch (err) {
     console.error("routine tick failed:", err);
     return NextResponse.json({ error: "Tick failed." }, { status: 500 });

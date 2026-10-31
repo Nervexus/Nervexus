@@ -1235,7 +1235,7 @@ async function runTool(
     if (action === "reschedule") {
       const due = new Date(String(args.dueAt ?? ""));
       if (Number.isNaN(due.getTime())) return { error: "reschedule needs a valid ISO dueAt" };
-      await prisma.reminder.update({ where: { id }, data: { dueAt: due, done: false } });
+      await prisma.reminder.update({ where: { id }, data: { dueAt: due, done: false, notifiedAt: null } });
       await logActivity("update_reminder", `Moved "${reminder.title}"`);
       return { result: `Moved "${reminder.title}" to ${friendlyDateTime(due)}.` };
     }

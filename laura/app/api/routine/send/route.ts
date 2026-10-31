@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { runDailyMessages } from "@/lib/daily";
+import { sendDueReminders } from "@/lib/reminder-pings";
 import { syncApiIssues } from "@/lib/api-issues";
 
 // Vercel's two daily crons (vercel.json) -- a fallback for the scheduler
@@ -12,7 +13,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
-    return NextResponse.json(await runDailyMessages());
+    const reminders = await sendDueReminders().catch((err) => {
+      console.error("reminder pings failed:", err);
+      return { sent: 0, failed: -1 };
+    });
+    return NextResponse.json({ ...(await runDailyMessages()), reminders });
   } catch (err) {
     console.error("routine send failed:", err);
     return NextResponse.json({ error: "Couldn't send." }, { status: 500 });

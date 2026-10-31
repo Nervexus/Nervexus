@@ -84,6 +84,8 @@ model Reminder {
   dueAt     DateTime
   done      Boolean   @default(false)
   priority  String    @default("normal") // "low" | "normal" | "high"
+  // When the Telegram ping went out; cleared when the time changes.
+  notifiedAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }

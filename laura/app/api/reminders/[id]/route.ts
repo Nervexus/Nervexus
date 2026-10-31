@@ -11,6 +11,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
     title?: string;
     note?: string | null;
     dueAt?: Date;
+    notifiedAt?: null;
     done?: boolean;
     priority?: string;
   } = {};
@@ -22,6 +23,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
       return NextResponse.json({ error: "Invalid dueAt date." }, { status: 400 });
     }
     update.dueAt = dueAt;
+    update.notifiedAt = null;
   }
   if (typeof data?.done === "boolean") update.done = data.done;
   if (["low", "normal", "high"].includes(data?.priority)) update.priority = data.priority;
