@@ -227,7 +227,7 @@ export default function LauraPage() {
       )}
 
       <div className={hasConversation ? "mt-4" : "mt-6"}>
-        <div className="relative rounded-[22px] border border-black/[0.08] bg-white/80 p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+        <div className="relative rounded-[22px] border border-black/[0.08] bg-white/80 p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.08)] backdrop-blur-xl focus-within:outline-none !ring-0">
           <textarea
             ref={inputRef}
             value={input}
@@ -240,7 +240,7 @@ export default function LauraPage() {
             }}
             placeholder="Ask Laura anything..."
             rows={2}
-            className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-normal text-text outline-none placeholder:text-neutral-400"
+            className="w-full resize-none bg-transparent px-2 pt-1 text-[15px] font-normal text-text outline-none focus:outline-none placeholder:text-neutral-400"
           />
           <div className="mt-2 flex items-center justify-between">
             <span className="pill">
